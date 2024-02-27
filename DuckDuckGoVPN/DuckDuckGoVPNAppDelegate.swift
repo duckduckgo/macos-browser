@@ -131,7 +131,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     }()
 
     private func handleControllerEvent(_ event: TransparentProxyController.Event) {
-        PixelKit.fire(event)
+
     }
 
     @MainActor
@@ -233,7 +233,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             },
             agentLoginItem: nil,
             isMenuBarStatusView: true,
-            accountManager: AccountManager()
+            entitlementCheck: {
+                return await AccountManager().hasEntitlement(for: .networkProtection)
+            })
     }
 
     @MainActor

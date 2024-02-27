@@ -94,7 +94,6 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
-        private let entitlementCheck: @escaping () async -> Swift.Result<Bool, Error>
         private let entitlementMonitor: NetworkProtectionEntitlementMonitor
 
         private var cancellables = Set<AnyCancellable>()
@@ -127,7 +126,6 @@ extension NetworkProtectionStatusView {
             self.agentLoginItem = agentLoginItem
             self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
-            self.accountManager = accountManager
             self.entitlementMonitor = NetworkProtectionEntitlementMonitor()
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
@@ -156,26 +154,19 @@ extension NetworkProtectionStatusView {
             }
             .store(in: &cancellables)
 
-//            Task {
-//                await entitlementMonitor.start {
-//                    await accountManager.hasEntitlement(for: "subscriber")
-//                } callback: { [weak self] result in
-//                    guard let self else { return }
-//                    switch result {
-//                    case .validEntitlement:
-//                        self.shouldShowSubscriptionExpired = false
-//                    case .error(let error):
-//                        guard case .invalid = error else { break }
-//                        self.shouldShowSubscriptionExpired = true
-//                    }
-//                }
-//
-//                if await accountManager.hasEntitlement(for: "subscriber") {
-//                    shouldShowSubscriptionExpired = false
-//                } else {
-//                    shouldShowSubscriptionExpired = true
-//                }
-//            }
+            Task {
+                await entitlementMonitor.start(entitlementCheck: entitlementCheck) { [weak self] result in
+                    guard let self else { return }
+                    switch result {
+                    case .validEntitlement:
+                        self.shouldShowSubscriptionExpired = false
+                    case .invalidEntitlement:
+                        self.shouldShowSubscriptionExpired = true
+                    case .error:
+                        break
+                    }
+                }
+            }
         }
 
         func refreshLoginItemStatus() {

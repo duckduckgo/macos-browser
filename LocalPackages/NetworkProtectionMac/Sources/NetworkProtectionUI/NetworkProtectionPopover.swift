@@ -67,7 +67,8 @@ public final class NetworkProtectionPopover: NSPopover {
                                                        appLauncher: appLauncher,
                                                        menuItems: menuItems,
                                                        agentLoginItem: agentLoginItem,
-                                                       isMenuBarStatusView: isMenuBarStatusView)
+                                                       isMenuBarStatusView: isMenuBarStatusView,
+                                                       entitlementCheck: entitlementCheck)
 
         super.init()
 

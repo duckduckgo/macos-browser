@@ -23,7 +23,7 @@ import NetworkProtection
 import NetworkExtension
 import Networking
 import PixelKit
-import Subscription
+// import Subscription
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
@@ -244,7 +244,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    settings: settings,
                    isSubscriptionEnabled: true,
                    entitlementCheck: {
+#if SUBSCRIPTION && NETP_SYSTEM_EXTENSION
             await AccountManager().hasEntitlement(for: .networkProtection)
+#else
+            return .success(true)
+#endif
         })
 
         observeServerChanges()
@@ -424,27 +428,15 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
-}
-
-extension PacketTunnelProvider.SubscriptionConfiguration {
-#if SUBSCRIPTION
-    static func makeConfiguration() -> PacketTunnelProvider.SubscriptionConfiguration {
-        .init(
-            isSubscriptionEnabled: true,
-            isEntitlementValid: Self.isEntitlementValid
-        )
-    }
-
+#if SUBSCRIPTION && NETP_SYSTEM_EXTENSION
     static func isEntitlementValid() async -> Bool {
         // todo - https://app.asana.com/0/0/1206470585910128/f
-        await AccountManager().hasEntitlement(for: "dummy1")
+        await AccountManager().hasEntitlement(for: .networkProtection)
     }
 #else
-    static func makeConfiguration() -> PacketTunnelProvider.SubscriptionConfiguration {
-        .init(
-            isSubscriptionEnabled: false,
-            isEntitlementValid: { true }
-        )
+    static func isEntitlementValid() async -> Bool {
+        return false
     }
 #endif
+
 }
