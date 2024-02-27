@@ -18,8 +18,8 @@
 
 import AppKit
 import BrowserServicesKit
-import Foundation
 import CoreData
+import Foundation
 import Persistence
 
 final class Database {
@@ -52,6 +52,14 @@ final class Database {
                 return (nil, error)
             }
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
+            _=mainModel.registerValueTransformers(withAllowedPropertyClasses: [
+                NSImage.self,
+                NSString.self,
+                NSURL.self,
+                NSNumber.self,
+                NSError.self,
+                NSData.self
+            ], keyStore: keyStore)
             let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
             return (CoreDataDatabase(name: Constants.databaseName,
@@ -108,6 +116,62 @@ extension Array where Element == CoreDataErrorsParser.ErrorInfo {
         }
         return params
     }
+}
+
+extension ValueTransformer {
+
+    static func registerValueTransformer(for propertyClass: AnyClass, with keyStore: EncryptionKeyStoring) -> NSValueTransformerName {
+        guard let encodableType = propertyClass as? (NSObject & NSSecureCoding).Type else {
+            fatalError("Unsupported type")
+        }
+        func registerValueTransformer<T: NSObject & NSSecureCoding>(for type: T.Type) -> NSValueTransformerName {
+            (try? EncryptedValueTransformer<T>.registerTransformer(keyStore: keyStore))!
+            return EncryptedValueTransformer<T>.transformerName
+        }
+        return registerValueTransformer(for: encodableType)
+    }
+
+}
+
+extension NSManagedObjectModel {
+
+    private static let transformerUserInfoKey = "transformer"
+    func registerValueTransformers(withAllowedPropertyClasses allowedPropertyClasses: [AnyClass]? = nil,
+                                   keyStore: EncryptionKeyStoring) -> [NSValueTransformerName] {
+        var registeredTransformers = [NSValueTransformerName]()
+        let allowedPropertyClassNames = allowedPropertyClasses.map { Set($0.map(NSStringFromClass)) }
+
+        // fix "no NSValueTransformer with class name 'X'" warnings
+        // https://stackoverflow.com/a/77623593/748453
+        for entity in self.entities {
+            for property in entity.properties {
+                guard let property = property as? NSAttributeDescription, property.attributeType == .transformableAttributeType else { continue }
+                guard let transformerName = (property.valueTransformerName?.isEmpty ?? true) ? property.userInfo?[Self.transformerUserInfoKey] as? String : property.valueTransformerName,
+                      !transformerName.isEmpty else {
+                    assertionFailure("Transformer (User Info `transformer` key) not set for \(entity).\(property)")
+                    continue
+                }
+                guard ValueTransformer(forName: .init(rawValue: transformerName)) == nil else { continue }
+
+                let propertyClassName = transformerName.dropping(suffix: "Transformer")
+                assert(propertyClassName != transformerName, "Expected Transformer name like `NSStringTransformer`")
+                guard allowedPropertyClassNames?.contains(propertyClassName ) != false,
+                      let propertyClass = NSClassFromString(propertyClassName) else {
+                    assertionFailure("Invalid class name `\(propertyClassName)` for \(transformerName)")
+                    continue
+                }
+
+                let transformer = ValueTransformer.registerValueTransformer(for: propertyClass, with: keyStore)
+                assert(ValueTransformer(forName: .init(transformerName)) != nil)
+                registeredTransformers.append(transformer)
+
+                property.userInfo?.removeValue(forKey: Self.transformerUserInfoKey)
+                property.valueTransformerName = transformerName
+            }
+        }
+        return registeredTransformers
+    }
+
 }
 
 extension NSManagedObjectContext {
