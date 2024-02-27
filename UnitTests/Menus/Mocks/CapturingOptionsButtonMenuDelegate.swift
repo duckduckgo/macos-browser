@@ -89,6 +89,6 @@ class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
-        
+
     }
 }
