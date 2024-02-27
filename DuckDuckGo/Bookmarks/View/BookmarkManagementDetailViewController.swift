@@ -507,13 +507,12 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
 
         func updateToolbarButtons() {
-            toolbarButtonsStackView.layoutSubtreeIfNeeded()
+            let shouldShowDeleteButton = indexes.count > 1
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.25
-                deleteItemsButton.animator().isHidden = indexes.count <= 1
-                newBookmarkButton.animator().isHidden = !deleteItemsButton.isHidden
-                newFolderButton.animator().isHidden = !deleteItemsButton.isHidden
-                toolbarButtonsStackView.layoutSubtreeIfNeeded()
+                deleteItemsButton.animator().isHidden = !shouldShowDeleteButton
+                newBookmarkButton.animator().isHidden = shouldShowDeleteButton
+                newFolderButton.animator().isHidden = shouldShowDeleteButton
             }
         }
 
