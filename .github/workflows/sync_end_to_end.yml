@@ -2,21 +2,19 @@ name: Sync-End-to-End tests
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 */4 * * *'  # Runs every 4 hours for flakiness check
   # schedule:
   #   - cron: '0 5 * * *' # run at 5 AM UTC
 
 jobs:
   sync-end-to-end-tests:
     name: Sync End to end Tests
-    runs-on: macos-13-xlarge
+    runs-on: [macos-13-xlarge, macos-14-xlarge]
 
     timeout-minutes: 60
 
     steps:
     - name: Check out the code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
