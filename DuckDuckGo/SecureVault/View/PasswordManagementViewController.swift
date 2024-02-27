@@ -1081,14 +1081,14 @@ extension PasswordManagementViewController: NSMenuItemValidation {
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
         case #selector(PasswordManagementViewController.onDeleteAllPasswordsClicked(_:)):
-            return areTherePasswords
+            return haveDuckDuckGoPasswords
         default:
             guard let appDelegate = NSApplication.shared.delegate as? AppDelegate else { return false }
             return appDelegate.validateMenuItem(menuItem)
         }
     }
 
-    private var areTherePasswords: Bool {
+    private var haveDuckDuckGoPasswords: Bool {
         guard let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared) else { return false }
         let accounts = (try? vault.accounts()) ?? []
         return !accounts.isEmpty
