@@ -107,7 +107,7 @@ extension AppDelegate {
     // MARK: - Window
 
     @objc func reopenAllWindowsFromLastSession(_ sender: Any?) {
-        stateRestorationManager.restoreLastSessionState(interactive: true)
+        _=stateRestorationManager.restoreLastSessionState(interactive: true)
     }
 
     // MARK: - Help

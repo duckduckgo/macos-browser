@@ -241,7 +241,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         startupSync()
 
-        stateRestorationManager.applicationDidFinishLaunching()
+        if [.normal, .uiTests].contains(NSApp.runType) {
+            stateRestorationManager.applicationDidFinishLaunching()
+        }
 
         BWManager.shared.initCommunication()
 
