@@ -66,7 +66,7 @@ jobs:
       uses: actions/download-artifact@v4
 
     - name: Copy app to /Applications
-      run: cp -R DuckDuckGo-review-${{ env.app-version }}.app /Applications
+      run: cp -R DuckDuckGo-review-${{ env.app-version }}.app /Applications/DuckDuckGo\ Review.app
 
     - name: Set cache key hash
       run: |
