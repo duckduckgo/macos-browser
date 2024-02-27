@@ -51,7 +51,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         self.submenu = makeSubmenu()
     }
 
-    private func makeSubmenu() -> NSMenu{
+    private func makeSubmenu() -> NSMenu {
         let menu = NSMenu(title: "")
 
         menu.addItem(NSMenuItem(title: "Simulate Subscription Active State (fake token)", action: #selector(simulateSubscriptionActiveState), target: self))
@@ -67,11 +67,30 @@ public final class SubscriptionDebugMenu: NSMenuItem {
             menu.addItem(NSMenuItem(title: "Sync App Store AppleID Account (re- sign-in)", action: #selector(syncAppleIDAccount), target: self))
             menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
         }
+
+        let environmentItem = NSMenuItem(title: "Environment", action: nil, target: nil)
+        environmentItem.submenu = makeEnvironmentSubmenu()
+        menu.addItem(environmentItem)
+
         menu.addItem(.separator())
         
         let internalTestingItem = NSMenuItem(title: "Internal testing", action: #selector(toggleInternalTesting), target: self)
         internalTestingItem.state = isInternalTestingEnabled() ? .on : .off
         menu.addItem(internalTestingItem)
+
+        return menu
+    }
+
+    private func makeEnvironmentSubmenu() -> NSMenu {
+        let menu = NSMenu(title: "Select environment:")
+
+        let stagingItem = NSMenuItem(title: "Staging", action: #selector(setEnvironmentToStaging), target: self)
+        stagingItem.state = .on
+        menu.addItem(stagingItem)
+
+        let productionItem = NSMenuItem(title: "Production", action: #selector(setEnvironmentToProduction), target: self)
+        productionItem.state = .off
+        menu.addItem(productionItem)
 
         return menu
     }
@@ -151,6 +170,34 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         }
     }
 
+    @IBAction func showPurchaseView(_ sender: Any?) {
+        if #available(macOS 12.0, *) {
+            currentViewController()?.presentAsSheet(DebugPurchaseViewController())
+        }
+    }
+
+    @IBAction func setEnvironmentToStaging(_ sender: Any?) {
+        let alert = makeAlert(title: "Are you sure you want to change the environment to Staging",
+                              message: "Please make sure you have manually removed your current active Subscription and reset all related features.",
+                              buttonNames: ["Yes", "No"])
+        let response = alert.runModal()
+
+        guard case .alertFirstButtonReturn = response else { return }
+
+        print("to staging!")
+    }
+
+    @IBAction func setEnvironmentToProduction(_ sender: Any?) {
+        let alert = makeAlert(title: "Are you sure you want to change the environment to Production",
+                              message: "Please make sure you have manually removed your current active Subscription and reset all related features.",
+                              buttonNames: ["Yes", "No"])
+        let response = alert.runModal()
+
+        guard case .alertFirstButtonReturn = response else { return }
+
+        print("to production!")
+    }
+
     @objc
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
@@ -167,12 +214,9 @@ public final class SubscriptionDebugMenu: NSMenuItem {
             let shouldShowAlert = currentValue == false
 
             if shouldShowAlert {
-                let alert = NSAlert()
-                alert.messageText = "Are you sure you want to enable internal testing"
-                alert.informativeText = "Only enable this option if you are participating in internal testing and have been requested to do so."
-                alert.addButton(withTitle: "Yes")
-                alert.addButton(withTitle: "No")
-
+                let alert = makeAlert(title: "Are you sure you want to enable internal testing",
+                                      message: "Only enable this option if you are participating in internal testing and have been requested to do so.",
+                                      buttonNames: ["Yes", "No"])
                 let response = alert.runModal()
 
                 guard case .alertFirstButtonReturn = response else { return }
@@ -183,22 +227,23 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         }
     }
 
-    @IBAction func showPurchaseView(_ sender: Any?) {
-        if #available(macOS 12.0, *) {
-            currentViewController()?.presentAsSheet(DebugPurchaseViewController())
+    private func showAlert(title: String, message: String? = nil) {
+        Task { @MainActor in
+            makeAlert(title: title, message: message).runModal
         }
     }
 
-    private func showAlert(title: String, message: String? = nil) {
-        Task { @MainActor in
-            let alert = NSAlert()
-            alert.messageText = title
-            if let message = message {
-                alert.informativeText = message
-            }
-            alert.addButton(withTitle: "OK")
-            alert.runModal()
+    private func makeAlert(title: String, message: String? = nil, buttonNames: [String] = ["Ok"]) -> NSAlert{
+        let alert = NSAlert()
+        alert.messageText = title
+        if let message = message {
+            alert.informativeText = message
         }
+
+        for buttonName in buttonNames {
+            alert.addButton(withTitle: buttonName)
+        }
+        return alert
     }
 }
 
