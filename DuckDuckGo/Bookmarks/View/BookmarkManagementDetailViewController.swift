@@ -96,6 +96,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
         emptyState.isHidden = true
         emptyState.translatesAutoresizingMaskIntoConstraints = false
+        importButton.translatesAutoresizingMaskIntoConstraints = false
 
         configureEmptyState(
             label: emptyStateTitle,
@@ -161,45 +162,47 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     private func setupLayout() {
-        toolbarButtonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48).isActive = true
-        view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 48).isActive = true
-        separator.topAnchor.constraint(equalTo: toolbarButtonsStackView.bottomAnchor, constant: 24).isActive = true
-        emptyState.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20).isActive = true
-        scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            toolbarButtonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
+            view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 48),
+            separator.topAnchor.constraint(equalTo: toolbarButtonsStackView.bottomAnchor, constant: 24),
+            emptyState.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20),
+            scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor),
 
-        view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        view.trailingAnchor.constraint(greaterThanOrEqualTo: toolbarButtonsStackView.trailingAnchor, constant: 20).isActive = true
-        view.trailingAnchor.constraint(equalTo: separator.trailingAnchor, constant: 58).isActive = true
-        emptyState.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 58).isActive = true
-        toolbarButtonsStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 32).isActive = true
-        emptyState.topAnchor.constraint(greaterThanOrEqualTo: separator.bottomAnchor, constant: 8).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48).isActive = true
-        emptyState.centerXAnchor.constraint(equalTo: separator.centerXAnchor).isActive = true
+            view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            view.trailingAnchor.constraint(greaterThanOrEqualTo: toolbarButtonsStackView.trailingAnchor, constant: 20),
+            view.trailingAnchor.constraint(equalTo: separator.trailingAnchor, constant: 58),
+            emptyState.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 58),
+            toolbarButtonsStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 32),
+            emptyState.topAnchor.constraint(greaterThanOrEqualTo: separator.bottomAnchor, constant: 8),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48),
+            emptyState.centerXAnchor.constraint(equalTo: separator.centerXAnchor),
 
-        newBookmarkButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
-        newFolderButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
-        deleteItemsButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
+            newBookmarkButton.heightAnchor.constraint(equalToConstant: 24),
+            newFolderButton.heightAnchor.constraint(equalToConstant: 24),
+            deleteItemsButton.heightAnchor.constraint(equalToConstant: 24),
 
-        emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+            emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor),
 
-        importButton.translatesAutoresizingMaskIntoConstraints = false
-        importButton.topAnchor.constraint(equalTo: emptyStateMessage.bottomAnchor, constant: 8).isActive = true
-        emptyState.heightAnchor.constraint(equalToConstant: 218).isActive = true
-        emptyStateMessage.topAnchor.constraint(equalTo: emptyStateTitle.bottomAnchor, constant: 8).isActive = true
-        importButton.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
-        emptyStateImageView.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
-        emptyState.widthAnchor.constraint(equalToConstant: 224).isActive = true
-        emptyStateImageView.topAnchor.constraint(equalTo: emptyState.topAnchor).isActive = true
-        emptyStateTitle.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
-        emptyStateTitle.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 8).isActive = true
+            importButton.topAnchor.constraint(equalTo: emptyStateMessage.bottomAnchor, constant: 8),
+            emptyState.heightAnchor.constraint(equalToConstant: 218),
+            emptyStateMessage.topAnchor.constraint(equalTo: emptyStateTitle.bottomAnchor, constant: 8),
+            importButton.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor),
+            emptyStateImageView.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor),
+            emptyState.widthAnchor.constraint(equalToConstant: 224),
+            emptyStateImageView.topAnchor.constraint(equalTo: emptyState.topAnchor),
+            emptyStateTitle.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor),
+            emptyStateTitle.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 8),
 
-        emptyStateMessage.widthAnchor.constraint(equalToConstant: 192).isActive = true
+            emptyStateMessage.widthAnchor.constraint(equalToConstant: 192),
 
-        emptyStateTitle.widthAnchor.constraint(equalToConstant: 192).isActive = true
+            emptyStateTitle.widthAnchor.constraint(equalToConstant: 192),
 
-        emptyStateImageView.widthAnchor.constraint(equalToConstant: 128).isActive = true
-        emptyStateImageView.heightAnchor.constraint(equalToConstant: 96).isActive = true
+            emptyStateImageView.widthAnchor.constraint(equalToConstant: 128),
+            emptyStateImageView.heightAnchor.constraint(equalToConstant: 96),
+        ])
+
     }
 
     override func viewDidLoad() {
@@ -548,7 +551,6 @@ private extension BookmarkManagementDetailViewController {
         button.mouseOverColor = .buttonMouseOverColor
         button.imageHugsTitle = true
         button.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        button.translatesAutoresizingMaskIntoConstraints = false
         button.alignment = .center
         button.font = .systemFont(ofSize: 13)
         button.image = image
