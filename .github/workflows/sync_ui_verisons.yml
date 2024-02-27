@@ -65,9 +65,6 @@ jobs:
     - name: Download and unzip artifact
       uses: actions/download-artifact@v4
 
-    - name: Copy app to /Applications
-      run: cp -R DuckDuckGo-review-${{ env.app-version }}.app /Applications/DuckDuckGo\ Review.app
-
     - name: Set cache key hash
       run: |
         has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
@@ -112,7 +109,16 @@ jobs:
       with:
         debug: true
 
-    - name: Build and run Sync e2e tests
+    - name: Build test runner 
+      run: |
+        set -o pipefail && xcodebuild build-for-testing \
+          -scheme "SyncE2EUITestsOldVersions" \
+          -configuration Review 
+    
+    - name: Copy app to /DerivedData
+      run: cp -R DuckDuckGo-review-${{ env.app-version }}.app /Users/runner/Library/Developer/Xcode/DerivedData/DuckDuckGo-*/Build/Products/Review/DuckDuckGo.app
+
+    - name: Run tests
       env:
         CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
       run: |
@@ -120,11 +126,11 @@ jobs:
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
         set -o pipefail && xcodebuild test-without-building \
-          -configuration Review \
           -scheme "SyncE2EUITestsOldVersions" \
+          -configuration Review \
         | tee xcodebuild.log \
         | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml \
-    
+
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v3
       if: always() 
