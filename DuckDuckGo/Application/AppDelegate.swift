@@ -188,6 +188,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -281,6 +282,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if SUBSCRIPTION
         Task {
+            var defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
+
+            let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
+                                                         defaultValue: defaultEnvironment).wrappedValue
+            SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
+
     #if STRIPE
             SubscriptionPurchaseEnvironment.current = .stripe
     #else

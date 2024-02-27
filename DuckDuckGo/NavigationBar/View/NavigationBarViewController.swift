@@ -330,12 +330,14 @@ final class NavigationBarViewController: NSViewController {
         }
 
         #if SUBSCRIPTION
-        let accountManager = AccountManager()
-        let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+            let accountManager = AccountManager()
+            let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
 
-        if accountManager.accessToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
-            print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
-            return
+            if accountManager.accessToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
+                print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
+                return
+            }
         }
         #endif
 
@@ -370,7 +372,7 @@ final class NavigationBarViewController: NSViewController {
 
 #if NETWORK_PROTECTION
     func listenToVPNToggleNotifications() {
-        vpnToggleCancellable = NotificationCenter.default.publisher(for: .ToggleNetworkProtectionInMainWindow).sink { [weak self] _ in
+        vpnToggleCancellable = NotificationCenter.default.publisher(for: .ToggleNetworkProtectionInMainWindow).receive(on: DispatchQueue.main).sink { [weak self] _ in
             guard self?.view.window?.isKeyWindow == true else {
                 return
             }
@@ -1032,6 +1034,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 #if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+    }
+
+    func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
+        WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
     }
 #endif
 
