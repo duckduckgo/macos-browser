@@ -5,7 +5,7 @@ on:
   push: 
     branches:
       - "kieran/sync-tests"
-      
+
   # schedule:
   #   - cron: '0 5 * * *' # run at 5 AM UTC
 
@@ -16,6 +16,7 @@ jobs:
     with:
       release-type: review
       create-dmg: false
+      asana-task-url: ""
       branch: "kieran/sync-tests" #temp
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
