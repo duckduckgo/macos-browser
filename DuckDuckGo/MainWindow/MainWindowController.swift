@@ -314,10 +314,7 @@ fileprivate extension MainMenu {
 fileprivate extension NavigationBarViewController {
 
     var controlsForUserPrevention: [NSControl?] {
-        return [goBackButton,
-                goForwardButton,
-                refreshOrStopButton,
-                optionsButton,
+        return [optionsButton,
                 bookmarkListButton,
                 passwordManagementButton,
                 addressBarViewController?.addressBarTextField,

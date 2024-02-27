@@ -611,7 +611,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let burnerMode: BurnerMode
 
-    @Published private(set) var content: TabContent {
+    @PublishedAfter private(set) var content: TabContent {
         didSet {
             if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
                 webView.stopAllMedia(shouldStopLoading: false)
@@ -680,17 +680,16 @@ protocol NewWindowPolicyDecisionMaker {
             }
             return
         }
-        var title = webView.title?.trimmingWhitespace()
-        if title?.isEmpty ?? true {
-            title = webView.url?.host?.droppingWwwPrefix()
-        }
 
+        let title = webView.title?.trimmingWhitespace()
         if title != self.title {
             self.title = title
         }
 
         if let wkBackForwardListItem = webView.backForwardList.currentItem,
-           content.urlForWebView == wkBackForwardListItem.url {
+           content.urlForWebView == wkBackForwardListItem.url,
+           !webView.isLoading,
+           title?.isEmpty == false {
             wkBackForwardListItem.tabTitle = title
         }
     }
@@ -701,6 +700,9 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
     let permissions: PermissionModel
+
+    @Published private(set) var lastWebError: Error?
+    @Published private(set) var lastHttpStatusCode: Int?
 
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var loadingProgress: Double = 0.0
@@ -831,7 +833,15 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         userInteractionDialog = nil
-        return webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
+        let navigation = webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
+        // update TabContent source to .historyEntry on navigation
+        navigation?.appendResponder(willStart: { [weak self] navigation in
+            guard let self,
+                  case .url(let url, credential: let credential, .webViewUpdated) = self.content,
+                  url == navigation.url else { return }
+            self.content = .url(url, credential: credential, source: .historyEntry)
+        })
+        return navigation
     }
 
     @MainActor
@@ -840,7 +850,15 @@ protocol NewWindowPolicyDecisionMaker {
         guard canGoForward else { return nil }
 
         userInteractionDialog = nil
-        return webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
+        let navigation = webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
+        // update TabContent source to .historyEntry on navigation
+        navigation?.appendResponder(willStart: { [weak self] navigation in
+            guard let self,
+                  case .url(let url, credential: let credential, _) = self.content,
+                  url == navigation.url else { return }
+            self.content = .url(url, credential: credential, source: .historyEntry)
+        })
+        return navigation
     }
 
     @MainActor
@@ -887,8 +905,16 @@ protocol NewWindowPolicyDecisionMaker {
             return nil
         }
 
-        return webView.navigator()?.go(to: backForwardNavigation.item,
-                                       withExpectedNavigationType: .backForward(distance: backForwardNavigation.distance))
+        let navigation = webView.navigator()?.go(to: backForwardNavigation.item,
+                                                 withExpectedNavigationType: .backForward(distance: backForwardNavigation.distance))
+        // update TabContent source to .historyEntry on navigation
+        navigation?.appendResponder(willStart: { [weak self] navigation in
+            guard let self,
+                  case .url(let url, credential: let credential, _) = self.content,
+                  url == navigation.url else { return }
+            self.content = .url(url, credential: credential, source: .historyEntry)
+        })
+        return navigation
     }
 
     func openHomePage() {
@@ -896,9 +922,9 @@ protocol NewWindowPolicyDecisionMaker {
 
         if startupPreferences.launchToCustomHomePage,
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
-            webView.load(URLRequest(url: customURL))
+            setContent(.url(customURL, credential: nil, source: .ui))
         } else {
-            webView.load(URLRequest(url: .newtab))
+            setContent(.newtab)
         }
     }
 
@@ -922,12 +948,13 @@ protocol NewWindowPolicyDecisionMaker {
            // interpreting the action as user-initiated link navigation causing a new tab opening when Cmd is pressed
            let redirectUrl = URL(string: "javascript:location.replace('\(failingUrl.absoluteString.escapedJavaScriptString())')") {
 
+            self.content = .url(failingUrl, credential: nil, source: .reload)
             webView.load(URLRequest(url: redirectUrl))
             return nil
         }
 
+        self.content = content.forceReload()
         if webView.url == nil, content.isUrl {
-            self.content = content.forceReload()
             // load from cache or interactionStateData when called by lazy loader
             return reloadIfNeeded(shouldLoadInBackground: true)
         } else {
@@ -943,43 +970,55 @@ protocol NewWindowPolicyDecisionMaker {
         audioState = webView.audioState()
     }
 
+    private func tabContentReloadInfo(for content: TabContent, shouldLoadInBackground: Bool) -> (url: URL, source: TabContent.URLSource, forceReload: Bool)? {
+        switch content {
+        case .url(let url, _, source: let source):
+            let forceReload = url.absoluteString == source.userEnteredValue ? shouldLoadInBackground : (source == .reload)
+            return (url, source, forceReload: forceReload)
+
+        case .subscription(let url):
+            return (url, .ui, forceReload: false)
+
+        case .newtab, .bookmarks, .onboarding, .dataBrokerProtection, .settings:
+            guard let contentUrl = content.urlForWebView, webView.url != contentUrl else { return nil }
+
+            return (contentUrl, .ui, forceReload: true) // always navigate built-in ui (duck://) urls
+
+        case .none:
+            return nil
+        }
+    }
+
     @MainActor(unsafe)
     @discardableResult
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) -> ExpectedNavigation? {
-        let source: TabContent.URLSource
-        let url: URL
-        if case .url(let contentUrl, _, source: let urlSource) = content {
-            url = contentUrl
-            source = urlSource
-        } else if let contentUrl = content.urlForWebView {
-            url = contentUrl
-            source = .ui
-        } else {
+        guard let (url, source, forceReload) = tabContentReloadInfo(for: content, shouldLoadInBackground: shouldLoadInBackground),
+              forceReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) else { return nil }
+
+        if case .settings = content, case .settings = webView.url.flatMap({ TabContent.contentFromURL($0, source: .ui) }) {
+            // replace WebView URL without adding a new history item if switching settings panes
+            webView.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: nil, in: .defaultClient)
             return nil
         }
 
-        let forceReload = (url.absoluteString == content.userEnteredValue) ? shouldLoadInBackground : (source == .reload)
-        if forceReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
-            if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading {
-                return reload()
-            }
-            if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
-            invalidateInteractionStateData()
-
-            if url.isFileURL {
-                return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                    .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
-            }
-
-            var request = URLRequest(url: url, cachePolicy: source.cachePolicy)
-            if #available(macOS 12.0, *), content.isUserEnteredUrl {
-                request.attribution = .user
-            }
-
-            return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: source.navigationType)
+        if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading {
+            return reload()
         }
-        return nil
+        if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
+        invalidateInteractionStateData()
+
+        if url.isFileURL {
+            return webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
+        }
+
+        var request = URLRequest(url: url, cachePolicy: source.cachePolicy)
+        if #available(macOS 12.0, *), content.isUserEnteredUrl {
+            request.attribution = .user
+        }
+
+        return webView.navigator(distributedNavigationDelegate: navigationDelegate)
+            .load(request, withExpectedNavigationType: source.navigationType)
     }
 
     @MainActor
@@ -1269,6 +1308,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
+        if lastWebError != nil { lastWebError = nil }
 
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
     }
@@ -1278,6 +1318,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
                                                         response: navigationResponse.response as? HTTPURLResponse)
 
+        lastHttpStatusCode = navigationResponse.httpStatusCode
+
         return .next
     }
 
@@ -1285,9 +1327,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func didStart(_ navigation: Navigation) {
         webViewDidStartNavigationPublisher.send()
         delegate?.tabDidStartNavigation(self)
+        permissions.tabDidStartNavigation()
         userInteractionDialog = nil
 
         // Unnecessary assignment triggers publishing
+        if lastWebError != nil { lastWebError = nil }
         if error != nil,
            navigation.navigationAction.navigationType != .alternateHtmlLoad { // error page navigation
             error = nil
@@ -1325,6 +1369,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
             loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
         }
+    }
+
+    @MainActor
+    func didFailProvisionalLoad(with request: URLRequest, in frame: WKFrameInfo, with error: Error) {
+        lastWebError = error
     }
 
     @MainActor
