@@ -346,6 +346,7 @@ final class BrokerJSONCodableTests: XCTestCase {
         }
     }
 
+    // swiftlint:disable function_body_length
     func testParentSelector_isCorrectlyParsed() {
         let json  = """
             {
@@ -417,4 +418,5 @@ final class BrokerJSONCodableTests: XCTestCase {
             XCTFail("JSON string should be parsed correctly.")
         }
     }
+    // swiftlint:enable function_body_length
 }
