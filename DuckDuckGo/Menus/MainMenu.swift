@@ -376,6 +376,8 @@ import SubscriptionUI
         if featureFlagger.isFeatureOn(.debugMenu) {
             NSMenuItem(title: "Debug")
                 .submenu(setupDebugMenu())
+        } else {
+            nil
         }
 #endif
     }
