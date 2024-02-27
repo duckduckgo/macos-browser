@@ -17,7 +17,7 @@
 		14505A08256084EF00272CC6 /* UserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14505A07256084EF00272CC6 /* UserAgent.swift */; };
 		1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1456D6E024EFCBC300775049 /* TabBarCollectionView.swift */; };
 		14D9B8FB24F7E089000D4D13 /* AddressBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */; };
-		1D02633628D8A9A9005CBB41 /* BWEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* BWEncryption.m */; settings = {COMPILER_FLAGS = "-Wno-deprecated"; }; };
+		1D02633628D8A9A9005CBB41 /* BWEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* BWEncryption.m */; settings = {COMPILER_FLAGS = "-Wno-deprecated -Wno-strict-prototypes"; }; };
 		1D074B272909A433006E4AC3 /* PasswordManagerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */; };
 		1D12F2E2298BC660009A65FD /* InternalUserDeciderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D12F2E1298BC660009A65FD /* InternalUserDeciderStoreMock.swift */; };
 		1D1A33492A6FEB170080ACED /* BurnerMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1A33482A6FEB170080ACED /* BurnerMode.swift */; };
@@ -1463,7 +1463,7 @@
 		4B957A012AC7AE700062CA31 /* SafariDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CFD26FE191E001E4761 /* SafariDataImporter.swift */; };
 		4B957A022AC7AE700062CA31 /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */; };
 		4B957A032AC7AE700062CA31 /* LocalBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F829999973005D8EB6 /* LocalBookmarkStore.swift */; };
-		4B957A042AC7AE700062CA31 /* BWEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* BWEncryption.m */; settings = {COMPILER_FLAGS = "-Wno-deprecated"; }; };
+		4B957A042AC7AE700062CA31 /* BWEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* BWEncryption.m */; settings = {COMPILER_FLAGS = "-Wno-deprecated -Wno-strict-prototypes"; }; };
 		4B957A052AC7AE700062CA31 /* StatisticsLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50342726A11F00758A2B /* StatisticsLoader.swift */; };
 		4B957A072AC7AE700062CA31 /* PrivacyPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54C127F2FDD100F1F7B9 /* PrivacyPreferencesModel.swift */; };
 		4B957A082AC7AE700062CA31 /* LocalUnprotectedDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */; };
