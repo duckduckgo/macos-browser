@@ -115,14 +115,13 @@ jobs:
           -scheme "SyncE2EUITestsOldVersions" \
           -configuration Review 
     
-    - name: Copy app to /DerivedData                         
+    - name: Unzip and Copy app to /DerivedData                         
       run: |
-        ls -latr 
-        (cd DuckDuckGo-review-${{ env.app-version }}.app && unzip DuckDuckGo-${{ env.app-version }}.zip)
+        cd DuckDuckGo-review-${{ env.app-version }}.app && unzip DuckDuckGo-${{ env.app-version }}.zip
         for dir in /Users/runner/Library/Developer/Xcode/DerivedData/DuckDuckGo-*/Build/Products/Review; do
-          cp -R DuckDuckGo-review-${{ env.app-version }}.app "$dir/DuckDuckGo Review.app"
-          ls -latr "$dir/DuckDuckGo Review.app"
+          cp -R "DuckDuckGo Review.app" "$dir/DuckDuckGo Review.app"
         done
+        ls -latr /Users/runner/Library/Developer/Xcode/DerivedData/DuckDuckGo-*/Build/Products/Review
 
     - name: Run tests
       env:
