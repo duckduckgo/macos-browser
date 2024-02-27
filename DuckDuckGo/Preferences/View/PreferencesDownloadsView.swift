@@ -25,7 +25,6 @@ extension Preferences {
     struct DownloadsView: View {
         @ObservedObject var model: DownloadsPreferences
 
-        @State var selectedNumber = 0
         var body: some View {
             PreferencePane(UserText.downloads) {
 
