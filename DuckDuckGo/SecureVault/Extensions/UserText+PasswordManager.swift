@@ -125,7 +125,7 @@ extension UserText {
     static let autoLockThreshold30Minutes = NSLocalizedString("pm.lock-screen.threshold.30-minutes", value: "30 minutes", comment: "Label used when selecting the Auto-Lock threshold")
     static let autoLockThreshold1Hour = NSLocalizedString("pm.lock-screen.threshold.1-hour", value: "1 hour", comment: "Label used when selecting the Auto-Lock threshold")
     static let autoLockThreshold12Hours = NSLocalizedString("pm.lock-screen.threshold.12-hours", value: "12 hours", comment: "Label used when selecting the Auto-Lock threshold")
-    
+
     // MARK: Autofill Item Deletion (Autofill -> More Menu, Settings -> Autofill)
     static let deleteAllPasswords = NSLocalizedString("autofill.items.delete-all-passwords", value: "Delete All Passwords…", comment: "Opens Delete All Passwords dialog")
 
