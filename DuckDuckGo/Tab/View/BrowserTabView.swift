@@ -20,6 +20,19 @@ import AppKit
 
 final class BrowserTabView: ColorView {
 
+    // Returns correct subview for the rendering of snapshots
+    func findContentSubview(containsHostingView: Bool) -> NSView? {
+        var content = subviews.last
+
+        if containsHostingView {
+            content = content?.subviews.first
+
+            assert(content?.className.contains("NSHostingView") == true)
+        }
+
+        return content
+    }
+
     // MARK: NSDraggingDestination
 
     override func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {

@@ -151,6 +151,12 @@
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
+                  Identifier = "ErrorPageTests/testWhenGoingBackToFailingPage_reloadIsTriggered()">
+               </Test>
+               <Test
+                  Identifier = "ErrorPageTests/testWhenTabWithNoConnectionErrorActivated_reloadTriggered()">
+               </Test>
+               <Test
                   Identifier = "HTTPSUpgradeIntegrationTests">
                </Test>
                <Test

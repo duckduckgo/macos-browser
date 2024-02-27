@@ -134,6 +134,12 @@ final class NetworkProtectionInviteCodeViewModel: InviteCodeViewModel {
         showProgressView = true
         do {
             try await redemptionCoordinator.redeem(textFieldText.trimmingWhitespace())
+
+            // If the user bypassed the waitlist, then erase any existing waitlist state they already have to avoid confusing the app.
+            NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+            UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+            UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionWaitlistSignUpPromptDismissed.rawValue)
+            NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         } catch NetworkProtectionClientError.invalidInviteCode {
             errorText = UserText.inviteDialogUnrecognizedCodeMessage
             showProgressView = false
