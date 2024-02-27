@@ -171,8 +171,10 @@ final class HomePageViewController: NSViewController {
             self?.bookmarkManager.update(bookmark: bookmark)
         }, deleteBookmark: { [weak self] bookmark in
             self?.bookmarkManager.remove(bookmark: bookmark)
-        }, addEdit: { [weak self] bookmark in
-            self?.showAddEditController(for: bookmark)
+        }, add: { [weak self] in
+            self?.showAddController()
+        }, edit: { [weak self] bookmark in
+            self?.showEditController(for: bookmark)
         }, moveFavorite: { [weak self] (bookmark, index) in
             self?.bookmarkManager.moveFavorites(with: [bookmark.id], toIndex: index) { _ in }
         }, onFaviconMissing: { [weak self] in
@@ -229,9 +231,14 @@ final class HomePageViewController: NSViewController {
         tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url, source: .bookmark))
     }
 
-    private func showAddEditController(for bookmark: Bookmark? = nil) {
-        AddBookmarkModalView(model: AddBookmarkModalViewModel(originalBookmark: bookmark, isFavorite: true))
-            .show(in: self.view.window)
+    private func showAddController() {
+        BookmarksDialogViewFactory.makeAddFavoriteView()
+            .show(in: view.window)
+    }
+
+    private func showEditController(for bookmark: Bookmark) {
+        BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
+            .show(in: view.window)
     }
 
     private var burningDataCancellable: AnyCancellable?

@@ -251,6 +251,28 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result, folder)
     }
 
+    func testShouldSetIsBookmarkFavoriteToTrueWhenModeIsAddAndShouldPresetFavoriteIsTrue() {
+        // GIVEN
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(shouldPresetFavorite: true), bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let result = sut.isBookmarkFavorite
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
+    func testShouldNotSetIsBookmarkFavoriteToTrueWhenModeIsAddAndShouldPresetFavoriteIsFalse() {
+        // GIVEN
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(shouldPresetFavorite: false), bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let result = sut.isBookmarkFavorite
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
     // MARK: - Actions
 
     func testReturnIsCancelActionDisabledFalseWhenModeIsAdd() {
