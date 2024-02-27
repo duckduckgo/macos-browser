@@ -80,7 +80,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(environmentItem)
 
         menu.addItem(.separator())
-        
+
         let internalTestingItem = NSMenuItem(title: "Internal testing", action: #selector(toggleInternalTesting), target: self)
         internalTestingItem.state = isInternalTestingEnabled() ? .on : .off
         menu.addItem(internalTestingItem)
@@ -92,7 +92,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         let menu = NSMenu(title: "Select environment:")
 
         let currentEnvironment = currentEnvironment()
-
 
         let stagingItem = NSMenuItem(title: "Staging", action: #selector(setEnvironmentToStaging), target: self)
         stagingItem.state = currentEnvironment == "staging" ? .on : .off
