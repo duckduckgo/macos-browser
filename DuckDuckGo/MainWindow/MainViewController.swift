@@ -40,9 +40,8 @@ final class MainViewController: NSViewController {
 
     private var addressBarBookmarkIconVisibilityCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
+    private var tabViewModelCancellables = Set<AnyCancellable>()
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
-    private var navigationalCancellables = Set<AnyCancellable>()
-    private var windowTitleCancellable: AnyCancellable?
     private var eventMonitorCancellables = Set<AnyCancellable>()
 
     private var bookmarksBarIsVisible: Bool {
@@ -93,6 +92,7 @@ final class MainViewController: NSViewController {
         subscribeToMouseTrackingArea()
         subscribeToSelectedTabViewModel()
         subscribeToAppSettingsNotifications()
+        subscribeToFirstResponder()
         mainView.findInPageContainerView.applyDropShadow()
 
         view.registerForDraggedTypes([.URL, .fileURL])
@@ -102,6 +102,7 @@ final class MainViewController: NSViewController {
         super.viewDidAppear()
         mainView.setMouseAboveWebViewTrackingAreaEnabled(true)
         registerForBookmarkBarPromptNotifications()
+        adjustFirstResponder()
     }
 
     var bookmarkBarPromptObserver: Any?
@@ -140,7 +141,7 @@ final class MainViewController: NSViewController {
             updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
         }
 
-        updateDividerColor()
+        updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
     }
 
     override func viewDidLayout() {
@@ -241,12 +242,11 @@ final class MainViewController: NSViewController {
         mainView.layoutSubtreeIfNeeded()
         mainView.updateTrackingAreas()
 
-        updateDividerColor()
+        updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
     }
 
-    private func updateDividerColor() {
+    private func updateDividerColor(isShowingHomePage isHomePage: Bool) {
         NSAppearance.withAppAppearance {
-            let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
             let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .bookmarkBarBackground : .addressBarSolidSeparatorColor
             mainView.divider.backgroundColor = backgroundColor
         }
@@ -261,28 +261,26 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToSelectedTabViewModel() {
-        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.navigationalCancellables = []
-            self?.subscribeToCanGoBackForward()
-            self?.subscribeToFindInPage()
-            self?.subscribeToTabContent()
-            self?.adjustFirstResponder()
-            self?.subscribeToTitleChange()
+        selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.sink { [weak self] tabViewModel in
+            guard let self, let tabViewModel else { return }
+
+            tabViewModelCancellables.removeAll(keepingCapacity: true)
+            subscribeToCanGoBackForward(of: tabViewModel)
+            subscribeToFindInPage(of: tabViewModel)
+            subscribeToTitleChange(of: tabViewModel)
+            subscribeToTabContent(of: tabViewModel)
         }
     }
 
-    private func subscribeToTitleChange() {
+    private func subscribeToTitleChange(of selectedTabViewModel: TabViewModel?) {
         guard let window = self.view.window else { return }
-        windowTitleCancellable = tabCollectionViewModel.$selectedTabViewModel
-            .compactMap { tabViewModel in
-                tabViewModel?.$title
-            }
-            .switchToLatest()
+        selectedTabViewModel?.$title
             .map {
                 $0.truncated(length: MainMenu.Constants.maxTitleLength)
             }
             .receive(on: DispatchQueue.main)
             .assign(to: \.title, onWeaklyHeld: window)
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToAppSettingsNotifications() {
@@ -294,28 +292,36 @@ final class MainViewController: NSViewController {
     }
 
     private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.1
-
-            let nonHomePageHeight: CGFloat = isInPopUpWindow ? 42 : 48
-
-            let height = animated ? mainView.addressBarHeightConstraint.animator() : mainView.addressBarHeightConstraint
-            height?.constant = homePage ? 52 : nonHomePageHeight
-
-            updateDividerColor()
-            navigationBarViewController.resizeAddressBarForHomePage(homePage, animated: animated)
-        }
+        updateDividerColor(isShowingHomePage: homePage)
+        navigationBarViewController.resizeAddressBar(for: homePage ? .homePage : (isInPopUpWindow ? .popUpWindow : .default), animated: animated)
     }
 
-    var lastTabContent: Tab.TabContent?
-    private func subscribeToTabContent() {
-        tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
-            guard let self = self else { return }
-            self.resizeNavigationBarForHomePage(content == .newtab, animated: content == .newtab && self.lastTabContent != .newtab)
-            self.updateBookmarksBar(content)
-            self.lastTabContent = content
-            self.adjustFirstResponderOnContentChange(content: content)
-        }).store(in: &self.navigationalCancellables)
+    private var lastTabContent = Tab.TabContent.none
+    private func subscribeToTabContent(of selectedTabViewModel: TabViewModel?) {
+        selectedTabViewModel?.tab.$content
+            .sink { [weak self, weak selectedTabViewModel] content in
+                guard let self, let selectedTabViewModel else { return }
+                defer { lastTabContent = content }
+
+                resizeNavigationBarForHomePage(content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
+                updateBookmarksBar(content)
+                adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
+            }
+            .store(in: &self.tabViewModelCancellables)
+    }
+
+    private func subscribeToFirstResponder() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(firstReponderDidChange(_:)),
+                                               name: .firstResponder,
+                                               object: nil)
+
+    }
+    @objc private func firstReponderDidChange(_ notification: Notification) {
+        // when window first responder is reset (to the window): activate Tab Content View
+        if view.window?.firstResponder === view.window {
+            browserTabViewController.adjustFirstResponder()
+        }
     }
 
     private func updateBookmarksBar(_ content: Tab.TabContent, _ prefs: AppearancePreferences = AppearancePreferences.shared) {
@@ -326,29 +332,29 @@ final class MainViewController: NSViewController {
         }
     }
 
-    private func subscribeToFindInPage() {
-        tabCollectionViewModel.selectedTabViewModel?.findInPage?
+    private func subscribeToFindInPage(of selectedTabViewModel: TabViewModel?) {
+        selectedTabViewModel?.findInPage?
             .$isVisible
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.updateFindInPage()
             }
-            .store(in: &self.navigationalCancellables)
+            .store(in: &self.tabViewModelCancellables)
     }
 
-    private func subscribeToCanGoBackForward() {
-        tabCollectionViewModel.selectedTabViewModel?.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
+    private func subscribeToCanGoBackForward(of selectedTabViewModel: TabViewModel) {
+        selectedTabViewModel.$canGoBack.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBackMenuItem()
-        }.store(in: &self.navigationalCancellables)
-        tabCollectionViewModel.selectedTabViewModel?.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        }.store(in: &self.tabViewModelCancellables)
+        selectedTabViewModel.$canGoForward.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateForwardMenuItem()
-        }.store(in: &self.navigationalCancellables)
-        tabCollectionViewModel.selectedTabViewModel?.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        }.store(in: &self.tabViewModelCancellables)
+        selectedTabViewModel.$canReload.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateReloadMenuItem()
-        }.store(in: &self.navigationalCancellables)
-        tabCollectionViewModel.selectedTabViewModel?.$isLoading.receive(on: DispatchQueue.main).sink { [weak self] _ in
+        }.store(in: &self.tabViewModelCancellables)
+        selectedTabViewModel.$isLoading.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateStopMenuItem()
-        }.store(in: &self.navigationalCancellables)
+        }.store(in: &self.tabViewModelCancellables)
     }
 
     private func updateFindInPage() {
@@ -411,39 +417,22 @@ final class MainViewController: NSViewController {
 
     // MARK: - First responder
 
-    func adjustFirstResponder() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
+    func adjustFirstResponder(selectedTabViewModel: TabViewModel? = nil, tabContent: Tab.TabContent? = nil) {
+        guard let selectedTabViewModel = selectedTabViewModel ?? tabCollectionViewModel.selectedTabViewModel else {
+            assertionFailure("No tab view model selected")
             return
         }
+        let tabContent = tabContent ?? selectedTabViewModel.tab.content
 
-        switch selectedTabViewModel.tab.content {
-        case .newtab:
+        if case .newtab = tabContent {
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
-        case .onboarding:
-            self.view.makeMeFirstResponder()
-        case .url, .subscription:
-            browserTabViewController.makeWebViewFirstResponder()
-        case .settings:
-            browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
-        case .bookmarks:
-            browserTabViewController.bookmarksViewController?.view.makeMeFirstResponder()
-        case .none:
-            shouldAdjustFirstResponderOnContentChange = true
-        case .dataBrokerProtection:
-            browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
+
+        } else {
+            // ignore published tab switch: BrowserTabViewController
+            // adjusts first responder itself
+            guard selectedTabViewModel === tabCollectionViewModel.selectedTabViewModel else { return }
+            browserTabViewController.adjustFirstResponder(tabContent: tabContent)
         }
-    }
-
-    var shouldAdjustFirstResponderOnContentChange = false
-
-    func adjustFirstResponderOnContentChange(content: Tab.TabContent) {
-        guard shouldAdjustFirstResponderOnContentChange, content != .none else {
-            return
-        }
-
-        shouldAdjustFirstResponderOnContentChange = false
-        adjustFirstResponder()
     }
 
 }
