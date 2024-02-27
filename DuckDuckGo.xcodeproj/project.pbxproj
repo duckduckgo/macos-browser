@@ -109,6 +109,9 @@
 		1E2AE4C82ACB216B00684E0A /* HoverTrackingArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B140872ABDBCC1004F8E85 /* HoverTrackingArea.swift */; };
 		1E2AE4CA2ACB21A000684E0A /* NetworkProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */; };
 		1E2AE4CB2ACB21C800684E0A /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9579202AC687170062CA31 /* HardwareModel.swift */; };
+		1E4195712B8DE0B00000E08D /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4195702B8DE0B00000E08D /* SubscriptionManager.swift */; };
+		1E4195722B8DE0B00000E08D /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4195702B8DE0B00000E08D /* SubscriptionManager.swift */; };
+		1E4195732B8DE0B00000E08D /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4195702B8DE0B00000E08D /* SubscriptionManager.swift */; };
 		1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */; };
 		1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */; };
 		1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E3E2912A10D0051A99B /* ContentBlocking */; };
@@ -3357,6 +3360,7 @@
 		1DFAB51C2A8982A600A0F7F6 /* SetExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetExtension.swift; sourceTree = "<group>"; };
 		1DFAB51F2A89830D00A0F7F6 /* SetExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetExtensionTests.swift; sourceTree = "<group>"; };
 		1E0C72052ABC63BD00802009 /* SubscriptionPagesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPagesUserScript.swift; sourceTree = "<group>"; };
+		1E4195702B8DE0B00000E08D /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
 		1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingRulesUpdateObserver.swift; sourceTree = "<group>"; };
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
 		1E862A882A9FC01200F84D4B /* SubscriptionUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SubscriptionUI; sourceTree = "<group>"; };
@@ -4920,6 +4924,7 @@
 			isa = PBXGroup;
 			children = (
 				1EA7B8D72B7E1283000330A4 /* SubscriptionFeatureAvailability.swift */,
+				1E4195702B8DE0B00000E08D /* SubscriptionManager.swift */,
 			);
 			path = Subscription;
 			sourceTree = "<group>";
@@ -9658,6 +9663,7 @@
 				4B44FEF42B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */,
 				3706FAA3293F65D500E42796 /* CrashReportPromptViewController.swift in Sources */,
 				3706FAA4293F65D500E42796 /* ContextMenuManager.swift in Sources */,
+				1E4195722B8DE0B00000E08D /* SubscriptionManager.swift in Sources */,
 				3706FAA5293F65D500E42796 /* GradientView.swift in Sources */,
 				3706FAA6293F65D500E42796 /* PreferencesSidebar.swift in Sources */,
 				3706FAA7293F65D500E42796 /* NSPointExtension.swift in Sources */,
@@ -11436,6 +11442,7 @@
 				4B957B9B2AC7AE700062CA31 /* PageObserverUserScript.swift in Sources */,
 				4B957B9C2AC7AE700062CA31 /* SecureVaultErrorReporter.swift in Sources */,
 				4B68DDFF2ACBA14100FB0973 /* FileLineError.swift in Sources */,
+				1E4195732B8DE0B00000E08D /* SubscriptionManager.swift in Sources */,
 				4B957B9D2AC7AE700062CA31 /* NSImageExtensions.swift in Sources */,
 				4B957B9E2AC7AE700062CA31 /* WaitlistKeychainStorage.swift in Sources */,
 				B69A14F82B4D701F00B9417D /* AddBookmarkPopoverViewModel.swift in Sources */,
@@ -11721,6 +11728,7 @@
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
 				85774AFF2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
+				1E4195712B8DE0B00000E08D /* SubscriptionManager.swift in Sources */,
 				3775913629AB9A1C00E26367 /* SyncManagementDialogViewController.swift in Sources */,
 				B6C0BB6729AEFF8100AE8E3C /* BookmarkExtension.swift in Sources */,
 				4BE6547F271FCD4D008D1D63 /* PasswordManagementCreditCardModel.swift in Sources */,

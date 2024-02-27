@@ -21,6 +21,8 @@ import Subscription
 
 public final class SubscriptionDebugMenu: NSMenuItem {
 
+    var currentEnvironment: () -> String
+    var updateEnvironment: (String) -> Void
     var isInternalTestingEnabled: () -> Bool
     var updateInternalTestingFlag: (Bool) -> Void
 
@@ -41,12 +43,17 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(isInternalTestingEnabled: @escaping () -> Bool,
+    public init(currentEnvironment: @escaping () -> String,
+                updateEnvironment: @escaping (String) -> Void,
+                isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?) {
+        self.currentEnvironment = currentEnvironment
+        self.updateEnvironment = updateEnvironment
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
+
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
     }
@@ -84,18 +91,31 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private func makeEnvironmentSubmenu() -> NSMenu {
         let menu = NSMenu(title: "Select environment:")
 
+        let currentEnvironment = currentEnvironment()
+
+
         let stagingItem = NSMenuItem(title: "Staging", action: #selector(setEnvironmentToStaging), target: self)
-        stagingItem.state = .on
+        stagingItem.state = currentEnvironment == "staging" ? .on : .off
+        if currentEnvironment == "staging" {
+            stagingItem.isEnabled = false
+            stagingItem.action = nil
+            stagingItem.target = nil
+        }
         menu.addItem(stagingItem)
 
         let productionItem = NSMenuItem(title: "Production", action: #selector(setEnvironmentToProduction), target: self)
-        productionItem.state = .off
+        productionItem.state = currentEnvironment == "production" ? .on : .off
+        if currentEnvironment == "production" {
+            productionItem.isEnabled = false
+            productionItem.action = nil
+            productionItem.target = nil
+        }
         menu.addItem(productionItem)
 
         return menu
     }
 
-    private func updateSubmenu() {
+    private func refreshSubmenu() {
         self.submenu = makeSubmenu()
     }
 
@@ -177,25 +197,23 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     }
 
     @IBAction func setEnvironmentToStaging(_ sender: Any?) {
-        let alert = makeAlert(title: "Are you sure you want to change the environment to Staging",
-                              message: "Please make sure you have manually removed your current active Subscription and reset all related features.",
-                              buttonNames: ["Yes", "No"])
-        let response = alert.runModal()
-
-        guard case .alertFirstButtonReturn = response else { return }
-
-        print("to staging!")
+        askAndUpdateEnvironment(to: "staging")
     }
 
     @IBAction func setEnvironmentToProduction(_ sender: Any?) {
-        let alert = makeAlert(title: "Are you sure you want to change the environment to Production",
-                              message: "Please make sure you have manually removed your current active Subscription and reset all related features.",
+        askAndUpdateEnvironment(to: "production")
+    }
+
+    private func askAndUpdateEnvironment(to newEnvironmentString: String) {
+        let alert = makeAlert(title: "Are you sure you want to change the environment to \(newEnvironmentString.capitalized)",
+                              message: "Please make sure you have manually removed your current active Subscription and reset all related features. \nYou may also need to change environment of related features e.g. Network Protection's to a matching one.",
                               buttonNames: ["Yes", "No"])
         let response = alert.runModal()
 
         guard case .alertFirstButtonReturn = response else { return }
 
-        print("to production!")
+        updateEnvironment(newEnvironmentString)
+        refreshSubmenu()
     }
 
     @objc
@@ -223,7 +241,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
             }
 
             updateInternalTestingFlag(!currentValue)
-            self.updateSubmenu()
+            self.refreshSubmenu()
         }
     }
 

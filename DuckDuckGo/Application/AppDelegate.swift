@@ -88,6 +88,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
 #endif
 
+#if SUBSCRIPTION
+    private let subscriptionManager: SubscriptionManager
+#endif
+
     private var didFinishLaunching = false
 
 #if SPARKLE
@@ -188,6 +192,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+
+#if SUBSCRIPTION
+        var defaultEnvironment: SubscriptionManager.SelectedEnvironment = .default
+
+        let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
+                                                     defaultValue: defaultEnvironment).wrappedValue
+        subscriptionManager = SubscriptionManager(environment: currentEnvironment)
+#endif
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
