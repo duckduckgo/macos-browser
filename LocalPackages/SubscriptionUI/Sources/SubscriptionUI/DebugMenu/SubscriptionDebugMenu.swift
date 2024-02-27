@@ -247,7 +247,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     private func showAlert(title: String, message: String? = nil) {
         Task { @MainActor in
-            makeAlert(title: title, message: message).runModal
+            let alert = makeAlert(title: title, message: message)
+            alert.runModal()
         }
     }
 
