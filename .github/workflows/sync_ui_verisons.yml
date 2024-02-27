@@ -63,13 +63,10 @@ jobs:
         echo ${{ env.app-version }}
 
     - name: Download and unzip artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: DuckDuckGo-review-${{ env.app-version }}.app
-        path: /Applications
-
-    - name: Check whats in applications
-      run: ls -latr /Applications
+      uses: actions/download-artifact@v4
+      
+    - name: Check whats downloaded
+      run: ls -R
 
     - name: Set cache key hash
       run: |
