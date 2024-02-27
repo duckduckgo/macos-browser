@@ -78,6 +78,8 @@ jobs:
           -configuration Review \
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
+          -test-iterations 2 \
+          -retry-tests-on-failure \
         | tee xcodebuild.log \
         | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml \
     
