@@ -37,14 +37,16 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
 
     var confirmationAlert: NSAlert {
         let accounts = (try? secureVault.accounts()) ?? []
-        let syncEnabled = syncService.account != nil
         return NSAlert.deleteAllPasswordsConfirmationAlert(count: accounts.count, syncEnabled: syncEnabled)
     }
 
     var completionAlert: NSAlert {
         let accounts = (try? secureVault.accounts()) ?? []
-        let syncEnabled = syncService.account != nil
         return NSAlert.deleteAllPasswordsCompletionAlert(count: accounts.count, syncEnabled: syncEnabled)
+    }
+
+    private var syncEnabled: Bool {
+        syncService.authState != .inactive
     }
 
     private var userAuthenticator: UserAuthenticating
