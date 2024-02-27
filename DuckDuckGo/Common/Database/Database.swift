@@ -41,16 +41,6 @@ final class Database {
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
         func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
-            do {
-                try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
-            } catch {
-                return (nil, error)
-            }
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
             _=mainModel.registerValueTransformers(withAllowedPropertyClasses: [
                 NSImage.self,
@@ -146,11 +136,19 @@ extension NSManagedObjectModel {
         for entity in self.entities {
             for property in entity.properties {
                 guard let property = property as? NSAttributeDescription, property.attributeType == .transformableAttributeType else { continue }
-                guard let transformerName = (property.valueTransformerName?.isEmpty ?? true) ? property.userInfo?[Self.transformerUserInfoKey] as? String : property.valueTransformerName,
-                      !transformerName.isEmpty else {
+
+                let transformerName: String
+                if let valueTransformerName = property.valueTransformerName, !valueTransformerName.isEmpty {
+                    transformerName = valueTransformerName
+                } else if let transformerUserInfoValue = property.userInfo?[Self.transformerUserInfoKey] as? String, !transformerUserInfoValue.isEmpty {
+                    transformerName = transformerUserInfoValue
+                    property.userInfo?.removeValue(forKey: Self.transformerUserInfoKey)
+                    property.valueTransformerName = transformerName
+                } else {
                     assertionFailure("Transformer (User Info `transformer` key) not set for \(entity).\(property)")
                     continue
                 }
+
                 guard ValueTransformer(forName: .init(rawValue: transformerName)) == nil else { continue }
 
                 let propertyClassName = transformerName.dropping(suffix: "Transformer")
@@ -164,9 +162,6 @@ extension NSManagedObjectModel {
                 let transformer = ValueTransformer.registerValueTransformer(for: propertyClass, with: keyStore)
                 assert(ValueTransformer(forName: .init(transformerName)) != nil)
                 registeredTransformers.append(transformer)
-
-                property.userInfo?.removeValue(forKey: Self.transformerUserInfoKey)
-                property.valueTransformerName = transformerName
             }
         }
         return registeredTransformers
