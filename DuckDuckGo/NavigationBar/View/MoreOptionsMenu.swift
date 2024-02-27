@@ -120,9 +120,7 @@ final class MoreOptionsMenu: NSMenu {
         } else {
             feedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: nil, keyEquivalent: "")
         }
-#if !APPSTORE
-//            .withImage(NSImage(named: "BetaLabel"))
-#endif // !APPSTORE
+
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(feedbackMenuItem)
 
