@@ -120,6 +120,7 @@ jobs:
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
         set -o pipefail && xcodebuild test-without-building \
+          -configuration Review \
           -scheme "SyncE2EUITestsOldVersions" \
         | tee xcodebuild.log \
         | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml \
