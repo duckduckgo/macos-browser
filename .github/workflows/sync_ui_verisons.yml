@@ -118,8 +118,8 @@ jobs:
     - name: Copy app to /DerivedData                         
       run: |
         for dir in /Users/runner/Library/Developer/Xcode/DerivedData/DuckDuckGo-*/Build/Products/Review; do
-          unzip DuckDuckGo-review-${{ env.app-version }}.app -d "$dir"
-          mv "$dir/DuckDuckGo-review-${{ env.app-version }}.app" "$dir/DuckDuckGo Review.app"
+          cp -R DuckDuckGo-review-${{ env.app-version }}.app "$dir/DuckDuckGo Review.app"
+          ls -latr "$dir/DuckDuckGo Review.app"
         done
 
     - name: Run tests
