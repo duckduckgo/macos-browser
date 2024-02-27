@@ -368,7 +368,7 @@ import SubscriptionUI
             })
     }
 
-    func buildDebugMenu(featureFlagger: FeatureFlagger) -> NSMenuItem {
+    func buildDebugMenu(featureFlagger: FeatureFlagger) -> NSMenuItem? {
 #if DEBUG || REVIEW
         NSMenuItem(title: "Debug")
             .submenu(setupDebugMenu())
