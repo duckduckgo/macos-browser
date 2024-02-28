@@ -156,6 +156,9 @@ jobs:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
 
+    - name: Output paths
+      run: ls -lR
+
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
       if: always() 
