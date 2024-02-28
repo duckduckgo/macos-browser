@@ -116,6 +116,7 @@ jobs:
 
     - name: Build test runner 
       run: |
+        mv LocalPackages 2LocalPackages
         set -o pipefail && xcodebuild build-for-testing \
           -scheme "SyncE2EUITestsOldVersions" \
           -configuration Review 
@@ -132,6 +133,7 @@ jobs:
       env:
         CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
       run: |
+
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
