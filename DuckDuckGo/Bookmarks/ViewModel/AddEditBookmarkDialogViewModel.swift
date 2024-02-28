@@ -151,7 +151,7 @@ private extension AddEditBookmarkDialogViewModel {
             bookmarkManager.update(bookmark: bookmark)
         }
         // If the bookmark changed parent location, move it.
-        if bookmark.parentFolderUUID != selectedFolder?.id {
+        if shouldMove(bookmark: bookmark) {
             let parentFolder: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: parentFolder, completion: { _ in })
         }
@@ -164,6 +164,15 @@ private extension AddEditBookmarkDialogViewModel {
         } else {
             bookmarkManager.makeBookmark(for: url, title: name, isFavorite: isFavorite, index: nil, parent: parent)
         }
+    }
+
+    func shouldMove(bookmark: Bookmark) -> Bool {
+        // There's a discrepancy in representing the root folder. A bookmark belonging to the root folder has `parentFolderUUID` equal to `bookmarks_root`.
+        // There's no `BookmarkFolder` to represent the root folder, so the root folder is represented by a nil selectedFolder.
+        // Move Bookmarks if its parent folder is != from the selected folder but ONLY if:
+        //   - The selected folder is not nil. This ensure we're comparing a subfolder with any bookmark parent folder.
+        //   - The selected folder is nil and the bookmark parent folder is not the root folder. This ensure we're not unnecessarily moving the items within the same root folder.
+        bookmark.parentFolderUUID != selectedFolder?.id && (selectedFolder != nil || selectedFolder == nil && !bookmark.isParentFolderRoot)
     }
 }
 
@@ -201,6 +210,14 @@ private extension AddEditBookmarkDialogViewModel.Mode {
         case let .edit(bookmark):
             return bookmark.urlObject
         }
+    }
+
+}
+
+private extension Bookmark {
+
+    var isParentFolderRoot: Bool {
+        parentFolderUUID == "bookmarks_root"
     }
 
 }
