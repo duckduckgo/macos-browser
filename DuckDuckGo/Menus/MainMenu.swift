@@ -30,6 +30,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
+import Subscription
 import SubscriptionUI
 #endif
 
@@ -591,7 +592,17 @@ import SubscriptionUI
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
 #if SUBSCRIPTION
-            SubscriptionDebugMenu(currentViewController: {
+            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
+            let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
+
+            SubscriptionDebugMenu(currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
+                                  updateEnvironment: {
+                guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
+                currentEnvironmentWrapper.wrappedValue = newEnvironment
+                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment },
+                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                                  currentViewController: {
                 WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
             })
 #endif
