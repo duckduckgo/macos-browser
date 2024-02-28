@@ -15,7 +15,7 @@
 # be run locally as part of the release process.
 #
 # Usage:
-#   ./update_asana_for_release.sh <release-type> <release-task-id> <target-section-id> <marketing-version>
+#   ./update_asana_for_release.sh <release-type> <release-task-id> <target-section-id> <marketing-version> [announcement-task-contents-file]
 #
 
 set -e -o pipefail
@@ -59,11 +59,10 @@ get_task_id() {
 	fi
 }
 
-construct_task_description() {
+construct_release_notes() {
 	local escaped_release_note
-	printf '%s' "<body><strong>Note: This task's description is managed automatically.</strong>\n"
-	printf '%s' 'Only the <em>Release notes</em> section below should be modified manually.\n'
-	printf '%s' 'Please do not adjust formatting.<h1>Release notes</h1>'
+
+	printf '%s' '<h1>Release notes</h1>'
 	if [[ -n "${release_notes[*]}" ]]; then
 		printf '%s' '<ul>'
 		for release_note in "${release_notes[@]}"; do
@@ -72,17 +71,48 @@ construct_task_description() {
 		done
 		printf '%s' '</ul>'
 	fi
+}
 
+construct_this_release_includes() {
 	printf '%s' '<h2>This release includes:</h2>'
 
 	if [[ -n "${task_ids[*]}" ]]; then
 		printf '%s' '<ul>'
 		for task_id in "${task_ids[@]}"; do
-			printf '%s' "<li><a data-asana-gid=\\\"${task_id}\\\"/></li>"
+			if [[ "$task_id" != "$release_task_id" ]]; then
+				printf '%s' "<li><a data-asana-gid=\\\"${task_id}\\\"/></li>"
+			fi
 		done
 		printf '%s' '</ul>'
 	fi
+}
 
+construct_release_task_description() {
+	printf '%s' "<body><strong>Note: This task's description is managed automatically.</strong>\n"
+	printf '%s' 'Only the <em>Release notes</em> section below should be modified manually.\n'
+	printf '%s' 'Please do not adjust formatting.'
+
+	construct_release_notes
+	construct_this_release_includes
+
+	printf '%s' '</body>'
+}
+
+construct_release_announcement_task_description() {
+	printf '%s' "<body>As the last step of the process, post a message to <a href='https://app.asana.com/0/11984721910118/1204991209236659'>REVIEW / RELEASE</a> Asana project:"
+	printf '%s' '<ul>'
+	printf '%s' "<li>Set title to <strong>macOS App Release ${marketing_version}</strong></li>"
+	printf '%s' '<li>Copy the content below (between separators) and paste as the message body.</li>'
+	printf '%s' '</ul>\n\n<hr>'
+	
+	construct_release_notes
+	construct_this_release_includes
+
+	printf '%s' '<strong>Rollout</strong>\n'
+	printf '%s' 'This is now rolling out to users. New users will receive this release immediately, '
+	printf '%s' 'existing users will receive this gradually over the next few days. You can force an update now '
+	printf '%s' 'by going to the DuckDuckGo menu in the menu bar and selecting "Check For Updates".'
+	printf '%s' '<hr>'
 	printf '%s' '</body>'
 }
 
@@ -210,6 +240,9 @@ complete_tasks() {
 	read -ra incident_task_ids <<< "$(fetch_incident_task_ids)"
 
 	for task_id in "${task_ids[@]}"; do
+		if [[ "$task_id" == "$release_task_id" ]]; then
+			continue
+		fi
 
 		# 2. Check if task is in Current Objectives project
 		local is_in_current_objectives_project
@@ -248,7 +281,7 @@ handle_internal_release() {
 
 	# 3. Construct new release task description
 	local html_notes
-	html_notes="$(construct_task_description)"
+	html_notes="$(construct_release_task_description)"
 
 	# 4. Update release task description
 	update_task_description "$html_notes"
@@ -282,6 +315,11 @@ handle_public_release() {
 
 	# 4. Complete tasks that don't require a post-mortem.
 	complete_tasks "${task_ids[@]}"
+
+	# 5. Construct release announcement task description
+	local html_notes
+	html_notes="$(construct_release_announcement_task_description)"
+	cat > "${announcement_task_contents_file}" <<< "${html_notes}"
 }
 
 main() {
@@ -295,6 +333,7 @@ main() {
 			handle_internal_release
 			;;
 		public | hotfix)
+			local announcement_task_contents_file="$5"
 			handle_public_release
 			;;
 		*)

@@ -190,7 +190,7 @@ jobs:
             echo "FILES_UPLOADED='No files uploaded.'" >> $GITHUB_ENV
           fi
 
-      - name: Update Asana tasks for the release
+      - name: Update Asana for the release
         id: update-asana
         if: ${{ github.event.inputs.release-type != 'internal' }}
         continue-on-error: true
@@ -199,7 +199,12 @@ jobs:
           BRANCH: ${{ github.ref_name }}
         run: |
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
-          ./scripts/update_asana_for_release.sh public ${{ steps.task-id.outputs.task-id }} ${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }} "${version}"
+          ./scripts/update_asana_for_release.sh public \
+            ${{ steps.task-id.outputs.task-id }} \
+            ${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }} \
+            "${version}" \
+            announcement-task-contents.txt
+          echo "announcement-task-contents=$(<announcement-task-contents.txt)" >> $GITHUB_OUTPUT
 
       - name: Set common environment variables
         if: always()
@@ -257,6 +262,17 @@ jobs:
           release-task-url: ${{ github.event.inputs.asana-task-url }}
           template-name: update-asana-for-public-release
 
+      - name: Create Asana task to announce the release
+        id: create-announcement-task
+        if: always() && ${{ github.event.inputs.release-type != 'internal' }}
+        uses: ./.github/actions/asana-create-action-item
+        env:
+          html-notes: ${{ steps.update-asana.outputs.announcement-task-contents }}
+        with:
+          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          release-task-url: ${{ github.event.inputs.asana-task-url }}
+          html-notes: ${{ env.html-notes }}
+
       - name: Upload patch to the Asana task
         id: upload-patch
         if: success()
@@ -304,7 +320,6 @@ jobs:
           template-name: ${{ steps.asana-templates.outputs.release-task-comment-template }}
 
   # This is only run for public and hotfix releases
-  # Internal release has been tagged as part of code_freeze or bump_interal_release workflows
   create-variants:
 
     name: Create DMG Variants
