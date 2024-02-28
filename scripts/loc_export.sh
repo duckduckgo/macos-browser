@@ -1,10 +1,42 @@
 #!/bin/bash
 
+# Function to display help information
+show_help() {
+    echo
+    echo "---HELP---"
+    echo "Usage: $(basename "$0") [OPTIONS]"
+    echo
+    echo "Options:"
+    echo "  -n, --name NAME    Specify the name for the exported xliff file"
+    echo "This script attempts to export an xliff file from the Xcode String Catalogue."
+    echo "--- ---"
+    echo
+    exit 0
+}
+
+# Parse command-line options
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+        -h|--help)
+            show_help
+            ;;
+        -n|--name)
+            new_xliff_name="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        *)
+            echo "Unknown option: $1"
+            show_help
+            ;;
+    esac
+done
+
 # Get the directory where the script is stored and define paths
 script_dir=$(dirname "$(readlink -f "$0")")
 export_path="${script_dir}/TempLocalizationExport"
 final_xliff_path="${script_dir}/assets/loc"
-new_xliff_name="$1" # Optional argument for renaming the .xliff file
 
 # Ensure the final xliff directory exists
 mkdir -p "$final_xliff_path"
@@ -34,9 +66,4 @@ rm -rf "$export_path"
 echo "Cleanup complete."
 
 # Open the directory containing the xliff file
-echo "Opening directory containing the xliff file..."
-case "$OSTYPE" in
-  linux-gnu*) xdg-open "$final_xliff_path";;
-  darwin*) open "$final_xliff_path";;
-  *) echo "Cannot open directory automatically on this OS. Please navigate manually to: $final_xliff_path";;
-esac
+open "${final_xliff_path}"
