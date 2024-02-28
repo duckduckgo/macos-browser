@@ -432,10 +432,10 @@ final class TabPermissionsTests: XCTestCase {
             }
             permissionRequest.fulfill()
         }
-        eDidCancel = expectation(description: "didCancel external app should be called")
+        eDidCancel = expectation(description: "external app permission requested")
 
         // but should open auth query on reload
-        tab.reload()
+        tab.setContent(.url(externalUrl, source: .reload))
 
         waitForExpectations(timeout: 2)
 
