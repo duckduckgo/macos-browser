@@ -19,8 +19,6 @@
 import Foundation
 
 enum CCFRequestData: Encodable {
-    case profile(ProfileQuery)
-    case extractedProfile(ExtractedProfile)
     case solveCaptcha(CaptchaToken)
     case userData(ProfileQuery, ExtractedProfile?)
 }
@@ -53,12 +51,8 @@ struct ActionRequest: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         switch data {
-        case .profile(let profileQuery):
-            try container.encode(profileQuery, forKey: .data)
         case .solveCaptcha(let captchaToken):
             try container.encode(captchaToken, forKey: .data)
-        case .extractedProfile(let extractedProfile):
-            try container.encode(extractedProfile, forKey: .data)
         case .userData(let profileQuery, let extractedProfile):
             var userDataContainer = container.nestedContainer(keyedBy: UserDataCodingKeys.self, forKey: .data)
             try userDataContainer.encode(profileQuery, forKey: .userProfile)

@@ -176,8 +176,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasLoadCalledWithURL: URL?
     var wasWaitForWebViewLoadCalled = false
     var wasFinishCalled = false
-    var wasExecuteCalledForExtractedProfile = false
-    var wasExecuteCalledForProfileData = false
+    var wasExecuteCalledForUserData = false
     var wasExecuteCalledForSolveCaptcha = false
     var wasExecuteJavascriptCalled = false
 
@@ -199,18 +198,12 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
 
     func execute(action: DataBrokerProtection.Action, data: DataBrokerProtection.CCFRequestData) async {
         switch data {
-        case .profile:
-            wasExecuteCalledForExtractedProfile = false
-            wasExecuteCalledForSolveCaptcha = false
-            wasExecuteCalledForProfileData = true
         case .solveCaptcha:
-            wasExecuteCalledForExtractedProfile = false
             wasExecuteCalledForSolveCaptcha = true
-            wasExecuteCalledForProfileData = false
-        case.extractedProfile:
-            wasExecuteCalledForExtractedProfile = true
+            wasExecuteCalledForUserData = false
+        case .userData:
+            wasExecuteCalledForUserData = true
             wasExecuteCalledForSolveCaptcha = false
-            wasExecuteCalledForProfileData = false
         }
     }
 
@@ -223,10 +216,9 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasLoadCalledWithURL = nil
         wasWaitForWebViewLoadCalled = false
         wasFinishCalled = false
-        wasExecuteCalledForExtractedProfile = false
         wasExecuteCalledForSolveCaptcha = false
-        wasExecuteCalledForProfileData = false
         wasExecuteJavascriptCalled = false
+        wasExecuteCalledForUserData = false
     }
 }
 
