@@ -66,9 +66,7 @@ final class BrowserTabViewController: NSViewController {
 
     override func loadView() {
         view = browserTabView
-
         homePageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addAndLayout(homePageView)
 
         hoverLabelContainer.cornerRadius = 4
         view.addSubview(hoverLabelContainer)
@@ -84,9 +82,6 @@ final class BrowserTabViewController: NSViewController {
         hoverLabelContainer.addSubview(hoverLabel)
 
         setupLayout()
-
-        let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
-        self.addAndLayoutChild(homePageViewController, into: homePageView)
     }
 
     private func setupLayout() {
@@ -601,6 +596,10 @@ final class BrowserTabViewController: NSViewController {
         case .newtab:
             removeAllTabContent()
             view.addAndLayout(homePageView)
+            if homePageView.subviews.isEmpty {
+                let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
+                self.addAndLayoutChild(homePageViewController, into: homePageView)
+            }
 
 #if DBP
         case .dataBrokerProtection:

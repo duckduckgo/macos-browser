@@ -88,6 +88,7 @@ class AddressBarTests: XCTestCase {
         StartupPreferences.shared.launchToCustomHomePage = false
 
         WindowControllersManager.shared.pinnedTabsManager.setUp(with: .init())
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @MainActor

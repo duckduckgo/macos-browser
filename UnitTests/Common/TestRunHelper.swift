@@ -68,6 +68,7 @@ extension TestRunHelper: XCTestObservation {
         if case .unitTests = NSApp.runType {
             // cleanup dedicated temporary directory before each test run
             FileManager.default.cleanupTemporaryDirectory()
+            NSAnimationContext.current.duration = 0
         }
         NSApp.swizzled_currentEvent = nil
     }
