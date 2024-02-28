@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import History
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -31,7 +32,7 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenAddVisitIsCalledBeforeHistoryIsLoadedFromStorage_ThenVisitIsIgnored() {
         let historyStoringMock = HistoryStoringMock()
         historyStoringMock.cleanOldResult = nil
-        let historyCoordinator = HistoryCoordinator()
+        let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
 
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
@@ -261,7 +262,6 @@ fileprivate extension HistoryCoordinator {
         historyStoringMock.cleanOldResult = .success(History())
         historyStoringMock.removeEntriesResult = .success(())
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
-        historyCoordinator.loadHistory()
 
         return (historyStoringMock, historyCoordinator)
     }
