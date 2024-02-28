@@ -61,7 +61,6 @@ final class MainView: NSView {
         bookmarksBarHeightConstraint = bookmarksBarContainerView.heightAnchor.constraint(equalToConstant: 34)
 
         navigationBarTopConstraint = navigationBarContainerView.topAnchor.constraint(equalTo: topAnchor, constant: 38)
-        addressBarHeightConstraint = navigationBarContainerView.heightAnchor.constraint(equalToConstant: 42)
 
         NSLayoutConstraint.activate([
             tabBarContainerView.topAnchor.constraint(equalTo: topAnchor),
@@ -82,7 +81,6 @@ final class MainView: NSView {
             navigationBarTopConstraint,
             navigationBarContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             navigationBarContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            addressBarHeightConstraint,
 
             webContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor),
             webContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
