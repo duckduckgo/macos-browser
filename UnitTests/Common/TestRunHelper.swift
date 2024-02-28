@@ -52,7 +52,7 @@ extension TestRunHelper: XCTestObservation {
 
     func testBundleDidFinish(_ testBundle: Bundle) {
         if case .integrationTests = NSApp.runType {
-            FileManager.default.cleanupTemporaryDirectory()
+            FileManager.default.cleanupTemporaryDirectory(excluding: ["Database.sqlite"])
         }
     }
 
