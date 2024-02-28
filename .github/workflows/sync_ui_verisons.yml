@@ -40,7 +40,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
 
   sync-end-to-end-tests:
-    name: Sync End to end Tests Legacy
+    name: Sync E2E tests
     needs: create-notarized-app
     env:
       app-version: ${{ needs.create-notarized-app.outputs.app-version }}
@@ -137,7 +137,7 @@ jobs:
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         defaults write com.duckduckgo.macos.browser.review sync.environment Development
         defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
-        set -o pipefail && xcodebuild test-without-building \
+        set -o pipefail && xcodebuild test \
           -scheme "SyncE2EUITestsOldVersions" \
           -configuration Review \
         | tee xcodebuild.log \
