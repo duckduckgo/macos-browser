@@ -48,12 +48,25 @@ class AddressBarTests: XCTestCase {
         mainViewController.navigationBarViewController.addressBarViewController!.addressBarTextField
     }
 
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
+
     var webViewConfiguration: WKWebViewConfiguration!
     var schemeHandler: TestSchemeHandler!
     static let testHtml = "<html><head><title>Title</title></head><body>test</body></html>"
 
     @MainActor
     override func setUp() async throws {
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
+            return false
+        }
+
         schemeHandler = TestSchemeHandler()
         WKWebView.customHandlerSchemes = [.http, .https]
 
@@ -129,7 +142,7 @@ class AddressBarTests: XCTestCase {
 
     func testWhenUserStartsTypingOnNewTabPageLoad_userInputIsNotReset() async throws {
         // open Tab with newtab page
-        let tab = Tab(content: .newtab)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
 
         var isNavigationFinished = false
@@ -178,16 +191,16 @@ class AddressBarTests: XCTestCase {
 
     func testWhenSwitchingBetweenTabs_addressBarFocusStateIsCorrect() async throws {
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [
-            Tab(content: .newtab),
-            Tab(content: .settings(pane: .about)),
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
-            Tab(content: .bookmarks),
-            Tab(content: .newtab),
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
-            Tab(content: .newtab),
-            Tab(content: .newtab),
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
+            Tab(content: .newtab, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .settings(pane: .about), privacyFeatures: privacyFeaturesMock),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .bookmarks, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .newtab, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .newtab, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .newtab, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
         ]))
         AppearancePreferences.shared.showFullURL = true
         window = WindowsManager.openNewWindow(with: viewModel)!
@@ -207,47 +220,47 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenRestoringToOnboarding_addressBarIsNotActive() async throws {
-        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .onboarding)]))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .onboarding, privacyFeatures: privacyFeaturesMock)]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         XCTAssertEqual(window.firstResponder, mainViewController.browserTabViewController.transientTabContentViewController!.view)
     }
 
     func testWhenRestoringToSettings_addressBarIsNotActive() async throws {
-        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .settings(pane: .appearance))]))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .settings(pane: .appearance), privacyFeatures: privacyFeaturesMock)]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         XCTAssertEqual(window.firstResponder, mainViewController.browserTabViewController.preferencesViewController!.view)
     }
 
     func testWhenRestoringToBookmarks_addressBarIsNotActive() async throws {
-        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .bookmarks)]))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .bookmarks, privacyFeatures: privacyFeaturesMock)]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         XCTAssertEqual(window.firstResponder, mainViewController.browserTabViewController.bookmarksViewController!.view)
     }
 
     func testWhenRestoringToURL_addressBarIsNotActive() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .loadedByStateRestoration), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .loadedByStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         XCTAssertEqual(window.firstResponder, tab.webView)
     }
 
     func testWhenRestoringToNewTab_addressBarIsActive() async throws {
-        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         XCTAssertTrue(isAddressBarFirstResponder)
     }
 
     func testWhenOpeningNewTab_addressBarIsActivated() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .loadedByStateRestoration), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .loadedByStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         XCTAssertEqual(window.firstResponder, tab.webView)
 
-        viewModel.append(tab: Tab(content: .newtab), selected: true)
+        viewModel.append(tab: Tab(content: .newtab, privacyFeatures: privacyFeaturesMock), selected: true)
         try await Task.sleep(interval: 0.01)
         XCTAssertTrue(isAddressBarFirstResponder)
 
-        viewModel.append(tab: Tab(content: .newtab), selected: true)
+        viewModel.append(tab: Tab(content: .newtab, privacyFeatures: privacyFeaturesMock), selected: true)
         try await Task.sleep(interval: 0.01)
         XCTAssertTrue(isAddressBarFirstResponder)
 
@@ -262,16 +275,16 @@ class AddressBarTests: XCTestCase {
 
     func testWhenSwitchingBetweenTabsWithTypedValue_typedValueIsPreserved() async throws {
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [
-            Tab(content: .newtab),
-            Tab(content: .settings(pane: .about)),
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
-            Tab(content: .bookmarks),
-            Tab(content: .newtab),
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
-            Tab(content: .newtab),
-            Tab(content: .newtab),
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
+            Tab(content: .newtab, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .settings(pane: .about), privacyFeatures: privacyFeaturesMock),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .bookmarks, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .newtab, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .newtab, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .newtab, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
         ]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -300,8 +313,8 @@ class AddressBarTests: XCTestCase {
 
     func testWhenSwitchingBetweenURLTabs_addressBarIsDeactivated() async throws {
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
-            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
+            Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock),
         ]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -319,7 +332,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenDeactivatingAddressBar_webViewShouldBecomeFirstResponder() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -333,7 +346,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenGoingBack_addressBarIsDeactivated() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .loadedByStateRestoration), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .loadedByStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -359,7 +372,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenGoingBackToNewtabPage_addressBarIsActivated() async throws {
-        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -396,7 +409,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenGoingBackToNewtabPageFromSettings_addressBarIsActivated() async throws {
-        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -421,7 +434,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenGoingBackToNewtabPageFromBookmarks_addressBarIsActivated() async throws {
-        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -446,7 +459,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenTabReloaded_addressBarIsDeactivated() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -468,7 +481,7 @@ class AddressBarTests: XCTestCase {
             return .failure(URLError(.notConnectedToInternet))
         }]
 
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -486,7 +499,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenTabReloadedBySubmittingSameAddressAndAddressIsActivated_addressBarIsKeptActiveOnPageLoad() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         _=try await tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise().value
@@ -507,7 +520,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenEditingSerpURL_serpIconIsDisplayed() async throws {
-        let tab = Tab(content: .url(.makeSearchUrl(from: "catz")!, credential: nil, source: .userEntered("catz")), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.makeSearchUrl(from: "catz")!, credential: nil, source: .userEntered("catz")), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         _=try await tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise().value
@@ -518,7 +531,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenOpeningBookmark_addressBarIsDeactivated() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         try await tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise().value
@@ -532,7 +545,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenOpeningHistoryEntry_addressBarIsDeactivated() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         try await tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise().value
@@ -546,7 +559,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenOpeningURLfromUI_addressBarIsDeactivated() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         try await tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise().value
@@ -562,7 +575,7 @@ class AddressBarTests: XCTestCase {
     func testWhenHomePageIsOpened_addressBarIsDeactivated() async throws {
         StartupPreferences.shared.launchToCustomHomePage = true
 
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
 
@@ -579,7 +592,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenAddressSubmitted_addressBarIsDeactivated() async throws {
-        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         _=try await tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise().value
@@ -592,7 +605,7 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenAddressSubmittedAndAddressBarIsReactivated_addressBarIsKeptActiveOnPageLoad() async throws {
-        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         _=try await tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise().value
@@ -636,7 +649,7 @@ class AddressBarTests: XCTestCase {
             }
         }]
 
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         XCTAssertEqual(addressBarValue, URL.duckDuckGo.absoluteString)
@@ -683,7 +696,7 @@ class AddressBarTests: XCTestCase {
             }
         }]
 
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
         let page1loadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
@@ -704,10 +717,10 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenActivatingWindowWithPinnedTabOpen_webViewBecomesFirstResponder() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         WindowControllersManager.shared.pinnedTabsManager.setUp(with: TabCollection(tabs: [tab]))
 
-        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         window = WindowsManager.openNewWindow(with: viewModel)!
         viewModel.select(at: .pinned(0))
@@ -715,7 +728,7 @@ class AddressBarTests: XCTestCase {
 
         XCTAssertEqual(window.firstResponder, tab.webView)
 
-        let viewModel2 = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+        let viewModel2 = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)]))
         let window2 = WindowsManager.openNewWindow(with: viewModel2)!
         defer {
             window2.close()
@@ -735,10 +748,10 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenActivatingWindowWithPinnedTabWhenAddressBarIsActive_addressBarIsKeptActive() async throws {
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         WindowControllersManager.shared.pinnedTabsManager.setUp(with: TabCollection(tabs: [tab]))
 
-        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         window = WindowsManager.openNewWindow(with: viewModel)!
         viewModel.select(at: .pinned(0))
@@ -746,7 +759,7 @@ class AddressBarTests: XCTestCase {
 
         XCTAssertEqual(window.firstResponder, tab.webView)
 
-        let viewModel2 = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab)]))
+        let viewModel2 = TabCollectionViewModel(tabCollection: TabCollection(tabs: [Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)]))
         let window2 = WindowsManager.openNewWindow(with: viewModel2)!
         defer {
             window2.close()
