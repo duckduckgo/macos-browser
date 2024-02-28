@@ -212,7 +212,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             didFinishLaunching = true
         }
 
-        _ = HistoryCoordinator.shared // Force history load now
+        HistoryCoordinator.shared.loadHistory {
+            HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
+        }
+
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
         if case .normal = NSApp.runType {

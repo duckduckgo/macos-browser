@@ -21,14 +21,9 @@ import History
 
 extension HistoryCoordinator {
 
-    static let shared: HistoryCoordinating = {
-        let storing = EncryptedHistoryStore()
-        let coordinator = HistoryCoordinator(historyStoring: storing)
-        coordinator.migrateModelV5toV6IfNeeded(storing)
-        return coordinator
-    }()
+    static let shared = HistoryCoordinator(historyStoring: EncryptedHistoryStore())
 
-    private func migrateModelV5toV6IfNeeded(_ storing: EncryptedHistoryStore) {
+    func migrateModelV5toV6IfNeeded() {
         let defaults = MigrationDefaults()
 
         guard let historyDictionary = historyDictionary,

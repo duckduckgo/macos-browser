@@ -41,6 +41,10 @@ final class HistoryStoringMock: HistoryStoring {
         }
     }
 
+    func load() {
+        // no-op
+    }
+
     var removeEntriesCalled = false
     var removeEntriesArray = [HistoryEntry]()
     var removeEntriesResult: Result<Void, Error>?

@@ -262,6 +262,7 @@ fileprivate extension HistoryCoordinator {
         historyStoringMock.cleanOldResult = .success(History())
         historyStoringMock.removeEntriesResult = .success(())
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
+        historyCoordinator.loadHistory { }
 
         return (historyStoringMock, historyCoordinator)
     }

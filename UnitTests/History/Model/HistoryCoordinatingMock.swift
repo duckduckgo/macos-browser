@@ -24,6 +24,10 @@ import History
 
 final class HistoryCoordinatingMock: HistoryCoordinating {
 
+    func loadHistory(onCleanFinished: @escaping () -> Void) {
+        onCleanFinished()
+    }
+
     var history: History?
     var allHistoryVisits: [Visit]?
     @Published private(set) var historyDictionary: [URL: HistoryEntry]?
