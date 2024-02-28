@@ -1542,7 +1542,6 @@
 		4B957A4D2AC7AE700062CA31 /* TemporaryFileHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF0914282DD40100EE1418 /* TemporaryFileHandler.swift */; };
 		4B957A4E2AC7AE700062CA31 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E8152A1E2570006D261F /* URL+NetworkProtection.swift */; };
 		4B957A4F2AC7AE700062CA31 /* PrivacyFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */; };
-		4B957A502AC7AE700062CA31 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		4B957A512AC7AE700062CA31 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378F44EA29B4C73E00899924 /* ViewExtension.swift */; };
 		4B957A522AC7AE700062CA31 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */; };
 		4B957A532AC7AE700062CA31 /* SubscriptionPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0C72052ABC63BD00802009 /* SubscriptionPagesUserScript.swift */; };
@@ -2727,7 +2726,6 @@
 		B64C853826944B880048FEBE /* StoredPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C853726944B880048FEBE /* StoredPermission.swift */; };
 		B64C853D26944B940048FEBE /* PermissionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C853C26944B940048FEBE /* PermissionStore.swift */; };
 		B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C85412694590B0048FEBE /* PermissionButton.swift */; };
-		B64CE01C2B861B4F00126CA5 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = B64CE01B2B861B4F00126CA5 /* BrowserServicesKit */; };
 		B64CE01E2B8622D700126CA5 /* AddressBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64CE01D2B8622D700126CA5 /* AddressBarTests.swift */; };
 		B64CE01F2B8622D700126CA5 /* AddressBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64CE01D2B8622D700126CA5 /* AddressBarTests.swift */; };
 		B65211252B29A42C00B30633 /* BookmarkStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CDA25DDAB32009059CC /* BookmarkStoreMock.swift */; };
@@ -3200,13 +3198,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 9D9AE8D32AAA39D30026E7DC;
 			remoteInfo = DuckDuckGoDBPBackgroundAgentAppStore;
-		};
-		7B4CE8DF26F02108009134B1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
-			remoteInfo = "DuckDuckGo Privacy Browser";
 		};
 		7BDA36F72B7E082100AD5388 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -4656,7 +4647,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B64CE01C2B861B4F00126CA5 /* BrowserServicesKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7807,9 +7797,9 @@
 			isa = PBXGroup;
 			children = (
 				B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */,
-				B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */,
 				B31055BE27A1BA1D001AC618 /* userscript.js */,
 				FD23FD2C2886A81D007F6985 /* AutoconsentManagement.swift */,
+				B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */,
 			);
 			path = Autoconsent;
 			sourceTree = "<group>";
@@ -8427,6 +8417,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6F997C12B8F35F800476735 /* PBXTargetDependency */,
 				376113D62B29CD6800E794BB /* PBXTargetDependency */,
 			);
 			name = "SyncE2EUITests App Store";
@@ -8657,6 +8648,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6F997BF2B8F35F400476735 /* PBXTargetDependency */,
 			);
 			name = SyncE2EUITests;
 			productName = DuckDuckGoSyncUITests;
@@ -8674,11 +8666,11 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6F997BD2B8F35EF00476735 /* PBXTargetDependency */,
 				B696E8192B8619D6008368F0 /* PBXTargetDependency */,
 			);
 			name = "UI Tests";
 			packageProductDependencies = (
-				B64CE01B2B861B4F00126CA5 /* BrowserServicesKit */,
 			);
 			productName = "UI Tests";
 			productReference = 7B4CE8DA26F02108009134B1 /* UI Tests.xctest */;
@@ -8770,7 +8762,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				B692D0DF2B209FB7003F2548 /* PBXTargetDependency */,
+				B6F997BB2B8F353F00476735 /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				31C6E9AD2B0C07BA0086DC30 /* PBXTargetDependency */,
 			);
@@ -8934,6 +8926,7 @@
 				371D00DF29D8509400EC8598 /* XCRemoteSwiftPackageReference "OpenSSL-XCFramework" */,
 				4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+				B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -11067,7 +11060,6 @@
 				4B957A4D2AC7AE700062CA31 /* TemporaryFileHandler.swift in Sources */,
 				4B957A4E2AC7AE700062CA31 /* URL+NetworkProtection.swift in Sources */,
 				4B957A4F2AC7AE700062CA31 /* PrivacyFeatures.swift in Sources */,
-				4B957A502AC7AE700062CA31 /* (null) in Sources */,
 				4B957A512AC7AE700062CA31 /* ViewExtension.swift in Sources */,
 				4B957A522AC7AE700062CA31 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
 				4B957A532AC7AE700062CA31 /* SubscriptionPagesUserScript.swift in Sources */,
@@ -12604,11 +12596,6 @@
 			target = 9D9AE8D32AAA39D30026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore */;
 			targetProxy = 4BBA2D2A2B6AD01E00F6A470 /* PBXContainerItemProxy */;
 		};
-		7B4CE8E026F02108009134B1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
-			targetProxy = 7B4CE8DF26F02108009134B1 /* PBXContainerItemProxy */;
-		};
 		7BDA36F82B7E082100AD5388 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 7BDA36E42B7E037100AD5388 /* VPNProxyExtension */;
@@ -12626,35 +12613,31 @@
 		};
 		B6080B9D2B20AF7700B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6080B9C2B20AF7700B418EF /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B6080B9F2B20AF7B00B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6080B9E2B20AF7B00B418EF /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B6080BA12B20AF7F00B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6080BA02B20AF7F00B418EF /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B6080BA32B20AF8300B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6080BA22B20AF8300B418EF /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B6080BA52B20AF8800B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6080BA42B20AF8800B418EF /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B6080BA92B20AF8F00B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6080BA82B20AF8F00B418EF /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B6080BAB2B20AF9200B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6080BAA2B20AF9200B418EF /* SwiftLintPlugin */;
-		};
-		B692D0DF2B209FB7003F2548 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B692D0DE2B209FB7003F2548 /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B696E8192B8619D6008368F0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -12663,23 +12646,23 @@
 		};
 		B69D06142A4C0AC50032D14D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B69D06132A4C0AC50032D14D /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B69D06162A4C0ACD0032D14D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B69D06152A4C0ACD0032D14D /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B69D06182A4C0AD20032D14D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B69D06172A4C0AD20032D14D /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B69D061A2A4C0AD80032D14D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B69D06192A4C0AD80032D14D /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B69D061C2A4C0BC10032D14D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B69D061B2A4C0BC10032D14D /* SwiftLintPlugin */;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
 		B6EC37F229B5DA8F001ACE79 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -12690,6 +12673,22 @@
 			isa = PBXTargetDependency;
 			target = B6EC37E729B5DA2A001ACE79 /* tests-server */;
 			targetProxy = B6EC37F329B5DA94001ACE79 /* PBXContainerItemProxy */;
+		};
+		B6F997BB2B8F353F00476735 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
+		};
+		B6F997BD2B8F35EF00476735 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6F997BC2B8F35EF00476735 /* SwiftLintPlugin */;
+		};
+		B6F997BF2B8F35F400476735 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6F997BE2B8F35F400476735 /* SwiftLintPlugin */;
+		};
+		B6F997C12B8F35F800476735 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6F997C02B8F35F800476735 /* SwiftLintPlugin */;
 		};
 /* End PBXTargetDependency section */
 
@@ -13584,7 +13583,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 111.1.1;
+				version = 112.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -13617,6 +13616,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.5.0;
+			};
+		};
+		B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/duckduckgo/apple-toolbox.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -14140,46 +14147,6 @@
 			package = AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
 		};
-		B6080B9C2B20AF7700B418EF /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6080B9E2B20AF7B00B418EF /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6080BA02B20AF7F00B418EF /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6080BA22B20AF8300B418EF /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6080BA42B20AF8800B418EF /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6080BA82B20AF8F00B418EF /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6080BAA2B20AF9200B418EF /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B64CE01B2B861B4F00126CA5 /* BrowserServicesKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = BrowserServicesKit;
-		};
 		B65CD8CA2B316DF100A595BB /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
@@ -14199,31 +14166,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
-		};
-		B692D0DE2B209FB7003F2548 /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B69D06132A4C0AC50032D14D /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B69D06152A4C0ACD0032D14D /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B69D06172A4C0AD20032D14D /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B69D06192A4C0AD80032D14D /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B69D061B2A4C0BC10032D14D /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "plugin:SwiftLintPlugin";
 		};
 		B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -14259,6 +14201,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Configuration;
+		};
+		B6F997BA2B8F353F00476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6F997BC2B8F35EF00476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6F997BE2B8F35F400476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6F997C02B8F35F800476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
 		};
 		CBC83E3529B63D380008E19C /* Configuration */ = {
 			isa = XCSwiftPackageProductDependency;
