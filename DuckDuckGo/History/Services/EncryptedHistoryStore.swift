@@ -24,8 +24,6 @@ import History
 
 final class EncryptedHistoryStore: HistoryStoring {
 
-    init() {}
-
     init(context: NSManagedObjectContext) {
         self.context = context
     }
@@ -35,7 +33,7 @@ final class EncryptedHistoryStore: HistoryStoring {
         case savingFailed
     }
 
-    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")
+    let context: NSManagedObjectContext
 
     func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error> {
         return Future { [weak self] promise in

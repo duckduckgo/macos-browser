@@ -21,7 +21,7 @@ import History
 
 extension HistoryCoordinator {
 
-    static let shared = HistoryCoordinator(historyStoring: EncryptedHistoryStore())
+    static let shared = HistoryCoordinator(historyStoring: EncryptedHistoryStore(context: Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "History")))
 
     func migrateModelV5toV6IfNeeded() {
         let defaults = MigrationDefaults()
