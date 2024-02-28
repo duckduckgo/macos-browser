@@ -180,6 +180,7 @@ class HistoryCoordinatorTests: XCTestCase {
         let context = CoreData.historyStoreContainer().newBackgroundContext()
         let historyStore = EncryptedHistoryStore(context: context)
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStore)
+        historyCoordinator.loadHistory { }
 
         let url1 = URL(string: "https://duckduckgo.com")!
         historyCoordinator.addVisit(of: url1)
