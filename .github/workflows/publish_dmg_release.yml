@@ -204,7 +204,7 @@ jobs:
             ${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }} \
             "${version}" \
             announcement-task-contents.txt
-          echo "announcement-task-contents=$(<announcement-task-contents.txt)" >> $GITHUB_OUTPUT
+          echo "announcement-task-contents=$(sed 's/"/\\"/g' < announcement-task-contents.txt)" >> $GITHUB_OUTPUT
 
       - name: Set common environment variables
         if: always()
@@ -253,7 +253,7 @@ jobs:
 
       - name: Create Asana task to handle Asana paperwork
         id: create-asana-paperwork-task
-        if: always() && ${{ steps.update-asana.outcome == 'failure' }}
+        if: ${{ steps.update-asana.outcome == 'failure' }}
         uses: ./.github/actions/asana-create-action-item
         env:
           APP_BOARD_ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
@@ -264,14 +264,15 @@ jobs:
 
       - name: Create Asana task to announce the release
         id: create-announcement-task
-        if: always() && ${{ github.event.inputs.release-type != 'internal' }}
+        if: ${{ github.event.inputs.release-type != 'internal' }}
         uses: ./.github/actions/asana-create-action-item
         env:
           html-notes: ${{ steps.update-asana.outputs.announcement-task-contents }}
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          release-task-url: ${{ github.event.inputs.asana-task-url }}
           html-notes: ${{ env.html-notes }}
+          release-task-url: ${{ github.event.inputs.asana-task-url }}
+          task-name: Announce the release to the company
 
       - name: Upload patch to the Asana task
         id: upload-patch
@@ -304,6 +305,7 @@ jobs:
         if: always()
         uses: ./.github/actions/asana-log-message
         env:
+          ANNOUNCEMENT_TASK_ID: ${{ steps.create-announcement-task.outputs.new-task-id }}
           ASSIGNEE_ID: ${{ steps.create-task.outputs.assignee-id }}
           TASK_ID: ${{ steps.create-task.outputs.new-task-id }}
         with:
