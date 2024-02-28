@@ -58,10 +58,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install xcbeautify if macos-11
-      if: matrix.runner == 'macos-11'
-      run: brew install xcbeautify
-
     - name: Download and unzip artifact
       uses: actions/download-artifact@v4
 
@@ -145,7 +141,11 @@ jobs:
           -scheme "SyncE2EUITestsOldVersions" \
           -configuration Review \
         | tee xcodebuild.log \
-        | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml \
+        | (if [ "${{ matrix.runner }}" = "macos-11" ]; then
+            xcpretty --report junit --output ui-tests.xml
+          else
+            xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
+          fi)
 
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v3
