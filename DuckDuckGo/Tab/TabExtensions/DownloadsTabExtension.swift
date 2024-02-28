@@ -30,8 +30,9 @@ protocol TabDownloadsDelegate: AnyObject {
 final class DownloadsTabExtension: NSObject {
 
     private let downloadManager: FileDownloadManagerProtocol
-    private let isBurner: Bool
     private let downloadsPreferences: DownloadsPreferences
+    private let isBurner: Bool
+    private var isRestoringSessionState = false
 
     enum DownloadLocation {
         case auto
@@ -154,7 +155,16 @@ extension DownloadsTabExtension: NavigationResponder {
 
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        if navigationAction.shouldDownload
+        if case .sessionRestoration = navigationAction.navigationType {
+            self.isRestoringSessionState = true
+        } else if isRestoringSessionState,
+                  navigationAction.isUserInitiated || navigationAction.isCustom || navigationAction.isUserEnteredUrl
+                    || [.reload, .formSubmitted, .formResubmitted, .alternateHtmlLoad, .reload].contains(navigationAction.navigationType)
+                    || navigationAction.navigationType.isBackForward {
+            self.isRestoringSessionState = false
+        }
+
+        if (navigationAction.shouldDownload && !self.isRestoringSessionState)
             // to be modularized later, modifiers should be collected on click (and key down!) event and passed as .custom NavigationType
             || (navigationAction.navigationType.isLinkActivated && NSApp.isOptionPressed && !NSApp.isCommandPressed) {
 
@@ -166,13 +176,19 @@ extension DownloadsTabExtension: NavigationResponder {
 
     @MainActor
     func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
+        // get an initial Navigation Action
+        let firstNavigationAction = navigationResponse.mainFrameNavigation?.redirectHistory.first
+            ?? navigationResponse.mainFrameNavigation?.navigationAction
+
         guard navigationResponse.httpResponse?.isSuccessful != false,
-              !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload
-        else {
-            return .next
+              !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload else {
+            return .next // proceed with normal page loading
         }
+
         // prevent download twice for session restoration/tab reopening requests
-        guard !navigationResponse.isForMainFrame || navigationResponse.mainFrameNavigation?.request.cachePolicy != .returnCacheDataElseLoad else {
+        guard firstNavigationAction?.request.cachePolicy != .returnCacheDataElseLoad,
+              !isRestoringSessionState
+        else {
             return .cancel
         }
 
