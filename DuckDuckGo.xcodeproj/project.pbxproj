@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -2176,6 +2176,18 @@
 		56D145F229E6F06D00E3488A /* MockBookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */; };
 		56D6A3D629DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
 		56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
+		56F5C53A2B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C5392B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings */; };
+		56F5C53C2B8F5FDB00E012C7 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C53B2B8F5FDB00E012C7 /* InfoPlist.xcstrings */; };
+		56F5C53E2B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C53D2B8F5FDB00E012C7 /* Localizable.xcstrings */; };
+		56F5C53F2B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C53D2B8F5FDB00E012C7 /* Localizable.xcstrings */; };
+		56F5C5412B8F5FDB00E012C7 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C5402B8F5FDB00E012C7 /* InfoPlist.xcstrings */; };
+		56F5C5432B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C5422B8F5FDB00E012C7 /* Localizable.xcstrings */; };
+		56F5C5442B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C5422B8F5FDB00E012C7 /* Localizable.xcstrings */; };
+		56F5C5452B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C5422B8F5FDB00E012C7 /* Localizable.xcstrings */; };
+		56F5C5472B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C5462B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings */; };
+		56F5C5492B8F5FDB00E012C7 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C5482B8F5FDB00E012C7 /* InfoPlist.xcstrings */; };
+		56F5C54B2B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C54A2B8F5FDB00E012C7 /* Localizable.xcstrings */; };
+		56F5C54C2B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 56F5C54A2B8F5FDB00E012C7 /* Localizable.xcstrings */; };
 		7B0099792B65013800FE7C31 /* BrowserWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0099782B65013800FE7C31 /* BrowserWindowManager.swift */; };
 		7B00997D2B6508B700FE7C31 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7B00997C2B6508B700FE7C31 /* NetworkProtectionProxy */; };
 		7B00997F2B6508C200FE7C31 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7B00997E2B6508C200FE7C31 /* NetworkProtectionProxy */; };
@@ -3793,6 +3805,15 @@
 		56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportProviderTests.swift; sourceTree = "<group>"; };
 		56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBookmarkManager.swift; sourceTree = "<group>"; };
 		56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContinueSetUpView.swift; sourceTree = "<group>"; };
+		56F5C5382B8F5FDB00E012C7 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/Suggestion.xcstrings; sourceTree = "<group>"; };
+		56F5C5392B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = "Info-AppStore-InfoPlist.xcstrings"; sourceTree = "<group>"; };
+		56F5C53B2B8F5FDB00E012C7 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		56F5C53D2B8F5FDB00E012C7 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		56F5C5402B8F5FDB00E012C7 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		56F5C5422B8F5FDB00E012C7 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		56F5C5462B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = "Info-AppStore-InfoPlist.xcstrings"; sourceTree = "<group>"; };
+		56F5C5482B8F5FDB00E012C7 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		56F5C54A2B8F5FDB00E012C7 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		7B0099782B65013800FE7C31 /* BrowserWindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowManager.swift; sourceTree = "<group>"; };
 		7B0099802B65C6B300FE7C31 /* MacTransparentProxyProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacTransparentProxyProvider.swift; sourceTree = "<group>"; };
 		7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
@@ -5400,6 +5421,8 @@
 		4B4BEC312A11B509001D9AC5 /* DuckDuckGoNotifications */ = {
 			isa = PBXGroup;
 			children = (
+				56F5C5402B8F5FDB00E012C7 /* InfoPlist.xcstrings */,
+				56F5C5422B8F5FDB00E012C7 /* Localizable.xcstrings */,
 				7B5291882A1697680022E406 /* Info.plist */,
 				4B4BEC382A11B509001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift */,
 				4B4BEC322A11B509001D9AC5 /* Logging.swift */,
@@ -6185,6 +6208,9 @@
 		7BA7CC0D2AD11DC80042E5CE /* DuckDuckGoVPN */ = {
 			isa = PBXGroup;
 			children = (
+				56F5C5462B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings */,
+				56F5C5482B8F5FDB00E012C7 /* InfoPlist.xcstrings */,
+				56F5C54A2B8F5FDB00E012C7 /* Localizable.xcstrings */,
 				7BA7CC132AD11DC80042E5CE /* AppLauncher+DefaultInitializer.swift */,
 				7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */,
 				7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */,
@@ -6589,6 +6615,9 @@
 		9D9AE9132AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent */ = {
 			isa = PBXGroup;
 			children = (
+				56F5C5392B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings */,
+				56F5C53B2B8F5FDB00E012C7 /* InfoPlist.xcstrings */,
+				56F5C53D2B8F5FDB00E012C7 /* Localizable.xcstrings */,
 				9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */,
 				9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */,
 				7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */,
@@ -8457,6 +8486,7 @@
 				4B2537562A11BE7300610219 /* Sources */,
 				4B2537572A11BE7300610219 /* Frameworks */,
 				B6BD8F0A2A260E5900B6A41F /* embed libswift_Concurrency.dylib */,
+				56F5C54E2B8F5FDB00E012C7 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -8567,6 +8597,7 @@
 			buildPhases = (
 				4B4D60392A0B290200BCD287 /* Sources */,
 				4B4D603A2A0B290200BCD287 /* Frameworks */,
+				56F5C54D2B8F5FDB00E012C7 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -9062,7 +9093,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56F5C5492B8F5FDB00E012C7 /* InfoPlist.xcstrings in Resources */,
 				7BA7CC482AD11E5C0042E5CE /* Assets.xcassets in Resources */,
+				56F5C54B2B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9070,7 +9103,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56F5C5472B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings in Resources */,
 				7BA7CC472AD11E5C0042E5CE /* Assets.xcassets in Resources */,
+				56F5C54C2B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9078,7 +9113,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56F5C5412B8F5FDB00E012C7 /* InfoPlist.xcstrings in Resources */,
 				4B4BEC482A11B61F001D9AC5 /* Assets.xcassets in Resources */,
+				56F5C5452B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9154,6 +9191,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		56F5C54D2B8F5FDB00E012C7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56F5C5432B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		56F5C54E2B8F5FDB00E012C7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56F5C5442B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7B4CE8D826F02108009134B1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -9172,7 +9225,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56F5C53C2B8F5FDB00E012C7 /* InfoPlist.xcstrings in Resources */,
 				9D9AE91F2AAA3B450026E7DC /* Assets.xcassets in Resources */,
+				56F5C53E2B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9180,7 +9235,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56F5C53A2B8F5FDB00E012C7 /* Info-AppStore-InfoPlist.xcstrings in Resources */,
 				9D9AE9202AAA3B450026E7DC /* Assets.xcassets in Resources */,
+				56F5C53F2B8F5FDB00E012C7 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12697,6 +12754,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				AA80EC74256C46A2007083E7 /* Base */,
+				56F5C5382B8F5FDB00E012C7 /* mul */,
 			);
 			name = Suggestion.storyboard;
 			sourceTree = "<group>";
