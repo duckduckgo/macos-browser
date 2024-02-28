@@ -61,7 +61,7 @@ enum BookmarksDialogViewFactory {
         let viewModel = AddEditBookmarkDialogViewModel(mode: .add(parentFolder: parent), bookmarkManager: bookmarkManager)
         return makeAddEditBookmarkDialogView(viewModel: viewModel, bookmarkManager: bookmarkManager)
     }
-    
+
     /// Creates an instance of AddEditBookmarkDialogView for adding a Bookmark from the Favorites view in the empty Tab.
     /// - Parameter bookmarkManager: An instance of `BookmarkManager`. This should be used for `#previews` only.
     /// - Returns: An instance of AddEditBookmarkDialogView

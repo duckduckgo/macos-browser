@@ -152,8 +152,8 @@ private extension AddEditBookmarkDialogViewModel {
         }
         // If the bookmark changed parent location, move it.
         if bookmark.parentFolderUUID != selectedFolder?.id {
-            let parentFoler: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
-            bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: parentFoler, completion: { _ in })
+            let parentFolder: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
+            bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: parentFolder, completion: { _ in })
         }
     }
 

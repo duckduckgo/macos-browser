@@ -305,14 +305,17 @@ struct Favorite: View {
     let bookmark: Bookmark
 
     // Maintain separate copies of bookmark metadata required by the view, in order to ensure that SwiftUI re-renders correctly.
+    // Do not remove these properties even if some are not used in the `FavoriteTemplate` view as the view will not re-render correctly.
     private let bookmarkTitle: String
     private let bookmarkURL: URL
+    private let bookmarkParentFolder: String?
 
     init?(bookmark: Bookmark) {
         guard let urlObject = bookmark.urlObject else { return nil }
         self.bookmark = bookmark
         self.bookmarkTitle = bookmark.title
         self.bookmarkURL = urlObject
+        self.bookmarkParentFolder = bookmark.parentFolderUUID
     }
 
     var body: some View {

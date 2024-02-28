@@ -122,7 +122,7 @@ extension HomePage.Models {
             open(bookmark, .current)
         }
 
-        func edit(_ bookmark: Bookmark) {
+        func editBookmark(_ bookmark: Bookmark) {
             edit(bookmark)
         }
 
