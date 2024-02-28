@@ -69,7 +69,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppPermissionRequestedAndGranted_AppIsOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -150,7 +150,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppPermissionRequestedAndGrantedAndPersisted_AppIsOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, permissionManager: PermissionManagerMock(), extensionsBuilder: extensionsBuilder)
 
@@ -222,7 +222,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppPermissionEnteredByUser_permissionIsQueriedAndAppIsOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -269,7 +269,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppPermissionRejected_AppIsNotOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -313,7 +313,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppNotFound_AppIsNotOpened() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -351,7 +351,7 @@ final class TabPermissionsTests: XCTestCase {
 
     @MainActor
     func testWhenExternalAppNotFoundForUserEnteredUrl_SearchIsDone() async throws {
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self])
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self])
         let workspace = WorkspaceMock()
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
 
@@ -393,7 +393,7 @@ final class TabPermissionsTests: XCTestCase {
     @MainActor
     func testWhenSessionIsRestored_externalAppIsNotOpened() {
         var eDidCancel: XCTestExpectation!
-        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self]) { builder in { _, _ in
+        let extensionsBuilder = TestTabExtensionsBuilder(load: [ExternalAppSchemeHandler.self, DownloadsTabExtension.self]) { builder in { _, _ in
             builder.add {
                 TestsClosureNavigationResponderTabExtension(.init { _, _ in
                     .next
