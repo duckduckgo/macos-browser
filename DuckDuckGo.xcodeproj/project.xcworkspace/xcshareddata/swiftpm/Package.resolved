@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "418b186e3e015d56f73435e7f6c035e10e106aa6",
-        "version" : "111.0.0"
+        "revision" : "e3140633373b14b3d1fca25b098869cdaa753913",
+        "version" : "111.1.1"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "bb7bfc010ef4d2e7913c343663b167e2a984ac79",
-        "version" : "3.1.2000"
+        "revision" : "b75ab2c0405860bb2616db71b9a456acb118c21a",
+        "version" : "3.1.4000"
       }
     },
     {
@@ -147,7 +147,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "a6b7ba151d9dc6684484f3785293875ec01cc1ff",
         "version" : "1.2.2"
