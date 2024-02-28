@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1708953918019,
+    "version": 1709129209488,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1077,6 +1077,10 @@
                     {
                         "domain": "www.evernote.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1827"
+                    },
+                    {
+                        "domain": "discord.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1839"
                     }
                 ],
                 "webViewDefault": [
@@ -1100,7 +1104,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "653b8d161df5462850be095097e85143"
+            "hash": "9b6023fe353530899b721c7e2eba4119"
         },
         "dbp": {
             "state": "enabled",
@@ -4661,10 +4665,20 @@
                     "rollout": {
                         "steps": []
                     }
+                },
+                "toggleReports": {
+                    "state": "internal",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 5
+                            }
+                        ]
+                    }
                 }
             },
-            "state": "disabled",
-            "hash": "dede7e70939822f5ecb9eb5fae577fa3"
+            "state": "enabled",
+            "hash": "0d76cb4a367fc6738f7c4aa6a66f0a04"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",
