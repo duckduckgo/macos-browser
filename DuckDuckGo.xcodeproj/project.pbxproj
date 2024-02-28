@@ -7797,9 +7797,9 @@
 			isa = PBXGroup;
 			children = (
 				B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */,
-				B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */,
 				B31055BE27A1BA1D001AC618 /* userscript.js */,
 				FD23FD2C2886A81D007F6985 /* AutoconsentManagement.swift */,
+				B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */,
 			);
 			path = Autoconsent;
 			sourceTree = "<group>";
@@ -13582,8 +13582,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = revision;
-				revision = 947d1d498a4accf60e6131cf8b028acd935dfc4b;
+				kind = exactVersion;
+				version = 112.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -13622,8 +13622,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/apple-toolbox.git";
 			requirement = {
-				kind = revision;
-				revision = 449a81d5f31af91033c0a7c47f8ca2b0c9362aea;
+				kind = exactVersion;
+				version = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

@@ -31,11 +31,11 @@ let package = Package(
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "947d1d498a4accf60e6131cf8b028acd935dfc4b"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "112.0.0"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../LoginItems"),
-        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "111.1.1"),
+        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "1.0.0"),
     ],
     targets: [
         // MARK: - NetworkProtectionIPC
