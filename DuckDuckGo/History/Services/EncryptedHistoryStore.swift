@@ -20,17 +20,9 @@ import Common
 import Foundation
 import CoreData
 import Combine
+import History
 
-protocol HistoryStoring {
-
-    func cleanOld(until date: Date) -> Future<History, Error>
-    func save(entry: HistoryEntry) -> Future<[(id: Visit.ID, date: Date)], Error>
-    func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error>
-    func removeVisits(_ visits: [Visit]) -> Future<Void, Error>
-
-}
-
-final class HistoryStore: HistoryStoring {
+final class EncryptedHistoryStore: HistoryStoring {
 
     init() {}
 

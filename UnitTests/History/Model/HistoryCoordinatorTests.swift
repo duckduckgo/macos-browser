@@ -177,7 +177,7 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenBurningVisits_DoesntDeleteHistoryBeforeVisits() {
         // Needs real store to catch assertion which can be raised by improper call ordering in the coordinator
         let context = CoreData.historyStoreContainer().newBackgroundContext()
-        let historyStore = HistoryStore(context: context)
+        let historyStore = EncryptedHistoryStore(context: context)
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStore)
 
         let url1 = URL(string: "https://duckduckgo.com")!

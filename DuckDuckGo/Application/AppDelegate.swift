@@ -30,6 +30,7 @@ import ServiceManagement
 import SyncDataProviders
 import UserNotifications
 import PixelKit
+import History
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -211,7 +212,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             didFinishLaunching = true
         }
 
-        HistoryCoordinator.shared.loadHistory()
+        _ = HistoryCoordinator.shared // Force history load now
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
         if case .normal = NSApp.runType {
