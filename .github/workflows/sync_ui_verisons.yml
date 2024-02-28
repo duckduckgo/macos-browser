@@ -110,6 +110,7 @@ jobs:
       with:
         debug: true
 
+    # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
     - name: Build test runner 
       run: |
         mv LocalPackages 2LocalPackages
@@ -128,7 +129,6 @@ jobs:
         for dir in /Users/runner/Library/Developer/Xcode/DerivedData/DuckDuckGo-*/Build/Products/Review; do
           cp -R "DuckDuckGo Review.app" "$dir/DuckDuckGo Review.app"
         done
-        ls -latr /Users/runner/Library/Developer/Xcode/DerivedData/DuckDuckGo-*/Build/Products/Review
 
     - name: Run tests
       env:
@@ -162,5 +162,6 @@ jobs:
         path: |
           xcodebuild.log
           DerivedData/Logs/Test/*.xcresult
+          DerivedData/**/Logs/Test/*.xcresult
           ~/Library/Logs/DiagnosticReports/*
         retention-days: 7
