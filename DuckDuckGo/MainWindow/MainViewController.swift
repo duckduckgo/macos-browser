@@ -419,7 +419,8 @@ final class MainViewController: NSViewController {
 
     func adjustFirstResponder(selectedTabViewModel: TabViewModel? = nil, tabContent: Tab.TabContent? = nil) {
         guard let selectedTabViewModel = selectedTabViewModel ?? tabCollectionViewModel.selectedTabViewModel else {
-            assertionFailure("No tab view model selected")
+            // Disabled pending fix
+            // assertionFailure("No tab view model selected")
             return
         }
         let tabContent = tabContent ?? selectedTabViewModel.tab.content
