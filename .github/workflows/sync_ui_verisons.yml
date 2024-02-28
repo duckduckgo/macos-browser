@@ -58,9 +58,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: echo properties
-      run:
-        echo ${{ env.app-version }}
+    - name: Install xcbeautify if macos-11
+      if: matrix.runner == 'macos-11'
+      run: brew install xcbeautify
 
     - name: Download and unzip artifact
       uses: actions/download-artifact@v4
