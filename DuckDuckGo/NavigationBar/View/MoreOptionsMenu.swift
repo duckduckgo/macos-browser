@@ -48,6 +48,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 #endif
 #if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu)
+    func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
 #endif
 }
 
@@ -244,6 +245,10 @@ final class MoreOptionsMenu: NSMenu {
     @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
+
+    @objc func openIdentityTheftRestoration(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedIdentityTheftRestoration(self)
+    }
 #endif
 
     @objc func findInPage(_ sender: NSMenuItem) {
@@ -304,13 +309,13 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        if AccountManager().isUserAuthenticated {
-            items.append(contentsOf: makeActiveSubscriptionItems())
-        } else if SubscriptionPurchaseEnvironment.canPurchase {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && !AccountManager().isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
+        } else {
+            items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
         }
 #else
-        items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
+        items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
 #endif
 
         if !items.isEmpty {
@@ -355,8 +360,18 @@ final class MoreOptionsMenu: NSMenu {
         } else {
             DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
         }
-
 #endif // DBP
+
+#if SUBSCRIPTION
+        if AccountManager().isUserAuthenticated {
+            let identityTheftRestorationItem = NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
+                                                          action: #selector(openIdentityTheftRestoration),
+                                                          keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "ITR-Icon"))
+            items.append(identityTheftRestorationItem)
+        }
+#endif
 
         return items
     }
