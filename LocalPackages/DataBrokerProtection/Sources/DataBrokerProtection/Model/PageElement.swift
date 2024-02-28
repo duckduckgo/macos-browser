@@ -1,5 +1,5 @@
 //
-//  FillForm.swift
+//  PageElement.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -15,17 +15,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-
 import Foundation
 
-struct FillFormAction: Action {
-    let id: String
-    let actionType: ActionType
+struct PageElement: Codable, Sendable {
+    let type: String
     let selector: String
-    let elements: [PageElement]
-    let dataSource: DataSource?
+    let parent: ParentElement?
+}
 
-    var needsEmail: Bool {
-        elements.contains { $0.type == "email" }
-    }
+struct ProfileMatch: Codable, Sendable {
+    let selector: String
+    let profile: ExtractProfileSelectors
+}
+
+struct ParentElement: Codable, Sendable {
+    let profileMatch: ProfileMatch
 }
