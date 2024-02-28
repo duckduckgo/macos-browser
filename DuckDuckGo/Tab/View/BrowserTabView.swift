@@ -36,7 +36,7 @@ final class BrowserTabView: ColorView {
 
         if containsHostingView && !content.isHostingView,
            let subview = content.subviews.first {
-            assert(content.isHostingView)
+            assert(subview.isHostingView)
             return subview
         }
 
