@@ -236,6 +236,9 @@ struct UserText {
     static let addressBarVisitSuffix = NSLocalizedString("address.bar.visit.suffix",
                                                          value: "Visit",
                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com . Visit spreadprivacy.com")
+    static let addressBarPlaceholder = NSLocalizedString("address.bar.placeholder",
+                                                         value: "Search or enter address",
+                                                         comment: "Empty Address Bar placeholder text displayed on the new tab page.")
 
     static let navigateBack = NSLocalizedString("navigate.back", value: "Back", comment: "Context menu item")
     static let closeAndReturnToParentFormat = NSLocalizedString("close.tab.on.back.format",
@@ -1065,6 +1068,8 @@ struct UserText {
     // Key: "subscription.menu.item"
     // Comment: "Title for Subscription item in the options menu"
     static let subscriptionOptionsMenuItem = "Privacy Pro"
+
+    static let identityTheftRestorationOptionsMenuItem = "Identity Theft Restoration"
 
     // Key: "preferences.subscription"
     // Comment: "Show subscription preferences"
