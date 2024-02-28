@@ -2622,7 +2622,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Show Downloads popup when downloads are completed"
+            "value" : "Automatically open the Downloads panel when downloads complete"
           }
         }
       }
