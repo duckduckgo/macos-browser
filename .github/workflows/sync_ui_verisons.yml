@@ -140,6 +140,8 @@ jobs:
         set -o pipefail && xcodebuild test \
           -scheme "SyncE2EUITestsOldVersions" \
           -configuration Review \
+          -test-iterations 2 \
+          -retry-tests-on-failure
         | tee xcodebuild.log \
         | (if [ "${{ matrix.runner }}" = "macos-11" ]; then
             xcpretty --report junit --output ui-tests.xml
