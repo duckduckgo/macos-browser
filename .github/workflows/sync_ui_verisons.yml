@@ -118,6 +118,7 @@ jobs:
       run: |
         mv LocalPackages 2LocalPackages
         rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved 
+        sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
         set -o pipefail && xcodebuild build-for-testing \
           -scheme "SyncE2EUITestsOldVersions" \
           -configuration Review 
