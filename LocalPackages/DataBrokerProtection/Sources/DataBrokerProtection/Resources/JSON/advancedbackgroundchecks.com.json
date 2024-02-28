@@ -45,7 +45,9 @@
               "separator": ","
             },
             "profileUrl": {
-              "selector": ".link-to-details"
+              "selector": ".link-to-details",
+              "identifierType": "path",
+              "identifier": "https://www.advancedbackgroundchecks.com/${id}"
             }
           }
         }
