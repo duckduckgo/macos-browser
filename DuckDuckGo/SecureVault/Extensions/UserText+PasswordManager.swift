@@ -136,51 +136,35 @@ extension UserText {
     }
 
     // Confirmation Information Text
-    static func deleteAllPasswordsConfirmationInformationText(count: Int, syncEnabled: Bool) -> String {
-        switch(count, syncEnabled) {
-        case (1, true):
-            return NSLocalizedString("autofill.items.delete-one-password-synced-confirmation-information-text", value: "Your password will be deleted from all synced devices. Make sure you still have a way to access your accounts.", comment: "Information message displayed when deleting one password on a synced device")
-        case (1, false):
-            return NSLocalizedString("autofill.items.delete-one-password-device-confirmation-information-text", value: "Your password will be deleted from this device.", comment: "Information message displayed when deleting one password on a device")
-        case (_, true):
+    static func deleteAllPasswordsConfirmationInformationText(syncEnabled: Bool) -> String {
+        if syncEnabled {
             return NSLocalizedString("autofill.items.delete-all-passwords-synced-confirmation-information-text", value: "Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts.", comment: "Information message displayed when deleting all passwords on a synced device")
-        default:
-            return NSLocalizedString("autofill.items.delete-all-passwords-device-confirmation-information-text", value: "Your passwords will be deleted from this device.", comment: "Information message displayed when deleting all passwords on a device")
+        } else {
+            return NSLocalizedString("autofill.items.delete-all-passwords-device-confirmation-information-text", value: "Your passwords will be deleted from this device. Make sure you still have a way to access your accounts.", comment: "Information message displayed when deleting all passwords on a device")
         }
     }
 
     // Completion Message Text
     static func deleteAllPasswordsCompletionMessageText(count: Int) -> String {
-        if count == 1 {
-            return NSLocalizedString("autofill.items.delete-one-password-confirmation-message-text", value: "Password deleted", comment: "Message displayed on completion of single password deletion")
-        } else {
-            let localized = NSLocalizedString("autofill.items.delete-all-passwords-confirmation-message-text", value: "Passwords deleted (%d)", comment: "Message displayed on completion of multiple password deletion")
-            return String(format: localized, count)
-        }
+        let localized = NSLocalizedString("autofill.items.delete-all-passwords-confirmation-message-text", value: "All passwords deleted (%d)", comment: "Message displayed on completion of multiple password deletion")
+        return String(format: localized, count)
     }
 
     // Completion Information Text
-    static func deleteAllPasswordsCompletionInformationText(count: Int, syncEnabled: Bool) -> String {
-        switch(count, syncEnabled) {
-        case (1, true):
-            return NSLocalizedString("autofill.items.delete-one-password-synced-completion-information-text",
-                                                                                   value: "Your password has been deleted from all synced devices.",
-                                                                                   comment: "Information message displayed on completion of single password deletion when devices are synced")
-        case (1, false):
-            return NSLocalizedString("autofill.items.delete-one-password-device-completion-information-text",
-                                                                                   value: "Your password has been deleted from this device.",
-                                                                                   comment: "Information message displayed on completion of single password deletion when devices are not synced")
-        case (_, true):
+    static func deleteAllPasswordsCompletionInformationText(syncEnabled: Bool) -> String {
+        if syncEnabled {
             return NSLocalizedString("autofill.items.delete-all-passwords-synced-completion-information-text",
-                                                                                   value: "Your passwords have been deleted from all synced devices.",
-                                                                                   comment: "Information message displayed on completion of multiple password deletion when devices are synced")
-        default:
-            return NSLocalizedString("autofill.items.delete-all-passwords-device-completion-information-text",
-                                                                                   value: "Your passwords have been deleted from this device.",
-                                                                                   comment: "Information message displayed on completion of multiple password deletion when no devices are not synced")
+                                     value: "Your passwords have been deleted from all synced devices.",
+                                     comment: "Information message displayed on completion of multiple password deletion when devices are synced")
+        } else {
+            return ""
         }
     }
 
+    // Completion Close Button
+    static let deleteAllPasswordsCompletionButtonText = NSLocalizedString("autofill.items.delete-all-passwords-completion-button-texy", value: "Close", comment: "Button text on dialog confirming deletion was completed")
+
+    // System Alert Permission Text
     static let deleteAllPasswordsPermissionText = NSLocalizedString("autofill.items.delete-all-passwords-permisson-text", value: "Authenticate to confirm you want to delete all passwords", comment: "Message displayed in system authentication dialog")
 
 }

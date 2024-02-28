@@ -318,7 +318,6 @@ final class PasswordManagementViewController: NSViewController {
         guard let autofillDeleteAllPasswordsExecutor = builder.buildExecutor() else { return }
         let presenter = builder.buildPresenter()
 
-
         presenter.show(actionExecutor: autofillDeleteAllPasswordsExecutor) {
             self.refreshData()
             self.select(category: .logins)

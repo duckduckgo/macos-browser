@@ -757,6 +757,18 @@
         }
       }
     },
+    "autofill.items.delete-all-passwords-completion-button-texy" : {
+      "comment" : "Button text on dialog confirming deletion was completed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close"
+          }
+        }
+      }
+    },
     "autofill.items.delete-all-passwords-confirmation-message-text" : {
       "comment" : "Message displayed on completion of multiple password deletion\n   Message displayed on dialog asking user to confirm deletion of all passwords",
       "extractionState" : "extracted_with_value",
@@ -769,18 +781,6 @@
         }
       }
     },
-    "autofill.items.delete-all-passwords-device-completion-information-text" : {
-      "comment" : "Information message displayed on completion of multiple password deletion when no devices are not synced",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your passwords have been deleted from this device."
-          }
-        }
-      }
-    },
     "autofill.items.delete-all-passwords-device-confirmation-information-text" : {
       "comment" : "Information message displayed when deleting all passwords on a device",
       "extractionState" : "extracted_with_value",
@@ -788,7 +788,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your passwords will be deleted from this device."
+            "value" : "Your passwords will be deleted from this device. Make sure you still have a way to access your accounts."
           }
         }
       }
@@ -825,66 +825,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts."
-          }
-        }
-      }
-    },
-    "autofill.items.delete-one-password-confirmation-message-text" : {
-      "comment" : "Message displayed on completion of single password deletion",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Password deleted"
-          }
-        }
-      }
-    },
-    "autofill.items.delete-one-password-device-completion-information-text" : {
-      "comment" : "Information message displayed on completion of single password deletion when devices are not synced",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your password has been deleted from this device."
-          }
-        }
-      }
-    },
-    "autofill.items.delete-one-password-device-confirmation-information-text" : {
-      "comment" : "Information message displayed when deleting one password on a device",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your password will be deleted from this device."
-          }
-        }
-      }
-    },
-    "autofill.items.delete-one-password-synced-completion-information-text" : {
-      "comment" : "Information message displayed on completion of single password deletion when devices are synced",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your password has been deleted from all synced devices."
-          }
-        }
-      }
-    },
-    "autofill.items.delete-one-password-synced-confirmation-information-text" : {
-      "comment" : "Information message displayed when deleting one password on a synced device",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your password will be deleted from all synced devices. Make sure you still have a way to access your accounts."
           }
         }
       }
