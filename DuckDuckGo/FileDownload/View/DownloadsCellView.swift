@@ -55,9 +55,19 @@ final class DownloadsCellView: NSTableCellView {
     private var progressCancellable: AnyCancellable?
 
     private static let byteFormatter = ByteCountFormatter()
+
     private static let estimatedMinutesRemainingFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .full
+        formatter.includesApproximationPhrase = true
+        formatter.includesTimeRemainingPhrase = true
+        return formatter
+    }()
+
+    private static let estimatedSecondsRemainingFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.second]
         formatter.unitsStyle = .full
         formatter.includesApproximationPhrase = true
         formatter.includesTimeRemainingPhrase = true
@@ -149,8 +159,8 @@ final class DownloadsCellView: NSTableCellView {
     private var onButtonMouseOverChange: ((Bool) -> Void)?
 
     private func updateDetails(with progress: Progress, isMouseOver: Bool) {
-        self.detailLabel.toolTip = progress.localizedAdditionalDescription ?? ""
-        self.estimatedTimeLabel.toolTip = self.detailLabel.toolTip
+        self.detailLabel.toolTip = nil
+        self.estimatedTimeLabel.toolTip = nil
 
         var details: String
         var estimatedTime: String = ""
@@ -175,8 +185,18 @@ final class DownloadsCellView: NSTableCellView {
             }
 
             if let estimatedTimeRemaining = progress.estimatedTimeRemaining,
-               let estimatedTimeStr = (estimatedTimeRemaining < 30 ? UserText.downloadFewSecondsRemaining : Self.estimatedMinutesRemainingFormatter.string(from: estimatedTimeRemaining)) {
-
+               // only set estimated time if already present or more than 10 seconds remaining to avoid blinking
+               !self.estimatedTimeLabel.stringValue.isEmpty || estimatedTimeRemaining > 10,
+               let estimatedTimeStr = {
+                switch estimatedTimeRemaining {
+                case ..<10:
+                    UserText.downloadFewSecondsRemaining
+                case ..<60:
+                    Self.estimatedSecondsRemainingFormatter.string(from: estimatedTimeRemaining)
+                default:
+                    Self.estimatedMinutesRemainingFormatter.string(from: estimatedTimeRemaining)
+                }
+            }() {
                 estimatedTime = estimatedTimeStr
             }
         }
