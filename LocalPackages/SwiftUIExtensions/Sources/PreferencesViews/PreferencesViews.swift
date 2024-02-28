@@ -29,7 +29,6 @@ public struct TextMenuTitle: View {
     public var body: some View {
         Text(text)
             .font(Const.Fonts.preferencePaneTitle)
-            .padding(.horizontal)
     }
 }
 
