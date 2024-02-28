@@ -23,7 +23,7 @@ final class MockAutofillActionPresenter: AutofillActionPresenter {
 
     var didCallShow = false
 
-    func show(actionExecutor: AutofillActionExecutor) {
+    func show(actionExecutor: AutofillActionExecutor, completion: () -> Void) {
         didCallShow = true
         actionExecutor.execute(nil)
     }

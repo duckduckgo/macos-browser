@@ -21,14 +21,14 @@ import AppKit
 
 /// Conforming types handles presentation of `NSAlert`s associated with an `AutofillActionExecutor`
 protocol AutofillActionPresenter {
-    func show(actionExecutor: AutofillActionExecutor)
+    func show(actionExecutor: AutofillActionExecutor, completion: @escaping () -> Void)
 }
 
 /// Handles presentation of an alert associated with an `AutofillActionExecutor`
 struct DefaultAutofillActionPresenter: AutofillActionPresenter {
 
     @MainActor
-    func show(actionExecutor: AutofillActionExecutor) {
+    func show(actionExecutor: AutofillActionExecutor, completion: @escaping  () -> Void) {
         guard let window else { return }
 
         let confirmationAlert = actionExecutor.confirmationAlert
@@ -38,7 +38,7 @@ struct DefaultAutofillActionPresenter: AutofillActionPresenter {
             switch response {
             case .alertFirstButtonReturn:
                 actionExecutor.execute {
-                    show(completionAlert)
+                    show(completionAlert, completion: completion)
                 }
             default:
                 break
@@ -50,9 +50,16 @@ struct DefaultAutofillActionPresenter: AutofillActionPresenter {
 private extension DefaultAutofillActionPresenter {
 
     @MainActor
-    func show(_ alert: NSAlert) {
+    func show(_ alert: NSAlert, completion: @escaping () -> Void) {
         guard let window else { return }
-        alert.beginSheetModal(for: window)
+        alert.beginSheetModal(for: window) { response in
+            switch response {
+            case .alertFirstButtonReturn:
+                completion()
+            default:
+                break
+            }
+        }
     }
 
     @MainActor

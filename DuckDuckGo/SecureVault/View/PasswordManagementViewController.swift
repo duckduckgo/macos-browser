@@ -318,9 +318,11 @@ final class PasswordManagementViewController: NSViewController {
         guard let autofillDeleteAllPasswordsExecutor = builder.buildExecutor() else { return }
         let presenter = builder.buildPresenter()
 
-        self.dismiss()
 
-        presenter.show(actionExecutor: autofillDeleteAllPasswordsExecutor)
+        presenter.show(actionExecutor: autofillDeleteAllPasswordsExecutor) {
+            self.refreshData()
+            self.select(category: .logins)
+        }
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {

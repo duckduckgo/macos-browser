@@ -66,7 +66,6 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
             do {
                 try secureVault.deleteAllWebsiteCredentials()
                 syncService.scheduler.notifyDataChanged()
-                NotificationCenter.default.post(name: .PasswordManagerChanged, object: nil)
                 onSuccess?()
             } catch {
                 Pixel.fire(.debug(event: .secureVaultError, error: error))

@@ -80,15 +80,4 @@ final class AutofillDeleteAllPasswordsExecutorTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 3)
         XCTAssertTrue(scheduler.notifyDataChangedCalled)
     }
-
-    func testExecutePostsAutofillDataChangedNotification() async throws {
-        // Given
-        let expectation = expectation(forNotification: .PasswordManagerChanged, object: nil, handler: nil)
-
-        // When
-        sut.execute()
-
-        // Then
-        await fulfillment(of: [expectation], timeout: 2)
-    }
 }
