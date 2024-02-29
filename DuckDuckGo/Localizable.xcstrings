@@ -800,7 +800,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Authenticate to confirm you want to delete all passwords"
+            "value" : "delete all passwords"
           }
         }
       }

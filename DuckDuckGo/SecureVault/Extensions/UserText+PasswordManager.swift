@@ -165,6 +165,6 @@ extension UserText {
     static let deleteAllPasswordsCompletionButtonText = NSLocalizedString("autofill.items.delete-all-passwords-completion-button-texy", value: "Close", comment: "Button text on dialog confirming deletion was completed")
 
     // System Alert Permission Text
-    static let deleteAllPasswordsPermissionText = NSLocalizedString("autofill.items.delete-all-passwords-permisson-text", value: "Authenticate to confirm you want to delete all passwords", comment: "Message displayed in system authentication dialog")
+    static let deleteAllPasswordsPermissionText = NSLocalizedString("autofill.items.delete-all-passwords-permisson-text", value: "delete all passwords", comment: "Message displayed in system authentication dialog")
 
 }
