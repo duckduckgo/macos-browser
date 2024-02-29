@@ -119,9 +119,7 @@ jobs:
         sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
         set -o pipefail && xcodebuild build-for-testing \
           -scheme "SyncE2EUITestsOldVersions" \
-          -configuration Review \
-          -test-iterations 2 \
-          -retry-tests-on-failure
+          -configuration Review 
     
     - name: Unzip and Copy app to /DerivedData                         
       run: |
@@ -165,6 +163,7 @@ jobs:
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |
+          ui-tests.xml
           xcodebuild.log
           DerivedData/Logs/Test/*.xcresult
           DerivedData/**/Logs/Test/*.xcresult
