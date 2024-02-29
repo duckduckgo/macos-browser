@@ -1,7 +1,7 @@
 {
   "name": "Veriforia",
   "url": "veriforia.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
   "steps": [
@@ -11,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "17442975-944c-4b01-8518-7f1dff171ad2",
+          "id": "7e7f0952-40cf-4cf4-92cb-3d6cc3464219",
           "url": "https://veriforia.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -25,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "32e963e1-4959-4e5e-981b-550f1bf36f9a",
+          "id": "e5894fdf-3afb-459e-b1a3-a8852d116346",
           "selector": ".search-item",
           "profile": {
             "name": {
@@ -48,7 +48,9 @@
               "beforeText": ","
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://veriforia.com/view/${id}"
             }
           }
         }
