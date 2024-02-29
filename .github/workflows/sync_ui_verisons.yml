@@ -124,7 +124,7 @@ jobs:
     
     - name: Unzip and Copy app to /DerivedData                         
       run: |
-        cd DuckDuckGo-review-${{ env.app-version }}.app && unzip DuckDuckGo-${{ env.app-version }}.zip
+        cd DuckDuckGo-review-*.app && unzip DuckDuckGo-*.zip
         cp -R "DuckDuckGo Review.app" "../DerivedData/Build/Products/Review/DuckDuckGo Review.app"
 
     - name: Run tests
