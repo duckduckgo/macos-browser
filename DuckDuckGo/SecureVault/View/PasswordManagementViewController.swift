@@ -994,7 +994,7 @@ final class PasswordManagementViewController: NSViewController {
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
         case .allItems: showDefaultEmptyState()
-        case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
+        case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
         case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
         }
@@ -1015,13 +1015,13 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
     }
 
-    private func showEmptyState(imageName: String, title: String) {
+    private func showEmptyState(imageName: String, title: String, hideMessage: Bool = true, hideButton: Bool = true) {
         emptyState.isHidden = false
 
         emptyStateImageView.image = NSImage(named: imageName)
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.isHidden = true
-        emptyStateButton.isHidden = true
+        emptyStateMessage.isHidden = hideMessage
+        emptyStateButton.isHidden = hideButton
     }
 
     private func requestSync() {
