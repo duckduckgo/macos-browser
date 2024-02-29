@@ -1,5 +1,5 @@
 //
-//  EmailConfirmation.swift
+//  PageElement.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -15,11 +15,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-
 import Foundation
 
-struct EmailConfirmationAction: Action {
-    let id: String
-    let actionType: ActionType
-    let pollingTime: TimeInterval
+struct PageElement: Codable, Sendable {
+    let type: String
+    let selector: String
+    let parent: ParentElement?
+}
+
+struct ProfileMatch: Codable, Sendable {
+    let selector: String
+    let profile: ExtractProfileSelectors
+}
+
+struct ParentElement: Codable, Sendable {
+    let profileMatch: ProfileMatch
 }
