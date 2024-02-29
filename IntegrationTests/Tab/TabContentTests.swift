@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Combine
 import Common
 import XCTest
@@ -50,7 +51,7 @@ class TabContentTests: XCTestCase {
 
     @MainActor
     func testWhenPDFContextMenuPrintChosen_printDialogOpens() async throws {
-        let pdfUrl = Bundle(for: Self.self).url(forResource: "empty", withExtension: "pdf")!
+        let pdfUrl = Bundle(for: Self.self).url(forResource: "test", withExtension: "pdf")!
         // open Tab with PDF
         let tab = Tab(content: .url(pdfUrl, credential: nil, source: .userEntered("")))
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
@@ -103,6 +104,10 @@ class TabContentTests: XCTestCase {
                 try await Task.sleep(interval: 0.01)
             }
         }
+        let printOperationPromise = tab.$userInteractionDialog.compactMap { (dialog: Tab.UserDialog?) -> NSPrintOperation? in
+            guard case .print(let request) = dialog?.dialog else { return nil }
+            return request.parameters
+        }.timeout(5).first().promise()
 
         XCTAssertNotNil(printMenuItem.action)
         XCTAssertNotNil(printMenuItem.pdfHudRepresentedObject)
@@ -118,13 +123,15 @@ class TabContentTests: XCTestCase {
         defer {
             window.endSheet(printDialog, returnCode: .cancel)
         }
+        let printOperation = try await printOperationPromise.value
 
         XCTAssertEqual(printDialog.title, UserText.printMenuItem.dropping(suffix: "…"))
+        XCTAssertEqual(printOperation.pageRange, NSRange(location: 1, length: 3))
     }
 
     @MainActor
-    func disabled_testWhenPDFContextMenuSaveAsChosen_saveDialogOpens() async throws {
-        let pdfUrl = Bundle(for: Self.self).url(forResource: "empty", withExtension: "pdf")!
+    func testWhenPDFContextMenuSaveAsChosen_saveDialogOpens() async throws {
+        let pdfUrl = Bundle(for: Self.self).url(forResource: "test", withExtension: "pdf")!
         // open Tab with PDF
         let tab = Tab(content: .url(pdfUrl, credential: nil, source: .userEntered("")))
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
@@ -146,51 +153,69 @@ class TabContentTests: XCTestCase {
                                            pressure: 1)!
 
         // wait for context menu to appear
-        let menuWindowPromise = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect().compactMap { _ in
-            print(NSApp.windows.map(\.className))
-            return NSApp.windows.first(where: {
-                $0.className == "NSPopupMenuWindow"
-            })
-        }.timeout(5).first().promise()
+        let eMenuShown = expectation(description: "menu shown")
+        var menuItems = [NSMenuItem]()
+        NSView.swizzleWillOpenMenu { menu, event in
+            menuItems = menu.items
+            menu.removeAllItems()
+            eMenuShown.fulfill()
+        }
 
         // right-click
+        NSApp.activate(ignoringOtherApps: true)
         window.sendEvent(mouseDown)
-        let menuWindow = try await menuWindowPromise.value
+        await fulfillment(of: [eMenuShown])
 
         // find Print, Save As
-//        let menuItems = menuWindow.contentView?.recursivelyFindMenuItemViews()
-//        let printMenuItem = menuItems?.first(where: { $0.menuItem.title == UserText.printMenuItem })
-//        let saveAsMenuItem = menuItems?.first(where: { $0.menuItem.title == UserText.mainMenuFileSaveAs })
-//        XCTAssertNotNil(printMenuItem)
-//        XCTAssertNotNil(saveAsMenuItem)
-//
-//        // wait for save dialog to appear
-//        let saveDialogPromise = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect().compactMap { _ in
-//            self.window.sheets.first as? NSSavePanel
-//        }.timeout(5).first().promise()
-//
-//        // Click Save As…
-//        saveAsMenuItem?.menuItem.accessibilityPerformPress()
-//
-//        let saveDialog = try await saveDialogPromise.value
-//        guard let url = saveDialog.url else {
-//            XCTFail("no Save Dialog url")
-//            return
-//        }
-//        try? FileManager.default.removeItem(at: url)
-//
-//        // wait until file is saved
-//        let fileSavedPromise = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect().filter { _ in
-//            FileManager.default.fileExists(atPath: url.path)
-//        }.timeout(5).first().promise()
-//        defer {
-//            try? FileManager.default.removeItem(at: url)
-//        }
-//
-//        window.endSheet(saveDialog, returnCode: .OK)
-//
-//        _=try await fileSavedPromise.value
-//        try XCTAssertEqual(Data(contentsOf: url), Data(contentsOf: pdfUrl))
+        let printMenuItem = menuItems.first(where: { $0.title == UserText.printMenuItem })
+        XCTAssertNotNil(printMenuItem)
+        guard let saveAsMenuItem = menuItems.first(where: { $0.title == UserText.mainMenuFileSaveAs }) else {
+            XCTFail("No Save As menu item")
+            return
+        }
+
+        // wait for print dialog to appear
+        let eSaveDialogShown = expectation(description: "Save dialog shown")
+        let getSaveDialog = Task { @MainActor in
+            while true {
+                if let sheet = self.window.sheets.first as? NSSavePanel {
+                    eSaveDialogShown.fulfill()
+                    return sheet
+                }
+                try await Task.sleep(interval: 0.01)
+            }
+        }
+
+        XCTAssertNotNil(saveAsMenuItem.action)
+        XCTAssertNotNil(saveAsMenuItem.pdfHudRepresentedObject)
+
+        // Click Save As…
+        _=saveAsMenuItem.action.map { action in
+            NSApp.sendAction(action, to: saveAsMenuItem.target, from: saveAsMenuItem)
+        }
+        if case .timedOut = await XCTWaiter(delegate: self).fulfillment(of: [eSaveDialogShown], timeout: 5) {
+            getSaveDialog.cancel()
+        }
+        let saveDialog = try await getSaveDialog.value
+
+        guard let url = saveDialog.url else {
+            XCTFail("no Save Dialog url")
+            return
+        }
+        try? FileManager.default.removeItem(at: url)
+
+        // wait until file is saved
+        let fileSavedPromise = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect().filter { _ in
+            FileManager.default.fileExists(atPath: url.path)
+        }.timeout(5).first().promise()
+        defer {
+            try? FileManager.default.removeItem(at: url)
+        }
+
+        window.endSheet(saveDialog, returnCode: .OK)
+
+        _=try await fileSavedPromise.value
+        try XCTAssertEqual(Data(contentsOf: url), Data(contentsOf: pdfUrl))
     }
 
 }
@@ -213,7 +238,6 @@ private extension NSView {
         _=swizzleWillOpenMenuOnce
         self.willOpenMenuWithEvent = willOpenMenuWithEvent
     }
-
 
     @objc dynamic func swizzled_willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         if let willOpenMenuWithEvent = Self.willOpenMenuWithEvent {
