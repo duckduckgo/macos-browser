@@ -94,7 +94,7 @@ class TabContentTests: XCTestCase {
 
         // wait for print dialog to appear
         let ePrintDialogShown = expectation(description: "Print dialog shown")
-        let getPrintDialog = Task {
+        let getPrintDialog = Task { @MainActor in
             while true {
                 if let sheet = self.window.sheets.first {
                     ePrintDialogShown.fulfill()
