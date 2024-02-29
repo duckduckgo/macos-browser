@@ -130,12 +130,6 @@ enum Preferences {
     }
 }
 
-public extension AccountManager {
-    convenience init() {
-        self.init(appGroup: Bundle.main.appGroup(bundle: .subs))
-    }
-}
-
 struct SyncView: View {
 
     var body: some View {
