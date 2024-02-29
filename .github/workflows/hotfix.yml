@@ -2,6 +2,9 @@ name: Hotfix release
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - dominik/hotfix-automation
 
 jobs:
 
