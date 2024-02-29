@@ -67,7 +67,8 @@ jobs:
       run: |
         case "${{ env.BRANCH }}" in
           release/*) ;;
-          *) echo "👎 Not a release branch"; exit 1 ;;
+          hotfix/*) ;;
+          *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
         esac
 
     - name: Check out the code
