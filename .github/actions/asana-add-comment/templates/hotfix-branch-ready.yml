@@ -1,0 +1,9 @@
+data:
+  html_text: |
+    <body>
+      <h2>Hotfix release branch ${BRANCH} is ready</h2>
+      <a data-asana-gid='${ASSIGNEE_ID}'/>, please follow up with having code merged to <code>${BRANCH}</code> and making a release build.</a>.
+
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>
