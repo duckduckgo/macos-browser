@@ -651,12 +651,12 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
     }
 
     func editFolder(_ sender: NSMenuItem) {
-        guard let (folder, parent) = sender.representedObject as? (BookmarkFolder, BookmarkFolder?) else {
+        guard let folderInfo = sender.representedObject as? BookmarkFolderInfo else {
             assertionFailure("Failed to cast menu represented object to BookmarkFolder")
             return
         }
 
-        BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: parent)
+        BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folderInfo.folder, parentFolder: folderInfo.parent)
             .show(in: view.window)
     }
 

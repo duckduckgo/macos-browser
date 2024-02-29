@@ -578,12 +578,12 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
     }
 
     func editFolder(_ sender: NSMenuItem) {
-        guard let (folder, parent) = sender.representedObject as? (BookmarkFolder, BookmarkFolder?) else {
+        guard let folderInfo = sender.representedObject as? BookmarkFolderInfo else {
             assertionFailure("Failed to retrieve Bookmark from Edit Folder context menu item")
             return
         }
 
-        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: parent)
+        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folderInfo.folder, parentFolder: folderInfo.parent)
         showDialog(view: view)
     }
 
