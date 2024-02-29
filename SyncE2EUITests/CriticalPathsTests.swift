@@ -70,9 +70,12 @@ final class CriticalPathsTests: XCTestCase {
     }
     
     func testCanCreateSyncAccount() throws {
+        XCTFail("Forced failure")
         // Go to Sync Set up
         accessSettings()
         let settingsWindow = app.windows["Settings"]
+        XCTAssertTrue(settingsWindow.exists, "Begin Syncing text is not visible")
+        
         settingsWindow.buttons["Sync & Backup"].click()
 
         // Create Account

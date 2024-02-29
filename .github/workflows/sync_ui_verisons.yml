@@ -1,4 +1,4 @@
-name: Sync-End-to-End tests Legacy
+name: Sync-End-to-End tests MacOS11/12
 
 on:
   workflow_dispatch:
@@ -163,7 +163,7 @@ jobs:
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |
-          /build/reports/junit.xml
+          build/*
           ui-tests.xml
           xcodebuild.log
           DerivedData/Logs/Test/*.xcresult
