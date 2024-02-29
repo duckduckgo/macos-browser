@@ -97,7 +97,7 @@ final class CaptchaServiceTests: XCTestCase {
         let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
-            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, retries: 2, shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, retries: 2, pollingInterval: 0.01, shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .timedOutWhenSubmittingCaptcha = error {
@@ -175,7 +175,7 @@ final class CaptchaServiceTests: XCTestCase {
         let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
-            _ = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 1, shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 0.01, shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .timedOutWhenFetchingCaptchaResult = error {

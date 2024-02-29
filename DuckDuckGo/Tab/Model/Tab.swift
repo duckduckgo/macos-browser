@@ -671,6 +671,8 @@ protocol NewWindowPolicyDecisionMaker {
             } else if content != self.content {
                 self.content = content
             }
+        } else if self.content.isUrl {
+            self.content = .none
         }
         self.updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
     }
