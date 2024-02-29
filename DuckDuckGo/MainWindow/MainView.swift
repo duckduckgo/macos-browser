@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import WebKit
 
 final class MainView: NSView {
     let tabBarContainerView = NSView()
@@ -133,15 +134,24 @@ final class MainView: NSView {
     }
 
     private func setupSaveAsAndPrintMenuItems(menu: NSMenu, with event: NSEvent) {
-        let hudView: WKPDFHUDViewWrapper? = withMouseLocationInViewCoordinates(event.locationInWindow) { point in
-            guard let view = self.hitTest(point) else { return nil }
-            if let hudView = WKPDFHUDViewWrapper(view: view) {
-                return hudView
-            } else if let webView = view as? WKWebView {
-                return webView.hudView(at: webView.convert(point, from: self))
+        guard let window else { return }
+
+        // try to find PDF HUD view at the right-click location (it might be a frame click)
+        let hudView: WKPDFHUDViewWrapper? = {
+            for point in [event.locationInWindow, window.mouseLocationOutsideOfEventStream] {
+                let locationInView = convert(point, from: nil)
+                guard let view = self.hitTest(locationInView) else { continue }
+
+                if let hudView = WKPDFHUDViewWrapper(view: view) {
+                    return hudView
+                } else if let webView = view as? WKWebView,
+                          let hudView = webView.hudView(at: webView.convert(locationInView, from: self)) {
+                    return hudView
+                }
             }
-            return nil
-        }
+            return (self.hitTest(bounds.center) as? WKWebView)?.hudView()
+        }()
+        assert(hudView != nil)
 
         // insert Save As… and Print… items after `Open with Preview`
         // 1. find `Copy`

@@ -47,6 +47,31 @@ class TabContentTests: XCTestCase {
         NSView.swizzleWillOpenMenu(with: nil)
     }
 
+    func sendRightMouseClick(to view: NSView) {
+        let point = view.convert(view.bounds.center, to: nil)
+
+        let mouseDown = NSEvent.mouseEvent(with: .rightMouseDown,
+                                           location: point,
+                                           modifierFlags: [],
+                                           timestamp: CACurrentMediaTime(),
+                                           windowNumber: window.windowNumber,
+                                           context: nil,
+                                           eventNumber: -22966,
+                                           clickCount: 1,
+                                           pressure: 1)!
+        let mouseUp = NSEvent.mouseEvent(with: .rightMouseUp,
+                                         location: point,
+                                         modifierFlags: [],
+                                         timestamp: CACurrentMediaTime(),
+                                         windowNumber: window.windowNumber,
+                                         context: nil,
+                                         eventNumber: -22966,
+                                         clickCount: 1,
+                                         pressure: 1)!
+        view.window!.sendEvent(mouseDown)
+        view.window!.sendEvent(mouseUp)
+    }
+
     // MARK: - Tests
 
     @MainActor
@@ -59,18 +84,6 @@ class TabContentTests: XCTestCase {
         let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
-        let point = tab.webView.convert(tab.webView.bounds.center, to: nil)
-
-        let mouseDown = NSEvent.mouseEvent(with: .rightMouseDown,
-                                           location: point,
-                                           modifierFlags: [],
-                                           timestamp: CACurrentMediaTime(),
-                                           windowNumber: window.windowNumber,
-                                           context: nil,
-                                           eventNumber: -22966,
-                                           clickCount: 1,
-                                           pressure: 1)!
-
         // wait for context menu to appear
         let eMenuShown = expectation(description: "menu shown")
         var menuItems = [NSMenuItem]()
@@ -82,7 +95,7 @@ class TabContentTests: XCTestCase {
 
         // right-click
         NSApp.activate(ignoringOtherApps: true)
-        window.sendEvent(mouseDown)
+        sendRightMouseClick(to: tab.webView)
         await fulfillment(of: [eMenuShown])
 
         // find Print, Save As
@@ -139,19 +152,6 @@ class TabContentTests: XCTestCase {
         let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
-        let point = tab.webView.convert(tab.webView.bounds.center, to: nil)
-
-        NSApp.activate(ignoringOtherApps: true)
-        let mouseDown = NSEvent.mouseEvent(with: .rightMouseDown,
-                                           location: point,
-                                           modifierFlags: [],
-                                           timestamp: CACurrentMediaTime(),
-                                           windowNumber: window.windowNumber,
-                                           context: nil,
-                                           eventNumber: -22966,
-                                           clickCount: 1,
-                                           pressure: 1)!
-
         // wait for context menu to appear
         let eMenuShown = expectation(description: "menu shown")
         var menuItems = [NSMenuItem]()
@@ -163,7 +163,7 @@ class TabContentTests: XCTestCase {
 
         // right-click
         NSApp.activate(ignoringOtherApps: true)
-        window.sendEvent(mouseDown)
+        sendRightMouseClick(to: tab.webView)
         await fulfillment(of: [eMenuShown])
 
         // find Print, Save As
