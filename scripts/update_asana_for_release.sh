@@ -80,7 +80,7 @@ construct_this_release_includes() {
 		printf '%s' '<ul>'
 		for task_id in "${task_ids[@]}"; do
 			if [[ "$task_id" != "$release_task_id" ]]; then
-				printf '%s' "<li><a data-asana-gid=\\\"${task_id}\\\"/></li>"
+				printf '%s' "<li><a data-asana-gid=\"${task_id}\"/></li>"
 			fi
 		done
 		printf '%s' '</ul>'
@@ -120,7 +120,8 @@ construct_release_announcement_task_description() {
 
 update_task_description() {
 	local html_notes="$1"
-	local request_payload="{\"data\":{\"html_notes\":\"${html_notes}\"}}"
+	local escaped_html_notes=${html_notes//\"/\\\"}
+	local request_payload="{\"data\":{\"html_notes\":\"${escaped_html_notes}\"}}"
 
 	curl -fLSs -X PUT "${asana_api_url}/tasks/${release_task_id}?opt_fields=permalink_url" \
 		-H 'Content-Type: application/json' \
