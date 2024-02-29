@@ -39,7 +39,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
 
-  sync-end-to-end-tests:
+  sync-end-to-end-tests-older-macos:
     name: Sync E2E tests
     needs: create-notarized-app
     env:
