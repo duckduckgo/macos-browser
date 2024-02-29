@@ -1,4 +1,4 @@
-name: Hotfix release
+name: Prepare Hotfix Release
 
 on:
   workflow_dispatch:
