@@ -113,7 +113,7 @@ jobs:
     # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
     - name: Build test runner 
       run: |
-        mv LocalPackages 2LocalPackages
+        rm -rf LocalPackages
         rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved 
         sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
         sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
@@ -163,6 +163,7 @@ jobs:
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |
+          /build/reports/junit.xml
           ui-tests.xml
           xcodebuild.log
           DerivedData/Logs/Test/*.xcresult
