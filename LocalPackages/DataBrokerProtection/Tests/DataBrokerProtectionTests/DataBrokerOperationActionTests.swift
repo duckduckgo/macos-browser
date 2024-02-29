@@ -35,7 +35,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenEmailConfirmationActionSucceeds_thenExtractedLinkIsOpened() async {
-        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1)
+        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1, dataSource: nil)
         let step = Step(type: .optOut, actions: [emailConfirmationAction])
         let extractedProfile = ExtractedProfile(email: "test@duck.com")
         let sut = OptOutOperation(
@@ -57,7 +57,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenEmailConfirmationActionHasNoEmail_thenNoURLIsLoadedAndWebViewFinishes() async {
-        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1)
+        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1, dataSource: nil)
         let step = Step(type: .optOut, actions: [emailConfirmationAction])
         let noEmailExtractedProfile = ExtractedProfile()
         let sut = OptOutOperation(
@@ -85,7 +85,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenOnEmailConfirmationActionEmailServiceThrows_thenOperationThrows() async {
-        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1)
+        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1, dataSource: nil)
         let step = Step(type: .optOut, actions: [emailConfirmationAction])
         let extractedProfile = ExtractedProfile(email: "test@duck.com")
         emailService.shouldThrow = true
@@ -114,7 +114,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenActionNeedsEmail_thenExtractedProfileEmailIsSet() async {
-        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil)])
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil)], dataSource: nil)
         let step = Step(type: .optOut, actions: [fillFormAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
@@ -130,11 +130,11 @@ final class DataBrokerOperationActionTests: XCTestCase {
         await sut.runNextAction(fillFormAction)
 
         XCTAssertEqual(sut.extractedProfile?.email, "test@duck.com")
-        XCTAssertTrue(webViewHandler.wasExecuteCalledForExtractedProfile)
+        XCTAssertTrue(webViewHandler.wasExecuteCalledForUserData)
     }
 
     func testWhenGetEmailServiceFails_thenOperationThrows() async {
-        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil)])
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil)], dataSource: nil)
         let step = Step(type: .optOut, actions: [fillFormAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
@@ -195,7 +195,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenSolveCaptchaActionIsRun_thenCaptchaIsResolved() async {
-        let solveCaptchaAction = SolveCaptchaAction(id: "1", actionType: .solveCaptcha, selector: "g-captcha")
+        let solveCaptchaAction = SolveCaptchaAction(id: "1", actionType: .solveCaptcha, selector: "g-captcha", dataSource: nil)
         let step = Step(type: .optOut, actions: [solveCaptchaAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
@@ -215,7 +215,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenSolveCapchaActionFailsToSubmitDataToTheBackend_thenOperationFails() async {
-        let solveCaptchaAction = SolveCaptchaAction(id: "1", actionType: .solveCaptcha, selector: "g-captcha")
+        let solveCaptchaAction = SolveCaptchaAction(id: "1", actionType: .solveCaptcha, selector: "g-captcha", dataSource: nil)
         let step = Step(type: .optOut, actions: [solveCaptchaAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
@@ -284,7 +284,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenRunningActionWithoutExtractedProfile_thenExecuteIsCalledWithProfileData() async {
-        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item]())
+        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil)
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
@@ -297,7 +297,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
 
         await sut.runNextAction(expectationAction)
 
-        XCTAssertTrue(webViewHandler.wasExecuteCalledForProfileData)
+        XCTAssertTrue(webViewHandler.wasExecuteCalledForUserData)
     }
 
     func testWhenLoadURLDelegateIsCalled_thenCorrectMethodIsExecutedOnWebViewHandler() async {

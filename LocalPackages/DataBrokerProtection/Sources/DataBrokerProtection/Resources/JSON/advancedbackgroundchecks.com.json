@@ -1,7 +1,7 @@
 {
   "name": "AdvancedBackgroundChecks",
   "url": "advancedbackgroundchecks.com",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678060800000,
   "steps": [
@@ -45,7 +45,9 @@
               "separator": ","
             },
             "profileUrl": {
-              "selector": ".link-to-details"
+              "selector": ".link-to-details",
+              "identifierType": "path",
+              "identifier": "https://www.advancedbackgroundchecks.com/${id}"
             }
           }
         }

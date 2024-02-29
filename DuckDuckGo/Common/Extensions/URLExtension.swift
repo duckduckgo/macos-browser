@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import AppKit
+import BrowserServicesKit
 import Common
 import Foundation
-import BrowserServicesKit
 
 extension URL.NavigationalScheme {
 
