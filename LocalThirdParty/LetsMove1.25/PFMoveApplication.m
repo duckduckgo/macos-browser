@@ -18,17 +18,21 @@
 
 @implementation LetsMove
 + (NSBundle *)bundle {
-
 	return [NSBundle bundleForClass:self];
 }
 @end
 
 // Strings
-#define kStrMoveApplicationCouldNotMove NSLocalizedStringWithDefaultValue(@"letsmove.could.not.move", nil, [LetsMove bundle], @"Could not move to Applications folder", @"Error message when moving the app to the /Applications folder failed")
-#define kStrMoveApplicationQuestionTitle NSLocalizedStringWithDefaultValue(@"letsmove.alert.title", nil, [LetsMove bundle], @"You‘re almost there", @"Title of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there")
-#define kStrMoveApplicationQuestionMessage NSLocalizedStringWithDefaultValue(@"letsmove.alert.message", nil, [LetsMove bundle], @"The DuckDuckGo app needs to be in the Applications folder for some features to work properly.", @"Message of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there")
-#define kStrMoveApplicationButtonMove NSLocalizedStringWithDefaultValue(@"letsmove.move.button", nil, [LetsMove bundle], @"Move to Applications Folder", @"Move the /Applications folder button title")
-#define kStrMoveApplicationButtonDoNotMove NSLocalizedStringWithDefaultValue(@"letsmove.dont.move.button", nil, [LetsMove bundle], @"Do Not Move", @"Do Not Move to the /Applications folder button title")
+// These are macros to be able to use custom i18n tools
+#define _I10NS(nsstr) NSLocalizedStringFromTableInBundle(nsstr, @"MoveApplication", [LetsMove bundle], nil)
+#define kStrMoveApplicationCouldNotMove _I10NS(@"Could not move to Applications folder")
+#define kStrMoveApplicationQuestionTitle  _I10NS(@"You're almost there")
+#define kStrMoveApplicationQuestionTitleHome _I10NS(@"You're almost there")
+#define kStrMoveApplicationQuestionMessage _I10NS(@"The DuckDuckGo app needs to be in the Applications folder for some features to work properly.")
+#define kStrMoveApplicationButtonMove _I10NS(@"Move to Applications Folder")
+#define kStrMoveApplicationButtonDoNotMove _I10NS(@"Do Not Move")
+#define kStrMoveApplicationQuestionInfoWillRequirePasswd _I10NS(@"")
+#define kStrMoveApplicationQuestionInfoInDownloadsFolder _I10NS(@"")
 
 // Needs to be defined for compiling under 10.5 SDK
 #ifndef NSAppKitVersionNumber10_5
@@ -47,6 +51,7 @@ static BOOL MoveInProgress = NO;
 // Helper functions
 static NSString *PreferredInstallLocation(void);
 static BOOL IsInApplicationsFolder(NSString *path);
+static BOOL IsInDownloadsFolder(NSString *path);
 static BOOL IsApplicationAtPathRunning(NSString *path);
 static BOOL IsApplicationAtPathNested(NSString *path);
 static NSString *ContainingDiskImageDevice(NSString *path);
@@ -110,6 +115,16 @@ void PFMoveToApplicationsFolderIfNecessary(BOOL allowAlertSilencing) {
 		[alert setMessageText:kStrMoveApplicationQuestionTitle];
 
 		informativeText = kStrMoveApplicationQuestionMessage;
+
+		if (needAuthorization) {
+			informativeText = [informativeText stringByAppendingString:@" "];
+			informativeText = [informativeText stringByAppendingString:kStrMoveApplicationQuestionInfoWillRequirePasswd];
+		}
+		else if (IsInDownloadsFolder(bundlePath)) {
+			// Don't mention this stuff if we need authentication. The informative text is long enough as it is in that case.
+			informativeText = [informativeText stringByAppendingString:@" "];
+			informativeText = [informativeText stringByAppendingString:kStrMoveApplicationQuestionInfoInDownloadsFolder];
+		}
 
 		[alert setInformativeText:informativeText];
 
@@ -233,6 +248,15 @@ static BOOL IsInApplicationsFolder(NSString *path) {
 	for (NSString *appDir in applicationDirs) {
 		if ([path hasPrefix:appDir]) return YES;
 	}
+	return NO;
+}
+
+static BOOL IsInDownloadsFolder(NSString *path) {
+	NSArray *downloadDirs = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory, NSAllDomainsMask, YES);
+	for (NSString *downloadsDirPath in downloadDirs) {
+		if ([path hasPrefix:downloadsDirPath]) return YES;
+	}
+
 	return NO;
 }
 
