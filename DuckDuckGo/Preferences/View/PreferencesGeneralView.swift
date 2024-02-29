@@ -43,8 +43,13 @@ extension Preferences {
                             } else {
                                 Image("Warning").foregroundColor(Color("LinkBlueColor"))
                                 Text(UserText.isNotDefaultBrowser)
-                                Button(UserText.makeDefaultBrowser) {
+                                Button(action: {
                                     defaultBrowserModel.becomeDefault()
+                                }) {
+                                    Text(UserText.makeDefaultBrowser)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .multilineTextAlignment(.center)
+                                        .lineLimit(2)
                                 }
                             }
                         }

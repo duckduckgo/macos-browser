@@ -22,7 +22,7 @@ import Subscription
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
-    @Published var hasEntitlements: Bool = false
+    @Published var cachedEntitlements: [AccountManager.Entitlement] = []
     @Published var subscriptionDetails: String?
 
     private var subscriptionPlatform: SubscriptionService.GetSubscriptionDetailsResponse.Platform?
@@ -31,18 +31,27 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private let accountManager: AccountManager
     private let openURLHandler: (URL) -> Void
+    private let openVPNHandler: () -> Void
+    private let openDBPHandler: () -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
+
+    private var fetchSubscriptionDetailsTask: Task<(), Never>?
 
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(accountManager: AccountManager = AccountManager(), openURLHandler: @escaping (URL) -> Void, sheetActionHandler: SubscriptionAccessActionHandlers) {
+    public init(accountManager: AccountManager = AccountManager(),
+                openURLHandler: @escaping (URL) -> Void,
+                openVPNHandler: @escaping () -> Void,
+                openDBPHandler: @escaping () -> Void,
+                sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
         self.openURLHandler = openURLHandler
+        self.openVPNHandler = openVPNHandler
+        self.openDBPHandler = openDBPHandler
         self.sheetActionHandler = sheetActionHandler
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
-        self.hasEntitlements = self.isUserAuthenticated
 
         if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
             updateDescription(for: cachedDate)
@@ -82,7 +91,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func learnMoreAction() {
-        openURLHandler(.purchaseSubscription)
+        openURLHandler(.subscriptionPurchase)
     }
 
     enum ChangePlanOrBillingAction {
@@ -150,17 +159,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openVPN() {
-        NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
+        openVPNHandler()
     }
 
     @MainActor
     func openPersonalInformationRemoval() {
-        NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+        openDBPHandler()
     }
 
     @MainActor
     func openIdentityTheftRestoration() {
-        NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
+        openURLHandler(.identityTheftRestoration)
     }
 
     @MainActor
@@ -170,12 +179,21 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
-        Task {
-            guard let token = accountManager.accessToken else { return }
+        guard fetchSubscriptionDetailsTask == nil else { return }
+
+        fetchSubscriptionDetailsTask = Task { [weak self] in
+            defer {
+                self?.fetchSubscriptionDetailsTask = nil
+            }
+
+            guard let token = self?.accountManager.accessToken else { return }
 
             if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
-                updateDescription(for: cachedDate)
-                self.hasEntitlements = cachedDate.timeIntervalSinceNow > 0
+                self?.updateDescription(for: cachedDate)
+
+                if cachedDate.timeIntervalSinceNow < 0 {
+                    self?.cachedEntitlements = []
+                }
             }
 
             if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
@@ -184,12 +202,14 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                     return
                 }
 
-                updateDescription(for: response.expiresOrRenewsAt)
+                self?.updateDescription(for: response.expiresOrRenewsAt)
 
-                subscriptionPlatform = response.platform
+                self?.subscriptionPlatform = response.platform
             }
 
-            self.hasEntitlements = await AccountManager().hasEntitlement(for: "dummy1")
+            if case let .success(entitlements) = await AccountManager().fetchEntitlements() {
+                self?.cachedEntitlements = entitlements
+            }
         }
     }
 

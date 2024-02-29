@@ -112,8 +112,6 @@ extension TunnelControllerIPCService: IPCServerInterface {
     }
 
     func debugCommand(_ command: DebugCommand) async throws {
-        _ = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID)
-
         switch command {
         case .removeSystemExtension:
 #if NETP_SYSTEM_EXTENSION
@@ -132,6 +130,9 @@ extension TunnelControllerIPCService: IPCServerInterface {
             if defaults.networkProtectionOnboardingStatus == .completed {
                 defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
             }
+        case .disableConnectOnDemandAndShutDown:
+            // Not implemented on macOS yet
+            break
         }
     }
 }

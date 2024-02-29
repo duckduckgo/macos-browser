@@ -69,6 +69,7 @@ public struct UserDefaultsWrapper<T> {
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
         case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
+        case autofillDebugScriptEnabled = "preferences.enable-autofill-debug-script"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
@@ -179,6 +180,11 @@ public struct UserDefaultsWrapper<T> {
         case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
         case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
         case syncDidShowSyncPausedByFeatureFlagAlert = "sync.did-show-sync-paused-by-feature-flag-alert"
+
+        // Subscription
+
+        case subscriptionInternalTesting = "subscription.internal-testing-enabled"
+        case subscriptionEnvironment = "subscription.environment"
     }
 
     enum RemovedKeys: String, CaseIterable {

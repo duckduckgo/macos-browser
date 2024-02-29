@@ -49,6 +49,7 @@ struct DatabaseView: View {
     @State private var isPopoverVisible = false
     @State private var selectedData: String = ""
     let data: [DataBrokerDatabaseBrowserData.Row]
+    let rowHeight: CGFloat = 40.0
 
     var body: some View {
         if data.count > 0 {
@@ -60,6 +61,11 @@ struct DatabaseView: View {
         } else {
             Text("No Data")
         }
+    }
+
+    private func spacerHeight(_ geometry: GeometryProxy) -> CGFloat {
+        let result = geometry.size.height - CGFloat(data.count) * rowHeight
+        return max(0, result)
     }
 
     private func dataView() -> some View {
@@ -86,7 +92,8 @@ struct DatabaseView: View {
                             ForEach(row.data.keys.sorted(), id: \.self) { key in
                                 VStack {
                                     Text("\(row.data[key]?.description ?? "")")
-                                        .frame(maxWidth: 200, maxHeight: 50)
+                                        .frame(maxWidth: 200)
+                                        .frame(height: rowHeight)
                                         .frame(minWidth: 60)
                                         .onTapGesture {
                                             selectedData = row.data[key]?.description ?? ""
@@ -100,7 +107,8 @@ struct DatabaseView: View {
                             }
                         }
                     }
-                    Spacer(minLength: geometry.size.height)
+                    Spacer()
+                        .frame(height: spacerHeight(geometry))
                 }
                 .frame(minWidth: geometry.size.width, minHeight: 0, alignment: .topLeading)
             }

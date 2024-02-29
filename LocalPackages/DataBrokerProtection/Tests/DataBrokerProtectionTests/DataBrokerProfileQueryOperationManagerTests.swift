@@ -44,7 +44,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let extractedProfileId: Int64 = 1
             let currentPreferredRunDate = Date()
 
-            let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -92,14 +92,14 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let extractedProfileId: Int64 = 1
             let currentPreferredRunDate = Date()
 
-            let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
             let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
 
-            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc")
-            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz")
+            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc", identifier: "abc")
+            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz", identifier: "zxz")
 
             let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved1),
                               OptOutOperationData.mock(with: extractedProfileSaved2)]
@@ -143,7 +143,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let extractedProfileId: Int64 = 1
             let currentPreferredRunDate = Date()
 
-            let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -745,7 +745,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let extractedProfileId: Int64 = 1
         let currentPreferredRunDate = Date()
 
-        let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+        let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
         let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
         let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -770,7 +770,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let currentPreferredRunDate = Date()
         let expectedPreferredRunDate = Date().addingTimeInterval(config.confirmOptOutScan.hoursToSeconds)
 
-        let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+        let mockDataBroker = DataBroker(name: "databroker", url: "databroker.com", steps: [Step](), version: "1.0", schedulingConfig: config)
         let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
         let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
@@ -795,7 +795,7 @@ final class MockWebOperationRunner: WebOperationRunner {
     var wasScanCalled = false
     var wasOptOutCalled = false
 
-    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: StageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
         wasScanCalled = true
 
         if shouldScanThrow {
@@ -805,7 +805,7 @@ final class MockWebOperationRunner: WebOperationRunner {
         }
     }
 
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: StageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
         wasOptOutCalled = true
 
         if shouldOptOutThrow {
@@ -846,6 +846,7 @@ extension DataBroker {
         DataBroker(
             id: 1,
             name: "Test broker",
+            url: "testbroker.com",
             steps: [
                 Step(type: .scan, actions: [Action]()),
                 Step(type: .optOut, actions: [Action]())
@@ -863,6 +864,7 @@ extension DataBroker {
         DataBroker(
             id: 1,
             name: "Test broker",
+            url: "testbroker.com",
             steps: [
                 Step(type: .scan, actions: [Action]()),
                 Step(type: .optOut, actions: [Action](), optOutType: .parentSiteOptOut)
@@ -879,6 +881,7 @@ extension DataBroker {
     static var mockWithoutId: DataBroker {
         DataBroker(
             name: "Test broker",
+            url: "testbroker.com",
             steps: [Step](),
             version: "1.0",
             schedulingConfig: DataBrokerScheduleConfig(
@@ -904,19 +907,19 @@ extension ProfileQuery {
 extension ExtractedProfile {
 
     static var mockWithRemovedDate: ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: Date())
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: Date(), identifier: "someURL")
     }
 
     static var mockWithoutRemovedDate: ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL")
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", identifier: "someURL")
     }
 
     static var mockWithoutId: ExtractedProfile {
-        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL")
+        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL", identifier: "someOtherURL")
     }
 
     static func mockWithRemoveDate(_ date: Date) -> ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date)
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date, identifier: "someURL")
     }
 }
 

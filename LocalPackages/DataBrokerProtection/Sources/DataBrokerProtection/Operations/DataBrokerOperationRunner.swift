@@ -23,13 +23,13 @@ import Common
 protocol WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
-              stageCalculator: DataBrokerProtectionStageDurationCalculator,
+              stageCalculator: StageDurationCalculator,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile]
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
-                stageCalculator: DataBrokerProtectionStageDurationCalculator,
+                stageCalculator: StageDurationCalculator,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws
 }
@@ -37,7 +37,7 @@ protocol WebOperationRunner {
 extension WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
-              stageCalculator: DataBrokerProtectionStageDurationCalculator,
+              stageCalculator: StageDurationCalculator,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
 
         try await scan(profileQuery,
@@ -48,7 +48,7 @@ extension WebOperationRunner {
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
-                stageCalculator: DataBrokerProtectionStageDurationCalculator,
+                stageCalculator: StageDurationCalculator,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await optOut(profileQuery: profileQuery,
@@ -77,7 +77,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
     }
 
     func scan(_ profileQuery: BrokerProfileQueryData,
-              stageCalculator: DataBrokerProtectionStageDurationCalculator,
+              stageCalculator: StageDurationCalculator,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
         let scan = ScanOperation(
@@ -93,7 +93,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
-                stageCalculator: DataBrokerProtectionStageDurationCalculator,
+                stageCalculator: StageDurationCalculator,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
         let optOut = OptOutOperation(

@@ -302,11 +302,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .appTrackingProtection:
             NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
         case .vpn:
-            NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
+            NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
         case .personalInformationRemoval:
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+            await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
-            NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
+            await WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
         }
 
         return nil
@@ -391,7 +392,7 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
-            WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
+            WindowControllersManager.shared.show(url: .subscriptionPurchase, source: .ui, newTab: true)
         })
     }
 
@@ -400,7 +401,7 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
-            WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
+            WindowControllersManager.shared.show(url: .subscriptionPurchase, source: .ui, newTab: true)
         })
     }
 

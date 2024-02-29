@@ -47,7 +47,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
 
         sut.calculateMismatches()
 
-        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelFired!
+        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let pixelName = DataBrokerProtectionPixels.parentChildMatches(parent: "", child: "", value: 0).name
         XCTAssertEqual(lastPixel.name, pixelName)
         XCTAssertEqual(Int((lastPixel.params?["value"])!),
@@ -72,7 +72,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
 
         sut.calculateMismatches()
 
-        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelFired!
+        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let pixelName = DataBrokerProtectionPixels.parentChildMatches(parent: "", child: "", value: 0).name
         XCTAssertEqual(lastPixel.name, pixelName)
         XCTAssertEqual(Int((lastPixel.params?["value"])!),
@@ -97,7 +97,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
 
         sut.calculateMismatches()
 
-        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelFired!
+        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let pixelName = DataBrokerProtectionPixels.parentChildMatches(parent: "", child: "", value: 0).name
         XCTAssertEqual(lastPixel.name, pixelName)
         XCTAssertEqual(Int((lastPixel.params?["value"])!),
@@ -122,7 +122,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
 
         sut.calculateMismatches()
 
-        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelFired!
+        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let pixelName = DataBrokerProtectionPixels.parentChildMatches(parent: "", child: "", value: 0).name
         XCTAssertEqual(lastPixel.name, pixelName)
         XCTAssertEqual(Int((lastPixel.params?["value"])!),
@@ -143,7 +143,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
 
         sut.calculateMismatches()
 
-        XCTAssertNil(MockDataBrokerProtectionPixelsHandler.lastPixelFired)
+        XCTAssertTrue(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.isEmpty)
     }
 }
 
@@ -152,6 +152,7 @@ extension BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: "parent",
+                url: "parent.com",
                 steps: [Step](),
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock
@@ -165,6 +166,7 @@ extension BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: "child",
+                url: "child.com",
                 steps: [Step](),
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,

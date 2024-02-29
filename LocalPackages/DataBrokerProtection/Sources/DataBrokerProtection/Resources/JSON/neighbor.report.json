@@ -1,7 +1,8 @@
 {
-  "name": "neighbor.report",
+  "name": "Neighbor Report",
+  "url": "neighbor.report",
   "version": "0.1.4",
-  "addedDatetime": 1703559600000,
+  "addedDatetime": 1703570400000,
   "steps": [
     {
       "stepType": "scan",
@@ -9,12 +10,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "a554d7d2-f348-487a-97de-8d4f0d1d35c0",
+          "id": "bbaf8a18-fef8-42a6-9682-747b8ff485b2",
           "url": "https://neighbor.report/${firstName}-${lastName}/${state|stateFull|hyphenated}/${city|hyphenated}"
         },
         {
           "actionType": "extract",
-          "id": "17f80250-1e3c-4e55-8e50-68fe98a6ce23",
+          "id": "0dac4a6d-1291-47c3-97b8-56200f751ac8",
           "selector": ".lstd",
           "profile": {
             "name": {
@@ -50,12 +51,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "59cc488d-e317-4fb4-8aaa-a20cb71f7480",
+          "id": "b1f7f4ab-51b0-4885-ba73-97be0822d0ba",
           "url": "https://neighbor.report/remove"
         },
         {
           "actionType": "fillForm",
-          "id": "3a4c1775-941a-4f48-873d-c780f5ea25a0",
+          "id": "743afa6c-7dea-4115-934b-bea369307acd",
           "selector": ".form-horizontal",
           "elements": [
             {
@@ -74,17 +75,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "f470e245-d5ee-4908-bd6c-16e604a1a29b",
+          "id": "24ce0da0-7cc3-47e7-bf8e-6f5fe98b7a91",
           "selector": ".recaptcha-div"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "7f0a8fc6-32a3-4f4a-b61d-267f9666de91",
+          "id": "b720de9a-f519-466f-980d-d9c52d8870a2",
           "selector": ".recaptcha-div"
         },
         {
           "actionType": "click",
-          "id": "7fbc5a97-bc57-41bc-a556-0fdfd8a0845d",
+          "id": "46690938-f112-4091-bd07-b5641e38151f",
           "elements": [
             {
               "type": "button",
@@ -94,7 +95,7 @@
         },
         {
           "actionType": "click",
-          "id": "d1513f65-a746-4597-9ed2-4cd5e40dead3",
+          "id": "07cfed17-9d75-471a-b6a0-0522add35ffa",
           "elements": [
             {
               "type": "button",
@@ -108,7 +109,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "8acd9c96-443d-4593-a3a7-9efc9fd5070a",
+          "id": "ebd61347-60e1-4c19-bc41-dd1ce36d3138",
           "expectations": [
             {
               "type": "text",

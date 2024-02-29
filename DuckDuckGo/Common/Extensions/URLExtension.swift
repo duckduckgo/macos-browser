@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
@@ -131,6 +132,8 @@ extension URL {
     static let welcome = #URL("duck://welcome")
     static let settings = #URL("duck://settings")
     static let bookmarks = #URL("duck://bookmarks")
+    // base url for Error Page Alternate HTML loaded into Web View
+    static let error = #URL("duck://error")
 
     static let dataBrokerProtection = #URL("duck://dbp")
 
@@ -472,5 +475,9 @@ extension URL {
             return "\(strippedURL)\(uuid)"
         }
         return self.absoluteString
+    }
+
+    public func isChild(of url: URL) -> Bool {
+        self.absoluteString.hasPrefix(url.absoluteString)
     }
 }

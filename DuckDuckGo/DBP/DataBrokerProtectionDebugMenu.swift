@@ -23,6 +23,7 @@ import Foundation
 import AppKit
 import Common
 import LoginItems
+import NetworkProtectionProxy
 
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
@@ -82,6 +83,11 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
                 NSMenuItem(title: "Restart", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentRestart))
                     .targetting(self)
+
+                NSMenuItem.separator()
+
+                NSMenuItem(title: "Show agent IP address", action: #selector(DataBrokerProtectionDebugMenu.showAgentIPAddress))
+                    .targetting(self)
             }
 
             NSMenuItem(title: "Operations") {
@@ -133,7 +139,12 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
                 .targetting(self)
             NSMenuItem(title: "Force Profile Removal", action: #selector(DataBrokerProtectionDebugMenu.showForceOptOutWindow))
+                .targetting(self)
             NSMenuItem(title: "Force broker JSON files update", action: #selector(DataBrokerProtectionDebugMenu.forceBrokerJSONFilesUpdate))
+                .targetting(self)
+            NSMenuItem(title: "Run Personal Information Removal Debug Mode", action: #selector(DataBrokerProtectionDebugMenu.runCustomJSON))
+                .targetting(self)
+            NSMenuItem(title: "Reset All State and Delete All Data", action: #selector(DataBrokerProtectionDebugMenu.deleteAllDataAndStopAgent))
                 .targetting(self)
         }
     }
@@ -225,6 +236,14 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         LoginItemsManager().enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
     }
 
+    @objc private func deleteAllDataAndStopAgent() {
+        Task { @MainActor in
+            guard case .alertFirstButtonReturn = await NSAlert.removeAllDBPStateAndDataAlert().runModal() else { return }
+            resetWaitlistState()
+            DataBrokerProtectionFeatureDisabler().disableAndDelete()
+        }
+    }
+
     @objc private func showDatabaseBrowser() {
         let viewController = DataBrokerDatabaseBrowserViewController()
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
@@ -240,6 +259,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         window.delegate = self
     }
 
+    @objc private func showAgentIPAddress() {
+        DataBrokerProtectionManager.shared.showAgentIPAddress()
+    }
+
     @objc private func showForceOptOutWindow() {
         let viewController = DataBrokerForceOptOutViewController()
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
@@ -252,6 +275,21 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         window.center()
         dataBrokerForceOptOutWindowController = NSWindowController(window: window)
         dataBrokerForceOptOutWindowController?.showWindow(nil)
+        window.delegate = self
+    }
+
+    @objc private func runCustomJSON() {
+        let viewController = DataBrokerRunCustomJSONViewController()
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
+                              styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                              backing: .buffered,
+                              defer: false)
+
+        window.contentViewController = viewController
+        window.minSize = NSSize(width: 500, height: 400)
+        window.center()
+        databaseBrowserWindowController = NSWindowController(window: window)
+        databaseBrowserWindowController?.showWindow(nil)
         window.delegate = self
     }
 

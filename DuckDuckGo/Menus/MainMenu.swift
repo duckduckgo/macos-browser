@@ -30,6 +30,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
+import Subscription
 import SubscriptionUI
 #endif
 
@@ -96,6 +97,7 @@ import SubscriptionUI
     private var loggingMenu: NSMenu?
     let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
     let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: nil)
+    let autofillDebugScriptMenuItem = NSMenuItem(title: "Autofill Debug Script", action: #selector(MainMenu.toggleAutofillScriptDebugSettingsAction))
 
     // MARK: - Help
 
@@ -385,6 +387,7 @@ import SubscriptionUI
         updateLoggingMenuItems()
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
+        updateAutofillDebugScriptMenuItem()
     }
 
     // MARK: - Bookmarks
@@ -589,7 +592,17 @@ import SubscriptionUI
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
 #if SUBSCRIPTION
-            SubscriptionDebugMenu(currentViewController: {
+            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
+            let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
+
+            SubscriptionDebugMenu(currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
+                                  updateEnvironment: {
+                guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
+                currentEnvironmentWrapper.wrappedValue = newEnvironment
+                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment },
+                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                                  currentViewController: {
                 WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
             })
 #endif
@@ -613,6 +626,9 @@ import SubscriptionUI
             menuItem.identifier = .init(category)
             menu.addItem(menuItem)
         }
+
+        menu.addItem(autofillDebugScriptMenuItem
+            .targetting(self))
 
         menu.addItem(.separator())
         let debugLoggingMenuItem = NSMenuItem(title: OSLog.isRunningInDebugEnvironment ? "Disable DEBUG level logging…" : "Enable DEBUG level logging…", action: #selector(debugLoggingMenuItemAction), target: self)
@@ -640,6 +656,10 @@ import SubscriptionUI
 
             item.state = enabledCategories.contains(category) ? .on : .off
         }
+    }
+
+    private func updateAutofillDebugScriptMenuItem() {
+        autofillDebugScriptMenuItem.state = AutofillPreferences().debugScriptEnabled ? .on : .off
     }
 
     private func updateRemoteConfigurationInfo() {
@@ -670,6 +690,12 @@ import SubscriptionUI
 
     @objc private func disableAllLogsMenuItemAction(_ sender: NSMenuItem) {
         OSLog.loggingCategories = []
+    }
+
+    @objc private func toggleAutofillScriptDebugSettingsAction(_ sender: NSMenuItem) {
+        AutofillPreferences().debugScriptEnabled = !AutofillPreferences().debugScriptEnabled
+        NotificationCenter.default.post(name: .autofillScriptDebugSettingsDidChange, object: nil)
+        updateAutofillDebugScriptMenuItem()
     }
 
     @objc private func debugLoggingMenuItemAction(_ sender: NSMenuItem) {

@@ -23,6 +23,7 @@ final class TabPreviewWindowController: NSWindowController {
 
     static let width: CGFloat = 280
     static let padding: CGFloat = 2
+    static let bottomPadding: CGFloat = 40
     static let delay: CGFloat = 1
 
     private var previewTimer: Timer?
@@ -33,18 +34,37 @@ final class TabPreviewWindowController: NSWindowController {
 
     // swiftlint:disable force_cast
     var tabPreviewViewController: TabPreviewViewController {
-        contentViewController as! TabPreviewViewController
+        return self.window!.contentViewController as! TabPreviewViewController
     }
     // swiftlint:enable force_cast
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
+    init() {
+        super.init(window: Self.loadWindow())
 
-        window?.animationBehavior = .utilityWindow
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(suggestionWindowOpenNotification(_:)),
                                                name: .suggestionWindowOpen,
                                                object: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
+    private static func loadWindow() -> NSWindow {
+        let tabPreviewViewController = TabPreviewViewController()
+
+        let window = NSWindow(contentRect: CGRect(x: 294, y: 313, width: 280, height: 58), styleMask: [.titled, .fullSizeContentView], backing: .buffered, defer: true)
+        window.contentViewController = tabPreviewViewController
+
+        window.allowsToolTipsWhenApplicationIsInactive = false
+        window.autorecalculatesKeyViewLoop = false
+        window.isReleasedWhenClosed = false
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.animationBehavior = .utilityWindow
+
+        return window
     }
 
     deinit {
@@ -124,8 +144,19 @@ final class TabPreviewWindowController: NSWindowController {
         guard let window = window else {
             return
         }
+        var topLeftPoint = topLeftPoint
 
-        window.setFrame(NSRect(x: 0, y: 0, width: 250, height: 58), display: true)
+        // Make sure preview is presented within screen
+        if let screenVisibleFrame = window.screen?.visibleFrame {
+            topLeftPoint.x = min(topLeftPoint.x, screenVisibleFrame.origin.x + screenVisibleFrame.width - window.frame.width)
+            topLeftPoint.x = max(topLeftPoint.x, screenVisibleFrame.origin.x)
+
+            let windowHeight = window.frame.size.height
+            if topLeftPoint.y <= windowHeight + screenVisibleFrame.origin.y {
+                topLeftPoint.y = topLeftPoint.y + windowHeight + Self.bottomPadding
+            }
+        }
+
         window.setFrameTopLeftPoint(topLeftPoint)
     }
 

@@ -48,15 +48,8 @@ final class TabViewModel {
     }
     @Published var progress: Double = 0.0
 
-    struct ErrorViewState {
-        var isVisible: Bool = false
-        var message: String?
-    }
-    @Published var errorViewState = ErrorViewState() {
-        didSet {
-            updateTitle()
-            updateFavicon()
-        }
+    var isShowingErrorPage: Bool {
+        tab.error != nil
     }
 
     @Published var autofillDataToSave: AutofillData?
@@ -66,7 +59,6 @@ final class TabViewModel {
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
-    private(set) var addressBarHasUpdated: Bool = false
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
@@ -76,11 +68,11 @@ final class TabViewModel {
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
 
     var canPrint: Bool {
-        self.canReload && tab.webView.canPrint
+        !isShowingErrorPage && canReload && tab.webView.canPrint
     }
 
     var canSaveContent: Bool {
-        self.canReload && !tab.webView.isInFullScreenMode
+        !isShowingErrorPage && canReload && !tab.webView.isInFullScreenMode
     }
 
     init(tab: Tab, appearancePreferences: AppearancePreferences = .shared) {
@@ -101,29 +93,52 @@ final class TabViewModel {
         tab.$loadingProgress
             .assign(to: \.progress, onWeaklyHeld: self)
             .store(in: &cancellables)
+        if case .url(_, credential: _, source: .pendingStateRestoration) = tab.content {
+            updateAddressBarStrings()
+        }
     }
 
     private func subscribeToUrl() {
+        enum Event {
+            case instant
+            case didCommit
+        }
         tab.$content
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] content in
-                self?.waitToUpdateAddressBar(content)
-            }
-            .store(in: &cancellables)
-    }
+            .map { [tab] content -> AnyPublisher<Event, Never> in
+                switch content {
+                case .url(_, _, source: .webViewUpdated),
+                     .url(_, _, source: .link):
 
-    private func waitToUpdateAddressBar(_ content: Published<Tab.TabContent>.Publisher.Output) {
-        self.addressBarHasUpdated = false
-        tab.$loadingProgress
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] progress in
-                // Update the address bar only after the tab has reached 10% loading
-                // to prevent Address Bar Spoofing
-                if progress > 0.1 && !(self?.addressBarHasUpdated ?? true) {
-                    self?.updateAddressBarStrings()
-                    self?.updateCanBeBookmarked()
-                    self?.updateFavicon()
-                    self?.addressBarHasUpdated = true
+                    // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
+                    return tab.webViewDidCommitNavigationPublisher.map { .didCommit }.eraseToAnyPublisher()
+
+                case .url(_, _, source: .pendingStateRestoration),
+                     .url(_, _, source: .loadedByStateRestoration),
+                     .url(_, _, source: .userEntered),
+                     .url(_, _, source: .historyEntry),
+                     .url(_, _, source: .bookmark),
+                     .url(_, _, source: .ui),
+                     .url(_, _, source: .appOpenUrl),
+                     .url(_, _, source: .reload),
+                     .newtab,
+                     .settings,
+                     .bookmarks,
+                     .onboarding,
+                     .none,
+                     .dataBrokerProtection,
+                     .subscription:
+                    // Update the address bar instantly for built-in content types or user-initiated navigations
+                    return Just( .instant ).eraseToAnyPublisher()
+                }
+            }
+            .switchToLatest()
+            .sink { [weak self] event in
+                guard let self else { return }
+
+                updateAddressBarStrings()
+                if case .didCommit = event {
+                    updateCanBeBookmarked()
+                    updateFavicon()
                 }
             }
             .store(in: &cancellables)
@@ -170,17 +185,12 @@ final class TabViewModel {
 
     private func subscribeToTabError() {
         tab.$error
-            .map { error -> ErrorViewState in
-
-                if let error = error, !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
-                    // don‘t show error for interrupted load like downloads and for cancelled loads
-                    return .init(isVisible: true, message: error.localizedDescription)
-                } else {
-                    return .init(isVisible: false, message: nil)
-                }
-            }
-            .assign(to: \.errorViewState, onWeaklyHeld: self)
-            .store(in: &cancellables)
+            .map { $0 != nil }
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.updateTitle()
+                self?.updateFavicon()
+            }.store(in: &cancellables)
     }
 
     private func subscribeToPermissions() {
@@ -209,7 +219,7 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
+        canBeBookmarked = !isShowingErrorPage && (tab.content.url ?? .blankPage) != .blankPage
     }
 
     private var tabURL: URL? {
@@ -220,15 +230,7 @@ final class TabViewModel {
         return tabURL?.root
     }
 
-    func updateAddressBarStrings() {
-        guard !errorViewState.isVisible else {
-            let failingUrl = tab.error?.failingUrl
-            let failingUrlHost = failingUrl?.host?.droppingWwwPrefix() ?? ""
-            addressBarString = failingUrl?.absoluteString ?? ""
-            passiveAddressBarString = appearancePreferences.showFullURL ? addressBarString : failingUrlHost
-            return
-        }
-
+    private func updateAddressBarStrings() {
         guard tab.content.isUrl, let url = tabURL else {
             addressBarString = ""
             passiveAddressBarString = ""
@@ -273,13 +275,12 @@ final class TabViewModel {
         }
     }
 
-    private func updateTitle() {
-        guard !errorViewState.isVisible else {
-            title = UserText.tabErrorTitle
-            return
-        }
-
+    private func updateTitle() { // swiftlint:disable:this cyclomatic_complexity
+        let title: String
         switch tab.content {
+        // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
+        case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
+            title = UserText.tabErrorTitle
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
         case .settings:
@@ -294,21 +295,25 @@ final class TabViewModel {
             }
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none:
-            if let title = tab.title?.trimmingWhitespace(),
-               !title.isEmpty {
-                self.title = title
+        case .url, .none, .subscription:
+            if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
+                title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
-                self.title = host
+                title = host
+            } else if let url = tab.url, url.isFileURL {
+                title = url.lastPathComponent
             } else {
-                self.title = addressBarString
+                title = addressBarString
             }
+        }
+        if self.title != title {
+            self.title = title
         }
     }
 
     private func updateFavicon() {
-        guard !errorViewState.isVisible else {
-            favicon = nil
+        guard !isShowingErrorPage else {
+            favicon = .alertCircleColor16
             return
         }
 
@@ -329,7 +334,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .none: break
+        case .url, .onboarding, .none, .subscription: break
         }
 
         if let favicon = tab.favicon {

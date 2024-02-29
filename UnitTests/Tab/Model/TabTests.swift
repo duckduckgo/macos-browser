@@ -270,8 +270,8 @@ final class TabTests: XCTestCase {
         XCTAssertTrue(tab.canGoBack)
         XCTAssertFalse(tab.canGoForward)
         XCTAssertEqual(tab.webView.url, urls.url3)
-        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.url])
-        XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
+        XCTAssertEqual(tab.backHistoryItems.map(\.url), [urls.url])
+        XCTAssertEqual(tab.forwardHistoryItems, [])
 
         withExtendedLifetime((c1, c2)) {}
     }
@@ -345,8 +345,8 @@ final class TabTests: XCTestCase {
         XCTAssertTrue(tab.canGoBack)
         XCTAssertFalse(tab.canGoForward)
         XCTAssertEqual(tab.webView.url, urls.url3)
-        XCTAssertEqual(tab.webView.backForwardList.backList.map(\.url), [urls.url, urls.url3])
-        XCTAssertEqual(tab.webView.backForwardList.forwardList, [])
+        XCTAssertEqual(tab.backHistoryItems.map(\.url), [urls.url, urls.url3])
+        XCTAssertEqual(tab.forwardHistoryItems, [])
 
         withExtendedLifetime((c1, c2)) {}
     }

@@ -139,7 +139,7 @@ public struct PreferencesSubscriptionView: View {
                             description: UserText.vpnServiceDescription,
                             buttonName: model.isUserAuthenticated ? "Manage" : nil,
                             buttonAction: { model.openVPN() },
-                            enabled: !model.isUserAuthenticated || model.hasEntitlements)
+                            enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.networkProtection))
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -149,7 +149,7 @@ public struct PreferencesSubscriptionView: View {
                             description: UserText.personalInformationRemovalServiceDescription,
                             buttonName: model.isUserAuthenticated ? "View" : nil,
                             buttonAction: { model.openPersonalInformationRemoval() },
-                            enabled: !model.isUserAuthenticated || model.hasEntitlements)
+                            enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.dataBrokerProtection))
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -159,10 +159,13 @@ public struct PreferencesSubscriptionView: View {
                             description: UserText.identityTheftRestorationServiceDescription,
                             buttonName: model.isUserAuthenticated ? "View" : nil,
                             buttonAction: { model.openIdentityTheftRestoration() },
-                            enabled: !model.isUserAuthenticated || model.hasEntitlements)
+                            enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.identityTheftRestoration))
             }
             .padding(10)
             .roundedBorder()
+
+            Spacer()
+                .frame(height: 24)
 
             PreferencePaneSection {
                 TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle)

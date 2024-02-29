@@ -116,7 +116,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenActionNeedsEmail_thenExtractedProfileEmailIsSet() async {
-        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email")])
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil)])
         let step = Step(type: .optOut, actions: [fillFormAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
@@ -136,7 +136,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenGetEmailServiceFails_thenOperationThrows() async {
-        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email")])
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil)])
         let step = Step(type: .optOut, actions: [fillFormAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
