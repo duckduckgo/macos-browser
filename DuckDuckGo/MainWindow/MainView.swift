@@ -108,6 +108,7 @@ final class MainView: NSView {
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         setupSearchContextMenuItem(menu: menu)
         setupSaveAsAndPrintMenuItems(menu: menu, with: event)
+        super.willOpenMenu(menu, with: event)
     }
 
     private func setupSearchContextMenuItem(menu: NSMenu) {
