@@ -22,7 +22,7 @@ import AppKit
 
 extension NSBezierPath {
 
-    var asCGPath: CGPath {
+    func asCGPath() -> CGPath {
         if #available(macOS 14.0, *) {
             return self.cgPath
         } else {

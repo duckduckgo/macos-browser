@@ -275,7 +275,7 @@ private extension CAShapeLayer {
         self.bounds = CGRect(x: 0, y: 0, width: (radius + lineWidth) * 2, height: (radius + lineWidth) * 2)
 
         let rect = NSRect(x: lineWidth, y: lineWidth, width: radius * 2, height: radius * 2)
-        self.path = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).asCGPath
+        self.path = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).asCGPath()
 
         self.lineWidth = lineWidth
         self.fillColor = NSColor.clear.cgColor
