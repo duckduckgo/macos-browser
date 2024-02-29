@@ -2009,42 +2009,6 @@
     "Contact Info" : {
       "comment" : "Title of the section of the Identities manager where the user can add/modify contact info (phone, email address)"
     },
-    "context.menu.home.button.mode.hide" : {
-      "comment" : "Preferences > Home Button > None item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Hide"
-          }
-        }
-      }
-    },
-    "context.menu.home.button.mode.left" : {
-      "comment" : "Preferences > Home Button > left position item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show left of the back button"
-          }
-        }
-      }
-    },
-    "context.menu.home.button.mode.right" : {
-      "comment" : "Preferences > Home Button > right position item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show right of the reload button"
-          }
-        }
-      }
-    },
     "copy" : {
       "comment" : "Copy button",
       "extractionState" : "extracted_with_value",
@@ -5025,42 +4989,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Close Developer Tools"
-          }
-        }
-      }
-    },
-    "main.menu.home.button.mode.hide" : {
-      "comment" : "Main Menu > View > Home Button > None item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Hide"
-          }
-        }
-      }
-    },
-    "main.menu.home.button.mode.left" : {
-      "comment" : "Main Menu > View > Home Button > left position item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Left of the Back Button"
-          }
-        }
-      }
-    },
-    "main.menu.home.button.mode.right" : {
-      "comment" : "Main Menu > View > Home Button > right position item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Right of the Reload Button"
           }
         }
       }
