@@ -132,16 +132,6 @@ jobs:
           echo "LAST_RELEASE_TAG=${last_release_tag}" >> $GITHUB_ENV
         fi
 
-    - name: Set up Asana success comment template
-      if: success()
-      id: asana-success-template
-      run: |
-        if [[ "${prerelease}" == "true" ]]; then
-          echo "comment-template=internal-release-ready" >> $GITHUB_OUTPUT
-        else
-          echo "comment-template=public-release-tagged" >> $GITHUB_OUTPUT
-        fi
-
     - name: Set up Asana templates
       if: failure() || ${{ env.MERGE_OR_DELETE_FAILED }}
       id: asana-failure-templates
@@ -184,8 +174,18 @@ jobs:
         task-url: ${{ env.asana-task-url }}
         template-name: ${{ steps.asana-failure-templates.outputs.comment-template }}
 
+    - name: Set up Asana success comment template
+      if: success() && ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
+      id: asana-success-template
+      run: |
+        if [[ "${prerelease}" == "true" ]]; then
+          echo "comment-template=internal-release-ready" >> $GITHUB_OUTPUT
+        else
+          echo "comment-template=public-release-tagged" >> $GITHUB_OUTPUT
+        fi
+
     - name: Report success
-      if: success()
+      if: success() && ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
       uses: ./.github/actions/asana-log-message
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
