@@ -44,6 +44,13 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
+        let accountManager = AccountManager(appGroup: Bundle.main.appGroup(bundle: .subs))
+
+        if let token = accountManager.accessToken {
+            os_log(.error, log: .networkProtection, "🟢 VPN Agent found token: %{public}d", token)
+        } else {
+            os_log(.error, log: .networkProtection, "🔴 VPN Agent found no token")
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -234,7 +241,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             agentLoginItem: nil,
             isMenuBarStatusView: true,
             entitlementCheck: {
-                return await AccountManager().hasEntitlement(for: .networkProtection)
+                return await AccountManager(appGroup: Bundle.main.appGroup(bundle: .subs)).hasEntitlement(for: .networkProtection)
             })
     }
 

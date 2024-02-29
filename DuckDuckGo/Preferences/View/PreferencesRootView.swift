@@ -121,10 +121,18 @@ enum Preferences {
                                                                       openURLHandler: openURL,
                                                                       goToSyncPreferences: { self.model.selectPane(.sync) })
 
-            return PreferencesSubscriptionModel(openURLHandler: openURL,
-                                                sheetActionHandler: sheetActionHandler)
+            return PreferencesSubscriptionModel(accountManager: AccountManager(),
+                                                openURLHandler: openURL,
+                                                sheetActionHandler: sheetActionHandler,
+                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }
 #endif
+    }
+}
+
+public extension AccountManager {
+    convenience init() {
+        self.init(appGroup: Bundle.main.appGroup(bundle: .subs))
     }
 }
 

@@ -22,7 +22,8 @@ import Subscription
 public final class SubscriptionDebugMenu: NSMenuItem {
 
     var currentViewController: () -> NSViewController?
-    private let accountManager = AccountManager()
+    private let accountManager: AccountManager
+    private let appGroup: String
 
     private var _purchaseManager: Any?
     @available(macOS 12.0, *)
@@ -38,8 +39,10 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(currentViewController: @escaping () -> NSViewController?) {
+    public init(currentViewController: @escaping () -> NSViewController?, appGroup: String) {
         self.currentViewController = currentViewController
+        self.accountManager = AccountManager(appGroup: appGroup)
+        self.appGroup = appGroup
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = submenuItem
     }
@@ -105,7 +108,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
             let entitlements: [AccountManager.Entitlement] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
             for entitlement in entitlements {
-                if case let .success(result) = await AccountManager().hasEntitlement(for: entitlement) {
+                if case let .success(result) = await accountManager.hasEntitlement(for: entitlement) {
                     let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
                     results.append(resultSummary)
                     print(resultSummary)
@@ -141,7 +144,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
-                await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
+                await AppStoreRestoreFlow.restoreAccountFromPastPurchase(appGroup: appGroup)
             }
         }
     }
@@ -171,7 +174,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            currentViewController()?.presentAsSheet(DebugPurchaseViewController())
+            currentViewController()?.presentAsSheet(DebugPurchaseViewController(subscriptionAppGroup: appGroup))
         }
     }
 

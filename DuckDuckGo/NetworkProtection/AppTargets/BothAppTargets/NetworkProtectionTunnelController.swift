@@ -29,6 +29,8 @@ import NetworkProtectionUI
 import Networking
 import PixelKit
 
+import Subscription
+
 #if NETP_SYSTEM_EXTENSION
 import SystemExtensionManager
 import SystemExtensions
@@ -42,6 +44,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     // MARK: - Settings
 
     let settings: VPNSettings
+
+    let accountManager = AccountManager(appGroup: Bundle.main.appGroup(bundle: .subs))
 
     // MARK: - Combine Cancellables
 
@@ -503,7 +507,13 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         var options = [String: NSObject]()
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
+        if let accessToken = accountManager.accessToken  {
+            os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
+            options[NetworkProtectionOptionKey.authToken] = NetworkProtectionKeychainTokenStore.makeToken(from: accessToken) as NSString?
+        } else {
+            os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
+            options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
+        }
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 
