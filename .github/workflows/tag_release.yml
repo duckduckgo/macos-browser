@@ -175,7 +175,7 @@ jobs:
         template-name: ${{ steps.asana-failure-templates.outputs.comment-template }}
 
     - name: Set up Asana success comment template
-      if: success() && ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
+      if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
       id: asana-success-template
       run: |
         if [[ "${prerelease}" == "true" ]]; then
@@ -185,7 +185,7 @@ jobs:
         fi
 
     - name: Report success
-      if: success() && ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
+      if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
       uses: ./.github/actions/asana-log-message
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
