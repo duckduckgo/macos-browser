@@ -40,7 +40,6 @@ final class DownloadsCellView: NSTableCellView {
 
     @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var detailLabel: NSTextField!
-    @IBOutlet var estimatedTimeLabel: NSTextField!
     @IBOutlet var progressView: CircularProgressView!
     @IBOutlet var cancelButton: MouseOverButton!
     @IBOutlet var revealButton: MouseOverButton!
@@ -54,13 +53,19 @@ final class DownloadsCellView: NSTableCellView {
     private var cancellables = Set<AnyCancellable>()
     private var progressCancellable: AnyCancellable?
 
-    private static let byteFormatter = ByteCountFormatter()
+    private static let byteFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.isAdaptive = true
+        formatter.allowsNonnumericFormatting = false
+        formatter.zeroPadsFractionDigits = true
+        return formatter
+    }()
 
     private static let estimatedMinutesRemainingFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.hour, .minute]
-        formatter.unitsStyle = .full
-        formatter.includesApproximationPhrase = true
+        formatter.unitsStyle = .brief
+        formatter.includesApproximationPhrase = false
         formatter.includesTimeRemainingPhrase = true
         return formatter
     }()
@@ -68,8 +73,8 @@ final class DownloadsCellView: NSTableCellView {
     private static let estimatedSecondsRemainingFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.second]
-        formatter.unitsStyle = .full
-        formatter.includesApproximationPhrase = true
+        formatter.unitsStyle = .brief
+        formatter.includesApproximationPhrase = false
         formatter.includesTimeRemainingPhrase = true
         return formatter
     }()
@@ -160,7 +165,6 @@ final class DownloadsCellView: NSTableCellView {
 
     private func updateDetails(with progress: Progress, isMouseOver: Bool) {
         self.detailLabel.toolTip = nil
-        self.estimatedTimeLabel.toolTip = nil
 
         var details: String
         var estimatedTime: String = ""
@@ -186,11 +190,9 @@ final class DownloadsCellView: NSTableCellView {
 
             if let estimatedTimeRemaining = progress.estimatedTimeRemaining,
                // only set estimated time if already present or more than 10 seconds remaining to avoid blinking
-               !self.estimatedTimeLabel.stringValue.isEmpty || estimatedTimeRemaining > 10,
+               !self.detailLabel.stringValue.contains("–") || estimatedTimeRemaining > 10,
                let estimatedTimeStr = {
                 switch estimatedTimeRemaining {
-                case ..<10:
-                    UserText.downloadFewSecondsRemaining
                 case ..<60:
                     Self.estimatedSecondsRemainingFormatter.string(from: estimatedTimeRemaining)
                 default:
@@ -201,9 +203,7 @@ final class DownloadsCellView: NSTableCellView {
             }
         }
 
-        self.detailLabel.stringValue = details
-        self.estimatedTimeLabel.stringValue = estimatedTime
-        self.estimatedTimeLabel.isHidden = estimatedTime.isEmpty
+        self.detailLabel.stringValue = details + (estimatedTime.isEmpty ? "" : " – " + estimatedTime)
     }
 
     private func subscribe(to progress: Progress) {
@@ -244,9 +244,6 @@ final class DownloadsCellView: NSTableCellView {
                 self?.detailLabel.stringValue = Self.byteFormatter.string(fromByteCount: Int64(fileSize))
             }
             self?.detailLabel.toolTip = nil
-            self?.estimatedTimeLabel.stringValue = ""
-            self?.estimatedTimeLabel.toolTip = nil
-            self?.estimatedTimeLabel.isHidden = true
         }
         onButtonMouseOverChange!(revealButton.isMouseOver)
     }
@@ -277,9 +274,6 @@ final class DownloadsCellView: NSTableCellView {
                 self?.detailLabel.stringValue = error.shortDescription
                 self?.detailLabel.toolTip = error.localizedDescription
             }
-            self?.estimatedTimeLabel.stringValue = ""
-            self?.estimatedTimeLabel.toolTip = nil
-            self?.estimatedTimeLabel.isHidden = true
         }
         onButtonMouseOverChange!(restartButton.isMouseOver)
     }

@@ -27,6 +27,8 @@ protocol DownloadsViewControllerDelegate: AnyObject {
 
 final class DownloadsViewController: NSViewController {
 
+    static let preferredContentSize = CGSize(width: 420, height: 500)
+
     static func create() -> Self {
         let storyboard = NSStoryboard(name: "Downloads", bundle: nil)
         // swiftlint:disable force_cast
@@ -65,8 +67,11 @@ final class DownloadsViewController: NSViewController {
 
         setupDragAndDrop()
         setUpStrings()
+
         openDownloadsFolderButton.toolTip = UserText.openDownloadsFolderTooltip
         clearDownloadsButton.toolTip = UserText.clearDownloadHistoryTooltip
+
+        preferredContentSize = Self.preferredContentSize
     }
 
     override func viewWillAppear() {

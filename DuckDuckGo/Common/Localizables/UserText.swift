@@ -672,9 +672,7 @@ struct UserText {
     static let downloadFailedToMoveFileToDownloads = NSLocalizedString("downloads.error.move.failed", value: "Could not move file to Downloads", comment: "Short error description when could not move downloaded file to the Downloads folder")
     static let downloadFailed = NSLocalizedString("downloads.error.other", value: "Error", comment: "Short error description when Download failed")
     static let downloadBytesLoadedFormat = NSLocalizedString("downloads.bytes.format", value: "%@ of %@", comment: "Number of bytes out of total bytes downloaded (1Mb of 2Mb)")
-    static let downloadSpeedFormat = NSLocalizedString("downloads.speed.format", value: "%@/sec", comment: "Download speed format (1Mb/sec)")
-
-    static let downloadFewSecondsRemaining = NSLocalizedString("downloads.few.seconds.remaining", value: "A few seconds remaining", comment: "Estimated time info displayed when a file is almost downloaded")
+    static let downloadSpeedFormat = NSLocalizedString("downloads.speed.format", value: "%@/s", comment: "Download speed format (1Mb/sec)")
 
     static let cancelDownloadToolTip = NSLocalizedString("downloads.tooltip.cancel", value: "Cancel Download", comment: "Mouse-over tooltip for Cancel Download button")
     static let restartDownloadToolTip = NSLocalizedString("downloads.tooltip.restart", value: "Restart Download", comment: "Mouse-over tooltip for Restart Download button")

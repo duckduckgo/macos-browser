@@ -2578,18 +2578,6 @@
         }
       }
     },
-    "downloads.few.seconds.remaining" : {
-      "comment" : "Estimated time info displayed when a file is almost downloaded",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "A few seconds remaining"
-          }
-        }
-      }
-    },
     "downloads.location" : {
       "comment" : "Downloads directory location",
       "extractionState" : "extracted_with_value",
@@ -2693,7 +2681,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%@/sec"
+            "value" : "%@/s"
           }
         }
       }
