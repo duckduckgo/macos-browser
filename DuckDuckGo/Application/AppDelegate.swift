@@ -295,6 +295,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     #else
             SubscriptionPurchaseEnvironment.current = .appStore
     #endif
+            SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
             await AccountManager().checkSubscriptionState()
         }
 #endif

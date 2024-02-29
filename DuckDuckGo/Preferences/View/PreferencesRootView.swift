@@ -134,9 +134,17 @@ enum Preferences {
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 openVPNHandler: openVPN,
                                                 openDBPHandler: openDBP,
-                                                sheetActionHandler: sheetActionHandler)
+                                                sheetActionHandler: sheetActionHandler,
+                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+
         }
 #endif
+    }
+}
+
+public extension AccountManager {
+    convenience init() {
+        self.init(appGroup: Bundle.main.appGroup(bundle: .subs))
     }
 }
 

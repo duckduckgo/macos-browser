@@ -226,7 +226,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             let emailAccessToken = try? EmailManager().getToken()
 
             os_log(.info, log: .subscription, "[Purchase] Purchasing")
-            switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
+            switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
             case .success:
                 break
             case .failure(let error):
@@ -239,7 +239,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
-            switch await AppStorePurchaseFlow.completeSubscriptionPurchase() {
+            switch await AppStorePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
             case .success(let purchaseUpdate):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
             case .failure(let error):
@@ -270,7 +270,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     WindowControllersManager.shared.show(url: .settingsPane(.sync), source: .ui, newTab: true)
                 })
 
-            let vc = SubscriptionAccessViewController(actionHandlers: actionHandlers)
+            let vc = SubscriptionAccessViewController(accountManager: AccountManager(), actionHandlers: actionHandlers, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
         }
 
@@ -318,7 +318,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let progressViewController = await ProgressViewController(title: UserText.completingPurchaseTitle)
 
         await mainViewController?.presentAsSheet(progressViewController)
-        await StripePurchaseFlow.completeSubscriptionPurchase()
+        await StripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         await mainViewController?.dismiss(progressViewController)
 
         return [String: String]() // cannot be nil
@@ -355,7 +355,7 @@ extension SubscriptionPagesUseSubscriptionFeature {
 
                 guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
-                switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
+                switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase(appGroup: Bundle.main.appGroup(bundle: .subs)) {
                 case .success:
                     onSuccessHandler()
                 case .failure(let error):
@@ -412,7 +412,7 @@ extension MainWindowController {
         window.show(.subscriptionFoundAlert(), firstButtonAction: {
             if #available(macOS 12.0, *) {
                 Task {
-                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
+                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(appGroup: Bundle.main.appGroup(bundle: .subs))
                     originalMessage.webView?.reload()
                 }
             }

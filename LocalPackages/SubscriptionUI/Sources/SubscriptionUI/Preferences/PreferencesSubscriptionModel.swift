@@ -34,6 +34,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private let openVPNHandler: () -> Void
     private let openDBPHandler: () -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
+    private let subscriptionAppGroup: String
 
     private var fetchSubscriptionDetailsTask: Task<(), Never>?
 
@@ -44,12 +45,14 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 openURLHandler: @escaping (URL) -> Void,
                 openVPNHandler: @escaping () -> Void,
                 openDBPHandler: @escaping () -> Void,
-                sheetActionHandler: SubscriptionAccessActionHandlers) {
+                sheetActionHandler: SubscriptionAccessActionHandlers,
+                subscriptionAppGroup: String) {
         self.accountManager = accountManager
         self.openURLHandler = openURLHandler
         self.openVPNHandler = openVPNHandler
         self.openDBPHandler = openDBPHandler
         self.sheetActionHandler = sheetActionHandler
+        self.subscriptionAppGroup = subscriptionAppGroup
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
@@ -78,7 +81,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
         if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email)
+            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, appGroup: subscriptionAppGroup)
         } else {
             ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
         }
@@ -128,7 +131,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
         case .stripe:
             Task {
-                guard let accessToken = AccountManager().accessToken, let externalID = AccountManager().externalID,
+                guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
                       case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
@@ -143,7 +146,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
-                return response.externalID == AccountManager().externalID
+                return response.externalID == accountManager.externalID
             case .failure:
                 return false
             }
@@ -198,7 +201,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
                 if !response.isSubscriptionActive {
-                    AccountManager().signOut()
+                    self?.accountManager.signOut()
                     return
                 }
 
@@ -207,7 +210,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.subscriptionPlatform = response.platform
             }
 
-            if case let .success(entitlements) = await AccountManager().fetchEntitlements() {
+            if case let .success(entitlements) = await self?.accountManager.fetchEntitlements() {
                 self?.cachedEntitlements = entitlements
             }
         }

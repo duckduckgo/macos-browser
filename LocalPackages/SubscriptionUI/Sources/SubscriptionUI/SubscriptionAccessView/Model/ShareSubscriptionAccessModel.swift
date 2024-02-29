@@ -23,14 +23,16 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var title = UserText.shareModalTitle
     public var description = UserText.shareModalDescription
 
+    private let appGroup: String
     private var actionHandlers: SubscriptionAccessActionHandlers
 
     private var email: String?
     private var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?) {
+    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, appGroup: String) {
         self.actionHandlers = actionHandlers
         self.email = email
+        self.appGroup = appGroup
     }
 
     public func descriptionHeader(for channel: AccessChannel) -> String? {
@@ -69,7 +71,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
             Task {
                 if SubscriptionPurchaseEnvironment.current == .appStore {
                     if #available(macOS 12.0, iOS 15.0, *) {
-                        await AppStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
+                        await AppStoreAccountManagementFlow.refreshAuthTokenIfNeeded(subscriptionAppGroup: appGroup)
                     }
                 }
 
