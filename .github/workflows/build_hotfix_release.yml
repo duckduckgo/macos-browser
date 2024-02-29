@@ -1,7 +1,6 @@
 name: Build Hotfix Release
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       asana-task-url:
