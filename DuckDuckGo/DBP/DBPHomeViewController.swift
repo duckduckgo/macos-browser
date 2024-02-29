@@ -195,8 +195,19 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .enableLoginItem,
                     .restartLoginItem,
                     .disableLoginItem,
-                    .resetLoginItem:
-                DailyPixel.fire(pixel: .pixelKitEvent(event), frequency: .dailyOnly, includeAppVersionParameter: true)
+                    .resetLoginItem,
+                    .disableAndDeleteAllUsers,
+                    .disableAndDeleteWaitlistUsers:
+
+                DispatchQueue.main.async { // delegateTyped needs to be called in the main thread
+                    let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
+
+                    DailyPixel.fire(pixel: .pixelKitEvent(event),
+                                    frequency: .dailyOnly,
+                                    includeAppVersionParameter: true,
+                                    withAdditionalParameters: ["isInternalUser": isInternalUser.description])
+                }
+
             }
         }
     }

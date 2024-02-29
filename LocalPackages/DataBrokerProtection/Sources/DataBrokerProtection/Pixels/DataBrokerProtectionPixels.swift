@@ -55,6 +55,8 @@ public enum DataBrokerProtectionPixels {
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
     case parentChildMatches(parent: String, child: String, value: Int)
+    case disableAndDeleteAllUsers
+    case disableAndDeleteWaitlistUsers
 
     // Stage Pixels
     case optOutStart(dataBroker: String, attemptId: UUID)
@@ -196,6 +198,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .dailyActiveUser: return "m_mac_dbp_engagement_dau"
         case .weeklyActiveUser: return "m_mac_dbp_engagement_wau"
         case .monthlyActiveUser: return "m_mac_dbp_engagement_mau"
+
+        case .disableAndDeleteAllUsers: return "m_mac_dbp_disable-and-delete-all"
+        case .disableAndDeleteWaitlistUsers: return "m_mac_dbp_disable-and-delete-waitlist"
         }
     }
 
@@ -261,7 +266,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                 .dailyActiveUser,
                 .weeklyActiveUser,
-                .monthlyActiveUser:
+                .monthlyActiveUser,
+                .disableAndDeleteAllUsers,
+                .disableAndDeleteWaitlistUsers:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -322,10 +329,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
                     .ipcServerRunAllOperations,
-                    .enableLoginItem,
-                    .restartLoginItem,
-                    .disableLoginItem,
-                    .resetLoginItem,
                     .scanSuccess,
                     .scanFailed,
                     .scanError,
@@ -340,6 +343,14 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dailyActiveUser,
                     .weeklyActiveUser,
                     .monthlyActiveUser:
+
+                PixelKit.fire(event)
+            case .enableLoginItem,
+                    .restartLoginItem,
+                    .disableLoginItem,
+                    .resetLoginItem,
+                    .disableAndDeleteAllUsers,
+                    .disableAndDeleteWaitlistUsers:
 
                 PixelKit.fire(event)
             }
