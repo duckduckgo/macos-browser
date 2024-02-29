@@ -27,6 +27,13 @@ final class FireTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 
+    override func tearDown() {
+        WindowsManager.closeWindows()
+        for controller in WindowControllersManager.shared.mainWindowControllers {
+            WindowControllersManager.shared.unregister(controller)
+        }
+    }
+
     func testWhenBurnAll_ThenAllWindowsAreClosed() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -203,8 +210,8 @@ fileprivate extension TabCollectionViewModel {
     static func makeTabCollectionViewModel(with pinnedTabsManager: PinnedTabsManager? = nil) -> TabCollectionViewModel {
 
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(), pinnedTabsManager: pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager)
-        tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.append(tab: Tab(content: .none))
+        tabCollectionViewModel.append(tab: Tab(content: .none))
         return tabCollectionViewModel
     }
 

@@ -61,7 +61,7 @@ final class MoreOptionsMenu: NSMenu {
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
-    private lazy var sharingMenu = SharingMenu(title: UserText.shareMenuItem)
+    private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
 
 #if NETWORK_PROTECTION
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
@@ -76,6 +76,7 @@ final class MoreOptionsMenu: NSMenu {
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
          networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -86,6 +87,9 @@ final class MoreOptionsMenu: NSMenu {
 
         super.init(title: "")
 
+        if let sharingMenu {
+            self.sharingMenu = sharingMenu
+        }
         self.emailManager.requestDelegate = self
 
         setupMenuItems()
@@ -94,6 +98,7 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
+         sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -103,6 +108,9 @@ final class MoreOptionsMenu: NSMenu {
 
         super.init(title: "")
 
+        if let sharingMenu {
+            self.sharingMenu = sharingMenu
+        }
         self.emailManager.requestDelegate = self
 
         setupMenuItems()
