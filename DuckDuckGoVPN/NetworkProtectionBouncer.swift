@@ -21,6 +21,7 @@ import Foundation
 import NetworkProtection
 import ServiceManagement
 import AppKit
+import Subscription
 
 /// Class that implements the necessary logic to ensure Network Protection is enabled, or prevent the app from running otherwise.
 ///
@@ -30,9 +31,11 @@ final class NetworkProtectionBouncer {
     /// current app.
     ///
     func requireAuthTokenOrKillApp() {
+        let accountManager = AccountManager(appGroup: Bundle.main.appGroup(bundle: .subs))
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil, isSubscriptionEnabled: false)
 
-        guard keychainStore.isFeatureActivated else {
+        // TODO: Do entitlements check, not this
+        guard accountManager.accessToken != nil || keychainStore.isFeatureActivated else {
             os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
 
             // EXIT_SUCCESS ensures the login item won't relaunch
