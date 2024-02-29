@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ macos-12, macos-11 ]
+        runner: [ macos-12 ]
 
     timeout-minutes: 60
     steps:
