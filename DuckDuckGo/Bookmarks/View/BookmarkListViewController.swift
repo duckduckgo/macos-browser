@@ -602,6 +602,18 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         tabCollection.append(tabs: tabs)
     }
 
+    func openAllInNewWindow(_ sender: NSMenuItem) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
+              let folder = sender.representedObject as? BookmarkFolder
+        else {
+            assertionFailure("Cannot open all in new window")
+            return
+        }
+
+        let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
+        WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
+    }
+
 }
 
 // MARK: - BookmarkListPopover
