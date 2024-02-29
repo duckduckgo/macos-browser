@@ -1,7 +1,7 @@
 {
   "name": "FreePeopleDirectory",
   "url": "freepeopledirectory.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "spokeo.com",
   "addedDatetime": 1674540000000,
   "steps": [
@@ -11,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "b8b912b0-201d-4cd1-8237-235c34fe0fea",
+          "id": "f1510c8b-f010-4e6f-a748-d34c7777edd7",
           "url": "https://www.freepeopledirectory.com/name/${firstName}-${lastName}/${state|upcase}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "50e30922-ef1d-4820-abbd-f536378472d4",
+          "id": "cc77e311-7660-43a2-88ae-2c179840f6df",
           "selector": ".whole-card",
           "profile": {
             "name": {
@@ -37,7 +37,9 @@
               "separator": ","
             },
             "profileUrl": {
-              "selector": ".//a[@class='button']"
+              "selector": ".//a[@class='button']",
+              "identifierType": "path",
+              "identifier": "https://www.freepeopledirectory.com/person/${firstName}-${lastName}/${city|capitalize}-${state|upcase}/${id}"
             }
           }
         }

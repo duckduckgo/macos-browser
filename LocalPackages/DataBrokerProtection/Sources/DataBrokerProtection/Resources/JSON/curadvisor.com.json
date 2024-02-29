@@ -1,7 +1,7 @@
 {
   "name": "CurAdvisor",
   "url": "curadvisor.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -11,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "ab5503c7-bd11-4320-b38e-c637b239182e",
+          "id": "e25dd6a6-60da-4d55-b544-bb03216f9e99",
           "url": "https://curadvisor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -25,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "d273c1cf-2635-40d7-b26f-6f34467282cf",
+          "id": "c9babcb9-540e-48ac-900b-b32229e28124",
           "selector": ".card",
           "profile": {
             "name": {
@@ -51,7 +51,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://curadvisor.com/pro/${id}"
             }
           }
         }

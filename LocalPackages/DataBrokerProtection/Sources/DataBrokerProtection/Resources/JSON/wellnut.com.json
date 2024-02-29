@@ -1,7 +1,7 @@
 {
   "name": "Wellnut",
   "url": "wellnut.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -11,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "a38752f3-ae69-45c3-ba3f-3a73e549e644",
+          "id": "673ccaec-2c34-42b9-806c-c453c02d8b94",
           "url": "https://wellnut.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -25,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "b7747e92-5fe5-46f7-b083-5df6fbdc2b84",
+          "id": "2846bcb5-84c4-4f20-8ff8-6118849b9828",
           "selector": ".card",
           "profile": {
             "name": {
@@ -51,7 +51,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://wellnut.com/person/${id}"
             }
           }
         }

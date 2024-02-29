@@ -488,7 +488,7 @@ final class TabBarViewController: NSViewController {
             if dividedWidth < TabBarViewItem.Width.minimumSelected.rawValue {
                 dividedWidth = (tabsWidth - TabBarViewItem.Width.minimumSelected.rawValue) / (numberOfItems - 1)
             }
-            return min(TabBarViewItem.Width.maximum.rawValue, max(minimumWidth, dividedWidth))
+            return min(TabBarViewItem.Width.maximum.rawValue, max(minimumWidth, dividedWidth)).rounded()
         } else {
             return minimumWidth
         }
