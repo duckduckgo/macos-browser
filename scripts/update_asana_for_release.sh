@@ -80,7 +80,7 @@ construct_this_release_includes() {
 		printf '%s' '<ul>'
 		for task_id in "${task_ids[@]}"; do
 			if [[ "$task_id" != "$release_task_id" ]]; then
-				printf '%s' "<li><a data-asana-gid=\"${task_id}\"/></li>"
+				printf '%s' "<li><a data-asana-gid=\\\"${task_id}\\\"/></li>"
 			fi
 		done
 		printf '%s' '</ul>'
