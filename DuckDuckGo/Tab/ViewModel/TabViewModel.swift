@@ -27,7 +27,7 @@ final class TabViewModel {
         static let burnerHome = NSImage(named: "BurnerTabFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
-        static let dataBrokerProtection = NSImage(named: "BurnerWindowIcon2")! // PLACEHOLDER: Change it once we have the final icon
+        static let dataBrokerProtection = NSImage(named: "DBP-Icon")!
     }
 
     private(set) var tab: Tab
