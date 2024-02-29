@@ -242,7 +242,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
-        case .setShouldShowExpiredEntitlementMessaging:
+        case .setShowEntitlementAlert, .setShowEntitlementNotification:
             // TODO: Handle this
             break
         }
