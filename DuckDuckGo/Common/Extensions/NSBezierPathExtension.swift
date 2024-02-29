@@ -32,19 +32,17 @@ extension NSBezierPath {
                 let type = self.element(at: i, associatedPoints: &points)
                 switch type {
                 case .moveTo:
-                  path.move(to: points[0])
+                    path.move(to: points[0])
                 case .lineTo:
-                  path.addLine(to: points[0])
-                case .curveTo:
-                  path.addCurve(to: points[2], control1: points[0], control2: points[1])
+                    path.addLine(to: points[0])
+                case .curveTo, .cubicCurveTo:
+                    path.addCurve(to: points[2], control1: points[0], control2: points[1])
                 case .closePath:
-                  path.closeSubpath()
-                case .cubicCurveTo, .quadraticCurveTo:
-                    // These two cases were introduced in macOS 14, but they will never be encountered here as on macOS 14 we use `cgPath` on
-                    // NSBezierPath directly. We handle them here to suppress compiler warnings.
-                    break
+                    path.closeSubpath()
+                case .quadraticCurveTo:
+                    path.addQuadCurve(to: points[1], control: points[0])
                 @unknown default:
-                  break
+                    break
                 }
             }
             return path
