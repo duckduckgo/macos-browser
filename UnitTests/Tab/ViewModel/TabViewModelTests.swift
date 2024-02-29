@@ -237,7 +237,7 @@ extension TabViewModel {
     }
 
     func simulateLoadingCompletion() {
-        self.updateAddressBarStrings()
+        self.tab.webViewDidCommitNavigationPublisher.send(())
     }
 
 }

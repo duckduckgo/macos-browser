@@ -49,7 +49,12 @@ final class SafariBookmarksReader {
         let type: OperationType
         let underlyingError: Error?
 
-        var errorType: DataImport.ErrorType { .dataCorrupted }
+        var errorType: DataImport.ErrorType {
+            switch underlyingError {
+            case let error as CocoaError where error.code == .fileReadNoSuchFile: .noData
+            default: .dataCorrupted
+            }
+        }
     }
 
     private let safariBookmarksFileURL: URL

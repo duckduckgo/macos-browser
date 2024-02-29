@@ -34,4 +34,5 @@ internal struct ExpectationAction: Action {
     let id: String
     let actionType: ActionType
     let expectations: [Item]
+    let dataSource: DataSource?
 }
