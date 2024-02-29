@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ macos-11 ]
+        runner: [ macos-11, macos-12-xlarge ]
 
     timeout-minutes: 60
     steps:
@@ -125,9 +125,7 @@ jobs:
     - name: Unzip and Copy app to /DerivedData                         
       run: |
         cd DuckDuckGo-review-${{ env.app-version }}.app && unzip DuckDuckGo-${{ env.app-version }}.zip
-        for dir in ../DerivedData/Build/Products/Review; do
-          cp -R "DuckDuckGo Review.app" "$dir/DuckDuckGo Review.app"
-        done
+        cp -R "DuckDuckGo Review.app" "../DerivedData/Build/Products/Review/DuckDuckGo Review.app"
 
     - name: Run tests
       env:
@@ -171,10 +169,7 @@ jobs:
       with:
         name: "BuildLogs ${{ matrix.runner }}"
         path: |
-          build/*
-          ui-tests.xml
           xcodebuild.log
           DerivedData/Logs/Test/*.xcresult
-          DerivedData/**/Logs/Test/*.xcresult
           ~/Library/Logs/DiagnosticReports/*
         retention-days: 7
