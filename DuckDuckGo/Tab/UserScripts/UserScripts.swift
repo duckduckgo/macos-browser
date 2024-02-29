@@ -87,11 +87,13 @@ final class UserScripts: UserScriptsProvider {
         }
 
 #if SUBSCRIPTION
-        subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
-        userScripts.append(subscriptionPagesUserScript)
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
+            userScripts.append(subscriptionPagesUserScript)
 
-        identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
-        userScripts.append(identityTheftRestorationPagesUserScript)
+            identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
+            userScripts.append(identityTheftRestorationPagesUserScript)
+        }
 #endif
     }
 
