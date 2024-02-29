@@ -18,11 +18,6 @@
 
 import Foundation
 
-struct PageElement: Codable, Sendable {
-    let type: String
-    let selector: String
-}
-
 struct FillFormAction: Action {
     let id: String
     let actionType: ActionType

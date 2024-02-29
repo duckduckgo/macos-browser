@@ -85,6 +85,7 @@ protocol CaptchaServiceProtocol {
     /// - Returns: `CaptchaTransactionId` an identifier so we can later use to fetch the resolved captcha information
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
                                   retries: Int,
+                                  pollingInterval: TimeInterval,
                                   shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId
 
     /// Fetches the resolved captcha information with the passed transaction ID.
@@ -97,13 +98,13 @@ protocol CaptchaServiceProtocol {
     /// - Returns: `CaptchaResolveData` a string containing the data to resolve the captcha
     func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
                                    retries: Int,
-                                   pollingInterval: Int,
+                                   pollingInterval: TimeInterval,
                                    shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData
 }
 
 extension CaptchaServiceProtocol {
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
-        try await submitCaptchaInformation(captchaInfo, retries: 5, shouldRunNextStep: shouldRunNextStep)
+        try await submitCaptchaInformation(captchaInfo, retries: 5, pollingInterval: 1, shouldRunNextStep: shouldRunNextStep)
     }
 
     func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
@@ -137,6 +138,7 @@ struct CaptchaService: CaptchaServiceProtocol {
 
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
                                   retries: Int = 5,
+                                  pollingInterval: TimeInterval = 1,
                                   shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
         guard let captchaSubmitResult = try? await submitCaptchaInformationRequest(captchaInfo) else {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
@@ -157,9 +159,10 @@ struct CaptchaService: CaptchaServiceProtocol {
             if retries == 0 {
                 throw CaptchaServiceError.timedOutWhenSubmittingCaptcha
             }
-            try await Task.sleep(nanoseconds: UInt64(1 * Double(NSEC_PER_SEC)))
+            try await Task.sleep(nanoseconds: UInt64(pollingInterval * 1000) * NSEC_PER_MSEC)
             return try await submitCaptchaInformation(captchaInfo,
                                                       retries: retries - 1,
+                                                      pollingInterval: pollingInterval,
                                                       shouldRunNextStep: shouldRunNextStep)
         case .failureCritical:
             throw CaptchaServiceError.criticalFailureWhenSubmittingCaptcha
@@ -195,7 +198,7 @@ struct CaptchaService: CaptchaServiceProtocol {
 
     func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
                                    retries: Int = 100,
-                                   pollingInterval: Int = 50,
+                                   pollingInterval: TimeInterval = 50,
                                    shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
         guard let captchaResolveResult = try? await submitCaptchaToBeResolvedRequest(transactionID) else {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
@@ -218,7 +221,7 @@ struct CaptchaService: CaptchaServiceProtocol {
             if retries == 0 {
                 throw CaptchaServiceError.timedOutWhenFetchingCaptchaResult
             }
-            try await Task.sleep(nanoseconds: UInt64(pollingInterval) * NSEC_PER_SEC)
+            try await Task.sleep(nanoseconds: UInt64(pollingInterval * 1000) * NSEC_PER_MSEC)
             return try await submitCaptchaToBeResolved(for: transactionID,
                                                        retries: retries - 1,
                                                        pollingInterval: pollingInterval,

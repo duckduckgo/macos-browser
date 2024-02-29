@@ -575,12 +575,18 @@ protocol NewWindowPolicyDecisionMaker {
             webView.stopAllMedia(shouldStopLoading: true)
 
             userContentController?.cleanUpBeforeClosing()
-            webView.assertObjectDeallocated(after: 4.0)
+#if DEBUG
+            if case .normal = NSApp.runType {
+                webView.assertObjectDeallocated(after: 4.0)
+            }
+#endif
         }
-        if !onDeinit {
+#if DEBUG
+        if !onDeinit, case .normal = NSApp.runType {
             // Tab should be deallocated shortly after burning
             self.assertObjectDeallocated(after: 4.0)
         }
+#endif
         guard Thread.isMainThread else {
             DispatchQueue.main.async { job() }
             return
@@ -675,6 +681,8 @@ protocol NewWindowPolicyDecisionMaker {
             } else if content != self.content {
                 self.content = content
             }
+        } else if self.content.isUrl {
+            self.content = .none
         }
         self.updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
     }

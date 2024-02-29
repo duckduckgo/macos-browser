@@ -377,7 +377,7 @@ final class AddressBarViewController: NSViewController {
         self.updateMode()
         self.addressBarButtonsViewController?.updateButtons()
 
-        guard let window = view.window else { return }
+        guard let window = view.window, NSApp.runType != .unitTests else { return }
 
         NSAppearance.withAppAppearance {
             if window.isKeyWindow {

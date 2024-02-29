@@ -102,7 +102,7 @@ final class MainViewController: NSViewController {
         super.viewDidAppear()
         mainView.setMouseAboveWebViewTrackingAreaEnabled(true)
         registerForBookmarkBarPromptNotifications()
-        adjustFirstResponder()
+        adjustFirstResponder(force: true)
     }
 
     var bookmarkBarPromptObserver: Any?
@@ -417,7 +417,7 @@ final class MainViewController: NSViewController {
 
     // MARK: - First responder
 
-    func adjustFirstResponder(selectedTabViewModel: TabViewModel? = nil, tabContent: Tab.TabContent? = nil) {
+    func adjustFirstResponder(selectedTabViewModel: TabViewModel? = nil, tabContent: Tab.TabContent? = nil, force: Bool = false) {
         guard let selectedTabViewModel = selectedTabViewModel ?? tabCollectionViewModel.selectedTabViewModel else {
             assertionFailure("No tab view model selected")
             return
@@ -430,8 +430,8 @@ final class MainViewController: NSViewController {
         } else {
             // ignore published tab switch: BrowserTabViewController
             // adjusts first responder itself
-            guard selectedTabViewModel === tabCollectionViewModel.selectedTabViewModel else { return }
-            browserTabViewController.adjustFirstResponder(tabContent: tabContent)
+            guard selectedTabViewModel === tabCollectionViewModel.selectedTabViewModel || force else { return }
+            browserTabViewController.adjustFirstResponder(force: force, tabContent: tabContent)
         }
     }
 

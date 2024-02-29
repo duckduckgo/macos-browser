@@ -33,7 +33,7 @@ protocol EmailServiceProtocol {
     func getEmail(dataBrokerURL: String?) async throws -> String
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int,
-                             pollingIntervalInSeconds: Int,
+                             pollingInterval: TimeInterval,
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL
 }
 
@@ -78,9 +78,9 @@ struct EmailService: EmailServiceProtocol {
 
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int = 100,
-                             pollingIntervalInSeconds: Int = 30,
+                             pollingInterval: TimeInterval = 30,
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
-        let pollingTimeInNanoSecondsSeconds = UInt64(pollingIntervalInSeconds) * NSEC_PER_SEC
+        let pollingTimeInNanoSecondsSeconds = UInt64(pollingInterval * 1000) * NSEC_PER_MSEC
 
         guard let emailResult = try? await extractEmailLink(email: email) else {
             throw EmailError.cantFindEmail
@@ -107,7 +107,7 @@ struct EmailService: EmailServiceProtocol {
             try await Task.sleep(nanoseconds: pollingTimeInNanoSecondsSeconds)
             return try await getConfirmationLink(from: email,
                                                  numberOfRetries: numberOfRetries - 1,
-                                                 pollingIntervalInSeconds: pollingIntervalInSeconds,
+                                                 pollingInterval: pollingInterval,
                                                  shouldRunNextStep: shouldRunNextStep)
         case .unknown:
             throw EmailError.unknownStatusReceived(email: email)

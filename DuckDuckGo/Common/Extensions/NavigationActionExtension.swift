@@ -31,6 +31,13 @@ extension NavigationAction {
         return false
     }
 
+    var isCustom: Bool {
+        if case .custom = self.navigationType {
+            return true
+        }
+        return false
+    }
+
 }
 
 extension CustomNavigationType {

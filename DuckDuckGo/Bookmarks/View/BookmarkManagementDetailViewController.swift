@@ -228,9 +228,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         emptyState.centerXAnchor.constraint(equalTo: separator.centerXAnchor).isActive = true
 
         newBookmarkButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
-        newBookmarkButton.widthAnchor.constraint(equalToConstant: 130).isActive = true
 
-        newFolderButton.widthAnchor.constraint(equalToConstant: 110).isActive = true
         newFolderButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
 
         emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
