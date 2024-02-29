@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "apple-toolbox",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/apple-toolbox.git",
+      "state" : {
+        "revision" : "e3dc4faf70ca09718a2d20d5c47b449389e8c153",
+        "version" : "1.0.0"
+      }
+    },
+    {
       "identity" : "bloom_cpp",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/bloom_cpp.git",
@@ -14,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "da5f8ae73e7ad7fc47931f82f5ac6c4fafa6ac94",
-        "version" : "109.0.2"
+        "revision" : "c513f0f0fedc1de65591d46908ddef530b0dc001",
+        "version" : "112.0.1"
       }
     },
     {
@@ -68,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "bb7bfc010ef4d2e7913c343663b167e2a984ac79",
-        "version" : "3.1.2000"
+        "revision" : "b75ab2c0405860bb2616db71b9a456acb118c21a",
+        "version" : "3.1.4000"
       }
     },
     {

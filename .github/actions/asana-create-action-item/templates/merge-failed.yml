@@ -1,5 +1,5 @@
 data:
-  name: Merging ${BRANCH} to ${BASE_BRANCH} failed
+  name: Merge ${BRANCH} to ${BASE_BRANCH}
   assignee: "${ASSIGNEE_ID}"
   html_notes: |
     <body>
