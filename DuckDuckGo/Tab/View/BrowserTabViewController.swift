@@ -27,7 +27,6 @@ import WebKit
 final class BrowserTabViewController: NSViewController {
 
     private lazy var browserTabView = BrowserTabView(frame: .zero, backgroundColor: .browserTabBackground)
-    private lazy var homePageView = NSView()
     private lazy var hoverLabel = NSTextField(string: URL.duckDuckGo.absoluteString)
     private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
 
@@ -67,9 +66,6 @@ final class BrowserTabViewController: NSViewController {
     override func loadView() {
         view = browserTabView
 
-        homePageView.translatesAutoresizingMaskIntoConstraints = false
-        view.addAndLayout(homePageView)
-
         hoverLabelContainer.cornerRadius = 4
         view.addSubview(hoverLabelContainer)
 
@@ -84,9 +80,6 @@ final class BrowserTabViewController: NSViewController {
         hoverLabelContainer.addSubview(hoverLabel)
 
         setupLayout()
-
-        let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
-        self.addAndLayoutChild(homePageViewController, into: homePageView)
     }
 
     private func setupLayout() {
@@ -536,10 +529,10 @@ final class BrowserTabViewController: NSViewController {
     // MARK: - Browser Tabs
 
     private func removeAllTabContent(includingWebView: Bool = true) {
-        self.homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
         preferencesViewController?.removeCompletely()
         bookmarksViewController?.removeCompletely()
+        homePageViewController?.removeCompletely()
 #if DBP
         dataBrokerProtectionHomeViewController?.removeCompletely()
 #endif
@@ -600,7 +593,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .newtab:
             removeAllTabContent()
-            view.addAndLayout(homePageView)
+            addAndLayoutChild(homePageViewControllerCreatingIfNeeded())
 
 #if DBP
         case .dataBrokerProtection:
@@ -653,6 +646,17 @@ final class BrowserTabViewController: NSViewController {
         Task {
             await tabViewModel.tab.tabSnapshots?.renderSnapshot(from: viewForRendering)
         }
+    }
+
+    // MARK: - New Tab page
+
+    var homePageViewController: HomePageViewController?
+    private func homePageViewControllerCreatingIfNeeded() -> HomePageViewController {
+        return homePageViewController ?? {
+            let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
+            self.homePageViewController = homePageViewController
+            return homePageViewController
+        }()
     }
 
 #if DBP
