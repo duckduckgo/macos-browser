@@ -390,22 +390,11 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let privacyProItem = NSMenuItem(title: "",
+        let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "SubscriptionIcon"))
-
-        let attributedText = NSMutableAttributedString(string: UserText.subscriptionOptionsMenuItem)
-        attributedText.append(NSAttributedString(string: "  "))
-
-        let imageAttachment = NSTextAttachment()
-        imageAttachment.image = NSImage(named: "NewLabel")
-        imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
-
-        attributedText.append(NSAttributedString(attachment: imageAttachment))
-
-        privacyProItem.attributedTitle = attributedText
 
         return [privacyProItem]
     }
