@@ -21,5 +21,5 @@ import Foundation
 struct EmailConfirmationAction: Action {
     let id: String
     let actionType: ActionType
-    let pollingTime: Int
+    let pollingTime: TimeInterval
 }

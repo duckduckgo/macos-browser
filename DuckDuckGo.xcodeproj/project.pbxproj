@@ -3171,13 +3171,6 @@
 			remoteGlobalIDString = 3706FA6A293F65D500E42796;
 			remoteInfo = "DuckDuckGo Privacy Browser App Store";
 		};
-		4B1AD8A225FC27E200261379 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
-			remoteInfo = "DuckDuckGo Privacy Browser";
-		};
 		4BA7C4DE2B3F6F4900AFE511 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
@@ -3213,19 +3206,26 @@
 			remoteGlobalIDString = 4B2537592A11BE7300610219;
 			remoteInfo = NetworkProtectionSystemExtension;
 		};
-		AA585D91248FD31400E9A3E2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
-			remoteInfo = DuckDuckGo;
-		};
 		B696E8182B8619D6008368F0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = B6EC37E729B5DA2A001ACE79;
 			remoteInfo = "tests-server";
+		};
+		B6CAC23C2B8F0EC6006CD402 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
+			remoteInfo = "DuckDuckGo Privacy Browser";
+		};
+		B6CAC23E2B8F0ECA006CD402 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
+			remoteInfo = "DuckDuckGo Privacy Browser";
 		};
 		B6EC37F129B5DA8F001ACE79 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -8436,9 +8436,9 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6CAC23F2B8F0ECA006CD402 /* PBXTargetDependency */,
 				B69D06162A4C0ACD0032D14D /* PBXTargetDependency */,
 				B6EC37F229B5DA8F001ACE79 /* PBXTargetDependency */,
-				4B1AD8A325FC27E200261379 /* PBXTargetDependency */,
 			);
 			name = "Integration Tests";
 			packageProductDependencies = (
@@ -8812,8 +8812,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6CAC23D2B8F0EC6006CD402 /* PBXTargetDependency */,
 				B69D06142A4C0AC50032D14D /* PBXTargetDependency */,
-				AA585D92248FD31400E9A3E2 /* PBXTargetDependency */,
 			);
 			name = "Unit Tests";
 			packageProductDependencies = (
@@ -12556,11 +12556,6 @@
 			target = 3706FA6A293F65D500E42796 /* DuckDuckGo Privacy Browser App Store */;
 			targetProxy = 376113D52B29CD6800E794BB /* PBXContainerItemProxy */;
 		};
-		4B1AD8A325FC27E200261379 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
-			targetProxy = 4B1AD8A225FC27E200261379 /* PBXContainerItemProxy */;
-		};
 		4B4BEC4A2A11B627001D9AC5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 4B4BEC492A11B627001D9AC5 /* NetworkProtection */;
@@ -12605,11 +12600,6 @@
 			isa = PBXTargetDependency;
 			target = 4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */;
 			targetProxy = 7BEC18302AD5DA3300D30536 /* PBXContainerItemProxy */;
-		};
-		AA585D92248FD31400E9A3E2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
-			targetProxy = AA585D91248FD31400E9A3E2 /* PBXContainerItemProxy */;
 		};
 		B6080B9D2B20AF7700B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -12663,6 +12653,16 @@
 		B69D061C2A4C0BC10032D14D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
+		};
+		B6CAC23D2B8F0EC6006CD402 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
+			targetProxy = B6CAC23C2B8F0EC6006CD402 /* PBXContainerItemProxy */;
+		};
+		B6CAC23F2B8F0ECA006CD402 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
+			targetProxy = B6CAC23E2B8F0ECA006CD402 /* PBXContainerItemProxy */;
 		};
 		B6EC37F229B5DA8F001ACE79 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -13583,7 +13583,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 112.0.0;
+				version = 112.0.1;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
