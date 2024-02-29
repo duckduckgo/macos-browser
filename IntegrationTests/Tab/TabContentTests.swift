@@ -45,8 +45,10 @@ class TabContentTests: XCTestCase {
         window = nil
     }
 
+    // MARK: - Tests
+
     @MainActor
-    func disabled_testWhenPDFContextMenuPrintChosen_printDialogOpens() async throws {
+    func testWhenPDFContextMenuPrintChosen_printDialogOpens() async throws {
         let pdfUrl = Bundle(for: Self.self).url(forResource: "empty", withExtension: "pdf")!
         // open Tab with PDF
         let tab = Tab(content: .url(pdfUrl, credential: nil, source: .userEntered("")))
@@ -69,16 +71,23 @@ class TabContentTests: XCTestCase {
                                            pressure: 1)!
 
         // wait for context menu to appear
-        let menuWindowPromise = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect().compactMap { _ in
-            print(NSApp.windows.map(\.className))
-            return NSApp.windows.first(where: {
-                $0.className == "NSPopupMenuWindow"
-            })
-        }.timeout(5).first().promise()
+        let eMenuShown = expectation(description: "menu shown")
+        let getMenuWindow = Task {
+            while true {
+                if let window = NSApp.windows.first(where: { $0.className == "NSPopupMenuWindow" }) {
+                    eMenuShown.fulfill()
+                    return window
+                }
+                try await Task.sleep(interval: 0.01)
+            }
+        }
 
         // right-click
         NSApp.sendEvent(mouseDown)
-        let menuWindow = try await menuWindowPromise.value
+        if case .timedOut = await XCTWaiter(delegate: self).fulfillment(of: [eMenuShown], timeout: 5) {
+            getMenuWindow.cancel()
+        }
+        let menuWindow = try await getMenuWindow.value
 
         // find Print, Save As
         let menuItems = menuWindow.contentView?.recursivelyFindMenuItemViews()
@@ -88,14 +97,24 @@ class TabContentTests: XCTestCase {
         XCTAssertNotNil(saveAsMenuItem)
 
         // wait for print dialog to appear
-        let printDialogPromise = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect().compactMap { _ in
-            self.window.sheets.first
-        }.timeout(5).first().promise()
+        let ePrintDialogShown = expectation(description: "Print dialog shown")
+        let getPrintDialog = Task {
+            while true {
+                if let sheet = self.window.sheets.first {
+                    ePrintDialogShown.fulfill()
+                    return sheet
+                }
+                try await Task.sleep(interval: 0.01)
+            }
+        }
 
         // Click Print…
         printMenuItem?.menuItem.accessibilityPerformPress()
+        if case .timedOut = await XCTWaiter(delegate: self).fulfillment(of: [ePrintDialogShown], timeout: 5) {
+            getPrintDialog.cancel()
+        }
+        let printDialog = try await getPrintDialog.value
 
-        let printDialog = try await printDialogPromise.value
         XCTAssertEqual(printDialog.title, UserText.printMenuItem.dropping(suffix: "…"))
     }
 
