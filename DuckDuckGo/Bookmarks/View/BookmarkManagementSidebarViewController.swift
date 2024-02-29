@@ -318,12 +318,13 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 
     func openInNewTabs(_ sender: NSMenuItem) {
         guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let children = (sender.representedObject as? BookmarkFolder)?.children else {
-            assertionFailure("Cannot open in new tabs")
+              let folder = sender.representedObject as? BookmarkFolder
+        else {
+            assertionFailure("Cannot open all in new tabs")
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0, source: .bookmark), shouldLoadInBackground: true, burnerMode: tabCollection.burnerMode) }
+        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
         tabCollection.append(tabs: tabs)
     }
 
