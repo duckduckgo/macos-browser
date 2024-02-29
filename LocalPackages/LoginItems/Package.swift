@@ -14,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "1.0.0"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "113.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "8274d9bee6f4c1d6cda75c3a9ca0a8d0b79c5611")
     ],
     targets: [
         .target(
