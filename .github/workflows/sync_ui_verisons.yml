@@ -142,7 +142,7 @@ jobs:
           -retry-tests-on-failure \
         | tee xcodebuild.log \
         | (if [ "${{ matrix.runner }}" = "macos-11" ]; then
-            xcpretty --report junit --output ui-tests.xml
+            xcpretty --report junit
           else
             xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
           fi)
