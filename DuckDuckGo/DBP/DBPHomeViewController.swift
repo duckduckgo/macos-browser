@@ -177,10 +177,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
                     .ipcServerRunAllOperations,
-                    .enableLoginItem,
-                    .restartLoginItem,
-                    .disableLoginItem,
-                    .resetLoginItem,
                     .scanSuccess,
                     .scanFailed,
                     .scanError,
@@ -196,6 +192,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .weeklyActiveUser,
                     .monthlyActiveUser:
                 Pixel.fire(.pixelKitEvent(event))
+            case .enableLoginItem,
+                    .restartLoginItem,
+                    .disableLoginItem,
+                    .resetLoginItem:
+                DailyPixel.fire(pixel: .pixelKitEvent(event), frequency: .dailyOnly, includeAppVersionParameter: true)
             }
         }
     }
