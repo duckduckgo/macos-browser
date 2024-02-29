@@ -284,7 +284,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if SUBSCRIPTION
         Task {
-            var defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
+            let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
 
             let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
                                                          defaultValue: defaultEnvironment).wrappedValue
