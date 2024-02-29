@@ -39,10 +39,12 @@ jobs:
           APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config --global user.name "Dax the Duck"
           git config --global user.email "dax@duckduckgo.com"
-          bundle exec fastlane prepare_hotfix
+          last_release="$(gh api repos/${{ github.repository }}/releases/latest | jq -r .tag_name)"
+          bundle exec fastlane prepare_hotfix version:"$last_release"
 
       - name: Create release task
         id: create_release_task
