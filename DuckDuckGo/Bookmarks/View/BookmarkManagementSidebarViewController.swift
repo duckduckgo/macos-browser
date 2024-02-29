@@ -292,7 +292,9 @@ extension BookmarkManagementSidebarViewController: NSMenuDelegate {
 extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 
     func newFolder(_ sender: NSMenuItem) {
-        AddBookmarkFolderModalView().show(in: view.window)
+        let parent = sender.representedObject as? BookmarkFolder
+        BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parent)
+            .show(in: view.window)
     }
 
     func editFolder(_ sender: NSMenuItem) {
