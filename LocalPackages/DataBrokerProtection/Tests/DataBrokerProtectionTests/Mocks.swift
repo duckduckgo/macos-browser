@@ -242,7 +242,7 @@ final class EmailServiceMock: EmailServiceProtocol {
         return "test@duck.com"
     }
 
-    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingIntervalInSeconds: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
+    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
@@ -261,7 +261,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
     var wasSubmitCaptchaToBeResolvedCalled = false
     var shouldThrow = false
 
-    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
         }
@@ -271,7 +271,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
         return "transactionID"
     }
 
-    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
         }

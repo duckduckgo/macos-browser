@@ -54,8 +54,6 @@ final class DeallocationTests: XCTestCase {
     // MARK: -
 
     func testWindowsDeallocation() {
-        NSAnimationContext.current.duration = 0
-
         autoreleasepool {
 
             // `showWindow: false` would still open a window, but not activate it, which seems to upset CI
