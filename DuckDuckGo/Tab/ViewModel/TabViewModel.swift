@@ -300,6 +300,8 @@ final class TabViewModel {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
                 title = host
+            } else if let url = tab.url, url.isFileURL {
+                title = url.lastPathComponent
             } else {
                 title = addressBarString
             }
