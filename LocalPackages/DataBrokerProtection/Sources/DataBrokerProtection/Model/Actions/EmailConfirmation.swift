@@ -22,4 +22,5 @@ struct EmailConfirmationAction: Action {
     let id: String
     let actionType: ActionType
     let pollingTime: TimeInterval
+    let dataSource: DataSource?
 }

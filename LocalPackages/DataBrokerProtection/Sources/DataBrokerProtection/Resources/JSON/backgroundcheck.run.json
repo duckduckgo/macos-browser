@@ -1,7 +1,7 @@
 {
   "name": "backgroundcheck.run",
   "url": "backgroundcheck.run",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
   "steps": [
@@ -11,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "5f90e39f-cb94-4b8d-94ed-48ba0060dc08",
+          "id": "64967cc5-ebf6-4c27-b12c-8f15dceb2678",
           "url": "https://backgroundcheck.run/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}"
         },
         {
           "actionType": "extract",
-          "id": "3225fa15-4e00-4e6a-bfc7-a85dfb504c86",
+          "id": "57dfbc89-94c8-49f0-9952-c58c92883ffd",
           "selector": ".b-pfl-list",
           "profile": {
             "name": {
@@ -39,7 +39,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://backgroundcheck.run/person/${id}"
             }
           }
         }
