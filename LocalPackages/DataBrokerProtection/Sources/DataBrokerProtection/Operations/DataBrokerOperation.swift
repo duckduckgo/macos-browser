@@ -120,7 +120,7 @@ extension DataBrokerOperation {
             let url =  try await emailService.getConfirmationLink(
                 from: email,
                 numberOfRetries: 100, // Move to constant
-                pollingIntervalInSeconds: action.pollingTime,
+                pollingInterval: action.pollingTime,
                 shouldRunNextStep: shouldRunNextStep
             )
             stageCalculator?.fireOptOutEmailReceive()
