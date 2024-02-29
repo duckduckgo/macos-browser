@@ -347,8 +347,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
-        WindowControllersManager.shared.showBookmarksTab()
-        delegate?.popoverShouldClose(self)
+        showManageBookmarks()
     }
 
     @objc func handleClick(_ sender: NSOutlineView) {
@@ -445,6 +444,11 @@ private extension BookmarkListViewController {
         view.show(in: parent?.view.window) { [weak delegate] in
             delegate?.popover(shouldPreventClosure: false)
         }
+    }
+
+    func showManageBookmarks() {
+        WindowControllersManager.shared.showBookmarksTab()
+        delegate?.popoverShouldClose(self)
     }
 
 }
@@ -553,6 +557,10 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         }
 
         bookmarkManager.remove(objectsWithUUIDs: uuids)
+    }
+
+    func manageBookmarks(_ sender: NSMenuItem) {
+        showManageBookmarks()
     }
 
 }
