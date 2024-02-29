@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Carbon
 import Combine
 import Common
 import XCTest
@@ -143,6 +144,51 @@ class TabContentTests: XCTestCase {
     }
 
     @MainActor
+    func testWhenPDFMainMenuPrintChosen_printDialogOpens() async throws {
+        let pdfUrl = Bundle(for: Self.self).url(forResource: "test", withExtension: "pdf")!
+        // open Tab with PDF
+        let tab = Tab(content: .url(pdfUrl, credential: nil, source: .userEntered("")))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+        try await eNewtabPageLoaded.value
+
+        // wait for print dialog to appear
+        let ePrintDialogShown = expectation(description: "Print dialog shown")
+        let getPrintDialog = Task { @MainActor in
+            while true {
+                if let sheet = self.window.sheets.first {
+                    ePrintDialogShown.fulfill()
+                    return sheet
+                }
+                try await Task.sleep(interval: 0.01)
+            }
+        }
+        let printOperationPromise = tab.$userInteractionDialog.compactMap { (dialog: Tab.UserDialog?) -> NSPrintOperation? in
+            guard case .print(let request) = dialog?.dialog else { return nil }
+            return request.parameters
+        }.timeout(5).first().promise()
+
+        // Hit Cmd+P
+        let keyDown = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: [.command], timestamp: 0, windowNumber: window.windowNumber, context: nil, characters: "p", charactersIgnoringModifiers: "p", isARepeat: false, keyCode: UInt16(kVK_ANSI_P))!
+        let keyUp = NSEvent.keyEvent(with: .keyUp, location: .zero, modifierFlags: [.command], timestamp: 0, windowNumber: window.windowNumber, context: nil, characters: "p", charactersIgnoringModifiers: "p", isARepeat: false, keyCode: UInt16(kVK_ANSI_P))!
+        window.sendEvent(keyDown)
+        window.sendEvent(keyUp)
+
+        if case .timedOut = await XCTWaiter(delegate: self).fulfillment(of: [ePrintDialogShown], timeout: 5) {
+            getPrintDialog.cancel()
+        }
+        let printDialog = try await getPrintDialog.value
+        defer {
+            window.endSheet(printDialog, returnCode: .cancel)
+        }
+        let printOperation = try await printOperationPromise.value
+
+        XCTAssertEqual(printDialog.title, UserText.printMenuItem.dropping(suffix: "…"))
+        XCTAssertEqual(printOperation.pageRange, NSRange(location: 1, length: 3))
+    }
+
+    @MainActor
     func testWhenPDFContextMenuSaveAsChosen_saveDialogOpens() async throws {
         let pdfUrl = Bundle(for: Self.self).url(forResource: "test", withExtension: "pdf")!
         // open Tab with PDF
@@ -193,6 +239,59 @@ class TabContentTests: XCTestCase {
         _=saveAsMenuItem.action.map { action in
             NSApp.sendAction(action, to: saveAsMenuItem.target, from: saveAsMenuItem)
         }
+        if case .timedOut = await XCTWaiter(delegate: self).fulfillment(of: [eSaveDialogShown], timeout: 5) {
+            getSaveDialog.cancel()
+        }
+        let saveDialog = try await getSaveDialog.value
+
+        guard let url = saveDialog.url else {
+            XCTFail("no Save Dialog url")
+            return
+        }
+        try? FileManager.default.removeItem(at: url)
+
+        // wait until file is saved
+        let fileSavedPromise = Timer.publish(every: 0.01, on: .main, in: .default).autoconnect().filter { _ in
+            FileManager.default.fileExists(atPath: url.path)
+        }.timeout(5).first().promise()
+        defer {
+            try? FileManager.default.removeItem(at: url)
+        }
+
+        window.endSheet(saveDialog, returnCode: .OK)
+
+        _=try await fileSavedPromise.value
+        try XCTAssertEqual(Data(contentsOf: url), Data(contentsOf: pdfUrl))
+    }
+
+    @MainActor
+    func testWhenPDFMainMenuSaveAsChosen_saveDialogOpens() async throws {
+        let pdfUrl = Bundle(for: Self.self).url(forResource: "test", withExtension: "pdf")!
+        // open Tab with PDF
+        let tab = Tab(content: .url(pdfUrl, credential: nil, source: .userEntered("")))
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+        try await eNewtabPageLoaded.value
+
+        // wait for print dialog to appear
+        let eSaveDialogShown = expectation(description: "Save dialog shown")
+        let getSaveDialog = Task { @MainActor in
+            while true {
+                if let sheet = self.window.sheets.first as? NSSavePanel {
+                    eSaveDialogShown.fulfill()
+                    return sheet
+                }
+                try await Task.sleep(interval: 0.01)
+            }
+        }
+
+        // Hit Cmd+S
+        let keyDown = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: [.command], timestamp: 0, windowNumber: window.windowNumber, context: nil, characters: "s", charactersIgnoringModifiers: "s", isARepeat: false, keyCode: UInt16(kVK_ANSI_S))!
+        let keyUp = NSEvent.keyEvent(with: .keyUp, location: .zero, modifierFlags: [.command], timestamp: 0, windowNumber: window.windowNumber, context: nil, characters: "s", charactersIgnoringModifiers: "s", isARepeat: false, keyCode: UInt16(kVK_ANSI_S))!
+        window.sendEvent(keyDown)
+        window.sendEvent(keyUp)
+
         if case .timedOut = await XCTWaiter(delegate: self).fulfillment(of: [eSaveDialogShown], timeout: 5) {
             getSaveDialog.cancel()
         }
