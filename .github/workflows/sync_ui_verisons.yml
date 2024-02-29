@@ -154,8 +154,14 @@ jobs:
         check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
 
-    - name: Output paths
-      run: ls -lR
+ #   - name: Create Asana task when workflow failed
+ #     if: ${{ failure() }} && github.ref == 'refs/heads/main'
+ #     run: |
+ #       curl -s "https://app.asana.com/api/1.0/tasks" \
+ #          --header "Accept: application/json" \
+ #          --header "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
+ #          --header "Content-Type: application/json" \
+ #          --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
@@ -166,7 +172,8 @@ jobs:
           build/*
           ui-tests.xml
           xcodebuild.log
-          DerivedData/Logs/Test/*.xcresult
-          DerivedData/**/Logs/Test/*.xcresult
-          ~/Library/Logs/DiagnosticReports/*
+          DerivedData/*
+#          DerivedData/Logs/Test/*.xcresult
+#          DerivedData/**/Logs/Test/*.xcresult
+#          ~/Library/Logs/DiagnosticReports/*
         retention-days: 7
