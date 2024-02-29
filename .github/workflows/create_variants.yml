@@ -74,7 +74,7 @@ jobs:
         run: |
           atb_variants="${{ github.event.inputs.atb-variants }}"
           if [[ -z "${atb_variants}" ]]; then
-            atb_variants="$(curl -fSsL 'https://app.asana.com/api/1.0/tasks/${ASANA_TASK_ID}?opt_fields=notes' \
+            atb_variants="$(curl -fSsL "https://app.asana.com/api/1.0/tasks/${ASANA_TASK_ID}?opt_fields=notes" \
               -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
               | jq -r .data.notes \
               | grep -A1 '^Variants list' \

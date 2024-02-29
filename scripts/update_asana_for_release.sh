@@ -80,7 +80,7 @@ construct_this_release_includes() {
 		printf '%s' '<ul>'
 		for task_id in "${task_ids[@]}"; do
 			if [[ "$task_id" != "$release_task_id" ]]; then
-				printf '%s' "<li><a data-asana-gid=\\\"${task_id}\\\"/></li>"
+				printf '%s' "<li><a data-asana-gid=\"${task_id}\"/></li>"
 			fi
 		done
 		printf '%s' '</ul>'
@@ -101,12 +101,14 @@ construct_release_task_description() {
 construct_release_announcement_task_description() {
 	printf '%s' "<body>As the last step of the process, post a message to <a href='https://app.asana.com/0/11984721910118/1204991209236659'>REVIEW / RELEASE</a> Asana project:"
 	printf '%s' '<ul>'
-	printf '%s' "<li>Set title to <strong>macOS App Release ${marketing_version}</strong></li>"
+	printf '%s' "<li>Set the title to <strong>macOS App Release ${marketing_version}</strong></li>"
 	printf '%s' '<li>Copy the content below (between separators) and paste as the message body.</li>'
-	printf '%s' '</ul>\n\n<hr>'
+	printf '%s' '</ul>\n<hr>'
 	
 	construct_release_notes
+	printf '%s' '\n'
 	construct_this_release_includes
+	printf '%s' '\n'
 
 	printf '%s' '<strong>Rollout</strong>\n'
 	printf '%s' 'This is now rolling out to users. New users will receive this release immediately, '
@@ -316,7 +318,13 @@ handle_public_release() {
 	# 4. Complete tasks that don't require a post-mortem.
 	complete_tasks "${task_ids[@]}"
 
-	# 5. Construct release announcement task description
+	# 5. Fetch current release notes from Asana release task.
+	local release_notes=()
+	while read -r line; do
+		release_notes+=("$line")
+	done <<< "$(fetch_current_release_notes "${release_task_id}")"
+
+	# 6. Construct release announcement task description
 	local html_notes
 	html_notes="$(construct_release_announcement_task_description)"
 	cat > "${announcement_task_contents_file}" <<< "${html_notes}"
