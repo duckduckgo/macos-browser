@@ -4507,6 +4507,66 @@
     "Let’s try doing it manually. It won’t take long." : {
       "comment" : "Suggestion to switch to a Manual File Data Import when data import fails."
     },
+    "letsmove.alert.message" : {
+      "comment" : "Message of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The DuckDuckGo app needs to be in the Applications folder for some features to work properly."
+          }
+        }
+      }
+    },
+    "letsmove.alert.title" : {
+      "comment" : "Title of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You‘re almost there"
+          }
+        }
+      }
+    },
+    "letsmove.could.not.move" : {
+      "comment" : "Error message when moving the app to the /Applications folder failed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Could not move to Applications folder"
+          }
+        }
+      }
+    },
+    "letsmove.dont.move.button" : {
+      "comment" : "Do Not Move to the /Applications folder button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Do Not Move"
+          }
+        }
+      }
+    },
+    "letsmove.move.button" : {
+      "comment" : "Move the /Applications folder button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Move to Applications Folder"
+          }
+        }
+      }
+    },
     "Location:" : {
       "comment" : "Add Folder popover: parent folder picker title"
     },
@@ -5684,13 +5744,13 @@
       }
     },
     "onboarding.startbrowsing.text" : {
-      "comment" : "Call to action to start using the app as a browser",
+      "comment" : "Call to action to start using the app as a browser. There should be a non-breaking space (0x00A0 – ” “) between “possible” and “🔒”",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+            "value" : "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible 🔒"
           }
         }
       }
