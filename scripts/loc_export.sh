@@ -14,8 +14,17 @@ show_help() {
     exit 0
 }
 
+# Check if xmlstarlet is installed
+if ! command -v xmlstarlet &> /dev/null
+then
+    echo "xmlstarlet could not be found. Please install xmlstarlet."
+    echo "You can install xmlstarlet using Homebrew:"
+    echo " brew install xmlstarlet"
+    exit 1
+fi
+
 # Parse command-line options
-while [[ $# -gt 0 ]]; do
+while [ $# -gt 0 ]; do
     key="$1"
     case $key in
         -h|--help)
@@ -64,6 +73,31 @@ echo "Extraction complete. .xliff file is now in ${final_xliff_path} as ${xliff_
 echo "Cleaning up temporary files..."
 rm -rf "$export_path"
 echo "Cleanup complete."
+
+# Define an array of unwanted paths
+declare -a unwanted_paths=(
+    "DuckDuckGoDBPBackgroundAgent/Info-AppStore-InfoPlist.xcstrings"
+    "DuckDuckGoDBPBackgroundAgent/InfoPlist.xcstrings"
+    "DuckDuckGoDBPBackgroundAgent/Localizable.xcstrings"
+    "DuckDuckGoNotifications/InfoPlist.xcstrings"
+    "DuckDuckGoNotifications/Localizable.xcstrings"
+    "DuckDuckGoVPN/Info-AppStore-InfoPlist.xcstrings"
+    "DuckDuckGoVPN/InfoPlist.xcstrings"
+    "DuckDuckGoVPN/Localizable.xcstrings"
+    "VPNProxyExtension/InfoPlist.xcstrings"
+    "DuckDuckGoNotifications/Resources/InfoPlist.xcstrings"
+    "DuckDuckGo/Suggestions/View/Base.lproj/Suggestion.storyboard"
+)
+
+# Loop through each unwanted path and remove the corresponding <file> elements
+for path in "${unwanted_paths[@]}"; do
+    echo "Removing entries for $path from the .xliff file..."
+    xmlstarlet ed --inplace -N x="urn:oasis:names:tc:xliff:document:1.2" \
+        -d "//x:file[contains(@original, '$path')]" \
+        "${final_xliff_path}/${xliff_file}"
+done
+
+echo "Modification of .xliff file complete."
 
 # Open the directory containing the xliff file
 open "${final_xliff_path}"

@@ -18,7 +18,7 @@ show_help() {
 }
 
 # Parse command-line options
-while [[ $# -gt 0 ]]; do
+while [ $# -gt 0 ]; do
     key="$1"
     case $key in
         -h|--help)
@@ -52,7 +52,7 @@ if [ $# -lt 2 ]; then
 fi
 
 # If input is zip file then extract it
-if [[ $input_path == *.zip ]]; then
+if expr "$input_path" : '.*\.zip$' > /dev/null; then
     extraction_dir="$(dirname "$input_path")/$baseName"
     mkdir -p "$extraction_dir"
     echo "Unzipping $input_path into $extraction_dir"
