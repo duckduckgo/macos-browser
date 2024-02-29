@@ -22022,7 +22022,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Abre **%2$s**\n%3$d Haz clic en %4$@ para abrir el menú de la aplicación y, a continuación, haz clic en **Contraseñas y tarjetas**\n%5$d Haz clic en %6$@ y luego en **Exportar contraseñas**\n%7$d Elige **A un archivo de texto (no seguro)** y haz clic en **Exportar**\n%8$d Guarda el archivo de contraseñas donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n %9$@ %10$@"
+            "value" : "%1$d Abre **%2$s**\n%3$d Haz clic en %4$@ para abrir el menú de la aplicación y, a continuación, haz clic en **Contraseñas y tarjetas**\n%5$d Haz clic en %6$@ y luego en **Exportar contraseñas**\n%7$d Elige **A un archivo de texto (no seguro)** y haz clic en **Exportar**\n%8$d Guarda el archivo de contraseñas donde puedas encontrarlo posteriormente (por ejemplo, en el escritorio)\n %9$d %10$@"
           }
         },
         "fr" : {
