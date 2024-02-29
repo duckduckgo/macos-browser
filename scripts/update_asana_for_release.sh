@@ -120,7 +120,8 @@ construct_release_announcement_task_description() {
 
 update_task_description() {
 	local html_notes="$1"
-	local request_payload="{\"data\":{\"html_notes\":\"${html_notes}\"}}"
+	local escaped_html_notes=${html_notes//\"/\\\"}
+	local request_payload="{\"data\":{\"html_notes\":\"${escaped_html_notes}\"}}"
 
 	curl -fLSs -X PUT "${asana_api_url}/tasks/${release_task_id}?opt_fields=permalink_url" \
 		-H 'Content-Type: application/json' \
