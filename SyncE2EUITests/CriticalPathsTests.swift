@@ -70,7 +70,6 @@ final class CriticalPathsTests: XCTestCase {
     }
     
     func testCanCreateSyncAccount() throws {
-        XCTFail("Forced failure")
         // Go to Sync Set up
         accessSettings()
         let settingsWindow = app.windows["Settings"]
