@@ -1029,7 +1029,7 @@ extension AppDelegate: PrivacyDashboardViewControllerSizeDelegate {
     }
 }
 
-private extension NSMenuItem {
+extension NSMenuItem {
 
     var pdfHudRepresentedObject: WKPDFHUDViewWrapper? {
         guard let representedObject = representedObject else { return nil }

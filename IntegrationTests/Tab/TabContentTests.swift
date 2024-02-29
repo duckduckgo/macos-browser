@@ -60,7 +60,6 @@ class TabContentTests: XCTestCase {
 
         let point = tab.webView.convert(tab.webView.bounds.center, to: nil)
 
-        NSApp.activate(ignoringOtherApps: true)
         let mouseDown = NSEvent.mouseEvent(with: .rightMouseDown,
                                            location: point,
                                            modifierFlags: [],
@@ -81,6 +80,7 @@ class TabContentTests: XCTestCase {
         }
 
         // right-click
+        NSApp.activate(ignoringOtherApps: true)
         window.sendEvent(mouseDown)
         await fulfillment(of: [eMenuShown])
 
@@ -104,12 +104,20 @@ class TabContentTests: XCTestCase {
             }
         }
 
+        XCTAssertNotNil(printMenuItem.action)
+        XCTAssertNotNil(printMenuItem.pdfHudRepresentedObject)
+
         // Click Print…
-        printMenuItem.accessibilityPerformPress()
+        _=printMenuItem.action.map { action in
+            NSApp.sendAction(action, to: printMenuItem.target, from: printMenuItem)
+        }
         if case .timedOut = await XCTWaiter(delegate: self).fulfillment(of: [ePrintDialogShown], timeout: 5) {
             getPrintDialog.cancel()
         }
         let printDialog = try await getPrintDialog.value
+        defer {
+            window.endSheet(printDialog, returnCode: .cancel)
+        }
 
         XCTAssertEqual(printDialog.title, UserText.printMenuItem.dropping(suffix: "…"))
     }
