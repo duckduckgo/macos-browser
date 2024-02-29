@@ -41,13 +41,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(accountManager: AccountManager = AccountManager(),
-                openURLHandler: @escaping (URL) -> Void,
+    public init(openURLHandler: @escaping (URL) -> Void,
                 openVPNHandler: @escaping () -> Void,
                 openDBPHandler: @escaping () -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
                 subscriptionAppGroup: String) {
-        self.accountManager = accountManager
+        self.accountManager = AccountManager(appGroup: subscriptionAppGroup)
         self.openURLHandler = openURLHandler
         self.openVPNHandler = openVPNHandler
         self.openDBPHandler = openDBPHandler

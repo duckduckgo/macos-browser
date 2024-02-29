@@ -189,7 +189,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 #if STRIPE
         let emailAccessToken = try? EmailManager().getToken()
 
-        switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken) {
+        switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
         case .success(let purchaseUpdate):
             await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
         case .failure:

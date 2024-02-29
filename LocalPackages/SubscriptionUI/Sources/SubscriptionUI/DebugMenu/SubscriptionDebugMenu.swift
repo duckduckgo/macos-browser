@@ -194,7 +194,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            currentViewController()?.presentAsSheet(DebugPurchaseViewController())
+            currentViewController()?.presentAsSheet(DebugPurchaseViewController(subscriptionAppGroup: appGroup))
         }
     }
 
