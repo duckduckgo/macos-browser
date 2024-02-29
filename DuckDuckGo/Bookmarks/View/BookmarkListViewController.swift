@@ -563,20 +563,6 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         newFolderButtonClicked(sender)
     }
 
-    func renameFolder(_ sender: NSMenuItem) {
-        guard let folder = sender.representedObject as? BookmarkFolder else {
-            assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
-            return
-        }
-
-        delegate?.popover(shouldPreventClosure: true)
-
-        AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
-            .show(in: parent?.view.window) { [weak delegate] in
-                delegate?.popover(shouldPreventClosure: false)
-            }
-    }
-
     func editFolder(_ sender: NSMenuItem) {
         guard let folderInfo = sender.representedObject as? BookmarkFolderInfo else {
             assertionFailure("Failed to retrieve Bookmark from Edit Folder context menu item")
