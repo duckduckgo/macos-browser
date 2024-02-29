@@ -196,8 +196,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .restartLoginItem,
                     .disableLoginItem,
                     .resetLoginItem,
-                    .disableAndDeleteAllUsers,
-                    .disableAndDeleteWaitlistUsers:
+                    .disableAndDelete:
 
                 DispatchQueue.main.async { // delegateTyped needs to be called in the main thread
                     let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser

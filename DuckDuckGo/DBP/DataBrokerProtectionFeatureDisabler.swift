@@ -20,6 +20,7 @@
 
 import Foundation
 import DataBrokerProtection
+import Common
 
 public extension Notification.Name {
     static let dbpWasDisabled = Notification.Name("com.duckduckgo.DBP.DBPWasDisabled")
@@ -32,11 +33,14 @@ protocol DataBrokerProtectionFeatureDisabling {
 struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling {
     private let scheduler: DataBrokerProtectionLoginItemScheduler
     private let dataManager: InMemoryDataCacheDelegate
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     init(scheduler: DataBrokerProtectionLoginItemScheduler = DataBrokerProtectionManager.shared.scheduler,
-         dataManager: InMemoryDataCacheDelegate = DataBrokerProtectionDataManager()) {
+         dataManager: InMemoryDataCacheDelegate = DataBrokerProtectionDataManager(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
         self.dataManager = dataManager
         self.scheduler = scheduler
+        self.pixelHandler = pixelHandler
     }
 
     func disableAndDelete() {
@@ -47,6 +51,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
 
             dataManager.removeAllData()
 
+            pixelHandler.fire(.disableAndDelete)
             NotificationCenter.default.post(name: .dbpWasDisabled, object: nil)
         }
     }

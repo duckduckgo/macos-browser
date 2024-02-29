@@ -55,8 +55,7 @@ public enum DataBrokerProtectionPixels {
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
     case parentChildMatches(parent: String, child: String, value: Int)
-    case disableAndDeleteAllUsers
-    case disableAndDeleteWaitlistUsers
+    case disableAndDelete
 
     // Stage Pixels
     case optOutStart(dataBroker: String, attemptId: UUID)
@@ -199,8 +198,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .weeklyActiveUser: return "m_mac_dbp_engagement_wau"
         case .monthlyActiveUser: return "m_mac_dbp_engagement_mau"
 
-        case .disableAndDeleteAllUsers: return "m_mac_dbp_disable-and-delete-all"
-        case .disableAndDeleteWaitlistUsers: return "m_mac_dbp_disable-and-delete-waitlist"
+        case .disableAndDelete: return "m_mac_dbp_disable-and-delete"
         }
     }
 
@@ -267,8 +265,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .dailyActiveUser,
                 .weeklyActiveUser,
                 .monthlyActiveUser,
-                .disableAndDeleteAllUsers,
-                .disableAndDeleteWaitlistUsers:
+                .disableAndDelete:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -349,10 +346,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .restartLoginItem,
                     .disableLoginItem,
                     .resetLoginItem,
-                    .disableAndDeleteAllUsers,
-                    .disableAndDeleteWaitlistUsers:
+                    .disableAndDelete:
+                // These pixels should not be called from the agent
+                break
 
-                PixelKit.fire(event)
             }
         }
     }
