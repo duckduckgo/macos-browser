@@ -30,6 +30,7 @@ import ServiceManagement
 import SyncDataProviders
 import UserNotifications
 import PixelKit
+import History
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -212,7 +213,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             didFinishLaunching = true
         }
 
-        HistoryCoordinator.shared.loadHistory()
+        HistoryCoordinator.shared.loadHistory {
+            HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
+        }
+
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
         if case .normal = NSApp.runType {
@@ -284,7 +288,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if SUBSCRIPTION
         Task {
-            var defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
+            let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
 
             let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
                                                          defaultValue: defaultEnvironment).wrappedValue

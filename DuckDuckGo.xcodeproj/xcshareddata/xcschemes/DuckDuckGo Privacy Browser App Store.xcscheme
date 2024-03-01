@@ -134,12 +134,6 @@
                   Identifier = "EncryptionKeyStoreTests">
                </Test>
                <Test
-                  Identifier = "ErrorPageTests/testWhenLoadingFailsAfterSessionRestoration_navigationHistoryIsPreserved()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenPageLoadedAndFailsOnRefreshAndOnConsequentRefresh_errorPageIsUpdatedKeepingForwardHistory()">
-               </Test>
-               <Test
                   Identifier = "HTTPSUpgradeIntegrationTests">
                </Test>
                <Test

@@ -63,7 +63,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
     func setUpCoordinatorAndAddDownload(isBurner: Bool = false) -> (WKDownloadMock, WebKitDownloadTask, UUID) {
         setUpCoordinator()
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         let task = WebKitDownloadTask(download: download, promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isBurner: isBurner)
 
         let e = expectation(description: "download added")
@@ -144,7 +144,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
     func testWhenDownloadAddedThenDownloadItemIsPublished() {
         setUpCoordinator()
 
-        let task = WebKitDownloadTask(download: WKDownloadMock(), promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isBurner: false)
+        let task = WebKitDownloadTask(download: WKDownloadMock(url: .duckDuckGo), promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isBurner: false)
 
         let e = expectation(description: "download added")
         let c = coordinator.updates.sink { [coordinator] (kind, item) in
@@ -245,7 +245,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         webView.resumeDownloadBlock = { data in
             resumeCalled.fulfill()
             XCTAssertEqual(data, .resumeData)
-            return WKDownloadMock()
+            return WKDownloadMock(url: .duckDuckGo)
         }
         webView.startDownloadBlock = { _ in
             XCTFail("unexpected start call")
@@ -298,7 +298,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         webView.resumeDownloadBlock = { data in
             resumeCalled.fulfill()
             XCTAssertEqual(data, .resumeData)
-            return WKDownloadMock()
+            return WKDownloadMock(url: .duckDuckGo)
         }
         webView.startDownloadBlock = { _ in
             XCTFail("unexpected start call")
@@ -354,7 +354,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         webView.startDownloadBlock = { request in
             startCalled.fulfill()
             XCTAssertEqual(request?.url, item.url)
-            return WKDownloadMock()
+            return WKDownloadMock(url: .duckDuckGo)
         }
 
         let downloadAdded = expectation(description: "download addeed")

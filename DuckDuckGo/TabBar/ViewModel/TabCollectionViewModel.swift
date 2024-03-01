@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import Combine
+import History
 
 /**
  * The delegate callbacks are triggered for events related to unpinned tabs only.
