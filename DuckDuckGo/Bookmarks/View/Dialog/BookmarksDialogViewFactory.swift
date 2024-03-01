@@ -42,13 +42,23 @@ enum BookmarksDialogViewFactory {
         return AddEditBookmarkFolderDialogView(viewModel: viewModel)
     }
 
-    /// Creates an instance of AddEditBookmarkDialogView for adding a Bookmark.
+    /// Creates an instance of AddEditBookmarkDialogView for adding a Bookmark with the specified web page.
     /// - Parameters:
     ///   - currentTab: An optional `WebsiteInfo`. When adding a bookmark from the bookmark shortcut panel, if the `Tab` has loaded a web page pass the information via the `currentTab`. If the `Tab` has not loaded a tab pass `nil`. If adding a `Bookmark` from the `Manage Bookmark` settings page, pass `nil`.
     ///  - bookmarkManager: An instance of `BookmarkManager`. This should be used for `#previews` only.
     /// - Returns: An instance of AddEditBookmarkDialogView
     static func makeAddBookmarkView(currentTab: WebsiteInfo?, bookmarkManager: LocalBookmarkManager = .shared) -> AddEditBookmarkDialogView {
         let viewModel = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: currentTab), bookmarkManager: bookmarkManager)
+        return makeAddEditBookmarkDialogView(viewModel: viewModel, bookmarkManager: bookmarkManager)
+    }
+
+    /// Creates an instance of AddEditBookmarkDialogView for adding a Bookmark with the specified parent folder.
+    /// - Parameters:
+    ///  - parentFolder: An optional `BookmarkFolder`. When adding a bookmark from the bookmark management view, if the user select a parent folder pass this value won't be `nil`. Otherwise, if no folder is selected this value will be `nil`.
+    ///  - bookmarkManager: An instance of `BookmarkManager`. This should be used for `#previews` only.
+    /// - Returns: An instance of AddEditBookmarkDialogView
+    static func makeAddBookmarkView(parent: BookmarkFolder?, bookmarkManager: LocalBookmarkManager = .shared) -> AddEditBookmarkDialogView {
+        let viewModel = AddEditBookmarkDialogViewModel(mode: .add(parentFolder: parent), bookmarkManager: bookmarkManager)
         return makeAddEditBookmarkDialogView(viewModel: viewModel, bookmarkManager: bookmarkManager)
     }
 

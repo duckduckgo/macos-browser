@@ -80,16 +80,25 @@ final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
     init(mode: Mode, bookmarkManager: LocalBookmarkManager = .shared) {
         self.mode = mode
         self.bookmarkManager = bookmarkManager
-        bookmarkName = mode.bookmarkName ?? ""
-        bookmarkURLPath = mode.bookmarkURLPath?.absoluteString ?? ""
-        isBookmarkFavorite = mode.bookmarkURLPath.flatMap(bookmarkManager.isUrlFavorited) ?? false
+        self.isBookmarkFavorite = mode.bookmarkURL.flatMap(bookmarkManager.isUrlFavorited) ?? false
         folders = .init(bookmarkManager.list)
         switch mode {
-        case let .add(_, parentFolder):
+        case let .add(websiteInfo, parentFolder):
+            // When adding a new bookmark with website info we need to show the bookmark name and URL only if the bookmark is not bookmarked already.
+            // Scenario we click on the "Add Bookmark" button from Bookmarks shortcut Panel. If Tab has a Bookmark loaded we present the dialog with prepopulated name and URL from the tab.
+            // If we save and click again on the "Add Bookmark" button we don't want to try re-add the same bookmark. Hence we present a dialog that is not pre-populated.
+            let isAlreadyBookmarked = websiteInfo.flatMap { bookmarkManager.isUrlBookmarked(url: $0.url) } ?? false
+            let websiteName = isAlreadyBookmarked ? "" : websiteInfo?.title ?? ""
+            let websiteURLPath = isAlreadyBookmarked ? "" : websiteInfo?.url.absoluteString ?? ""
+            bookmarkName = websiteName
+            bookmarkURLPath = websiteURLPath
             selectedFolder = parentFolder
         case let .edit(bookmark):
+            bookmarkName = bookmark.title
+            bookmarkURLPath = bookmark.urlObject?.absoluteString ?? ""
             selectedFolder = folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
         }
+
         bind()
     }
 
@@ -182,16 +191,7 @@ private extension AddEditBookmarkDialogViewModel.Mode {
         }
     }
 
-    var bookmarkName: String? {
-        switch self {
-        case let .add(tabInfo, _):
-            return tabInfo?.title
-        case let .edit(bookmark):
-            return bookmark.title
-        }
-    }
-
-    var bookmarkURLPath: URL? {
+    var bookmarkURL: URL? {
         switch self {
         case let .add(tabInfo, _):
             return tabInfo?.url
