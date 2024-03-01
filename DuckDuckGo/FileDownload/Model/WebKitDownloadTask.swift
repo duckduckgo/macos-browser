@@ -33,6 +33,10 @@ protocol WebKitDownloadTaskDelegate: AnyObject {
 final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable {
 
     static let downloadExtension = "duckload"
+    private enum Constants {
+        static let remainingDownloadTimeEstimationDelay: TimeInterval = 1
+        static let downloadSpeedSmoothingFactor = 0.1
+    }
 
     let progress: Progress
     let shouldPromptForLocation: Bool
@@ -72,7 +76,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     private weak var delegate: WebKitDownloadTaskDelegate?
 
     private let download: WebKitDownload
-    private var cancellables = Set<AnyCancellable>()
+    private var progressCancellable: AnyCancellable?
 
     private var decideDestinationCompletionHandler: ((URL?) -> Void)?
 
@@ -114,12 +118,37 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     private func start() {
         self.progress.fileDownloadingSourceURL = download.originalRequest?.url
         if let progress = (self.download as? ProgressReporting)?.progress {
-            progress.publisher(for: \.totalUnitCount)
-                .assign(to: \.totalUnitCount, onWeaklyHeld: self.progress)
-                .store(in: &self.cancellables)
-            progress.publisher(for: \.completedUnitCount)
-                .assign(to: \.completedUnitCount, onWeaklyHeld: self.progress)
-                .store(in: &self.cancellables)
+
+            var startTime: Date?
+            progressCancellable = progress.publisher(for: \.totalUnitCount)
+                .combineLatest(progress.publisher(for: \.completedUnitCount))
+                .sink { [weak progress=self.progress] total, completed in
+                    guard let progress else { return }
+                    if progress.totalUnitCount != total {
+                        progress.totalUnitCount = total
+                    }
+                    progress.completedUnitCount = completed
+
+                    if total > 0, completed > 0 {
+                        guard let startTime else {
+                            startTime = Date()
+                            return
+                        }
+                        let elapsedTime = Date().timeIntervalSince(startTime)
+                        // delay before we start calculating the estimated time - because initially it‘s not reliable
+                        guard elapsedTime > Constants.remainingDownloadTimeEstimationDelay else { return }
+
+                        // calculate instantaneous download speed
+                        var throughput = Double(completed) / elapsedTime
+
+                        // calculate the moving average of download speed
+                        if let oldThroughput = progress.throughput.map(Double.init) {
+                            throughput = Constants.downloadSpeedSmoothingFactor * throughput + (1 - Constants.downloadSpeedSmoothingFactor) * oldThroughput
+                        }
+                        progress.throughput = Int(throughput)
+                        progress.estimatedTimeRemaining = Double(total - completed) / throughput
+                    }
+                }
         }
     }
 
