@@ -31,6 +31,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private let accountManager: AccountManager
     private let openURLHandler: (URL) -> Void
+    private let openVPNHandler: () -> Void
+    private let openDBPHandler: () -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
     private let subscriptionAppGroup: String
 
@@ -39,9 +41,15 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(accountManager: AccountManager, openURLHandler: @escaping (URL) -> Void, sheetActionHandler: SubscriptionAccessActionHandlers, subscriptionAppGroup: String) {
-        self.accountManager = accountManager
+    public init(openURLHandler: @escaping (URL) -> Void,
+                openVPNHandler: @escaping () -> Void,
+                openDBPHandler: @escaping () -> Void,
+                sheetActionHandler: SubscriptionAccessActionHandlers,
+                subscriptionAppGroup: String) {
+        self.accountManager = AccountManager(appGroup: subscriptionAppGroup)
         self.openURLHandler = openURLHandler
+        self.openVPNHandler = openVPNHandler
+        self.openDBPHandler = openDBPHandler
         self.sheetActionHandler = sheetActionHandler
         self.subscriptionAppGroup = subscriptionAppGroup
 
@@ -153,12 +161,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openVPN() {
-        NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
+        openVPNHandler()
     }
 
     @MainActor
     func openPersonalInformationRemoval() {
-        NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+        openDBPHandler()
     }
 
     @MainActor

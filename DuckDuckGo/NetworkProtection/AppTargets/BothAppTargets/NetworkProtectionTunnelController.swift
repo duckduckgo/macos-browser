@@ -247,7 +247,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
         case .setShowEntitlementAlert, .setShowEntitlementNotification:
-            // TODO: Handle this
+            // todo
             break
         }
     }

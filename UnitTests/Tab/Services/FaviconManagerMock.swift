@@ -20,6 +20,7 @@ import XCTest
 import Combine
 import BrowserServicesKit
 import Common
+import History
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FaviconManagerMock: FaviconManagement {
@@ -53,7 +54,7 @@ final class FaviconManagerMock: FaviconManagement {
     }
 
     // swiftlint:disable:next function_parameter_count
-    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, exceptExistingHistory history: DuckDuckGo_Privacy_Browser.History, tld: Common.TLD, completion: @escaping () -> Void) {
+    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, exceptExistingHistory history: History, tld: Common.TLD, completion: @escaping () -> Void) {
         completion()
     }
 }

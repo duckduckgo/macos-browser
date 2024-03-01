@@ -64,15 +64,23 @@ final class Database {
         }())
 #endif
 
-        let keyStore: EncryptionKeyStoring
-        let containerLocation: URL
-#if CI
-        keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
-        containerLocation = FileManager.default.temporaryDirectory
-#else
-        keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
-        containerLocation = URL.sandboxApplicationSupportURL
+        let keyStore: EncryptionKeyStoring = {
+#if DEBUG
+            guard case .normal = NSApp.runType else {
+                return (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
+            }
 #endif
+            return EncryptionKeyStore(generator: EncryptionKeyGenerator())
+        }()
+
+        let containerLocation: URL = {
+#if DEBUG
+            guard case .normal = NSApp.runType else {
+                return FileManager.default.temporaryDirectory
+            }
+#endif
+            return .sandboxApplicationSupportURL
+        }()
 
         return makeDatabase(keyStore: keyStore, containerLocation: containerLocation)
     }

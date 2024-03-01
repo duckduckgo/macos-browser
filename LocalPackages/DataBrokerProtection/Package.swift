@@ -29,10 +29,11 @@ let package = Package(
             targets: ["DataBrokerProtection"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "190c50eb5ca7a0d1bfd492f0ea372efb8f046797"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "cb11e5449e9767796ae539688fa4b9319db5024c"),
         .package(path: "../PixelKit"),
         .package(path: "../SwiftUIExtensions"),
-        .package(path: "../XPCHelper")
+        .package(path: "../XPCHelper"),
+        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "1.0.0"),
     ],
     targets: [
         .target(
@@ -41,21 +42,21 @@ let package = Package(
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "PixelKit", package: "PixelKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
-                .byName(name: "XPCHelper")
+                .byName(name: "XPCHelper"),
             ],
             resources: [.process("Resources")],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
         .testTarget(
             name: "DataBrokerProtectionTests",
             dependencies: [
                 "DataBrokerProtection",
-                "BrowserServicesKit"
+                "BrowserServicesKit",
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         )
     ]
 )

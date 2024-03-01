@@ -30,18 +30,18 @@ let package = Package(
         .library(name: "XPCHelper", targets: ["XPCHelper"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "190c50eb5ca7a0d1bfd492f0ea372efb8f046797"),
+        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "1.0.0"),
     ],
     targets: [
         .target(
             name: "XPCHelper",
             dependencies: [
-                .targetItem(name: "XPCDelegateProxy", condition: nil)
+                .targetItem(name: "XPCDelegateProxy", condition: nil),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
 
         .target(

@@ -125,7 +125,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
             case .vpnAccessRevoked:
-                // TODO: Handle this
+                // todo
                 return
             }
 
@@ -242,14 +242,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
-                   isSubscriptionEnabled: true,
-                   entitlementCheck: {
-#if SUBSCRIPTION && NETP_SYSTEM_EXTENSION
-            await AccountManager().hasEntitlement(for: .networkProtection)
-#else
-            return .success(true)
-#endif
-        })
+                   isSubscriptionEnabled: false,
+                   entitlementCheck: nil)
 
         observeServerChanges()
         observeStatusUpdateRequests()

@@ -30,6 +30,7 @@ import ServiceManagement
 import SyncDataProviders
 import UserNotifications
 import PixelKit
+import History
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -188,6 +189,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -211,7 +213,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             didFinishLaunching = true
         }
 
-        HistoryCoordinator.shared.loadHistory()
+        HistoryCoordinator.shared.loadHistory {
+            HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
+        }
+
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
         if case .normal = NSApp.runType {
@@ -240,7 +245,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         startupSync()
 
-        stateRestorationManager.applicationDidFinishLaunching()
+        if [.normal, .uiTests].contains(NSApp.runType) {
+            stateRestorationManager.applicationDidFinishLaunching()
+        }
 
         BWManager.shared.initCommunication()
 
@@ -281,13 +288,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if SUBSCRIPTION
         Task {
+            var defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
+
+            let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
+                                                         defaultValue: defaultEnvironment).wrappedValue
+            SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
+
     #if STRIPE
             SubscriptionPurchaseEnvironment.current = .stripe
     #else
             SubscriptionPurchaseEnvironment.current = .appStore
     #endif
             SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
-            await AccountManager().checkSubscriptionState()
+            let accountManager = AccountManager()
+            do {
+                try accountManager.migrateAccessTokenToNewStore()
+            } catch {
+                if let error = error as? AccountManager.MigrationError {
+                    switch error {
+                    case AccountManager.MigrationError.migrationFailed:
+                        os_log(.default, log: .subscription, "Access token migration failed")
+                    case AccountManager.MigrationError.noMigrationNeeded:
+                        os_log(.default, log: .subscription, "No access token migration needed")
+                    }
+                }
+            }
+            await accountManager.checkSubscriptionState()
         }
 #endif
     }

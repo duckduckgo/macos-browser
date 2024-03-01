@@ -44,6 +44,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
+#if DEBUG
         let accountManager = AccountManager(appGroup: Bundle.main.appGroup(bundle: .subs))
 
         if let token = accountManager.accessToken {
@@ -51,6 +52,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
         } else {
             os_log(.error, log: .networkProtection, "🔴 VPN Agent found no token")
         }
+#endif
     }
 
     required init?(coder: NSCoder) {
