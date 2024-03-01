@@ -133,7 +133,7 @@ jobs:
         fi
 
     - name: Set up Asana templates
-      if: failure() || ${{ env.MERGE_OR_DELETE_FAILED }}
+      if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
       id: asana-failure-templates
       run: |
         if [[ ${{ steps.create-tag.outputs.tag-created }} == "true" ]]; then
@@ -156,7 +156,7 @@ jobs:
 
     - name: Create Asana task on failure
       id: create-task-on-failure
-      if: failure() || ${{ env.MERGE_OR_DELETE_FAILED }}
+      if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
       uses: ./.github/actions/asana-create-action-item
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -164,7 +164,7 @@ jobs:
         template-name: ${{ steps.asana-failure-templates.outputs.task-template }}
 
     - name: Report failure
-      if: failure() || ${{ env.MERGE_OR_DELETE_FAILED }}
+      if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
       uses: ./.github/actions/asana-log-message
       env:
         ASSIGNEE_ID: ${{ steps.create-task-on-failure.outputs.assignee-id }}
@@ -175,7 +175,7 @@ jobs:
         template-name: ${{ steps.asana-failure-templates.outputs.comment-template }}
 
     - name: Set up Asana success comment template
-      if: success() && ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
+      if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
       id: asana-success-template
       run: |
         if [[ "${prerelease}" == "true" ]]; then
@@ -185,7 +185,7 @@ jobs:
         fi
 
     - name: Report success
-      if: success() && ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
+      if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
       uses: ./.github/actions/asana-log-message
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
