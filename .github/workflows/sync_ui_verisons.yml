@@ -147,13 +147,6 @@ jobs:
             xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml
           fi)
 
-    - name: Publish tests report
-      uses: mikepenz/action-junit-report@v3
-      if: always() 
-      with:
-        check_name: "Test Report ${{ matrix.runner }}"
-        report_paths: ui-tests.xml
-
  #   - name: Create Asana task when workflow failed
  #     if: ${{ failure() }} && github.ref == 'refs/heads/main'
  #     run: |
@@ -162,6 +155,13 @@ jobs:
  #          --header "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
  #          --header "Content-Type: application/json" \
  #          --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
+
+    - name: Publish tests report
+      uses: mikepenz/action-junit-report@v3
+      if: always() 
+      with:
+        check_name: "Test Report ${{ matrix.runner }}"
+        report_paths: ui-tests.xml
 
     - name: Upload logs when workflow failed
       uses: actions/upload-artifact@v4
