@@ -164,6 +164,10 @@ extension BookmarksBarCollectionViewItem: BookmarkMenuItemSelectors {
         delegate?.bookmarksBarCollectionViewItemDeleteEntityAction(self)
     }
 
+    func moveToEnd(_ sender: NSMenuItem) {
+        delegate?.bookmarksBarCollectionViewItemMoveToEndAction(self)
+    }
+
     func deleteEntities(_ sender: NSMenuItem) {}
 
     func manageBookmarks(_ sender: NSMenuItem) {

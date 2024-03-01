@@ -29,7 +29,7 @@ final class ContextualMenuTests: XCTestCase {
         let items = ContextualMenu.bookmarkMenuItems(isFavorite: isFavorite)
 
         // THEN
-        XCTAssertEqual(items.count, 11)
+        XCTAssertEqual(items.count, 12)
         assertMenu(item: items[0], withTitle: UserText.openInNewTab, selector: #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)))
         assertMenu(item: items[1], withTitle: UserText.openInNewWindow, selector: #selector(BookmarkMenuItemSelectors.openBookmarkInNewWindow(_:)))
         assertMenu(item: items[2], withTitle: "", selector: nil) // Separator
@@ -38,9 +38,10 @@ final class ContextualMenuTests: XCTestCase {
         assertMenu(item: items[5], withTitle: UserText.editBookmark, selector: #selector(BookmarkMenuItemSelectors.editBookmark(_:)))
         assertMenu(item: items[6], withTitle: UserText.bookmarksBarContextMenuCopy, selector: #selector(BookmarkMenuItemSelectors.copyBookmark(_:)))
         assertMenu(item: items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)))
-        assertMenu(item: items[8], withTitle: "", selector: nil) // Separator
-        assertMenu(item: items[9], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
-        assertMenu(item: items[10], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
+        assertMenu(item: items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)))
+        assertMenu(item: items[9], withTitle: "", selector: nil) // Separator
+        assertMenu(item: items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
+        assertMenu(item: items[11], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
 
     }
 
@@ -60,9 +61,10 @@ final class ContextualMenuTests: XCTestCase {
         assertMenu(item: items[5], withTitle: UserText.editBookmark, selector: #selector(BookmarkMenuItemSelectors.editBookmark(_:)))
         assertMenu(item: items[6], withTitle: UserText.bookmarksBarContextMenuCopy, selector: #selector(BookmarkMenuItemSelectors.copyBookmark(_:)))
         assertMenu(item: items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)))
-        assertMenu(item: items[8], withTitle: "", selector: nil) // Separator
-        assertMenu(item: items[9], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
-        assertMenu(item: items[10], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
+        assertMenu(item: items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)))
+        assertMenu(item: items[9], withTitle: "", selector: nil) // Separator
+        assertMenu(item: items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
+        assertMenu(item: items[11], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
     }
 
     func testWhenAskingFolderItemThenItShouldReturnTheItemsInTheCorrectOrders() {
@@ -70,15 +72,16 @@ final class ContextualMenuTests: XCTestCase {
         let items = ContextualMenu.folderMenuItems()
 
         // THEN
-        XCTAssertEqual(items.count, 8)
+        XCTAssertEqual(items.count, 9)
         assertMenu(item: items[0], withTitle: UserText.openAllInNewTabs, selector: #selector(FolderMenuItemSelectors.openInNewTabs(_:)))
         assertMenu(item: items[1], withTitle: UserText.openAllTabsInNewWindow, selector: #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)))
         assertMenu(item: items[2], withTitle: "", selector: nil) // Separator
         assertMenu(item: items[3], withTitle: UserText.editBookmark, selector: #selector(FolderMenuItemSelectors.editFolder(_:)))
         assertMenu(item: items[4], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(FolderMenuItemSelectors.deleteFolder(_:)))
-        assertMenu(item: items[5], withTitle: "", selector: nil) // Separator
-        assertMenu(item: items[6], withTitle: UserText.addFolder, selector: #selector(FolderMenuItemSelectors.newFolder(_:)))
-        assertMenu(item: items[7], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(FolderMenuItemSelectors.manageBookmarks(_:)))
+        assertMenu(item: items[5], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(FolderMenuItemSelectors.moveToEnd(_:)))
+        assertMenu(item: items[6], withTitle: "", selector: nil) // Separator
+        assertMenu(item: items[7], withTitle: UserText.addFolder, selector: #selector(FolderMenuItemSelectors.newFolder(_:)))
+        assertMenu(item: items[8], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(FolderMenuItemSelectors.manageBookmarks(_:)))
     }
 
     func testWhenCreateMenuForEmptySelectionThenItReturnsAMenuWithAddFolderOnly() throws {
@@ -91,7 +94,7 @@ final class ContextualMenuTests: XCTestCase {
         assertMenu(item: menuItem, withTitle: UserText.addFolder, selector: #selector(FolderMenuItemSelectors.newFolder(_:)))
     }
 
-    func testWhenCreateMenuForBookmarkThenReturnsAMenuWithTheBookmarkMenuItems() throws {
+    func testWhenCreateMenuForBookmarkWithoutParentThenReturnsAMenuWithTheBookmarkMenuItems() throws {
         // GIVEN
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: false)
 
@@ -100,7 +103,7 @@ final class ContextualMenuTests: XCTestCase {
 
         // THEN
         let items = try XCTUnwrap(menu?.items)
-        XCTAssertEqual(items.count, 11)
+        XCTAssertEqual(items.count, 12)
         assertMenu(item: items[0], withTitle: UserText.openInNewTab, selector: #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)), representedObject: bookmark)
         assertMenu(item: items[1], withTitle: UserText.openInNewWindow, selector: #selector(BookmarkMenuItemSelectors.openBookmarkInNewWindow(_:)), representedObject: bookmark)
         assertMenu(item: items[2], withTitle: "", selector: nil) // Separator
@@ -109,9 +112,37 @@ final class ContextualMenuTests: XCTestCase {
         assertMenu(item: items[5], withTitle: UserText.editBookmark, selector: #selector(BookmarkMenuItemSelectors.editBookmark(_:)), representedObject: bookmark)
         assertMenu(item: items[6], withTitle: UserText.bookmarksBarContextMenuCopy, selector: #selector(BookmarkMenuItemSelectors.copyBookmark(_:)), representedObject: bookmark)
         assertMenu(item: items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), representedObject: bookmark)
-        assertMenu(item: items[8], withTitle: "", selector: nil) // Separator
-        assertMenu(item: items[9], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
-        assertMenu(item: items[10], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
+        assertMenu(item: items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), representedObject: BookmarkEntityInfo(entity: bookmark, parent: nil))
+        assertMenu(item: items[9], withTitle: "", selector: nil) // Separator
+        assertMenu(item: items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
+        assertMenu(item: items[11], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
+    }
+
+    func testWhenCreateMenuForBookmarkWithParentThenReturnsAMenuWithTheBookmarkMenuItems() throws {
+        // GIVEN
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: false, parentFolderUUID: "A")
+        let parent = BookmarkFolder(id: "A", title: "Folder", children: [bookmark])
+        let parentNode = BookmarkNode(representedObject: parent, parent: nil)
+        let node = BookmarkNode(representedObject: bookmark, parent: parentNode)
+
+        // WHEN
+        let menu = ContextualMenu.menu(for: [node])
+
+        // THEN
+        let items = try XCTUnwrap(menu?.items)
+        XCTAssertEqual(items.count, 12)
+        assertMenu(item: items[0], withTitle: UserText.openInNewTab, selector: #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)), representedObject: bookmark)
+        assertMenu(item: items[1], withTitle: UserText.openInNewWindow, selector: #selector(BookmarkMenuItemSelectors.openBookmarkInNewWindow(_:)), representedObject: bookmark)
+        assertMenu(item: items[2], withTitle: "", selector: nil) // Separator
+        assertMenu(item: items[3], withTitle: UserText.addToFavorites, selector: #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), representedObject: bookmark)
+        assertMenu(item: items[4], withTitle: "", selector: nil) // Separator
+        assertMenu(item: items[5], withTitle: UserText.editBookmark, selector: #selector(BookmarkMenuItemSelectors.editBookmark(_:)), representedObject: bookmark)
+        assertMenu(item: items[6], withTitle: UserText.bookmarksBarContextMenuCopy, selector: #selector(BookmarkMenuItemSelectors.copyBookmark(_:)), representedObject: bookmark)
+        assertMenu(item: items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), representedObject: bookmark)
+        assertMenu(item: items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), representedObject: BookmarkEntityInfo(entity: bookmark, parent: parent))
+        assertMenu(item: items[9], withTitle: "", selector: nil) // Separator
+        assertMenu(item: items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
+        assertMenu(item: items[11], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
     }
 
     func testWhenCreateMenuForFolderNodeThenReturnsAMenuWithTheFolderMenuItems() throws {
@@ -126,15 +157,16 @@ final class ContextualMenuTests: XCTestCase {
 
         // THEN
         let items = try XCTUnwrap(menu?.items)
-        XCTAssertEqual(items.count, 8)
+        XCTAssertEqual(items.count, 9)
         assertMenu(item: items[0], withTitle: UserText.openAllInNewTabs, selector: #selector(FolderMenuItemSelectors.openInNewTabs(_:)), representedObject: folder)
         assertMenu(item: items[1], withTitle: UserText.openAllTabsInNewWindow, selector: #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)), representedObject: folder)
         assertMenu(item: items[2], withTitle: "", selector: nil) // Separator
-        assertMenu(item: items[3], withTitle: UserText.editBookmark, selector: #selector(FolderMenuItemSelectors.editFolder(_:)), representedObject: BookmarkFolderInfo(parent: parent, folder: folder))
+        assertMenu(item: items[3], withTitle: UserText.editBookmark, selector: #selector(FolderMenuItemSelectors.editFolder(_:)), representedObject: BookmarkEntityInfo(entity: folder, parent: parent))
         assertMenu(item: items[4], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(FolderMenuItemSelectors.deleteFolder(_:)), representedObject: folder)
-        assertMenu(item: items[5], withTitle: "", selector: nil) // Separator
-        assertMenu(item: items[6], withTitle: UserText.addFolder, selector: #selector(FolderMenuItemSelectors.newFolder(_:)), representedObject: folder)
-        assertMenu(item: items[7], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(FolderMenuItemSelectors.manageBookmarks(_:)))
+        assertMenu(item: items[5], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(FolderMenuItemSelectors.moveToEnd(_:)), representedObject: BookmarkEntityInfo(entity: folder, parent: parent))
+        assertMenu(item: items[6], withTitle: "", selector: nil) // Separator
+        assertMenu(item: items[7], withTitle: UserText.addFolder, selector: #selector(FolderMenuItemSelectors.newFolder(_:)), representedObject: folder)
+        assertMenu(item: items[8], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(FolderMenuItemSelectors.manageBookmarks(_:)))
     }
 
     func testWhenCreateMenuForMultipleUnfavoriteBookmarksThenReturnsMenuWithOpenInNewTabsAddToFavoritesAndDelete() throws {

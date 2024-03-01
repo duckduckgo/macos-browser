@@ -563,6 +563,16 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         showManageBookmarks()
     }
 
+    func moveToEnd(_ sender: NSMenuItem) {
+        guard let bookmarkEntity = sender.representedObject as? BookmarksEntityIdentifiable else {
+            assertionFailure("Failed to cast menu item's represented object to BookmarkEntity")
+            return
+        }
+
+        let parentFolderType: ParentFolderType = bookmarkEntity.parentId.flatMap { .parent(uuid: $0) } ?? .root
+        bookmarkManager.move(objectUUIDs: [bookmarkEntity.entityId], toIndex: nil, withinParentFolder: parentFolderType) { _ in }
+    }
+
 }
 
 extension BookmarkListViewController: FolderMenuItemSelectors {
@@ -572,12 +582,14 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
     }
 
     func editFolder(_ sender: NSMenuItem) {
-        guard let folderInfo = sender.representedObject as? BookmarkFolderInfo else {
+        guard let bookmarkEntityInfo = sender.representedObject as? BookmarkEntityInfo,
+              let folder = bookmarkEntityInfo.entity as? BookmarkFolder
+        else {
             assertionFailure("Failed to retrieve Bookmark from Edit Folder context menu item")
             return
         }
 
-        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folderInfo.folder, parentFolder: folderInfo.parent)
+        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: bookmarkEntityInfo.parent)
         showDialog(view: view)
     }
 

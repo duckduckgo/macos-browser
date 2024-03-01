@@ -20,6 +20,7 @@ import AppKit
 
 @objc protocol BookmarksMenuItemSelectors {
     func newFolder(_ sender: NSMenuItem)
+    func moveToEnd(_ sender: NSMenuItem)
     @objc optional func manageBookmarks(_ sender: NSMenuItem)
 }
 

@@ -63,7 +63,7 @@ enum ContextualMenu {
     static func menu(for entity: BaseBookmarkEntity, parentFolder: BookmarkFolder?) -> NSMenu? {
         let menu: NSMenu?
         if let bookmark = entity as? Bookmark {
-            menu = self.menu(for: bookmark, isFavorite: bookmark.isFavorite)
+            menu = self.menu(for: bookmark, parent: parentFolder, isFavorite: bookmark.isFavorite)
         } else if let folder = entity as? BookmarkFolder {
             // When the user edits a folder we need to show the parent in the folder picker. Folders directly child of PseudoFolder `Bookmarks` have nil parent because their parent is not an instance of `BookmarkFolder`
             menu = self.menu(for: folder, parent: parentFolder)
@@ -81,7 +81,7 @@ enum ContextualMenu {
     /// - Parameter isFavorite: True if the menu item should contain a menu item to add to favorites. False to contain a menu item to remove from favorites.
     /// - Returns: An array of `NSMenuItem`
     static func bookmarkMenuItems(isFavorite: Bool) -> [NSMenuItem] {
-        menuItems(for: nil, isFavorite: isFavorite)
+        menuItems(for: nil, parent: nil, isFavorite: isFavorite)
     }
 
     /// Returns an array of `NSMenuItem` to show for a bookmark folder.
@@ -101,15 +101,15 @@ private extension ContextualMenu {
         NSMenu(items: [addFolderMenuItem()])
     }
 
-    static func menu(for bookmark: Bookmark?, isFavorite: Bool) -> NSMenu {
-        NSMenu(items: menuItems(for: bookmark, isFavorite: isFavorite))
+    static func menu(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool) -> NSMenu {
+        NSMenu(items: menuItems(for: bookmark, parent: parent, isFavorite: isFavorite))
     }
 
     static func menu(for folder: BookmarkFolder?, parent: BookmarkFolder?) -> NSMenu {
        NSMenu(items: menuItems(for: folder, parent: parent))
     }
 
-    static func menuItems(for bookmark: Bookmark?, isFavorite: Bool) -> [NSMenuItem] {
+    static func menuItems(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool) -> [NSMenuItem] {
         [
             openBookmarkInNewTabMenuItem().bookmark(bookmark),
             openBookmarkInNewWindowMenuItem().bookmark(bookmark),
@@ -119,6 +119,7 @@ private extension ContextualMenu {
             editBookmarkMenuItem().bookmark(bookmark),
             copyBookmarkMenuItem().bookmark(bookmark),
             deleteBookmarkMenuItem().bookmark(bookmark),
+            moveToEndMenuItem().entityInfo(bookmark, parent: parent),
             NSMenuItem.separator(),
             addFolderMenuItem(),
             manageBookmarksMenuItem(),
@@ -130,8 +131,9 @@ private extension ContextualMenu {
             openInNewTabsMenuItem().folder(folder),
             openAllInNewWindowMenuItem().folder(folder),
             NSMenuItem.separator(),
-            editFolderMenuItem().folder(folder, parent: parent),
+            editFolderMenuItem().entityInfo(folder, parent: parent),
             deleteFolderMenuItem().folder(folder),
+            moveToEndMenuItem().entityInfo(folder, parent: parent),
             NSMenuItem.separator(),
             addFolderMenuItem().folder(folder),
             manageBookmarksMenuItem(),
@@ -178,6 +180,10 @@ private extension ContextualMenu {
 
     static func deleteBookmarkMenuItem() -> NSMenuItem {
         menuItem(UserText.bookmarksBarContextMenuDelete, #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)))
+    }
+
+    static func moveToEndMenuItem() -> NSMenuItem {
+        menuItem(UserText.bookmarksBarContextMenuMoveToEnd, #selector(BookmarkMenuItemSelectors.moveToEnd(_:)))
     }
 
     // MARK: - Bookmark Folder Menu Items
@@ -252,9 +258,9 @@ private extension NSMenuItem {
         return self
     }
 
-    func folder(_ folder: BookmarkFolder?, parent: BookmarkFolder?) -> NSMenuItem {
-        guard let folder else { return self }
-        representedObject = BookmarkFolderInfo(parent: parent, folder: folder)
+    func entityInfo(_ entity: BaseBookmarkEntity?, parent: BookmarkFolder?) -> NSMenuItem {
+        guard let entity else { return self }
+        representedObject = BookmarkEntityInfo(entity: entity, parent: parent)
         return self
     }
 

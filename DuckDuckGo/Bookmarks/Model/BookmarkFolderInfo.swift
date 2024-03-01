@@ -18,7 +18,15 @@
 
 import Foundation
 
-struct BookmarkFolderInfo: Equatable {
+protocol BookmarksEntityIdentifiable {
+    var entityId: String { get }
+    var parentId: String? { get }
+}
+
+struct BookmarkEntityInfo: Equatable, BookmarksEntityIdentifiable {
+    let entity: BaseBookmarkEntity
     let parent: BookmarkFolder?
-    let folder: BookmarkFolder
+
+    var entityId: String { entity.id }
+    var parentId: String? { parent?.id }
 }
