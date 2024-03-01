@@ -113,7 +113,12 @@ final class MoreOptionsMenu: NSMenu {
     private func setupMenuItems() {
 
 #if FEEDBACK
-        var feedbackString = internalUserDecider.isInternalUser ? "\(UserText.sendFeedback) (version: \(AppVersion.shared.versionNumber))" : UserText.sendFeedback
+        let feedbackString: String = {
+            guard internalUserDecider.isInternalUser else {
+                return UserText.sendFeedback
+            }
+            return "\(UserText.sendFeedback) (version: \(AppVersion.shared.versionNumber).\(AppVersion.shared.buildNumber))"
+        }()
         let feedbackMenuItem = NSMenuItem(title: feedbackString, action: nil, keyEquivalent: "")
 
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
