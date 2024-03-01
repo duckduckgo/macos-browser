@@ -1,7 +1,7 @@
 {
   "name": "FastBackgroundCheck.com",
   "url": "fastbackgroundcheck.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "peoplefinders.com",
   "addedDatetime": 1706248800000,
   "steps": [
@@ -11,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "997adf8d-023c-409e-9206-57871cd25f0a",
+          "id": "58fdfa90-9b0c-4fda-8961-e73502f68474",
           "url": "https://www.fastbackgroundcheck.com/people/${firstName}-${lastName}/${city}-${state}"
         },
         {
           "actionType": "extract",
-          "id": "2f531e34-2ac0-4743-a760-065187d6c951",
+          "id": "14dfda23-a4c3-483f-a67f-e89322636036",
           "selector": ".person-container",
           "profile": {
             "name": {
@@ -49,7 +49,9 @@
               "separator": "•"
             },
             "profileUrl": {
-              "selector": ".//a[contains(@title, 'See full background')]"
+              "selector": ".//a[contains(@title, 'See full background')]",
+              "identifierType": "path",
+              "identifier": "https://www.fastbackgroundcheck.com/people/${firstName}-${lastName}/id/${id}"
             }
           }
         }
