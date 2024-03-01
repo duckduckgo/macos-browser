@@ -58,6 +58,7 @@ final class AppStateRestorationManager: NSObject {
         service.canRestoreLastSessionState
     }
 
+    @discardableResult
     func restoreLastSessionState(interactive: Bool) -> WindowManagerStateRestoration? {
         var state: WindowManagerStateRestoration?
         do {
