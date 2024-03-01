@@ -389,6 +389,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
 
         if displayedItems.isEmpty && items.isEmpty {
+            calculateEmptyState()
             return
         }
 
