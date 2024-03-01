@@ -700,10 +700,7 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 
-        let title = webView.title?.trimmingWhitespace()
-        if title != self.title {
-            self.title = title
-        }
+        self.title = webView.title?.trimmingWhitespace()
 
         if let wkBackForwardListItem = webView.backForwardList.currentItem,
            content.urlForWebView == wkBackForwardListItem.url,
