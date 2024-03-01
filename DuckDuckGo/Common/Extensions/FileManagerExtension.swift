@@ -21,8 +21,14 @@ import Foundation
 
 extension FileManager {
 
+    @discardableResult
     func moveItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
         return try self.perform(self.moveItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
+    }
+
+    @discardableResult
+    func copyItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
+        return try self.perform(self.copyItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
     }
 
     private func perform(_ operation: (URL, URL) throws -> Void,
