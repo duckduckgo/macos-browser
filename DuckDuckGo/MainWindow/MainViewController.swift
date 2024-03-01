@@ -482,13 +482,12 @@ extension MainViewController {
             .subtracting(.capsLock)
 
         switch Int(event.keyCode) {
-        case kVK_Return:
-            if let addressBarTextField = navigationBarViewController.addressBarViewController?.addressBarTextField,
-               addressBarTextField.isFirstResponder {
-                addressBarTextField.addressBarEnterPressed()
-                return true
-            }
-            return false
+        case kVK_Return  where navigationBarViewController.addressBarViewController?
+                .addressBarTextField.isFirstResponder == true:
+
+            navigationBarViewController.addressBarViewController?.addressBarTextField.addressBarEnterPressed()
+
+            return true
 
         case kVK_Escape:
             var isHandled = false

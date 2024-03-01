@@ -395,6 +395,11 @@ final class AddressBarTextField: NSTextField {
                 updateTab(tab, upgradedTo: url)
             }
 
+            if selected {
+                // reset address bar value
+                updateValue(selectedTabViewModel: nil, addressBarString: nil)
+                window?.makeFirstResponder(nil)
+            }
             switch tabOrWindow {
             case .tab:
                 tabCollectionViewModel.append(tab: tab, selected: selected)
