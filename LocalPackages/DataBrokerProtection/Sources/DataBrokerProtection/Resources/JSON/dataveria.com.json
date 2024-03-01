@@ -1,7 +1,7 @@
 {
   "name": "Dataveria",
   "url": "dataveria.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
   "steps": [
@@ -11,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "a8f3a259-2d39-4ae3-ac13-65aa63a53331",
+          "id": "92f18635-ddbb-4700-afcd-055f80f721b8",
           "url": "https://dataveria.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -25,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "e810cc23-2d2a-4e6e-b06f-dfc8a2e1e85d",
+          "id": "441a4974-cc5a-401d-aec5-f597956327ff",
           "selector": ".search-item",
           "profile": {
             "name": {
@@ -48,7 +48,9 @@
               "beforeText": ","
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://dataveria.com/view/${id}"
             }
           }
         }

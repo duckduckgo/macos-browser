@@ -1,7 +1,7 @@
 {
   "name": "PublicReports",
   "url": "publicreports.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -11,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "b995b1bf-6610-4085-9d07-d38857807535",
+          "id": "cdd6e94e-ad5d-4331-bb0d-8212e52e0efb",
           "url": "https://publicreports.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -25,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "7fb121fb-e2a0-4fa2-9b97-51130104971c",
+          "id": "64808ea7-0f52-45ef-a374-dafe8b9272e7",
           "selector": ".card",
           "profile": {
             "name": {
@@ -51,7 +51,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://neighbor.report/person/${id}"
             }
           }
         }
