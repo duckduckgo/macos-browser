@@ -140,9 +140,9 @@ final class TabViewModel {
                 guard let self else { return }
 
                 updateAddressBarStrings()
+                updateFavicon()
                 if case .didCommit = event {
                     updateCanBeBookmarked()
-                    updateFavicon()
                 }
             }
             .store(in: &cancellables)
