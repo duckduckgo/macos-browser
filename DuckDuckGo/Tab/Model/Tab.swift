@@ -174,7 +174,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isDisplayable: Bool {
             switch self {
-            case .settings, .bookmarks, .dataBrokerProtection:
+            case .settings, .bookmarks, .dataBrokerProtection, .subscription:
                 return true
             default:
                 return false
@@ -188,6 +188,8 @@ protocol NewWindowPolicyDecisionMaker {
             case (.bookmarks, .bookmarks):
                 return true
             case (.dataBrokerProtection, .dataBrokerProtection):
+                return true
+            case (.subscription(let url1), .subscription(let url2)):
                 return true
             default:
                 return false
