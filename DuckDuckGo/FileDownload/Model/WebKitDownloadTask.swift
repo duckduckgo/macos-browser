@@ -135,18 +135,17 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
                             return
                         }
                         let elapsedTime = Date().timeIntervalSince(startTime)
+                        // delay before we start calculating the estimated time - because initially it‘s not reliable
                         guard elapsedTime > Constants.remainingDownloadTimeEstimationDelay else { return }
 
-                        // Calculate instantaneous download speed
+                        // calculate instantaneous download speed
                         var throughput = Double(completed) / elapsedTime
 
-                        // Calculate the moving average of download speed
+                        // calculate the moving average of download speed
                         if let oldThroughput = progress.throughput.map(Double.init) {
                             throughput = Constants.downloadSpeedSmoothingFactor * throughput + (1 - Constants.downloadSpeedSmoothingFactor) * oldThroughput
                         }
                         progress.throughput = Int(throughput)
-
-                        // only update estimated time after initial delay
                         progress.estimatedTimeRemaining = Double(total - completed) / throughput
                     }
                 }
