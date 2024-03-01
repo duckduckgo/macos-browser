@@ -73,6 +73,8 @@ jobs:
           BRANCH: ${{ github.ref_name }}
         run: |
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
+          # 'internal', because we start with making a build that still needs to be tested before being published
+          # and we want Asana tasks to be moved to "Validation" and not already to "Done"
           ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.task-id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
 
   prepare_release:
@@ -116,7 +118,7 @@ jobs:
       asana-task-url: ${{ github.event.inputs.asana-task-url }}
       branch: ${{ github.ref_name }}
       base-branch: ${{ github.event.inputs.current-internal-release-branch || 'main' }}
-      prerelease: true
+      prerelease: true # Pre-release for now, and the actual release will be done as part of publish_dmg_release that's called later
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
