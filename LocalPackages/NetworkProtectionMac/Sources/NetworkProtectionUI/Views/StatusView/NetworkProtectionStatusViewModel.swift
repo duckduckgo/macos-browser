@@ -94,8 +94,6 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
-        private let entitlementMonitor: NetworkProtectionEntitlementMonitor
-
         private var cancellables = Set<AnyCancellable>()
 
         // MARK: - Dispatch Queues
@@ -126,7 +124,6 @@ extension NetworkProtectionStatusView {
             self.agentLoginItem = agentLoginItem
             self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
-            self.entitlementMonitor = NetworkProtectionEntitlementMonitor()
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
@@ -154,19 +151,19 @@ extension NetworkProtectionStatusView {
             }
             .store(in: &cancellables)
 
-            Task {
-                await entitlementMonitor.start(entitlementCheck: entitlementCheck) { [weak self] result in
-                    guard let self else { return }
-                    switch result {
-                    case .validEntitlement:
-                        self.shouldShowSubscriptionExpired = false
-                    case .invalidEntitlement:
-                        self.shouldShowSubscriptionExpired = true
-                    case .error:
-                        break
-                    }
-                }
-            }
+//            Task {
+//                await entitlementMonitor.start(entitlementCheck: entitlementCheck) { [weak self] result in
+//                    guard let self else { return }
+//                    switch result {
+//                    case .validEntitlement:
+//                        self.shouldShowSubscriptionExpired = false
+//                    case .invalidEntitlement:
+//                        self.shouldShowSubscriptionExpired = true
+//                    case .error:
+//                        break
+//                    }
+//                }
+//            }
         }
 
         func refreshLoginItemStatus() {

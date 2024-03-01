@@ -3104,11 +3104,6 @@
 		EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295EE2A545C12008C0991 /* NetworkProtection */; };
 		EEA3EEB12B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */; };
 		EEA3EEB32B24EC0600E8333A /* VPNLocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB22B24EC0600E8333A /* VPNLocationViewModel.swift */; };
-		EEA4A6402B90E7490046A237 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA4A63F2B90E7490046A237 /* AccountManagerExtension.swift */; };
-		EEA4A6412B90E78C0046A237 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA4A63F2B90E7490046A237 /* AccountManagerExtension.swift */; };
-		EEA4A6422B90E78E0046A237 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA4A63F2B90E7490046A237 /* AccountManagerExtension.swift */; };
-		EEA4A6432B90E7C00046A237 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA4A63F2B90E7490046A237 /* AccountManagerExtension.swift */; };
-		EEA4A6442B90E7C10046A237 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA4A63F2B90E7490046A237 /* AccountManagerExtension.swift */; };
 		EEAD7A7A2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEAD7A7B2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEAD7A7C2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
@@ -4462,7 +4457,6 @@
 		EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationsHostingViewController.swift; sourceTree = "<group>"; };
 		EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionVPNCountryLabelsModel.swift; sourceTree = "<group>"; };
 		EEA3EEB22B24EC0600E8333A /* VPNLocationViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNLocationViewModel.swift; sourceTree = "<group>"; };
-		EEA4A63F2B90E7490046A237 /* AccountManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountManagerExtension.swift; sourceTree = "<group>"; };
 		EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppLauncher.swift; sourceTree = "<group>"; };
 		EEBE97B22B7E48A600404915 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		EEC111E3294D06020086524F /* JSAlert.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = JSAlert.storyboard; sourceTree = "<group>"; };
@@ -4568,7 +4562,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B41EDAB2B1544B2001EEDF4 /* LoginItems in Frameworks */,
-				EE297CC52B83EF480083DB29 /* Subscription in Frameworks */,
 				7B00997D2B6508B700FE7C31 /* NetworkProtectionProxy in Frameworks */,
 				7BEEA5122AD1235B00A9E72B /* NetworkProtectionIPC in Frameworks */,
 				7BA7CC5F2AD1210C0042E5CE /* Networking in Frameworks */,
@@ -4588,7 +4581,6 @@
 				EE2F9C5D2B90F31B00D45FC9 /* Subscription in Frameworks */,
 				7BA7CC612AD1211C0042E5CE /* Networking in Frameworks */,
 				7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */,
-				EE297CC72B83EF510083DB29 /* Subscription in Frameworks */,
 				7B00997F2B6508C200FE7C31 /* NetworkProtectionProxy in Frameworks */,
 				EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */,
 				4B2D067F2A1334D700DE1F49 /* NetworkProtectionUI in Frameworks */,
@@ -8295,14 +8287,6 @@
 			path = VPNLocation;
 			sourceTree = "<group>";
 		};
-		EEA4A63E2B90E7210046A237 /* Subscription */ = {
-			isa = PBXGroup;
-			children = (
-				EEA4A63F2B90E7490046A237 /* AccountManagerExtension.swift */,
-			);
-			path = Subscription;
-			sourceTree = "<group>";
-		};
 		EEAEA3F4294D05CF00D04DF3 /* JSAlert */ = {
 			isa = PBXGroup;
 			children = (
@@ -8529,7 +8513,6 @@
 				7BEC182E2AD5D8DC00D30536 /* SystemExtensionManager */,
 				7BFCB74D2ADE7E1A00DA3EA7 /* PixelKit */,
 				4B41EDAA2B1544B2001EEDF4 /* LoginItems */,
-				EE297CC42B83EF480083DB29 /* Subscription */,
 				7B00997C2B6508B700FE7C31 /* NetworkProtectionProxy */,
 				EE2F9C5A2B90F2FF00D45FC9 /* Subscription */,
 			);
@@ -9731,7 +9714,6 @@
 				3706FEBF293F6EFF00E42796 /* BWError.swift in Sources */,
 				3706FAC6293F65D500E42796 /* ConnectBitwardenViewController.swift in Sources */,
 				EEC589DA2A4F1CE400BCD60C /* AppLauncher.swift in Sources */,
-				EEA4A6412B90E78C0046A237 /* AccountManagerExtension.swift in Sources */,
 				3706FAC8293F65D500E42796 /* AppTrackerDataSetProvider.swift in Sources */,
 				3706FAC9293F65D500E42796 /* EncryptionKeyGeneration.swift in Sources */,
 				3706FACA293F65D500E42796 /* TabLazyLoader.swift in Sources */,
@@ -10730,7 +10712,6 @@
 				7B0694982B6E980F00FA4DBA /* VPNProxyLauncher.swift in Sources */,
 				EEC589DB2A4F1CE700BCD60C /* AppLauncher.swift in Sources */,
 				B65DA5EF2A77CC3A00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
-				EEA4A6432B90E7C00046A237 /* AccountManagerExtension.swift in Sources */,
 				4BF0E5072AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				7BA7CC442AD11E490042E5CE /* UserText.swift in Sources */,
 				4BF0E5142AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
@@ -10765,7 +10746,6 @@
 				B65DA5F02A77CC3C00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				7BA7CC392AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */,
-				EEA4A6442B90E7C10046A237 /* AccountManagerExtension.swift in Sources */,
 				7BA7CC552AD11FFB0042E5CE /* NetworkProtectionOptionKeyExtension.swift in Sources */,
 				7BA7CC3D2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */,
 				4BA7C4DA2B3F639800AFE511 /* NetworkProtectionTunnelController.swift in Sources */,
@@ -11429,7 +11409,6 @@
 				B6ABC5982B4861D4008343B9 /* FocusableTextField.swift in Sources */,
 				4B957B752AC7AE700062CA31 /* RandomAccessCollectionExtension.swift in Sources */,
 				4B957B762AC7AE700062CA31 /* NSOutlineViewExtensions.swift in Sources */,
-				EEA4A6422B90E78E0046A237 /* AccountManagerExtension.swift in Sources */,
 				4B957B772AC7AE700062CA31 /* AppDelegate.swift in Sources */,
 				4B957B782AC7AE700062CA31 /* ContentOverlayViewController.swift in Sources */,
 				4B957B792AC7AE700062CA31 /* ContentBlockingTabExtension.swift in Sources */,
@@ -12110,7 +12089,6 @@
 				4BB99D0126FE191E001E4761 /* ChromiumBookmarksReader.swift in Sources */,
 				B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */,
 				AAE8B110258A456C00E81239 /* TabPreviewViewController.swift in Sources */,
-				EEA4A6402B90E7490046A237 /* AccountManagerExtension.swift in Sources */,
 				B6C8CAA72AD010DD0060E1CD /* YandexDataImporter.swift in Sources */,
 				EE66666F2B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */,
 				37CC53EC27E8A4D10028713D /* PreferencesPrivacyView.swift in Sources */,
