@@ -24,6 +24,7 @@ import Foundation
 import Navigation
 import UserScript
 import WebKit
+import History
 
 #if SUBSCRIPTION
 import Subscription
@@ -66,7 +67,7 @@ protocol NewWindowPolicyDecisionMaker {
         enum URLSource: Equatable {
             case pendingStateRestoration
             case loadedByStateRestoration
-            case userEntered(String)
+            case userEntered(String, downloadRequested: Bool = false)
             case historyEntry
             case bookmark
             case ui
@@ -77,7 +78,7 @@ protocol NewWindowPolicyDecisionMaker {
             case webViewUpdated
 
             var userEnteredValue: String? {
-                if case .userEntered(let userEnteredValue) = self {
+                if case .userEntered(let userEnteredValue, _) = self {
                     userEnteredValue
                 } else {
                     nil
@@ -90,6 +91,8 @@ protocol NewWindowPolicyDecisionMaker {
 
             var navigationType: NavigationType {
                 switch self {
+                case .userEntered(_, downloadRequested: true):
+                    .custom(.userRequestedPageDownload)
                 case .userEntered:
                     .custom(.userEnteredUrl)
                 case .pendingStateRestoration:
@@ -257,6 +260,14 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isUserEnteredUrl: Bool {
             userEnteredValue != nil
+        }
+
+        var isUserRequestedPageDownload: Bool {
+            if case .url(_, credential: _, source: .userEntered(_, downloadRequested: true)) = self {
+                return true
+            } else {
+                return false
+            }
         }
 
         var displaysContentInWebView: Bool {
@@ -1009,7 +1020,7 @@ protocol NewWindowPolicyDecisionMaker {
             return nil
         }
 
-        if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading {
+        if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading, !content.isUserRequestedPageDownload {
             return reload()
         }
         if restoreInteractionStateIfNeeded() { return nil /* session restored */ }
