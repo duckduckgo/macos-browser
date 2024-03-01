@@ -147,13 +147,36 @@ final class DownloadsViewController: NSViewController {
     // MARK: User Actions
 
     @IBAction func openDownloadsFolderAction(_ sender: Any) {
-        guard let url = DownloadsPreferences().effectiveDownloadLocation
-                ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
-        else {
-            return
+        let prefs = DownloadsPreferences()
+        var url: URL?
+        var itemToSelect: URL?
+
+        if prefs.alwaysRequestDownloadLocation {
+            url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+
+            if let lastDownloaded = viewModel.items.first/* last added */(where: {
+                // should still exist
+                $0.localURL != nil && FileManager.default.fileExists(atPath: $0.localURL!.deletingLastPathComponent().path)
+            }),
+               let lastDownloadedURL = lastDownloaded.localURL,
+               // if no downloads are from the default Downloads folder - open the last downloaded item folder
+               !viewModel.items.contains(where: { $0.localURL?.deletingLastPathComponent().path == url?.path  }) || url == nil {
+
+                url = lastDownloadedURL.deletingLastPathComponent()
+                // select last downloaded item
+                itemToSelect = lastDownloadedURL
+
+            } /* else fallback to default User‘s Downloads */
+
+        } else {
+            // open preferred downlod location
+            url = prefs.effectiveDownloadLocation ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         }
+
+        guard let url else { return }
+
         self.dismiss()
-        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
+        NSWorkspace.shared.selectFile(itemToSelect?.path, inFileViewerRootedAtPath: url.path)
     }
 
     @IBAction func clearDownloadsAction(_ sender: Any) {

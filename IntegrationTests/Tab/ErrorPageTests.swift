@@ -143,23 +143,25 @@ class ErrorPageTests: XCTestCase {
         NSError.disableSwizzledDescription = false
     }
 
+    // MARK: - Tests
+
     func testWhenPageFailsToLoad_errorPageShown() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
-        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
         // navigate to test url, fail with error
         schemeHandler.middleware = [{ _ in
             .failure(NSError.hostNotFound)
         }]
-        tab.setContent(.url(.test, source: .userEntered(URL.test.absoluteString)))
 
         let eNavigationFailed = tab.$error.compactMap { $0 }.timeout(5).first().promise()
         let eNavigationFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
+        tab.setContent(.url(.test, source: .userEntered(URL.test.absoluteString)))
         let error = try await eNavigationFailed.value
         _=try await eNavigationFinished.value
 
@@ -187,39 +189,43 @@ class ErrorPageTests: XCTestCase {
         // open 2 Tabs with newtab page
         let tab1 = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let tab2 = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNewtabPageLoaded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+        let eNewtab2PageLoaded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let tabsViewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab1, tab2]))
+        tabsViewModel.select(at: .unpinned(0))
         window = WindowsManager.openNewWindow(with: tabsViewModel)!
 
         // wait until Home page loads
-        let eNewtabPageLoaded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
+        try await eNewtab2PageLoaded.value
 
         // navigate to a failing url
+        let eNavigationFailed = tab1.$error.compactMap { $0 }.timeout(5).first().promise()
+        let eErrorPageLoaded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         schemeHandler.middleware = [{ _ in
             .failure(NSError.noConnection)
         }]
+
         tab1.setContent(.url(.test, source: .userEntered(URL.test.absoluteString)))
         // wait for error page to open
-        let eNavigationFailed = tab1.$error.compactMap { $0 }.timeout(5).first().promise()
-
         _=try await eNavigationFailed.value
+        _=try await eErrorPageLoaded.value
 
         // switch to tab 2
         tabsViewModel.select(at: .unpinned(1))
 
         // next load should be ok
         let eServerQueried = expectation(description: "server request sent")
+        let eNavigationSucceeded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         schemeHandler.middleware = [{ _ in
             eServerQueried.fulfill()
             return .ok(.html(Self.testHtml))
         }]
         // coming back to the failing tab 1 should trigger its reload
-        let eNavigationSucceeded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
-
         tabsViewModel.select(at: .unpinned(0))
 
+        await fulfillment(of: [eServerQueried], timeout: 5)
         _=try await eNavigationSucceeded.value
-        await fulfillment(of: [eServerQueried], timeout: 1)
         XCTAssertEqual(tab1.content.url, .test)
         XCTAssertNil(tab1.error)
     }
@@ -232,13 +238,13 @@ class ErrorPageTests: XCTestCase {
         }]
         let tab1 = Tab(content: .url(.test, source: .link), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let tab2 = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNavigationFailed = tab1.$error.compactMap { $0 }.timeout(5).first().promise()
+        let eNavigationFinished = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+
         let tabsViewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab1, tab2]))
         window = WindowsManager.openNewWindow(with: tabsViewModel)!
 
         // wait for error page to open
-        let eNavigationFailed = tab1.$error.compactMap { $0 }.timeout(5).first().promise()
-        let eNavigationFinished = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
-
         _=try await eNavigationFailed.value
         _=try await eNavigationFinished.value
 
@@ -285,12 +291,12 @@ class ErrorPageTests: XCTestCase {
         }]
         let tab1 = Tab(content: .url(.test, source: .link), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let tab2 = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNavigationFailed = tab1.$error.compactMap { $0 }.timeout(5).first().promise()
+        let errorNavigationFinished = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let tabsViewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab1, tab2]))
         window = WindowsManager.openNewWindow(with: tabsViewModel)!
 
         // wait for error page to open
-        let eNavigationFailed = tab1.$error.compactMap { $0 }.timeout(5).first().promise()
-        let errorNavigationFinished = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         _=try await eNavigationFailed.value
         _=try await errorNavigationFinished.value
 
@@ -314,11 +320,11 @@ class ErrorPageTests: XCTestCase {
             .failure(NSError.hostNotFound)
         }]
         let tab = Tab(content: .url(.test, source: .link), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNavigationFailed = tab.$error.compactMap { $0 }.timeout(5).first().promise()
+        let errorNavigationFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         window = WindowsManager.openNewWindow(with: tab)!
 
         // wait for navigation to fail
-        let eNavigationFailed = tab.$error.compactMap { $0 }.timeout(5).first().promise()
-        let errorNavigationFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         _=try await eNavigationFailed.value
         _=try await errorNavigationFinished.value
 
@@ -366,11 +372,11 @@ class ErrorPageTests: XCTestCase {
             .failure(NSError.hostNotFound)
         }]
         let tab = Tab(content: .url(.test, source: .link), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNavigationFailed = tab.$error.compactMap { $0 }.timeout(5).first().promise()
+        let errorNavigationFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         window = WindowsManager.openNewWindow(with: tab)!
 
         // wait for navigation to fail
-        let eNavigationFailed = tab.$error.compactMap { $0 }.timeout(5).first().promise()
-        let errorNavigationFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         _=try await eNavigationFailed.value
         _=try await errorNavigationFinished.value
 
@@ -420,9 +426,9 @@ class ErrorPageTests: XCTestCase {
     func testWhenPageLoadedAndFailsOnRefreshAndOnConsequentRefresh_errorPageIsUpdatedKeepingForwardHistory() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
-        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
         // navigate to test url, success
@@ -496,9 +502,9 @@ class ErrorPageTests: XCTestCase {
     func testWhenPageLoadedAndFailsOnRefreshAndSucceedsOnConsequentRefresh_forwardHistoryIsPreserved() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
-        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
         // navigate to test url, success
@@ -564,9 +570,9 @@ class ErrorPageTests: XCTestCase {
     func testWhenReloadingBySubmittingSameURL_errorPageRemainsSame() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
-        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
         // navigate to test url, success
@@ -639,9 +645,9 @@ class ErrorPageTests: XCTestCase {
     func testWhenGoingToAnotherUrlFails_newBackForwardHistoryItemIsAdded() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
-        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
         // navigate to test url, success
@@ -714,9 +720,9 @@ class ErrorPageTests: XCTestCase {
     func testWhenGoingToAnotherUrlSucceeds_newBackForwardHistoryItemIsAdded() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
-        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
         // navigate to test url, success
@@ -786,9 +792,9 @@ class ErrorPageTests: XCTestCase {
         }]
 
         let tab = Tab(content: .url(.test, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, interactionStateData: Self.sessionStateData)
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
-        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
         XCTAssertTrue(tab.canReload)
@@ -871,8 +877,8 @@ class ErrorPageTests: XCTestCase {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
-        window = WindowsManager.openNewWindow(with: viewModel)!
         let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+        window = WindowsManager.openNewWindow(with: viewModel)!
         try await eNewtabPageLoaded.value
 
         // navigate to alt url, redirect to test url, fail with error
