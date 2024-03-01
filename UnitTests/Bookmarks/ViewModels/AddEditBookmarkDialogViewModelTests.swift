@@ -119,7 +119,7 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         XCTAssertTrue(result.isEmpty)
     }
 
-    func testShouldSetNameAndURLToValueWhenInitModeIsAddAndTabInfoIsNotNil() {
+    func testShouldSetNameAndURLToValueWhenInitModeIsAddTabInfoIsNotNilAndURLIsNotAlreadyBookmarked() {
         // GIVEN
         let tab = Tab(content: .url(URL.duckDuckGo, source: .link), title: "Test")
         let sut = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: WebsiteInfo(tab)), bookmarkManager: bookmarkManager)
@@ -131,6 +131,24 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         // THEN
         XCTAssertEqual(name, "Test")
         XCTAssertEqual(url, URL.duckDuckGo.absoluteString)
+    }
+
+    func testShouldSetNameAndURLToEmptyWhenInitModeIsAddTabInfoIsNotNilAndURLIsAlreadyBookmarked() throws {
+        // GIVEN
+        let tab = Tab(content: .url(URL.duckDuckGo, source: .link), title: "Test")
+        let websiteInfo = try XCTUnwrap(WebsiteInfo(tab))
+        let bookmark = Bookmark(id: "1", url: websiteInfo.url.absoluteString, title: websiteInfo.title ?? "", isFavorite: false)
+        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkManager.loadBookmarks()
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: WebsiteInfo(tab)), bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let name = sut.bookmarkName
+        let url = sut.bookmarkURLPath
+
+        // THEN
+        XCTAssertEqual(name, "")
+        XCTAssertEqual(url, "")
     }
 
     func testShouldSetBookmarkNameToValueWhenInitAndModeIsEdit() {
@@ -178,7 +196,6 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
     func testShouldSetSelectedFolderToNilWhenBookmarkParentFolderIsNilAndModeIsAdd() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: #function)
-        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false, parentFolderUUID: "2")
         bookmarkStoreMock.bookmarks = [folder]
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)

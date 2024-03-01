@@ -1620,7 +1620,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Add bookmark"
+            "value" : "Add Bookmark"
           }
         }
       }
@@ -1644,7 +1644,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Edit bookmark"
+            "value" : "Edit Bookmark"
           }
         }
       }

@@ -34,6 +34,8 @@ final class BookmarkOutlineCellView: NSTableCellView {
         NSTrackingArea(rect: .zero, options: [.inVisibleRect, .activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
     }()
 
+    var shouldShowMenuButton = false
+
     weak var delegate: BookmarkOutlineCellViewDelegate?
 
     init(identifier: NSUserInterfaceItemIdentifier) {
@@ -48,17 +50,19 @@ final class BookmarkOutlineCellView: NSTableCellView {
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
 
-        guard !trackingAreas.contains(trackingArea) else { return }
+        guard !trackingAreas.contains(trackingArea), shouldShowMenuButton else { return }
         addTrackingArea(trackingArea)
     }
 
     override func mouseEntered(with event: NSEvent) {
+        guard shouldShowMenuButton else { return }
         countLabel.isHidden = true
         favoriteImageView.isHidden = true
         menuButton.isHidden = false
     }
 
     override func mouseExited(with event: NSEvent) {
+        guard shouldShowMenuButton else { return }
         menuButton.isHidden = true
         countLabel.isHidden = false
         favoriteImageView.isHidden = false

@@ -392,7 +392,10 @@ final class LocalBookmarkStore: BookmarkStore {
 
     func update(folder: BookmarkFolder) {
         do {
-            _ = try applyChangesAndSave(changes: { context in
+            _ = try applyChangesAndSave(changes: { [weak self] context in
+                guard let self = self else {
+                    throw BookmarkStoreError.storeDeallocated
+                }
                 try update(folder: folder, in: context)
             })
         } catch {
@@ -403,7 +406,10 @@ final class LocalBookmarkStore: BookmarkStore {
 
     func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType) {
         do {
-            _ = try applyChangesAndSave(changes: { context in
+            _ = try applyChangesAndSave(changes: { [weak self] context in
+                guard let self = self else {
+                    throw BookmarkStoreError.storeDeallocated
+                }
                 let folderEntity = try update(folder: folder, in: context)
                 try move(entities: [folderEntity], toIndex: nil, withinParentFolderType: parent, in: context)
             })

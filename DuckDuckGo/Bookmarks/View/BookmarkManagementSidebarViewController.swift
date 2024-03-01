@@ -51,7 +51,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     private lazy var outlineView = BookmarksOutlineView(frame: scrollView.frame)
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
-    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController)
+    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController, showMenuButtonOnHover: false)
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -306,7 +306,13 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
     }
 
     func editFolder(_ sender: NSMenuItem) {
-        // https://app.asana.com/0/0/1206531304671948/f
+        guard let (folder, parent) = sender.representedObject as? (BookmarkFolder, BookmarkFolder?) else {
+            assertionFailure("Failed to cast menu represented object to BookmarkFolder")
+            return
+        }
+
+        BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: parent)
+            .show(in: view.window)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
