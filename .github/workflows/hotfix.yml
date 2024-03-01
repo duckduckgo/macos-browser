@@ -1,4 +1,4 @@
-name: Prepare Hotfix Release
+name: Set Up Hotfix Release Branch
 
 on:
   workflow_dispatch:
@@ -44,6 +44,7 @@ jobs:
           git config --global user.name "Dax the Duck"
           git config --global user.email "dax@duckduckgo.com"
           last_release="$(gh api repos/${{ github.repository }}/releases/latest | jq -r .tag_name)"
+          echo "last_release=$last_release" >> $GITHUB_OUTPUT
           bundle exec fastlane prepare_hotfix version:"$last_release"
 
       - name: Create release task
@@ -76,3 +77,13 @@ jobs:
             -H "Content-Type: application/json" \
             --output /dev/null \
             -d "{ \"data\": { \"assignee\": \"$assignee_id\" }}"
+
+      - name: Report success
+        uses: ./.github/actions/asana-add-comment
+        env:
+          BRANCH: ${{ steps.make_release_branch.outputs.release_branch_name }}
+          RELEASE_TAG: ${{ steps.make_release_branch.outputs.last_release }}
+        with:
+          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          task-url: ${{ steps.create_release_task.outputs.asana_task_url }}
+          template-name: hotfix-branch-ready
