@@ -37,7 +37,7 @@ extension URLRequest {
         request.setValue(userAgent, forHTTPHeaderField: HeaderKey.userAgent.rawValue)
 
         let languages = Locale.preferredLanguages.prefix(6)
-        let acceptLanguage = languages.enumerated().map { index, language in
+        let acceptLanguage: String = languages.enumerated().map { index, language in
             let q = 1.0 - (Double(index) * 0.1)
             return "\(language);q=\(q)"
         }.joined(separator: ", ")
