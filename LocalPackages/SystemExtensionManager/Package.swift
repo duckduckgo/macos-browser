@@ -17,7 +17,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "1.0.0"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "5c0c48168023ede55ecf2cd410e60ca16e5dc721")
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "cb11e5449e9767796ae539688fa4b9319db5024c")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
