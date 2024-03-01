@@ -237,7 +237,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             bookmark.isFavorite = true
             bookmarkManager.update(bookmark: bookmark)
         case .edit:
-            AddBookmarkModalView(model: AddBookmarkModalViewModel(originalBookmark: bookmark))
+            BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
                 .show(in: view.window)
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
@@ -258,7 +258,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
             menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
         case .edit:
-            AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
+            BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: nil)
                 .show(in: view.window)
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [folder.id], toIndex: nil, withinParentFolder: .root) { _ in }
