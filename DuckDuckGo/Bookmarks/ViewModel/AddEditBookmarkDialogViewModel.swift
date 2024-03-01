@@ -37,7 +37,8 @@ final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
         /// If the users add a bookmark to the root `Bookmarks` folder, then the parent folder is `nil`.
         /// If the users add a bookmark to a different folder then the parent folder is not `nil`.
         /// If the users add a bookmark from the bookmark shortcut and `Tab` has a page loaded, then the `tabWebsite` is not `nil`.
-        case add(tabWebsite: WebsiteInfo? = nil, parentFolder: BookmarkFolder? = nil)
+        /// When adding a bookmark from favorite screen the `shouldPresetFavorite` flag should be set to `true`.
+        case add(tabWebsite: WebsiteInfo? = nil, parentFolder: BookmarkFolder? = nil, shouldPresetFavorite: Bool = false)
         /// Edit an existing bookmark.
         case edit(bookmark: Bookmark)
     }
@@ -78,12 +79,12 @@ final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
     private let bookmarkManager: BookmarkManager
 
     init(mode: Mode, bookmarkManager: LocalBookmarkManager = .shared) {
+        let isFavorite = mode.bookmarkURL.flatMap(bookmarkManager.isUrlFavorited) ?? false
         self.mode = mode
         self.bookmarkManager = bookmarkManager
-        self.isBookmarkFavorite = mode.bookmarkURL.flatMap(bookmarkManager.isUrlFavorited) ?? false
         folders = .init(bookmarkManager.list)
         switch mode {
-        case let .add(websiteInfo, parentFolder):
+        case let .add(websiteInfo, parentFolder, shouldPresetFavorite):
             // When adding a new bookmark with website info we need to show the bookmark name and URL only if the bookmark is not bookmarked already.
             // Scenario we click on the "Add Bookmark" button from Bookmarks shortcut Panel. If Tab has a Bookmark loaded we present the dialog with prepopulated name and URL from the tab.
             // If we save and click again on the "Add Bookmark" button we don't want to try re-add the same bookmark. Hence we present a dialog that is not pre-populated.
@@ -92,10 +93,12 @@ final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
             let websiteURLPath = isAlreadyBookmarked ? "" : websiteInfo?.url.absoluteString ?? ""
             bookmarkName = websiteName
             bookmarkURLPath = websiteURLPath
+            isBookmarkFavorite = shouldPresetFavorite ? true : isFavorite
             selectedFolder = parentFolder
         case let .edit(bookmark):
             bookmarkName = bookmark.title
             bookmarkURLPath = bookmark.urlObject?.absoluteString ?? ""
+            isBookmarkFavorite = isFavorite
             selectedFolder = folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
         }
 
@@ -148,9 +151,9 @@ private extension AddEditBookmarkDialogViewModel {
             bookmarkManager.update(bookmark: bookmark)
         }
         // If the bookmark changed parent location, move it.
-        if bookmark.parentFolderUUID != selectedFolder?.id {
-            let parentFoler: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
-            bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: parentFoler, completion: { _ in })
+        if shouldMove(bookmark: bookmark) {
+            let parentFolder: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
+            bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: parentFolder, completion: { _ in })
         }
     }
 
@@ -161,6 +164,15 @@ private extension AddEditBookmarkDialogViewModel {
         } else {
             bookmarkManager.makeBookmark(for: url, title: name, isFavorite: isFavorite, index: nil, parent: parent)
         }
+    }
+
+    func shouldMove(bookmark: Bookmark) -> Bool {
+        // There's a discrepancy in representing the root folder. A bookmark belonging to the root folder has `parentFolderUUID` equal to `bookmarks_root`.
+        // There's no `BookmarkFolder` to represent the root folder, so the root folder is represented by a nil selectedFolder.
+        // Move Bookmarks if its parent folder is != from the selected folder but ONLY if:
+        //   - The selected folder is not nil. This ensure we're comparing a subfolder with any bookmark parent folder.
+        //   - The selected folder is nil and the bookmark parent folder is not the root folder. This ensure we're not unnecessarily moving the items within the same root folder.
+        bookmark.parentFolderUUID != selectedFolder?.id && (selectedFolder != nil || selectedFolder == nil && !bookmark.isParentFolderRoot)
     }
 }
 
@@ -193,11 +205,19 @@ private extension AddEditBookmarkDialogViewModel.Mode {
 
     var bookmarkURL: URL? {
         switch self {
-        case let .add(tabInfo, _):
+        case let .add(tabInfo, _, _):
             return tabInfo?.url
         case let .edit(bookmark):
             return bookmark.urlObject
         }
+    }
+
+}
+
+private extension Bookmark {
+
+    var isParentFolderRoot: Bool {
+        parentFolderUUID == "bookmarks_root"
     }
 
 }

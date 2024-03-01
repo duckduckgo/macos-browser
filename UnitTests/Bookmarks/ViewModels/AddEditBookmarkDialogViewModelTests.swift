@@ -251,6 +251,28 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result, folder)
     }
 
+    func testShouldSetIsBookmarkFavoriteToTrueWhenModeIsAddAndShouldPresetFavoriteIsTrue() {
+        // GIVEN
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(shouldPresetFavorite: true), bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let result = sut.isBookmarkFavorite
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
+    func testShouldNotSetIsBookmarkFavoriteToTrueWhenModeIsAddAndShouldPresetFavoriteIsFalse() {
+        // GIVEN
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(shouldPresetFavorite: false), bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let result = sut.isBookmarkFavorite
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
     // MARK: - Actions
 
     func testReturnIsCancelActionDisabledFalseWhenModeIsAdd() {
@@ -622,6 +644,31 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: folder.id))
     }
 
+    func testShouldAskBookmarkStoreToMoveBookmarkWhenSelectedFolderIsNilAndOriginalFolderIsNotRootFolderAndModeIsEdit() {
+        // GIVEN
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false, parentFolderUUID: "ABCDE")
+        let folder = BookmarkFolder(id: "ABCDE", title: "Test Folder", children: [bookmark])
+        let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
+        bookmarkStoreMock.bookmarks = [folder, bookmark]
+        bookmarkManager.loadBookmarks()
+        sut.selectedFolder = nil
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
+        XCTAssertFalse(bookmarkStoreMock.updateBookmarkCalled)
+        XCTAssertFalse(bookmarkStoreMock.moveObjectUUIDCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedObjectUUIDs)
+        XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
+
+        // WHEN
+        sut.addOrSave {}
+
+        // THEN
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
+        XCTAssertFalse(bookmarkStoreMock.updateBookmarkCalled)
+        XCTAssertTrue(bookmarkStoreMock.moveObjectUUIDCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedObjectUUIDs, [bookmark.id])
+        XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
+    }
+
     func testShouldNotAskBookmarkStoreToMoveBookmarkWhenSelectedFolderIsNotDifferentFromOriginalFolderAndModeIsEdit() {
         // GIVEN
         let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false, parentFolderUUID: "ABCDE")
@@ -630,6 +677,30 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         bookmarkStoreMock.bookmarks = [bookmark]
         bookmarkManager.loadBookmarks()
         sut.selectedFolder = folder
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
+        XCTAssertFalse(bookmarkStoreMock.updateBookmarkCalled)
+        XCTAssertFalse(bookmarkStoreMock.moveObjectUUIDCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedObjectUUIDs)
+        XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
+
+        // WHEN
+        sut.addOrSave {}
+
+        // THEN
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
+        XCTAssertFalse(bookmarkStoreMock.updateBookmarkCalled)
+        XCTAssertFalse(bookmarkStoreMock.moveObjectUUIDCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedObjectUUIDs)
+        XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
+    }
+
+    func testShouldNotAskBookmarkStoreToMoveBookmarkWhenSelectedFolderIsNilAndOriginalFolderIsRootAndModeIsEdit() {
+        // GIVEN
+        let bookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: #function, isFavorite: false, parentFolderUUID: "bookmarks_root")
+        let sut = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
+        bookmarkStoreMock.bookmarks = [bookmark]
+        bookmarkManager.loadBookmarks()
+        sut.selectedFolder = nil
         XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
         XCTAssertFalse(bookmarkStoreMock.updateBookmarkCalled)
         XCTAssertFalse(bookmarkStoreMock.moveObjectUUIDCalled)
