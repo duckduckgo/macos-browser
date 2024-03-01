@@ -285,22 +285,22 @@ final class AddressBarTextField: NSTextField {
         clearUndoManager()
     }
 
-    private func addressBarEnterPressed() {
+    func addressBarEnterPressed() {
         suggestionContainerViewModel?.clearUserStringValue()
 
         let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
-        if NSApp.isCommandPressed {
-            openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
-        } else {
-            navigate(suggestion: suggestion)
-        }
+        navigate(suggestion: suggestion)
 
         hideSuggestionWindow()
     }
 
     private func navigate(suggestion: Suggestion?) {
-        hideSuggestionWindow()
-        updateTabUrl(suggestion: suggestion)
+        if NSApp.isCommandPressed {
+            openNew(NSApp.isOptionPressed ? .window : .tab, selected: NSApp.isShiftPressed, suggestion: suggestion)
+        } else {
+            hideSuggestionWindow()
+            updateTabUrl(suggestion: suggestion, downloadRequested: NSApp.isOptionPressed && !NSApp.isShiftPressed)
+        }
 
         currentEditor()?.selectAll(self)
     }
@@ -322,7 +322,7 @@ final class AddressBarTextField: NSTextField {
         }
     }
 
-    private func updateTabUrlWithUrl(_ providedUrl: URL, userEnteredValue: String, suggestion: Suggestion?) {
+    private func updateTabUrlWithUrl(_ providedUrl: URL, userEnteredValue: String, downloadRequested: Bool, suggestion: Suggestion?) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
@@ -355,44 +355,57 @@ final class AddressBarTextField: NSTextField {
 #endif
 
         self.window?.makeFirstResponder(nil)
-        selectedTabViewModel.tab.setUrl(providedUrl, source: .userEntered(userEnteredValue))
+        selectedTabViewModel.tab.setUrl(providedUrl, source: .userEntered(userEnteredValue, downloadRequested: downloadRequested))
+        if downloadRequested {
+            updateValue(selectedTabViewModel: nil, addressBarString: nil)
+        }
     }
 
-    private func updateTabUrl(suggestion: Suggestion?) {
+    private func updateTabUrl(suggestion: Suggestion?, downloadRequested: Bool) {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix,
                 completion: { [weak self] url, userEnteredValue, isUpgraded in
             guard let url = url else { return }
 
-            if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-            self?.updateTabUrlWithUrl(url, userEnteredValue: userEnteredValue, suggestion: suggestion)
+            if isUpgraded {
+                self?.updateTab(self?.tabCollectionViewModel.selectedTabViewModel?.tab, upgradedTo: url)
+            }
+            self?.updateTabUrlWithUrl(url, userEnteredValue: userEnteredValue, downloadRequested: downloadRequested, suggestion: suggestion)
         })
     }
 
-    private func updateTabUpgradedToUrl(_ url: URL?) {
-        if url == nil { return }
-        let tab = tabCollectionViewModel.selectedTabViewModel?.tab
-        tab?.setMainFrameConnectionUpgradedTo(url)
+    private func updateTab(_ tab: Tab?, upgradedTo url: URL?) {
+        guard let tab, let url else { return }
+        tab.setMainFrameConnectionUpgradedTo(url)
     }
 
-    private func openNewTabWithUrl(_ providedUrl: URL?, userEnteredValue: String, selected: Bool, suggestion: Suggestion?) {
-        guard let url = providedUrl else {
-            os_log("%s: Making url from address bar string failed", type: .error, className)
-            return
-        }
-
-        let tab = Tab(content: .url(url, source: .userEntered(userEnteredValue)),
-                      shouldLoadInBackground: true,
-                      burnerMode: tabCollectionViewModel.burnerMode)
-        tabCollectionViewModel.append(tab: tab, selected: selected)
-    }
-
-    private func openNewTab(selected: Bool, suggestion: Suggestion?) {
+    enum TabOrWindow { case tab, window }
+    private func openNew(_ tabOrWindow: TabOrWindow, selected: Bool, suggestion: Suggestion?) {
         makeUrl(suggestion: suggestion,
                 stringValueWithoutSuffix: stringValueWithoutSuffix) { [weak self] url, userEnteredValue, isUpgraded in
+            guard let self, let url else {
+                os_log("%s: Making url from address bar string failed", type: .error)
+                return
+            }
+            let tab = Tab(content: .url(url, source: .userEntered(userEnteredValue)),
+                          shouldLoadInBackground: true,
+                          burnerMode: tabCollectionViewModel.burnerMode)
 
-            if isUpgraded { self?.updateTabUpgradedToUrl(url) }
-            self?.openNewTabWithUrl(url, userEnteredValue: userEnteredValue, selected: selected, suggestion: suggestion)
+            if isUpgraded {
+                updateTab(tab, upgradedTo: url)
+            }
+
+            if selected {
+                // reset address bar value
+                updateValue(selectedTabViewModel: nil, addressBarString: nil)
+                window?.makeFirstResponder(nil)
+            }
+            switch tabOrWindow {
+            case .tab:
+                tabCollectionViewModel.append(tab: tab, selected: selected)
+            case .window:
+                WindowsManager.openNewWindow(with: tab, showWindow: selected, popUp: false)
+            }
         }
     }
 
@@ -1122,10 +1135,6 @@ extension AddressBarTextField: SuggestionViewControllerDelegate {
 
     func suggestionViewControllerDidConfirmSelection(_ suggestionViewController: SuggestionViewController) {
         let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
-        if NSApp.isCommandPressed {
-            openNewTab(selected: NSApp.isShiftPressed, suggestion: suggestion)
-            return
-        }
         navigate(suggestion: suggestion)
     }
 
