@@ -450,8 +450,11 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             userScriptInstalled.fulfill()
         }
         let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+
+        let makeContentBlockerRulesCalled = expectation(description: "makeContentBlockerRulesCalled")
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
+            makeContentBlockerRulesCalled.fulfill()
         }
 
         waitForExpectations(timeout: 1)

@@ -21,6 +21,7 @@ import Cocoa
 import Common
 import WebKit
 import Configuration
+import History
 
 // Actions are sent to objects of responder chain
 
@@ -107,7 +108,7 @@ extension AppDelegate {
     // MARK: - Window
 
     @objc func reopenAllWindowsFromLastSession(_ sender: Any?) {
-        stateRestorationManager.restoreLastSessionState(interactive: true)
+        _=stateRestorationManager.restoreLastSessionState(interactive: true)
     }
 
     // MARK: - Help
