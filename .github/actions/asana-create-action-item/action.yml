@@ -13,12 +13,8 @@ inputs:
     description: "Task name"
     required: false
     type: string
-  notes:
-    description: "Task notes"
-    required: false
-    type: string
-  html-notes:
-    description: "Task HTML notes"
+  contents:
+    description: "Task contents"
     required: false
     type: string
   template-name:
@@ -59,28 +55,16 @@ runs:
         payload="$(envsubst < $TEMPLATE_PATH | yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g' | jq -c)"
         echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
 
-    - id: process-notes-payload
-      if: ${{ inputs.notes }}
+    - id: process-contents-payload
+      if: ${{ inputs.contents }}
       shell: bash
       env:
         ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
-        NOTES: ${{ inputs.notes }}
+        CONTENTS: ${{ inputs.contents }}
         TASK_NAME: ${{ inputs.task-name }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
-        payload="{ \"data\": { \"name\": \"${TASK_NAME}\", \"notes\": \"${NOTES}\n\n🔗 Workflow URL: ${WORKFLOW_URL}\", \"assignee\": \"${ASSIGNEE_ID}\" } }"
-        echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
-
-    - id: process-html-notes-payload
-      if: ${{ inputs.html-notes }}
-      shell: bash
-      env:
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
-        HTML_NOTES: ${{ inputs.html-notes }}
-        TASK_NAME: ${{ inputs.task-name }}
-        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      run: |
-        payload="{ \"data\": { \"name\": \"${TASK_NAME}\", \"html_notes\": \"${HTML_NOTES}\", \"assignee\": \"${ASSIGNEE_ID}\" } }"
+        payload="{ \"data\": { \"name\": \"${TASK_NAME}\", \"notes\": \"${CONTENTS}\n\nWorkflow URL: ${WORKFLOW_URL}\", \"assignee\": \"${ASSIGNEE_ID}\" } }"
         echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
 
     - id: create-task
@@ -89,7 +73,7 @@ runs:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
         ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
         TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
-        PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-notes-payload.outputs.payload-base64 || steps.process-html-notes-payload.outputs.payload-base64 }}
+        PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-comment-payload.outputs.payload-base64 }}
       run: |
         # Create a subtask and retrieve its ID from the response (.data.gid) to return as an output
         new_task_id=$(set -o pipefail && curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/subtasks?opt_fields=gid" \
