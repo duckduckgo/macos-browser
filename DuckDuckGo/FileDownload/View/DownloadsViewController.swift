@@ -153,15 +153,18 @@ final class DownloadsViewController: NSViewController {
                 // should still exist
                 $0.localURL != nil && FileManager.default.fileExists(atPath: $0.localURL!.deletingLastPathComponent().path)
             }),
-               let localURL = lastDownloaded.localURL {
-                // if no downloads are from the preferred Downloads folder - open the last downloaded item folder
-                if url == nil || !viewModel.items.contains(where: { $0.localURL?.deletingLastPathComponent().path == url?.path  }) {
-                    url = localURL.deletingLastPathComponent()
-                }
+               let lastDownloadedURL = lastDownloaded.localURL,
+               // if no downloads are from the default Downloads folder - open the last downloaded item folder
+               !viewModel.items.contains(where: { $0.localURL?.deletingLastPathComponent().path == url?.path  }) || url == nil {
+
+                url = lastDownloadedURL.deletingLastPathComponent()
                 // select last downloaded item
-                itemToSelect = localURL
-            }
+                itemToSelect = lastDownloadedURL
+
+            } /* else fallback to default User‘s Downloads */
+
         } else {
+            // open preferred downlod location
             url = prefs.effectiveDownloadLocation ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         }
 
