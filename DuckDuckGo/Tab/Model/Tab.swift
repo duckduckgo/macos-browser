@@ -24,6 +24,7 @@ import Foundation
 import Navigation
 import UserScript
 import WebKit
+import History
 
 #if SUBSCRIPTION
 import Subscription

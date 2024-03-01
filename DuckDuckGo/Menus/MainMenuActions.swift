@@ -21,6 +21,7 @@ import Cocoa
 import Common
 import WebKit
 import Configuration
+import History
 
 // Actions are sent to objects of responder chain
 
