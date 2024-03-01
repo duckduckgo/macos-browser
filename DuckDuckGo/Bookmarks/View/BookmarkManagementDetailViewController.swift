@@ -232,6 +232,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         let scrollPosition = tableView.visibleRect.origin
         tableView.reloadData()
         tableView.scroll(scrollPosition)
+
+        updateToolbarButtons()
     }
 
     @objc func onImportClicked(_ sender: NSButton) {
@@ -503,25 +505,24 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     func onSelectionChanged() {
         func updateCellSelections() {
             resetSelections()
-            indexes.forEach {
+            tableView.selectedRowIndexes.forEach {
                 let cell = self.tableView.view(atColumn: 0, row: $0, makeIfNecessary: false) as? BookmarkTableCellView
                 cell?.isSelected = true
             }
         }
 
-        func updateToolbarButtons() {
-            let shouldShowDeleteButton = indexes.count > 1
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.25
-                deleteItemsButton.animator().isHidden = !shouldShowDeleteButton
-                newBookmarkButton.animator().isHidden = shouldShowDeleteButton
-                newFolderButton.animator().isHidden = shouldShowDeleteButton
-            }
-        }
-
-        let indexes = tableView.selectedRowIndexes
         updateCellSelections()
         updateToolbarButtons()
+    }
+
+    private func updateToolbarButtons() {
+        let shouldShowDeleteButton = tableView.selectedRowIndexes.count > 1
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.25
+            deleteItemsButton.animator().isHidden = !shouldShowDeleteButton
+            newBookmarkButton.animator().isHidden = shouldShowDeleteButton
+            newFolderButton.animator().isHidden = shouldShowDeleteButton
+        }
     }
 
     fileprivate func openBookmarksInNewTabs(_ bookmarks: [Bookmark]) {
