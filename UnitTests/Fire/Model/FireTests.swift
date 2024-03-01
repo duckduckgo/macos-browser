@@ -165,7 +165,8 @@ final class FireTests: XCTestCase {
                                                                     shouldRestorePreviousSession: false)
         appStateRestorationManager.applicationDidFinishLaunching()
 
-        let fire = Fire(stateRestorationManager: appStateRestorationManager,
+        let fire = Fire(historyCoordinating: HistoryCoordinatingMock(),
+                        stateRestorationManager: appStateRestorationManager,
                         tld: ContentBlocking.shared.tld)
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
@@ -182,7 +183,8 @@ final class FireTests: XCTestCase {
                                                                     shouldRestorePreviousSession: false)
         appStateRestorationManager.applicationDidFinishLaunching()
 
-        let fire = Fire(stateRestorationManager: appStateRestorationManager,
+        let fire = Fire(historyCoordinating: HistoryCoordinatingMock(),
+                        stateRestorationManager: appStateRestorationManager,
                         tld: ContentBlocking.shared.tld)
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
