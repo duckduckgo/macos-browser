@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-@testable import DuckDuckGo_Privacy_Browser
 
-// Integration Tests helpers
+// UI/Integration Tests helpers
 extension URL {
 
     static let testsServer = URL(string: "http://localhost:8085/")!
@@ -54,7 +54,7 @@ extension URL {
             let value = URL(string: "/")!.appendingParameters(headers).query!
             url = url.appendingParameter(name: "headers", value: value)
         }
-        if let dataStr = data?.utf8String() {
+        if let dataStr = data.flatMap({ String(data: $0, encoding: .utf8) }) {
             url = url.appendingParameter(name: "data", value: dataStr)
         } else if let data {
             url = url.appendingParameter(name: "data", value: data.base64EncodedString())

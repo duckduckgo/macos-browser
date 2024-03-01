@@ -20,7 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@objc(TestRunHelper)
+@objc(TestRunHelper) // auto-initialized in TestRunHelperInitializer.m
 final class TestRunHelper: NSObject {
     @objc(sharedInstance) static let shared = TestRunHelper()
 

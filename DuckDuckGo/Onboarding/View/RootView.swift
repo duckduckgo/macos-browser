@@ -27,6 +27,24 @@ struct RootView: View {
     @State var showOnboardingFlow = false
     @State var showBackgroundImage = false
 
+    private static var onboardingFlowAnimation: Animation {
+#if CI || DEBUG || REVIEW
+        guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else {
+            return .linear(duration: 0)
+        }
+#endif
+        return .default
+    }
+
+    private static var backgroundImageAnimation: Animation {
+#if CI || DEBUG || REVIEW
+        guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else {
+            return .linear(duration: 0)
+        }
+#endif
+        return .easeIn.delay(0.3)
+    }
+
     var body: some View {
 
         ZStack(alignment: .bottom) {
@@ -50,11 +68,11 @@ struct RootView: View {
                 return
             }
 
-            withAnimation {
+            withAnimation(Self.onboardingFlowAnimation) {
                 showOnboardingFlow = true
             }
 
-            withAnimation(.easeIn.delay(0.3)) {
+            withAnimation(Self.backgroundImageAnimation) {
                 showBackgroundImage = true
             }
         }

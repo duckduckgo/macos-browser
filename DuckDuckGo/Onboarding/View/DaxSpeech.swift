@@ -30,6 +30,13 @@ struct DaxSpeech: View {
 
     let onTypingFinished: (() -> Void)?
 
+    private static var typingInterval: TimeInterval {
+#if CI || DEBUG || REVIEW
+        guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else { return 0 }
+#endif
+        return 0.02
+    }
+
     @State private var typingIndex = 0
     @State private var typedText = "" {
         didSet {
@@ -43,7 +50,7 @@ struct DaxSpeech: View {
             attributedTypedText = combined
         }
     }
-    @State private var timer = Timer.publish(every: 0.02, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
+    @State private var timer = Timer.publish(every: Self.typingInterval, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
     @State private var attributedTypedText = NSAttributedString(string: "")
 
@@ -83,7 +90,7 @@ struct DaxSpeech: View {
                 Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { _ in onTypingFinished?() })
                 self.timer.upstream.connect().cancel()
                 return
-            } else if model.skipTypingRequested {
+            } else if model.skipTypingRequested || Self.typingInterval == 0 {
                 typedText = text
             }
 

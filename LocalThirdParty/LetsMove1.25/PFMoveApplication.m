@@ -45,7 +45,7 @@
 #define PFUseSmallAlertSuppressCheckbox 1
 
 
-static NSString *AlertSuppressKey = @"moveToApplicationsFolderAlertSuppress";
+NSString * const AlertSuppressKey = @"moveToApplicationsFolderAlertSuppress";
 static BOOL MoveInProgress = NO;
 
 // Helper functions

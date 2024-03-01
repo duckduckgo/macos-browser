@@ -30,10 +30,19 @@ struct ActionSpeech: View {
 
     @State var typingFinished = false
 
+    private static var animation: Animation {
+#if CI || DEBUG || REVIEW
+        guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else {
+            return .linear(duration: 0)
+        }
+#endif
+        return .default
+    }
+
     var body: some View {
         VStack(spacing: 15) {
             DaxSpeech(text: text) {
-                withAnimation {
+                withAnimation(Self.animation) {
                     typingFinished = true
                 }
             }
@@ -41,14 +50,14 @@ struct ActionSpeech: View {
             HStack(spacing: 12) {
 
                 Button(UserText.onboardingNotNowButton) {
-                    withAnimation {
+                    withAnimation(Self.animation) {
                         skip()
                     }
                 }
                 .buttonStyle(SkipButtonStyle())
 
                 Button(actionName) {
-                    withAnimation {
+                    withAnimation(Self.animation) {
                         action()
                     }
                 }

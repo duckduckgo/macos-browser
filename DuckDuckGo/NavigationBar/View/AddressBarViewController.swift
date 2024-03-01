@@ -96,6 +96,9 @@ final class AddressBarViewController: NSViewController {
         view.wantsLayer = true
         view.layer?.masksToBounds = false
 
+        addressBarTextField.setAccessibilityIdentifier("AddressBar")
+        passiveTextField.setAccessibilityIdentifier("AddressBar-passive")
+
         updateView()
         // only activate active text field leading constraint on its appearance to avoid constraint conflicts
         activeTextFieldMinXConstraint.isActive = false

@@ -30,6 +30,58 @@ struct OnboardingFlow: View {
     @State var daxInSpeechPosition = false
     @State var showDialogs = false
 
+    private static var logoAnimation: Animation {
+#if CI || DEBUG || REVIEW
+        guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else {
+            return .linear(duration: 0)
+        }
+#endif
+        return .easeIn(duration: 0.5)
+    }
+
+    private static var daxInSpeechAnimation: Animation {
+#if CI || DEBUG || REVIEW
+        guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else {
+            return .linear(duration: 0)
+        }
+#endif
+        return .easeIn
+    }
+
+    private static var onSplashFinishedAnimation: Animation {
+#if CI || DEBUG || REVIEW
+        guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else {
+            return .linear(duration: 0)
+        }
+#endif
+        return .default
+    }
+
+    private enum Constants {
+
+        static var logoDelay: TimeInterval {
+#if CI || DEBUG || REVIEW
+            guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else { return 0 }
+#endif
+            return 1.5
+        }
+
+        static var daxInSpeechDelay: TimeInterval {
+#if CI || DEBUG || REVIEW
+            guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else { return 0 }
+#endif
+            return 3.0
+        }
+
+        static var onSplashFinishedDelay: TimeInterval {
+#if CI || DEBUG || REVIEW
+            guard ProcessInfo().uiTestsEnvironment[.disableOnboardingAnimations]?.boolValue != true else { return 0 }
+#endif
+            return 3.5
+        }
+
+    }
+
     var body: some View {
 
         VStack(alignment: daxInSpeechPosition ? .leading : .center) {
@@ -93,21 +145,21 @@ struct OnboardingFlow: View {
                 return
             }
 
-            Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
-                withAnimation(.easeIn(duration: 0.5)) {
+            Timer.scheduledTimer(withTimeInterval: Constants.logoDelay, repeats: false) { _ in
+                withAnimation(Self.logoAnimation) {
                     showLogo = true
                 }
             }
 
-            Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
-                withAnimation(.easeIn) {
+            Timer.scheduledTimer(withTimeInterval: Constants.daxInSpeechDelay, repeats: false) { _ in
+                withAnimation(Self.daxInSpeechAnimation) {
                     showTitle = false
                     daxInSpeechPosition = true
                 }
             }
 
-            Timer.scheduledTimer(withTimeInterval: 3.5, repeats: false) { _ in
-                withAnimation {
+            Timer.scheduledTimer(withTimeInterval: Constants.onSplashFinishedDelay, repeats: false) { _ in
+                withAnimation(Self.onSplashFinishedAnimation) {
                     model.onSplashFinished()
                     showDialogs = true
                 }

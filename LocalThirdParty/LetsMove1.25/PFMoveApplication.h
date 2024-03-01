@@ -27,6 +27,8 @@ void PFMoveToApplicationsFolderIfNecessary(BOOL allowAlertSilencing);
  See https://github.com/potionfactory/LetsMove/issues/64 for details. */
 BOOL PFMoveIsInProgress(void);
 
+extern NSString *const AlertSuppressKey;
+
 #ifdef __cplusplus
 }
 #endif

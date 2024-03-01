@@ -21,8 +21,35 @@ import AppKit
 @main
 struct AppMain {
 
+#if CI || DEBUG || REVIEW
+    static func applyUITestsEnvironment() {
+        let uiTestsEnvironment = ProcessInfo().uiTestsEnvironment
+#if !APPSTORE
+        if let value = uiTestsEnvironment[.suppressMoveToApplications]?.boolValue {
+            UserDefaultsWrapper<Bool?>.sharedDefaults.set(value, forKey: AlertSuppressKey)
+        }
+#endif
+        if let value = uiTestsEnvironment[.onboardingFinished]?.boolValue {
+            if value {
+                UserDefaultsWrapper<Bool?>(key: .onboardingFinished).wrappedValue = true
+            } else {
+                UserDefaultsWrapper<Bool?>(key: .onboardingFinished).clear()
+            }
+        }
+        if let value = uiTestsEnvironment[.shouldRestorePreviousSession]?.boolValue {
+            UserDefaultsWrapper<Bool?>(key: .restorePreviousSession).wrappedValue = value
+        }
+        if uiTestsEnvironment[.resetSavedState] == .true {
+            try? FileManager.default.removeItem(at: URL.sandboxApplicationSupportURL.appending(AppStateRestorationManager.fileName))
+        }
+    }
+#else
+    static func applyUITestsEnvironment() {}
+#endif
+
     static func main() {
         _=Application.shared
+        applyUITestsEnvironment()
 
 #if !APPSTORE && !DEBUG
         // this should be run after NSApplication.shared is set

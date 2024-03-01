@@ -1,0 +1,41 @@
+{
+  "configurations" : [
+    {
+      "id" : "273D8F82-DE38-4E0E-8B39-EFCA637E363A",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "-NSConstraintBasedLayoutVisualizeMutuallyExclusiveConstraints YES"
+      },
+      {
+        "argument" : "-com.apple.CoreData.ConcurrencyDebug 1"
+      }
+    ],
+    "environmentVariableEntries" : [
+      {
+        "key" : "OS_ACTIVITY_DT_MODE",
+        "value" : "YES"
+      },
+      {
+        "key" : "OS_ACTIVITY_MODE",
+        "value" : "debug"
+      }
+    ]
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:DuckDuckGo.xcodeproj",
+        "identifier" : "B64FD7A42B91B4DF002A86A2",
+        "name" : "UI Tests App Store"
+      }
+    }
+  ],
+  "version" : 1
+}
