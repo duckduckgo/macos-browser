@@ -180,8 +180,11 @@ extension DownloadsTabExtension: NavigationResponder {
         let firstNavigationAction = navigationResponse.mainFrameNavigation?.redirectHistory.first
             ?? navigationResponse.mainFrameNavigation?.navigationAction
 
-        guard navigationResponse.httpResponse?.isSuccessful != false,
-              !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload else {
+        guard navigationResponse.httpResponse?.isSuccessful != false, // download non-http responses
+              !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload
+                // if user pressed Opt+Enter in the Address bar to download from a URL
+                || (navigationResponse.mainFrameNavigation?.redirectHistory.last ?? navigationResponse.mainFrameNavigation?.navigationAction)?.navigationType == .custom(.userRequestedPageDownload)
+        else {
             return .next // proceed with normal page loading
         }
 
