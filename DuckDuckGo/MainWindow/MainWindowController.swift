@@ -176,7 +176,11 @@ final class MainWindowController: NSWindowController {
     }
 
     func orderWindowBack(_ sender: Any?) {
-        window?.orderBack(sender)
+        if let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window {
+            window?.order(.below, relativeTo: lastKeyWindow.windowNumber)
+        } else {
+            window?.orderFront(sender)
+        }
         register()
     }
 

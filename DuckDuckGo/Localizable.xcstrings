@@ -37,6 +37,17 @@
     "%@ does not support storing passwords" : {
       "comment" : "Data Import disabled checkbox message about a browser (%@) not supporting storing passwords"
     },
+    "%@ of %@" : {
+      "comment" : "Number of bytes out of total bytes downloaded (1Mb of 2Mb)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
 
     },
@@ -2543,6 +2554,18 @@
         }
       }
     },
+    "downloads.bytes.format" : {
+      "comment" : "Number of bytes out of total bytes downloaded (1Mb of 2Mb)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@"
+          }
+        }
+      }
+    },
     "downloads.change" : {
       "comment" : "Change downloads directory button",
       "extractionState" : "extracted_with_value",
@@ -2699,6 +2722,18 @@
         }
       }
     },
+    "downloads.open.on.completion" : {
+      "comment" : "Checkbox to open a Download Manager popover when downloads are completed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically open the Downloads panel when downloads complete"
+          }
+        }
+      }
+    },
     "downloads.remove-from-list.item" : {
       "comment" : "Contextual menu item in downloads manager to remove the given downloaded from the list of downloaded files",
       "extractionState" : "extracted_with_value",
@@ -2731,6 +2766,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Show in Finder"
+          }
+        }
+      }
+    },
+    "downloads.speed.format" : {
+      "comment" : "Download speed format (1Mb/sec)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@/s"
           }
         }
       }
