@@ -23,6 +23,7 @@ protocol DownloadsPreferencesPersistor {
     var lastUsedCustomDownloadLocation: String? { get set }
 
     var alwaysRequestDownloadLocation: Bool { get set }
+    var shouldOpenPopupOnCompletion: Bool { get set }
 
     var defaultDownloadLocation: URL? { get }
     func isDownloadLocationValid(_ location: URL) -> Bool
@@ -37,6 +38,9 @@ struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor 
 
     @UserDefaultsWrapper(key: .alwaysRequestDownloadLocationKey, defaultValue: false)
     var alwaysRequestDownloadLocation: Bool
+
+    @UserDefaultsWrapper(key: .openDownloadsPopupOnCompletionKey, defaultValue: true)
+    var shouldOpenPopupOnCompletion: Bool
 
     var defaultDownloadLocation: URL? {
         let fileManager = FileManager.default
@@ -119,9 +123,18 @@ final class DownloadsPreferences: ObservableObject {
         get {
             persistor.alwaysRequestDownloadLocation
         }
-
         set {
             persistor.alwaysRequestDownloadLocation = newValue
+            objectWillChange.send()
+        }
+    }
+
+    var shouldOpenPopupOnCompletion: Bool {
+        get {
+            persistor.shouldOpenPopupOnCompletion
+        }
+        set {
+            persistor.shouldOpenPopupOnCompletion = newValue
             objectWillChange.send()
         }
     }

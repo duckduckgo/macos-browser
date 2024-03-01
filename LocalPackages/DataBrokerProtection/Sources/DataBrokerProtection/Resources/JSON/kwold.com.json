@@ -1,7 +1,7 @@
 {
   "name": "Kwold",
   "url": "kwold.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "steps": [
@@ -11,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "936eee30-d31e-48fb-8cc4-9391869934b9",
+          "id": "878e00ab-dbad-4ca9-a303-645702a36ee2",
           "url": "https://kwold.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age}",
           "ageRange": [
             "18-30",
@@ -25,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "870ee174-275a-4ea8-b2d7-a222418e5de9",
+          "id": "ec9f8ae6-199e-441b-9722-ffc6737b4595",
           "selector": ".card",
           "profile": {
             "name": {
@@ -51,7 +51,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://kwold.com/pp/${id}"
             }
           }
         }

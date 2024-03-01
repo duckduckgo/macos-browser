@@ -112,6 +112,10 @@ final class TabViewModel {
                     // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
                     return tab.webViewDidCommitNavigationPublisher.map { .didCommit }.eraseToAnyPublisher()
 
+                case .url(_, _, source: .userEntered(_, downloadRequested: true)):
+                    // don‘t update the address bar for download navigations
+                    return Empty().eraseToAnyPublisher().eraseToAnyPublisher()
+
                 case .url(_, _, source: .pendingStateRestoration),
                      .url(_, _, source: .loadedByStateRestoration),
                      .url(_, _, source: .userEntered),
@@ -300,6 +304,8 @@ final class TabViewModel {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
                 title = host
+            } else if let url = tab.url, url.isFileURL {
+                title = url.lastPathComponent
             } else {
                 title = addressBarString
             }

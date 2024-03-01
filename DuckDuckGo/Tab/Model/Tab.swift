@@ -24,6 +24,7 @@ import Foundation
 import Navigation
 import UserScript
 import WebKit
+import History
 
 #if SUBSCRIPTION
 import Subscription
@@ -66,7 +67,7 @@ protocol NewWindowPolicyDecisionMaker {
         enum URLSource: Equatable {
             case pendingStateRestoration
             case loadedByStateRestoration
-            case userEntered(String)
+            case userEntered(String, downloadRequested: Bool = false)
             case historyEntry
             case bookmark
             case ui
@@ -77,7 +78,7 @@ protocol NewWindowPolicyDecisionMaker {
             case webViewUpdated
 
             var userEnteredValue: String? {
-                if case .userEntered(let userEnteredValue) = self {
+                if case .userEntered(let userEnteredValue, _) = self {
                     userEnteredValue
                 } else {
                     nil
@@ -90,6 +91,8 @@ protocol NewWindowPolicyDecisionMaker {
 
             var navigationType: NavigationType {
                 switch self {
+                case .userEntered(_, downloadRequested: true):
+                    .custom(.userRequestedPageDownload)
                 case .userEntered:
                     .custom(.userEnteredUrl)
                 case .pendingStateRestoration:
@@ -257,6 +260,14 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isUserEnteredUrl: Bool {
             userEnteredValue != nil
+        }
+
+        var isUserRequestedPageDownload: Bool {
+            if case .url(_, credential: _, source: .userEntered(_, downloadRequested: true)) = self {
+                return true
+            } else {
+                return false
+            }
         }
 
         var displaysContentInWebView: Bool {
@@ -565,12 +576,18 @@ protocol NewWindowPolicyDecisionMaker {
             webView.stopAllMedia(shouldStopLoading: true)
 
             userContentController?.cleanUpBeforeClosing()
-            webView.assertObjectDeallocated(after: 4.0)
+#if DEBUG
+            if case .normal = NSApp.runType {
+                webView.assertObjectDeallocated(after: 4.0)
+            }
+#endif
         }
-        if !onDeinit {
+#if DEBUG
+        if !onDeinit, case .normal = NSApp.runType {
             // Tab should be deallocated shortly after burning
             self.assertObjectDeallocated(after: 4.0)
         }
+#endif
         guard Thread.isMainThread else {
             DispatchQueue.main.async { job() }
             return
@@ -665,6 +682,8 @@ protocol NewWindowPolicyDecisionMaker {
             } else if content != self.content {
                 self.content = content
             }
+        } else if self.content.isUrl {
+            self.content = .none
         }
         self.updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
     }
@@ -1001,10 +1020,10 @@ protocol NewWindowPolicyDecisionMaker {
             return nil
         }
 
-        if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading {
+        if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading, !content.isUserRequestedPageDownload {
             return reload()
         }
-        if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
+        if restoreInteractionStateIfNeeded() { return nil /* session restored */ }
         invalidateInteractionStateData()
 
         if url.isFileURL {
@@ -1043,28 +1062,34 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     @MainActor
-    private func restoreInteractionStateDataIfNeeded() -> Bool {
+    private func restoreInteractionStateIfNeeded() -> Bool {
         // only restore session from interactionStateData passed to Tab.init
         guard case .loadCachedFromTabContent(let interactionStateData) = self.interactionState else { return false }
 
         if let url = content.urlForWebView, url.isFileURL {
             // request file system access before restoration
-            _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+            webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                .loadFileURL(url, allowingReadAccessTo: url)?
+                .overrideResponders(navigationDidFinish: { [weak self] _ in
+                    self?.restoreInteractionState(with: interactionStateData)
+                }, navigationDidFail: { [weak self] _, _ in
+                    self?.restoreInteractionState(with: interactionStateData)
+                })
+        } else {
+            restoreInteractionState(with: interactionStateData)
         }
 
-        if #available(macOS 12.0, *) {
-            webView.interactionState = interactionStateData
-        } else {
-            do {
-                try webView.restoreSessionState(from: interactionStateData)
-            } catch {
-                os_log("Tab:setupWebView could not restore session state %s", type: .error, "\(error)")
-                return false
-            }
-        }
         invalidateInteractionStateData()
 
         return true
+    }
+
+    private func restoreInteractionState(with interactionStateData: Data) {
+        guard #available(macOS 12.0, *) else {
+            try? webView.restoreSessionState(from: interactionStateData)
+            return
+        }
+        webView.interactionState = interactionStateData
     }
 
     private func addHomePageToWebViewIfNeeded() {
