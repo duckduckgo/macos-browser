@@ -9493,6 +9493,7 @@
 		};
 		7B557F2A2B8CA2A400099746 /* Embed Debug-only Network Extensions */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
