@@ -116,7 +116,7 @@ struct PasswordManagementListSection {
 
         let sortedKeys = switch order {
         case .ascending: itemsByDateMetadata.keys.sorted(by: (>))
-        case .descending: itemsByDateMetadata.keys.sorted(by: (>))
+        case .descending: itemsByDateMetadata.keys.sorted(by: (<))
         }
 
         return sortedKeys.map { key in

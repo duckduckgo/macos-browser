@@ -19,6 +19,7 @@
 import Cocoa
 import BrowserServicesKit
 import Common
+import History
 
 @MainActor
 final class FirePopoverViewModel {

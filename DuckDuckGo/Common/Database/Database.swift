@@ -161,7 +161,7 @@ extension NSManagedObjectModel {
 
                 let propertyClassName = transformerName.dropping(suffix: "Transformer")
                 assert(propertyClassName != transformerName, "Expected Transformer name like `NSStringTransformer`")
-                guard allowedPropertyClassNames?.contains(propertyClassName ) != false,
+                guard allowedPropertyClassNames?.contains(propertyClassName) != false,
                       let propertyClass = NSClassFromString(propertyClassName) else {
                     assertionFailure("Invalid class name `\(propertyClassName)` for \(transformerName)")
                     continue
