@@ -181,6 +181,36 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(cell, capturedCell)
     }
 
+    func testWhenShowMenuButtonOnHoverIsTrue_ThenCellShouldHaveShouldMenuButtonFlagTrue() throws {
+        // GIVEN
+        let mockFolder = BookmarkFolder.mock
+        let mockOutlineView = NSOutlineView(frame: .zero)
+        let treeController = createTreeController(with: [mockFolder])
+        let mockFolderNode = treeController.node(representing: mockFolder)!
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .bookmarksAndFolders, bookmarkManager: LocalBookmarkManager(), treeController: treeController, showMenuButtonOnHover: true)
+
+        // WHEN
+        let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
+
+        // THEN
+        XCTAssertTrue(cell.shouldShowMenuButton)
+    }
+
+    func testWhenShowMenuButtonOnHoverIsFalse_ThenCellShouldHaveShouldMenuButtonFlagFalse() throws {
+        // GIVEN
+        let mockFolder = BookmarkFolder.mock
+        let mockOutlineView = NSOutlineView(frame: .zero)
+        let treeController = createTreeController(with: [mockFolder])
+        let mockFolderNode = treeController.node(representing: mockFolder)!
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, showMenuButtonOnHover: false)
+
+        // WHEN
+        let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
+
+        // THEN
+        XCTAssertFalse(cell.shouldShowMenuButton)
+    }
+
     // MARK: - Private
 
     private func createTreeController(with bookmarks: [BaseBookmarkEntity]) -> BookmarkTreeController {

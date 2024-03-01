@@ -34,6 +34,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     private let contentMode: ContentMode
     private let bookmarkManager: BookmarkManager
+    private let showMenuButtonOnHover: Bool
     private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
 
@@ -44,12 +45,14 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         contentMode: ContentMode,
         bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
+        showMenuButtonOnHover: Bool = true,
         onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
     ) {
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
         self.treeController = treeController
+        self.showMenuButtonOnHover = showMenuButtonOnHover
         self.onMenuRequestedAction = onMenuRequestedAction
         self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
 
@@ -126,6 +129,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
         let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView
             ?? BookmarkOutlineCellView(identifier: .init(BookmarkOutlineCellView.className()))
+        cell.shouldShowMenuButton = showMenuButtonOnHover
         cell.delegate = self
 
         if let bookmark = node.representedObject as? Bookmark {

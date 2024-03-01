@@ -22,8 +22,6 @@ final class BookmarkTableRowView: NSTableRowView {
 
     var onSelectionChanged: (() -> Void)?
 
-    var editing = false
-
     var hasPrevious = false {
         didSet {
             needsDisplay = true
@@ -56,7 +54,7 @@ final class BookmarkTableRowView: NSTableRowView {
         backgroundColor.setFill()
         bounds.fill()
 
-        if mouseInside && !editing {
+        if mouseInside {
             let path = NSBezierPath(roundedRect: bounds, xRadius: 6, yRadius: 6)
             NSColor.rowHover.setFill()
             path.fill()
@@ -68,8 +66,6 @@ final class BookmarkTableRowView: NSTableRowView {
     }
 
     override func drawSelection(in dirtyRect: NSRect) {
-        guard !editing else { return }
-
         var roundedCorners = [NSBezierPath.Corners]()
 
         if !hasPrevious {
