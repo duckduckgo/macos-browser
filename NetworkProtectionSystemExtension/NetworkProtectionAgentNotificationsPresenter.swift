@@ -52,7 +52,7 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
         notificationCenter.post(.showTestNotification)
     }
 
-    func showExpiredEntitlementNotification() {
+    func showEntitlementNotification(completion: @escaping (Error?) -> Void) {
         // todo
     }
 }
