@@ -83,6 +83,7 @@ jobs:
         env:
           BRANCH: ${{ steps.make_release_branch.outputs.release_branch_name }}
           RELEASE_TAG: ${{ steps.make_release_branch.outputs.last_release }}
+          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           task-url: ${{ steps.create_release_task.outputs.asana_task_url }}
