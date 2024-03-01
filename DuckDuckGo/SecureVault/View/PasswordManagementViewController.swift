@@ -202,8 +202,8 @@ final class PasswordManagementViewController: NSViewController {
         settingsMenuItem.title = UserText.settingsSuspended
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
         autofillTitleLabel.stringValue = UserText.autofill
-        emptyStateTitle.stringValue = UserText.passwordManagerEmptyStateTitle
-        emptyStateMessage.stringValue = UserText.passwordManagerEmptyStateMessage
+        emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
+        emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
         emptyStateButton.title = UserText.importData
     }
 
@@ -319,8 +319,9 @@ final class PasswordManagementViewController: NSViewController {
         let presenter = builder.buildPresenter()
 
         presenter.show(actionExecutor: autofillDeleteAllPasswordsExecutor) {
-            self.refreshData()
-            self.select(category: .logins)
+            self.refreshData {
+                self.select(category: .logins)
+            }
         }
     }
 
@@ -708,9 +709,11 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func refreshData() {
+    private func refreshData(completion: (() -> Void)? = nil) {
         self.itemModel?.clearSecureVaultModel()
-        self.refetchWithText(self.searchField.stringValue)
+        self.refetchWithText(self.searchField.stringValue) {
+            completion?()
+        }
         self.postChange()
     }
 
@@ -993,7 +996,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showDefaultEmptyState()
+        case .allItems: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
         case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
         case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
@@ -1004,22 +1007,13 @@ final class PasswordManagementViewController: NSViewController {
         emptyState.isHidden = true
     }
 
-    private func showDefaultEmptyState() {
+    private func showEmptyState(imageName: String, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true) {
         emptyState.isHidden = false
-        emptyStateMessage.isHidden = false
-        emptyStateButton.isHidden = false
-
-        emptyStateImageView.image = NSImage(named: "LoginsEmpty")
-
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultTitle, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
-    }
-
-    private func showEmptyState(imageName: String, title: String, hideMessage: Bool = true, hideButton: Bool = true) {
-        emptyState.isHidden = false
-
         emptyStateImageView.image = NSImage(named: imageName)
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
+        if let message {
+            emptyStateMessage.attributedStringValue = NSAttributedString.make(message, lineHeight: 1.05, kern: -0.08)
+        }
         emptyStateMessage.isHidden = hideMessage
         emptyStateButton.isHidden = hideButton
     }
