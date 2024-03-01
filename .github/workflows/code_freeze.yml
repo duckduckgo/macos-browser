@@ -82,10 +82,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           ./scripts/update_asana_for_release.sh \
-            internal \
             ${{ steps.create_release_task.outputs.asana_task_id }} \
-            ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} \
-            ${{ steps.create_release_task.outputs.marketing_version }}
+            ${{ steps.create_release_task.outputs.marketing_version }} \
+            ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }}
 
   run_tests:
 
