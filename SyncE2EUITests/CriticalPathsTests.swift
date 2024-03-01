@@ -40,9 +40,7 @@ final class CriticalPathsTests: XCTestCase {
     }
     
     private func accessSettings() {
-        let newTabWindow = app.windows["New Tab"]
-        app.buttons["Options Button"].click()
-        newTabWindow.menuItems["openPreferences:"].click()
+        app.menuItems["openPreferences:"].click()
     }
     
     private func toggleInternalUserState() {
