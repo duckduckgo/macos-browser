@@ -187,21 +187,22 @@ class ErrorPageTests: XCTestCase {
         // open 2 Tabs with newtab page
         let tab1 = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let tab2 = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let eNewtabPageLoaded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let tabsViewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab1, tab2]))
+        tabsViewModel.select(at: .unpinned(0))
         window = WindowsManager.openNewWindow(with: tabsViewModel)!
 
         // wait until Home page loads
-        let eNewtabPageLoaded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
         // navigate to a failing url
+        let eNavigationFailed = tab1.$error.compactMap { $0 }.timeout(5).first().promise()
         schemeHandler.middleware = [{ _ in
             .failure(NSError.noConnection)
         }]
+
         tab1.setContent(.url(.test, source: .userEntered(URL.test.absoluteString)))
         // wait for error page to open
-        let eNavigationFailed = tab1.$error.compactMap { $0 }.timeout(5).first().promise()
-
         _=try await eNavigationFailed.value
 
         // switch to tab 2
@@ -209,13 +210,12 @@ class ErrorPageTests: XCTestCase {
 
         // next load should be ok
         let eServerQueried = expectation(description: "server request sent")
+        let eNavigationSucceeded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         schemeHandler.middleware = [{ _ in
             eServerQueried.fulfill()
             return .ok(.html(Self.testHtml))
         }]
         // coming back to the failing tab 1 should trigger its reload
-        let eNavigationSucceeded = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
-
         tabsViewModel.select(at: .unpinned(0))
 
         _=try await eNavigationSucceeded.value
