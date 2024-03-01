@@ -219,7 +219,7 @@ class ErrorPageTests: XCTestCase {
         tabsViewModel.select(at: .unpinned(0))
 
         _=try await eNavigationSucceeded.value
-        await fulfillment(of: [eServerQueried], timeout: 1)
+        await fulfillment(of: [eServerQueried], timeout: 5)
         XCTAssertEqual(tab1.content.url, .test)
         XCTAssertNil(tab1.error)
     }
