@@ -1,7 +1,7 @@
 {
   "name": "Inforver",
   "url": "inforver.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
   "steps": [
@@ -11,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "85fac850-36ad-4d9c-ad7c-c1250c7b5585",
+          "id": "840da5cd-0581-4692-af09-ce89c83e6786",
           "url": "https://inforver.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -25,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "e5e9c1b0-4af4-4fb6-bd2d-7d026ffd95e7",
+          "id": "4cabd3c9-83bd-4cfb-9acb-d20738bfea21",
           "selector": ".search-item",
           "profile": {
             "name": {
