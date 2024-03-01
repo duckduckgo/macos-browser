@@ -2638,6 +2638,18 @@
         }
       }
     },
+    "downloads.open.on.completion" : {
+      "comment" : "Checkbox to open a Download Manager popover when downloads are completed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically open the Downloads panel when downloads complete"
+          }
+        }
+      }
+    },
     "downloads.remove-from-list.item" : {
       "comment" : "Contextual menu item in downloads manager to remove the given downloaded from the list of downloaded files",
       "extractionState" : "extracted_with_value",

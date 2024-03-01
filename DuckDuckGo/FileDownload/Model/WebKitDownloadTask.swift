@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Navigation
 import Combine
 import Foundation
+import Navigation
 import UniformTypeIdentifiers
 import WebKit
 
