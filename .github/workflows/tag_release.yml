@@ -67,7 +67,8 @@ jobs:
       run: |
         case "${{ env.BRANCH }}" in
           release/*) ;;
-          *) echo "👎 Not a release branch"; exit 1 ;;
+          hotfix/*) ;;
+          *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
         esac
 
     - name: Check out the code
@@ -86,6 +87,7 @@ jobs:
     - name: Merge to base branch
       id: merge
       if: ${{ env.prerelease == 'true' }}
+      continue-on-error: true
       uses: actions/github-script@v7
       with:
         github-token: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
@@ -100,6 +102,7 @@ jobs:
     - name: Delete release branch
       id: delete
       if: ${{ env.prerelease == 'false' }}
+      continue-on-error: true
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
@@ -111,7 +114,9 @@ jobs:
         GH_TOKEN: ${{ github.token }}
         PROMOTED_TAG: ${{ steps.create-tag.outputs.promoted-tag }}
         TAG: ${{ steps.create-tag.outputs.tag }}
+        MERGE_OR_DELETE_FAILED: ${{ (steps.merge.outcome == 'failure') || (steps.delete.outcome == 'failure') }}
       run: |
+        echo "MERGE_OR_DELETE_FAILED=${MERGE_OR_DELETE_FAILED}" >> $GITHUB_ENV
         echo "TAG=$TAG" >> $GITHUB_ENV
         if [[ "${prerelease}" == "true" ]]; then
           DMG_VERSION=${TAG//-/.}
@@ -127,18 +132,8 @@ jobs:
           echo "LAST_RELEASE_TAG=${last_release_tag}" >> $GITHUB_ENV
         fi
 
-    - name: Set up Asana success comment template
-      if: success()
-      id: asana-success-template
-      run: |
-        if [[ "${prerelease}" == "true" ]]; then
-          echo "comment-template=internal-release-ready" >> $GITHUB_OUTPUT
-        else
-          echo "comment-template=public-release-tagged" >> $GITHUB_OUTPUT
-        fi
-
     - name: Set up Asana templates
-      if: failure()
+      if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
       id: asana-failure-templates
       run: |
         if [[ ${{ steps.create-tag.outputs.tag-created }} == "true" ]]; then
@@ -161,7 +156,7 @@ jobs:
 
     - name: Create Asana task on failure
       id: create-task-on-failure
-      if: failure()
+      if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
       uses: ./.github/actions/asana-create-action-item
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -169,7 +164,7 @@ jobs:
         template-name: ${{ steps.asana-failure-templates.outputs.task-template }}
 
     - name: Report failure
-      if: failure()
+      if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
       uses: ./.github/actions/asana-log-message
       env:
         ASSIGNEE_ID: ${{ steps.create-task-on-failure.outputs.assignee-id }}
@@ -179,8 +174,18 @@ jobs:
         task-url: ${{ env.asana-task-url }}
         template-name: ${{ steps.asana-failure-templates.outputs.comment-template }}
 
+    - name: Set up Asana success comment template
+      if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
+      id: asana-success-template
+      run: |
+        if [[ "${prerelease}" == "true" ]]; then
+          echo "comment-template=internal-release-ready" >> $GITHUB_OUTPUT
+        else
+          echo "comment-template=public-release-tagged" >> $GITHUB_OUTPUT
+        fi
+
     - name: Report success
-      if: success()
+      if: ${{ env.MERGE_OR_DELETE_FAILED == 'false' }}
       uses: ./.github/actions/asana-log-message
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
