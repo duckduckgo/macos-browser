@@ -119,7 +119,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let authToken = AccountManager().authToken, let accessToken = AccountManager().accessToken {
+        if let authToken = AccountManager().authToken, AccountManager().accessToken != nil {
             return Subscription(token: authToken)
         } else {
             return Subscription(token: "")
@@ -302,9 +302,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .appTrackingProtection:
             NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
         case .vpn:
-            NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
+            NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
         case .personalInformationRemoval:
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+            await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
             await WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
         }

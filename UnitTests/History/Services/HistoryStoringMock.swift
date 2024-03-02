@@ -19,6 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 import Combine
+import History
 
 final class HistoryStoringMock: HistoryStoring {
 
@@ -38,6 +39,10 @@ final class HistoryStoringMock: HistoryStoring {
 
             promise(cleanOldResult)
         }
+    }
+
+    func load() {
+        // no-op
     }
 
     var removeEntriesCalled = false
@@ -72,7 +77,7 @@ final class HistoryStoringMock: HistoryStoring {
 
     var saveCalled = false
     var savedHistoryEntries = [HistoryEntry]()
-    func save(entry: DuckDuckGo_Privacy_Browser.HistoryEntry) -> Future<[(id: DuckDuckGo_Privacy_Browser.Visit.ID, date: Date)], Error> {
+    func save(entry: HistoryEntry) -> Future<[(id: Visit.ID, date: Date)], Error> {
         saveCalled = true
         savedHistoryEntries.append(entry)
         for visit in entry.visits {

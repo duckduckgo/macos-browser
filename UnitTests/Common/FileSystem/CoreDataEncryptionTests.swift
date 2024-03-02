@@ -32,6 +32,10 @@ final class CoreDataEncryptionTests: XCTestCase {
         return transformer
     }()
 
+    static var container = CoreData.encryptionContainer()
+    static var context = container.viewContext
+    var context: NSManagedObjectContext { Self.context }
+
     override func setUp() {
         super.setUp()
 
@@ -39,9 +43,6 @@ final class CoreDataEncryptionTests: XCTestCase {
     }
 
     func testSavingEncryptedValues() {
-        let container = CoreData.encryptionContainer()
-        let context = container.viewContext
-
         context.performAndWait {
             let entity = PartiallyEncryptedEntity(context: context)
             entity.date = Date()
@@ -56,8 +57,6 @@ final class CoreDataEncryptionTests: XCTestCase {
     }
 
     func testFetchingEncryptedValues() {
-        let container = CoreData.encryptionContainer()
-        let context = container.viewContext
         let timestamp = Date()
 
         context.performAndWait {
@@ -81,8 +80,6 @@ final class CoreDataEncryptionTests: XCTestCase {
 
     func testValueTransformers() {
         let transformer = self.mockValueTransformer
-        let container = CoreData.encryptionContainer()
-        let context = container.viewContext
 
         context.performAndWait {
             let entity = MockEntity(context: context)

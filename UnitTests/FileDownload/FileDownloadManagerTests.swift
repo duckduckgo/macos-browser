@@ -56,6 +56,7 @@ final class FileDownloadManagerTests: XCTestCase {
         FileManager.restoreUrlsForIn()
         self.chooseDestination = nil
         self.fileIconFlyAnimationOriginalRect = nil
+        preferences.alwaysRequestDownloadLocation = false
     }
 
     func testWhenDownloadIsAddedThenItsPublished() {
@@ -64,7 +65,7 @@ final class FileDownloadManagerTests: XCTestCase {
             e.fulfill()
         }
 
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: nil, location: .auto)
 
         withExtendedLifetime(cancellable) {
@@ -78,7 +79,7 @@ final class FileDownloadManagerTests: XCTestCase {
             e.fulfill()
         }
 
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: nil, location: .auto)
 
         struct TestError: Error {}
@@ -96,7 +97,7 @@ final class FileDownloadManagerTests: XCTestCase {
             e.fulfill()
         }
 
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: nil, location: .auto)
 
         download.delegate?.downloadDidFinish!(download.asWKDownload())
@@ -122,7 +123,7 @@ final class FileDownloadManagerTests: XCTestCase {
             callback(nil, nil)
         }
 
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .prompt)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
@@ -155,7 +156,7 @@ final class FileDownloadManagerTests: XCTestCase {
             callback(localURL, .html)
         }
 
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
@@ -177,7 +178,7 @@ final class FileDownloadManagerTests: XCTestCase {
         fm.createFile(atPath: localURL.path, contents: nil, attributes: nil)
         XCTAssertTrue(fm.fileExists(atPath: localURL.path))
 
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .prompt)
         self.chooseDestination = { _, _, _, callback in
             callback(localURL, nil)
@@ -194,11 +195,38 @@ final class FileDownloadManagerTests: XCTestCase {
         XCTAssertFalse(fm.fileExists(atPath: localURL.path))
     }
 
+    func testWhenDownloadingLocalFileThenLocationChooserIsCalled() {
+        let downloadsURL = fm.temporaryDirectory
+        preferences.selectedDownloadLocation = downloadsURL
+
+        let download = WKDownloadMock(url: URL(fileURLWithPath: "/some/path"))
+
+        let localURL = downloadsURL.appendingPathComponent(testFile)
+        let e1 = expectation(description: "chooseDestinationCallback called")
+        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+            dispatchPrecondition(condition: .onQueue(.main))
+            XCTAssertEqual(directoryURL, downloadsURL)
+            e1.fulfill()
+
+            callback(localURL, .html)
+        }
+
+        dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
+
+        let e2 = expectation(description: "WKDownload called")
+        download.delegate?.download(download.asWKDownload(), decideDestinationUsing: response, suggestedFilename: testFile) { [testFile] url in
+            XCTAssertEqual(url, downloadsURL.appendingPathComponent(testFile).appendingPathExtension(WebKitDownloadTask.downloadExtension))
+            e2.fulfill()
+        }
+
+        waitForExpectations(timeout: 0.3)
+    }
+
     func testWhenNotRequiredByPreferencesThenDefaultDownloadLocationIsChosen() {
         let downloadsURL = fm.temporaryDirectory
         preferences.selectedDownloadLocation = downloadsURL
 
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
         self.chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
@@ -217,7 +245,7 @@ final class FileDownloadManagerTests: XCTestCase {
         let downloadsURL = fm.temporaryDirectory
         preferences.selectedDownloadLocation = downloadsURL
 
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
         self.chooseDestination = { _, _, _, _ in
             XCTFail("Unpected chooseDestination call")
@@ -240,7 +268,7 @@ final class FileDownloadManagerTests: XCTestCase {
             [URL(fileURLWithPath: "/")]
         }
 
-        let download = WKDownloadMock()
+        let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
 
         let e = expectation(description: "WKDownload called")

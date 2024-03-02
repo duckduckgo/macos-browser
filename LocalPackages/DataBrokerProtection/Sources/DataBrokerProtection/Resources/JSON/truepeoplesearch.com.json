@@ -1,7 +1,7 @@
 {
   "name": "TruePeopleSearch",
   "url": "truepeoplesearch.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "peoplefinders.com",
   "addedDatetime": 1703138400000,
   "steps": [
@@ -11,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "12eb70c1-53d5-4881-9dce-74ed4fada583",
+          "id": "127f6406-5630-42dc-bfdf-d7df7862f5d6",
           "url": "https://www.truepeoplesearch.com/results?name=${firstName}%20${lastName}&citystatezip=${city|capitalize},${state|upcase}"
         },
         {
           "actionType": "extract",
-          "id": "881e0e21-c375-4083-a9be-86f82063849b",
+          "id": "267a0b26-dc67-4ed9-b5c4-a6de838765ed",
           "selector": ".card-summary",
           "profile": {
             "name": {
@@ -43,7 +43,9 @@
               "beforeText": "..."
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://www.truepeoplesearch.com/find/person/${id}"
             }
           }
         }

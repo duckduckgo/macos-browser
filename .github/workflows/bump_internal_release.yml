@@ -85,7 +85,7 @@ jobs:
           BRANCH: ${{ github.ref_name }}
         run: |
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
-          ./scripts/update_asana_for_release.sh ${{ steps.task-id.outputs.task-id }} "${version}" ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }}
+          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.task-id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
 
   prepare_release:
     name: Prepare Release
