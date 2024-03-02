@@ -36,7 +36,7 @@ on:
         required: true
       SPARKLE_PRIVATE_KEY:
         required: true
-      
+
 jobs:
 
   # This is only run for public and hotfix releases, so only when it's triggered manually.
