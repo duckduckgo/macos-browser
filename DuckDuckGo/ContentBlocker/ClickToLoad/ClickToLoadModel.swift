@@ -20,6 +20,7 @@ import Foundation
 
 struct ClickToLoadModel {
 
+    // DELETE ME!
     private static func loadFile(name: String) -> String? {
         let pathPrefix = "social_images/"
         let fileArgs = name.split(separator: ".")

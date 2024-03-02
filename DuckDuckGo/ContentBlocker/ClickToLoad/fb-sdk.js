@@ -42,6 +42,7 @@
     function enableFacebookSDK () {
         if (!fbIsEnabled) {
             window.FB = undefined
+            window.fbTest = "*** disabled surrogate ***";
             window.fbAsyncInit = function () {
                 if (runInit && initData) {
                     window.FB.init(initData)

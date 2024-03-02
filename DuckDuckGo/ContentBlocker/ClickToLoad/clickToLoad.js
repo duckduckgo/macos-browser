@@ -2,19 +2,23 @@
 //     function sendMessage (messageType, options, callback) {
 //         TODO chrome.runtime.sendMessage({ messageType, options }, callback)
 //     }
+    
+    // LDA DISABLED
     let appID
     const loadingImages = {
         darkMode: '',
         lightMode: ''
     }
     let logoImg
-    const titleID = 'DuckDuckGoPrivacyEssentialsCTLElementTitle'
+    const titleID = 'DuckDuckGoPrivacyEssentialsCTLElementTitle_LDATEST_EMBED'
     const entities = []
     const entityData = {}
     const fbSurrogate = `${fb-sdk.js}` // eslint-disable-line
     const fbConfig = JSON.parse(`${clickToLoadConfig.json}`.replace(/\\/g, '')) // eslint-disable-line
     const proximaRegFontInline = `${proximaRegFont}` // eslint-disable-line
     const proximaBoldFontInline = `${proximaBoldFont}` // eslint-disable-line
+
+    return;
 
     /**
      *
