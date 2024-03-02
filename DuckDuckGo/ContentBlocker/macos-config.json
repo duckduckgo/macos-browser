@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1709129209488,
+    "version": 1709322525408,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -72,13 +72,13 @@
                     "domain": "www.audiosciencereview.com"
                 },
                 {
-                    "domain": "golf.com"
-                },
-                {
                     "domain": "thehustle.co"
                 },
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -98,6 +98,7 @@
                     "^https?:\\/\\/\\S+ampproject\\.org\\/\\S\\/s\\/(\\S+)$"
                 ],
                 "keywords": [
+                    "amp=",
                     "=amp",
                     "&amp",
                     "amp&",
@@ -113,7 +114,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "369b8aac2cb358e0df3a828c1e3b9a29"
+            "hash": "a92fae2cdccf479cc1bbe840cd32627b"
         },
         "androidBrowserConfig": {
             "exceptions": [],
@@ -264,6 +265,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -280,7 +284,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "ce906469aa6ac0fb5ecf3f39710ef05b"
+            "hash": "1ba9ece92f6e27c88a54cc69b63b3df1"
         },
         "autofill": {
             "exceptions": [
@@ -900,6 +904,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -924,12 +931,15 @@
                 }
             },
             "state": "disabled",
-            "hash": "36e8971fa9bb204b78a5929a14a108dd"
+            "hash": "9c70121360bcdfeb63770d8d9aeee770"
         },
         "clickToPlay": {
             "exceptions": [
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -951,7 +961,7 @@
                 }
             },
             "state": "enabled",
-            "hash": "f1b7de266435cd2e414f50deb2c9234a"
+            "hash": "fac8ee1d06f89e1c93ca9287c095b055"
         },
         "clientBrandHint": {
             "exceptions": [],
@@ -983,6 +993,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -992,7 +1005,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "e37447d42ee8194f185e35e40f577f41"
+            "hash": "910e25ffe4d683b3c708a1578d097a16"
         },
         "cookie": {
             "settings": {
@@ -1038,6 +1051,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -1048,7 +1064,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "37a27966915571085613911b47e6e2eb"
+            "hash": "7c7ceca9eeb664059750ea96938669b0"
         },
         "customUserAgent": {
             "settings": {
@@ -1203,6 +1219,9 @@
                 },
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -3955,12 +3974,15 @@
                 ]
             },
             "state": "enabled",
-            "hash": "d2a8f09dc34bc7775ab582f4ad45518d"
+            "hash": "d0c2a82c472355a8396b1f2c5af8cf6e"
         },
         "exceptionHandler": {
             "exceptions": [
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -3973,7 +3995,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "5e792dd491428702bc0104240fbce0ce"
+            "hash": "2b0b6ee567814d75aa2646d494a45a78"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -3985,6 +4007,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -3994,7 +4019,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "f25a8f2709e865c2bd743828c7ee2f77"
+            "hash": "40b13d6ca36cd3de287345ab9e5839fb"
         },
         "fingerprintingBattery": {
             "exceptions": [
@@ -4003,6 +4028,9 @@
                 },
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -4015,7 +4043,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "4085f1593faff2feac2093533b819a41"
+            "hash": "651cfc12aec9ff9a1caac0f817b58c3c"
         },
         "fingerprintingCanvas": {
             "settings": {
@@ -4110,6 +4138,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4120,7 +4151,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "ea4c565bae27996f0d651300d757594c"
+            "hash": "98b5e91ff539dfb6c81699e32b76f70c"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -4176,6 +4207,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4219,7 +4253,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "37e16df501e3e68416a13f991b4e4147"
+            "hash": "d58f56954556ee2a4a32855edbf6e224"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4263,6 +4297,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4273,7 +4310,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "466b85680f138657de9bfd222c440887"
+            "hash": "84897737f8a85968b246fdb80a84e671"
         },
         "fingerprintingTemporaryStorage": {
             "exceptions": [
@@ -4290,6 +4327,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4300,7 +4340,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "f858697949c90842c450daee64a1dc30"
+            "hash": "dd1b1fb96c2f932048f1767f949e4453"
         },
         "googleRejected": {
             "exceptions": [
@@ -4308,6 +4348,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4318,7 +4361,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "5e792dd491428702bc0104240fbce0ce"
+            "hash": "2b0b6ee567814d75aa2646d494a45a78"
         },
         "gpc": {
             "state": "enabled",
@@ -4357,6 +4400,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4375,7 +4421,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "1a1373bcf16647d63220659fce650a83"
+            "hash": "99ec2ffa33009050831feba194452790"
         },
         "harmfulApis": {
             "settings": {
@@ -4481,6 +4527,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4491,7 +4540,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "44d3e707cba3ee0a3578f52dc2ce2aa4"
+            "hash": "9d0f5f4f8c02e79246e2d809cada2fdb"
         },
         "history": {
             "state": "disabled",
@@ -4514,6 +4563,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4523,7 +4575,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "f772808ed34cc9ea8cbcbb7cdaf74429"
+            "hash": "ea6d5ad048e35c75c451bff6fe58cb11"
         },
         "incontextSignup": {
             "exceptions": [],
@@ -4564,6 +4616,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4581,7 +4636,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "698de7b963d7d7942c5c5d1e986bb1b1"
+            "hash": "f8dc40f1f5687f403f381452d66eb0d0"
         },
         "networkProtection": {
             "state": "enabled",
@@ -4640,6 +4695,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4650,7 +4708,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "841fa92b9728c9754f050662678f82c7"
+            "hash": "d07b5bf740e4d648c94e1ac65c4305d9"
         },
         "notificationPermissions": {
             "exceptions": [],
@@ -4709,6 +4767,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -4719,13 +4780,16 @@
                 }
             ],
             "state": "disabled",
-            "hash": "0d3df0f7c24ebde89d2dced4e2d34322"
+            "hash": "1679be76968fe50858b3cc664b8fcbad"
         },
         "requestFilterer": {
             "state": "disabled",
             "exceptions": [
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -4740,13 +4804,16 @@
             "settings": {
                 "windowInMs": 0
             },
-            "hash": "0fff8017d8ea4b5609b8f5c110be1401"
+            "hash": "219a51a9aafbc9c1bae4bad55d7ce437"
         },
         "runtimeChecks": {
             "state": "disabled",
             "exceptions": [
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -4759,12 +4826,15 @@
                 }
             ],
             "settings": {},
-            "hash": "800a19533c728bbec7e31e466f898268"
+            "hash": "e2246d7c78df2167134e1428b04d51ca"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -4777,7 +4847,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "5e792dd491428702bc0104240fbce0ce"
+            "hash": "2b0b6ee567814d75aa2646d494a45a78"
         },
         "sync": {
             "state": "enabled",
@@ -5930,6 +6000,12 @@
                                 "rule": "2a7e9.v.fwmrm.net/ad/g/1",
                                 "domains": [
                                     "channel4.com"
+                                ]
+                            },
+                            {
+                                "rule": "7cbf2.v.fwmrm.net/ad/g/1",
+                                "domains": [
+                                    "6play.fr"
                                 ]
                             }
                         ]
@@ -7760,6 +7836,12 @@
                                 "domains": [
                                     "fashionnova.com"
                                 ]
+                            },
+                            {
+                                "rule": "rapid-cdn.yottaa.com/rapid/lib/ZfJxptseJcUQIA.js",
+                                "domains": [
+                                    "aviatornation.com"
+                                ]
                             }
                         ]
                     },
@@ -7830,6 +7912,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -7839,7 +7924,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "a2128d54a6fe4247b302d37733c6a88b"
+            "hash": "58e30d6e8e826a78d0c9bd448f50ae5d"
         },
         "trackingCookies1p": {
             "settings": {
@@ -7853,6 +7938,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -7863,7 +7951,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "4dddf681372a2aea9788090b13db6e6f"
+            "hash": "bfd8b32efe8d633fe670bf6ab1b00240"
         },
         "trackingCookies3p": {
             "settings": {
@@ -7874,6 +7962,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -7884,7 +7975,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "841fa92b9728c9754f050662678f82c7"
+            "hash": "d07b5bf740e4d648c94e1ac65c4305d9"
         },
         "trackingParameters": {
             "exceptions": [
@@ -7893,6 +7984,9 @@
                 },
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -7935,7 +8029,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "0.22.3",
-            "hash": "9a0282376084874f0245c421d6943841"
+            "hash": "12e223e9f9327015be71e620e0ab4ccb"
         },
         "userAgentRotation": {
             "settings": {
@@ -7944,6 +8038,9 @@
             "exceptions": [
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -7956,7 +8053,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "f65d10dfdf6739feab99a08d42734747"
+            "hash": "4498ff835bed7ce27ff2a568db599155"
         },
         "voiceSearch": {
             "exceptions": [],
@@ -7967,6 +8064,9 @@
             "exceptions": [
                 {
                     "domain": "earth.google.com"
+                },
+                {
+                    "domain": "instructure.com"
                 },
                 {
                     "domain": "iscorp.com"
@@ -8239,7 +8339,7 @@
                     }
                 ]
             },
-            "hash": "151d7ee40451c4aac4badfcc829ea0b5"
+            "hash": "f85196ca319a430ae50cd654b3230148"
         },
         "windowsPermissionUsage": {
             "exceptions": [],
@@ -8252,6 +8352,9 @@
                     "domain": "earth.google.com"
                 },
                 {
+                    "domain": "instructure.com"
+                },
+                {
                     "domain": "iscorp.com"
                 },
                 {
@@ -8262,7 +8365,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "5e792dd491428702bc0104240fbce0ce"
+            "hash": "2b0b6ee567814d75aa2646d494a45a78"
         },
         "windowsWaitlist": {
             "exceptions": [],
