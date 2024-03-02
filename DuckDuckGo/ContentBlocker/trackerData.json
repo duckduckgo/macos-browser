@@ -47,36 +47,6 @@
             ],
             "default": "block"
         },
-        "1gr.cz": {
-            "domain": "1gr.cz",
-            "owner": {
-                "name": "MAFRA, a.s.",
-                "displayName": "MAFRA"
-            },
-            "prevalence": 0.0000885,
-            "fingerprinting": 3,
-            "cookies": 0.0000545,
-            "categories": [],
-            "default": "ignore",
-            "rules": [
-                {
-                    "rule": "1gr\\.cz\\/js\\/uni\\/uni\\.js",
-                    "fingerprinting": 2,
-                    "cookies": 0.000034
-                },
-                {
-                    "rule": "1gr\\.cz\\/js\\/uni\\/paticka\\.js",
-                    "fingerprinting": 2,
-                    "cookies": 0
-                },
-                {
-                    "rule": "1gr\\.cz\\/mafra\\/SETSV\\/TTL=300\\/LASTPBFCID=160547\\/append",
-                    "fingerprinting": 0,
-                    "cookies": 0,
-                    "comment": "pixel"
-                }
-            ]
-        },
         "1rx.io": {
             "domain": "1rx.io",
             "owner": {
@@ -7247,6 +7217,34 @@
                 }
             ]
         },
+        "d1y068gyog18cq.cloudfront.net": {
+            "domain": "d1y068gyog18cq.cloudfront.net",
+            "owner": {
+                "name": "Amazon Technologies, Inc.",
+                "displayName": "Amazon.com",
+                "privacyPolicy": "https://www.amazon.com/gp/help/customer/display.html?nodeId=468496",
+                "url": "http://www.amazon.com/"
+            },
+            "prevalence": 0.0000272,
+            "fingerprinting": 2,
+            "cookies": 0.0000272,
+            "categories": [
+                "Content Delivery"
+            ],
+            "default": "ignore",
+            "rules": [
+                {
+                    "rule": "d1y068gyog18cq\\.cloudfront\\.net\\/psjhjhsb\\.js",
+                    "fingerprinting": 2,
+                    "cookies": 0.0000136
+                },
+                {
+                    "rule": "d1y068gyog18cq\\.cloudfront\\.net\\/sp\\.js",
+                    "fingerprinting": 2,
+                    "cookies": 0.0000136
+                }
+            ]
+        },
         "d214hhm15p4t1d.cloudfront.net": {
             "domain": "d214hhm15p4t1d.cloudfront.net",
             "owner": {
@@ -9712,28 +9710,15 @@
                     "cookies": 0.000034
                 },
                 {
-                    "rule": "facebook\\.com\\/tr\\/",
-                    "fingerprinting": 0,
-                    "cookies": 0.000538,
-                    "comment": "pixel"
+                    "rule": "facebook\\.com/[a-z_A-Z]+/sdk\\.js",
+                    "surrogate": "fb-sdk.js",
+                    "action": "block-ctl-fb",
+                    "fingerprinting": 1,
+                    "cookies": 0
                 },
                 {
-                    "rule": "facebook\\.com\\/tr",
-                    "fingerprinting": 0,
-                    "cookies": 0.0000272,
-                    "comment": "pixel"
-                },
-                {
-                    "rule": "facebook\\.com\\/ajax\\/bz",
-                    "fingerprinting": 0,
-                    "cookies": 0,
-                    "comment": "pixel"
-                },
-                {
-                    "rule": "facebook\\.com\\/123450\\/picture",
-                    "fingerprinting": 0,
-                    "cookies": 0,
-                    "comment": "pixel"
+                    "rule": "facebook\\.com/",
+                    "action": "block-ctl-fb"
                 }
             ]
         },
@@ -9765,9 +9750,23 @@
             "default": "ignore",
             "rules": [
                 {
+                    "rule": "facebook\\.net/.*/all\\.js",
+                    "surrogate": "fb-sdk.js",
+                    "action": "block-ctl-fb",
+                    "fingerprinting": 1,
+                    "cookies": 0.0000408
+                },
+                {
                     "rule": "facebook\\.net/.*/fbevents\\.js",
                     "fingerprinting": 1,
                     "cookies": 0.108
+                },
+                {
+                    "rule": "facebook\\.net/[a-z_A-Z]+/sdk\\.js",
+                    "surrogate": "fb-sdk.js",
+                    "action": "block-ctl-fb",
+                    "fingerprinting": 1,
+                    "cookies": 0.000334
                 },
                 {
                     "rule": "facebook\\.net/signals/config/",
@@ -9795,16 +9794,8 @@
                     "cookies": 0
                 },
                 {
-                    "rule": "facebook\\.net\\/\\/log\\/error",
-                    "fingerprinting": 0,
-                    "cookies": 0,
-                    "comment": "pixel"
-                },
-                {
-                    "rule": "facebook\\.net\\/en_US\\/fp\\.js",
-                    "fingerprinting": 0,
-                    "cookies": 0,
-                    "comment": "pixel"
+                    "rule": "facebook\\.net/",
+                    "action": "block-ctl-fb"
                 }
             ]
         },
@@ -11971,31 +11962,6 @@
                     "rule": "growsumo\\.com\\/growsumo\\.min\\.js",
                     "fingerprinting": 1,
                     "cookies": 0.0000817
-                }
-            ]
-        },
-        "gsitrix.com": {
-            "domain": "gsitrix.com",
-            "owner": {
-                "name": "GP One GmbH",
-                "displayName": "GP One"
-            },
-            "prevalence": 0.0000953,
-            "fingerprinting": 3,
-            "cookies": 0.0000953,
-            "categories": [],
-            "default": "ignore",
-            "rules": [
-                {
-                    "rule": "gsitrix\\.com\\/page\\/",
-                    "fingerprinting": 3,
-                    "cookies": 0.0000545
-                },
-                {
-                    "rule": "gsitrix\\.com\\/js\\/ax\\.php",
-                    "fingerprinting": 0,
-                    "cookies": 0,
-                    "comment": "pixel"
                 }
             ]
         },
@@ -28146,6 +28112,25 @@
             "categories": [],
             "default": "block"
         },
+        "uio.no": {
+            "domain": "uio.no",
+            "owner": {
+                "name": "Universitetet i Oslo",
+                "displayName": "Universitetet i Oslo"
+            },
+            "prevalence": 0.00000681,
+            "fingerprinting": 2,
+            "cookies": 0.00000681,
+            "categories": [],
+            "default": "ignore",
+            "rules": [
+                {
+                    "rule": "uio\\.no\\/js\\/analytics\\/v3\\/analytics\\.js",
+                    "fingerprinting": 2,
+                    "cookies": 0.0000136
+                }
+            ]
+        },
         "uk-v1.edgekey.net": {
             "domain": "uk-v1.edgekey.net",
             "owner": {
@@ -28943,6 +28928,25 @@
                             "electrek.co"
                         ]
                     }
+                }
+            ]
+        },
+        "visilabs.net": {
+            "domain": "visilabs.net",
+            "owner": {
+                "name": "Portakal Yazilim Danismanlik Reklamcilik ve Yayincilik San. Tic. A.S.",
+                "displayName": "Portakal Yazilim Danismanlik Reklamcilik ve Yayincilik San. Tic"
+            },
+            "prevalence": 0.0000545,
+            "fingerprinting": 2,
+            "cookies": 0.0000545,
+            "categories": [],
+            "default": "ignore",
+            "rules": [
+                {
+                    "rule": "visilabs\\.net/.*/Visilabs\\.min\\.js",
+                    "fingerprinting": 2,
+                    "cookies": 0.0000136
                 }
             ]
         },
@@ -30901,7 +30905,23 @@
                 "Content Delivery",
                 "Embedded Content"
             ],
-            "default": "ignore"
+            "default": "ignore",
+            "rules": [
+                {
+                    "rule": "youtube-nocookie\\.com/iframe_api",
+                    "surrogate": "youtube-iframe-api.js",
+                    "action": "block-ctl-yt"
+                },
+                {
+                    "rule": "youtube-nocookie\\.com/player_api",
+                    "surrogate": "youtube-iframe-api.js",
+                    "action": "block-ctl-yt"
+                },
+                {
+                    "rule": "youtube-nocookie\\.com/",
+                    "action": "block-ctl-yt"
+                }
+            ]
         },
         "youtube.com": {
             "domain": "youtube.com",
@@ -30919,7 +30939,23 @@
                 "Content Delivery",
                 "Embedded Content"
             ],
-            "default": "ignore"
+            "default": "ignore",
+            "rules": [
+                {
+                    "rule": "youtube\\.com/iframe_api",
+                    "surrogate": "youtube-iframe-api.js",
+                    "action": "block-ctl-yt"
+                },
+                {
+                    "rule": "youtube\\.com/player_api",
+                    "surrogate": "youtube-iframe-api.js",
+                    "action": "block-ctl-yt"
+                },
+                {
+                    "rule": "youtube\\.com/",
+                    "action": "block-ctl-yt"
+                }
+            ]
         },
         "zemanta.com": {
             "domain": "zemanta.com",
@@ -31236,6 +31272,25 @@
                 }
             ]
         },
+        "gov.bc.ca": {
+            "domain": "gov.bc.ca",
+            "owner": {
+                "name": "Government of the Province of British Columbia",
+                "displayName": "Government of the Province of British Columbia"
+            },
+            "prevalence": 0.000703,
+            "fingerprinting": 2,
+            "cookies": 0.000502,
+            "categories": [],
+            "default": "ignore",
+            "rules": [
+                {
+                    "rule": "gov\\.bc\\.ca\\/StaticWebResources\\/static\\/sp\\/sp-2-14-0\\.js",
+                    "fingerprinting": 2,
+                    "cookies": 0.000502
+                }
+            ]
+        },
         "google.ch": {
             "domain": "google.ch",
             "owner": {
@@ -31296,6 +31351,25 @@
                     "fingerprinting": 0,
                     "cookies": 0,
                     "comment": "pixel"
+                }
+            ]
+        },
+        "framasoft.org": {
+            "domain": "framasoft.org",
+            "owner": {
+                "name": "Alexis Kauffmann",
+                "displayName": "Alexis Kauffmann"
+            },
+            "prevalence": 0.000402,
+            "fingerprinting": 2,
+            "cookies": 0,
+            "categories": [],
+            "default": "ignore",
+            "rules": [
+                {
+                    "rule": "framasoft\\.org\\/nav\\/nav\\.js",
+                    "fingerprinting": 2,
+                    "cookies": 0
                 }
             ]
         },
@@ -39470,16 +39544,6 @@
             "prevalence": 0.0007,
             "displayName": "CleverDATA"
         },
-        "MAFRA, a.s.": {
-            "domains": [
-                "1gr.cz",
-                "emimino.cz",
-                "idnes.cz",
-                "lidovky.cz"
-            ],
-            "prevalence": 0.0054,
-            "displayName": "MAFRA"
-        },
         "RhythmOne": {
             "domains": [
                 "1rx.io",
@@ -44183,13 +44247,6 @@
             "prevalence": 0.0143,
             "displayName": "GrowSumo"
         },
-        "GP One GmbH": {
-            "domains": [
-                "gsitrix.com"
-            ],
-            "prevalence": 0.0095,
-            "displayName": "GP One"
-        },
         "buySAFE Inc": {
             "domains": [
                 "buysafe.com",
@@ -48541,6 +48598,13 @@
             "prevalence": 0,
             "displayName": "uidapi.com"
         },
+        "Universitetet i Oslo": {
+            "domains": [
+                "uio.no"
+            ],
+            "prevalence": 0.0007,
+            "displayName": "Universitetet i Oslo"
+        },
         "SEOPULT LTD": {
             "domains": [
                 "getsale.io",
@@ -48692,6 +48756,13 @@
             ],
             "prevalence": 0.282,
             "displayName": "Soluciones Corporativas IP"
+        },
+        "Portakal Yazilim Danismanlik Reklamcilik ve Yayincilik San. Tic. A.S.": {
+            "domains": [
+                "visilabs.net"
+            ],
+            "prevalence": 0.0054,
+            "displayName": "Portakal Yazilim Danismanlik Reklamcilik ve Yayincilik San. Tic"
         },
         "Wingify": {
             "domains": [
@@ -49204,6 +49275,14 @@
             "prevalence": 0.0041,
             "displayName": "Telstra"
         },
+        "Government of the Province of British Columbia": {
+            "domains": [
+                "gov.bc.ca",
+                "healthlinkbc.ca"
+            ],
+            "prevalence": 0.0007,
+            "displayName": "Government of the Province of British Columbia"
+        },
         "opencmp.net": {
             "domains": [
                 "opencmp.net"
@@ -49217,6 +49296,13 @@
             ],
             "prevalence": 0,
             "displayName": "axept.io"
+        },
+        "Alexis Kauffmann": {
+            "domains": [
+                "framasoft.org"
+            ],
+            "prevalence": 0.0402,
+            "displayName": "Alexis Kauffmann"
         },
         "J S WEB PRODUCTION": {
             "domains": [
@@ -50308,10 +50394,6 @@
         "datacamp.com": "DataCamp Limited",
         "rdocumentation.org": "DataCamp Limited",
         "1dmp.io": "CleverDATA LLC",
-        "1gr.cz": "MAFRA, a.s.",
-        "emimino.cz": "MAFRA, a.s.",
-        "idnes.cz": "MAFRA, a.s.",
-        "lidovky.cz": "MAFRA, a.s.",
         "1rx.io": "RhythmOne",
         "allmovie.com": "RhythmOne",
         "allmusic.com": "RhythmOne",
@@ -53932,7 +54014,6 @@
         "tvfanatic.com": "Mediavine, Inc.",
         "growsumo.com": "GrowSumo Inc.",
         "grsm.io": "GrowSumo Inc.",
-        "gsitrix.com": "GP One GmbH",
         "buysafe.com": "buySAFE Inc",
         "guarantee-cdn.com": "buySAFE Inc",
         "gumgum.com": "GumGum",
@@ -55884,6 +55965,7 @@
         "ubembed.com": "Unbounce",
         "unbounce.com": "Unbounce",
         "uidapi.com": "uidapi.com",
+        "uio.no": "Universitetet i Oslo",
         "getsale.io": "SEOPULT LTD",
         "ulogin.ru": "SEOPULT LTD",
         "unbxdapi.com": "Unbxd Software Private Limited",
@@ -55922,6 +56004,7 @@
         "videohub.tv": "Tremor Video DSP",
         "eleconomista.es": "Soluciones Corporativas IP, SL",
         "vidoomy.com": "Soluciones Corporativas IP, SL",
+        "visilabs.net": "Portakal Yazilim Danismanlik Reklamcilik ve Yayincilik San. Tic. A.S.",
         "pushcrew.com": "Wingify",
         "visualwebsiteoptimizer.com": "Wingify",
         "vwo.com": "Wingify",
@@ -56127,8 +56210,11 @@
         "shop.pe": "Add Shoppers",
         "telstra.com": "Telstra Corporation Limited",
         "telstra.com.au": "Telstra Corporation Limited",
+        "gov.bc.ca": "Government of the Province of British Columbia",
+        "healthlinkbc.ca": "Government of the Province of British Columbia",
         "opencmp.net": "opencmp.net",
         "axept.io": "axept.io",
+        "framasoft.org": "Alexis Kauffmann",
         "ad2perf.com": "J S WEB PRODUCTION",
         "moxielinks.com": "J S WEB PRODUCTION",
         "veoxa.com": "J S WEB PRODUCTION",

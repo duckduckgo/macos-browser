@@ -932,7 +932,7 @@
                     "ruleActions": [
                         "block-ctl-fb"
                     ],
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "Youtube": {
                     "ruleActions": [
@@ -941,8 +941,8 @@
                     "state": "disabled"
                 }
             },
-            "state": "disabled",
-            "hash": "770f7ae0f752e976764771bccec352b2"
+            "state": "enabled",
+            "hash": "36e8971fa9bb204b78a5929a14a108dd"
         },
         "clickToPlay": {
             "exceptions": [
@@ -959,7 +959,7 @@
                     "ruleActions": [
                         "block-ctl-fb"
                     ],
-                    "state": "disabled"
+                    "state": "enabled"
                 }
             },
             "state": "enabled",
