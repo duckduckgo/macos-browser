@@ -68,6 +68,7 @@ class OnboardingTests: XCTestCase {
         XCTAssertEqual(0, delegate.hasFinishedCalled)
     }
 
+    @MainActor
     func testWhenSetDefaultPressedDelegateIsCalled() {
         let model = OnboardingViewModel(delegate: delegate)
         XCTAssertEqual(0, delegate.didRequestImportDataCalled)
