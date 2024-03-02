@@ -85,11 +85,9 @@ jobs:
         github-token: ${{ github.token }}
 
     - name: Store created tag in a file artifact
-      if: github.event_name == 'workflow_call'
       run: echo ${{ steps.create-tag.outputs.tag }} > .github/tag
 
     - name: Upload tag artifact
-      if: github.event_name == 'workflow_call'
       uses: actions/upload-artifact@v4
       with:
         name: tag
