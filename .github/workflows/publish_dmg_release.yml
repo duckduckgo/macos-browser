@@ -28,9 +28,9 @@ on:
     secrets:
       ASANA_ACCESS_TOKEN:
         required: true
-      TEST_AWS_ACCESS_KEY_ID:
+      TEST_AWS_ACCESS_KEY_ID_RELEASE_S3:
         required: true
-      TEST_AWS_SECRET_ACCESS_KEY:
+      TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3:
         required: true
       GHA_ELEVATED_PERMISSIONS_TOKEN:
         required: true
