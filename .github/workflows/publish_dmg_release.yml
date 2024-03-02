@@ -87,9 +87,9 @@ jobs:
       - name: Set tag variable
         run: |
           if [[ "${{ steps.download-tag.outcome }}" == 'success' ]]; then
-            echo "tag=$(<.github/tag)" >> $GITHUB_ENV
+            echo "TAG=$(<.github/tag)" >> $GITHUB_ENV
           else
-            echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+            echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
           fi
 
       - name: Verify the tag
@@ -97,11 +97,11 @@ jobs:
         run: |
           tag_regex='^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$'
 
-          if [[ ! "$tag" =~ $tag_regex ]]; then
-            echo "::error::The provided tag ($tag) has incorrect format (attempted to match ${tag_regex})."
+          if [[ ! "$TAG" =~ $tag_regex ]]; then
+            echo "::error::The provided tag ($TAG) has incorrect format (attempted to match ${tag_regex})."
             exit 1
           fi
-          echo "release-version=${tag//-/.}" >> $GITHUB_OUTPUT
+          echo "release-version=${TAG//-/.}" >> $GITHUB_OUTPUT
 
       - name: Check out the code
         uses: actions/checkout@v4
@@ -247,7 +247,6 @@ jobs:
           echo "RELEASE_BUCKET_NAME=${{ vars.TEST_RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_PREFIX=${{ vars.TEST_RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
-          echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
           echo "VERSION=${{ steps.verify-tag.outputs.release-version }}" >> $GITHUB_ENV
           echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
 
