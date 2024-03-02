@@ -28,9 +28,9 @@ on:
     secrets:
       ASANA_ACCESS_TOKEN:
         required: true
-      AWS_ACCESS_KEY_ID:
+      AWS_ACCESS_KEY_ID_RELEASE_S3:
         required: true
-      AWS_SECRET_ACCESS_KEY:
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3:
         required: true
       GHA_ELEVATED_PERMISSIONS_TOKEN:
         required: true
