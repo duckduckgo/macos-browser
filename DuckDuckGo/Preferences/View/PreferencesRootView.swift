@@ -53,7 +53,8 @@ enum Preferences {
 
                             switch model.selectedPane {
                             case .defaultBrowser:
-                                DefaultBrowserView(defaultBrowserModel: DefaultBrowserPreferences.shared)
+                                DefaultBrowserView(defaultBrowserModel: DefaultBrowserPreferences.shared,
+                                                   status: PrivacyProtectionStatus.status(for: .defaultBrowser))
                             case .privateSearch:
                                 PrivateSearchView(model: SearchPreferences.shared)
                             case .webTrackingProtection:

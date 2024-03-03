@@ -26,9 +26,15 @@ extension Preferences {
 
     struct DefaultBrowserView: View {
         @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
+        let status: PrivacyProtectionStatus
 
         var body: some View {
             PreferencePane("Default Browser App") {
+
+                // Status Indicator
+                if let status = status.status {
+                    StatusIndicatorView(status: status).padding(.top, -20)
+                }
 
                 // SECTION 1: Default Browser
                 PreferencePaneSection {
@@ -36,7 +42,6 @@ extension Preferences {
                     PreferencePaneSubSection {
                         HStack {
                             if defaultBrowserModel.isDefault {
-                                Image("SolidCheckmark")
                                 Text(UserText.isDefaultBrowser)
                             } else {
                                 Image("Warning").foregroundColor(Color("LinkBlueColor"))

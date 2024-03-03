@@ -5158,6 +5158,7 @@
 				37CD54C127F2FDD100F1F7B9 /* FireButtonPreferences.swift */,
 				37F19A6628E1B43200740DC6 /* DuckPlayerPreferences.swift */,
 				37CD54C527F2FDD100F1F7B9 /* AboutModel.swift */,
+				1D220BFB2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -5234,7 +5235,6 @@
 				37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */,
 				37AFCE8627DA334800471A10 /* PreferencesRootView.swift */,
 				37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */,
-				1D220BFB2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift */,
 				37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */,
 				1D01A3D72B88DF8B00FE8150 /* PreferencesSyncView.swift */,
 				1DDC84FA2B8356CE00670238 /* PreferencesDefaultBrowserView.swift */,
