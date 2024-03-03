@@ -251,8 +251,11 @@ final class PasswordManagementItemListModel: ObservableObject {
             updateFilteredData()
 
             /*
-             Note 1: The following fixes an long-standing issue where the relevant empty state is not displayed while switching autofill types when we have not autofill data.
-             Note 2: Not an ideal solution, however, until we better unify how state (e.g displayedSections, emptyState) is managed/updated in this type, this solution is acceptable.
+             Note: 
+             - The following fixes an long-standing issue where the relevant empty state is not displayed
+               while switching autofill types when we have no autofill data.
+             - Not an ideal solution, but acceptable until we better unify how we manage Autofill
+               state (e.g displayedSections, emptyState)
              */
             if emptyState == .noData {
                 calculateEmptyState()
