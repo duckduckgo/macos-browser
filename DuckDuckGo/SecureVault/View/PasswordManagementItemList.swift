@@ -185,7 +185,7 @@ private struct PasswordManagementItemStackContentsView: View {
             ExternalPasswordManagerItemSection(model: model)
         }
 
-        ForEach(Array(model.displayedItems.enumerated()), id: \.offset) { index, section in
+        ForEach(Array(model.displayedSections.enumerated()), id: \.offset) { index, section in
             Section(header: Text(section.title).padding(.leading, 18).padding(.top, index == 0 ? 0 : 10)) {
 
                 ForEach(section.items, id: \.id) { item in

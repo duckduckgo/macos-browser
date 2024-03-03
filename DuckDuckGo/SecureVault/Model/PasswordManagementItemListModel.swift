@@ -250,6 +250,14 @@ final class PasswordManagementItemListModel: ObservableObject {
             clearSelection()
             updateFilteredData()
 
+            /*
+             Note 1: The following fixes an long-standing issue where the relevant empty state is not displayed while switching autofill types when we have not autofill data.
+             Note 2: Not an ideal solution, however, until we better unify how state (e.g displayedSections, emptyState) is managed/updated in this type, this solution is acceptable.
+             */
+            if emptyState == .noData {
+                calculateEmptyState()
+            }
+
             // Select first item if no previous selection was provided
             if selected == nil {
                 selectFirst()
@@ -257,7 +265,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         }
     }
 
-    @Published private(set) var displayedItems = [PasswordManagementListSection]() {
+    @Published private(set) var displayedSections = [PasswordManagementListSection]() {
         didSet {
             calculateEmptyState()
         }
@@ -315,7 +323,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func select(item: SecureVaultItem, notify: Bool = true) {
-        for section in displayedItems {
+        for section in displayedSections {
             if let first = section.items.first(where: { $0 == item }) {
                 selected(item: first, notify: notify)
                 return
@@ -341,7 +349,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         // If there are no matches for autofill, just pick the first item in the list
         if let match = bestMatch.first {
 
-            for section in displayedItems {
+            for section in displayedSections {
                 if let account = section.items.first(where: {
                     $0.websiteAccount?.username == match.username &&
                     $0.websiteAccount?.domain == match.domain &&
@@ -361,13 +369,13 @@ final class PasswordManagementItemListModel: ObservableObject {
             items[index] = item
         }
 
-        var sections = displayedItems
+        var sections = displayedSections
 
         guard let sectionIndex = sections.firstIndex(where: {
             $0.items.contains(item)
         }) else { return }
 
-        let updatedSection = displayedItems[sectionIndex]
+        let updatedSection = displayedSections[sectionIndex]
         var updatedSectionItems = updatedSection.items
 
         guard let updatedItemIndex = updatedSectionItems.firstIndex(where: {
@@ -377,7 +385,7 @@ final class PasswordManagementItemListModel: ObservableObject {
         updatedSectionItems[updatedItemIndex] = item
         sections[sectionIndex] = updatedSection.withUpdatedItems(updatedSectionItems)
 
-        displayedItems = sections
+        displayedSections = sections
     }
 
     func updateFilteredData() {
@@ -388,18 +396,17 @@ final class PasswordManagementItemListModel: ObservableObject {
             itemsByCategory = itemsByCategory.filter { $0.item(matches: filter) }
         }
 
-        if displayedItems.isEmpty && items.isEmpty {
-            calculateEmptyState()
+        if displayedSections.isEmpty && items.isEmpty {
             return
         }
 
         switch sortDescriptor.parameter {
         case .title:
-            displayedItems = PasswordManagementListSection.sectionsByTLD(with: itemsByCategory, order: sortDescriptor.order)
+            displayedSections = PasswordManagementListSection.sectionsByTLD(with: itemsByCategory, order: sortDescriptor.order)
         case .dateCreated:
-            displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.created, order: sortDescriptor.order)
+            displayedSections = PasswordManagementListSection.sections(with: itemsByCategory, by: \.created, order: sortDescriptor.order)
         case .dateModified:
-            displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.lastUpdated, order: sortDescriptor.order)
+            displayedSections = PasswordManagementListSection.sections(with: itemsByCategory, by: \.lastUpdated, order: sortDescriptor.order)
         }
     }
 
@@ -408,7 +415,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         if passwordManagerCoordinator.isEnabled && (sortDescriptor.category == .allItems || sortDescriptor.category == .logins) {
             externalPasswordManagerSelected = true
-        } else if let firstSection = displayedItems.first, let selectedItem = firstSection.items.first {
+        } else if let firstSection = displayedSections.first, let selectedItem = firstSection.items.first {
             selected(item: selectedItem)
         } else {
             selected(item: nil)
@@ -464,7 +471,7 @@ final class PasswordManagementItemListModel: ObservableObject {
             return
         }
 
-        guard displayedItems.isEmpty else {
+        guard displayedSections.isEmpty else {
             emptyState = .none
             return
         }

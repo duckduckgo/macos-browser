@@ -347,7 +347,7 @@ final class PasswordManagementViewController: NSViewController {
             self?.searchField.stringValue = text
             self?.updateFilter()
 
-            if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
+            if clearWhenNoMatches && self?.listModel?.displayedSections.isEmpty == true {
                 self?.searchField.stringValue = ""
                 self?.updateFilter()
             } else if self?.isDirty == false {
