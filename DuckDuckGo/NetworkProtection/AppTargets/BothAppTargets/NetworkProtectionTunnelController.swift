@@ -464,23 +464,20 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async {
+        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionStartAttempt,
+                      frequency: .dailyAndContinuous)
         controllerErrorStore.lastErrorMessage = nil
 
-#if NETP_SYSTEM_EXTENSION
         do {
+#if NETP_SYSTEM_EXTENSION
             try await activateSystemExtension { [weak self] in
                 // If we're waiting for user approval we wanna make sure the
                 // onboarding step is set correctly.  This can be useful to
                 // help prevent the value from being de-synchronized.
                 self?.onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
             }
-        } catch {
-            await stop()
-            return
-        }
 #endif
 
-        do {
             let tunnelManager: NETunnelProviderManager
 
             do {
@@ -502,14 +499,27 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 break
             default:
                 try await start(tunnelManager)
+
+                // It's important to note that we've seen instances where the above call to start()
+                // doesn't throw any errors, yet the tunnel fails to start.  In any case this pixel
+                // should be interpreted as "the controller successfully requrested the tunnel to be
+                // started".  Meaning there's no error caught in this start attempt.  There are pixels
+                // in the packet tunnel provider side that can be used to debug additional logic.
+                //
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionStartSuccess,
+                              frequency: .dailyAndContinuous)
             }
         } catch {
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionStartFailed, frequency: .standard, withError: error, includeAppVersionParameter: true
+                NetworkProtectionPixelEvent.networkProtectionStartFailed, frequency: .dailyAndContinuous, withError: error, includeAppVersionParameter: true
             )
 
             await stop()
-            controllerErrorStore.lastErrorMessage = error.localizedDescription
+
+            // Always keep the first error message shown, as it's the more actionable one.
+            if controllerErrorStore.lastErrorMessage == nil {
+                controllerErrorStore.lastErrorMessage = error.localizedDescription
+            }
         }
     }
 
