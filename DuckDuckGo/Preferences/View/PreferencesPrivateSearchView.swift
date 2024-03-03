@@ -28,17 +28,25 @@ extension Preferences {
         @ObservedObject var model: SearchPreferences
 
         var body: some View {
-            PreferencePane("Private Search") {
+            PreferencePane("Private Search", spacing: 20) {
+
+                // Status Indicator
+                StatusIndicatorView(status: .alwaysOn, isLarge: true).padding(.top, -16)
 
                 // SECTION 1: Description
-                DescriptionView(imageName: "PrivateSearch",
-                                header: "Private Search",
-                                description: UserText.privateSearchExplenation,
-                                learnMoreUrl: .privateSearchLearnMore,
-                                status: .alwaysOn)
+                PreferencePaneSection {
+                    VStack(alignment: .leading, spacing: 1) {
+                        TextMenuItemCaption(UserText.privateSearchExplenation)
+                        TextButton(UserText.learnMore) {
+                            WindowControllersManager.shared.show(url: .privateSearchLearnMore,
+                                                                 source: .ui,
+                                                                 newTab: true)
+                        }
+                    }
+                }
 
                 // SECTION 2: Search Settings
-                PreferencePaneSection("Search Settings") {
+                PreferencePaneSection {
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
             }
@@ -48,6 +56,7 @@ extension Preferences {
 
 extension Preferences {
 
+    //!TODO REMOVE
     struct DescriptionView: View {
         let imageName: String
         let header: String

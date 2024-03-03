@@ -91,15 +91,24 @@ extension Preferences {
 
     struct StatusIndicatorView: View {
         var status: StatusIndicator
+        var isLarge: Bool = false
+
+        private var fontSize: CGFloat {
+            isLarge ? 13 : 10
+        }
+
+        private var circleSize: CGFloat {
+            isLarge ? 7 : 5
+        }
 
         var body: some View {
-            HStack(spacing: 4) {
+            HStack(spacing: isLarge ? 6 : 4) {
                 Circle()
-                    .frame(width: 5, height: 5)
+                    .frame(width: circleSize, height: circleSize)
                     .foregroundColor(colorForStatus(status))
 
                 Text(status.text)
-                    .font(.system(size: 10))
+                    .font(.system(size: fontSize))
                     .foregroundColor(.secondary)
             }
         }
