@@ -287,6 +287,20 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
     }
 
+    // MARK: - Debug Command support
+
+    func relay(_ command: DebugCommand) async throws {
+        guard await isConnected,
+              let session = await session else {
+            return
+        }
+
+        let errorMessage: ExtensionMessageString? = try await session.sendProviderRequest(.debugCommand(command))
+        if let errorMessage {
+            throw TunnelFailureError(errorDescription: errorMessage.value)
+        }
+    }
+
     // MARK: - Tunnel Configuration
 
     /// Setups the tunnel manager if it's not set up already.
