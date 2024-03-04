@@ -165,7 +165,7 @@ final class BookmarkNode: Hashable {
         // The Node class will most frequently represent Bookmark entities and PseudoFolders. Because of this, their unique properties are
         // used to derive the hash for the node so that equality can be handled based on the represented object.
         if let entity = self.representedObject as? BaseBookmarkEntity {
-            hasher.combine(entity.id)
+            hasher.combine(entity.hashValue)
         } else if let folder = self.representedObject as? PseudoFolder {
             hasher.combine(folder.name)
         } else {
@@ -176,7 +176,8 @@ final class BookmarkNode: Hashable {
     // MARK: - Equatable
 
     class func == (lhs: BookmarkNode, rhs: BookmarkNode) -> Bool {
-        return lhs === rhs
+        return lhs.uniqueID == rhs.uniqueID &&
+        lhs.representedObjectEquals(rhs.representedObject)
     }
 
 }

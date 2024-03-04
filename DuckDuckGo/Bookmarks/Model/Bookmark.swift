@@ -19,7 +19,7 @@
 import Cocoa
 import Bookmarks
 
-internal class BaseBookmarkEntity: Identifiable {
+internal class BaseBookmarkEntity: Identifiable, Equatable, Hashable {
 
     static func singleEntity(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
@@ -92,6 +92,22 @@ internal class BaseBookmarkEntity: Identifiable {
         }
     }
 
+    func isEqual(to instance: BaseBookmarkEntity) -> Bool {
+        id == instance.id &&
+        title == instance.title &&
+        isFolder == instance.isFolder
+    }
+
+    static func == (lhs: BaseBookmarkEntity, rhs: BaseBookmarkEntity) -> Bool {
+        return type(of: lhs) == type(of: rhs) && lhs.isEqual(to: rhs)
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(isFolder)
+    }
+
 }
 
 final class BookmarkFolder: BaseBookmarkEntity {
@@ -129,6 +145,26 @@ final class BookmarkFolder: BaseBookmarkEntity {
 
         super.init(id: id, title: title, isFolder: true)
     }
+
+    override func isEqual(to instance: BaseBookmarkEntity) -> Bool {
+        guard let folder = instance as? BookmarkFolder else {
+            return false
+        }
+        return id == folder.id &&
+        title == folder.title &&
+        isFolder == folder.isFolder &&
+        parentFolderUUID == folder.parentFolderUUID &&
+        children == folder.children
+    }
+
+    override func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(isFolder)
+        hasher.combine(parentFolderUUID)
+        hasher.combine(children)
+    }
+
 }
 
 final class Bookmark: BaseBookmarkEntity {
@@ -183,7 +219,6 @@ final class Bookmark: BaseBookmarkEntity {
                   parentFolderUUID: bookmark.parentFolderUUID)
     }
 
-}
     convenience init(from bookmark: Bookmark, withNewUrl url: String, title: String, isFavorite: Bool) {
         self.init(id: bookmark.id,
                   url: url,
@@ -192,10 +227,25 @@ final class Bookmark: BaseBookmarkEntity {
                   parentFolderUUID: bookmark.parentFolderUUID)
     }
 
-extension BaseBookmarkEntity: Equatable {
+    override func isEqual(to instance: BaseBookmarkEntity) -> Bool {
+        guard let bookmark = instance as? Bookmark else {
+            return false
+        }
+        return id == bookmark.id &&
+        title == bookmark.title &&
+        isFolder == bookmark.isFolder &&
+        url == bookmark.url &&
+        isFavorite == bookmark.isFavorite &&
+        parentFolderUUID == bookmark.parentFolderUUID
+    }
 
-    static func == (lhs: BaseBookmarkEntity, rhs: BaseBookmarkEntity) -> Bool {
-        return lhs.id == rhs.id
+    override func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(isFolder)
+        hasher.combine(url)
+        hasher.combine(isFavorite)
+        hasher.combine(parentFolderUUID)
     }
 
 }
