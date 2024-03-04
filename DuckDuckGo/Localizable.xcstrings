@@ -8027,18 +8027,6 @@
         }
       }
     },
-    "preferences.appearance.zoom" : {
-      "comment" : "Zoom settings section title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Zoom"
-          }
-        }
-      }
-    },
     "preferences.appearance.zoom-picker" : {
       "comment" : "Default page zoom picker title",
       "extractionState" : "extracted_with_value",

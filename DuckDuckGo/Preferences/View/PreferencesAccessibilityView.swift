@@ -31,7 +31,7 @@ extension Preferences {
             PreferencePane("Accessibility") {
 
                 // SECTION 1: Zoom Setting
-                PreferencePaneSection(UserText.zoomSettingTitle) {
+                PreferencePaneSection {
 
                     HStack {
                         Text(UserText.zoomPickerTitle)
