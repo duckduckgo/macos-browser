@@ -48,7 +48,9 @@ runs:
       shell: bash
       env:
         ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         TEMPLATE_PATH: ${{ github.action_path }}/templates/${{ inputs.template-name }}.yml
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         if [ ! -f $TEMPLATE_PATH ]; then
           echo "::error::Template file not found at $TEMPLATE_PATH"
@@ -64,6 +66,7 @@ runs:
       shell: bash
       env:
         ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         NOTES: ${{ inputs.notes }}
         TASK_NAME: ${{ inputs.task-name }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -76,6 +79,7 @@ runs:
       shell: bash
       env:
         ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         HTML_NOTES: ${{ inputs.html-notes }}
         TASK_NAME: ${{ inputs.task-name }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
