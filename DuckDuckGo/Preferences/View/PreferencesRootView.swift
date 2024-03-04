@@ -31,7 +31,7 @@ import SubscriptionUI
 enum Preferences {
 
     enum Const {
-        static let sidebarWidth: CGFloat = 300
+        static let sidebarWidth: CGFloat = 310
         static let paneContentWidth: CGFloat = 524
         static let panePaddingHorizontal: CGFloat = 48
         static let panePaddingVertical: CGFloat = 40
@@ -87,6 +87,9 @@ enum Preferences {
                                 AccessibilityView(model: AccessibilityPreferences.shared)
                             case .duckPlayer:
                                 DuckPlayerView(model: .shared)
+                            case .otherPlatforms:
+                                // Opens a new tab
+                                Spacer()
                             case .about:
 #if NETWORK_PROTECTION
                                 let netPInvitePresenter = NetworkProtectionInvitePresenter()

@@ -125,7 +125,16 @@ final class PreferencesSidebarModel: ObservableObject {
         }
     }
 
+    @MainActor
     func selectPane(_ identifier: PreferencePaneIdentifier) {
+        // Open a new tab in case of special panes
+        if identifier.rawValue.hasPrefix(URL.NavigationalScheme.https.rawValue),
+            let url = URL(string: identifier.rawValue) {
+            WindowControllersManager.shared.show(url: url,
+                                                 source: .ui,
+                                                 newTab: true)
+        }
+
         if sections.flatMap(\.panes).contains(identifier), identifier != selectedPane {
             selectedPane = identifier
         }

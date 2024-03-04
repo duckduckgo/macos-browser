@@ -71,12 +71,14 @@ struct PreferencesSection: Hashable, Identifiable {
             .init(id: .privacyProtections, panes: privacyPanes),
             (shouldIncludeSubscriptionPane ? .init(id: .privacyPro, panes: [.subscription]) : nil),
             .init(id: .regularPreferencePanes, panes: regularPanes),
+            .init(id: .nextSteps, panes: [.otherPlatforms]),
             .init(id: .about, panes: [.about])
         ].compactMap { $0 }
 #else
         return [
             .init(id: .privacyProtections, panes: privacyPanes),
             .init(id: .regularPreferencePanes, panes: regularPanes),
+            .init(id: .nextSteps, panes: [.otherPlatforms]),
             .init(id: .about, panes: [.about])
         ].compactMap { $0 }
 #endif
@@ -87,6 +89,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
     case privacyProtections
     case privacyPro
     case regularPreferencePanes
+    case nextSteps
     case about
 
     var displayName: String? {
@@ -97,6 +100,8 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
             return nil
         case .regularPreferencePanes:
             return "Main Settings"
+        case .nextSteps:
+            return "Next Steps"
         case .about:
             return nil
         }
@@ -124,6 +129,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case autofill
     case accessibility
     case duckPlayer = "duckplayer"
+    case otherPlatforms = "https://duckduckgo.com/app"
     case about
 
     var id: Self {
@@ -187,6 +193,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.duckPlayer
         case .about:
             return UserText.about
+        case .otherPlatforms:
+            return "DuckDuckGo on Other Platforms"
         }
     }
 
@@ -220,12 +228,14 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
 #endif
         case .autofill:
             return "Autofill"
+        case .accessibility:
+            return "Accessibility"
         case .duckPlayer:
             return "DuckPlayerSettings"
         case .about:
             return "About"
-        case .accessibility:
-            return "Accessibility"
+        case .otherPlatforms:
+            return "OtherPlatformsPreferences"
         }
     }
 }
