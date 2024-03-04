@@ -28,15 +28,27 @@ extension Preferences {
         @ObservedObject var model: CookiePopupProtectionPreferences
 
         var body: some View {
-            PreferencePane("Cookie Pop-up Protection") {
+            PreferencePane("Cookie Pop-up Protection", spacing: 20) {
+
+                // Status Indicator
+                StatusIndicatorView(status: model.isAutoconsentEnabled ? .on : .off, isLarge: true).padding(.top, -16)
 
                 // SECTION 1: Description
-                DescriptionView(imageName: "CookiePopupProtection",
-                                header: "Cookie Pop-up Protection",
-                                description: UserText.autoconsentExplanation,
-                                learnMoreUrl: .cookieConsentPopUpManagement,
-                                status: model.isAutoconsentEnabled ? .on : .off)
-                ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
+                PreferencePaneSection {
+                    VStack(alignment: .leading, spacing: 1) {
+                        TextMenuItemCaption(UserText.autoconsentExplanation)
+                        TextButton(UserText.learnMore) {
+                            WindowControllersManager.shared.show(url: .cookieConsentPopUpManagement,
+                                                                 source: .ui,
+                                                                 newTab: true)
+                        }
+                    }
+                }
+
+                // SECTION 2: Search Settings
+                PreferencePaneSection {
+                    ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
+                }
             }
         }
     }

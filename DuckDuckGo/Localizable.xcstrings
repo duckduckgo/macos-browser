@@ -479,7 +479,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you."
+            "value" : "When DuckDuckGo detects cookie pop-ups on sites you visit, we can automatically set your cookie preferences to minimize cookies and maximize privacy, then close pop-ups."
           }
         }
       }
