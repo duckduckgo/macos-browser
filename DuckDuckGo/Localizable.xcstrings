@@ -568,6 +568,9 @@
         }
       }
     },
+    "Autofill enabled in this browser for " : {
+
+    },
     "autofill.addresses" : {
       "comment" : "Autofill autosaved data type",
       "extractionState" : "extracted_with_value",

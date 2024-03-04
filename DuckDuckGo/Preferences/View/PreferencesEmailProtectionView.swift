@@ -29,17 +29,29 @@ extension Preferences {
         @ObservedObject var protectionStatus: PrivacyProtectionStatus = PrivacyProtectionStatus.status(for: .emailProtection)
 
             var body: some View {
-                PreferencePane("Email Protection") {
+                PreferencePane("Email Protection", spacing: 20) {
+
+                    // Status Indicator
+                    StatusIndicatorView(status: protectionStatus.status ?? .off, isLarge: true).padding(.top, -16)
 
                     // SECTION 1: Description
-                    DescriptionView(imageName: "WebTrackingProtection",
-                                    header: "Email Protection",
-                                    description: UserText.emailProtectionExplanation,
-                                    learnMoreUrl: .duckDuckGoEmailInfo,
-                                    status: protectionStatus.status ?? .off)
+                    PreferencePaneSection {
+                        VStack(alignment: .leading, spacing: 1) {
+                            TextMenuItemCaption(UserText.emailProtectionExplanation)
+                            TextButton(UserText.learnMore) {
+                                WindowControllersManager.shared.show(url: .duckDuckGoEmailInfo,
+                                                                     source: .ui,
+                                                                     newTab: true)
+                            }
+                        }
+                    }
 
+                    // SECTION 2: Email Info
                     PreferencePaneSubSection {
                         if emailManager.isSignedIn {
+                            if let userEmail = emailManager.userEmail {
+                                Text("Autofill enabled in this browser for ").foregroundColor(Color("GreyTextColor")) + Text(userEmail).bold()
+                            }
                             Button(UserText.emailOptionsMenuManageAccountSubItem + "…") {
                                 WindowControllersManager.shared.show(url: EmailUrls().emailProtectionAccountLink,
                                                                      source: .ui,
