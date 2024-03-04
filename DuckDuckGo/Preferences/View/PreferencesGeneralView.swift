@@ -46,25 +46,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 2: Downloads
-                PreferencePaneSection(UserText.downloads) {
-
-                    PreferencePaneSubSection {
-                        Text(UserText.downloadsLocation + ":").bold()
-                        HStack {
-                            NSPathControlView(url: downloadsModel.selectedDownloadLocation)
-#if !APPSTORE
-                            Button(UserText.downloadsChangeDirectory) {
-                                downloadsModel.presentDownloadDirectoryPanel()
-                            }
-#endif
-                        }
-                        .disabled(downloadsModel.alwaysRequestDownloadLocation)
-                        ToggleMenuItem(UserText.downloadsAlwaysAsk, isOn: $downloadsModel.alwaysRequestDownloadLocation)
-                    }
-                }
-
-                // SECTION 3: Home Page
+                // SECTION 2: Home Page
                 PreferencePaneSection(UserText.homePage) {
 
                     PreferencePaneSubSection {
@@ -97,7 +79,7 @@ extension Preferences {
                                     Text(UserText.homeButtonMode(for: position)).tag(position)
                                 }
                             }
-                            .scaledToFit()
+                            .frame(width: 200)
                             .onChange(of: startupModel.homeButtonPosition) { _ in
                                 startupModel.updateHomeButton()
                             }
@@ -108,6 +90,23 @@ extension Preferences {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
+                // SECTION 3: Downloads
+                PreferencePaneSection(UserText.downloads) {
+
+                    PreferencePaneSubSection {
+                        Text(UserText.downloadsLocation + ":").bold()
+                        HStack {
+                            NSPathControlView(url: downloadsModel.selectedDownloadLocation)
+    #if !APPSTORE
+                            Button(UserText.downloadsChangeDirectory) {
+                                downloadsModel.presentDownloadDirectoryPanel()
+                            }
+    #endif
+                        }
+                        .disabled(downloadsModel.alwaysRequestDownloadLocation)
+                        ToggleMenuItem(UserText.downloadsAlwaysAsk, isOn: $downloadsModel.alwaysRequestDownloadLocation)
+                    }
+                }
             }
         }
     }
