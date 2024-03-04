@@ -128,8 +128,7 @@ enum Preferences {
             }
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
-                                                                      openURLHandler: openURL,
-                                                                      goToSyncPreferences: { self.model.selectPane(.sync) })
+                                                                      openURLHandler: openURL)
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 openVPNHandler: openVPN,

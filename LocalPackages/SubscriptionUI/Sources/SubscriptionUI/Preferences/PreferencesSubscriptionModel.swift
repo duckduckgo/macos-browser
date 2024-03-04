@@ -80,7 +80,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if accountManager.isUserAuthenticated {
             ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
         }
     }
 
