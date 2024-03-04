@@ -123,6 +123,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     .failedToParseLocationListResponse:
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
+            case .vpnAccessRevoked:
+                // todo
+                return
             }
 
             PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
@@ -226,7 +229,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                              serviceName: Self.tokenServiceName,
-                                                             errorEvents: debugEvents)
+                                                             errorEvents: debugEvents,
+                                                             isSubscriptionEnabled: false)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings)
 
         super.init(notificationsPresenter: notificationsPresenter,
@@ -236,7 +240,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    tokenStore: tokenStore,
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
-                   settings: settings)
+                   settings: settings,
+                   isSubscriptionEnabled: false,
+                   entitlementCheck: nil)
 
         observeServerChanges()
         observeStatusUpdateRequests()
