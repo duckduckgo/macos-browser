@@ -184,6 +184,13 @@ final class Bookmark: BaseBookmarkEntity {
     }
 
 }
+    convenience init(from bookmark: Bookmark, withNewUrl url: String, title: String, isFavorite: Bool) {
+        self.init(id: bookmark.id,
+                  url: url,
+                  title: title,
+                  isFavorite: isFavorite,
+                  parentFolderUUID: bookmark.parentFolderUUID)
+    }
 
 extension BaseBookmarkEntity: Equatable {
 
