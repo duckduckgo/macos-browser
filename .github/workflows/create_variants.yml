@@ -83,7 +83,6 @@ jobs:
           echo "atb-variants=${atb_variants}" >> $GITHUB_ENV
           variant_matrix="$(sed 's/,/\",\"/g' <<< "${atb_variants}")"
           echo "matrix={\"variant\": [\"${variant_matrix}\"]}" >> $GITHUB_OUTPUT
-          echo "atb-variants=${atb_variants}"
 
   create-atb-variants:
 
