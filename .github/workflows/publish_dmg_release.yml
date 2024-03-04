@@ -24,7 +24,7 @@ jobs:
 
   # This is only run for public and hotfix releases
   # Internal release has been tagged as part of code_freeze or bump_interal_release workflows
-  # tag-public-release:
+  tag-public-release:
 
     name: Tag public release
 
