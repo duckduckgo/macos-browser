@@ -33,6 +33,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private let openURLHandler: (URL) -> Void
     private let openVPNHandler: () -> Void
     private let openDBPHandler: () -> Void
+    private let openITRHandler: () -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
 
     private var fetchSubscriptionDetailsTask: Task<(), Never>?
@@ -44,11 +45,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 openURLHandler: @escaping (URL) -> Void,
                 openVPNHandler: @escaping () -> Void,
                 openDBPHandler: @escaping () -> Void,
+                openITRHandler: @escaping () -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
         self.openURLHandler = openURLHandler
         self.openVPNHandler = openVPNHandler
         self.openDBPHandler = openDBPHandler
+        self.openITRHandler = openITRHandler
         self.sheetActionHandler = sheetActionHandler
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
@@ -169,7 +172,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openIdentityTheftRestoration() {
-        openURLHandler(.identityTheftRestoration)
+        openITRHandler()
     }
 
     @MainActor

@@ -29,6 +29,7 @@ final class TabViewModel {
         static let bookmarks = NSImage(named: "Bookmarks")!
         static let dataBrokerProtection = NSImage(named: "DBP-Icon")!
         static let subscription = NSImage(named: "SubscriptionIcon")!
+        static let identityTheftRestoration = NSImage(named: "ITR-Icon")!
     }
 
     private(set) var tab: Tab
@@ -131,7 +132,8 @@ final class TabViewModel {
                      .onboarding,
                      .none,
                      .dataBrokerProtection,
-                     .subscription:
+                     .subscription,
+                     .identityTheftRestoration:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
                     return Just( .instant ).eraseToAnyPublisher()
                 }
@@ -297,7 +299,7 @@ final class TabViewModel {
             }
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .subscription:
+        case .url, .none, .subscription, .identityTheftRestoration:
             if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
@@ -338,6 +340,9 @@ final class TabViewModel {
             return
         case .subscription:
             favicon = Favicon.subscription
+            return
+        case .identityTheftRestoration:
+            favicon = Favicon.identityTheftRestoration
             return
         case .url, .onboarding, .none: break
         }

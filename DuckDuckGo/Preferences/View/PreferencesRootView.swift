@@ -127,12 +127,19 @@ enum Preferences {
                 }
             }
 
+            let openITR: () -> Void = {
+                DispatchQueue.main.async {
+                    WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+                }
+            }
+
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
                                                                       openURLHandler: openURL)
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 openVPNHandler: openVPN,
                                                 openDBPHandler: openDBP,
+                                                openITRHandler: openITR,
                                                 sheetActionHandler: sheetActionHandler)
         }
 #endif
