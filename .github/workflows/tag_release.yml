@@ -181,7 +181,7 @@ jobs:
 
     - name: Create Publish DMG Release task on failure
       id: create-publish-dmg-task-on-failure
-      if: (failure() || env.MERGE_OR_DELETE_FAILED == 'true') && env.internal-release-bump == 'true'
+      if: failure() && env.internal-release-bump == 'true'
       uses: ./.github/actions/asana-create-action-item
       env:
         ASANA_TASK_URL: ${{ env.asana-task-url }}
