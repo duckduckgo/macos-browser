@@ -81,8 +81,8 @@ final class EmailServiceTests: XCTestCase {
         let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
-            let email = try await sut.getEmail(dataBrokerURL: "fakeBroker")
-            XCTAssertEqual("test@ddg.com", email)
+            let emailData = try await sut.getEmail(dataBrokerURL: "fakeBroker")
+            XCTAssertEqual("test@ddg.com", emailData.emailAddress)
         } catch {
             XCTFail("Unexpected. It should not throw")
         }
