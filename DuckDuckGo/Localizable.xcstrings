@@ -21692,7 +21692,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Cliquez sur l'icône **%2$s** de votre navigateur et saisissez votre mot de passe principal\n%3$d Sélectionnez **Ouvrir mon coffre-fort**\n%4$d Dans la barre latérale, sélectionnez **Options avancées → Exporter**\n%5$d Saisissez votre mot de passe LastPass principal\n%$d Sélectionnez le format de fichier** : **Texte séparé par des virgules (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Cliquez sur l'icône **%2$s** de votre navigateur et saisissez votre mot de passe principal\n%3$d Sélectionnez **Ouvrir mon coffre-fort**\n%4$d Dans la barre latérale, sélectionnez **Options avancées → Exporter**\n%5$d Saisissez votre mot de passe LastPass principal\n%6$d Sélectionnez le format de fichier** : **Texte séparé par des virgules (.csv)**\n%7$d %8$@"
           }
         },
         "it" : {
@@ -23204,7 +23204,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Favorieten → Bladwijzerbeheerder**\n%4$d Klik op %5$@ en vervolgens op **Bladwijzers exporteren naar HTML-bestand**\n%6$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Favorieten → Bladwijzerbeheerder**\n%4$d Klik op %5$@ en vervolgens op **Bladwijzers exporteren naar HTML-bestand**\n%6$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%7$d %8$@"
           }
         },
         "pl" : {
