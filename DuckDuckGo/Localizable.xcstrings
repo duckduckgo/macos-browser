@@ -159,17 +159,6 @@
         }
       }
     },
-    "%@ of %@" : {
-      "comment" : "Number of bytes out of total bytes downloaded (1Mb of 2Mb)",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ of %2$@"
-          }
-        }
-      }
-    },
     "%lld" : {
       "localizations" : {
         "de" : {
@@ -21235,7 +21224,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wachtwoorden importeren ..."
+            "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer **Bestand → Kluis exporteren** in de menubalk\n%4$d Selecteer de bestandsindeling: **.csv**\n%5$d Voer je Bitwarden-masterwachtwoord in\n%6$d Klik op %7$@ en bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@t"
           }
         },
         "pl" : {
@@ -21415,7 +21404,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open **%2$s**\n%3$d Klik in een nieuw tabblad op %4$@ en vervolgens op **Google Wachtwoordbeheerder → Instellingen**\n%5$d Zoek \"Wachtwoorden exporteren\" en klik op **Bestand downloaden**\n%6$d Bewaar het wachtwoordbestand op een plek waar je het kunt vinden (bijv. het bureaublad) \n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Klik in een nieuw tabblad op %4$@ en vervolgens op **Google Wachtwoordbeheerder → Instellingen**\n%5$d Zoek \"Wachtwoorden exporteren\" en klik op **Bestand downloaden**\n%6$d Bewaar het wachtwoordbestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%7$d %8$@"
           }
         },
         "pl" : {
@@ -21475,7 +21464,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open **%2$s**\n%3$d Klik in een nieuw tabblad op %4$@ en vervolgens op **Wachtwoordbeheerder → Instellingen**\n%5$d Zoek \"Wachtwoorden exporteren\" en klik op **Bestand downloaden**\n%6$d Bewaar het wachtwoordbestand op een plek waar je het kunt vinden (bijv. het bureaublad) \n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Klik in een nieuw tabblad op %4$@ en vervolgens op **Wachtwoordbeheerder → Instellingen**\n%5$d Zoek \"Wachtwoorden exporteren\" en klik op **Bestand downloaden**\n%6$d Bewaar het wachtwoordbestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%7$d %8$@"
           }
         },
         "pl" : {
@@ -21649,7 +21638,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'importatore CSV cercherà di abbinare le intestazioni delle colonne alla loro posizione.\nSe non è presente alcuna intestazione, supporta due formati:  %1$d URL, Nome utente, Password\n%2$d Titolo, URL, Nome utente, Password\n%3$@"
+            "value" : "L'importatore CSV cercherà di abbinare le intestazioni delle colonne alla loro posizione.\nSe non è presente alcuna intestazione, supporta due formati: %1$d URL, Nome utente, Password\n%2$d Titolo, URL, Nome utente, Password\n%3$@"
           }
         },
         "nl" : {
@@ -21703,7 +21692,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Cliquez sur l'icône **%2$s** de votre navigateur et saisissez votre mot de passe principal\n%3$d Sélectionnez **Ouvrir mon coffre-fort**\n%4$d Dans la barre latérale, sélectionnez **Options avancées → Exporter**\n%5$d Saisissez votre mot de passe LastPass principal\n%6$d Sélectionnez le format de fichier** : **Texte séparé par des virgules (.csv)**\n%7$d %8$@"
+            "value" : "%1$d Cliquez sur l'icône **%2$s** de votre navigateur et saisissez votre mot de passe principal\n%3$d Sélectionnez **Ouvrir mon coffre-fort**\n%4$d Dans la barre latérale, sélectionnez **Options avancées → Exporter**\n%5$d Saisissez votre mot de passe LastPass principal\n*6%$d Sélectionnez le format de fichier** : **Texte séparé par des virgules (.csv)**\n%7$d %8$@"
           }
         },
         "it" : {
@@ -21889,13 +21878,13 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Apri **%2$s**\n%3$d Usa la Barra dei menu per selezionare **Visualizza il gestore delle password**%4$d Seleziona **Impostazioni**%5$d Trova \"Esporta password\" e fai clic su **Scarica file**%6$d Salva il file password dove puoi trovarlo (ad esempio, sul desktop)%7$d %8$@"
+            "value" : "%1$d Apri **%2$s**\n%3$d Usa la Barra dei menu per selezionare **Visualizza il gestore delle password**\n%4$d Seleziona **Impostazioni**\n%5$d Trova \"Esporta password\" e fai clic su **Scarica file**\n%6$d Salva il file password dove puoi trovarlo (ad esempio, sul desktop)\n%7$d %8$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bekijken → Wachtwoordbeheerder weergeven**\n%4$d Selecteer **Instellingen**\n%5$d Zoek 'Wachtwoorden exporteren' en klik op **Bestand downloaden**\n%6$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad) \n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bekijken → Wachtwoordbeheerder weergeven**\n%4$d Selecteer **Instellingen**\n%5$d Zoek 'Wachtwoorden exporteren' en klik op **Bestand downloaden**\n%6$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad)\n%7$d %8$@"
           }
         },
         "pl" : {
@@ -21955,7 +21944,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bekijken → Wachtwoordbeheerder weergeven**\n%4$d Klik op %5$@ (rechts van _Bewaarde wachtwoorden_) en selecteer **Wachtwoorden exporteren**\n%6$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad) \n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bekijken → Wachtwoordbeheerder weergeven**\n%4$d Klik op %5$@ (rechts van _Bewaarde wachtwoorden_) en selecteer **Wachtwoorden exporteren**\n%6$d Bewaar het bestand met de wachtwoorden op een plek waar je het kunt vinden (bijv. het bureaublad)\n%7$d %8$@"
           }
         },
         "pl" : {
@@ -22009,7 +21998,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Apri **Safari**\n%2$d Seleziona **File → Esporta → Password**\n%3$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%4$d %5$@"
+            "value" : "%1$d Apri **Safari**\n%2$d Seleziona **File → Esporta → Password**\n%3$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%4$d % 5$@"
           }
         },
         "nl" : {
@@ -22795,7 +22784,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bladwijzers → Bladwijzerbeheerder**\n%4$d Klik op %5$@ en vervolgens op **Bladwijzers exporteren**\n%6$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)  %7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bladwijzers → Bladwijzerbeheerder**\n%4$d Klik op %5$@ en vervolgens op **Bladwijzers exporteren**\n%6$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%7$d %8$@"
           }
         },
         "pl" : {
@@ -22855,7 +22844,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bladwijzers → Bladwijzers beheren**\n%4$d Klik op %5$@ en vervolgens op **Bladwijzers exporteren naar HTML ...**\n%6$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)  %7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bladwijzers → Bladwijzers beheren**\n%4$d Klik op %5$@ en vervolgens op **Bladwijzers exporteren naar HTML ...**\n%6$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%7$d %8$@"
           }
         },
         "pl" : {
@@ -23155,7 +23144,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bestand → Bladwijzers exporteren…**\n%4$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)  \n%5$d %6$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Bestand → Bladwijzers exporteren…**\n%4$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%5$d %6$@"
           }
         },
         "pl" : {
@@ -23215,7 +23204,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Favorieten → Bladwijzerbeheerder**\n%4$d Klik op %5$@ en vervolgens op **Bladwijzers exporteren naar HTML-bestand**\n%6$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)  %7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Ga in de menubalk naar **Favorieten → Bladwijzerbeheerder**\n%4$d Klik op %5$@ en vervolgens op **Bladwijzers exporteren naar HTML-bestand**\n%6$d Bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)%7$d %8$@"
           }
         },
         "pl" : {
@@ -27199,10 +27188,58 @@
       "comment" : "Menu item. Mute tab",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab stummschalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Mute Tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silenciar pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couper le son de l'onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silenzia scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabblad dempen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakładka wyciszenia"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silenciar Separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отключить звук на вкладке"
           }
         }
       }
@@ -30117,13 +30154,13 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆 \n\n Kijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijku{00A0}🔒"
+            "value" : "Je bent helemaal klaar!\n\nWil je zien hoe ik je bescherm? Ga eens naar een van je favoriete websites 👆 \n\n Kijk tijdens het surfen goed naar de adresbalk. Ik blokkeer trackers en werk de beveiliging van je verbinding bij wanneer mogelijk 🔒"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączeniau 🔒"
+            "value" : "Wszystko gotowe!\n\nChcesz zobaczyć, jak Cię chronię? Spróbuj odwiedzić jedną z ulubionych stron 👆\n\nW międzyczasie obserwuj pasek adresu. Będę blokować mechanizmy śledzące i w miarę możliwości poprawiać bezpieczeństwo połączenia 🔒"
           }
         },
         "pt" : {
@@ -31457,10 +31494,58 @@
       "comment" : "Error page heading text shown when a Web Page process had crashed",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Webseite ist abgestürzt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "This webpage has crashed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página web se ha caído."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page Web a planté."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa pagina web si è bloccata."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze webpagina is gecrasht."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta strona uległa awarii."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta página falhou."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На этой странице произошел сбой."
           }
         }
       }
@@ -31469,10 +31554,58 @@
       "comment" : "Error page message text shown when a Web Page process had crashed",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versuche, die Seite neu zu laden, oder versuche es später erneut."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Try reloading the page or come back later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intenta volver a cargar la página o vuelve más tarde."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez de recharger la page ou revenez plus tard."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova a ricaricare la pagina o torna più tardi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probeer de pagina opnieuw te laden of kom later terug."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spróbuj ponownie załadować stronę lub wróć później."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimenta recarregar a página ou voltar mais tarde."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перезагрузите ее или попробуйте вернуться позже."
           }
         }
       }
@@ -31481,10 +31614,58 @@
       "comment" : "Error page heading text",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo kann diese Seite nicht laden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "DuckDuckGo can’t load this page."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo no puede cargar esta página."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo ne peut pas charger cette page."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo non riesce a caricare questa pagina."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo kan deze pagina niet laden."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo nie może wczytać tej strony."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo não consegue carregar esta página."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo не удалось загрузить эту страницу."
           }
         }
       }
@@ -46381,10 +46562,58 @@
       "comment" : "Tab error title",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seite konnte nicht geöffnet werden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Failed to open page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al abrir la página"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d'ouvrir la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile aprire la pagina"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kan de pagina niet openen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się otworzyć strony"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falha ao abrir a página"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось открыть страницу"
           }
         }
       }
@@ -48677,10 +48906,58 @@
       "comment" : "Menu item. Unmute tab",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab-Stummschaltung aufheben"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Unmute Tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desilenciar pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réactiver le son de l'onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riattiva audio scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dempen van tabblad opheffen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyłącz wyciszenie karty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ativar Som do Separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включить звук на вкладке"
           }
         }
       }
