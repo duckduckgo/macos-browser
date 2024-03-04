@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import History
 
 final class TabCollection: NSObject {
 

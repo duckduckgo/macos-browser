@@ -456,4 +456,9 @@ final class WorkspaceMock: Workspace {
         return onOpen?(url) ?? false
     }
 
+    var onOpenURLs: (([URL], String?, NSWorkspace.LaunchOptions, NSAppleEventDescriptor?, AutoreleasingUnsafeMutablePointer<NSArray?>?) -> Bool)?
+    func open(_ urls: [URL], withAppBundleIdentifier bundleIdentifier: String?, options: NSWorkspace.LaunchOptions, additionalEventParamDescriptor descriptor: NSAppleEventDescriptor?, launchIdentifiers identifiers: AutoreleasingUnsafeMutablePointer<NSArray?>?) -> Bool {
+        return onOpenURLs?(urls, bundleIdentifier, options, descriptor, identifiers) ?? false
+    }
+
 }

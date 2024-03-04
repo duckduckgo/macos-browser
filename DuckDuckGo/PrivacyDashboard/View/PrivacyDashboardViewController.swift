@@ -101,7 +101,7 @@ final class PrivacyDashboardViewController: NSViewController {
         privacyDashboardController.privacyDashboardNavigationDelegate = self
         privacyDashboardController.privacyDashboardDelegate = self
         privacyDashboardController.privacyDashboardReportBrokenSiteDelegate = self
-        privacyDashboardController.preferredLocale = "en" // fixed until app is localised
+        privacyDashboardController.preferredLocale = Bundle.main.preferredLocalizations.first
     }
 
     private func initWebView() {
