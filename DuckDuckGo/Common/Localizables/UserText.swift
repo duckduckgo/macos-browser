@@ -567,7 +567,7 @@ struct UserText {
     static let zoomSettingTitle = NSLocalizedString("preferences.appearance.zoom", value: "Zoom", comment: "Zoom settings section title")
     static let zoomPickerTitle = NSLocalizedString("preferences.appearance.zoom-picker", value: "Default page zoom", comment: "Default page zoom picker title")
     static let defaultZoomPageMoreOptionsItem = NSLocalizedString("more-options.zoom.default-zoom-page", value: "Change Default Page Zoom…", comment: "Default page zoom picker title")
-    static let autofill = NSLocalizedString("preferences.autofill", value: "Autofill", comment: "Show Autofill preferences")
+    static let autofill = NSLocalizedString("preferences.autofill", value: "Passwords", comment: "Show Autofill preferences")
 
     static let aboutDuckDuckGo = NSLocalizedString("preferences.about.about-duckduckgo", value: "About DuckDuckGo", comment: "About screen")
     static let privacySimplified = NSLocalizedString("preferences.about.privacy-simplified", value: "Privacy, simplified.", comment: "About screen")
