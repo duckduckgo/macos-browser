@@ -230,8 +230,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success:
                 break
             case .failure(let error):
-                os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
-                await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                switch error {
+                case .cancelledByUser:
+                    os_log(.error, log: .subscription, "[Purchase] Cancelled by user")
+                default:
+                    os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                    await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                }
                 return nil
             }
 
