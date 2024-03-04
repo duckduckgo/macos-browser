@@ -55,7 +55,6 @@ public enum DataBrokerProtectionPixels {
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
     case parentChildMatches(parent: String, child: String, value: Int)
-    case disableAndDelete
 
     // Stage Pixels
     case optOutStart(dataBroker: String, attemptId: UUID)
@@ -94,12 +93,6 @@ public enum DataBrokerProtectionPixels {
     case ipcServerRunQueuedOperations
     case ipcServerRunQueuedOperationsCompletion(error: Error?)
     case ipcServerRunAllOperations
-
-    // Login Item events
-    case enableLoginItem
-    case restartLoginItem
-    case disableLoginItem
-    case resetLoginItem
 
     // DataBrokerProtection User Notifications
     case dataBrokerProtectionNotificationSentFirstScanComplete
@@ -170,11 +163,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .ipcServerRunQueuedOperationsCompletion: return "m_mac_dbp_ipc-server_run-queued-operations_completion"
         case .ipcServerRunAllOperations: return "m_mac_dbp_ipc-server_run-all-operations"
 
-        case .enableLoginItem: return "m_mac_dbp_login-item_enable"
-        case .restartLoginItem: return "m_mac_dbp_login-item_restart"
-        case .disableLoginItem: return "m_mac_dbp_login-item_disable"
-        case .resetLoginItem: return "m_mac_dbp_login-item_reset"
-
             // User Notifications
         case .dataBrokerProtectionNotificationSentFirstScanComplete:
             return "m_mac_dbp_notification_sent_first_scan_complete"
@@ -197,8 +185,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .dailyActiveUser: return "m_mac_dbp_engagement_dau"
         case .weeklyActiveUser: return "m_mac_dbp_engagement_wau"
         case .monthlyActiveUser: return "m_mac_dbp_engagement_mau"
-
-        case .disableAndDelete: return "m_mac_dbp_disable-and-delete"
         }
     }
 
@@ -250,10 +236,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
                 .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
-                .enableLoginItem,
-                .restartLoginItem,
-                .disableLoginItem,
-                .resetLoginItem,
                 .dataBrokerProtectionNotificationSentFirstScanComplete,
                 .dataBrokerProtectionNotificationOpenedFirstScanComplete,
                 .dataBrokerProtectionNotificationSentFirstRemoval,
@@ -264,8 +246,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                 .dailyActiveUser,
                 .weeklyActiveUser,
-                .monthlyActiveUser,
-                .disableAndDelete:
+                .monthlyActiveUser:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -342,14 +323,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .monthlyActiveUser:
 
                 PixelKit.fire(event)
-            case .enableLoginItem,
-                    .restartLoginItem,
-                    .disableLoginItem,
-                    .resetLoginItem,
-                    .disableAndDelete:
-                // These pixels should not be called from the agent
-                break
-
             }
         }
     }

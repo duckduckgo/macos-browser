@@ -33,14 +33,11 @@ protocol DataBrokerProtectionFeatureDisabling {
 struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling {
     private let scheduler: DataBrokerProtectionLoginItemScheduler
     private let dataManager: InMemoryDataCacheDelegate
-    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     init(scheduler: DataBrokerProtectionLoginItemScheduler = DataBrokerProtectionManager.shared.scheduler,
-         dataManager: InMemoryDataCacheDelegate = DataBrokerProtectionDataManager(),
-         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
+         dataManager: InMemoryDataCacheDelegate = DataBrokerProtectionDataManager()) {
         self.dataManager = dataManager
         self.scheduler = scheduler
-        self.pixelHandler = pixelHandler
     }
 
     func disableAndDelete() {
@@ -51,7 +48,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
 
             dataManager.removeAllData()
 
-            pixelHandler.fire(.disableAndDelete)
+            DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerDisableAndDeleteDaily, frequency: .dailyOnly)
             NotificationCenter.default.post(name: .dbpWasDisabled, object: nil)
         }
     }
