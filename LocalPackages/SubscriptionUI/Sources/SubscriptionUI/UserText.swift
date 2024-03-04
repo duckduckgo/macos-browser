@@ -66,7 +66,7 @@ enum UserText {
     static let changeSubscriptionDialogDone = NSLocalizedString("subscription.dialog.change.done.button", value: "Done", comment: "Button to close the change subscription dialog")
 
     // MARK: - Remove from this device dialog
-    static let removeSubscriptionDialogTitle = NSLocalizedString("subscription.dialog.remove.title", value: "Remove From This Device?", comment: "Remove subscription from device dialog title")
+    static let removeSubscriptionDialogTitle = NSLocalizedString("subscription.dialog.remove.title", value: "Remove from this device?", comment: "Remove subscription from device dialog title")
     static let removeSubscriptionDialogDescription = NSLocalizedString("subscription.dialog.remove.description", value: "You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.", comment: "Remove subscription from device dialog subtitle description")
     static let removeSubscriptionDialogCancel = NSLocalizedString("subscription.dialog.remove.cancel.button", value: "Cancel", comment: "Button to cancel removing subscription from device")
     static let removeSubscriptionDialogConfirm = NSLocalizedString("subscription.dialog.remove.confirm", value: "Remove Subscription", comment: "Button to confirm removing subscription from device")

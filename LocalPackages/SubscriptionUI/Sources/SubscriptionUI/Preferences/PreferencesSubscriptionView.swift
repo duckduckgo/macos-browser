@@ -39,7 +39,7 @@ public struct PreferencesSubscriptionView: View {
                     SubscriptionAccessView(model: model.sheetModel)
                 }
                 .sheet(isPresented: $showingRemoveConfirmationDialog) {
-                    SubscriptionDialog(imageName: "Placeholder-96x64",
+                    SubscriptionDialog(imageName: "Privacy-Pro-128",
                                        title: UserText.removeSubscriptionDialogTitle,
                                        description: UserText.removeSubscriptionDialogDescription,
                                        buttons: {
