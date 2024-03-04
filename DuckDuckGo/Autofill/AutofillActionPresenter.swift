@@ -38,7 +38,8 @@ struct DefaultAutofillActionPresenter: AutofillActionPresenter {
             switch response {
             case .alertFirstButtonReturn:
                 actionExecutor.execute {
-                    show(completionAlert, completion: completion)
+                    completion()
+                    show(completionAlert)
                 }
             default:
                 break
@@ -50,16 +51,9 @@ struct DefaultAutofillActionPresenter: AutofillActionPresenter {
 private extension DefaultAutofillActionPresenter {
 
     @MainActor
-    func show(_ alert: NSAlert, completion: @escaping () -> Void) {
+    func show(_ alert: NSAlert) {
         guard let window else { return }
-        alert.beginSheetModal(for: window) { response in
-            switch response {
-            case .alertFirstButtonReturn:
-                completion()
-            default:
-                break
-            }
-        }
+        alert.beginSheetModal(for: window)
     }
 
     @MainActor
