@@ -34,7 +34,7 @@ enum UserText {
 
     // MARK: Preferences footer
     static let preferencesSubscriptionFooterTitle = NSLocalizedString("subscription.preferences.subscription.footer.title", value: "Questions about Privacy Pro?", comment: "Title for the subscription preferences pane footer")
-    static let preferencesSubscriptionFooterCaption = NSLocalizedString("subscription.preferences.subscription.footer.caption", value: "Visit our Privacy Pro help pages for answers to frequently asked questions.", comment: "Caption for the subscription preferences pane footer")
+    static let preferencesSubscriptionFooterCaption = NSLocalizedString("subscription.preferences.subscription.footer.caption", value: "Get answers to frequently asked questions about Privacy Pro in our help pages.", comment: "Caption for the subscription preferences pane footer")
     static let viewFaqsButton = NSLocalizedString("subscription.preferences.view.faqs.button", value: "View FAQs", comment: "Button to open page for FAQs")
 
     // MARK: Preferences when subscription is active
@@ -50,10 +50,10 @@ enum UserText {
     static let removeFromThisDeviceButton = NSLocalizedString("subscription.preferences.remove.from.this.device.button", value: "Remove From This Device...", comment: "Button to remove subscription from this device")
 
     // MARK: Preferences when subscription is inactive
-    static let preferencesSubscriptionInactiveHeader = NSLocalizedString("subscription.preferences.subscription.inactive.header", value: "One subscription, three advanced protections", comment: "Header for the subscription preferences pane when the subscription is inactive")
-    static let preferencesSubscriptionInactiveCaption = NSLocalizedString("subscription.preferences.subscription.inactive.caption", value: "Get enhanced protection across all your devices and reduce your online footprint for as little as $9.99/mo.", comment: "Caption for the subscription preferences pane when the subscription is inactive")
+    static let preferencesSubscriptionInactiveHeader = NSLocalizedString("subscription.preferences.subscription.inactive.header", value: "Subscribe to Privacy Pro", comment: "Header for the subscription preferences pane when the subscription is inactive")
+    static let preferencesSubscriptionInactiveCaption = NSLocalizedString("subscription.preferences.subscription.inactive.caption", value: "More seamless privacy with three new protections.", comment: "Caption for the subscription preferences pane when the subscription is inactive")
 
-    static let learnMoreButton = NSLocalizedString("subscription.preferences.learn.more.button", value: "Learn More", comment: "Button to open a page where user can learn more and purchase the subscription")
+    static let purchaseButton = NSLocalizedString("subscription.preferences.purchase.button", value: "Get Privacy Pro", comment: "Button to open a page where user can learn more and purchase the subscription")
     static let haveSubscriptionButton = NSLocalizedString("subscription.preferences.i.have.a.subscription.button", value: "I Have a Subscription", comment: "Button enabling user to activate a subscription user bought earlier or on another device")
 
     // MARK: - Change plan or billing dialogs

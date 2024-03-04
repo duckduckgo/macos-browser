@@ -90,7 +90,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func learnMoreAction() {
+    func purchaseAction() {
         openURLHandler(.subscriptionPurchase)
     }
 

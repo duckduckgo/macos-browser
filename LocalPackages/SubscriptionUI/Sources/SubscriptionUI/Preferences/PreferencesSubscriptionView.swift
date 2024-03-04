@@ -116,15 +116,15 @@ public struct PreferencesSubscriptionView: View {
 
                 } else {
                     UniversalHeaderView {
-                        Image("subscription-inactive-icon", bundle: .module)
+                        Image("PrivacyPro", bundle: .module)
                             .padding(4)
-                            .background(Color.black.opacity(0.06))
+                            .background(Color("BadgeBackground", bundle: .module))
                             .cornerRadius(4)
                     } content: {
                         TextMenuItemHeader(UserText.preferencesSubscriptionInactiveHeader)
                         TextMenuItemCaption(UserText.preferencesSubscriptionInactiveCaption)
                     } buttons: {
-                        Button(UserText.learnMoreButton) { model.learnMoreAction() }
+                        Button(UserText.purchaseButton) { model.purchaseAction() }
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
                         Button(UserText.haveSubscriptionButton) { showingSheet.toggle() }
                     }
@@ -134,7 +134,7 @@ public struct PreferencesSubscriptionView: View {
                     .foregroundColor(Color.secondary)
                     .padding(.horizontal, -10)
 
-                SectionView(iconName: "vpn-service-icon",
+                SectionView(iconName: "VPN-Icon",
                             title: UserText.vpnServiceTitle,
                             description: UserText.vpnServiceDescription,
                             buttonName: model.isUserAuthenticated ? "Manage" : nil,
@@ -144,7 +144,7 @@ public struct PreferencesSubscriptionView: View {
                 Divider()
                     .foregroundColor(Color.secondary)
 
-                SectionView(iconName: "pir-service-icon",
+                SectionView(iconName: "PIR-Icon",
                             title: UserText.personalInformationRemovalServiceTitle,
                             description: UserText.personalInformationRemovalServiceDescription,
                             buttonName: model.isUserAuthenticated ? "View" : nil,
@@ -154,7 +154,7 @@ public struct PreferencesSubscriptionView: View {
                 Divider()
                     .foregroundColor(Color.secondary)
 
-                SectionView(iconName: "itr-service-icon",
+                SectionView(iconName: "ITR-Icon",
                             title: UserText.identityTheftRestorationServiceTitle,
                             description: UserText.identityTheftRestorationServiceDescription,
                             buttonName: model.isUserAuthenticated ? "View" : nil,
@@ -239,6 +239,8 @@ public struct SectionView: View {
                             .fixMultilineScrollableText()
                             .font(.body)
                             .foregroundColor(Color("TextPrimary", bundle: .module))
+                        Spacer()
+                            .frame(height: 4)
                         Text(description)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .fixMultilineScrollableText()
