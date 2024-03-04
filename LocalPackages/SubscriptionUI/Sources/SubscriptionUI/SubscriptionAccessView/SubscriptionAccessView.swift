@@ -36,56 +36,55 @@ public struct SubscriptionAccessView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 8) {
-            VStack(spacing: 8) {
-                Text(model.title)
-                    .font(.title2)
-                    .bold()
-                    .foregroundColor(Color("TextPrimary", bundle: .module))
-                Text(model.description)
-                    .font(.body)
-                    .multilineTextAlignment(.center)
-                    .fixMultilineScrollableText()
-                    .foregroundColor(Color("TextPrimary", bundle: .module))
-            }
-            .padding(4)
-
+        VStack(spacing: 0) {
             VStack(spacing: 0) {
-                ForEach(model.items) { item in
-                    SubscriptionAccessRow(iconName: item.iconName,
-                                          name: item.title,
-                                          descriptionHeader: model.descriptionHeader(for: item),
-                                          description: model.description(for: item),
-                                          isExpanded: self.selection == item,
-                                          buttonTitle: model.buttonTitle(for: item),
-                                          buttonAction: {
-                        dismiss {
-                            model.handleAction(for: item)
-                        }
-                    })
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            self.selection = item
-                        }
-                        .padding(.vertical, 10)
-
-                    if model.items.last != item {
-                        Divider()
-                    }
+                VStack(spacing: 8) {
+                    Text(model.title)
+                        .font(.title2)
+                        .bold()
+                        .foregroundColor(Color("TextPrimary", bundle: .module))
+                    Text(model.description)
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .fixMultilineScrollableText()
+                        .foregroundColor(Color("TextPrimary", bundle: .module))
                 }
-                .padding(.horizontal, 20)
+
+                Spacer()
+                    .frame(height: 20)
+
+                VStack(spacing: 0) {
+                    ForEach(model.items) { item in
+                        SubscriptionAccessRow(iconName: item.iconName,
+                                              name: item.title,
+                                              descriptionHeader: model.descriptionHeader(for: item),
+                                              description: model.description(for: item),
+                                              isExpanded: self.selection == item,
+                                              buttonTitle: model.buttonTitle(for: item),
+                                              buttonAction: {
+                            dismiss {
+                                model.handleAction(for: item)
+                            }
+                        })
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                self.selection = item
+                            }
+                            .padding(.vertical, 10)
+
+                        if model.items.last != item {
+                            Divider()
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .roundedBorder()
+                .animation(.easeOut(duration: 0.3))
 
             }
-            .roundedBorder()
-            .animation(.easeOut(duration: 0.3))
-
-            Spacer()
-                .frame(minHeight: 4, idealHeight: 60)
+            .padding(20)
 
             Divider()
-
-            Spacer()
-                .frame(height: 8)
 
             HStack {
                 Spacer()
@@ -94,8 +93,9 @@ public struct SubscriptionAccessView: View {
                     dismiss()
                 }
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
-        .padding(20)
         .frame(width: 480)
     }
 

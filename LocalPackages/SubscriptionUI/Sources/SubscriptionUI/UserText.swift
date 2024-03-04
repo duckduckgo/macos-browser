@@ -75,7 +75,7 @@ enum UserText {
 
     // MARK: - Activate subscription modal
     static let activateModalTitle = NSLocalizedString("subscription.activate.modal.title", value: "Activate your subscription on this device", comment: "Activate subscription modal view title")
-    static let activateModalDescription = NSLocalizedString("subscription.activate.modal.description", value: "Access your Privacy Pro subscription on this device via Sync, Apple ID or an email address.", comment: "Activate subscription modal view subtitle description")
+    static let activateModalDescription = NSLocalizedString("subscription.activate.modal.description", value: "Access your Privacy Pro subscription on this device via an email address.", comment: "Activate subscription modal view subtitle description")
 
     static let activateModalAppleIDDescription = NSLocalizedString("subscription.activate.modal.appleid.description", value: "Your subscription is automatically available on any device signed in to the same Apple ID.", comment: "Activate subscription modal description for Apple ID channel")
     static let activateModalEmailDescription = NSLocalizedString("subscription.activate.modal.email.description", value: "Use your email to access your subscription on this device.", comment: "Activate subscription modal description for email address channel")
