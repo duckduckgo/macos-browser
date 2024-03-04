@@ -94,12 +94,6 @@ public enum DataBrokerProtectionPixels {
     case ipcServerRunQueuedOperationsCompletion(error: Error?)
     case ipcServerRunAllOperations
 
-    // Login Item events
-    case enableLoginItem
-    case restartLoginItem
-    case disableLoginItem
-    case resetLoginItem
-
     // DataBrokerProtection User Notifications
     case dataBrokerProtectionNotificationSentFirstScanComplete
     case dataBrokerProtectionNotificationOpenedFirstScanComplete
@@ -168,11 +162,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .ipcServerRunQueuedOperations: return "m_mac_dbp_ipc-server_run-queued-operations"
         case .ipcServerRunQueuedOperationsCompletion: return "m_mac_dbp_ipc-server_run-queued-operations_completion"
         case .ipcServerRunAllOperations: return "m_mac_dbp_ipc-server_run-all-operations"
-
-        case .enableLoginItem: return "m_mac_dbp_login-item_enable"
-        case .restartLoginItem: return "m_mac_dbp_login-item_restart"
-        case .disableLoginItem: return "m_mac_dbp_login-item_disable"
-        case .resetLoginItem: return "m_mac_dbp_login-item_reset"
 
             // User Notifications
         case .dataBrokerProtectionNotificationSentFirstScanComplete:
@@ -247,10 +236,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
                 .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
-                .enableLoginItem,
-                .restartLoginItem,
-                .disableLoginItem,
-                .resetLoginItem,
                 .dataBrokerProtectionNotificationSentFirstScanComplete,
                 .dataBrokerProtectionNotificationOpenedFirstScanComplete,
                 .dataBrokerProtectionNotificationSentFirstRemoval,
@@ -322,10 +307,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
                     .ipcServerRunAllOperations,
-                    .enableLoginItem,
-                    .restartLoginItem,
-                    .disableLoginItem,
-                    .resetLoginItem,
                     .scanSuccess,
                     .scanFailed,
                     .scanError,
