@@ -390,13 +390,19 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
+        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionScanOptionsMenuItem,
+                                                  action: #selector(openSubscriptionPurchasePage(_:)),
+                                                  keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "DBP-Icon"))
+
         let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "SubscriptionIcon"))
 
-        return [privacyProItem]
+        return [dataBrokerProtectionItem, privacyProItem]
     }
 #endif
 
