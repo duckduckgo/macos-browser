@@ -28,6 +28,7 @@ final class TabViewModel {
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
         static let dataBrokerProtection = NSImage(named: "DBP-Icon")!
+        static let subscription = NSImage(named: "SubscriptionIcon")!
     }
 
     private(set) var tab: Tab
@@ -335,7 +336,10 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .none, .subscription: break
+        case .subscription:
+            favicon = Favicon.subscription
+            return
+        case .url, .onboarding, .none: break
         }
 
         if let favicon: NSImage? = tabFavicon {
