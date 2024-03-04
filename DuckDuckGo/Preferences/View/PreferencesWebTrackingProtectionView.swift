@@ -28,18 +28,25 @@ extension Preferences {
         @ObservedObject var model: WebTrackingProtectionPreferences
 
         var body: some View {
-            PreferencePane("Web Tracking Protection") {
+            PreferencePane("Web Tracking Protection", spacing: 20) {
+
+                // Status Indicator
+                StatusIndicatorView(status: .alwaysOn, isLarge: true).padding(.top, -16)
 
                 // SECTION 1: Description
-                DescriptionView(imageName: "WebTrackingProtection",
-                                header: "Web Tracking Protection",
-                                description: UserText.webTrackingProtectionExplanation,
-                                learnMoreUrl: .webTrackingProtection,
-                                status: .alwaysOn)
+                PreferencePaneSection {
+                    VStack(alignment: .leading, spacing: 1) {
+                        TextMenuItemCaption(UserText.webTrackingProtectionExplanation)
+                        TextButton(UserText.learnMore) {
+                            WindowControllersManager.shared.show(url: .webTrackingProtection,
+                                                                 source: .ui,
+                                                                 newTab: true)
+                        }
+                    }
+                }
 
                 // SECTION 2: Global privacy control
-                PreferencePaneSection(UserText.gpcSettingsTitle) {
-
+                PreferencePaneSection {
                     ToggleMenuItem(UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.gpcExplanation)
@@ -48,9 +55,10 @@ extension Preferences {
                                                                  source: .ui,
                                                                  newTab: true)
                         }
-                    }
+                    }.padding(.leading, 19)
                 }
             }
         }
+
     }
 }

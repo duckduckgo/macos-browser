@@ -3599,18 +3599,6 @@
         }
       }
     },
-    "gpc.title" : {
-      "comment" : "GPC settings title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Global Privacy Control (GPC)"
-          }
-        }
-      }
-    },
     "Help" : {
       "comment" : "Main Menu Help"
     },

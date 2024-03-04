@@ -36,7 +36,7 @@ extension Preferences {
                 // SECTION 1: Description
                 PreferencePaneSection {
                     VStack(alignment: .leading, spacing: 1) {
-                        TextMenuItemCaption(UserText.privateSearchExplenation)
+                        TextMenuItemCaption(UserText.privateSearchExplanation)
                         TextButton(UserText.learnMore) {
                             WindowControllersManager.shared.show(url: .privateSearchLearnMore,
                                                                  source: .ui,
