@@ -21998,7 +21998,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$d Apri **Safari**\n%2$d Seleziona **File → Esporta → Password**\n%3$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%4$d % 5$@"
+            "value" : "%1$d Apri **Safari**\n%2$d Seleziona **File → Esporta → Password**\n%3$d Salva il file delle password dove puoi trovarlo (ad esempio, sul desktop)\n%4$d %5$@"
           }
         },
         "nl" : {
