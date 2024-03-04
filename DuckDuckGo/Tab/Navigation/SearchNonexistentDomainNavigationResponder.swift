@@ -33,7 +33,7 @@ final class SearchNonexistentDomainNavigationResponder {
         self.setContent = setContent
 
         cancellable = contentPublisher.sink { [weak self] tabContent in
-            if case .url(_, credential: .none, source: .userEntered(let userEnteredValue)) = tabContent {
+            if case .url(_, credential: .none, source: .userEntered(let userEnteredValue, _)) = tabContent {
                 self?.lastUserEnteredValue = userEnteredValue
             }
         }

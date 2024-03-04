@@ -22,7 +22,15 @@ import IOKit
 struct HardwareModel {
 
     static var model: String? {
-        let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+        let port: mach_port_t
+
+        if #available(macOS 12.0, *) {
+            port = kIOMainPortDefault
+        } else {
+            port = kIOMasterPortDefault
+        }
+
+        let service = IOServiceGetMatchingService(port, IOServiceMatching("IOPlatformExpertDevice"))
         var modelIdentifier: String?
 
         if let modelData = IORegistryEntryCreateCFProperty(

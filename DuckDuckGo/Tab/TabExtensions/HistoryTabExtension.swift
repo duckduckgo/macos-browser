@@ -21,6 +21,7 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
+import History
 
 final class HistoryTabExtension: NSObject {
 
