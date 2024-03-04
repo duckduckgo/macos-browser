@@ -156,9 +156,6 @@ jobs:
           if [[ "${prerelease}" == "true" ]]; then
             echo "task-template=merge-failed" >> $GITHUB_OUTPUT
             echo "comment-template=internal-release-ready-merge-failed" >> $GITHUB_OUTPUT
-            if [[ "${internal-release-bump}" == "true" ]]; then
-              echo "extra-task-template=run-publish-dmg-release" >> $GITHUB_OUTPUT
-            fi
           else
             echo "task-template=delete-branch-failed" >> $GITHUB_OUTPUT
             echo "comment-template=public-release-tagged-delete-branch-failed" >> $GITHUB_OUTPUT
@@ -167,9 +164,6 @@ jobs:
           if [[ "${prerelease}" == "true" ]]; then
             echo "task-template=internal-release-tag-failed" >> $GITHUB_OUTPUT
             echo "comment-template=internal-release-ready-tag-failed" >> $GITHUB_OUTPUT
-            if [[ "${internal-release-bump}" == "true" ]]; then
-              echo "extra-task-template=run-publish-dmg-release" >> $GITHUB_OUTPUT
-            fi
           else
             echo "task-template=public-release-tag-failed" >> $GITHUB_OUTPUT
             echo "comment-template=public-release-tag-failed" >> $GITHUB_OUTPUT
@@ -194,7 +188,7 @@ jobs:
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         release-task-url: ${{ env.asana-task-url }}
-        template-name: ${{ steps.asana-failure-templates.outputs.extra-task-template }}
+        template-name: run-publish-dmg-release
 
     - name: Report failure
       if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
