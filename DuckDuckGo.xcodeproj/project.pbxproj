@@ -431,7 +431,6 @@
 		3706FB83293F65D500E42796 /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */; };
 		3706FB84293F65D500E42796 /* NSWindowExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9E9A5525A3AE8400D1959D /* NSWindowExtension.swift */; };
 		3706FB85293F65D500E42796 /* AddBookmarkPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4C425D6A6E8007F5990 /* AddBookmarkPopover.swift */; };
-		3706FB86293F65D500E42796 /* PreferencesDownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */; };
 		3706FB87293F65D500E42796 /* ProcessExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C2FB127706E6A00BF2C7D /* ProcessExtension.swift */; };
 		3706FB88293F65D500E42796 /* PermissionAuthorizationQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA526A7BEC80013B453 /* PermissionAuthorizationQuery.swift */; };
 		3706FB89293F65D500E42796 /* BadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B9288984D00068632A /* BadgeAnimationView.swift */; };
@@ -1063,7 +1062,6 @@
 		37CBCA9A2A8966E60050218F /* SyncSettingsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */; };
 		37CBCA9B2A8966E60050218F /* SyncSettingsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */; };
 		37CC53EC27E8A4D10028713D /* PreferencesFireButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EB27E8A4D10028713D /* PreferencesFireButtonView.swift */; };
-		37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */; };
 		37CC53F427E8D4620028713D /* NSPathControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53F327E8D4620028713D /* NSPathControlView.swift */; };
 		37CD54B527F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54B427F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift */; };
 		37CD54B727F1B28A00F1F7B9 /* DefaultBrowserPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54B627F1B28A00F1F7B9 /* DefaultBrowserPreferencesTests.swift */; };
@@ -1625,7 +1623,6 @@
 		4B957A812AC7AE700062CA31 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		4B957A822AC7AE700062CA31 /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
 		4B957A832AC7AE700062CA31 /* AddBookmarkPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4C425D6A6E8007F5990 /* AddBookmarkPopover.swift */; };
-		4B957A842AC7AE700062CA31 /* PreferencesDownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */; };
 		4B957A852AC7AE700062CA31 /* QRSharingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F7127D29F6779000594A45 /* QRSharingService.swift */; };
 		4B957A862AC7AE700062CA31 /* ProcessExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C2FB127706E6A00BF2C7D /* ProcessExtension.swift */; };
 		4B957A872AC7AE700062CA31 /* PermissionAuthorizationQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA526A7BEC80013B453 /* PermissionAuthorizationQuery.swift */; };
@@ -3478,7 +3475,6 @@
 		37BF3F1F286F0A7A00BD9014 /* PinnedTabsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinnedTabsView.swift; sourceTree = "<group>"; };
 		37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSettingsAdapter.swift; sourceTree = "<group>"; };
 		37CC53EB27E8A4D10028713D /* PreferencesFireButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesFireButtonView.swift; sourceTree = "<group>"; };
-		37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDownloadsView.swift; sourceTree = "<group>"; };
 		37CC53F327E8D4620028713D /* NSPathControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPathControlView.swift; sourceTree = "<group>"; };
 		37CD54B427F1AC1300F1F7B9 /* PreferencesSidebarModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSidebarModelTests.swift; sourceTree = "<group>"; };
 		37CD54B627F1B28A00F1F7B9 /* DefaultBrowserPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBrowserPreferencesTests.swift; sourceTree = "<group>"; };
@@ -5248,7 +5244,6 @@
 				1D01A3CF2B88CEC600FE8150 /* PreferencesAccessibilityView.swift */,
 				37CC53EB27E8A4D10028713D /* PreferencesFireButtonView.swift */,
 				37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */,
-				37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */,
 				37AFCE9127DB8CAD00471A10 /* PreferencesAboutView.swift */,
 			);
 			path = View;
@@ -9844,7 +9839,6 @@
 				37197EA42942441D00394917 /* NewWindowPolicy.swift in Sources */,
 				3706FB84293F65D500E42796 /* NSWindowExtension.swift in Sources */,
 				3706FB85293F65D500E42796 /* AddBookmarkPopover.swift in Sources */,
-				3706FB86293F65D500E42796 /* PreferencesDownloadsView.swift in Sources */,
 				7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */,
 				3706FB87293F65D500E42796 /* ProcessExtension.swift in Sources */,
 				3706FB88293F65D500E42796 /* PermissionAuthorizationQuery.swift in Sources */,
@@ -11030,7 +11024,6 @@
 				4B41EDA52B1543B9001EEDF4 /* VPNPreferencesModel.swift in Sources */,
 				4B957A822AC7AE700062CA31 /* SyncDebugMenu.swift in Sources */,
 				4B957A832AC7AE700062CA31 /* AddBookmarkPopover.swift in Sources */,
-				4B957A842AC7AE700062CA31 /* PreferencesDownloadsView.swift in Sources */,
 				4B957A852AC7AE700062CA31 /* QRSharingService.swift in Sources */,
 				4B957A862AC7AE700062CA31 /* ProcessExtension.swift in Sources */,
 				4B957A872AC7AE700062CA31 /* PermissionAuthorizationQuery.swift in Sources */,
@@ -11796,7 +11789,6 @@
 				7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */,
 				370A34B12AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* AddBookmarkPopover.swift in Sources */,
-				37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */,
 				B6F7127E29F6779000594A45 /* QRSharingService.swift in Sources */,
 				B68C2FB227706E6A00BF2C7D /* ProcessExtension.swift in Sources */,
 				B6106BA726A7BECC0013B453 /* PermissionAuthorizationQuery.swift in Sources */,

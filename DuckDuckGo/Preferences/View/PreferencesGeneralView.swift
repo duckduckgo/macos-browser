@@ -26,6 +26,7 @@ extension Preferences {
 
     struct GeneralView: View {
         @ObservedObject var startupModel: StartupPreferences
+        @ObservedObject var downloadsModel: DownloadsPreferences
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
@@ -45,7 +46,25 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 2: Home Page
+                // SECTION 2: Downloads
+                PreferencePaneSection(UserText.downloads) {
+
+                    PreferencePaneSubSection {
+                        Text(UserText.downloadsLocation + ":").bold()
+                        HStack {
+                            NSPathControlView(url: downloadsModel.selectedDownloadLocation)
+#if !APPSTORE
+                            Button(UserText.downloadsChangeDirectory) {
+                                downloadsModel.presentDownloadDirectoryPanel()
+                            }
+#endif
+                        }
+                        .disabled(downloadsModel.alwaysRequestDownloadLocation)
+                        ToggleMenuItem(UserText.downloadsAlwaysAsk, isOn: $downloadsModel.alwaysRequestDownloadLocation)
+                    }
+                }
+
+                // SECTION 3: Home Page
                 PreferencePaneSection(UserText.homePage) {
 
                     PreferencePaneSubSection {
