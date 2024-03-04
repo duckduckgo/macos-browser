@@ -330,7 +330,7 @@ jobs:
 
     if: ${{ github.event.inputs.release-type != 'internal' }}
 
-    uses: ./.github/workflows/create_variants.yml
+    uses: duckduckgo/macos-browser/.github/workflows/create_variants.yml@main
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
