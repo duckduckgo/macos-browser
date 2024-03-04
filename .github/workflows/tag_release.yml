@@ -37,6 +37,11 @@ on:
         description: "Is this a pre-release? (a.k.a. internal release)"
         required: true
         type: boolean
+      internal-release-bump:
+        description: "Is this an internal release bump? (the subsequent internal release of the current week)"
+        required: false
+        default: false
+        type: boolean
     secrets:
       ASANA_ACCESS_TOKEN:
         required: true
@@ -57,6 +62,7 @@ jobs:
       BASE_BRANCH: ${{ inputs.base-branch || 'main' }}
       BRANCH: ${{ inputs.branch || github.ref_name }}
       prerelease: ${{ github.event.inputs.prerelease || inputs.prerelease }}
+      internal-release-bump: ${{ inputs.internal-release-bump }}
 
     outputs:
       tag: ${{ steps.create-tag.outputs.tag }}
@@ -150,6 +156,9 @@ jobs:
           if [[ "${prerelease}" == "true" ]]; then
             echo "task-template=merge-failed" >> $GITHUB_OUTPUT
             echo "comment-template=internal-release-ready-merge-failed" >> $GITHUB_OUTPUT
+            if [[ "${internal-release-bump}" == "true" ]]; then
+              echo "extra-task-template=run-publish-dmg-release" >> $GITHUB_OUTPUT
+            fi
           else
             echo "task-template=delete-branch-failed" >> $GITHUB_OUTPUT
             echo "comment-template=public-release-tagged-delete-branch-failed" >> $GITHUB_OUTPUT
@@ -158,6 +167,9 @@ jobs:
           if [[ "${prerelease}" == "true" ]]; then
             echo "task-template=internal-release-tag-failed" >> $GITHUB_OUTPUT
             echo "comment-template=internal-release-ready-tag-failed" >> $GITHUB_OUTPUT
+            if [[ "${internal-release-bump}" == "true" ]]; then
+              echo "extra-task-template=run-publish-dmg-release" >> $GITHUB_OUTPUT
+            fi
           else
             echo "task-template=public-release-tag-failed" >> $GITHUB_OUTPUT
             echo "comment-template=public-release-tag-failed" >> $GITHUB_OUTPUT
@@ -172,6 +184,17 @@ jobs:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         release-task-url: ${{ env.asana-task-url }}
         template-name: ${{ steps.asana-failure-templates.outputs.task-template }}
+
+    - name: Create Publish DMG Release task on failure
+      id: create-publish-dmg-task-on-failure
+      if: (failure() || env.MERGE_OR_DELETE_FAILED == 'true') && env.internal-release-bump == 'true'
+      uses: ./.github/actions/asana-create-action-item
+      env:
+        ASANA_TASK_URL: ${{ env.asana-task-url }}
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        release-task-url: ${{ env.asana-task-url }}
+        template-name: ${{ steps.asana-failure-templates.outputs.extra-task-template }}
 
     - name: Report failure
       if: failure() || env.MERGE_OR_DELETE_FAILED == 'true'
