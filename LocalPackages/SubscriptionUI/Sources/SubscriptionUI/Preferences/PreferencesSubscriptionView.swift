@@ -137,7 +137,7 @@ public struct PreferencesSubscriptionView: View {
                 SectionView(iconName: "VPN-Icon",
                             title: UserText.vpnServiceTitle,
                             description: UserText.vpnServiceDescription,
-                            buttonName: model.isUserAuthenticated ? "Manage" : nil,
+                            buttonName: model.isUserAuthenticated ? UserText.vpnServiceButtonTitle : nil,
                             buttonAction: { model.openVPN() },
                             enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.networkProtection))
 
@@ -147,7 +147,7 @@ public struct PreferencesSubscriptionView: View {
                 SectionView(iconName: "PIR-Icon",
                             title: UserText.personalInformationRemovalServiceTitle,
                             description: UserText.personalInformationRemovalServiceDescription,
-                            buttonName: model.isUserAuthenticated ? "View" : nil,
+                            buttonName: model.isUserAuthenticated ? UserText.personalInformationRemovalServiceButtonTitle : nil,
                             buttonAction: { model.openPersonalInformationRemoval() },
                             enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.dataBrokerProtection))
 
@@ -157,7 +157,7 @@ public struct PreferencesSubscriptionView: View {
                 SectionView(iconName: "ITR-Icon",
                             title: UserText.identityTheftRestorationServiceTitle,
                             description: UserText.identityTheftRestorationServiceDescription,
-                            buttonName: model.isUserAuthenticated ? "View" : nil,
+                            buttonName: model.isUserAuthenticated ? UserText.identityTheftRestorationServiceButtonTitle : nil,
                             buttonAction: { model.openIdentityTheftRestoration() },
                             enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.identityTheftRestoration))
             }

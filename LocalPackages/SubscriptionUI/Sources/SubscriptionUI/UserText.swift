@@ -25,12 +25,15 @@ enum UserText {
 
     static let vpnServiceTitle = NSLocalizedString("subscription.preferences.services.vpn.title", value: "VPN", comment: "Title for the VPN service listed in the subscription preferences pane")
     static let vpnServiceDescription = NSLocalizedString("subscription.preferences.services.vpn.description", value: "Full-device protection with the VPN built for speed and security.", comment: "Description for the VPN service listed in the subscription preferences pane")
+    static let vpnServiceButtonTitle = NSLocalizedString("subscription.preferences.services.vpn.button.title", value: "Open", comment: "Title for the VPN service button to open its settings")
 
     static let personalInformationRemovalServiceTitle = NSLocalizedString("subscription.preferences.services.personal.information.removal.title", value: "Personal Information Removal", comment: "Title for the Personal Information Removal service listed in the subscription preferences pane")
     static let personalInformationRemovalServiceDescription = NSLocalizedString("subscription.preferences.services.personal.information.removal.description", value: "Find and remove your personal information from sites that store and sell it.", comment: "Description for the Personal Information Removal service listed in the subscription preferences pane")
+    static let personalInformationRemovalServiceButtonTitle = NSLocalizedString("subscription.preferences.services.personal.information.removal.button.title", value: "Get Started", comment: "Title for the Personal Information Removal service button to open its settings")
 
     static let identityTheftRestorationServiceTitle = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.title", value: "Identity Theft Restoration", comment: "Title for the Identity Theft Restoration service listed in the subscription preferences pane")
     static let identityTheftRestorationServiceDescription = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.description", value: "Restore stolen accounts and financial losses in the event of identity theft.", comment: "Description for the Identity Theft Restoration service listed in the subscription preferences pane")
+    static let identityTheftRestorationServiceButtonTitle = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.button.title", value: "View", comment: "Title for the Identity Theft Restoration service button to open its settings")
 
     // MARK: Preferences footer
     static let preferencesSubscriptionFooterTitle = NSLocalizedString("subscription.preferences.subscription.footer.title", value: "Questions about Privacy Pro?", comment: "Title for the subscription preferences pane footer")
