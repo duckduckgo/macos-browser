@@ -25,8 +25,7 @@ data:
           </ul></li>
         <li><code>git push origin ${BASE_BRANCH}</code> push merged branch</li>
       </ul>
-      Complete this task when ready and proceed with testing the build. If you're bumping an internal release, you should get another task asking you to publish the release in Sparkle. 
-      Look for other tasks in <a data-asana-gid='${AUTOMATION_TASK_ID}'/> task and handle them as needed.
+      Complete this task when ready and proceed with testing the build.
 
 
       🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
