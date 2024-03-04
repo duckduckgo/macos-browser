@@ -24,26 +24,26 @@ jobs:
 
   # This is only run for public and hotfix releases
   # Internal release has been tagged as part of code_freeze or bump_interal_release workflows
-  tag-public-release:
+  # tag-public-release:
 
-    name: Tag public release
+  #   name: Tag public release
 
-    if: ${{ github.event.inputs.release-type != 'internal' }}
+  #   if: ${{ github.event.inputs.release-type != 'internal' }}
 
-    uses: ./.github/workflows/tag_release.yml
-    with:
-      asana-task-url: ${{ github.event.inputs.asana-task-url }}
-      branch: ${{ github.ref_name }}
-      prerelease: false
-    secrets:
-      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+  #   uses: ./.github/workflows/tag_release.yml
+  #   with:
+  #     asana-task-url: ${{ github.event.inputs.asana-task-url }}
+  #     branch: ${{ github.ref_name }}
+  #     prerelease: false
+  #   secrets:
+  #     ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  #     GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
 
   publish-to-sparkle:
 
     name: Publish a release to Sparkle
 
-    needs: [tag-public-release]
+    # needs: [tag-public-release]
 
     # Allow to run even if the tag-public-release job was skipped (e.g. for internal releases)
     # or failed (for public releases or hotfixes), because tagging doesn't block publishing the release
