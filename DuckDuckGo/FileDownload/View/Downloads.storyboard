@@ -11,14 +11,14 @@
             <objects>
                 <viewController storyboardIdentifier="PasswordManagement" id="luO-ux-o3b" customClass="DownloadsViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="7fC-jy-ghc">
-                        <rect key="frame" x="0.0" y="0.0" width="366" height="484"/>
+                        <rect key="frame" x="0.0" y="0.0" width="420" height="484"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Bcr-Im-bcg">
-                                <rect key="frame" x="0.0" y="0.0" width="366" height="484"/>
+                                <rect key="frame" x="0.0" y="0.0" width="420" height="484"/>
                                 <subviews>
                                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="wlm-tA-4J8">
-                                        <rect key="frame" x="1" y="438" width="364" height="5"/>
+                                        <rect key="frame" x="1" y="438" width="418" height="5"/>
                                     </box>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h7h-Ho-bYo">
                                         <rect key="frame" x="10" y="453" width="80" height="19"/>
@@ -29,7 +29,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="aKx-1h-4hp" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="291" y="447" width="32" height="32"/>
+                                        <rect key="frame" x="345" y="447" width="32" height="32"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="OpenDownloadsFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="zPp-Ue-FE8">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -58,7 +58,7 @@
                                         </connections>
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="cev-k6-wFH" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="323" y="447" width="32" height="32"/>
+                                        <rect key="frame" x="377" y="447" width="32" height="32"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ClearDownloads" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="rtz-Fb-5yl">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -87,18 +87,18 @@
                                         </connections>
                                     </button>
                                     <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="60" horizontalPageScroll="10" verticalLineScroll="60" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v01-Bs-7xy">
-                                        <rect key="frame" x="0.0" y="0.0" width="366" height="440"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="420" height="440"/>
                                         <clipView key="contentView" drawsBackground="NO" id="wkx-Z3-x2p">
-                                            <rect key="frame" x="0.0" y="0.0" width="366" height="440"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="420" height="440"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="fullWidth" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="60" viewBased="YES" id="zWp-mP-b3k">
-                                                    <rect key="frame" x="0.0" y="0.0" width="366" height="440"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="420" height="440"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <color key="backgroundColor" name="ClearColor"/>
                                                     <color key="gridColor" name="ClearColor"/>
                                                     <tableColumns>
-                                                        <tableColumn width="353" minWidth="40" maxWidth="1000" id="BU8-mD-jcA">
+                                                        <tableColumn width="408" minWidth="40" maxWidth="1000" id="BU8-mD-jcA">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -111,7 +111,7 @@
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
                                                                 <tableCellView identifier="cell" id="0Hy-P1-z0d" customClass="DownloadsCellView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="365" height="60"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="420" height="60"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hpj-1Y-eDv">
@@ -123,7 +123,7 @@
                                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Iz7-Te-xl9"/>
                                                                         </imageView>
                                                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="w5d-I6-kEZ">
-                                                                            <rect key="frame" x="43" y="32" width="96" height="16"/>
+                                                                            <rect key="frame" x="43" y="32" width="335" height="16"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="16" id="e05-6Y-K6e"/>
                                                                             </constraints>
@@ -134,7 +134,7 @@
                                                                             </textFieldCell>
                                                                         </textField>
                                                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="ziJ-5p-mOT">
-                                                                            <rect key="frame" x="43" y="13" width="96" height="16"/>
+                                                                            <rect key="frame" x="43" y="13" width="335" height="16"/>
                                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Table View Cell" usesSingleLineMode="YES" id="P5k-0F-CZE">
                                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -142,7 +142,7 @@
                                                                             </textFieldCell>
                                                                         </textField>
                                                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CEa-RP-JgA" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="329" y="14" width="32" height="32"/>
+                                                                            <rect key="frame" x="384" y="14" width="32" height="32"/>
                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="CancelDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="kcy-Qa-BSO">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
@@ -170,7 +170,7 @@
                                                                             </connections>
                                                                         </button>
                                                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ejd-n2-PCA" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="329" y="14" width="32" height="32"/>
+                                                                            <rect key="frame" x="384" y="14" width="32" height="32"/>
                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="8X3-Se-bda">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
@@ -198,7 +198,7 @@
                                                                             </connections>
                                                                         </button>
                                                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="foT-7L-XqL" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="329" y="14" width="32" height="32"/>
+                                                                            <rect key="frame" x="384" y="14" width="32" height="32"/>
                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RestartDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="OH5-JL-AF7">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
@@ -226,14 +226,14 @@
                                                                             </connections>
                                                                         </button>
                                                                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="BUB-Ea-xr5" customClass="CircularProgressView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="332" y="17" width="27" height="27"/>
+                                                                            <rect key="frame" x="387" y="17" width="27" height="27"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="27" id="eYj-jc-HTB"/>
                                                                                 <constraint firstAttribute="width" constant="27" id="vVc-1u-0F0"/>
                                                                             </constraints>
                                                                         </customView>
                                                                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Fue-CV-Ukm">
-                                                                            <rect key="frame" x="0.0" y="-2" width="365" height="5"/>
+                                                                            <rect key="frame" x="0.0" y="-2" width="420" height="5"/>
                                                                         </box>
                                                                     </subviews>
                                                                     <constraints>
@@ -247,12 +247,12 @@
                                                                         <constraint firstItem="Fue-CV-Ukm" firstAttribute="leading" secondItem="0Hy-P1-z0d" secondAttribute="leading" id="QBC-Js-e0p"/>
                                                                         <constraint firstItem="Fue-CV-Ukm" firstAttribute="top" secondItem="ziJ-5p-mOT" secondAttribute="bottom" constant="12" id="QwU-JU-idK"/>
                                                                         <constraint firstItem="hpj-1Y-eDv" firstAttribute="centerY" secondItem="0Hy-P1-z0d" secondAttribute="centerY" id="T7a-0E-ouJ"/>
-                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="w5d-I6-kEZ" secondAttribute="trailing" constant="8" id="U1h-uy-ann"/>
+                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" secondItem="w5d-I6-kEZ" secondAttribute="trailing" constant="8" id="U1h-uy-ann"/>
                                                                         <constraint firstItem="Ejd-n2-PCA" firstAttribute="centerY" secondItem="foT-7L-XqL" secondAttribute="centerY" id="ZL1-MJ-Czx"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerY" secondItem="BUB-Ea-xr5" secondAttribute="centerY" id="enG-OL-lav"/>
                                                                         <constraint firstItem="w5d-I6-kEZ" firstAttribute="leading" secondItem="hpj-1Y-eDv" secondAttribute="trailing" constant="6" id="gSS-n9-QXX"/>
                                                                         <constraint firstAttribute="trailing" secondItem="Fue-CV-Ukm" secondAttribute="trailing" id="oZ0-bh-Iaf"/>
-                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ziJ-5p-mOT" secondAttribute="trailing" constant="8" id="rp5-hJ-Ccg"/>
+                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" secondItem="ziJ-5p-mOT" secondAttribute="trailing" constant="8" id="rp5-hJ-Ccg"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerX" secondItem="Ejd-n2-PCA" secondAttribute="centerX" id="uRp-Pm-Vkf"/>
                                                                         <constraint firstItem="hpj-1Y-eDv" firstAttribute="leading" secondItem="0Hy-P1-z0d" secondAttribute="leading" constant="7" id="vnq-0C-72q"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerY" secondItem="Ejd-n2-PCA" secondAttribute="centerY" id="xeM-DX-IDw"/>
@@ -270,11 +270,11 @@
                                                                     </connections>
                                                                 </tableCellView>
                                                                 <tableCellView identifier="NoDownloads" id="q3R-14-XtD" userLabel="No Downloads Cell View" customClass="NoDownloadViewCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                    <rect key="frame" x="0.0" y="60" width="365" height="60"/>
+                                                                    <rect key="frame" x="0.0" y="60" width="420" height="60"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0d3-Th-2Ic">
-                                                                            <rect key="frame" x="116" y="32" width="133" height="16"/>
+                                                                            <rect key="frame" x="144" y="32" width="133" height="16"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="No recent downloads" id="qQZ-ro-Kgg">
                                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -282,7 +282,7 @@
                                                                             </textFieldCell>
                                                                         </textField>
                                                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="l4f-0C-oRY" customClass="LinkButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="108" y="12" width="149" height="16"/>
+                                                                            <rect key="frame" x="136" y="12" width="149" height="16"/>
                                                                             <buttonCell key="cell" type="square" title="Open Downloads Folder" bezelStyle="shadowlessSquare" alignment="center" imageScaling="proportionallyDown" inset="2" id="JMw-qp-avv">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
@@ -305,11 +305,11 @@
                                                                     </connections>
                                                                 </tableCellView>
                                                                 <tableCellView identifier="OpenDownloads" id="n1l-Gb-vtG" userLabel="Open Downloads Cell View" customClass="OpenDownloadViewCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                    <rect key="frame" x="0.0" y="120" width="365" height="60"/>
+                                                                    <rect key="frame" x="0.0" y="120" width="420" height="60"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jbc-kS-JbC" customClass="LinkButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                                            <rect key="frame" x="108" y="22" width="149" height="16"/>
+                                                                            <rect key="frame" x="136" y="22" width="149" height="16"/>
                                                                             <buttonCell key="cell" type="square" title="Open Downloads Folder" bezelStyle="shadowlessSquare" alignment="center" imageScaling="proportionallyDown" inset="2" id="31c-Jt-x7J">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
@@ -356,7 +356,6 @@
                                     </scrollView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="366" id="54p-oX-nFB"/>
                                     <constraint firstAttribute="trailing" secondItem="v01-Bs-7xy" secondAttribute="trailing" id="DfP-ji-bgO"/>
                                     <constraint firstAttribute="bottom" secondItem="v01-Bs-7xy" secondAttribute="bottom" id="Kin-9D-Elb"/>
                                     <constraint firstItem="h7h-Ho-bYo" firstAttribute="leading" secondItem="Bcr-Im-bcg" secondAttribute="leading" constant="12" id="NbX-pY-e0i"/>

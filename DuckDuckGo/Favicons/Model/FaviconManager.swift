@@ -21,6 +21,7 @@ import Cocoa
 import Combine
 import BrowserServicesKit
 import Common
+import History
 
 @MainActor
 protocol FaviconManagement: AnyObject {

@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import History
 
 @MainActor
 final class HistoryMenu: NSMenu {
