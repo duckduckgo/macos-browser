@@ -154,19 +154,21 @@ final class DownloadListCoordinator {
             .combineLatest(task.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] (total, completed) in
-                guard let self = self else { return }
-                self.progress.totalUnitCount += (total - lastKnownProgress.total)
-                self.progress.completedUnitCount += (completed - lastKnownProgress.completed)
+                guard let self = self, total > 0, completed > 0 else { return }
+
+                progress.totalUnitCount += (total - lastKnownProgress.total)
+                progress.completedUnitCount += (completed - lastKnownProgress.completed)
                 lastKnownProgress = (total, completed)
             }
             .store(in: &self.taskProgressCancellables[task, default: []])
 
         task.output.receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                guard let self = self else { return }
-                self.progress.completedUnitCount -= lastKnownProgress.completed
-                self.progress.totalUnitCount -= lastKnownProgress.total
-                self.taskProgressCancellables[task] = nil
+                guard let self else { return }
+
+                progress.completedUnitCount -= lastKnownProgress.completed
+                progress.totalUnitCount -= lastKnownProgress.total
+                taskProgressCancellables[task] = nil
 
             } receiveValue: { _ in }
             .store(in: &self.taskProgressCancellables[task, default: []])
