@@ -27,6 +27,10 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionActiveUser
     case networkProtectionNewUser
 
+    case networkProtectionControllerStartAttempt
+    case networkProtectionControllerStartSuccess
+    case networkProtectionControllerStartFailure
+
     case networkProtectionTunnelStartAttempt
     case networkProtectionTunnelStartSuccess
     case networkProtectionTunnelStartFailure
@@ -102,6 +106,15 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
         case .networkProtectionNewUser:
             return "m_mac_netp_daily_active_u"
+
+        case .networkProtectionControllerStartAttempt:
+            return "m_mac_netp_controller_start_attempt"
+
+        case .networkProtectionControllerStartSuccess:
+            return "m_mac_netp_controller_start_success"
+
+        case .networkProtectionControllerStartFailure:
+            return "m_mac_netp_controller_start_failure"
 
         case .networkProtectionTunnelStartAttempt:
             return "m_mac_netp_tunnel_start_attempt"

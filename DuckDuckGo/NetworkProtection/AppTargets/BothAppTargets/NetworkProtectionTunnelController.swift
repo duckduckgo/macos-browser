@@ -472,7 +472,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async {
-        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionTunnelStartAttempt,
+        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
                       frequency: .dailyAndContinuous)
         controllerErrorStore.lastErrorMessage = nil
 
@@ -513,12 +513,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 // started".  Meaning there's no error caught in this start attempt.  There are pixels
                 // in the packet tunnel provider side that can be used to debug additional logic.
                 //
-                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionTunnelStartSuccess,
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartSuccess,
                               frequency: .dailyAndContinuous)
             }
         } catch {
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionTunnelStartFailure, frequency: .dailyAndContinuous, withError: error, includeAppVersionParameter: true
+                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure, frequency: .dailyAndContinuous, withError: error, includeAppVersionParameter: true
             )
 
             await stop()
