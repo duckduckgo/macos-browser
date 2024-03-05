@@ -122,10 +122,14 @@ final class MoreOptionsMenu: NSMenu {
     private func setupMenuItems() {
 
 #if FEEDBACK
-        let feedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: nil, keyEquivalent: "")
-#if !APPSTORE
-            .withImage(NSImage(named: "BetaLabel"))
-#endif // !APPSTORE
+        let feedbackString: String = {
+            guard internalUserDecider.isInternalUser else {
+                return UserText.sendFeedback
+            }
+            return "\(UserText.sendFeedback) (version: \(AppVersion.shared.versionNumber).\(AppVersion.shared.buildNumber))"
+        }()
+        let feedbackMenuItem = NSMenuItem(title: feedbackString, action: nil, keyEquivalent: "")
+
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(feedbackMenuItem)
 

@@ -112,6 +112,10 @@ final class TabViewModel {
                     // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
                     return tab.webViewDidCommitNavigationPublisher.map { .didCommit }.eraseToAnyPublisher()
 
+                case .url(_, _, source: .userEntered(_, downloadRequested: true)):
+                    // don‘t update the address bar for download navigations
+                    return Empty().eraseToAnyPublisher().eraseToAnyPublisher()
+
                 case .url(_, _, source: .pendingStateRestoration),
                      .url(_, _, source: .loadedByStateRestoration),
                      .url(_, _, source: .userEntered),
@@ -132,14 +136,12 @@ final class TabViewModel {
                 }
             }
             .switchToLatest()
-            .sink { [weak self] event in
+            .sink { [weak self] _ in
                 guard let self else { return }
 
                 updateAddressBarStrings()
-                if case .didCommit = event {
-                    updateCanBeBookmarked()
-                    updateFavicon()
-                }
+                updateFavicon()
+                updateCanBeBookmarked()
             }
             .store(in: &cancellables)
     }
@@ -176,9 +178,8 @@ final class TabViewModel {
             .filter { [weak self] _ in
                 self?.tab.isLazyLoadingInProgress == false
             }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.updateFavicon()
+            .sink { [weak self] favicon in
+                self?.updateFavicon(favicon)
             }
             .store(in: &cancellables)
     }
@@ -311,7 +312,7 @@ final class TabViewModel {
         }
     }
 
-    private func updateFavicon() {
+    private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
             favicon = .alertCircleColor16
             return
@@ -337,10 +338,10 @@ final class TabViewModel {
         case .url, .onboarding, .none, .subscription: break
         }
 
-        if let favicon = tab.favicon {
+        if let favicon: NSImage? = tabFavicon {
             self.favicon = favicon
         } else {
-            favicon = nil
+            self.favicon = tab.favicon
         }
     }
 
