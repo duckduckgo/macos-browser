@@ -126,13 +126,13 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
             return "m_mac_netp_tunnel_start_failure"
 
         case .networkProtectionTunnelUpdateAttempt:
-            return "m_mac_netp_tunnel_start_attempt"
+            return "m_mac_netp_tunnel_update_attempt"
 
         case .networkProtectionTunnelUpdateSuccess:
-            return "m_mac_netp_tunnel_start_success"
+            return "m_mac_netp_tunnel_update_success"
 
         case .networkProtectionTunnelUpdateFailure:
-            return "m_mac_netp_tunnel_start_failure"
+            return "m_mac_netp_tunnel_update_failure"
 
         case .networkProtectionEnableAttemptConnecting:
             return "m_mac_netp_ev_enable_attempt"
