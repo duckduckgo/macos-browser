@@ -45,7 +45,7 @@ jobs:
 
     name: Tag public release
 
-    # Run if release-type is provided (not empty) an is not internal
+    # Run if release-type is provided (not empty) and is not internal
     if: contains(github.event.inputs.release-type, '') == false && github.event.inputs.release-type != 'internal'
 
     uses: ./.github/workflows/tag_release.yml
@@ -111,6 +111,28 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
+      - name: Extract Asana Task ID
+        id: task-id
+        uses: ./.github/actions/asana-extract-task-id
+        with:
+          task-url: ${{ github.event.inputs.asana-task-url }}
+
+      - name: Fetch and validate release notes
+        env:
+          TASK_ID: ${{ steps.task-id.outputs.task-id }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes" \
+            -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+            | jq -r .data.notes \
+            | ./scripts/extract_release_notes.sh) > release_notes.txt
+          release_notes="$(<release_notes)"
+          if [[ ${#release_notes} == 0 || "$release_notes" == "<-- Add release notes here -->" ]]; then
+            echo "::error::Release notes are empty. Please add release notes to the Asana task and restart the workflow."
+            exit 1
+          fi
+          echo "RELEASE_NOTES_FILE=release_notes.txt" >> $GITHUB_ENV
+
       - name: Set up Sparkle tools
         env:
           SPARKLE_URL: https://github.com/sparkle-project/Sparkle/releases/download/${{ vars.SPARKLE_VERSION }}/Sparkle-${{ vars.SPARKLE_VERSION }}.tar.xz
@@ -130,23 +152,6 @@ jobs:
           fi
           echo "dmg-name=$DMG_NAME" >> $GITHUB_OUTPUT
           echo "dmg-path=$DMG_NAME" >> $GITHUB_OUTPUT
-
-      - name: Extract Asana Task ID
-        id: task-id
-        uses: ./.github/actions/asana-extract-task-id
-        with:
-          task-url: ${{ github.event.inputs.asana-task-url }}
-
-      - name: Fetch release notes
-        env:
-          TASK_ID: ${{ steps.task-id.outputs.task-id }}
-          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        run: |
-          curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes" \
-            -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-            | jq -r .data.notes \
-            | ./scripts/extract_release_notes.sh > release_notes.txt
-          echo "RELEASE_NOTES_FILE=release_notes.txt" >> $GITHUB_ENV
 
       - name: Generate appcast
         id: appcast
