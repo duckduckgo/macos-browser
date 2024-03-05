@@ -47,7 +47,7 @@ struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
                 if let bottomText {
                     Spacer()
                     Text(bottomText)
-                        .foregroundColor(Color("BlackWhite60"))
+                        .foregroundColor(Color(.blackWhite60))
                 }
                 Spacer()
                 buttons()
@@ -58,7 +58,7 @@ struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
         .padding(.bottom, 16.0)
         .frame(minWidth: 360, idealHeight: 314)
         .background(
-            Color("DialogPanelBackground")
+            Color(.dialogPanelBackground)
         )
     }
 }
