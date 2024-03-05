@@ -147,7 +147,7 @@ final class DownloadsViewController: NSViewController {
     // MARK: User Actions
 
     @IBAction func openDownloadsFolderAction(_ sender: Any) {
-        let prefs = DownloadsPreferences()
+        let prefs = DownloadsPreferences.shared
         var url: URL?
         var itemToSelect: URL?
 
