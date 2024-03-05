@@ -26,7 +26,7 @@ struct DeviceSyncedView: View {
     var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
-                Image("Sync-setup-success")
+                Image(.syncSetupSuccess)
                 SyncUIViews.TextHeader(text: UserText.deviceSynced)
             }
             .frame(width: 320)

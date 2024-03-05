@@ -312,10 +312,10 @@ import SubscriptionUI
             NSMenuItem(title: UserText.favorites)
                 .submenu(favoritesMenu.buildItems {
                     NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
-                        .withImage(NSImage(named: "Favorite"))
+                        .withImage(.favorite)
                     NSMenuItem.separator()
                 })
-                .withImage(NSImage(named: "Favorite"))
+                .withImage(.favorite)
 
             NSMenuItem.separator()
         })

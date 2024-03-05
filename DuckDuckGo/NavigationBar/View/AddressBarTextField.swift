@@ -821,7 +821,7 @@ extension AddressBarTextField {
         case title(String)
 
         func toAttributedString(size: CGFloat, isBurner: Bool) -> NSAttributedString {
-            let suffixColor = isBurner ? NSColor.burnerAccentColor : NSColor.addressBarSuffixColor
+            let suffixColor = isBurner ? NSColor.burnerAccent : NSColor.addressBarSuffix
             let attrs: [NSAttributedString.Key: Any] = [
                 .font: NSFont.systemFont(ofSize: size, weight: .light),
                 .foregroundColor: suffixColor
