@@ -22,7 +22,7 @@ import BrowserServicesKit
 
 struct ClickToLoadRulesSplitter {
 
-    public enum Constant {
+    public enum Constants {
 
         public static let clickToLoadRuleListPrefix = "CTL_"
 
@@ -43,7 +43,7 @@ struct ClickToLoadRulesSplitter {
                 ContentBlockerRulesList(name: rulesList.name,
                                         trackerData: splitTDS?.withoutBlockCTL ?? rulesList.trackerData,
                                         fallbackTrackerData: splitFallbackTDS?.withoutBlockCTL ?? rulesList.fallbackTrackerData),
-                ContentBlockerRulesList(name: "XD",
+                ContentBlockerRulesList(name: ContentBlockerRulesLists.Constants.clickToLoadRulesListName,
                                         trackerData: splitTDS?.withBlockCTL ?? rulesList.trackerData,
                                         fallbackTrackerData: splitFallbackTDS?.withBlockCTL ?? rulesList.fallbackTrackerData)
             )
@@ -52,16 +52,16 @@ struct ClickToLoadRulesSplitter {
     }
 
     private func split(trackerData: TrackerDataManager.DataSet) -> (withoutBlockCTL: TrackerDataManager.DataSet, withBlockCTL: TrackerDataManager.DataSet)? {
-        let trackersWithBlockCTL = filterTrackersByBlockCTLAction(trackerData.tds.trackers, hasBlockCTL: true)
+        let trackersWithBlockCTL = filterTrackersWithCTLAction(trackerData.tds.trackers)
 
         if !trackersWithBlockCTL.isEmpty {
-            let trackersWithoutBlockCTL = filterTrackersByBlockCTLAction(trackerData.tds.trackers, hasBlockCTL: false)
+            let trackersWithoutBlockCTL = filterTrackersWithoutCTLAction(trackerData.tds.trackers)
             let trackerDataWithoutBlockCTL = makeTrackerData(using: trackersWithoutBlockCTL, originalTDS: trackerData.tds)
             let trackerDataWithBlockCTL = makeTrackerData(using: trackersWithBlockCTL, originalTDS: trackerData.tds)
 
             return (
-                (tds: trackerDataWithoutBlockCTL, etag: Constant.clickToLoadRuleListPrefix + trackerData.etag),
-                (tds: trackerDataWithBlockCTL, etag: Constant.clickToLoadRuleListPrefix + trackerData.etag)
+                (tds: trackerDataWithoutBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag),
+                (tds: trackerDataWithBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag)
             )
         }
         return nil
@@ -76,8 +76,33 @@ struct ClickToLoadRulesSplitter {
                            cnames: originalTDS.cnames)
     }
 
-    private func filterTrackersByBlockCTLAction(_ trackers: [String: KnownTracker], hasBlockCTL: Bool) -> [String: KnownTracker] {
-        trackers.filter { (_, tracker) in tracker.containsCTLActions == hasBlockCTL }
+    private func filterTrackersWithoutCTLAction(_ trackers: [String: KnownTracker]) -> [String: KnownTracker] {
+        trackers.filter { (_, tracker) in tracker.containsCTLActions == false }
+    }
+
+    private func filterTrackersWithCTLAction(_ trackers: [String: KnownTracker]) -> [String: KnownTracker] {
+        return Dictionary(uniqueKeysWithValues: trackers.filter { (_, tracker) in
+            return tracker.containsCTLActions == true
+        }.map { (key, value) in
+            var modifiedTracker = value
+            // Modify the tracker here
+            if modifiedTracker.defaultAction == .blockCtlFB {
+                modifiedTracker.defaultAction = .block
+            }
+            print("RULES BEFORE \(modifiedTracker.rules)")
+
+            if let rules = modifiedTracker.rules as [KnownTracker.Rule]? {
+                for ruleIndex in rules.indices {
+                    if let action = rules[ruleIndex].action, action == .blockCtlFB {
+//                        modifiedTracker.rules?[ruleIndex].action = .block
+                        modifiedTracker.rules?[ruleIndex].action = nil
+                    }
+                }
+            }
+            print("RULES AFTER \(modifiedTracker.rules)")
+
+            return (key, modifiedTracker)
+        })
     }
 
     private func extractDomains(from entities: [String: Entity]) -> [String: String] {

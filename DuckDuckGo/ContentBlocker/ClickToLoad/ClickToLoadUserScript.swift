@@ -110,8 +110,6 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
                 'use strict';
                 console.warn('fb-sdk document.currentScript.src', document.currentScript, document.currentScript?.src);
                 console.warn('in fbSurrogate, location is', window.location.href);
-                debugger;
-                return;
                 window.fbTest = "inline surrogate";
                 const facebookEntity = 'Facebook, Inc.';
                 const originalFBURL = 'https://connect.facebook.net/en_US/sdk.js?XFBML=false' //FIXME: document.currentScript.src;
