@@ -66,16 +66,23 @@ final class BookmarkNode: Hashable {
 
         return 0
     }
-
-    #if DEBUG
-    // For testing purpose
+    
+    /// Creates an instance of a bookmark node.
+    /// - Parameters:
+    ///   - representedObject: The represented object contained in the node.
+    ///   - parent: An optional parent node.
+    ///   - uniqueId: A unique identifier for the node. This should be used only in unit tests.
+    /// - Attention: Use this initializer only in tests. 
     init(representedObject: AnyObject, parent: BookmarkNode?, uniqueId: Int) {
         self.representedObject = representedObject
         self.parent = parent
         self.uniqueID = uniqueId
     }
-    #endif
-
+    
+    /// Creates an instance of a bookmark node.
+    /// - Parameters:
+    ///   - representedObject: The represented object contained in the node.
+    ///   - parent: An optional parent node.
     convenience init(representedObject: AnyObject, parent: BookmarkNode?) {
         self.init(representedObject: representedObject, parent: parent, uniqueId: BookmarkNode.incrementingID)
         BookmarkNode.incrementingID += 1
