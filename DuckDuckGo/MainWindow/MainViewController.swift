@@ -129,13 +129,15 @@ final class MainViewController: NSViewController {
             tabBarViewController.view.isHidden = true
             mainView.tabBarContainerView.isHidden = true
             mainView.navigationBarTopConstraint.constant = 0.0
-            mainView.addressBarHeightConstraint.constant = mainView.tabBarContainerView.frame.height
+            resizeNavigationBar(isHomePage: false, animated: false)
+
             updateBookmarksBarViewVisibility(visible: false)
         } else {
             mainView.navigationBarContainerView.wantsLayer = true
             mainView.navigationBarContainerView.layer?.masksToBounds = false
 
-            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab, animated: false)
+            resizeNavigationBar(isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
+                                animated: false)
 
             let bookmarksBarVisible = AppearancePreferences.shared.showBookmarksBar
             updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
@@ -291,7 +293,7 @@ final class MainViewController: NSViewController {
             }
     }
 
-    private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
+    private func resizeNavigationBar(isHomePage homePage: Bool, animated: Bool) {
         updateDividerColor(isShowingHomePage: homePage)
         navigationBarViewController.resizeAddressBar(for: homePage ? .homePage : (isInPopUpWindow ? .popUpWindow : .default), animated: animated)
     }
@@ -303,7 +305,7 @@ final class MainViewController: NSViewController {
                 guard let self, let selectedTabViewModel else { return }
                 defer { lastTabContent = content }
 
-                resizeNavigationBarForHomePage(content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
+                resizeNavigationBar(isHomePage: content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
                 updateBookmarksBar(content)
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
             }
