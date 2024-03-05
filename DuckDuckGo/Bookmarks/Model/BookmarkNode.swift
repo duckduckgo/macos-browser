@@ -176,8 +176,7 @@ final class BookmarkNode: Hashable {
     // MARK: - Equatable
 
     class func == (lhs: BookmarkNode, rhs: BookmarkNode) -> Bool {
-        return lhs.uniqueID == rhs.uniqueID &&
-        lhs.representedObjectEquals(rhs.representedObject)
+        return lhs.representedObjectEquals(rhs.representedObject)
     }
 
 }
