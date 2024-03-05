@@ -29,8 +29,6 @@ import NetworkProtectionUI
 import Networking
 import PixelKit
 
-import Subscription
-
 #if NETP_SYSTEM_EXTENSION
 import SystemExtensionManager
 import SystemExtensions
@@ -44,8 +42,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     // MARK: - Settings
 
     let settings: VPNSettings
-
-    let accountManager = AccountManager(appGroup: Bundle.main.appGroup(bundle: .subs))
 
     // MARK: - Combine Cancellables
 
