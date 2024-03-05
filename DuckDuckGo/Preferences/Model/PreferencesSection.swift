@@ -38,7 +38,7 @@ struct PreferencesSection: Hashable, Identifiable {
 #endif
 
         let regularPanes: [PreferencePaneIdentifier] = {
-            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .fireButton]
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .dataClearing]
 
 #if SUBSCRIPTION
 
@@ -119,7 +119,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case general
     case sync
     case appearance
-    case fireButton
+    case dataClearing
 #if NETWORK_PROTECTION
     case vpn
 #endif
@@ -175,8 +175,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.sync
         case .appearance:
             return UserText.appearance
-        case .fireButton:
-            return UserText.fireButton
+        case .dataClearing:
+            return UserText.dataClearing
 #if NETWORK_PROTECTION
         case .vpn:
             return UserText.vpn
@@ -216,7 +216,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Sync"
         case .appearance:
             return "Appearance"
-        case .fireButton:
+        case .dataClearing:
             return "FireSettings"
 #if NETWORK_PROTECTION
         case .vpn:

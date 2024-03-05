@@ -22,11 +22,11 @@ import SwiftUIExtensions
 
 extension Preferences {
 
-    struct FireButtonView: View {
+    struct DataClearingView: View {
         @ObservedObject var model: FireButtonPreferences
 
         var body: some View {
-            PreferencePane("Fire Button") {
+            PreferencePane("Data Clearing") {
 
                 // SECTION 1: Fireproof Site
                 PreferencePaneSection(UserText.fireproofSites) {

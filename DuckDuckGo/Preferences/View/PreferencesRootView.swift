@@ -69,8 +69,8 @@ enum Preferences {
                                 SyncView()
                             case .appearance:
                                 AppearanceView(model: .shared)
-                            case .fireButton:
-                                FireButtonView(model: FireButtonPreferences())
+                            case .dataClearing:
+                                DataClearingView(model: FireButtonPreferences())
 
 #if NETWORK_PROTECTION
                             case .vpn:
