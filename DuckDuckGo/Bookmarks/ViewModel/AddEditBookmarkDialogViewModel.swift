@@ -138,8 +138,6 @@ private extension AddEditBookmarkDialogViewModel {
     }
 
     func updateBookmark(_ bookmark: Bookmark, url: URL, name: String, isFavorite: Bool, location: BookmarkFolder?) {
-        var bookmark = bookmark
-
         // If the URL or Title or Favorite is changed update bookmark
         if bookmark.url != url.absoluteString || bookmark.title != name || bookmark.isFavorite != isBookmarkFavorite {
             bookmarkManager.update(bookmark: bookmark, withURL: url, title: name, isFavorite: isFavorite)

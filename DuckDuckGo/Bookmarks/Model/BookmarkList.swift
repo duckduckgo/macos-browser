@@ -127,11 +127,6 @@ struct BookmarkList {
     mutating func update(bookmark: Bookmark, newURL: String, newTitle: String, newIsFavorite: Bool) -> Bookmark? {
         guard !bookmark.isFolder else { return nil }
 
-        guard itemsDict[bookmark.url] != nil, let index = allBookmarkURLsOrdered.firstIndex(of: IdentifiableBookmark(from: bookmark)) else {
-            os_log("BookmarkList: Update failed, no such item in bookmark list")
-            return nil
-        }
-
         let newBookmark = Bookmark(from: bookmark, withNewUrl: newURL, title: newTitle, isFavorite: newIsFavorite)
         return updateBookmarkList(newBookmark: newBookmark, oldBookmark: bookmark)
     }
