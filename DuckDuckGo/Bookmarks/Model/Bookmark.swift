@@ -92,6 +92,7 @@ internal class BaseBookmarkEntity: Identifiable, Equatable, Hashable {
         }
     }
 
+    // Subclasses needs to override to check equality on their properties
     func isEqual(to instance: BaseBookmarkEntity) -> Bool {
         id == instance.id &&
         title == instance.title &&

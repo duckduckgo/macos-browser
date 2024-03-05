@@ -67,11 +67,17 @@ final class BookmarkNode: Hashable {
         return 0
     }
 
-    init(representedObject: AnyObject, parent: BookmarkNode?) {
+    #if DEBUG
+    // For testing purpose
+    init(representedObject: AnyObject, parent: BookmarkNode?, uniqueId: Int) {
         self.representedObject = representedObject
         self.parent = parent
-        self.uniqueID = BookmarkNode.incrementingID
+        self.uniqueID = uniqueId
+    }
+    #endif
 
+    convenience init(representedObject: AnyObject, parent: BookmarkNode?) {
+        self.init(representedObject: representedObject, parent: parent, uniqueId: BookmarkNode.incrementingID)
         BookmarkNode.incrementingID += 1
     }
 
