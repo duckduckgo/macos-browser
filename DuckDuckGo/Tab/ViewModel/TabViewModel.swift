@@ -23,11 +23,11 @@ import BrowserServicesKit
 final class TabViewModel {
 
     enum Favicon {
-        static let home = NSImage(named: "HomeFavicon")!
-        static let burnerHome = NSImage(named: "BurnerTabFavicon")!
-        static let preferences = NSImage(named: "Preferences")!
-        static let bookmarks = NSImage(named: "Bookmarks")!
-        static let dataBrokerProtection = NSImage(named: "BurnerWindowIcon2")! // PLACEHOLDER: Change it once we have the final icon
+        static let home = NSImage.homeFavicon
+        static let burnerHome = NSImage.burnerTabFavicon
+        static let preferences = NSImage.preferences
+        static let bookmarks = NSImage.bookmarks
+        static let dataBrokerProtection = NSImage.burnerWindowIcon2 // PLACEHOLDER: Change it once we have the final icon
     }
 
     private(set) var tab: Tab
@@ -136,14 +136,12 @@ final class TabViewModel {
                 }
             }
             .switchToLatest()
-            .sink { [weak self] event in
+            .sink { [weak self] _ in
                 guard let self else { return }
 
                 updateAddressBarStrings()
-                if case .didCommit = event {
-                    updateCanBeBookmarked()
-                    updateFavicon()
-                }
+                updateFavicon()
+                updateCanBeBookmarked()
             }
             .store(in: &cancellables)
     }
@@ -180,9 +178,8 @@ final class TabViewModel {
             .filter { [weak self] _ in
                 self?.tab.isLazyLoadingInProgress == false
             }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.updateFavicon()
+            .sink { [weak self] favicon in
+                self?.updateFavicon(favicon)
             }
             .store(in: &cancellables)
     }
@@ -315,7 +312,7 @@ final class TabViewModel {
         }
     }
 
-    private func updateFavicon() {
+    private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
             favicon = .alertCircleColor16
             return
@@ -341,10 +338,10 @@ final class TabViewModel {
         case .url, .onboarding, .none, .subscription: break
         }
 
-        if let favicon = tab.favicon {
+        if let favicon: NSImage? = tabFavicon {
             self.favicon = favicon
         } else {
-            favicon = nil
+            self.favicon = tab.favicon
         }
     }
 

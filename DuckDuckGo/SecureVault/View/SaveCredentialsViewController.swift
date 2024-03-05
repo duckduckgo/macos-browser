@@ -336,11 +336,10 @@ final class SaveCredentialsViewController: NSViewController {
 
     func loadFaviconForDomain(_ domain: String?) {
         guard let domain else {
-            faviconImage.image = NSImage(named: NSImage.Name("Web"))
+            faviconImage.image = .web
             return
         }
-        faviconImage.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
-            ?? NSImage(named: NSImage.Name("Web"))
+        faviconImage.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? .web
     }
 
     private func updatePasswordFieldVisibility(visible: Bool) {

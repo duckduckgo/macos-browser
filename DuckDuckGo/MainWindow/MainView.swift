@@ -30,7 +30,6 @@ final class MainView: NSView {
     let divider = ColorView(frame: .zero, backgroundColor: .separatorColor)
 
     private(set) var navigationBarTopConstraint: NSLayoutConstraint!
-    private(set) var addressBarHeightConstraint: NSLayoutConstraint!
     private(set) var bookmarksBarHeightConstraint: NSLayoutConstraint!
 
     @Published var isMouseAboveWebView: Bool = false

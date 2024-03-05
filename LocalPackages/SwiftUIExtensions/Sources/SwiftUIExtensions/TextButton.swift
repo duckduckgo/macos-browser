@@ -34,7 +34,7 @@ public struct TextButton: View {
         Button(action: action) {
             Text(title)
                 .fontWeight(fontWeight)
-                .foregroundColor(Color("LinkBlueColor"))
+                .foregroundColor(Color(.linkBlue))
         }
         .buttonStyle(.plain)
         .cursor(.pointingHand)

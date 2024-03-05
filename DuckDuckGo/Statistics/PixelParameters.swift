@@ -161,7 +161,11 @@ extension Pixel.Event {
              .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn,
              .dataBrokerProtectionRemoteMessageOpened,
              .dataBrokerProtectionRemoteMessageDisplayed,
-             .dataBrokerProtectionRemoteMessageDismissed:
+             .dataBrokerProtectionRemoteMessageDismissed,
+             .dataBrokerDisableAndDeleteDaily,
+             .dataBrokerEnableLoginItemDaily,
+             .dataBrokerDisableLoginItemDaily,
+             .dataBrokerResetLoginItemDaily:
             return nil
         }
     }
