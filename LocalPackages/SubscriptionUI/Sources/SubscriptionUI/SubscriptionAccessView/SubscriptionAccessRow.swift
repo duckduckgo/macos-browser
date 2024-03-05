@@ -62,12 +62,12 @@ public struct SubscriptionAccessRow: View {
                     if let header = descriptionHeader, !header.isEmpty {
                         Text(header)
                             .bold()
-                            .foregroundColor(Color("TextPrimary", bundle: .module))
+                            .foregroundColor(Color(.textPrimary))
                     }
 
                     Text(description)
                         .font(.system(size: 13, weight: .regular, design: .default))
-                        .foregroundColor(Color("TextSecondary", bundle: .module))
+                        .foregroundColor(Color(.textSecondary))
                         .fixMultilineScrollableText()
 
                     if let title = buttonTitle, let action = buttonAction {

@@ -306,8 +306,7 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
             return NSView()
         }
 
-        let image = NSImage(named: "Drop-Target-Indicator-16")!
-        let imageView = NSImageView(image: image)
+        let imageView = NSImageView(image: .dropTargetIndicator16)
         imageView.contentTintColor = NSColor.controlAccentColor
 
         return imageView

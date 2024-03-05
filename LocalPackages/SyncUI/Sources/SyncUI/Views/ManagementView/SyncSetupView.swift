@@ -55,7 +55,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     fileprivate func syncWithAnotherDeviceView() -> some View {
         VStack(alignment: .center, spacing: 16) {
-            Image("Sync-Pair-96")
+            Image(.syncPair96)
             VStack(alignment: .center, spacing: 8) {
                 SyncUIViews.TextHeader(text: UserText.beginSyncTitle)
                 SyncUIViews.TextDetailSecondary(text: UserText.beginSyncDescription)
