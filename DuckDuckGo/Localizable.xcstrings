@@ -3866,8 +3866,20 @@
         }
       }
     },
+    "autofill.items.delete-all-passwords-completion-message-text" : {
+      "comment" : "Message displayed on completion of multiple password deletion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "All passwords deleted (%d)"
+          }
+        }
+      }
+    },
     "autofill.items.delete-all-passwords-confirmation-message-text" : {
-      "comment" : "Message displayed on completion of multiple password deletion\n   Message displayed on dialog asking user to confirm deletion of all passwords",
+      "comment" : "Message displayed on dialog asking user to confirm deletion of all passwords",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {

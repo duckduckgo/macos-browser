@@ -146,7 +146,7 @@ extension UserText {
 
     // Completion Message Text
     static func deleteAllPasswordsCompletionMessageText(count: Int) -> String {
-        let localized = NSLocalizedString("autofill.items.delete-all-passwords-confirmation-message-text", value: "All passwords deleted (%d)", comment: "Message displayed on completion of multiple password deletion")
+        let localized = NSLocalizedString("autofill.items.delete-all-passwords-completion-message-text", value: "All passwords deleted (%d)", comment: "Message displayed on completion of multiple password deletion")
         return String(format: localized, count)
     }
 
