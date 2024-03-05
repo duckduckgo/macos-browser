@@ -27,9 +27,13 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionActiveUser
     case networkProtectionNewUser
 
-    case networkProtectionStartAttempt
-    case networkProtectionStartSuccess
-    case networkProtectionStartFailed
+    case networkProtectionTunnelStartAttempt
+    case networkProtectionTunnelStartSuccess
+    case networkProtectionTunnelStartFailure
+
+    case networkProtectionTunnelUpdateAttempt
+    case networkProtectionTunnelUpdateSuccess
+    case networkProtectionTunnelUpdateFailure
 
     case networkProtectionEnableAttemptConnecting
     case networkProtectionEnableAttemptSuccess
@@ -79,7 +83,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
     case networkProtectionNoAuthTokenFoundError
 
+    case networkProtectionRekeyAttempted
     case networkProtectionRekeyCompleted
+    case networkProtectionRekeyFailed
 
     case networkProtectionSystemExtensionActivationFailure
 
@@ -97,14 +103,23 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionNewUser:
             return "m_mac_netp_daily_active_u"
 
-        case .networkProtectionStartAttempt:
-            return "m_mac_netp_start_attempt"
+        case .networkProtectionTunnelStartAttempt:
+            return "m_mac_netp_tunnel_start_attempt"
 
-        case .networkProtectionStartSuccess:
-            return "m_mac_netp_start_success"
+        case .networkProtectionTunnelStartSuccess:
+            return "m_mac_netp_tunnel_start_success"
 
-        case .networkProtectionStartFailed:
-            return "m_mac_netp_start_failed"
+        case .networkProtectionTunnelStartFailure:
+            return "m_mac_netp_tunnel_start_failure"
+
+        case .networkProtectionTunnelUpdateAttempt:
+            return "m_mac_netp_tunnel_start_attempt"
+
+        case .networkProtectionTunnelUpdateSuccess:
+            return "m_mac_netp_tunnel_start_success"
+
+        case .networkProtectionTunnelUpdateFailure:
+            return "m_mac_netp_tunnel_start_failure"
 
         case .networkProtectionEnableAttemptConnecting:
             return "m_mac_netp_ev_enable_attempt"
@@ -223,7 +238,13 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionNoAuthTokenFoundError:
             return "m_mac_netp_no_auth_token_found_error"
 
+        case .networkProtectionRekeyAttempted:
+            return "m_mac_netp_rekey_attempted"
+
         case .networkProtectionRekeyCompleted:
+            return "m_mac_netp_rekey_completed"
+
+        case .networkProtectionRekeyFailed:
             return "m_mac_netp_rekey_completed"
 
         case .networkProtectionSystemExtensionActivationFailure:
@@ -317,7 +338,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionServerListStoreFailedToEncodeServerList,
              .networkProtectionServerListStoreFailedToDecodeServerList,
              .networkProtectionNoAuthTokenFoundError,
+             .networkProtectionRekeyAttempted,
              .networkProtectionRekeyCompleted,
+             .networkProtectionRekeyFailed,
              .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
              .networkProtectionWireguardErrorFailedDNSResolution,
              .networkProtectionSystemExtensionActivationFailure,
@@ -330,9 +353,12 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionTunnelFailureRecovered,
              .networkProtectionLatency,
              .networkProtectionLatencyError,
-             .networkProtectionStartAttempt,
-             .networkProtectionStartSuccess,
-             .networkProtectionStartFailed:
+             .networkProtectionTunnelStartAttempt,
+             .networkProtectionTunnelStartSuccess,
+             .networkProtectionTunnelStartFailure,
+             .networkProtectionTunnelUpdateAttempt,
+             .networkProtectionTunnelUpdateSuccess,
+             .networkProtectionTunnelUpdateFailure:
 
             return nil
         }

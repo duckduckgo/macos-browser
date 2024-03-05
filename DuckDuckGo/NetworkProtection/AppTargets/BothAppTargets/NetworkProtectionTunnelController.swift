@@ -445,10 +445,18 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     enum StartError: LocalizedError {
         case connectionStatusInvalid
+        case connectionAlreadyStarted
         case simulateControllerFailureError
 
         var errorDescription: String? {
             switch self {
+            case .connectionAlreadyStarted:
+#if DEBUG
+                return "[Debug] Connection already started"
+#else
+                return nil
+#endif
+
             case .connectionStatusInvalid:
 #if DEBUG
                 return "[DEBUG] Connection status invalid"
@@ -464,7 +472,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async {
-        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionStartAttempt,
+        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionTunnelStartAttempt,
                       frequency: .dailyAndContinuous)
         controllerErrorStore.lastErrorMessage = nil
 
@@ -495,8 +503,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             case .invalid:
                 throw StartError.connectionStatusInvalid
             case .connected:
-                // Intentional no-op
-                break
+                throw StartError.connectionAlreadyStarted
             default:
                 try await start(tunnelManager)
 
@@ -506,12 +513,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 // started".  Meaning there's no error caught in this start attempt.  There are pixels
                 // in the packet tunnel provider side that can be used to debug additional logic.
                 //
-                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionStartSuccess,
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionTunnelStartSuccess,
                               frequency: .dailyAndContinuous)
             }
         } catch {
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionStartFailed, frequency: .dailyAndContinuous, withError: error, includeAppVersionParameter: true
+                NetworkProtectionPixelEvent.networkProtectionTunnelStartFailure, frequency: .dailyAndContinuous, withError: error, includeAppVersionParameter: true
             )
 
             await stop()
