@@ -104,41 +104,86 @@ final class DownloadsCellView: NSTableCellView {
                 unsubscribe()
                 return
             }
-            subscribe(to: viewModel)
+
+            // animate progress appearance if needed
+            subscribeToViewModel(viewModel)
+            // reset `shouldAnimate` flag
+            viewModel.didAppear()
         }
     }
 
-    private func subscribe(to viewModel: DownloadViewModel) {
-        viewModel.$filename.map { filename in
-            let utType = UTType(filenameExtension: filename.pathExtension) ?? .data
-            return NSWorkspace.shared.icon(for: utType)
-        }
+    // called on cell appearance
+    private func subscribeToViewModel(_ viewModel: DownloadViewModel) {
+        viewModel.$filename
+            .map { filename in
+                let utType = UTType(filenameExtension: filename.pathExtension) ?? .data
+                return NSWorkspace.shared.icon(for: utType)
+            }
             .assign(to: \.image, on: imageView!)
             .store(in: &cancellables)
-        viewModel.$filename.combineLatest(viewModel.$state)
+
+        viewModel.$filename
+            .combineLatest(viewModel.$state)
             .sink { [weak self] filename, state in
                 self?.updateFilename(filename, state: state)
             }
             .store(in: &cancellables)
 
-        viewModel.$state.map {
-            $0.progress?.publisher(for: \.fractionCompleted).map { .some($0) }.eraseToAnyPublisher() ?? Just(.none).eraseToAnyPublisher()
+        // only animate progress appearance when download is added
+        if case .downloading(let progress, shouldAnimateOnAppear: false /* progress was already displayed once */) = viewModel.state {
+            let progressValue = progress.totalUnitCount == -1 ? -1 : Double(progress.completedUnitCount) / Double(progress.totalUnitCount)
+            // set progress without animation
+            progressView.setProgress(progressValue, animated: false)
         }
+
+        self.subscribeToStateProgressUpdates(viewModel)
+    }
+
+    private func subscribeToStateProgressUpdates(_ viewModel: DownloadViewModel) {
+        viewModel.$state
+            .map { state -> AnyPublisher<Double?, Never> in
+                guard case .downloading(let progress, _) = state else {
+                    return Just(.none).eraseToAnyPublisher()
+                }
+
+                return progress.publisher(for: \.totalUnitCount)
+                    .combineLatest(progress.publisher(for: \.completedUnitCount))
+                    .map { (total, completed) -> Double? in
+                        guard total > 0 else { return -1 /* indeterminate */ }
+                        return Double(completed) / Double(total)
+                    }
+                    .eraseToAnyPublisher()
+            }
             .switchToLatest()
-            .dropFirst()
-            .assign(to: \.progress, on: progressView)
+            .sink { [weak self] progress in
+                guard let self else { return }
+
+                // don‘t hide progress on completion - it will be animated out in `updateFilename(_:state:)`
+                if progressView.progress != nil && progress == nil { return }
+
+                progressView.setProgress(progress, animated: true)
+            }
             .store(in: &cancellables)
-        progressView.progress = viewModel.state.progress?.fractionCompleted
     }
 
     private static let fileRemovedTitleAttributes: [NSAttributedString.Key: Any] = [.strikethroughStyle: 1,
                                                                                     .foregroundColor: NSColor.disabledControlTextColor]
 
     private func updateFilename(_ filename: String, state: DownloadViewModel.State) {
-        var attributes: [NSAttributedString.Key: Any]?
+        // hide progress with animation on completion/failure
+        if state.progress == nil, progressView.progress != nil {
+            progressView.setProgress(nil, animated: true) { [weak self, viewModel=(objectValue as? DownloadViewModel)] _ in
+                guard let self, objectValue as? DownloadViewModel === viewModel else { return }
 
+                updateButtons(for: state, animated: true)
+            }
+        } else {
+            updateButtons(for: state, animated: false)
+        }
+
+        var attributes: [NSAttributedString.Key: Any]?
         switch state {
-        case .downloading(let progress):
+        case .downloading(let progress, _):
             subscribe(to: progress)
 
         case .complete(.some(let url)):
@@ -157,8 +202,8 @@ final class DownloadsCellView: NSTableCellView {
             updateDownloadFailed(with: .downloadFailed(error))
         }
 
-        self.titleLabel.attributedStringValue = NSAttributedString(string: filename, attributes: attributes)
-        self.titleLabel.toolTip = filename
+        titleLabel.attributedStringValue = NSAttributedString(string: filename, attributes: attributes)
+        titleLabel.toolTip = filename
     }
 
     private var onButtonMouseOverChange: ((Bool) -> Void)?
@@ -171,7 +216,7 @@ final class DownloadsCellView: NSTableCellView {
         if isMouseOver {
             details = UserText.cancelDownloadToolTip
         } else {
-            if progress.fractionCompleted == 0 {
+            if progress.completedUnitCount == 0 {
                 details = UserText.downloadStarting
             } else if progress.fractionCompleted == 1.0 {
                 details = UserText.downloadFinishing
@@ -179,18 +224,19 @@ final class DownloadsCellView: NSTableCellView {
                 let completed = Self.byteFormatter.string(fromByteCount: progress.completedUnitCount)
                 let total = Self.byteFormatter.string(fromByteCount: progress.totalUnitCount)
                 details = String(format: UserText.downloadBytesLoadedFormat, completed, total)
-
-                if let throughput = progress.throughput {
-                    let speed = Self.byteFormatter.string(fromByteCount: Int64(throughput))
-                    details += " (\(String(format: UserText.downloadSpeedFormat, speed)))"
-                }
             } else {
                 details = Self.byteFormatter.string(fromByteCount: progress.completedUnitCount)
             }
 
+            if progress.completedUnitCount > 0, progress.fractionCompleted < 1,
+               let throughput = progress.throughput {
+                let speed = Self.byteFormatter.string(fromByteCount: Int64(throughput))
+                details += " (\(String(format: UserText.downloadSpeedFormat, speed)))"
+            }
+
             if let estimatedTimeRemaining = progress.estimatedTimeRemaining,
                // only set estimated time if already present or more than 10 seconds remaining to avoid blinking
-               !self.detailLabel.stringValue.contains("–") || estimatedTimeRemaining > 10,
+               self.detailLabel.stringValue.contains("–") || estimatedTimeRemaining > 10,
                let estimatedTimeStr = {
                 switch estimatedTimeRemaining {
                 case ..<60:
@@ -207,7 +253,6 @@ final class DownloadsCellView: NSTableCellView {
     }
 
     private func subscribe(to progress: Progress) {
-        self.progressView.isHidden = false
         progressCancellable = progress.publisher(for: \.completedUnitCount)
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in
@@ -215,11 +260,7 @@ final class DownloadsCellView: NSTableCellView {
                 updateDetails(with: progress, isMouseOver: cancelButton.isMouseOver)
         }
 
-        self.cancelButton.isHidden = false
-        self.restartButton.isHidden = true
-        self.revealButton.isHidden = true
-
-        self.imageView?.alphaValue = 1.0
+        imageView?.alphaValue = 1.0
 
         onButtonMouseOverChange = { [weak self] isMouseOver in
             self?.updateDetails(with: progress, isMouseOver: isMouseOver)
@@ -229,53 +270,54 @@ final class DownloadsCellView: NSTableCellView {
 
     private func updateCompletedFile(fileSize: Int) {
         progressCancellable = nil
-        self.progressView.isHidden = true
 
-        self.cancelButton.isHidden = true
-        self.restartButton.isHidden = true
-        self.revealButton.isHidden = false
-
-        self.imageView?.alphaValue = 1.0
+        imageView?.alphaValue = 1.0
 
         onButtonMouseOverChange = { [weak self] isMouseOver in
+            guard let self else { return }
             if isMouseOver {
-                self?.detailLabel.stringValue = UserText.revealToolTip
+                detailLabel.stringValue = UserText.revealToolTip
             } else {
-                self?.detailLabel.stringValue = Self.byteFormatter.string(fromByteCount: Int64(fileSize))
+                detailLabel.stringValue = Self.byteFormatter.string(fromByteCount: Int64(fileSize))
             }
-            self?.detailLabel.toolTip = nil
+            detailLabel.toolTip = nil
         }
         onButtonMouseOverChange!(revealButton.isMouseOver)
     }
 
     private func updateDownloadFailed(with error: DownloadError) {
         progressCancellable = nil
-        self.progressView.isHidden = true
 
-        self.cancelButton.isHidden = true
-        self.restartButton.isHidden = !error.isRetryable
-        self.revealButton.isHidden = true
-
-        if case .fileRemoved = error {
-            self.imageView?.alphaValue = 0.3
-        } else {
-            self.imageView?.alphaValue = 1.0
-        }
+        imageView?.animator().alphaValue = if case .fileRemoved = error { 0.3 } else { 1.0 }
 
         onButtonMouseOverChange = { [weak self] isMouseOver in
+            guard let self else { return }
             if isMouseOver {
                 if case .fileRemoved = error {
-                    self?.detailLabel.stringValue = UserText.redownloadToolTip
+                    detailLabel.stringValue = UserText.redownloadToolTip
                 } else {
-                    self?.detailLabel.stringValue = UserText.restartDownloadToolTip
+                    detailLabel.stringValue = UserText.restartDownloadToolTip
                 }
-                self?.detailLabel.toolTip = nil
+                detailLabel.toolTip = nil
             } else {
-                self?.detailLabel.stringValue = error.shortDescription
-                self?.detailLabel.toolTip = error.localizedDescription
+                detailLabel.stringValue = error.shortDescription
+                detailLabel.toolTip = error.localizedDescription
             }
         }
         onButtonMouseOverChange!(restartButton.isMouseOver)
+    }
+
+    private func updateButtons(for state: DownloadViewModel.State, animated: Bool) {
+        NSAnimationContext.runAnimationGroup { context in
+            if !animated {
+                context.duration = 0
+            }
+
+            progressView.isHidden = (state.progress == nil)
+            cancelButton.animator().isHidden = (state.progress == nil)
+            restartButton.animator().isHidden = (state.error?.isRetryable != true)
+            revealButton.animator().isHidden = (state.progress != nil || state.error != nil)
+        }
     }
 
     private func unsubscribe() {
@@ -286,6 +328,9 @@ final class DownloadsCellView: NSTableCellView {
     override func prepareForReuse() {
         super.prepareForReuse()
         unsubscribe()
+        progressView.prepareForReuse()
+        detailLabel.stringValue = ""
+        titleLabel.stringValue = ""
     }
 
 }

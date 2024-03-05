@@ -35,12 +35,12 @@ final class DownloadViewModel {
     @Published private(set) var fileType: UTType?
 
     enum State {
-        case downloading(Progress)
+        case downloading(Progress, shouldAnimateOnAppear: Bool)
         case complete(URL?)
         case failed(FileDownloadError)
 
         var progress: Progress? {
-            guard case .downloading(let progress) = self else { return nil }
+            guard case .downloading(let progress, _) = self else { return nil }
             return progress
         }
 
@@ -49,9 +49,14 @@ final class DownloadViewModel {
             return error
         }
 
-        init(item: DownloadListItem) {
+        var shouldAnimateOnAppear: Bool? {
+            guard case .downloading(_, shouldAnimateOnAppear: let animate) = self else { return nil }
+            return animate
+        }
+
+        init(item: DownloadListItem, shouldAnimateOnAppear: Bool) {
             if let progress = item.progress {
-                self = .downloading(progress)
+                self = .downloading(progress, shouldAnimateOnAppear: shouldAnimateOnAppear)
             } else if item.error == nil, let destinationURL = item.destinationURL {
                 self = .complete(destinationURL)
             } else {
@@ -67,7 +72,7 @@ final class DownloadViewModel {
         self.id = item.identifier
         self.url = item.url
         self.websiteURL = item.websiteURL
-        self.state = .init(item: item)
+        self.state = .init(item: item, shouldAnimateOnAppear: true)
 
         self.update(with: item)
     }
@@ -76,7 +81,14 @@ final class DownloadViewModel {
         self.localURL = item.destinationURL
         self.filename = item.destinationURL?.lastPathComponent ?? ""
         self.fileType = item.fileType
-        self.state = .init(item: item)
+        self.state = .init(item: item, shouldAnimateOnAppear: state.shouldAnimateOnAppear ?? true)
+    }
+
+    /// resets shouldAnimateOnAppear flag
+    func didAppear() {
+        if case .downloading(let progress, shouldAnimateOnAppear: true) = state {
+            state = .downloading(progress, shouldAnimateOnAppear: false)
+        }
     }
 
 }
