@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1709563256742,
+    "version": 1709635842185,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -2985,6 +2985,9 @@
                         "domain": "newser.com",
                         "rules": [
                             {
+                                "type": "disable-default"
+                            },
+                            {
                                 "selector": ".RightRailAds",
                                 "type": "hide-empty"
                             },
@@ -3974,7 +3977,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "d0c2a82c472355a8396b1f2c5af8cf6e"
+            "hash": "3dc2d5b9a38827f46503a3b5882c7e33"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5629,7 +5632,8 @@
                                 "rule": "dpm.demdex.net/id",
                                 "domains": [
                                     "dhl.de",
-                                    "homedepot.com"
+                                    "homedepot.com",
+                                    "sbs.com.au"
                                 ]
                             }
                         ]
@@ -7924,7 +7928,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "58e30d6e8e826a78d0c9bd448f50ae5d"
+            "hash": "e39561ea302e0723839334accacfba7e"
         },
         "trackingCookies1p": {
             "settings": {
