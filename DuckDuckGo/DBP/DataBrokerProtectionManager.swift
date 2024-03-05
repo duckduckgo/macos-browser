@@ -47,7 +47,7 @@ public final class DataBrokerProtectionManager {
 
         let ipcScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
 
-        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler, pixelHandler: pixelHandler)
+        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler)
     }()
 
     private init() {
