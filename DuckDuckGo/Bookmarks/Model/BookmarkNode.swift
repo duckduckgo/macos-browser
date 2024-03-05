@@ -66,7 +66,7 @@ final class BookmarkNode: Hashable {
 
         return 0
     }
-    
+
     /// Creates an instance of a bookmark node.
     /// - Parameters:
     ///   - representedObject: The represented object contained in the node.
@@ -78,7 +78,7 @@ final class BookmarkNode: Hashable {
         self.parent = parent
         self.uniqueID = uniqueId
     }
-    
+
     /// Creates an instance of a bookmark node.
     /// - Parameters:
     ///   - representedObject: The represented object contained in the node.
