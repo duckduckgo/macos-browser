@@ -1,0 +1,19 @@
+data:
+  name: Move release task and included items to "Done" section in macOS App Board and close them if possible
+  assignee: "${ASSIGNEE_ID}"
+  html_notes: |
+    <body>
+      Automation failed to update Asana for the public release. Please follow the steps below.
+      <ol>
+        <li>Open <a data-asana-gid='${APP_BOARD_ASANA_PROJECT_ID}'/> and select the List view</li>
+        <li>Scroll to the "Validation" section.</li>
+        <li>Select all the tasks in that section.</li>
+        <li>Drag and drop all the selected tasks to the "Done" section</li>
+        <li>Close all tasks that are not incidents and don't belong to <a data-asana-gid='72649045549333'/> project, including the release task itself.</li>
+      </ol>
+
+      Complete this task when ready.
+
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

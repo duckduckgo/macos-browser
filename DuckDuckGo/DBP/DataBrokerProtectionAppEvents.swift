@@ -93,7 +93,7 @@ struct DataBrokerProtectionAppEvents {
     }
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
-        pixelHandler.fire(.resetLoginItem)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerResetLoginItemDaily, frequency: .dailyOnly)
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
 
