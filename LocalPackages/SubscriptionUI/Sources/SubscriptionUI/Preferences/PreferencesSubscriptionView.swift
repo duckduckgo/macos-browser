@@ -83,7 +83,7 @@ public struct PreferencesSubscriptionView: View {
             VStack {
                 if model.isUserAuthenticated {
                     UniversalHeaderView {
-                        Image("subscription-active-icon", bundle: .module)
+                        Image(.subscriptionActiveIcon)
                             .padding(4)
                     } content: {
                         TextMenuItemHeader(UserText.preferencesSubscriptionActiveHeader)
@@ -116,7 +116,7 @@ public struct PreferencesSubscriptionView: View {
 
                 } else {
                     UniversalHeaderView {
-                        Image("subscription-inactive-icon", bundle: .module)
+                        Image(.subscriptionInactiveIcon)
                             .padding(4)
                             .background(Color.black.opacity(0.06))
                             .cornerRadius(4)
@@ -230,7 +230,7 @@ public struct SectionView: View {
                 HStack(alignment: .center, spacing: 8) {
                     Image(iconName, bundle: .module)
                         .padding(4)
-                        .background(Color("BadgeBackground", bundle: .module))
+                        .background(Color(.badgeBackground))
                         .cornerRadius(4)
 
                     VStack (alignment: .leading) {
@@ -238,12 +238,12 @@ public struct SectionView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .fixMultilineScrollableText()
                             .font(.body)
-                            .foregroundColor(Color("TextPrimary", bundle: .module))
+                            .foregroundColor(Color(.textPrimary))
                         Text(description)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .fixMultilineScrollableText()
                             .font(.system(size: 11, weight: .regular, design: .default))
-                            .foregroundColor(Color("TextSecondary", bundle: .module))
+                            .foregroundColor(Color(.textSecondary))
                     }
 
                     if let name = buttonName, !name.isEmpty, let action = buttonAction {
@@ -271,12 +271,12 @@ private struct SubscriptionDialog<Buttons>: View where Buttons: View {
             Text(title)
                 .font(.title2)
                 .bold()
-                .foregroundColor(Color("TextPrimary", bundle: .module))
+                .foregroundColor(Color(.textPrimary))
             Text(description)
                 .font(.body)
                 .multilineTextAlignment(.center)
                 .fixMultilineScrollableText()
-                .foregroundColor(Color("TextPrimary", bundle: .module))
+                .foregroundColor(Color(.textPrimary))
         } buttons: {
             buttons()
         }

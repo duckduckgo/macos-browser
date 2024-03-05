@@ -24,7 +24,7 @@ struct PreparingToSyncView: View {
     var body: some View {
         SyncDialog(spacing: 20.0, bottomText: UserText.preparingToSyncDialogAction) {
             VStack(alignment: .center, spacing: 20) {
-                Image("Sync-96")
+                Image(.sync96)
                 SyncUIViews.TextHeader(text: UserText.preparingToSyncDialogTitle)
                     .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                     .multilineTextAlignment(.center)
@@ -43,7 +43,7 @@ struct RecoverSyncedDataView: View {
     var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
-                Image("Sync-Pair-96")
+                Image(.syncPair96)
                 SyncUIViews.TextHeader(text: UserText.reciverSyncedDataDialogTitle)
                 SyncUIViews.TextDetailMultiline(text: UserText.reciverSyncedDataDialogSubitle)
             }
