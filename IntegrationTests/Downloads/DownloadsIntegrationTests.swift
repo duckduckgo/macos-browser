@@ -35,9 +35,22 @@ class DownloadsIntegrationTests: XCTestCase {
         (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
     }
 
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
+
     @MainActor
     override func setUp() {
-        window = WindowsManager.openNewWindow(with: Tab(content: .none))!
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
+            return false
+        }
+
+        window = WindowsManager.openNewWindow(with: Tab(content: .none, privacyFeatures: privacyFeaturesMock))!
     }
 
     @MainActor

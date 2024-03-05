@@ -125,7 +125,7 @@ private struct RoundedCorner: Shape {
 
     func path(in rect: CGRect) -> Path {
         let path = NSBezierPath(roundedRect: rect, forCorners: corners, cornerRadius: radius)
-        return Path(path.cgPath)
+        return Path(path.asCGPath())
     }
 }
 
