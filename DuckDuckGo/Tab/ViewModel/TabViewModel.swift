@@ -23,13 +23,13 @@ import BrowserServicesKit
 final class TabViewModel {
 
     enum Favicon {
-        static let home = NSImage(named: "HomeFavicon")!
-        static let burnerHome = NSImage(named: "BurnerTabFavicon")!
-        static let preferences = NSImage(named: "Preferences")!
-        static let bookmarks = NSImage(named: "Bookmarks")!
-        static let dataBrokerProtection = NSImage(named: "DBP-Icon")!
-        static let subscription = NSImage(named: "SubscriptionIcon")!
-        static let identityTheftRestoration = NSImage(named: "ITR-Icon")!
+        static let home = NSImage.homeFavicon
+        static let burnerHome = NSImage.burnerTabFavicon
+        static let preferences = NSImage.preferences
+        static let bookmarks = NSImage.bookmarks
+        static let dataBrokerProtection = NSImage.dbpIcon
+        static let subscription = NSImage.subscriptionIcon
+        static let identityTheftRestoration = NSImage.itrIcon
     }
 
     private(set) var tab: Tab

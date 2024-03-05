@@ -39,7 +39,7 @@ final class CircularProgressView: NSView {
             progressLayer.strokeColor = strokeColor.cgColor
         }
     }
-    @IBInspectable var backgroundStrokeColor: NSColor = .buttonMouseOverColor {
+    @IBInspectable var backgroundStrokeColor: NSColor = .buttonMouseOver {
         didSet {
             backgroundLayer.fillColor = backgroundStrokeColor.cgColor
         }
