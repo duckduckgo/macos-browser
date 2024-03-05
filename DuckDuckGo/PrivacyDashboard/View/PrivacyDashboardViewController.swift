@@ -170,7 +170,6 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private func privacyDashboardProtectionSwitchChangeHandler(state: ProtectionState) {
         privacyDashboardDidTriggerDismiss = true
-        dismiss()
         guard let domain = privacyDashboardController.privacyInfo?.url.host else {
             return
         }
