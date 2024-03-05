@@ -56,7 +56,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
     weak var delegate: FileDownloadManagerDelegate?
 
-    init(preferences: DownloadsPreferences = .init()) {
+    init(preferences: DownloadsPreferences = .shared) {
         self.preferences = preferences
     }
 
@@ -205,7 +205,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             fileTypes.append(fileType)
         }
 
-        delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: downloadLocation, fileTypes: fileTypes) { [weak self] url, fileType in
+        delegate.chooseDestination(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { [weak self] url, fileType in
             guard let self, let url else {
                 completion(nil, nil)
                 return
@@ -259,7 +259,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 protocol DownloadTaskDelegate: AnyObject {
 
     @MainActor
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void)
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void)
     @MainActor
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
 

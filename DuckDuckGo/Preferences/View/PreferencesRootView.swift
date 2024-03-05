@@ -84,7 +84,7 @@ enum Preferences {
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
-                                DownloadsView(model: DownloadsPreferences())
+                                DownloadsView(model: .shared)
                             case .duckPlayer:
                                 DuckPlayerView(model: .shared)
                             case .about:

@@ -31,7 +31,7 @@ final class FileDownloadManagerTests: XCTestCase {
     let fm = FileManager.default
     let testFile = "downloaded file"
 
-    var chooseDestination: (@MainActor (String?, URL?, [UTType], @MainActor (URL?, UTType?) -> Void) -> Void)?
+    var chooseDestination: (@MainActor (String?, [UTType], @MainActor (URL?, UTType?) -> Void) -> Void)?
     var fileIconFlyAnimationOriginalRect: ((WebKitDownloadTask) -> NSRect?)?
 
     let response = URLResponse(url: .duckDuckGo,
@@ -113,10 +113,9 @@ final class FileDownloadManagerTests: XCTestCase {
         preferences.selectedDownloadLocation = downloadsURL
 
         let e1 = expectation(description: "chooseDestinationCallback called")
-        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+        self.chooseDestination = { suggestedFilename, fileTypes, callback in
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
-            XCTAssertEqual(directoryURL, downloadsURL)
             XCTAssertEqual(fileTypes, [UTType(filenameExtension: "filename")!, .pdf])
             e1.fulfill()
 
@@ -146,10 +145,9 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let localURL = downloadsURL.appendingPathComponent(testFile)
         let e1 = expectation(description: "chooseDestinationCallback called")
-        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+        self.chooseDestination = { suggestedFilename, fileTypes, callback in
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
-            XCTAssertEqual(directoryURL, downloadsURL)
             XCTAssertEqual(fileTypes, [UTType(filenameExtension: "filename")!, .html])
             e1.fulfill()
 
@@ -180,7 +178,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .prompt)
-        self.chooseDestination = { _, _, _, callback in
+        self.chooseDestination = { _, _, callback in
             callback(localURL, nil)
         }
 
@@ -203,9 +201,8 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let localURL = downloadsURL.appendingPathComponent(testFile)
         let e1 = expectation(description: "chooseDestinationCallback called")
-        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+        self.chooseDestination = { suggestedFilename, fileTypes, callback in
             dispatchPrecondition(condition: .onQueue(.main))
-            XCTAssertEqual(directoryURL, downloadsURL)
             e1.fulfill()
 
             callback(localURL, .html)
@@ -228,7 +225,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
-        self.chooseDestination = { _, _, _, _ in
+        self.chooseDestination = { _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
 
@@ -247,7 +244,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
-        self.chooseDestination = { _, _, _, _ in
+        self.chooseDestination = { _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
 
@@ -285,8 +282,8 @@ final class FileDownloadManagerTests: XCTestCase {
 extension FileDownloadManagerTests: DownloadTaskDelegate {
 
     @MainActor
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
-        self.chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
+        self.chooseDestination?(suggestedFilename, fileTypes, callback)
     }
 
     @MainActor

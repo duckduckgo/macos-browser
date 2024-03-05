@@ -673,11 +673,11 @@ final class NavigationBarViewController: NSViewController {
                 guard let self else { return }
 
                 let shouldShowPopover = update.kind == .updated
-                    && DownloadsPreferences().shouldOpenPopupOnCompletion
-                    && update.item.destinationURL != nil
-                    && update.item.tempURL == nil
-                    && !update.item.isBurner
-                    && WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window
+                && DownloadsPreferences.shared.shouldOpenPopupOnCompletion
+                && update.item.destinationURL != nil
+                && update.item.tempURL == nil
+                && !update.item.isBurner
+                && WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window
 
                 if shouldShowPopover {
                     self.popovers.showDownloadsPopoverAndAutoHide(usingView: downloadsButton,
