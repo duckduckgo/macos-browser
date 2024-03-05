@@ -41,12 +41,12 @@ public struct SubscriptionAccessView: View {
                 Text(model.title)
                     .font(.title2)
                     .bold()
-                    .foregroundColor(Color("TextPrimary", bundle: .module))
+                    .foregroundColor(Color(.textPrimary))
                 Text(model.description)
                     .font(.body)
                     .multilineTextAlignment(.center)
                     .fixMultilineScrollableText()
-                    .foregroundColor(Color("TextPrimary", bundle: .module))
+                    .foregroundColor(Color(.textPrimary))
             }
             .padding(4)
 

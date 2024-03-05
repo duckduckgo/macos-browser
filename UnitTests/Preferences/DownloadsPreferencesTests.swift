@@ -183,6 +183,7 @@ class DownloadsPreferencesTests: XCTestCase {
         waitForExpectations(timeout: 0)
         XCTAssertFalse(preferences.shouldOpenPopupOnCompletion)
         XCTAssertEqual(persistor2.values().difference(from: valuesWithFalse), [])
+        withExtendedLifetime(c) {}
     }
 
     private func createTemporaryTestDirectory(named name: String = DownloadsPreferencesTests.defaultTestDirectoryName) -> URL {

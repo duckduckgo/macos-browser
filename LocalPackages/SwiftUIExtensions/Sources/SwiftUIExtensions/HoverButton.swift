@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import SwiftUI
 
 public struct HoverButton: View {
@@ -23,7 +24,7 @@ public struct HoverButton: View {
     public let size: CGFloat
     public let backgroundColor: Color
     public let mouseOverColor: Color
-    public let imageName: String
+    public let image: NSImage
     public let imageSize: CGFloat?
     public let action: () -> Void
     public let cornerRadius: CGFloat
@@ -32,18 +33,18 @@ public struct HoverButton: View {
 
     public init(
         size: CGFloat = 32,
-        backgroundColor: Color = Color.clear,
-        mouseOverColor: Color = Color("ButtonMouseOverColor"),
-        imageName: String,
+        backgroundColor: Color? = nil,
+        mouseOverColor: Color? = nil,
+        image: NSImage,
         imageSize: CGFloat = 16,
         cornerRadius: CGFloat,
         action: @escaping () -> Void
     ) {
 
         self.size = size
-        self.backgroundColor = backgroundColor
-        self.mouseOverColor = mouseOverColor
-        self.imageName = imageName
+        self.backgroundColor = backgroundColor ?? .clear
+        self.mouseOverColor = mouseOverColor ?? Color(.buttonMouseOver)
+        self.image = image
         self.imageSize = imageSize
         self.cornerRadius = cornerRadius
         self.action = action
@@ -56,13 +57,8 @@ public struct HoverButton: View {
                 .fill(isHovering ? mouseOverColor : backgroundColor)
 
             Group {
-                if NSImage(named: imageName) != nil {
-                    Image(imageName)
-                        .resizable()
-                } else {
-                    Image(systemName: imageName)
-                        .resizable()
-                }
+                Image(nsImage: image)
+                    .resizable()
             }
             .frame(width: imageSize ?? size, height: imageSize ?? size)
 
