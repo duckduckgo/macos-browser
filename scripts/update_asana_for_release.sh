@@ -41,6 +41,7 @@ find_task_urls_in_git_log() {
 		| grep -A 1 'Task.*URL' \
 		| awk '{ print $NF; }' \
 		| grep app\.asana\.com \
+		| sed -E 's/.*(https:.*)/\1/' \
 		| uniq
 }
 
