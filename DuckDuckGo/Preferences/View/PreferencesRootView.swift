@@ -64,7 +64,9 @@ enum Preferences {
                             case .emailProtection:
                                 EmailProtectionView(emailManager: EmailManager())
                             case .general:
-                                GeneralView(startupModel: StartupPreferences.shared, downloadsModel: DownloadsPreferences())
+                                GeneralView(startupModel: StartupPreferences.shared,
+                                            downloadsModel: DownloadsPreferences(),
+                                            searchModel: SearchPreferences.shared)
                             case .sync:
                                 SyncView()
                             case .appearance:

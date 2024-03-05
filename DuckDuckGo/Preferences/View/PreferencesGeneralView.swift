@@ -27,6 +27,7 @@ extension Preferences {
     struct GeneralView: View {
         @ObservedObject var startupModel: StartupPreferences
         @ObservedObject var downloadsModel: DownloadsPreferences
+        @ObservedObject var searchModel: SearchPreferences
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
@@ -90,7 +91,12 @@ extension Preferences {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
-                // SECTION 3: Downloads
+                // SECTION 3: Search Settings
+                PreferencePaneSection("Private Search") {
+                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions)
+                }
+
+                // SECTION 4: Downloads
                 PreferencePaneSection(UserText.downloads) {
 
                     PreferencePaneSubSection {
