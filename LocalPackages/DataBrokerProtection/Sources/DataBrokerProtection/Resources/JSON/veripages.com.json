@@ -1,8 +1,9 @@
 {
-  "name": "veripages.com",
-  "version": "0.1.2",
+  "name": "Veripages",
+  "url": "veripages.com",
+  "version": "0.1.5",
   "parent": "verecor.com",
-  "addedDatetime": 1691982000000,
+  "addedDatetime": 1691989200000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "5bf98772-1804-4939-a06b-dbf9cd31f198",
+          "id": "658fce8a-8bc7-4fb7-9f52-4cdbf2e90054",
           "url": "https://veripages.com/inner/profile/search?fname=${firstName}&lname=${lastName}&fage=${age|ageRange}&state=${state}&city=${city}",
           "ageRange": [
             "18-30",
@@ -24,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "f3d53642-9a58-4275-b97f-5547e3ef8e55",
+          "id": "4bb4d602-8697-4ad0-ab7e-fef2b5b8406c",
           "selector": ".search-item",
           "profile": {
             "name": {
@@ -49,7 +50,9 @@
               "beforeText": ","
             },
             "profileUrl": {
-              "selector": ".//div[@class='search-item-title']//a"
+              "selector": ".//div[@class='search-item-title']//a",
+              "identifierType": "path",
+              "identifier": "https://veripages.com/profile/${firstName}-${lastName}/${id}"
             }
           }
         }

@@ -27,6 +27,13 @@ final class FireTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 
+    override func tearDown() {
+        WindowsManager.closeWindows()
+        for controller in WindowControllersManager.shared.mainWindowControllers {
+            WindowControllersManager.shared.unregister(controller)
+        }
+    }
+
     func testWhenBurnAll_ThenAllWindowsAreClosed() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
@@ -153,10 +160,13 @@ final class FireTests: XCTestCase {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
         let service = StatePersistenceService(fileStore: fileStore, fileName: fileName)
-        let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
+        let appStateRestorationManager = AppStateRestorationManager(fileStore: fileStore,
+                                                                    service: service,
+                                                                    shouldRestorePreviousSession: false)
         appStateRestorationManager.applicationDidFinishLaunching()
 
-        let fire = Fire(stateRestorationManager: appStateRestorationManager,
+        let fire = Fire(historyCoordinating: HistoryCoordinatingMock(),
+                        stateRestorationManager: appStateRestorationManager,
                         tld: ContentBlocking.shared.tld)
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
@@ -168,10 +178,13 @@ final class FireTests: XCTestCase {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
         let service = StatePersistenceService(fileStore: fileStore, fileName: fileName)
-        let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
+        let appStateRestorationManager = AppStateRestorationManager(fileStore: fileStore,
+                                                                    service: service,
+                                                                    shouldRestorePreviousSession: false)
         appStateRestorationManager.applicationDidFinishLaunching()
 
-        let fire = Fire(stateRestorationManager: appStateRestorationManager,
+        let fire = Fire(historyCoordinating: HistoryCoordinatingMock(),
+                        stateRestorationManager: appStateRestorationManager,
                         tld: ContentBlocking.shared.tld)
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
@@ -199,8 +212,8 @@ fileprivate extension TabCollectionViewModel {
     static func makeTabCollectionViewModel(with pinnedTabsManager: PinnedTabsManager? = nil) -> TabCollectionViewModel {
 
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(), pinnedTabsManager: pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager)
-        tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.append(tab: Tab(content: .none))
+        tabCollectionViewModel.append(tab: Tab(content: .none))
         return tabCollectionViewModel
     }
 

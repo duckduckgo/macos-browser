@@ -16,8 +16,10 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Combine
 import Foundation
+import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
@@ -66,24 +68,33 @@ final class NetworkProtectionNavBarPopoverManager {
             let popover = NetworkProtectionPopover(controller: controller,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,
                                                    statusReporter: statusReporter,
-                                                   showLocationsAction: {
-                await appLauncher.launchApp(withCommand: .showVPNLocations)
-            }
-) {
-                let menuItems = [
-                    NetworkProtectionStatusView.Model.MenuItem(
-                        name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
-                            await appLauncher.launchApp(withCommand: .showSettings)
-                        }),
-                    NetworkProtectionStatusView.Model.MenuItem(
-                        name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                        action: {
-                            await appLauncher.launchApp(withCommand: .shareFeedback)
-                        })
-                ]
-
-                return menuItems
-            }
+                                                   appLauncher: appLauncher,
+                                                   menuItems: {
+                if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
+                    return [
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
+                                await appLauncher.launchApp(withCommand: .showSettings)
+                            }),
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            action: {
+                                await appLauncher.launchApp(withCommand: .shareFeedback)
+                            })
+                    ]
+                } else {
+                    return [
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            action: {
+                                await appLauncher.launchApp(withCommand: .shareFeedback)
+                            })
+                    ]
+                }
+            },
+                                                   agentLoginItem: LoginItem.vpnMenu,
+                                                   isMenuBarStatusView: false
+            )
             popover.delegate = delegate
 
             networkProtectionPopover = popover

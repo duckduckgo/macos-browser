@@ -26,7 +26,6 @@ extension OSLog {
         case atb = "ATB"
         case config = "Configuration Downloading"
         case fire = "Fire"
-        case history = "History"
         case dataImportExport = "Data Import/Export"
         case pixel = "Pixel"
         case contentBlocking = "Content Blocking"
@@ -40,6 +39,7 @@ extension OSLog {
         case bitwarden = "Bitwarden"
         case navigation = "Navigation"
         case duckPlayer = "Duck Player"
+        case tabSnapshots = "Tab Snapshots"
         case sync = "Sync"
         case networkProtection = "Network Protection"
         case dbp = "dbp"
@@ -54,7 +54,6 @@ extension OSLog {
     @OSLogWrapper(.atb) static var atb
     @OSLogWrapper(.config) static var config
     @OSLogWrapper(.fire) static var fire
-    @OSLogWrapper(.history) static var history
     @OSLogWrapper(.dataImportExport) static var dataImportExport
     @OSLogWrapper(.pixel) static var pixel
     @OSLogWrapper(.contentBlocking) static var contentBlocking
@@ -68,6 +67,7 @@ extension OSLog {
     @OSLogWrapper(.bitwarden) static var bitwarden
     @OSLogWrapper(.navigation) static var navigation
     @OSLogWrapper(.duckPlayer) static var duckPlayer
+    @OSLogWrapper(.tabSnapshots) static var tabSnapshots
     @OSLogWrapper(.sync) static var sync
     @OSLogWrapper(.networkProtection) static var networkProtection
     @OSLogWrapper(.dbp) static var dbp

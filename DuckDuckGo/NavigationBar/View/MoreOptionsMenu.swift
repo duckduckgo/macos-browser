@@ -48,6 +48,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 #endif
 #if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu)
+    func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
 #endif
 }
 
@@ -60,7 +61,7 @@ final class MoreOptionsMenu: NSMenu {
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
-    private lazy var sharingMenu = SharingMenu(title: UserText.shareMenuItem)
+    private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
 
 #if NETWORK_PROTECTION
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
@@ -75,6 +76,7 @@ final class MoreOptionsMenu: NSMenu {
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
          networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -85,6 +87,9 @@ final class MoreOptionsMenu: NSMenu {
 
         super.init(title: "")
 
+        if let sharingMenu {
+            self.sharingMenu = sharingMenu
+        }
         self.emailManager.requestDelegate = self
 
         setupMenuItems()
@@ -93,6 +98,7 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
+         sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -102,6 +108,9 @@ final class MoreOptionsMenu: NSMenu {
 
         super.init(title: "")
 
+        if let sharingMenu {
+            self.sharingMenu = sharingMenu
+        }
         self.emailManager.requestDelegate = self
 
         setupMenuItems()
@@ -113,10 +122,14 @@ final class MoreOptionsMenu: NSMenu {
     private func setupMenuItems() {
 
 #if FEEDBACK
-        let feedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: nil, keyEquivalent: "")
-#if !APPSTORE
-            .withImage(.betaLabel)
-#endif // !APPSTORE
+        let feedbackString: String = {
+            guard internalUserDecider.isInternalUser else {
+                return UserText.sendFeedback
+            }
+            return "\(UserText.sendFeedback) (version: \(AppVersion.shared.versionNumber).\(AppVersion.shared.buildNumber))"
+        }()
+        let feedbackMenuItem = NSMenuItem(title: feedbackString, action: nil, keyEquivalent: "")
+
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(feedbackMenuItem)
 
@@ -244,6 +257,10 @@ final class MoreOptionsMenu: NSMenu {
     @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
+
+    @objc func openIdentityTheftRestoration(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedIdentityTheftRestoration(self)
+    }
 #endif
 
     @objc func findInPage(_ sender: NSMenuItem) {
@@ -304,13 +321,13 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        if AccountManager().isUserAuthenticated {
-            items.append(contentsOf: makeActiveSubscriptionItems())
-        } else if SubscriptionPurchaseEnvironment.canPurchase {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && !AccountManager().isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
+        } else {
+            items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
         }
 #else
-        items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
+        items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
 #endif
 
         if !items.isEmpty {
@@ -355,8 +372,18 @@ final class MoreOptionsMenu: NSMenu {
         } else {
             DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
         }
-
 #endif // DBP
+
+#if SUBSCRIPTION
+        if AccountManager().isUserAuthenticated {
+            let identityTheftRestorationItem = NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
+                                                          action: #selector(openIdentityTheftRestoration),
+                                                          keyEquivalent: "")
+                .targetting(self)
+                .withImage(.itrIcon)
+            items.append(identityTheftRestorationItem)
+        }
+#endif
 
         return items
     }

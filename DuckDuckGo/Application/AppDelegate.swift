@@ -30,6 +30,7 @@ import ServiceManagement
 import SyncDataProviders
 import UserNotifications
 import PixelKit
+import History
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -62,7 +63,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private let keyStore = EncryptionKeyStore()
 #endif
 
-    private let fileStore: FileStore
+    let fileStore: FileStore
 
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
@@ -102,14 +103,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         } catch {
             os_log("App Encryption Key could not be read: %s", "\(error)")
             fileStore = EncryptedFileStore()
-        }
-
-        // keep this on top!
-        // disable onboarding for existing users
-        let isOnboardingFinished = UserDefaultsWrapper<Bool>(key: .onboardingFinished, defaultValue: false)
-        if !isOnboardingFinished.wrappedValue,
-           FileManager.default.fileExists(atPath: URL.sandboxApplicationSupportURL.path) {
-            isOnboardingFinished.wrappedValue = true
         }
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
@@ -188,6 +181,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -211,7 +205,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             didFinishLaunching = true
         }
 
-        HistoryCoordinator.shared.loadHistory()
+        HistoryCoordinator.shared.loadHistory {
+            HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
+        }
+
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
         if case .normal = NSApp.runType {
@@ -240,7 +237,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         startupSync()
 
-        stateRestorationManager.applicationDidFinishLaunching()
+        if [.normal, .uiTests].contains(NSApp.runType) {
+            stateRestorationManager.applicationDidFinishLaunching()
+        }
 
         BWManager.shared.initCommunication()
 
@@ -281,6 +280,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if SUBSCRIPTION
         Task {
+            let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
+
+            let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
+                                                         defaultValue: defaultEnvironment).wrappedValue
+            SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
+
     #if STRIPE
             SubscriptionPurchaseEnvironment.current = .stripe
     #else

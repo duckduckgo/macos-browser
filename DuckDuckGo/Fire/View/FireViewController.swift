@@ -36,6 +36,7 @@ final class FireViewController: NSViewController {
         return storyboard.instantiateController(identifier: "FirePopoverViewController")
     }()
 
+    @IBOutlet weak var deletingDataLabel: NSTextField!
     @IBOutlet weak var fakeFireButton: NSButton!
     @IBOutlet weak var progressIndicatorWrapper: NSView!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
@@ -66,7 +67,7 @@ final class FireViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        deletingDataLabel.stringValue = UserText.fireDialogDelitingData
         if case .normal = NSApp.runType {
             fireAnimationViewLoadingTask = Task.detached(priority: .userInitiated) {
                 await self.setupFireAnimationView()

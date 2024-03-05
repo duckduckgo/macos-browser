@@ -176,7 +176,11 @@ final class MainWindowController: NSWindowController {
     }
 
     func orderWindowBack(_ sender: Any?) {
-        window?.orderBack(sender)
+        if let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window {
+            window?.order(.below, relativeTo: lastKeyWindow.windowNumber)
+        } else {
+            window?.orderFront(sender)
+        }
         register()
     }
 
@@ -203,6 +207,11 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowWillEnterFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
+        mainViewController.windowWillEnterFullScreen()
+    }
+
+    func windowWillMiniaturize(_ notification: Notification) {
+        mainViewController.windowWillMiniaturize()
     }
 
     func windowDidEnterFullScreen(_ notification: Notification) {
@@ -309,10 +318,7 @@ fileprivate extension MainMenu {
 fileprivate extension NavigationBarViewController {
 
     var controlsForUserPrevention: [NSControl?] {
-        return [goBackButton,
-                goForwardButton,
-                refreshOrStopButton,
-                optionsButton,
+        return [optionsButton,
                 bookmarkListButton,
                 passwordManagementButton,
                 addressBarViewController?.addressBarTextField,

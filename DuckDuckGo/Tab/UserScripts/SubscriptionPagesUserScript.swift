@@ -119,7 +119,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let authToken = AccountManager().authToken, AccountManager().accessToken != nil{
+        if let authToken = AccountManager().authToken, AccountManager().accessToken != nil {
             return Subscription(token: authToken)
         } else {
             return Subscription(token: "")
@@ -260,31 +260,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         Task { @MainActor in
             let actionHandlers = SubscriptionAccessActionHandlers(
                 restorePurchases: {
-                    if #available(macOS 12.0, *) {
-                        Task {
-                            let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                            let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
-
-                            defer { mainViewController?.dismiss(progressViewController) }
-
-                            mainViewController?.presentAsSheet(progressViewController)
-
-                            guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
-
-                            switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                            case .success:
-                                message.webView?.reload()
-                            case .failure(let error):
-                                switch error {
-                                case .missingAccountOrTransactions:
-                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
-                                case .subscriptionExpired:
-                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
-                                default:
-                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
-                                }
-                            }
-                        }
+                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow {
+                        message.webView?.reload()
                     }
                 },
                 openURLHandler: { url in
@@ -325,11 +302,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .appTrackingProtection:
             NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
         case .vpn:
-            NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
+            NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
         case .personalInformationRemoval:
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+            await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
-            NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
+            await WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
         }
 
         return nil
@@ -363,6 +341,38 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 }
 
+extension SubscriptionPagesUseSubscriptionFeature {
+
+    static func startAppStoreRestoreFlow(onSuccessHandler: @escaping () -> Void = {}) {
+        if #available(macOS 12.0, *) {
+            Task { @MainActor in
+                let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+                let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
+
+                defer { mainViewController?.dismiss(progressViewController) }
+
+                mainViewController?.presentAsSheet(progressViewController)
+
+                guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
+
+                switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
+                case .success:
+                    onSuccessHandler()
+                case .failure(let error):
+                    switch error {
+                    case .missingAccountOrTransactions:
+                        WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
+                    case .subscriptionExpired:
+                        WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
+                    default:
+                        WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                    }
+                }
+            }
+        }
+    }
+}
+
 extension MainWindowController {
 
     @MainActor
@@ -375,7 +385,6 @@ extension MainWindowController {
         case .stripe:
             window.show(.somethingWentWrongStripeAlert())
         }
-
     }
 
     @MainActor
@@ -383,7 +392,7 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
-            WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
+            WindowControllersManager.shared.show(url: .subscriptionPurchase, source: .ui, newTab: true)
         })
     }
 
@@ -392,7 +401,7 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
-            WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
+            WindowControllersManager.shared.show(url: .subscriptionPurchase, source: .ui, newTab: true)
         })
     }
 

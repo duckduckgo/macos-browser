@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import AppKit
+import BrowserServicesKit
 import Common
 import Foundation
-import BrowserServicesKit
 
 extension URL.NavigationalScheme {
 
@@ -130,6 +131,8 @@ extension URL {
     static let welcome = URL(string: "duck://welcome")!
     static let settings = URL(string: "duck://settings")!
     static let bookmarks = URL(string: "duck://bookmarks")!
+    // base url for Error Page Alternate HTML loaded into Web View
+    static let error = URL(string: "duck://error")!
 
     static let dataBrokerProtection = URL(string: "duck://dbp")!
 
@@ -223,10 +226,10 @@ extension URL {
         toString(decodePunycode: decodePunycode, dropScheme: dropScheme, needsWWW: nil, dropTrailingSlash: dropTrailingSlash)
     }
 
-    private func toString(decodePunycode: Bool,
-                          dropScheme: Bool,
-                          needsWWW: Bool? = nil,
-                          dropTrailingSlash: Bool) -> String {
+    func toString(decodePunycode: Bool,
+                  dropScheme: Bool,
+                  needsWWW: Bool? = nil,
+                  dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
               var string = components.string
         else {
@@ -471,5 +474,9 @@ extension URL {
             return "\(strippedURL)\(uuid)"
         }
         return self.absoluteString
+    }
+
+    public func isChild(of url: URL) -> Bool {
+        self.absoluteString.hasPrefix(url.absoluteString)
     }
 }

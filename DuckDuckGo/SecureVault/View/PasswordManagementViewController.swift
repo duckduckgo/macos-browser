@@ -204,7 +204,7 @@ final class PasswordManagementViewController: NSViewController {
         autofillTitleLabel.stringValue = UserText.autofill
         emptyStateTitle.stringValue = UserText.passwordManagerEmptyStateTitle
         emptyStateMessage.stringValue = UserText.passwordManagerEmptyStateMessage
-        emptyStateButton.stringValue = UserText.importData
+        emptyStateButton.title = UserText.importData
     }
 
     private func bindSyncDidFinish() -> AnyCancellable? {

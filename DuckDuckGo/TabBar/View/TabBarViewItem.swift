@@ -42,7 +42,9 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
@@ -51,7 +53,7 @@ protocol TabBarViewItemDelegate: AnyObject {
 final class TabBarViewItem: NSCollectionViewItem {
 
     enum Constants {
-        static let textFieldPadding: CGFloat = 32
+        static let textFieldPadding: CGFloat = 28
         static let textFieldPaddingNoFavicon: CGFloat = 12
     }
 
@@ -94,6 +96,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var titleTextFieldLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var titleTextFieldLeadingMuteConstraint: NSLayoutConstraint!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
@@ -103,7 +106,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var closeButtonTrailingConstraint: NSLayoutConstraint!
-
+    @IBOutlet weak var mutedTabIcon: NSImageView!
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
     private var currentURL: URL?
@@ -176,6 +179,11 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @objc func fireproofSiteAction(_ sender: NSButton) {
         delegate?.tabBarViewItemFireproofSite(self)
+    }
+
+    @objc func muteUnmuteSiteAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemMuteUnmuteSite(self)
+        setupMuteOrUnmutedIcon()
     }
 
     @objc func removeFireproofingAction(_ sender: NSButton) {
@@ -267,7 +275,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         layer.borderWidth = TabShadowConfig.dividerSize
         layer.opacity = TabShadowConfig.alpha
         layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-        layer.cornerRadius = 7
+        layer.cornerRadius = 11
         layer.mask = layerMask
         return layer
     }()
@@ -319,7 +327,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func setupView() {
         view.wantsLayer = true
-        view.layer?.cornerRadius = 7
+        view.layer?.cornerRadius = 11
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.layer?.masksToBounds = true
         view.layer?.addSublayer(borderLayer)
@@ -331,7 +339,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func updateSubviews() {
         NSAppearance.withAppAppearance {
-            let backgroundColor: NSColor = isSelected || isDragged ? .interfaceBackground : .clear
+            let backgroundColor: NSColor = isSelected || isDragged ? .navigationBarBackground : .clear
             view.layer?.backgroundColor = backgroundColor.cgColor
             mouseOverView.mouseOverColor = isSelected || isDragged ? .clear : .tabMouseOver
         }
@@ -341,9 +349,16 @@ final class TabBarViewItem: NSCollectionViewItem {
         updateSeparatorView()
         permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden && faviconImageView.image != nil
+        setupMuteOrUnmutedIcon()
 
-        faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
-        faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
+        if mutedTabIcon.isHidden {
+            faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
+            faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
+        } else {
+            // When the mute icon is visible and the tab is compressed we need to center both
+            faviconWrapperViewCenterConstraint.priority = .defaultLow
+            faviconWrapperViewLeadingConstraint.priority = .defaultHigh
+        }
 
         updateBorderLayerColor()
 
@@ -355,7 +370,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         // Adjust colors for burner window
         if isBurner && faviconImageView.image === TabViewModel.Favicon.burnerHome {
-                    faviconImageView.contentTintColor = .textColor
+            faviconImageView.contentTintColor = .textColor
         } else {
             faviconImageView.contentTintColor = nil
         }
@@ -416,8 +431,44 @@ final class TabBarViewItem: NSCollectionViewItem {
         faviconWrapperView.isHidden = favicon == nil
         titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding
         faviconImageView.image = favicon
+        faviconImageView.imageScaling = .scaleProportionallyDown
     }
 
+    private func setupMuteOrUnmutedIcon() {
+        setupMutedTabIconVisibility()
+        setupMutedTabIconColor()
+        setupMutedTabIconPosition()
+    }
+
+    private func setupMutedTabIconVisibility() {
+        switch delegate?.tabBarViewItemAudioState(self) {
+        case .muted:
+            mutedTabIcon.isHidden = false
+        default:
+            mutedTabIcon.isHidden = true
+        }
+    }
+
+    private func setupMutedTabIconColor() {
+        mutedTabIcon.image?.isTemplate = true
+        mutedTabIcon.contentTintColor = .mutedTabIcon
+    }
+
+    private func setupMutedTabIconPosition() {
+        if mutedTabIcon.isHidden {
+            titleTextFieldLeadingConstraint.priority = .defaultHigh
+            titleTextFieldLeadingMuteConstraint.priority = .defaultLow
+            titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding
+        } else {
+            if titleTextField.isHidden {
+                titleTextFieldLeadingMuteConstraint.priority = .defaultLow
+                titleTextFieldLeadingConstraint.priority = .defaultLow
+            } else {
+                titleTextFieldLeadingMuteConstraint.priority = .required
+                titleTextFieldLeadingConstraint.priority = .defaultLow
+            }
+        }
+    }
 }
 
 extension TabBarViewItem: NSMenuDelegate {
@@ -438,6 +489,8 @@ extension TabBarViewItem: NSMenuDelegate {
         // Section 2
         addBookmarkMenuItem(to: menu)
         addFireproofMenuItem(to: menu)
+
+        addMuteUnmuteMenuItem(to: menu)
         menu.addItem(NSMenuItem.separator())
 
         // Section 3
@@ -482,6 +535,18 @@ extension TabBarViewItem: NSMenuDelegate {
         menu.addItem(menuItem)
     }
 
+    private func addMuteUnmuteMenuItem(to menu: NSMenu) {
+        let audioState = delegate?.tabBarViewItemAudioState(self) ?? .notSupported
+
+        if audioState != .notSupported {
+            menu.addItem(NSMenuItem.separator())
+            let menuItemTitle = audioState == .muted ? UserText.unmuteTab : UserText.muteTab
+            let muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
+            muteUnmuteMenuItem.target = self
+            menu.addItem(muteUnmuteMenuItem)
+        }
+    }
+
     private func addCloseMenuItem(to menu: NSMenu) {
         let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
         closeMenuItem.target = self
@@ -516,7 +581,9 @@ extension TabBarViewItem: NSMenuDelegate {
 extension TabBarViewItem: MouseClickViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
-        delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
+        if self.isMouseOver != isMouseOver {
+            delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
+        }
         self.isMouseOver = isMouseOver
         view.needsLayout = true
     }
@@ -545,11 +612,11 @@ extension TabBarViewItem: MouseClickViewDelegate {
 extension TabBarViewItem {
 
     enum Height: CGFloat {
-        case standard = 32
+        case standard = 34
     }
 
     enum Width: CGFloat {
-        case minimum = 50
+        case minimum = 52
         case minimumSelected = 120
         case maximum = 240
     }

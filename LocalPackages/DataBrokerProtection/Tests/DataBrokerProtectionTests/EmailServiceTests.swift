@@ -41,7 +41,7 @@ final class EmailServiceTests: XCTestCase {
         let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
-            _ = try await sut.getEmail(dataBrokerName: "fakeBroker")
+            _ = try await sut.getEmail(dataBrokerURL: "fakeBroker")
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? EmailError,
@@ -62,7 +62,7 @@ final class EmailServiceTests: XCTestCase {
         let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
-            _ = try await sut.getEmail(dataBrokerName: "fakeBroker")
+            _ = try await sut.getEmail(dataBrokerURL: "fakeBroker")
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? EmailError, case .cantFindEmail = error {
@@ -81,7 +81,7 @@ final class EmailServiceTests: XCTestCase {
         let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
-            let email = try await sut.getEmail(dataBrokerName: "fakeBroker")
+            let email = try await sut.getEmail(dataBrokerURL: "fakeBroker")
             XCTAssertEqual("test@ddg.com", email)
         } catch {
             XCTFail("Unexpected. It should not throw")
@@ -99,8 +99,8 @@ final class EmailServiceTests: XCTestCase {
         do {
             _ = try await sut.getConfirmationLink(
                 from: "some@email.com",
-                numberOfRetries: 2,
-                pollingIntervalInSeconds: 2,
+                numberOfRetries: 20,
+                pollingInterval: 0.01,
                 shouldRunNextStep: { true }
             )
         } catch {
@@ -126,7 +126,7 @@ final class EmailServiceTests: XCTestCase {
             _ = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 2,
-                pollingIntervalInSeconds: 2,
+                pollingInterval: 0.01,
                 shouldRunNextStep: { true }
             )
         } catch {
@@ -155,7 +155,7 @@ final class EmailServiceTests: XCTestCase {
             let url = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 2,
-                pollingIntervalInSeconds: 2,
+                pollingInterval: 0.01,
                 shouldRunNextStep: { true }
             )
             XCTAssertEqual(url.absoluteString, "www.duckduckgo.com")
@@ -174,8 +174,8 @@ final class EmailServiceTests: XCTestCase {
         do {
             _ = try await sut.getConfirmationLink(
                 from: "some@email.com",
-                numberOfRetries: 2,
-                pollingIntervalInSeconds: 2,
+                numberOfRetries: 20,
+                pollingInterval: 0.01,
                 shouldRunNextStep: { true }
             )
         } catch {
@@ -198,7 +198,7 @@ final class EmailServiceTests: XCTestCase {
             _ = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 1,
-                pollingIntervalInSeconds: 1,
+                pollingInterval: 0.01,
                 shouldRunNextStep: { true }
             )
         } catch {
@@ -221,7 +221,7 @@ final class EmailServiceTests: XCTestCase {
             let url = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 1,
-                pollingIntervalInSeconds: 1,
+                pollingInterval: 0.01,
                 shouldRunNextStep: { true }
             )
             XCTAssertEqual(url.absoluteString, "www.duckduckgo.com")

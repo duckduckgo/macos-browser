@@ -20,6 +20,7 @@ import Combine
 import Common
 import Navigation
 import XCTest
+import History
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -35,8 +36,21 @@ class HistoryIntegrationTests: XCTestCase {
         mainViewController.browserTabViewController.tabViewModel!
     }
 
+    var contentBlockingMock: ContentBlockingMock!
+    var privacyFeaturesMock: AnyPrivacyFeatures!
+    var privacyConfiguration: MockPrivacyConfiguration {
+        contentBlockingMock.privacyConfigurationManager.privacyConfig as! MockPrivacyConfiguration
+    }
+
     @MainActor
     override func setUp() async throws {
+        contentBlockingMock = ContentBlockingMock()
+        privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
+        // disable waiting for CBR compilation on navigation
+        privacyConfiguration.isFeatureKeyEnabled = { _, _ in
+            return false
+        }
+
         await withCheckedContinuation { continuation in
             HistoryCoordinator.shared.burnAll {
                 continuation.resume(returning: ())
@@ -55,7 +69,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenPageTitleIsUpdated_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .newtab)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -99,7 +113,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenSameDocumentNavigation_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .newtab)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -143,7 +157,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingToSamePage_visitIsAdded() async throws {
-        let tab = Tab(content: .newtab)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [
@@ -163,7 +177,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingBack_visitIsNotAdded() async throws {
-        let tab = Tab(content: .newtab)
+        let tab = Tab(content: .newtab, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [

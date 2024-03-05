@@ -50,13 +50,15 @@ public struct NetworkProtectionStatusView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            if let onboardingStepViewModel = model.onboardingStepViewModel {
-                OnboardingStepView(model: onboardingStepViewModel)
+            if let promptActionViewModel = model.promptActionViewModel {
+                PromptActionView(model: promptActionViewModel)
                     .padding(.horizontal, 5)
                     .padding(.top, 5)
+                    .transition(.slide)
             } else {
                 if let healthWarning = model.issueDescription {
                     connectionHealthWarningView(message: healthWarning)
+                        .transition(.slide)
                 }
             }
 
@@ -67,12 +69,14 @@ public struct NetworkProtectionStatusView: View {
 
             if model.showDebugInformation {
                 DebugInformationView(model: DebugInformationViewModel())
+                    .transition(.slide)
             }
 
             bottomMenuView()
         }
         .padding(5)
         .frame(maxWidth: 350, alignment: .top)
+        .transition(.slide)
     }
 
     // MARK: - Composite Views

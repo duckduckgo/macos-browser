@@ -35,6 +35,9 @@ public struct FaviconsFetcherOnboardingView: View {
 
                 Text(UserText.fetchFaviconsOnboardingTitle)
                     .font(.system(size: 17, weight: .bold))
+                    .frame(width: 320, alignment: .center)
+                    .multilineTextAlignment(.center)
+                    .fixedSize()
 
                 Text(UserText.fetchFaviconsOnboardingMessage)
                     .frame(width: 320, alignment: .center)
@@ -57,7 +60,6 @@ public struct FaviconsFetcherOnboardingView: View {
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
 
         }
-        .padding(.vertical, 20)
-        .frame(width: 360, height: 290)
+        .frame(width: 360)
     }
 }

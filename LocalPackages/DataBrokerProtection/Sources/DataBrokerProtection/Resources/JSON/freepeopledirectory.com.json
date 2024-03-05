@@ -1,6 +1,7 @@
 {
-  "name": "freepeopledirectory.com",
-  "version": "0.1.1",
+  "name": "FreePeopleDirectory",
+  "url": "freepeopledirectory.com",
+  "version": "0.1.5",
   "parent": "spokeo.com",
   "addedDatetime": 1674540000000,
   "steps": [
@@ -10,16 +11,20 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "815a1cd3-2577-4f43-a163-0cf4d22e66a4",
+          "id": "f1510c8b-f010-4e6f-a748-d34c7777edd7",
           "url": "https://www.freepeopledirectory.com/name/${firstName}-${lastName}/${state|upcase}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "10738ba0-bc6b-42ba-a37c-487ff3927dd5",
+          "id": "cc77e311-7660-43a2-88ae-2c179840f6df",
           "selector": ".whole-card",
           "profile": {
             "name": {
               "selector": ".card-title"
+            },
+            "alternativeNamesList": {
+              "selector": ".//h3/span[contains(text(),'AKA:')]/following-sibling::span",
+              "afterText": "No other aliases."
             },
             "addressCityState": {
               "selector": ".city"
@@ -32,7 +37,9 @@
               "separator": ","
             },
             "profileUrl": {
-              "selector": ".//a[@class='button']"
+              "selector": ".//a[@class='button']",
+              "identifierType": "path",
+              "identifier": "https://www.freepeopledirectory.com/person/${firstName}-${lastName}/${city|capitalize}-${state|upcase}/${id}"
             }
           }
         }

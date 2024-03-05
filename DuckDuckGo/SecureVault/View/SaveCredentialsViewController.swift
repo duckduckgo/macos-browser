@@ -108,6 +108,10 @@ final class SaveCredentialsViewController: NSViewController {
         fireproofCheckDescription.title = UserText.passwordManagementSaveCredentialsFireproofCheckboxDescription
         saveButton.title = UserText.save
         notNowSegmentedControl.setLabel(UserText.dontSave, forSegment: 0)
+        let fontAttributes = [NSAttributedString.Key.font: NSFont.systemFont(ofSize: NSFont.systemFontSize)]
+          let titleSize = (UserText.dontSave as NSString).size(withAttributes: fontAttributes)
+        notNowSegmentedControl.setWidth(titleSize.width + 16, forSegment: 0)
+        notNowSegmentedControl.setLabel(UserText.dontSave, forSegment: 0)
         updateButton.title = UserText.update
         openPasswordManagerButton.title = UserText.bitwardenPreferencesOpenBitwarden
         dontUpdateButton.title = UserText.dontUpdate
@@ -169,6 +173,21 @@ final class SaveCredentialsViewController: NSViewController {
 
             titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
             view.window?.makeFirstResponder(nil)
+        }
+        let notNowTrailingToOpenPasswordConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
+        let notNowTrailingToSaveButtonConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: saveButton.leadingAnchor, constant: -12)
+        let dontUpdateRrailingToOpenPasswordConstraint = dontUpdateButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
+        let dontUpdateTrailingToUpdateButtonConstraint = dontUpdateButton.trailingAnchor.constraint(equalTo: updateButton.leadingAnchor, constant: -12)
+        if openPasswordManagerButton.isHidden {
+            notNowTrailingToOpenPasswordConstraint.isActive = false
+            dontUpdateRrailingToOpenPasswordConstraint.isActive = false
+            notNowTrailingToSaveButtonConstraint.isActive = true
+            dontUpdateTrailingToUpdateButtonConstraint.isActive = true
+        } else {
+            notNowTrailingToSaveButtonConstraint.isActive = false
+            dontUpdateTrailingToUpdateButtonConstraint.isActive = false
+            notNowTrailingToOpenPasswordConstraint.isActive = true
+            dontUpdateRrailingToOpenPasswordConstraint.isActive = true
         }
     }
 

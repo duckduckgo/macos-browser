@@ -49,8 +49,8 @@ final class DBPHomeViewController: NSViewController {
         let privacySettings = PrivacySecurityPreferences.shared
         let sessionKey = UUID().uuidString
         let prefs = ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
-                                                sessionKey: sessionKey,
-                                                featureToggles: features)
+                                           sessionKey: sessionKey,
+                                           featureToggles: features)
 
         return DataBrokerProtectionViewController(
             scheduler: dataBrokerProtectionManager.scheduler,
@@ -177,10 +177,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
                     .ipcServerRunAllOperations,
-                    .enableLoginItem,
-                    .restartLoginItem,
-                    .disableLoginItem,
-                    .resetLoginItem,
                     .scanSuccess,
                     .scanFailed,
                     .scanError,
@@ -191,7 +187,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerProtectionNotificationScheduled2WeeksCheckIn,
                     .dataBrokerProtectionNotificationOpened2WeeksCheckIn,
                     .dataBrokerProtectionNotificationSentAllRecordsRemoved,
-                    .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
+                    .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
+                    .dailyActiveUser,
+                    .weeklyActiveUser,
+                    .monthlyActiveUser:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }

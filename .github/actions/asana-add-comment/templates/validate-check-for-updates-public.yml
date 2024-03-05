@@ -1,0 +1,11 @@
+data:
+  html_text: |
+    <body>
+      <h2>Build ${TAG} is available publicly through Sparkle 🚀</h2>
+      <ul>
+        <li>🌟 New appcast file has been generated and uploaded to S3, together with binary delta files.</li>
+        <li>👀 <a data-asana-gid='${ASSIGNEE_ID}'/>, please proceed by following instructions in <a data-asana-gid='${TASK_ID}'/> and <a data-asana-gid='${ANNOUNCEMENT_TASK_ID}'/> which concludes the release process.</li>
+      </ul>
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

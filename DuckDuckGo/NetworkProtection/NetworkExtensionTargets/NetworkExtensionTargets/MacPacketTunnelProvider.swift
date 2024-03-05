@@ -123,6 +123,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     .failedToParseLocationListResponse:
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
+            case .vpnAccessRevoked:
+                // todo
+                return
             }
 
             PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
@@ -224,21 +227,23 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
-        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: NetworkProtectionBundle.keychainType,
+        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                              serviceName: Self.tokenServiceName,
-                                                             errorEvents: debugEvents)
+                                                             errorEvents: debugEvents,
+                                                             isSubscriptionEnabled: false)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings)
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
-                   keychainType: NetworkProtectionBundle.keychainType,
+                   keychainType: Bundle.keychainType,
                    tokenStore: tokenStore,
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
-                   settings: settings)
+                   settings: settings,
+                   isSubscriptionEnabled: false,
+                   entitlementCheck: nil)
 
-        observeConnectionStatusChanges()
         observeServerChanges()
         observeStatusUpdateRequests()
     }
@@ -247,12 +252,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     /// Observe connection status changes to broadcast those changes through distributed notifications.
     ///
-    private func observeConnectionStatusChanges() {
-        connectionStatusPublisher.sink { [weak self] status in
-            self?.lastStatusChangeDate = Date()
-            self?.broadcast(status)
-        }
-        .store(in: &cancellables)
+    public override func handleConnectionStatusChange(old: ConnectionStatus, new: ConnectionStatus) {
+        super.handleConnectionStatusChange(old: old, new: new)
+
+        lastStatusChangeDate = Date()
+        broadcast(new)
     }
 
     /// Observe server changes to broadcast those changes through distributed notifications.
@@ -271,8 +275,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     ///
     private func observeStatusUpdateRequests() {
         notificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
-            self?.broadcastConnectionStatus()
-            self?.broadcastLastSelectedServerInfo()
+            guard let self else { return }
+
+            Task { @MainActor in
+                self.broadcastConnectionStatus()
+                self.broadcastLastSelectedServerInfo()
+            }
         }
         .store(in: &cancellables)
     }
@@ -281,6 +289,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     /// Broadcasts the current connection status.
     ///
+    @MainActor
     private func broadcastConnectionStatus() {
         broadcast(connectionStatus)
     }
@@ -323,13 +332,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         case missingPixelHeaders
     }
 
-    override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
-        super.prepareToConnect(using: provider)
-
-        guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
-        try? loadDefaultPixelHeaders(from: options)
-    }
-
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
         try super.loadVendorOptions(from: provider)
 
@@ -348,6 +350,15 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
 
         setupPixels(defaultHeaders: defaultPixelHeaders)
+    }
+
+    // MARK: - Overrideable Connection Events
+
+    override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
+        super.prepareToConnect(using: provider)
+
+        guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
+        try? loadDefaultPixelHeaders(from: options)
     }
 
     // MARK: - Start/Stop Tunnel

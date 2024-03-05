@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import Combine
+import History
 
 /**
  * The delegate callbacks are triggered for events related to unpinned tabs only.
@@ -86,6 +87,7 @@ final class TabCollectionViewModel: NSObject {
     @Published private(set) var selectedTabViewModel: TabViewModel? {
         didSet {
             previouslySelectedTabViewModel = oldValue
+            oldValue?.tab.renderTabSnapshot()
         }
     }
     private weak var previouslySelectedTabViewModel: TabViewModel?

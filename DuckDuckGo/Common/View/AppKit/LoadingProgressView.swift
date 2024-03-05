@@ -118,6 +118,7 @@ final class LoadingProgressView: NSView, CAAnimationDelegate {
                 && progressMask.animation(forKey: Constants.fadeOutAnimationKey) == nil
         else { return }
 
+        self.lastEvent = ProgressEvent(progress: Constants.max, interval: Constants.hideAnimationDuration)
         increaseProgress(to: Constants.max, animationDuration: Constants.hideAnimationDuration)
     }
 
@@ -302,7 +303,12 @@ extension LoadingProgressView {
 
             for (idx, step) in milestones.enumerated() {
                 if let event = lastProgressEvent {
-                    if event.progress >= step.progress {
+                    if event.progress == Constants.max {
+                        // 100%: finish fast
+                        nextStepIdx = milestones.indices.last!
+                        estimatedElapsedTime = TimeInterval.greatestFiniteMagnitude
+                        break
+                    } else if event.progress >= step.progress {
                         estimatedElapsedTime += step.interval
                     } else {
                         // take percentage of estimated time for the current step based of (actual / estimated) progress difference

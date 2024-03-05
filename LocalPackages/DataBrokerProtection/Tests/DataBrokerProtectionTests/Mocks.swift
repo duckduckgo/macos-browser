@@ -27,6 +27,7 @@ import GRDB
 extension BrokerProfileQueryData {
     static func mock(with steps: [Step] = [Step](),
                      dataBrokerName: String = "test",
+                     url: String = "test.com",
                      lastRunDate: Date? = nil,
                      preferredRunDate: Date? = nil,
                      extractedProfile: ExtractedProfile? = nil,
@@ -36,6 +37,7 @@ extension BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: dataBrokerName,
+                url: url,
                 steps: steps,
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,
@@ -174,8 +176,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasLoadCalledWithURL: URL?
     var wasWaitForWebViewLoadCalled = false
     var wasFinishCalled = false
-    var wasExecuteCalledForExtractedProfile = false
-    var wasExecuteCalledForProfileData = false
+    var wasExecuteCalledForUserData = false
     var wasExecuteCalledForSolveCaptcha = false
     var wasExecuteJavascriptCalled = false
 
@@ -197,18 +198,12 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
 
     func execute(action: DataBrokerProtection.Action, data: DataBrokerProtection.CCFRequestData) async {
         switch data {
-        case .profile:
-            wasExecuteCalledForExtractedProfile = false
-            wasExecuteCalledForSolveCaptcha = false
-            wasExecuteCalledForProfileData = true
         case .solveCaptcha:
-            wasExecuteCalledForExtractedProfile = false
             wasExecuteCalledForSolveCaptcha = true
-            wasExecuteCalledForProfileData = false
-        case.extractedProfile:
-            wasExecuteCalledForExtractedProfile = true
+            wasExecuteCalledForUserData = false
+        case .userData:
+            wasExecuteCalledForUserData = true
             wasExecuteCalledForSolveCaptcha = false
-            wasExecuteCalledForProfileData = false
         }
     }
 
@@ -221,10 +216,9 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasLoadCalledWithURL = nil
         wasWaitForWebViewLoadCalled = false
         wasFinishCalled = false
-        wasExecuteCalledForExtractedProfile = false
         wasExecuteCalledForSolveCaptcha = false
-        wasExecuteCalledForProfileData = false
         wasExecuteJavascriptCalled = false
+        wasExecuteCalledForUserData = false
     }
 }
 
@@ -232,7 +226,7 @@ final class EmailServiceMock: EmailServiceProtocol {
 
     var shouldThrow: Bool = false
 
-    func getEmail(dataBrokerName: String?) async throws -> String {
+    func getEmail(dataBrokerURL: String?) async throws -> String {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
@@ -240,7 +234,7 @@ final class EmailServiceMock: EmailServiceProtocol {
         return "test@duck.com"
     }
 
-    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingIntervalInSeconds: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
+    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
@@ -259,7 +253,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
     var wasSubmitCaptchaToBeResolvedCalled = false
     var shouldThrow = false
 
-    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
         }
@@ -269,7 +263,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
         return "transactionID"
     }
 
-    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
         }
@@ -360,20 +354,20 @@ final class MockAuthenticationRepository: AuthenticationRepository {
 }
 
 final class BrokerUpdaterRepositoryMock: BrokerUpdaterRepository {
-    var wasSaveLastRunDateCalled = false
-    var lastRunDate: Date?
+    var wasSaveLatestAppVersionCheckCalled = false
+    var lastCheckedVersion: String?
 
-    func saveLastRunDate(date: Date) {
-        wasSaveLastRunDateCalled = true
+    func saveLatestAppVersionCheck(version: String) {
+        wasSaveLatestAppVersionCheckCalled = true
     }
 
-    func getLastRunDate() -> Date? {
-        return lastRunDate
+    func getLastCheckedVersion() -> String? {
+        return lastCheckedVersion
     }
 
     func reset() {
-        wasSaveLastRunDateCalled = false
-        lastRunDate = nil
+        wasSaveLatestAppVersionCheckCalled = false
+        lastCheckedVersion = nil
     }
 }
 
@@ -491,9 +485,9 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
 
     func fetchBroker(with name: String) throws -> DataBroker? {
         if shouldReturnOldVersionBroker {
-            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)
+            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)
         } else if shouldReturnNewVersionBroker {
-            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)
+            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)
         }
 
         return nil
@@ -618,11 +612,11 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
 
 public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
-    static var lastPixelFired: DataBrokerProtectionPixels?
+    static var lastPixelsFired = [DataBrokerProtectionPixels]()
 
     public init() {
         super.init { event, _, _, _ in
-            MockDataBrokerProtectionPixelsHandler.lastPixelFired = event
+            MockDataBrokerProtectionPixelsHandler.lastPixelsFired.append(event)
         }
     }
 
@@ -631,7 +625,7 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
     }
 
     func clear() {
-        MockDataBrokerProtectionPixelsHandler.lastPixelFired = nil
+        MockDataBrokerProtectionPixelsHandler.lastPixelsFired.removeAll()
     }
 }
 
@@ -660,6 +654,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastParentBrokerWhereChildSitesWhereFetched: String?
     var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
     var brokerProfileQueryDataToReturn = [BrokerProfileQueryData]()
+    var profile: DataBrokerProtectionProfile?
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -688,7 +683,11 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func fetchProfile() -> DataBrokerProtectionProfile? {
         wasFetchProfileCalled = true
-        return nil
+        return profile
+    }
+
+    func setFetchedProfile(_ profile: DataBrokerProtectionProfile?) {
+        self.profile = profile
     }
 
     func deleteProfileData() {
@@ -800,5 +799,15 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastParentBrokerWhereChildSitesWhereFetched = nil
         lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
         brokerProfileQueryDataToReturn.removeAll()
+        profile = nil
+    }
+}
+
+final class MockAppVersion: AppVersionNumberProvider {
+
+    var versionNumber: String
+
+    init(versionNumber: String) {
+        self.versionNumber = versionNumber
     }
 }

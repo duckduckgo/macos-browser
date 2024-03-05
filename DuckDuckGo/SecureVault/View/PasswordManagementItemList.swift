@@ -116,8 +116,6 @@ struct PasswordManagementItemListCategoryView: View {
                     return 11
                 }
 
-            Spacer()
-
             // MenuButton incorrectly displays a disabled state when you re-render it with a different image.
             // According to Stack Overflow, this was fixed in macOS 12, but it can still be reproduced on 12.2.
             // This also happens with Menu in macOS 11.0+, so using that on later macOS versions doesn't help.
@@ -128,8 +126,10 @@ struct PasswordManagementItemListCategoryView: View {
 
             if model.sortDescriptor.order == .ascending {
                 PasswordManagementSortButton(imageName: "SortAscending")
+                    .frame(width: 24)
             } else {
                 PasswordManagementSortButton(imageName: "SortDescending")
+                    .frame(width: 24)
             }
         }
         .padding(.vertical, -4)

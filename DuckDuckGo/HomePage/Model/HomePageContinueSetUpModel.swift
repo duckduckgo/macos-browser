@@ -281,6 +281,7 @@ extension HomePage.Models {
         }
 
         // Helper Functions
+        @MainActor(unsafe)
         @objc private func newTabOpenNotification(_ notification: Notification) {
             if !isFirstSession {
                 listOfFeatures = randomisedFeatures

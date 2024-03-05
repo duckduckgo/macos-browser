@@ -28,6 +28,7 @@ final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
     var askToSavePaymentMethods: Bool = true
     var passwordManager: PasswordManager = .duckduckgo
     var autolockLocksFormFilling: Bool = false
+    var debugScriptEnabled: Bool = false
 }
 
 final class UserAuthenticatorMock: UserAuthenticating {
@@ -36,6 +37,9 @@ final class UserAuthenticatorMock: UserAuthenticating {
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
         let authenticationResult = _authenticateUser(reason)
         result(authenticationResult)
+    }
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
+        _authenticateUser(reason)
     }
 }
 

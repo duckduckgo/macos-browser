@@ -27,6 +27,8 @@ protocol DownloadsViewControllerDelegate: AnyObject {
 
 final class DownloadsViewController: NSViewController {
 
+    static let preferredContentSize = CGSize(width: 420, height: 500)
+
     static func create() -> Self {
         let storyboard = NSStoryboard(name: "Downloads", bundle: nil)
         // swiftlint:disable force_cast
@@ -35,6 +37,17 @@ final class DownloadsViewController: NSViewController {
         // swiftlint:enable force_cast
         return controller
     }
+
+    @IBOutlet weak var openItem: NSMenuItem!
+    @IBOutlet weak var showInFinderItem: NSMenuItem!
+    @IBOutlet weak var copyDownloadLinkItem: NSMenuItem!
+    @IBOutlet weak var openWebsiteItem: NSMenuItem!
+    @IBOutlet weak var removeFromListItem: NSMenuItem!
+    @IBOutlet weak var stopItem: NSMenuItem!
+    @IBOutlet weak var restartItem: NSMenuItem!
+    @IBOutlet weak var clearAllItem: NSMenuItem!
+
+    @IBOutlet weak var titleLabel: NSTextField!
 
     @IBOutlet var openDownloadsFolderButton: NSButton!
     @IBOutlet var clearDownloadsButton: NSButton!
@@ -53,9 +66,12 @@ final class DownloadsViewController: NSViewController {
         super.viewDidLoad()
 
         setupDragAndDrop()
+        setUpStrings()
 
         openDownloadsFolderButton.toolTip = UserText.openDownloadsFolderTooltip
         clearDownloadsButton.toolTip = UserText.clearDownloadHistoryTooltip
+
+        preferredContentSize = Self.preferredContentSize
     }
 
     override func viewWillAppear() {
@@ -90,6 +106,18 @@ final class DownloadsViewController: NSViewController {
         downloadsCancellable = nil
     }
 
+    private func setUpStrings() {
+        titleLabel.stringValue = UserText.downloadsDialogTitle
+        openItem.title = UserText.downloadsOpenItem
+        showInFinderItem.title = UserText.downloadsShowInFinderItem
+        copyDownloadLinkItem.title = UserText.downloadsCopyLinkItem
+        openWebsiteItem.title = UserText.downloadsOpenWebsiteItem
+        removeFromListItem.title = UserText.downloadsRemoveFromListItem
+        stopItem.title = UserText.downloadsStopItem
+        restartItem.title = UserText.downloadsRestartItem
+        clearAllItem.title = UserText.downloadsClearAllItem
+    }
+
     private func index(for sender: Any) -> Int? {
         let row: Int
         switch sender {
@@ -119,13 +147,36 @@ final class DownloadsViewController: NSViewController {
     // MARK: User Actions
 
     @IBAction func openDownloadsFolderAction(_ sender: Any) {
-        guard let url = DownloadsPreferences().effectiveDownloadLocation
-                ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
-        else {
-            return
+        let prefs = DownloadsPreferences()
+        var url: URL?
+        var itemToSelect: URL?
+
+        if prefs.alwaysRequestDownloadLocation {
+            url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+
+            if let lastDownloaded = viewModel.items.first/* last added */(where: {
+                // should still exist
+                $0.localURL != nil && FileManager.default.fileExists(atPath: $0.localURL!.deletingLastPathComponent().path)
+            }),
+               let lastDownloadedURL = lastDownloaded.localURL,
+               // if no downloads are from the default Downloads folder - open the last downloaded item folder
+               !viewModel.items.contains(where: { $0.localURL?.deletingLastPathComponent().path == url?.path  }) || url == nil {
+
+                url = lastDownloadedURL.deletingLastPathComponent()
+                // select last downloaded item
+                itemToSelect = lastDownloadedURL
+
+            } /* else fallback to default User‘s Downloads */
+
+        } else {
+            // open preferred downlod location
+            url = prefs.effectiveDownloadLocation ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         }
+
+        guard let url else { return }
+
         self.dismiss()
-        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
+        NSWorkspace.shared.selectFile(itemToSelect?.path, inFileViewerRootedAtPath: url.path)
     }
 
     @IBAction func clearDownloadsAction(_ sender: Any) {
@@ -273,6 +324,7 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
         if identifier == .downloadCell {
             cell?.menu = contextMenu
         }
+
         return cell
     }
 
@@ -322,4 +374,23 @@ private extension NSUserInterfaceItemIdentifier {
     static let downloadCell = NSUserInterfaceItemIdentifier(rawValue: "cell")
     static let noDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "NoDownloads")
     static let openDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "OpenDownloads")
+}
+
+final class NoDownloadViewCell: NSTableCellView {
+    @IBOutlet weak var openFolderButton: LinkButton!
+    @IBOutlet weak var titleLabel: NSTextField!
+
+    override func awakeFromNib() {
+        titleLabel.stringValue = UserText.downloadsNoRecentDownload
+        openFolderButton.title = UserText.downloadsOpenDownloadsFolder
+    }
+}
+
+final class OpenDownloadViewCell: NSTableCellView {
+    @IBOutlet weak var openFolderButton: LinkButton!
+
+    override func awakeFromNib() {
+        openFolderButton.title = UserText.downloadsOpenDownloadsFolder
+    }
+
 }

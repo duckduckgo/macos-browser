@@ -73,7 +73,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
                     if editingBookmarkIndex != nil {
                         view.animator().layer?.backgroundColor = NSColor.backgroundSecondary.cgColor
                     } else {
-                        view.animator().layer?.backgroundColor = NSColor.interfaceBackground.cgColor
+                        view.animator().layer?.backgroundColor = NSColor.bookmarkPageBackground.cgColor
                     }
                 }
             }
@@ -95,7 +95,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     // swiftlint:disable:next function_body_length
     override func loadView() {
-        view = ColorView(frame: .zero, backgroundColor: .interfaceBackground)
+        view = ColorView(frame: .zero, backgroundColor: .bookmarkPageBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(separator)
@@ -228,9 +228,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         emptyState.centerXAnchor.constraint(equalTo: separator.centerXAnchor).isActive = true
 
         newBookmarkButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
-        newBookmarkButton.widthAnchor.constraint(equalToConstant: 130).isActive = true
 
-        newFolderButton.widthAnchor.constraint(equalToConstant: 110).isActive = true
         newFolderButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
 
         emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true

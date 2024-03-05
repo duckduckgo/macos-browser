@@ -40,7 +40,12 @@ final class UserText {
     static let networkProtectionOnboardingAllowVPNDescPrefix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.prefix", value: "Select ", comment: "Non-bold prefix for the onboarding allow-VPN description")
     static let networkProtectionOnboardingAllowVPNDescAllow = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.allow", value: "Allow", comment: "'Allow' word between the prefix and suffix for the onboarding allow-VPN description")
     static let networkProtectionOnboardingAllowVPNDescSuffix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.suffix", value: " when prompted to finish setting up Network Protection.", comment: "Non-bold suffix for the onboarding allow-VPN description")
+    static let networkProtectionOnboardingAllowVPNDescExpandedSuffix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.expanded.suffix", value: " when prompted to finish setting up Network Protection.\n\nThis adds a shortcut in the menu bar so you can still access the VPN if the browser isn't running.", comment: "Non-bold suffix for the onboarding allow-VPN description")
     static let networkProtectionOnboardingAllowVPNAction = NSLocalizedString("network.protection.onboarding.allow.vpn.action", value: "Add VPN Configuration...", comment: "Action button title for the onboarding allow-VPN view")
+
+    static let networkProtectionOnboardingMoveToApplicationsTitle = NSLocalizedString("network.protection.onboarding.move.to.applications.title", value: "Move DuckDuckGo App", comment: "Title for the onboarding move-app-to-applications step")
+    static let networkProtectionOnboardingMoveToApplicationsDesc = NSLocalizedString("network.protection.onboarding.move.to.applications.desc", value: "To use the VPN, the DuckDuckGo app needs to be in the Applications folder on your Mac. Click the button below to move the app and restart the browser.", comment: "Description for the onboarding move-app-to-applications step")
+    static let networkProtectionOnboardingMoveToApplicationsAction = NSLocalizedString("network.protection.onboarding.move.to.applications.action", value: "Move App for Me and Restart…", comment: "Action button title for the onboarding move-app-to-applications step")
 
     // MARK: - Connection Status
 

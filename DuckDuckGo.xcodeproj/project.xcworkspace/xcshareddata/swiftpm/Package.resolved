@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "apple-toolbox",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/apple-toolbox.git",
+      "state" : {
+        "revision" : "e3dc4faf70ca09718a2d20d5c47b449389e8c153",
+        "version" : "1.0.0"
+      }
+    },
+    {
       "identity" : "bloom_cpp",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/bloom_cpp.git",
@@ -14,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "2555be729ff019465b4b263d9d68c2d10a88470a",
-        "version" : "104.2.1"
+        "revision" : "045a8782c3dbbf79fc088b38120dea1efadc13e1",
+        "version" : "114.1.0"
       }
     },
     {
@@ -23,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "38ee7284bac7fa12d822fcaf0677ea3969d15fb1",
-        "version" : "4.59.2"
+        "revision" : "a3690b7666a3617693383d948cb492513f6aa569",
+        "version" : "5.0.0"
       }
     },
     {
@@ -68,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "bb7bfc010ef4d2e7913c343663b167e2a984ac79",
-        "version" : "3.1.2000"
+        "revision" : "b75ab2c0405860bb2616db71b9a456acb118c21a",
+        "version" : "3.1.4000"
       }
     },
     {
@@ -95,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "1f07f4096e52f19b5e7abaa697b7fc592b7ff57c",
-        "version" : "2.5.1"
+        "revision" : "47d3d90aee3c52b6f61d04ceae426e607df62347",
+        "version" : "2.5.2"
       }
     },
     {
@@ -113,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
       "state" : {
-        "revision" : "59b663f68e69f27a87b45de48cb63264b8194605",
-        "version" : "1.15.1"
+        "revision" : "e7b77228b34057041374ebef00c0fd7739d71a2b",
+        "version" : "1.15.3"
       }
     },
     {

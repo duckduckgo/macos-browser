@@ -57,13 +57,22 @@ final class TabWKUIDelegateTests: XCTestCase {
         XCTAssertNil(downloadExtensionMock.capturedSavedDownloadData)
         XCTAssertNil(downloadExtensionMock.capturedMimeType)
 
+        let eDidCallSaveDownloadedData = expectation(description: "didCallSaveDownloadedData")
+        let c = downloadExtensionMock.$didCallSaveDownloadedData.sink { didCall in
+            if didCall {
+                eDidCallSaveDownloadedData.fulfill()
+            }
+        }
+
         // WHEN
         sut.webView(WKWebView(), saveDataToFile: testData, suggestedFilename: filename, mimeType: "application/pdf", originatingURL: originatingURL)
 
         // THEN
-        XCTAssertTrue(downloadExtensionMock.didCallSaveDownloadedData)
+        waitForExpectations(timeout: 1)
         XCTAssertEqual(downloadExtensionMock.capturedSavedDownloadData, testData)
         XCTAssertNotNil(downloadExtensionMock.capturedMimeType, "application/pdf")
+
+        withExtendedLifetime(c) {}
     }
 
 }

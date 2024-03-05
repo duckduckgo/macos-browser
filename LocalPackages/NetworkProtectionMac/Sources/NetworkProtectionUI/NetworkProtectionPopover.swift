@@ -21,6 +21,7 @@ import Combine
 import Foundation
 import SwiftUI
 import NetworkProtection
+import LoginItems
 
 @available(iOS, introduced: 10.15, deprecated: 12.0, message: "Use Apple's DismissAction")
 public struct DismissAction: EnvironmentKey {
@@ -46,46 +47,42 @@ public final class NetworkProtectionPopover: NSPopover {
 
     private let debugInformationPublisher = CurrentValueSubject<Bool, Never>(false)
     private let statusReporter: NetworkProtectionStatusReporter
+    private let model: NetworkProtectionStatusView.Model
+    private var appLifecycleCancellable: AnyCancellable?
 
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
-                         showLocationsAction: @escaping () async -> Void,
-                         menuItems: @escaping () -> [MenuItem]) {
+                         appLauncher: AppLaunching,
+                         menuItems: @escaping () -> [MenuItem],
+                         agentLoginItem: LoginItem?,
+                         isMenuBarStatusView: Bool) {
 
         self.statusReporter = statusReporter
+        self.model = NetworkProtectionStatusView.Model(controller: controller,
+                                                       onboardingStatusPublisher: onboardingStatusPublisher,
+                                                       statusReporter: statusReporter,
+                                                       debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
+                                                       appLauncher: appLauncher,
+                                                       menuItems: menuItems,
+                                                       agentLoginItem: agentLoginItem,
+                                                       isMenuBarStatusView: isMenuBarStatusView)
 
         super.init()
 
         self.animates = false
         self.behavior = .semitransient
 
-        setupContentController(controller: controller,
-                               onboardingStatusPublisher: onboardingStatusPublisher,
-                               statusReporter: statusReporter,
-                               debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
-                               showLocationsAction: showLocationsAction,
-                               menuItems: menuItems)
+        subscribeToAppLifecycleEvents()
+        setupContentController()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setupContentController(controller: TunnelController,
-                                        onboardingStatusPublisher: OnboardingStatusPublisher,
-                                        statusReporter: NetworkProtectionStatusReporter,
-                                        debugInformationPublisher: AnyPublisher<Bool, Never>,
-                                        showLocationsAction: @escaping () async -> Void,
-                                        menuItems: @escaping () -> [MenuItem]) {
-
-        let model = NetworkProtectionStatusView.Model(controller: controller,
-                                                      onboardingStatusPublisher: onboardingStatusPublisher,
-                                                      statusReporter: statusReporter,
-                                                      debugInformationPublisher: debugInformationPublisher, showLocationsAction: showLocationsAction,
-                                                      menuItems: menuItems)
-
-        let view = NetworkProtectionStatusView(model: model).environment(\.dismiss, { [weak self] in
+    private func setupContentController() {
+        let view = NetworkProtectionStatusView(model: self.model).environment(\.dismiss, { [weak self] in
             self?.close()
         }).fixedSize()
 
@@ -97,11 +94,20 @@ public final class NetworkProtectionPopover: NSPopover {
         controller.view.frame = CGRect(origin: .zero, size: controller.view.intrinsicContentSize)
     }
 
-    // MARK: - Forcing Status Refresh
+    // MARK: - Status Refresh
+
+    private func subscribeToAppLifecycleEvents() {
+        appLifecycleCancellable = NotificationCenter
+            .default
+            .publisher(for: NSApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                self?.model.refreshLoginItemStatus()
+        }
+    }
 
     override public func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
-
         statusReporter.forceRefresh()
+        model.refreshLoginItemStatus()
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
 

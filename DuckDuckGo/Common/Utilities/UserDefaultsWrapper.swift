@@ -58,6 +58,7 @@ public struct UserDefaultsWrapper<T> {
         case selectedDownloadLocationKey = "preferences.download-location"
         case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
+        case openDownloadsPopupOnCompletionKey = "preferences.downloads.open.on.completion"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
         case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
@@ -69,6 +70,7 @@ public struct UserDefaultsWrapper<T> {
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
         case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
+        case autofillDebugScriptEnabled = "preferences.enable-autofill-debug-script"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
@@ -179,6 +181,11 @@ public struct UserDefaultsWrapper<T> {
         case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
         case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
         case syncDidShowSyncPausedByFeatureFlagAlert = "sync.did-show-sync-paused-by-feature-flag-alert"
+
+        // Subscription
+
+        case subscriptionInternalTesting = "subscription.internal-testing-enabled"
+        case subscriptionEnvironment = "subscription.environment"
     }
 
     enum RemovedKeys: String, CaseIterable {

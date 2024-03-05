@@ -34,7 +34,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
-    var stageCalculator: DataBrokerProtectionStageDurationCalculator? { get }
+    var stageCalculator: StageDurationCalculator? { get }
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
     var extractedProfile: ExtractedProfile? { get set }
     var shouldRunNextStep: () -> Bool { get }
@@ -43,7 +43,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
-             stageCalculator: DataBrokerProtectionStageDurationCalculator,
+             stageCalculator: StageDurationCalculator,
              showWebView: Bool) async throws -> ReturnValue
 
     func executeNextStep() async
@@ -54,7 +54,7 @@ extension DataBrokerOperation {
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
-             stageCalculator: DataBrokerProtectionStageDurationCalculator,
+             stageCalculator: StageDurationCalculator,
              shouldRunNextStep: @escaping () -> Bool) async throws -> ReturnValue {
 
         try await run(inputValue: inputValue,
@@ -99,7 +99,7 @@ extension DataBrokerOperation {
         if action.needsEmail {
             do {
                 stageCalculator?.setStage(.emailGenerate)
-                extractedProfile?.email = try await emailService.getEmail(dataBrokerName: query.dataBroker.name)
+                extractedProfile?.email = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url)
                 stageCalculator?.fireOptOutEmailGenerate()
             } catch {
                 await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
@@ -111,11 +111,7 @@ extension DataBrokerOperation {
             stageCalculator?.setStage(.captchaParse)
         }
 
-        if let extractedProfile = self.extractedProfile {
-            await webViewHandler?.execute(action: action, data: .extractedProfile(extractedProfile))
-        } else {
-            await webViewHandler?.execute(action: action, data: .profile(query.profileQuery))
-        }
+        await webViewHandler?.execute(action: action, data: .userData(query.profileQuery, self.extractedProfile))
     }
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
@@ -124,7 +120,7 @@ extension DataBrokerOperation {
             let url =  try await emailService.getConfirmationLink(
                 from: email,
                 numberOfRetries: 100, // Move to constant
-                pollingIntervalInSeconds: action.pollingTime,
+                pollingInterval: action.pollingTime,
                 shouldRunNextStep: shouldRunNextStep
             )
             stageCalculator?.fireOptOutEmailReceive()

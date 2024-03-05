@@ -36,26 +36,10 @@ final class AppStateChangePublisherTests: XCTestCase {
         }
     }
 
-    final class MultiExpectation {
-        let e: XCTestExpectation
-        let count: Int
-        var counter = 0
-
-        init(e: XCTestExpectation, count: Int) {
-            self.e = e
-            self.count = count
-        }
-
-        func fulfill() {
-            counter += 1
-            if counter >= count {
-                e.fulfill()
-            }
-        }
-    }
-
-    func expect(description expectationDescription: String, events: Int) -> MultiExpectation {
-        MultiExpectation(e: expectation(description: description), count: events)
+    func expect(description expectationDescription: String, events: Int) -> XCTestExpectation {
+        let e = expectation(description: description)
+        e.expectedFulfillmentCount = events
+        return e
     }
 
     // MARK: -
@@ -68,12 +52,12 @@ final class AppStateChangePublisherTests: XCTestCase {
                 e.fulfill()
             }.store(in: &cancellables)
 
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(with: Tab(content: .none))
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
     func testWhenManyWindowsOpenedThenStateChangePublished() {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(with: Tab(content: .none))
 
         let n = 7
         let e = expect(description: "Windows Opened fire State change", events: n)
@@ -84,14 +68,15 @@ final class AppStateChangePublisherTests: XCTestCase {
             }.store(in: &cancellables)
 
         for _ in (0..<n) {
-            WindowsManager.openNewWindow()
+            WindowsManager.openNewWindow(with: Tab(content: .none))
         }
 
         waitForExpectations(timeout: 0.3, handler: nil)
+        cancellables.removeAll()
     }
 
     func testWhenWindowIsClosedThenStateChangePublished() {
-        let window = WindowsManager.openNewWindow()
+        let window = WindowsManager.openNewWindow(with: Tab(content: .none))
 
         let e = expectation(description: "Window Closed fires State changes")
 
@@ -105,7 +90,7 @@ final class AppStateChangePublisherTests: XCTestCase {
     }
 
     func testWhenWindowIsPositionedThenStateChangePublished() {
-        let window = WindowsManager.openNewWindow()
+        let window = WindowsManager.openNewWindow(with: Tab(content: .none))
 
         let e = expectation(description: "Window setFrameOrigin fires State changes")
 
@@ -120,7 +105,7 @@ final class AppStateChangePublisherTests: XCTestCase {
     }
 
     func testWhenWindowIsResizedThenStateChangePublished() {
-        let window = WindowsManager.openNewWindow()
+        let window = WindowsManager.openNewWindow(with: Tab(content: .none))
 
         let e = expectation(description: "Window setContentSize fires State changes")
 
@@ -135,9 +120,9 @@ final class AppStateChangePublisherTests: XCTestCase {
     }
 
     func testWhenNewTabIsOpenedThenStateChangePublished() {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(with: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
 
         // 2 events should be fired (one for tab appending, one for selectionIndex change)
         let e = expect(description: "Append new tab fires State changes", events: 2)
@@ -147,18 +132,18 @@ final class AppStateChangePublisherTests: XCTestCase {
             }.store(in: &cancellables)
 
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
 
         waitForExpectations(timeout: 0.3, handler: nil)
     }
 
     func testWhenTabIsClosedThenStateChangePublished() {
-        WindowsManager.openNewWindow()
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(with: Tab(content: .none))
+        WindowsManager.openNewWindow(with: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[1].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
 
         // 4 events should be fired (2 for tabs removal, 2 for selectionIndex change)
         let e = expect(description: "Close tabs fire State Changee", events: 4)
@@ -176,13 +161,13 @@ final class AppStateChangePublisherTests: XCTestCase {
     }
 
     func testWhenAllTabsExceptOneClosedThenStateChangePublished() {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(with: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
 
         // 2 events should be fired (one for tab removal, one for selectionIndex change)
         let e = expect(description: "Close tabs fires State changes", events: 2)
@@ -198,13 +183,13 @@ final class AppStateChangePublisherTests: XCTestCase {
     }
 
     func testWhenTabsReorderedThenStateChangePublished() {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(with: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .appendNewTab()
+            .append(tab: Tab(content: .none))
 
         // 2 events should be fired: 1 for tabs reordering, 1 for selectionIndex change
         let e = expect(description: "Reordering tabs fires State changes", events: 2)
@@ -220,7 +205,7 @@ final class AppStateChangePublisherTests: XCTestCase {
     }
 
     func testWhenTabURLChangedThenStateChangePublished() {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(with: Tab(content: .none))
 
         var e: XCTestExpectation? = expectation(description: "Reordering tabs fires State changes")
         WindowControllersManager.shared.stateChanged
@@ -236,7 +221,7 @@ final class AppStateChangePublisherTests: XCTestCase {
     }
 
     func testWhenTabFaviconChangedThenStateChangePublished() {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(with: Tab(content: .none))
 
         let e = expectation(description: "Reordering tabs fires State changes")
         WindowControllersManager.shared.stateChanged

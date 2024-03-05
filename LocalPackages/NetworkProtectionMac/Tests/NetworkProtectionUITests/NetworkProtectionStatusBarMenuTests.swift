@@ -53,8 +53,10 @@ final class StatusBarMenuTests: XCTestCase {
             statusReporter: MockNetworkProtectionStatusReporter(),
             controller: TestTunnelController(),
             iconProvider: MenuIconProvider(),
-            showLocationsAction: {},
-            menuItems: { [] })
+            appLauncher: MockAppLauncher(),
+            menuItems: { [] },
+            agentLoginItem: nil,
+            isMenuBarStatusView: false)
 
         menu.show()
 
@@ -74,8 +76,10 @@ final class StatusBarMenuTests: XCTestCase {
             statusReporter: MockNetworkProtectionStatusReporter(),
             controller: TestTunnelController(),
             iconProvider: MenuIconProvider(),
-            showLocationsAction: {},
-            menuItems: { [] })
+            appLauncher: MockAppLauncher(),
+            menuItems: { [] },
+            agentLoginItem: nil,
+            isMenuBarStatusView: false)
 
         menu.hide()
 

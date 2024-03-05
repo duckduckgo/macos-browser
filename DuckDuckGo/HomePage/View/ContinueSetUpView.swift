@@ -139,7 +139,9 @@ extension HomePage.Views {
             var body: some View {
                 ZStack(alignment: .center) {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.homeFavoritesGhost), style: StrokeStyle(lineWidth: 1.0))
+                        .stroke(Color.homeFavoritesGhost, style: StrokeStyle(lineWidth: 1.0))
+                        .background(Color.homepageCardBackground)
+                        .cornerRadius(12)
                     ZStack {
                         VStack(spacing: 18) {
                             icon

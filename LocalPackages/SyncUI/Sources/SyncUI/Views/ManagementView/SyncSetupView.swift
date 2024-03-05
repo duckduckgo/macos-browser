@@ -28,7 +28,6 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                 syncUnavailableView()
                 syncWithAnotherDeviceView()
                 SyncUIViews.TextDetailSecondary(text: UserText.beginSyncFooter)
-                    .frame(height: 28)
                     .padding(.bottom, 24)
                     .padding(.horizontal, 110)
                     .font(.system(size: 11))
@@ -36,10 +35,19 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
             VStack(alignment: .leading, spacing: 12) {
                 SyncUIViews.TextHeader2(text: UserText.otherOptionsSectionTitle)
                 VStack(alignment: .leading, spacing: 8) {
-                    TextButton(UserText.syncThisDeviceLink, weight: .semibold, action: model.syncWithServerPressed)
-                        .disabled(!model.isAccountCreationAvailable)
-                    TextButton(UserText.recoverDataLink, weight: .semibold, action: model.recoverDataPressed)
-                        .disabled(!model.isAccountRecoveryAvailable)
+                    TextButton(UserText.syncThisDeviceLink, weight: .semibold) {
+                        Task {
+                            await model.syncWithServerPressed()
+                        }
+                    }
+                    .disabled(!model.isAccountCreationAvailable)
+
+                    TextButton(UserText.recoverDataLink, weight: .semibold) {
+                        Task {
+                            await model.recoverDataPressed()
+                        }
+                    }
+                    .disabled(!model.isAccountRecoveryAvailable)
                 }
             }
         }
@@ -53,9 +61,13 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                 SyncUIViews.TextDetailSecondary(text: UserText.beginSyncDescription)
             }
             .padding(.bottom, 16)
-            Button(UserText.beginSyncButton, action: model.syncWithAnotherDevicePressed)
-                .buttonStyle(SyncWithAnotherDeviceButtonStyle(enabled: model.isConnectingDevicesAvailable))
-                .disabled(!model.isConnectingDevicesAvailable)
+            Button(UserText.beginSyncButton) {
+                Task {
+                    await model.syncWithAnotherDevicePressed()
+                }
+            }
+            .buttonStyle(SyncWithAnotherDeviceButtonStyle(enabled: model.isConnectingDevicesAvailable))
+            .disabled(!model.isConnectingDevicesAvailable)
         }
         .frame(maxWidth: .infinity)
         .frame(height: 254)
@@ -96,10 +108,10 @@ private struct SyncWithAnotherDeviceButtonStyle: ButtonStyle {
         configuration.label
             .lineLimit(1)
             .font(.body.bold())
-            .frame(width: 220, height: 32)
+            .frame(height: 32)
+            .padding(.horizontal, 24)
             .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
             .foregroundColor(labelColor)
             .cornerRadius(8)
-
     }
 }

@@ -22,6 +22,14 @@ extension NSColor {
 
     // MARK: Aliases
 
+    static var burnerWindowMouseOverColor: NSColor {
+        .alternateSelectedControlTextColor.withAlphaComponent(0.1)
+    }
+
+    static var burnerWindowMouseDownColor: NSColor {
+        .alternateSelectedControlTextColor.withAlphaComponent(0.2)
+    }
+
     static let detailAccentColor = NSColor(catalogName: "System", colorName: "detailAccentColor") ?? .controlAccentColor
 
     static var addressBarSuffix: NSColor {
