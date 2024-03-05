@@ -124,34 +124,7 @@ struct BookmarkList {
         }
     }
 
-    mutating func updateUrl(of bookmark: Bookmark, to newURL: String) -> Bookmark? {
-        guard !bookmark.isFolder else { return nil }
-
-        guard itemsDict[newURL] == nil else {
-            os_log("BookmarkList: Update failed, new url already in bookmark list")
-            return nil
-        }
-        guard itemsDict[bookmark.url] != nil, let index = allBookmarkURLsOrdered.firstIndex(where: { $0.id == IdentifiableBookmark(from: bookmark).id }) else {
-            os_log("BookmarkList: Update failed, no such item in bookmark list")
-            return nil
-        }
-
-        let newBookmark = Bookmark(from: bookmark, with: newURL)
-        let newIdentifiableBookmark = IdentifiableBookmark(from: newBookmark)
-
-        allBookmarkURLsOrdered.remove(at: index)
-        allBookmarkURLsOrdered.insert(newIdentifiableBookmark, at: index)
-
-        let existingBookmarks = itemsDict[bookmark.url] ?? []
-        let updatedBookmarks = existingBookmarks.filter { $0.id != bookmark.id }
-
-        itemsDict[bookmark.url] = updatedBookmarks
-        itemsDict[newURL] = (itemsDict[newURL] ?? []) + [bookmark]
-
-        return newBookmark
-    }
-
-    mutating func updateUrl(of bookmark: Bookmark, to newURL: String, title: String, isFavorite: Bool) -> Bookmark? {
+    mutating func update(bookmark: Bookmark, newURL: String, newTitle: String, newIsFavorite: Bool) -> Bookmark? {
         guard !bookmark.isFolder else { return nil }
 
         guard itemsDict[bookmark.url] != nil, let index = allBookmarkURLsOrdered.firstIndex(of: IdentifiableBookmark(from: bookmark)) else {
@@ -159,7 +132,36 @@ struct BookmarkList {
             return nil
         }
 
-        let newBookmark = Bookmark(from: bookmark, withNewUrl: newURL, title: title, isFavorite: isFavorite)
+        let newBookmark = Bookmark(from: bookmark, withNewUrl: newURL, title: newTitle, isFavorite: newIsFavorite)
+        return updateBookmarkList(newBookmark: newBookmark, oldBookmark: bookmark)
+    }
+
+    mutating func updateUrl(of bookmark: Bookmark, to newURL: String) -> Bookmark? {
+        guard !bookmark.isFolder else { return nil }
+
+        guard itemsDict[newURL] == nil else {
+            os_log("BookmarkList: Update failed, new url already in bookmark list")
+            return nil
+        }
+
+        let newBookmark = Bookmark(from: bookmark, with: newURL)
+        return updateBookmarkList(newBookmark: newBookmark, oldBookmark: bookmark)
+    }
+
+    func bookmarks() -> [IdentifiableBookmark] {
+        return allBookmarkURLsOrdered
+    }
+
+}
+
+private extension BookmarkList {
+
+    mutating private func updateBookmarkList(newBookmark: Bookmark, oldBookmark bookmark: Bookmark) -> Bookmark? {
+        guard itemsDict[bookmark.url] != nil, let index = allBookmarkURLsOrdered.firstIndex(of: IdentifiableBookmark(from: bookmark)) else {
+            os_log("BookmarkList: Update failed, no such item in bookmark list")
+            return nil
+        }
+
         let newIdentifiableBookmark = IdentifiableBookmark(from: newBookmark)
 
         allBookmarkURLsOrdered.remove(at: index)
@@ -169,13 +171,8 @@ struct BookmarkList {
         let updatedBookmarks = existingBookmarks.filter { $0.id != bookmark.id }
 
         itemsDict[bookmark.url] = updatedBookmarks
-        itemsDict[newURL] = (itemsDict[newURL] ?? []) + [bookmark]
+        itemsDict[newBookmark.url] = (itemsDict[newBookmark.url] ?? []) + [newBookmark]
 
         return newBookmark
     }
-
-    func bookmarks() -> [IdentifiableBookmark] {
-        return allBookmarkURLsOrdered
-    }
-
 }

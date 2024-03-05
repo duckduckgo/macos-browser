@@ -220,7 +220,7 @@ final class LocalBookmarkManager: BookmarkManager {
             return
         }
 
-        guard let newBookmark = list?.updateUrl(of: bookmark, to: url.absoluteString, title: title, isFavorite: isFavorite) else {
+        guard let newBookmark = list?.update(bookmark: bookmark, newURL: url.absoluteString, newTitle: title, newIsFavorite: isFavorite) else {
             os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
             return
         }
