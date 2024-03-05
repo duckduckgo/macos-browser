@@ -30,16 +30,16 @@ jobs:
             *) echo "👎 Not a release branch"; exit 1 ;;
           esac
 
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+  
       - name: Extract Asana Task ID
         id: task-id
         uses: ./.github/actions/asana-extract-task-id
         with:
           task-url: ${{ github.event.inputs.asana-task-url }}
-
-      - name: Check out the code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
 
       - name: Validate release notes
         env:
