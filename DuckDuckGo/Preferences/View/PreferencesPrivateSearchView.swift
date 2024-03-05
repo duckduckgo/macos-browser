@@ -38,9 +38,7 @@ extension Preferences {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.privateSearchExplanation)
                         TextButton(UserText.learnMore) {
-                            WindowControllersManager.shared.show(url: .privateSearchLearnMore,
-                                                                 source: .ui,
-                                                                 newTab: true)
+                            openNewTab(with: .privateSearchLearnMore)
                         }
                     }
                 }
@@ -50,42 +48,6 @@ extension Preferences {
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
             }
-        }
-    }
-}
-
-extension Preferences {
-
-    //!TODO REMOVE
-    struct DescriptionView: View {
-        let imageName: String
-        let header: String
-        let description: String
-        let learnMoreUrl: URL
-        let status: StatusIndicator
-
-        var body: some View {
-            VStack(alignment: .center, spacing: 16) {
-                Image(imageName)
-                VStack(alignment: .center, spacing: 4) {
-                    Text(header)
-                    StatusIndicatorView(status: status)
-                }
-                VStack(alignment: .center, spacing: 1) {
-                    Text(description)
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(.secondary)
-                    TextButton(UserText.learnMore) {
-                        WindowControllersManager.shared.show(url: learnMoreUrl,
-                                                             source: .ui,
-                                                             newTab: true)
-                    }
-                }
-                .padding(.horizontal, 16)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 254)
-            .roundedBorder()
         }
     }
 }

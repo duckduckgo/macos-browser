@@ -38,9 +38,7 @@ extension Preferences {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.webTrackingProtectionExplanation)
                         TextButton(UserText.learnMore) {
-                            WindowControllersManager.shared.show(url: .webTrackingProtection,
-                                                                 source: .ui,
-                                                                 newTab: true)
+                            openNewTab(with: .webTrackingProtection)
                         }
                     }
                 }
@@ -51,9 +49,7 @@ extension Preferences {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.gpcExplanation)
                         TextButton(UserText.learnMore) {
-                            WindowControllersManager.shared.show(url: .gpcLearnMore,
-                                                                 source: .ui,
-                                                                 newTab: true)
+                            openNewTab(with: .gpcLearnMore)
                         }
                     }.padding(.leading, 19)
                 }
@@ -61,4 +57,16 @@ extension Preferences {
         }
 
     }
+
+
+
+}
+
+extension View {
+
+    @MainActor
+    func openNewTab(with url: URL) {
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    }
+
 }

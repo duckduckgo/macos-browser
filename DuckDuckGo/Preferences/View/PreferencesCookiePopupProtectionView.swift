@@ -38,9 +38,7 @@ extension Preferences {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.autoconsentExplanation)
                         TextButton(UserText.learnMore) {
-                            WindowControllersManager.shared.show(url: .cookieConsentPopUpManagement,
-                                                                 source: .ui,
-                                                                 newTab: true)
+                            openNewTab(with: .cookieConsentPopUpManagement)
                         }
                     }
                 }

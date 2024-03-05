@@ -39,9 +39,7 @@ extension Preferences {
                         VStack(alignment: .leading, spacing: 1) {
                             TextMenuItemCaption(UserText.emailProtectionExplanation)
                             TextButton(UserText.learnMore) {
-                                WindowControllersManager.shared.show(url: .duckDuckGoEmailInfo,
-                                                                     source: .ui,
-                                                                     newTab: true)
+                                openNewTab(with: .duckDuckGoEmailInfo)
                             }
                         }
                     }
@@ -53,9 +51,7 @@ extension Preferences {
                                 Text("Autofill enabled in this browser for ").foregroundColor(Color("GreyTextColor")) + Text(userEmail).bold()
                             }
                             Button(UserText.emailOptionsMenuManageAccountSubItem + "…") {
-                                WindowControllersManager.shared.show(url: EmailUrls().emailProtectionAccountLink,
-                                                                     source: .ui,
-                                                                     newTab: true)
+                                openNewTab(with: EmailUrls().emailProtectionAccountLink)
                             }
                             Button(UserText.emailOptionsMenuTurnOffSubItem) {
                                 let alert = NSAlert.disableEmailProtection()
@@ -66,9 +62,7 @@ extension Preferences {
                             }
                         } else {
                             Button(UserText.emailOptionsMenuTurnOnSubItem + "…") {
-                                WindowControllersManager.shared.show(url: EmailUrls().emailProtectionLink,
-                                                                     source: .ui,
-                                                                     newTab: true)
+                                openNewTab(with: EmailUrls().emailProtectionLink)
                             }
                         }
                     }

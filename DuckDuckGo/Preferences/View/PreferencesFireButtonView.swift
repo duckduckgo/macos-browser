@@ -36,9 +36,7 @@ extension Preferences {
                         VStack(alignment: .leading, spacing: 1) {
                             TextMenuItemCaption(UserText.fireproofExplanation)
                             TextButton(UserText.learnMore) {
-                                WindowControllersManager.shared.show(url: .theFireButton,
-                                                                     source: .ui,
-                                                                     newTab: true)
+                                openNewTab(with: .theFireButton)
                             }
                         }
                     }
