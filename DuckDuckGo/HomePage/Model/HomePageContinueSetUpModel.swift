@@ -281,6 +281,7 @@ extension HomePage.Models {
         }
 
         // Helper Functions
+        @MainActor(unsafe)
         @objc private func newTabOpenNotification(_ notification: Notification) {
             if !isFirstSession {
                 listOfFeatures = randomisedFeatures
@@ -543,23 +544,23 @@ extension HomePage.Models {
 
             switch self {
             case .defaultBrowser:
-                return NSImage(named: "Default-App-128")!.resized(to: iconSize)!
+                return .defaultApp128.resized(to: iconSize)!
             case .importBookmarksAndPasswords:
-                return NSImage(named: "Import-128")!.resized(to: iconSize)!
+                return .import128.resized(to: iconSize)!
             case .duckplayer:
-                return NSImage(named: "Clean-Tube-128")!.resized(to: iconSize)!
+                return .cleanTube128.resized(to: iconSize)!
             case .emailProtection:
-                return NSImage(named: "inbox-128")!.resized(to: iconSize)!
+                return .inbox128.resized(to: iconSize)!
             case .surveyDay0:
-                return NSImage(named: "Survey-128")!.resized(to: iconSize)!
+                return .survey128.resized(to: iconSize)!
             case .surveyDay7:
-                return NSImage(named: "Survey-128")!.resized(to: iconSize)!
+                return .survey128.resized(to: iconSize)!
             case .networkProtectionRemoteMessage:
-                return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
+                return .vpnEnded.resized(to: iconSize)!
             case .dataBrokerProtectionRemoteMessage:
-                return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
+                return .dbpInformationRemover.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
-                return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
+                return .dbpInformationRemover.resized(to: iconSize)!
             }
         }
     }

@@ -52,6 +52,7 @@ protocol StageDurationCalculator {
     func fireScanFailed()
     func fireScanError(error: Error)
     func setStage(_ stage: Stage)
+    func setEmailPattern(_ emailPattern: String?)
 }
 
 final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator {
@@ -60,7 +61,8 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     let dataBroker: String
     let startTime: Date
     var lastStateTime: Date
-    var stage: Stage = .other
+    private (set) var stage: Stage = .other
+    private (set) var emailPattern: String?
 
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),
@@ -128,11 +130,18 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     }
 
     func fireOptOutSubmitSuccess() {
-        handler.fire(.optOutSubmitSuccess(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
+        handler.fire(.optOutSubmitSuccess(dataBroker: dataBroker,
+                                          attemptId: attemptId,
+                                          duration: durationSinceStartTime(),
+                                          emailPattern: emailPattern))
     }
 
     func fireOptOutFailure() {
-        handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime(), stage: stage.rawValue))
+        handler.fire(.optOutFailure(dataBroker: dataBroker,
+                                    attemptId: attemptId,
+                                    duration: durationSinceStartTime(),
+                                    stage: stage.rawValue,
+                                    emailPattern: emailPattern))
     }
 
     func fireScanSuccess(matchesFound: Int) {
@@ -180,5 +189,9 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
 
     func setStage(_ stage: Stage) {
         self.stage = stage
+    }
+
+    func setEmailPattern(_ emailPattern: String?) {
+        self.emailPattern = emailPattern
     }
 }

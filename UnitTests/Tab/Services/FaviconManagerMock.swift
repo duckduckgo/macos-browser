@@ -29,7 +29,7 @@ final class FaviconManagerMock: FaviconManagement {
     @Published var areFaviconsLoaded = true
     var faviconsLoadedPublisher: Published<Bool>.Publisher { $areFaviconsLoaded }
 
-    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping (Favicon?) -> Void) {
+    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping @MainActor (Favicon?) -> Void) {
         completion(nil)
     }
 
@@ -49,7 +49,7 @@ final class FaviconManagerMock: FaviconManagement {
         return nil
     }
 
-    func burnExcept(fireproofDomains: DuckDuckGo_Privacy_Browser.FireproofDomains, bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, savedLogins: Set<String>, completion: @escaping () -> Void) {
+    func burnExcept(fireproofDomains: DuckDuckGo_Privacy_Browser.FireproofDomains, bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, savedLogins: Set<String>, completion: @escaping @MainActor () -> Void) {
         completion()
     }
 
