@@ -151,19 +151,17 @@ extension NetworkProtectionStatusView {
             }
             .store(in: &cancellables)
 
-//            Task {
-//                await entitlementMonitor.start(entitlementCheck: entitlementCheck) { [weak self] result in
-//                    guard let self else { return }
-//                    switch result {
-//                    case .validEntitlement:
-//                        self.shouldShowSubscriptionExpired = false
-//                    case .invalidEntitlement:
-//                        self.shouldShowSubscriptionExpired = true
-//                    case .error:
-//                        break
-//                    }
-//                }
-//            }
+            Timer.publish(every: 60, on: .main, in: .default).sink { [weak self] _ in
+                Task {
+                    let result = await entitlementCheck()
+                    switch result {
+                    case .success(let enabled):
+                        self?.shouldShowSubscriptionExpired = !enabled
+                    case .failure:
+                        break
+                    }
+                }
+            }.store(in: &cancellables)
         }
 
         func refreshLoginItemStatus() {

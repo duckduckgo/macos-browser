@@ -231,7 +231,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                              serviceName: Self.tokenServiceName,
                                                              errorEvents: debugEvents,
-                                                             isSubscriptionEnabled: false)
+                                                             isSubscriptionEnabled: true)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings)
 
         super.init(notificationsPresenter: notificationsPresenter,
@@ -242,7 +242,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
-                   isSubscriptionEnabled: false,
+                   isSubscriptionEnabled: true,
                    entitlementCheck: nil)
 
         observeServerChanges()
