@@ -225,7 +225,7 @@ final class FirePopoverViewModel {
 
 }
 
-extension History {
+extension BrowsingHistory {
 
     func visitedDomains(tld: TLD) -> Set<String> {
         return reduce(Set<String>(), { result, historyEntry in
