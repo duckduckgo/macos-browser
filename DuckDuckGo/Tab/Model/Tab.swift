@@ -63,6 +63,7 @@ protocol NewWindowPolicyDecisionMaker {
         case none
         case dataBrokerProtection
         case subscription(URL)
+        case identityTheftRestoration(URL)
 
         enum URLSource: Equatable {
             case pendingStateRestoration
@@ -140,8 +141,10 @@ protocol NewWindowPolicyDecisionMaker {
 
 #if SUBSCRIPTION
             if let url {
-                if url.isChild(of: URL.subscriptionBaseURL) || url.isChild(of: URL.identityTheftRestoration) {
+                if url.isChild(of: URL.subscriptionBaseURL) {
                     return .subscription(url)
+                } else if url.isChild(of: URL.identityTheftRestoration) {
+                    return .identityTheftRestoration(url)
                 }
             }
 #endif
@@ -174,7 +177,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isDisplayable: Bool {
             switch self {
-            case .settings, .bookmarks, .dataBrokerProtection:
+            case .settings, .bookmarks, .dataBrokerProtection, .subscription, .identityTheftRestoration:
                 return true
             default:
                 return false
@@ -189,6 +192,10 @@ protocol NewWindowPolicyDecisionMaker {
                 return true
             case (.dataBrokerProtection, .dataBrokerProtection):
                 return true
+            case (.subscription, .subscription):
+                return true
+            case (.identityTheftRestoration, .identityTheftRestoration):
+                return true
             default:
                 return false
             }
@@ -201,7 +208,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
             case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
-            case .subscription: return nil
+            case .subscription, .identityTheftRestoration: return nil
             }
         }
 
@@ -233,7 +240,7 @@ protocol NewWindowPolicyDecisionMaker {
                 return .welcome
             case .dataBrokerProtection:
                 return .dataBrokerProtection
-            case .subscription(let url):
+            case .subscription(let url), .identityTheftRestoration(let url):
                 return url
             case .none:
                 return nil
@@ -242,7 +249,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isUrl: Bool {
             switch self {
-            case .url, .subscription:
+            case .url, .subscription, .identityTheftRestoration:
                 return true
             default:
                 return false
@@ -992,7 +999,7 @@ protocol NewWindowPolicyDecisionMaker {
             let forceReload = url.absoluteString == source.userEnteredValue ? shouldLoadInBackground : (source == .reload)
             return (url, source, forceReload: forceReload)
 
-        case .subscription(let url):
+        case .subscription(let url), .identityTheftRestoration(let url):
             return (url, .ui, forceReload: false)
 
         case .newtab, .bookmarks, .onboarding, .dataBrokerProtection, .settings:
