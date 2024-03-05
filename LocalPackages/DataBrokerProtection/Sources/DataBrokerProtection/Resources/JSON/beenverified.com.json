@@ -2,7 +2,7 @@
   "name": "BeenVerified",
   "url": "beenverified.com",
   "version": "0.1.5",
-  "addedDatetime": 1677110400000,
+  "addedDatetime": 1677132000000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,12 +10,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "883bd0e2-69bf-4bea-9206-79ddda77169b",
+          "id": "d4f62a57-2e91-4da6-b600-3533e59d4a78",
           "url": "https://www.beenverified.com/app/search/person?age=${age}&city=${city}&fname=${firstName}&ln=${lastName}&mn=${middleName}&optout=true&state=${state}"
         },
         {
           "actionType": "extract",
-          "id": "9e7df9d7-0f1f-4e37-8b5e-5be648c767f0",
+          "id": "5a703233-7f61-418b-b97d-7f5ad9a38461",
           "selector": ".person-search-result-card",
           "profile": {
             "name": {
@@ -52,13 +52,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "cb8eda17-686a-482c-948f-2f3118bcaa28",
-          "dataSource": "userProfile",
+          "id": "c1c30dbe-a85f-47f5-936b-7b0f623dae17",
           "url": "https://www.beenverified.com/app/search/person?age=${age}&city=${city}&fname=${firstName}&ln=${lastName}&mn=${middleName}&optout=true&state=${state}"
         },
         {
           "actionType": "click",
-          "id": "29f84bfe-5412-4ea6-9f89-ef6670e99520",
+          "id": "c12ec57c-c9d3-43ec-a1ee-f5d089850c65",
           "elements": [
             {
               "type": "button",
@@ -96,7 +95,7 @@
         },
         {
           "actionType": "fillForm",
-          "id": "6bc102eb-fa42-4760-a30a-9151a7bee119",
+          "id": "099451db-1621-4a16-b3c4-2661eed53052",
           "selector": "#optout-form",
           "elements": [
             {
@@ -107,17 +106,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "4796c8c2-ce0b-432a-9a43-583855bbe0ee",
+          "id": "4eed2935-c053-433d-8356-323f2d0be505",
           "selector": "#captcha-widget"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "642daf6c-5ea4-4c14-bd6d-f4c56be74742",
+          "id": "1bd7c79c-b5d1-4892-9fd6-99d7ad1aa689",
           "selector": "#captcha-widget"
         },
         {
           "actionType": "click",
-          "id": "72384727-6d27-4449-b4f8-3efb04e424d1",
+          "id": "47ecb64a-921c-47bb-a22a-27653143b652",
           "elements": [
             {
               "type": "button",
@@ -127,12 +126,12 @@
         },
         {
           "actionType": "emailConfirmation",
-          "id": "f4b6177a-6b03-4488-b67f-30cf06b28ba0",
+          "id": "e4c333d8-bf67-481d-abcf-5f4d89add727",
           "pollingTime": 30
         },
         {
           "actionType": "expectation",
-          "id": "1e251d9e-2caf-447f-9276-ca1f712beae8",
+          "id": "823ed122-0fdd-4074-8b58-551cc22871c4",
           "expectations": [
             {
               "type": "text",
