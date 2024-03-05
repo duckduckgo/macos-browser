@@ -132,8 +132,8 @@ private extension AddEditBookmarkDialogViewModel {
     func bind() {
         folderCancellable = bookmarkManager.listPublisher
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { bookmarkList in
-                self.folders = .init(bookmarkList)
+            .sink(receiveValue: { [weak self] bookmarkList in
+                self?.folders = .init(bookmarkList)
             })
     }
 
