@@ -105,14 +105,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             fileStore = EncryptedFileStore()
         }
 
-        // keep this on top!
-        // disable onboarding for existing users
-        let isOnboardingFinished = UserDefaultsWrapper<Bool>(key: .onboardingFinished, defaultValue: false)
-        if !isOnboardingFinished.wrappedValue,
-           FileManager.default.fileExists(atPath: URL.sandboxApplicationSupportURL.path) {
-            isOnboardingFinished.wrappedValue = true
-        }
-
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 

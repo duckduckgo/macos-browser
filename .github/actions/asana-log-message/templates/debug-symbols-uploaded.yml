@@ -1,8 +1,0 @@
-data:
-  html_text: |
-    <body>
-      🐛 Debug symbols archive for ${TAG} build is uploaded to <code>${DSYM_S3_PATH}</code>.
-
-
-      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
-    </body>
