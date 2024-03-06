@@ -33,7 +33,7 @@ public final class DebugPurchaseModel: ObservableObject {
         self.purchaseManager = manager
         self.subscriptions = subscriptions
         self.subscriptionAppGroup = subscriptionAppGroup
-        self.accountManager = AccountManager(appGroup: subscriptionAppGroup)
+        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
     }
 
     @MainActor

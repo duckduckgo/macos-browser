@@ -48,7 +48,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 openITRHandler: @escaping () -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
                 subscriptionAppGroup: String) {
-        self.accountManager = AccountManager(appGroup: subscriptionAppGroup)
+        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
         self.openURLHandler = openURLHandler
         self.openVPNHandler = openVPNHandler
         self.openDBPHandler = openDBPHandler
@@ -83,7 +83,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
         if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, appGroup: subscriptionAppGroup)
+            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, subscriptionAppGroup: subscriptionAppGroup)
         } else {
             ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
         }

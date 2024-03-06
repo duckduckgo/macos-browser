@@ -358,7 +358,7 @@ extension SubscriptionPagesUseSubscriptionFeature {
 
                 guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
-                switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase(appGroup: Bundle.main.appGroup(bundle: .subs)) {
+                switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
                 case .success:
                     onSuccessHandler()
                 case .failure(let error):
@@ -415,7 +415,7 @@ extension MainWindowController {
         window.show(.subscriptionFoundAlert(), firstButtonAction: {
             if #available(macOS 12.0, *) {
                 Task {
-                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(appGroup: Bundle.main.appGroup(bundle: .subs))
+                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
                     originalMessage.webView?.reload()
                 }
             }

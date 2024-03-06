@@ -28,7 +28,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     var currentViewController: () -> NSViewController?
     private let accountManager: AccountManager
-    private let appGroup: String
+    private let subscriptionAppGroup: String
 
     private var _purchaseManager: Any?
     @available(macOS 12.0, *)
@@ -49,14 +49,14 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
-                appGroup: String) {
+                subscriptionAppGroup: String) {
         self.currentEnvironment = currentEnvironment
         self.updateEnvironment = updateEnvironment
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
-        self.accountManager = AccountManager(appGroup: appGroup)
-        self.appGroup = appGroup
+        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
+        self.subscriptionAppGroup = subscriptionAppGroup
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
     }
@@ -194,7 +194,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            currentViewController()?.presentAsSheet(DebugPurchaseViewController(subscriptionAppGroup: appGroup))
+            currentViewController()?.presentAsSheet(DebugPurchaseViewController(subscriptionAppGroup: subscriptionAppGroup))
         }
     }
 
@@ -222,7 +222,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
-                await AppStoreRestoreFlow.restoreAccountFromPastPurchase(appGroup: appGroup)
+                await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: subscriptionAppGroup)
             }
         }
     }
