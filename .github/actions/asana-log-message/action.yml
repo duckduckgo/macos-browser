@@ -29,11 +29,17 @@ runs:
         access-token: ${{ inputs.access-token }}
         task-url: ${{ inputs.task-url }}
 
+    - id: get-asana-user-id
+      uses: duckduckgo/apple-infra/actions/asana-get-user-id-for-github-handle@main
+      with:
+        access-token: ${{ inputs.access-token }}
+        github-handle: ${{ github.actor }}
+
     - id: add-colaborator
       shell: bash
       env:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
         TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
       run: |
         return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/addFollowers" \
