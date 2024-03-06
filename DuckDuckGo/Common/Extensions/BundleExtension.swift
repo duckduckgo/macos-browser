@@ -102,6 +102,8 @@ extension Bundle {
             appGroupName = "DBP_APP_GROUP"
         case .netP:
             appGroupName = "NETP_APP_GROUP"
+        case .subs:
+            appGroupName = "SUBSCRIPTION_APP_GROUP"
         }
 
         guard let appGroup = object(forInfoDictionaryKey: appGroupName) as? String else {
@@ -128,4 +130,5 @@ extension Bundle {
 enum BundleGroup {
     case netP
     case dbp
+    case subs
 }

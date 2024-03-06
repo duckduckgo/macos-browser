@@ -291,7 +291,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     #else
             SubscriptionPurchaseEnvironment.current = .appStore
     #endif
-            await AccountManager().checkSubscriptionState()
+            let accountManager = AccountManager()
+            do {
+                try accountManager.migrateAccessTokenToNewStore()
+            } catch {
+                if let error = error as? AccountManager.MigrationError {
+                    switch error {
+                    case AccountManager.MigrationError.migrationFailed:
+                        os_log(.default, log: .subscription, "Access token migration failed")
+                    case AccountManager.MigrationError.noMigrationNeeded:
+                        os_log(.default, log: .subscription, "No access token migration needed")
+                    }
+                }
+            }
+            await accountManager.checkSubscriptionState()
         }
 #endif
     }
