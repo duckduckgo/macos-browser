@@ -183,7 +183,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     var preferenceIconName: String {
         switch self {
         case .defaultBrowser:
-            return "DefaultBrowserIcon"
+            return "DefaultBrowser"
         case .privateSearch:
             return "PrivateSearchIcon"
         case .webTrackingProtection:
