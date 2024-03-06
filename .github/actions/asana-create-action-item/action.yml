@@ -71,7 +71,7 @@ runs:
       if: ${{ inputs.notes }}
       shell: bash
       env:
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
         AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         NOTES: ${{ inputs.notes }}
         TASK_NAME: ${{ inputs.task-name }}
@@ -84,7 +84,7 @@ runs:
       if: ${{ inputs.html-notes }}
       shell: bash
       env:
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
         AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         HTML_NOTES: ${{ inputs.html-notes }}
         TASK_NAME: ${{ inputs.task-name }}
@@ -97,7 +97,7 @@ runs:
       shell: bash
       env:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
         TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-notes-payload.outputs.payload-base64 || steps.process-html-notes-payload.outputs.payload-base64 }}
       run: |
