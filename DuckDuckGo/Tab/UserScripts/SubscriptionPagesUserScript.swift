@@ -180,6 +180,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    
+        DailyPixel.fire(pixel: .privacyProPurchaseAttempt, frequency: .dailyAndCount)
+
         struct SubscriptionSelection: Decodable {
             let id: String
         }
@@ -209,16 +212,18 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
                 assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
+                report(subscriptionActivationError: .generalError)
                 return nil
             }
 
-            os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %{public}s", subscriptionSelection.id)
+            os_log(.debug, log: .subscription, "[Purchase] Starting purchase for: %{public}s", subscriptionSelection.id)
 
             await mainViewController?.presentAsSheet(progressViewController)
 
             // Check for active subscriptions
             if await PurchaseManager.hasActiveSubscription() {
-                os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
+                os_log(.debug, log: .subscription, "[Purchase] Found active subscription during purchase")
+                report(subscriptionActivationError: .hasActiveSubscription)
                 await WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionFoundAlert(originalMessage: message)
                 return nil
             }
@@ -230,19 +235,34 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success:
                 break
             case .failure(let error):
+                
                 switch error {
+                case .noProductsFound:
+                    report(subscriptionActivationError: .subscriptionNotFound)
+                case .activeSubscriptionAlreadyPresent:
+                    report(subscriptionActivationError: .activeSubscriptionAlreadyPresent)
+                case .authenticatingWithTransactionFailed:
+                    report(subscriptionActivationError: .generalError)
+                case .accountCreationFailed:
+                    report(subscriptionActivationError: .accountCreationFailed)
+                case .purchaseFailed:
+                    report(subscriptionActivationError: .purchaseFailed)
                 case .cancelledByUser:
-                    os_log(.error, log: .subscription, "[Purchase] Cancelled by user")
-                default:
-                    os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                    report(subscriptionActivationError: .cancelledByUser)
+                case .missingEntitlements:
+                    report(subscriptionActivationError: .missingEntitlements)
+                }
+                
+                if error != .cancelledByUser {
                     await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
                 }
+
                 return nil
             }
 
             await progressViewController.updateTitleText(UserText.completingPurchaseTitle)
 
-            os_log(.info, log: .subscription, "[Purchase] Completing purchase")
+            os_log(.debug, log: .subscription, "[Purchase] Completing purchase")
 
             switch await AppStorePurchaseFlow.completeSubscriptionPurchase() {
             case .success(let purchaseUpdate):
@@ -255,23 +275,111 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             os_log(.info, log: .subscription, "[Purchase] Purchase complete")
         }
 #endif
-
         return nil
+    }
+
+    fileprivate enum SubscriptionError: Error {
+        case purchaseFailed,
+             missingEntitlements,
+             failedToGetSubscriptionOptions,
+             failedToSetSubscription,
+             failedToRestoreFromEmail,
+             failedToRestoreFromEmailSubscriptionInactive,
+             failedToRestorePastPurchase,
+             subscriptionNotFound,
+             subscriptionExpired,
+             hasActiveSubscription,
+             cancelledByUser,
+             accountCreationFailed,
+             activeSubscriptionAlreadyPresent,
+             generalError
+    }
+
+    fileprivate func report(subscriptionActivationError: SubscriptionError) {
+        
+        os_log(.error, log: .subscription, "Subscription purchase error: %{public}s", subscriptionActivationError.localizedDescription)
+
+        var isStoreError = false
+        var isBackendError = false
+
+        switch subscriptionActivationError {
+        case .purchaseFailed:
+            isStoreError = true
+//            transactionError = .purchaseFailed
+        case .missingEntitlements:
+            isBackendError = true
+//            transactionError = .missingEntitlements
+        case .failedToGetSubscriptionOptions:
+            isStoreError = true
+//            transactionError = .failedToGetSubscriptionOptions
+        case .failedToSetSubscription:
+            isBackendError = true
+//            transactionError = .failedToSetSubscription
+        case .failedToRestoreFromEmail, .failedToRestoreFromEmailSubscriptionInactive:
+            isBackendError = true
+//            transactionError = .generalError
+        case .failedToRestorePastPurchase:
+            isStoreError = true
+//            transactionError = .failedToRestorePastPurchase
+        case .subscriptionNotFound:
+            isStoreError = true
+//            transactionError = .generalError
+        case .subscriptionExpired:
+            isStoreError = true
+//            transactionError = .subscriptionExpired
+        case .hasActiveSubscription:
+            isStoreError = true
+            isBackendError = true
+        case .cancelledByUser:
+            isStoreError = true
+        case .accountCreationFailed:
+            DailyPixel.fire(pixel: .privacyProPurchaseFailureAccountNotCreated, frequency: .dailyAndCount)
+        case .activeSubscriptionAlreadyPresent: break
+        case .generalError: break
+        }
+
+        if isStoreError {
+            DailyPixel.fire(pixel: .privacyProPurchaseFailureStoreError, frequency: .dailyAndCount)
+        }
+
+        if isBackendError {
+            DailyPixel.fire(pixel: .privacyProPurchaseFailureBackendError, frequency: .dailyAndCount)
+        }
+
+        if subscriptionActivationError != .hasActiveSubscription {
+            DailyPixel.fire(pixel: .privacyProPurchaseFailure, frequency: .dailyAndCount)
+        }
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let message = original
 
         Task { @MainActor in
-            let actionHandlers = SubscriptionAccessActionHandlers(
-                restorePurchases: {
-                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow {
-                        message.webView?.reload()
+            let actionHandlers = SubscriptionAccessActionHandlers(restorePurchases: {
+                if #available(macOS 12.0, *) {
+                    
+                    Self.startAppStoreRestoreFlow { result in
+                        switch result {
+                        case .success:
+                            message.webView?.reload()
+                        case .failure(let error):
+                            switch error {
+                            case .missingAccountOrTransactions:
+                                self.report(subscriptionActivationError: .subscriptionNotFound)
+                                WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
+                            case .subscriptionExpired:
+                                self.report(subscriptionActivationError: .subscriptionExpired)
+                                WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
+                            default:
+                                self.report(subscriptionActivationError: .generalError)
+                                WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                            }
+                        }
                     }
-                },
-                openURLHandler: { url in
-                    WindowControllersManager.shared.showTab(with: .subscription(url))
-                })
+                }
+            }, openURLHandler: { url in
+                WindowControllersManager.shared.showTab(with: .subscription(url))
+            })
 
             let vc = SubscriptionAccessViewController(actionHandlers: actionHandlers)
             WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
@@ -346,32 +454,15 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
 extension SubscriptionPagesUseSubscriptionFeature {
 
-    static func startAppStoreRestoreFlow(onSuccessHandler: @escaping () -> Void = {}) {
-        if #available(macOS 12.0, *) {
-            Task { @MainActor in
-                let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
-
-                defer { mainViewController?.dismiss(progressViewController) }
-
-                mainViewController?.presentAsSheet(progressViewController)
-
-                guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
-
-                switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                case .success:
-                    onSuccessHandler()
-                case .failure(let error):
-                    switch error {
-                    case .missingAccountOrTransactions:
-                        WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
-                    case .subscriptionExpired:
-                        WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
-                    default:
-                        WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
-                    }
-                }
-            }
+    @available(macOS 12.0, *)
+    static func startAppStoreRestoreFlow(onResultHandler: @escaping (Result<Void, AppStoreRestoreFlow.Error>) -> Void) {
+        Task { @MainActor in
+            let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+            let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
+            defer { mainViewController?.dismiss(progressViewController) }
+            mainViewController?.presentAsSheet(progressViewController)
+            guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
+            onResultHandler(await AppStoreRestoreFlow.restoreAccountFromPastPurchase())
         }
     }
 }

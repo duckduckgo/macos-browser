@@ -133,7 +133,11 @@ enum Preferences {
                 }
             }
 
-            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
+            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
+                if #available(macOS 12.0, *) {
+                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow { result in }
+                }
+            },
                                                                       openURLHandler: openURL)
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
