@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import WebKit
 
 final class MainView: NSView {
     let tabBarContainerView = NSView()
@@ -29,7 +30,6 @@ final class MainView: NSView {
     let divider = ColorView(frame: .zero, backgroundColor: .separatorColor)
 
     private(set) var navigationBarTopConstraint: NSLayoutConstraint!
-    private(set) var addressBarHeightConstraint: NSLayoutConstraint!
     private(set) var bookmarksBarHeightConstraint: NSLayoutConstraint!
 
     @Published var isMouseAboveWebView: Bool = false
@@ -61,7 +61,6 @@ final class MainView: NSView {
         bookmarksBarHeightConstraint = bookmarksBarContainerView.heightAnchor.constraint(equalToConstant: 34)
 
         navigationBarTopConstraint = navigationBarContainerView.topAnchor.constraint(equalTo: topAnchor, constant: 38)
-        addressBarHeightConstraint = navigationBarContainerView.heightAnchor.constraint(equalToConstant: 42)
 
         NSLayoutConstraint.activate([
             tabBarContainerView.topAnchor.constraint(equalTo: topAnchor),
@@ -82,7 +81,6 @@ final class MainView: NSView {
             navigationBarTopConstraint,
             navigationBarContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             navigationBarContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            addressBarHeightConstraint,
 
             webContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor),
             webContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
@@ -109,6 +107,8 @@ final class MainView: NSView {
     // PDF Plugin context menu
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         setupSearchContextMenuItem(menu: menu)
+        setupSaveAsAndPrintMenuItems(menu: menu, with: event)
+        super.willOpenMenu(menu, with: event)
     }
 
     private func setupSearchContextMenuItem(menu: NSMenu) {
@@ -130,6 +130,45 @@ final class MainView: NSView {
                 break
             }
         }
+    }
+
+    private func setupSaveAsAndPrintMenuItems(menu: NSMenu, with event: NSEvent) {
+        guard let window else { return }
+
+        // try to find PDF HUD view at the right-click location (it might be a frame click)
+        let hudView: WKPDFHUDViewWrapper? = {
+            for point in [event.locationInWindow, window.mouseLocationOutsideOfEventStream] {
+                let locationInView = convert(point, from: nil)
+                guard let view = self.hitTest(locationInView) else { continue }
+
+                if let hudView = WKPDFHUDViewWrapper(view: view) {
+                    return hudView
+                } else if let webView = view as? WKWebView,
+                          let hudView = webView.hudView(at: webView.convert(locationInView, from: self)) {
+                    return hudView
+                }
+            }
+            return (self.hitTest(bounds.center) as? WKWebView)?.hudView()
+        }()
+        assert(hudView != nil)
+
+        // insert Save As… and Print… items after `Open with Preview`
+        // 1. find `Copy`
+        let idxAfterCopy = menu.indexOfItem(withTitle: UserText.copy) + /* will become 0 if no copy (-1 + 1) */ 1
+        let insertionIdx: Int
+        if idxAfterCopy > 0 {
+            // 2. find separator below `Copy`
+            let separatorIdx = (idxAfterCopy..<menu.items.endIndex).first(where: { menu.items[$0].isSeparatorItem }) ?? idxAfterCopy //  separator
+            // 3. descend 2 items down: the separator, `Open with Preview`
+            insertionIdx = min(separatorIdx + 2, menu.items.count /* just in case… */)
+        } else {
+            insertionIdx = min(1, menu.items.count /* just in case… */)
+        }
+
+        menu.insertItem(NSMenuItem(title: UserText.mainMenuFileSaveAs, action: #selector(MainViewController.saveAs), representedObject: hudView),
+                        at: insertionIdx)
+        menu.insertItem(NSMenuItem(title: UserText.printMenuItem, action: #selector(MainViewController.printWebView), representedObject: hudView),
+                        at: insertionIdx)
     }
 
     // MARK: - NSDraggingDestination

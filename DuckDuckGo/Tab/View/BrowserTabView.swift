@@ -17,8 +17,31 @@
 //
 
 import AppKit
+import SwiftUI
+
+private protocol HostingViewProtocol {}
+extension NSHostingView: HostingViewProtocol {}
+
+private extension NSView {
+    var isHostingView: Bool {
+        return self is HostingViewProtocol
+    }
+}
 
 final class BrowserTabView: ColorView {
+
+    // Returns correct subview for the rendering of snapshots
+    func findContentSubview(containsHostingView: Bool) -> NSView? {
+        guard let content = subviews.last else { return nil }
+
+        if containsHostingView && !content.isHostingView,
+           let subview = content.subviews.first {
+            assert(subview.isHostingView)
+            return subview
+        }
+
+        return content
+    }
 
     // MARK: NSDraggingDestination
 

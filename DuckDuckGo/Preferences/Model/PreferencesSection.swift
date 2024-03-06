@@ -30,27 +30,21 @@ struct PreferencesSection: Hashable, Identifiable {
     @MainActor
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
-#if SUBSCRIPTION
-            var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
 
-            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
+
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+#if SUBSCRIPTION
+                panes = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
+#endif
+            }
+
+            if includingSync {
                 if let generalIndex = panes.firstIndex(of: .general) {
                     panes.insert(.sync, at: generalIndex + 1)
                 }
             }
 
-            if !AccountManager().isUserAuthenticated && !SubscriptionPurchaseEnvironment.canPurchase {
-                if let subscriptionIndex = panes.firstIndex(of: .subscription) {
-                    panes.remove(at: subscriptionIndex)
-                }
-            }
-#else
-            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
-
-            if includingSync {
-                panes.insert(.sync, at: 1)
-            }
-#endif
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
             }
@@ -162,7 +156,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
 #endif
 #if SUBSCRIPTION
         case .subscription:
-            return "Privacy"
+            return "PrivacyPro"
 #endif
         case .autofill:
             return "Autofill"

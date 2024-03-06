@@ -46,14 +46,35 @@ final class DownloadsCellView: NSTableCellView {
     @IBOutlet var restartButton: MouseOverButton!
     @IBOutlet var separator: NSBox!
 
-    static let highlightedReloadImage = NSImage(named: "RestartDownloadHighlighted")!
-    static let normalReloadImage = NSImage(named: "RestartDownload")!
-
     private var buttonOverCancellables = Set<AnyCancellable>()
     private var cancellables = Set<AnyCancellable>()
     private var progressCancellable: AnyCancellable?
 
-    private static let byteFormatter = ByteCountFormatter()
+    private static let byteFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.isAdaptive = true
+        formatter.allowsNonnumericFormatting = false
+        formatter.zeroPadsFractionDigits = true
+        return formatter
+    }()
+
+    private static let estimatedMinutesRemainingFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .brief
+        formatter.includesApproximationPhrase = false
+        formatter.includesTimeRemainingPhrase = true
+        return formatter
+    }()
+
+    private static let estimatedSecondsRemainingFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.second]
+        formatter.unitsStyle = .brief
+        formatter.includesApproximationPhrase = false
+        formatter.includesTimeRemainingPhrase = true
+        return formatter
+    }()
 
     var isSelected: Bool = false {
         didSet {
@@ -139,35 +160,56 @@ final class DownloadsCellView: NSTableCellView {
 
     private var onButtonMouseOverChange: ((Bool) -> Void)?
 
-    private func updateDetails(with progress: Progress) {
+    private func updateDetails(with progress: Progress, isMouseOver: Bool) {
+        self.detailLabel.toolTip = nil
+
         var details: String
-        if cancelButton.isMouseOver {
+        var estimatedTime: String = ""
+        if isMouseOver {
             details = UserText.cancelDownloadToolTip
         } else {
-            details = progress.localizedAdditionalDescription ?? ""
-            if details.isEmpty {
-                if progress.fractionCompleted == 0 {
-                    details = UserText.downloadStarting
-                } else if progress.fractionCompleted == 1.0 {
-                    details = UserText.downloadFinishing
-                } else {
-                    assertionFailure("Unexpected empty description")
-                    details = "Downloading…"
+            if progress.fractionCompleted == 0 {
+                details = UserText.downloadStarting
+            } else if progress.fractionCompleted == 1.0 {
+                details = UserText.downloadFinishing
+            } else if progress.totalUnitCount > 0 {
+                let completed = Self.byteFormatter.string(fromByteCount: progress.completedUnitCount)
+                let total = Self.byteFormatter.string(fromByteCount: progress.totalUnitCount)
+                details = String(format: UserText.downloadBytesLoadedFormat, completed, total)
+
+                if let throughput = progress.throughput {
+                    let speed = Self.byteFormatter.string(fromByteCount: Int64(throughput))
+                    details += " (\(String(format: UserText.downloadSpeedFormat, speed)))"
                 }
+            } else {
+                details = Self.byteFormatter.string(fromByteCount: progress.completedUnitCount)
             }
 
-            self.detailLabel.toolTip = progress.localizedDescription
+            if let estimatedTimeRemaining = progress.estimatedTimeRemaining,
+               // only set estimated time if already present or more than 10 seconds remaining to avoid blinking
+               !self.detailLabel.stringValue.contains("–") || estimatedTimeRemaining > 10,
+               let estimatedTimeStr = {
+                switch estimatedTimeRemaining {
+                case ..<60:
+                    Self.estimatedSecondsRemainingFormatter.string(from: estimatedTimeRemaining)
+                default:
+                    Self.estimatedMinutesRemainingFormatter.string(from: estimatedTimeRemaining)
+                }
+            }() {
+                estimatedTime = estimatedTimeStr
+            }
         }
 
-        self.detailLabel.stringValue = details
+        self.detailLabel.stringValue = details + (estimatedTime.isEmpty ? "" : " – " + estimatedTime)
     }
 
     private func subscribe(to progress: Progress) {
         self.progressView.isHidden = false
         progressCancellable = progress.publisher(for: \.completedUnitCount)
-            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
+            .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in
-                self?.updateDetails(with: progress)
+                guard let self else { return }
+                updateDetails(with: progress, isMouseOver: cancelButton.isMouseOver)
         }
 
         self.cancelButton.isHidden = false
@@ -176,8 +218,8 @@ final class DownloadsCellView: NSTableCellView {
 
         self.imageView?.alphaValue = 1.0
 
-        onButtonMouseOverChange = { [weak self] _ in
-            self?.updateDetails(with: progress)
+        onButtonMouseOverChange = { [weak self] isMouseOver in
+            self?.updateDetails(with: progress, isMouseOver: isMouseOver)
         }
         onButtonMouseOverChange!(cancelButton.isMouseOver)
     }

@@ -1,7 +1,7 @@
 {
   "name": "Pub360",
   "url": "pub360.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
   "steps": [
@@ -11,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "8e2a1251-2685-476a-b4c1-53d138331abe",
+          "id": "6ed70f0e-db89-44e1-ab8d-f27a1f4fc3ac",
           "url": "https://pub360.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -25,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "9ce62e6f-b103-45f6-9f92-56785eb22320",
+          "id": "3bdb06db-9c0b-46fb-b572-b31a6f4b6445",
           "selector": ".search-item",
           "profile": {
             "name": {
@@ -48,7 +48,9 @@
               "beforeText": ","
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://pub360.com/entry/${id}"
             }
           }
         }

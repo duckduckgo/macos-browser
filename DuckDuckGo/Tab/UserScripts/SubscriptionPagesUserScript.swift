@@ -119,7 +119,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let authToken = AccountManager().authToken, let accessToken = AccountManager().accessToken {
+        if let authToken = AccountManager().authToken, AccountManager().accessToken != nil {
             return Subscription(token: authToken)
         } else {
             return Subscription(token: "")
@@ -178,7 +178,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 #endif
     }
 
-    // swiftlint:disable:next function_body_length
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct SubscriptionSelection: Decodable {
             let id: String
@@ -230,8 +230,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success:
                 break
             case .failure(let error):
-                os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
-                await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                switch error {
+                case .cancelledByUser:
+                    os_log(.error, log: .subscription, "[Purchase] Cancelled by user")
+                default:
+                    os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                    await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                }
                 return nil
             }
 
@@ -265,9 +270,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     }
                 },
                 openURLHandler: { url in
-                    WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-                }, goToSyncPreferences: {
-                    WindowControllersManager.shared.show(url: .settingsPane(.sync), source: .ui, newTab: true)
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
                 })
 
             let vc = SubscriptionAccessViewController(actionHandlers: actionHandlers)
@@ -302,11 +305,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .appTrackingProtection:
             NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
         case .vpn:
-            NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
+            NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
         case .personalInformationRemoval:
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+            await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
-            await WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
+            await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
         }
 
         return nil

@@ -93,6 +93,7 @@ private extension Tab.TabContent {
         case duckPlayer = 5
         case dataBrokerProtection = 6
         case subscription = 7
+        case identityTheftRestoration = 8
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -117,6 +118,9 @@ private extension Tab.TabContent {
         case .subscription:
             guard let url = url else { return nil }
             self = .subscription(url)
+        case .identityTheftRestoration:
+            guard let url = url else { return nil }
+            self = .identityTheftRestoration(url)
         }
     }
 
@@ -130,6 +134,7 @@ private extension Tab.TabContent {
         case .none: return .newtab
         case .dataBrokerProtection: return .dataBrokerProtection
         case .subscription: return .subscription
+        case .identityTheftRestoration: return .identityTheftRestoration
         }
     }
 

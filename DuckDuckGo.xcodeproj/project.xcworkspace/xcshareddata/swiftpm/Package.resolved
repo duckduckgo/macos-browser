@@ -1,11 +1,20 @@
 {
   "pins" : [
     {
+      "identity" : "apple-toolbox",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/apple-toolbox.git",
+      "state" : {
+        "revision" : "e3dc4faf70ca09718a2d20d5c47b449389e8c153",
+        "version" : "1.0.0"
+      }
+    },
+    {
       "identity" : "barebonesbrowser",
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:duckduckgo/BareBonesBrowser.git",
       "state" : {
-        "revision" : "bc90c28736ff77f9561c51fc89a061a5306217e9",
+        "revision" : "31e5bfedc3c2ca005640c4bf2b6959d69b0e18b9",
         "version" : "0.1.0"
       }
     },
@@ -23,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "da6a822844922401d80e26963b8b11dcd6ef221a",
-        "version" : "109.0.1"
+        "revision" : "fd8dc258cd560791e8c6df2eeb85a86828e4cfd3",
+        "version" : "114.3.1"
       }
     },
     {
@@ -32,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "063b560e59a50e03d9b00b88a7fcb2ed2b562395",
-        "version" : "4.61.0"
+        "revision" : "59752eb7973d3e3b0c23255ff51359f48b343f15",
+        "version" : "5.2.0"
       }
     },
     {
@@ -77,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "bb7bfc010ef4d2e7913c343663b167e2a984ac79",
-        "version" : "3.1.2000"
+        "revision" : "b75ab2c0405860bb2616db71b9a456acb118c21a",
+        "version" : "3.1.4000"
       }
     },
     {

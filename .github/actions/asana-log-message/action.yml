@@ -15,7 +15,8 @@ inputs:
     type: string
   template-name:
     description: |
-      Name of a template file (without extension) for the comment, relative to 'templates' subdirectory of the action.
+      Name of a template file (without extension) for the comment, relative to 'templates'
+      subdirectory of the 'asana-add-comment' action.
       The file is processed by envsubst before being sent to Asana.
     required: false
     type: string

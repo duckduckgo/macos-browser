@@ -21,6 +21,7 @@
 import Foundation
 import BrowserServicesKit
 import Common
+import DataBrokerProtection
 
 protocol DataBrokerProtectionFeatureVisibility {
     func isFeatureVisible() -> Bool
@@ -31,14 +32,17 @@ protocol DataBrokerProtectionFeatureVisibility {
 struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeatureVisibility {
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
     static var bypassWaitlist = false
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
+         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
+        self.pixelHandler = pixelHandler
     }
 
     var waitlistIsOngoing: Bool {

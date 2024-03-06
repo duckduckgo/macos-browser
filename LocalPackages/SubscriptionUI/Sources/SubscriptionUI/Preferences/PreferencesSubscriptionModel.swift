@@ -31,6 +31,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private let accountManager: AccountManager
     private let openURLHandler: (URL) -> Void
+    private let openVPNHandler: () -> Void
+    private let openDBPHandler: () -> Void
+    private let openITRHandler: () -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
 
     private var fetchSubscriptionDetailsTask: Task<(), Never>?
@@ -38,9 +41,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(accountManager: AccountManager = AccountManager(), openURLHandler: @escaping (URL) -> Void, sheetActionHandler: SubscriptionAccessActionHandlers) {
+    public init(accountManager: AccountManager = AccountManager(),
+                openURLHandler: @escaping (URL) -> Void,
+                openVPNHandler: @escaping () -> Void,
+                openDBPHandler: @escaping () -> Void,
+                openITRHandler: @escaping () -> Void,
+                sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
         self.openURLHandler = openURLHandler
+        self.openVPNHandler = openVPNHandler
+        self.openDBPHandler = openDBPHandler
+        self.openITRHandler = openITRHandler
         self.sheetActionHandler = sheetActionHandler
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
@@ -72,7 +83,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if accountManager.isUserAuthenticated {
             ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
         }
     }
 
@@ -82,7 +93,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func learnMoreAction() {
+    func purchaseAction() {
         openURLHandler(.subscriptionPurchase)
     }
 
@@ -151,17 +162,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openVPN() {
-        NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
+        openVPNHandler()
     }
 
     @MainActor
     func openPersonalInformationRemoval() {
-        NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+        openDBPHandler()
     }
 
     @MainActor
     func openIdentityTheftRestoration() {
-        openURLHandler(.identityTheftRestoration)
+        openITRHandler()
     }
 
     @MainActor

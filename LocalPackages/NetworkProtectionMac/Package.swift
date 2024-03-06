@@ -31,10 +31,11 @@ let package = Package(
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "114.3.1"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
-        .package(path: "../LoginItems")
+        .package(path: "../LoginItems"),
+        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "1.0.0"),
     ],
     targets: [
         // MARK: - NetworkProtectionIPC
@@ -43,12 +44,12 @@ let package = Package(
             name: "NetworkProtectionIPC",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
-                .product(name: "XPCHelper", package: "XPCHelper")
+                .product(name: "XPCHelper", package: "XPCHelper"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
 
         // MARK: - NetworkProtectionProxy
@@ -56,12 +57,12 @@ let package = Package(
         .target(
             name: "NetworkProtectionProxy",
             dependencies: [
-                .product(name: "NetworkProtection", package: "BrowserServicesKit")
+                .product(name: "NetworkProtection", package: "BrowserServicesKit"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
 
         // MARK: - NetworkProtectionUI
@@ -79,16 +80,16 @@ let package = Package(
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
         .testTarget(
             name: "NetworkProtectionUITests",
             dependencies: [
                 "NetworkProtectionUI",
                 .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit"),
-                .product(name: "LoginItems", package: "LoginItems")
+                .product(name: "LoginItems", package: "LoginItems"),
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         )
     ]
 )
