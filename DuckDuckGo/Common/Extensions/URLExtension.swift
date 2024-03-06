@@ -479,7 +479,7 @@ extension URL {
     public func isChild(of url: URL) -> Bool {
         var components = URLComponents(string: url.absoluteString)
         components?.query = nil
-        
+
         return self.absoluteString.hasPrefix(components?.url?.absoluteString ?? url.absoluteString)
     }
 }

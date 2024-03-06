@@ -30,7 +30,7 @@ struct EditableTextView: NSViewRepresentable {
     var maxLength: Int?
     var insets: NSSize?
     var cornerRadius: CGFloat = 0
-    var backgroundColor: NSColor? = .textEditorBackgroundColor
+    var backgroundColor: NSColor? = .textEditorBackground
     var textColor: NSColor? = .textColor
     var focusRingType: NSFocusRingType = .default
     var isFocusedOnAppear: Bool = true
