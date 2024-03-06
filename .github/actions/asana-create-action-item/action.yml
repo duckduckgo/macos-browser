@@ -30,7 +30,7 @@ inputs:
 outputs:
   assignee-id:
     description: "Assignee ID"
-    value: ${{ steps.get-asana-user-id.outputs.assignee-id }}
+    value: ${{ steps.get-asana-user-id.outputs.user-id }}
   new-task-id:
     description: "New task ID"
     value: ${{ steps.create-task.outputs.new-task-id }}
