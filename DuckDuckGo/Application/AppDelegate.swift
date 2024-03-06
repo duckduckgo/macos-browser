@@ -27,18 +27,18 @@ import DDGSync
 import History
 import Macros
 import Networking
-import NetworkProtection
 import Persistence
 import PixelKit
 import ServiceManagement
-import Subscription
 import SyncDataProviders
 import UserNotifications
 
 #if NETWORK_PROTECTION
+import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
+import Subscription
 #endif
 
 @MainActor
