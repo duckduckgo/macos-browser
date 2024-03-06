@@ -221,8 +221,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
 #if NETP_SYSTEM_EXTENSION
         let settings = VPNSettings(defaults: .standard)
+        let defaults = UserDefaults.standard
 #else
         let settings = VPNSettings(defaults: .netP)
+        let defaults = UserDefaults.netP
 #endif
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
@@ -231,7 +233,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                                              serviceName: Self.tokenServiceName,
                                                              errorEvents: debugEvents,
                                                              isSubscriptionEnabled: false)
-        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings)
+        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
@@ -241,6 +243,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
+                   defaults: defaults,
                    isSubscriptionEnabled: false,
                    entitlementCheck: nil)
 
