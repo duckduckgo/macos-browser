@@ -27,7 +27,10 @@ import NetworkProtectionProxy
 import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
+
+#if SUBSCRIPTION
 import Subscription
+#endif
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -44,7 +47,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
-#if DEBUG
+#if DEBUG && SUBSCRIPTION
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
         if let token = accountManager.accessToken {
