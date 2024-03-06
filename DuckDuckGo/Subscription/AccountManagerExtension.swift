@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+#if SUBSCRIPTION
 import Subscription
 
 public extension AccountManager {
@@ -24,3 +24,4 @@ public extension AccountManager {
         self.init(appGroup: Bundle.main.appGroup(bundle: .subs))
     }
 }
+#endif
