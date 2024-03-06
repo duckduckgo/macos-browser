@@ -62,7 +62,7 @@ class HistoryIntegrationTests: XCTestCase {
     override func tearDown() async throws {
         window?.close()
         window = nil
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
@@ -198,7 +198,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenScriptTrackerLoaded_trackerAddedToHistory() async throws {
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
@@ -226,7 +226,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenSurrogateTrackerLoaded_trackerAddedToHistory() async throws {
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!

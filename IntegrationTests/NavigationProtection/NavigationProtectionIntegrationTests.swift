@@ -46,7 +46,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         window?.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
@@ -54,7 +54,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
     @MainActor
     func testAMPLinks() async throws {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         var onDidCancel: ((NavigationAction, [ExpectedNavigation]?) -> Void)?
         var onWillStart: ((Navigation) -> Void)?
@@ -131,7 +131,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
     @MainActor
     func testReferrerTrimming() async throws {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         var lastRedirectedNavigation: Navigation?
         var onDidFinish: ((Navigation) -> Void)?
@@ -204,11 +204,11 @@ class NavigationProtectionIntegrationTests: XCTestCase {
 
         let url = URL(string: "https://privacy-test-pages.site/privacy-protections/gpc/")!
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         _=try await tab.setUrl(url, source: .link)?.result.get()
 
         // enable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
 
         // expect popup to open and then close
         var oldValue: TabViewModel! = self.tabViewModel
