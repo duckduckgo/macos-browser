@@ -1,11 +1,7 @@
 {
   "images" : [
     {
-<<<<<<<< HEAD:LocalPackages/SubscriptionUI/Sources/SubscriptionUI/Resources/Subscription.xcassets/Icons/PrivacyPro.imageset/Contents.json
-      "filename" : "PrivacyPro.pdf",
-========
       "filename" : "icon-16-share.pdf",
->>>>>>>> main:LocalPackages/SyncUI/Sources/SyncUI/Assets.xcassets/Images/Share.imageset/Contents.json
       "idiom" : "universal"
     }
   ],
