@@ -1,11 +1,7 @@
 {
   "images" : [
     {
-<<<<<<<< HEAD:DuckDuckGo/Assets.xcassets/Images/PrivacyPro.imageset/Contents.json
-      "filename" : "PrivacyPro.pdf",
-========
       "filename" : "Copy.pdf",
->>>>>>>> main:LocalPackages/SyncUI/Sources/SyncUI/Assets.xcassets/Images/Copy.imageset/Contents.json
       "idiom" : "universal"
     }
   ],
