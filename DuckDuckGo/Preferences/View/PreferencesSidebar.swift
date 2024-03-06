@@ -78,11 +78,11 @@ extension Preferences {
         var text: String {
             switch self {
             case .alwaysOn:
-                return "Always On"
+                return UserText.preferencesAlwaysOn
             case .on:
-                return "On"
+                return UserText.preferencesOn
             case .off:
-                return "Off"
+                return UserText.preferencesOff
             case .custom(let customText):
                 return customText
             }

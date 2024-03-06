@@ -92,7 +92,7 @@ extension Preferences {
                 }
 
                 // SECTION 3: Search Settings
-                PreferencePaneSection("Private Search") {
+                PreferencePaneSection(UserText.privateSearch) {
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions)
                 }
 

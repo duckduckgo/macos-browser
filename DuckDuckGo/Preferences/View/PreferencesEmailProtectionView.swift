@@ -29,7 +29,7 @@ extension Preferences {
         @ObservedObject var protectionStatus: PrivacyProtectionStatus = PrivacyProtectionStatus.status(for: .emailProtection)
 
         var body: some View {
-            PreferencePane("Email Protection", spacing: 20) {
+            PreferencePane(UserText.emailProtectionPreferences, spacing: 20) {
 
                 // Status Indicator
                 StatusIndicatorView(status: protectionStatus.status ?? .off, isLarge: true).padding(.top, -16)
@@ -48,7 +48,7 @@ extension Preferences {
                 PreferencePaneSection {
                     if emailManager.isSignedIn {
                         if let userEmail = emailManager.userEmail {
-                            Text("Autofill enabled in this browser for") + Text(" \(userEmail)").bold()
+                            Text(UserText.autofillEnabledFor) + Text(" \(userEmail)").bold()
                         }
                         Button(UserText.emailOptionsMenuManageAccountSubItem + "…") {
                             openNewTab(with: EmailUrls().emailProtectionAccountLink)
@@ -69,7 +69,7 @@ extension Preferences {
 
                 // Section 3: FAQ
                 PreferencePaneSection {
-                    TextButton("Support") {
+                    TextButton(UserText.support) {
                         openNewTab(with: EmailUrls().emailProtectionSupportLink)
                     }
                 }

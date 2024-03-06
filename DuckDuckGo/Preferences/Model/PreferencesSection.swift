@@ -79,11 +79,11 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
     var displayName: String? {
         switch self {
         case .privacyProtections:
-            return "Privacy Protections"
+            return UserText.privacyProtections
         case .privacyPro:
             return nil
         case .regularPreferencePanes:
-            return "Main Settings"
+            return UserText.mainSettings
         case .about:
             return nil
         }
@@ -135,15 +135,15 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     var displayName: String {
         switch self {
         case .defaultBrowser:
-            return "Default Browser App"
+            return UserText.defaultBrowser
         case .privateSearch:
-            return "Private Search"
+            return UserText.privateSearch
         case .webTrackingProtection:
-            return "Web Tracking Protection"
+            return UserText.webTrackingProtection
         case .cookiePopupProtection:
-            return "Cookie Pop-up Protection"
+            return UserText.cookiePopUpProtection
         case .emailProtection:
-            return "Email Protection"
+            return UserText.emailProtectionPreferences
         case .general:
             return UserText.general
         case .sync:
@@ -176,7 +176,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         case .about:
             return UserText.about
         case .otherPlatforms:
-            return "DuckDuckGo on Other Platforms"
+            return UserText.duckduckgoOnOtherPlatforms
         }
     }
 

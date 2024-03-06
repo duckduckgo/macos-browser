@@ -28,7 +28,7 @@ extension Preferences {
         @ObservedObject var model: WebTrackingProtectionPreferences
 
         var body: some View {
-            PreferencePane("Web Tracking Protection", spacing: 20) {
+            PreferencePane(UserText.webTrackingProtection, spacing: 20) {
 
                 // Status Indicator
                 StatusIndicatorView(status: .alwaysOn, isLarge: true).padding(.top, -16)

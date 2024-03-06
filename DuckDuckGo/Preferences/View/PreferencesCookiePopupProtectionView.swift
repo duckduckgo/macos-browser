@@ -28,7 +28,7 @@ extension Preferences {
         @ObservedObject var model: CookiePopupProtectionPreferences
 
         var body: some View {
-            PreferencePane("Cookie Pop-up Protection", spacing: 20) {
+            PreferencePane(UserText.cookiePopUpProtection, spacing: 20) {
 
                 // Status Indicator
                 StatusIndicatorView(status: model.isAutoconsentEnabled ? .on : .off, isLarge: true).padding(.top, -16)

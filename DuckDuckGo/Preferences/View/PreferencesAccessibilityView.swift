@@ -28,7 +28,7 @@ extension Preferences {
         @ObservedObject var model: AccessibilityPreferences
 
         var body: some View {
-            PreferencePane("Accessibility") {
+            PreferencePane(UserText.accessibility) {
 
                 // SECTION 1: Zoom Setting
                 PreferencePaneSection {

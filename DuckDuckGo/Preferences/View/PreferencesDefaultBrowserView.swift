@@ -29,7 +29,7 @@ extension Preferences {
         let status: PrivacyProtectionStatus
 
         var body: some View {
-            PreferencePane("Default Browser App", spacing: 20) {
+            PreferencePane(UserText.defaultBrowser, spacing: 20) {
 
                 // Status Indicator
                 if let status = status.status {

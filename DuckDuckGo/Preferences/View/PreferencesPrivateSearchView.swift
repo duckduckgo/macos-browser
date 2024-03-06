@@ -28,7 +28,7 @@ extension Preferences {
         @ObservedObject var model: SearchPreferences
 
         var body: some View {
-            PreferencePane("Private Search", spacing: 20) {
+            PreferencePane(UserText.privateSearch, spacing: 20) {
 
                 // Status Indicator
                 StatusIndicatorView(status: .alwaysOn, isLarge: true).padding(.top, -16)

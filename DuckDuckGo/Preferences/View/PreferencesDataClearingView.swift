@@ -1,5 +1,5 @@
 //
-//  PreferencesFireButtonView.swift
+//  PreferencesDataClearingView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -26,7 +26,7 @@ extension Preferences {
         @ObservedObject var model: FireButtonPreferences
 
         var body: some View {
-            PreferencePane("Data Clearing") {
+            PreferencePane(UserText.dataClearing) {
 
                 // SECTION 1: Fireproof Site
                 PreferencePaneSection(UserText.fireproofSites) {
