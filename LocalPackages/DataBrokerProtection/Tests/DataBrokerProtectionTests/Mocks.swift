@@ -656,6 +656,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var brokerProfileQueryDataToReturn = [BrokerProfileQueryData]()
     var profile: DataBrokerProtectionProfile?
     var attemptInformation: AttemptInformation?
+    var historyEvents = [HistoryEvent]()
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -757,6 +758,14 @@ final class MockDatabase: DataBrokerProtectionRepository {
         return lastHistoryEventToReturn
     }
 
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) -> [HistoryEvent] {
+        return [HistoryEvent]()
+    }
+
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) -> [HistoryEvent] {
+        return historyEvents
+    }
+
     func hasMatches() -> Bool {
         false
     }
@@ -802,6 +811,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         brokerProfileQueryDataToReturn.removeAll()
         profile = nil
         attemptInformation = nil
+        historyEvents.removeAll()
     }
 }
 
