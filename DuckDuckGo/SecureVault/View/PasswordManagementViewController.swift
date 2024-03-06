@@ -16,13 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
+import BrowserServicesKit
 import Combine
 import Common
 import DDGSync
-import SwiftUI
-import BrowserServicesKit
+import Foundation
 import SecureStorage
+import SwiftUI
 
 protocol PasswordManagementDelegate: AnyObject {
 
@@ -68,9 +69,9 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var lockScreenIconImageView: NSImageView! {
         didSet {
             if DeviceAuthenticator.deviceSupportsBiometrics {
-                lockScreenIconImageView.image = NSImage(named: "LoginsLockTouchID")
+                lockScreenIconImageView.image = .loginsLockTouchID
             } else {
-                lockScreenIconImageView.image = NSImage(named: "LoginsLockPassword")
+                lockScreenIconImageView.image = .loginsLockPassword
             }
         }
     }
@@ -81,7 +82,7 @@ final class PasswordManagementViewController: NSViewController {
             lockScreenOpenInPreferencesTextView.delegate = self
 
             let linkAttributes: [NSAttributedString.Key: Any] = [
-                .foregroundColor: NSColor(named: "LinkBlueColor")!,
+                .foregroundColor: NSColor.linkBlue,
                 .cursor: NSCursor.pointingHand
             ]
 
@@ -100,7 +101,7 @@ final class PasswordManagementViewController: NSViewController {
                 .cursor: NSCursor.arrow,
                 .paragraphStyle: paragraphStyle,
                 .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-                .foregroundColor: NSColor(named: "BlackWhite60")!
+                .foregroundColor: NSColor.blackWhite60
             ], range: NSRange(location: 0, length: string.length))
 
             lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
@@ -803,22 +804,11 @@ final class PasswordManagementViewController: NSViewController {
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
-        let menu = NSMenu()
-
-        func createMenuItem(title: String, action: Selector, imageName: String) -> NSMenuItem {
-            let item = NSMenuItem(title: title, action: action, target: self, keyEquivalent: "")
-            item.image = NSImage(named: imageName)
-
-            return item
+        NSMenu {
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin)).withImage(.loginGlyph)
+            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity)).withImage(.identityGlyph)
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard)).withImage(.creditCardGlyph)
         }
-
-        menu.items = [
-            createMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), imageName: "LoginGlyph"),
-            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph"),
-            createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
-        ]
-
-        return menu
     }
 
     private func updateFilter() {
@@ -982,9 +972,9 @@ final class PasswordManagementViewController: NSViewController {
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
         case .allItems: showDefaultEmptyState()
-        case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle)
-        case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
+        case .logins: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateLoginsTitle)
+        case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
         }
     }
 
@@ -997,16 +987,16 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateMessage.isHidden = false
         emptyStateButton.isHidden = false
 
-        emptyStateImageView.image = NSImage(named: "LoginsEmpty")
+        emptyStateImageView.image = .loginsEmpty
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultTitle, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
     }
 
-    private func showEmptyState(imageName: String, title: String) {
+    private func showEmptyState(image: NSImage, title: String) {
         emptyState.isHidden = false
 
-        emptyStateImageView.image = NSImage(named: imageName)
+        emptyStateImageView.image = image
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.isHidden = true
         emptyStateButton.isHidden = true

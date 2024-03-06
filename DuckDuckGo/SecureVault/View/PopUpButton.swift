@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
 private struct NSMenuItemColor {
@@ -43,20 +44,18 @@ final class PopUpButton: NSPopUpButton {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func addItem(withTitle title: String,
-                 foregroundColor: NSColor?,
-                 backgroundColor: NSColor) {
-        self.addItem(withTitle: title)
+    func add(_ item: NSMenuItem, withForegroundColor foregroundColor: NSColor?, backgroundColor: NSColor) {
+        self.menu?.addItem(item)
 
         let itemColor = NSMenuItemColor(foregroundColor: foregroundColor, backgroundColor: backgroundColor)
-        backgroundColorCell?.colors[title] = itemColor
+        backgroundColorCell?.colors[item.title] = itemColor
     }
 
 }
 
 final class NSPopUpButtonBackgroundColorCell: NSPopUpButtonCell {
 
-    private static let chevronsImage = NSImage(named: "PopUpButtonChevrons")!
+    private static let chevronsImage = NSImage.popUpButtonChevrons
 
     fileprivate var colors: [String: NSMenuItemColor] = [:]
 

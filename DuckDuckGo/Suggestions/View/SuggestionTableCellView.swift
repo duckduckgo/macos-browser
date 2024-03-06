@@ -23,11 +23,11 @@ final class SuggestionTableCellView: NSTableCellView {
 
     static let identifier = "SuggestionTableCellView"
 
-    static let textColor = NSColor.suggestionTextColor
-    static let suffixColor = NSColor.addressBarSuffixColor
-    static let burnerSuffixColor = NSColor.burnerAccentColor
-    static let iconColor = NSColor.suggestionIconColor
-    static let selectedTintColor = NSColor.selectedSuggestionTintColor
+    static let textColor: NSColor = .suggestionText
+    static let suffixColor: NSColor = .addressBarSuffix
+    static let burnerSuffixColor: NSColor = .burnerAccent
+    static let iconColor: NSColor = .suggestionIcon
+    static let selectedTintColor: NSColor = .selectedSuggestionTint
 
     @IBOutlet weak var iconImageView: NSImageView!
     @IBOutlet weak var suffixTextField: NSTextField!
