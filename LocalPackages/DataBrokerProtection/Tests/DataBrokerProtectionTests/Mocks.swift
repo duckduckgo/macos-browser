@@ -226,12 +226,12 @@ final class EmailServiceMock: EmailServiceProtocol {
 
     var shouldThrow: Bool = false
 
-    func getEmail(dataBrokerURL: String?) async throws -> String {
+    func getEmail(dataBrokerURL: String?) async throws -> EmailData {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return "test@duck.com"
+        return EmailData(pattern: nil, emailAddress: "test@duck.com")
     }
 
     func getConfirmationLink(from email: String, numberOfRetries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {

@@ -26,8 +26,10 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     private let appGroup: String
     private var actionHandlers: SubscriptionAccessActionHandlers
 
-    private var email: String?
-    private var hasEmail: Bool { !(email?.isEmpty ?? true) }
+    public var email: String?
+    public var emailLabel: String { UserText.email }
+    public var emailDescription: String { hasEmail ? UserText.shareModalHasEmailDescription : UserText.shareModalNoEmailDescription }
+    public var emailButtonTitle: String { hasEmail ? UserText.manageEmailButton : UserText.addEmailButton }
 
     public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, appGroup: String) {
         self.actionHandlers = actionHandlers
@@ -35,52 +37,21 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         self.appGroup = appGroup
     }
 
-    public func descriptionHeader(for channel: AccessChannel) -> String? {
-        hasEmail && channel == .email ? email : nil
-    }
+    private var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
-    public func description(for channel: AccessChannel) -> String {
-        switch channel {
-        case .appleID:
-            return UserText.shareModalAppleIDDescription
-        case .email:
-            return hasEmail ? UserText.shareModalNoEmailDescription : UserText.shareModalHasEmailDescription
-        case .sync:
-            return UserText.shareModalSyncDescription
-        }
-    }
+    public func handleEmailAction() {
+        let url: URL = hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription
 
-    public func buttonTitle(for channel: AccessChannel) -> String? {
-        switch channel {
-        case .appleID:
-            return nil
-        case .email:
-            return hasEmail ? UserText.manageEmailButton : UserText.enterEmailButton
-        case .sync:
-            return UserText.goToSyncSettingsButton
-        }
-    }
-
-    public func handleAction(for channel: AccessChannel) {
-        switch channel {
-        case .appleID:
-            actionHandlers.restorePurchases()
-        case .email:
-            let url: URL = hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription
-
-            Task {
-                if SubscriptionPurchaseEnvironment.current == .appStore {
-                    if #available(macOS 12.0, iOS 15.0, *) {
-                        await AppStoreAccountManagementFlow.refreshAuthTokenIfNeeded(subscriptionAppGroup: appGroup)
-                    }
-                }
-
-                DispatchQueue.main.async {
-                    self.actionHandlers.openURLHandler(url)
+        Task {
+            if SubscriptionPurchaseEnvironment.current == .appStore {
+                if #available(macOS 12.0, iOS 15.0, *) {
+                    await AppStoreAccountManagementFlow.refreshAuthTokenIfNeeded(subscriptionAppGroup: appGroup)
                 }
             }
-        case .sync:
-            actionHandlers.goToSyncPreferences()
+
+            DispatchQueue.main.async {
+                self.actionHandlers.openURLHandler(url)
+            }
         }
     }
 }

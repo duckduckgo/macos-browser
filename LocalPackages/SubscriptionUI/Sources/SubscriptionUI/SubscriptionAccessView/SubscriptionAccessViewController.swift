@@ -59,7 +59,7 @@ public final class SubscriptionAccessViewController: NSViewController {
         if accountManager.isUserAuthenticated {
             ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: accountManager.email, appGroup: subscriptionAppGroup)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers)
+            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
         }
     }
 }
