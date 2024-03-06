@@ -141,10 +141,10 @@ final class BookmarkTableCellView: NSTableCellView {
         shadowView.borderColor = .clear
         shadowView.borderWidth = 1
         shadowView.cornerRadius = 4
-        shadowView.fillColor = .tableCellEditingColor
+        shadowView.fillColor = .tableCellEditing
         shadowView.translatesAutoresizingMaskIntoConstraints = false
         shadowView.wantsLayer = true
-        shadowView.layer?.backgroundColor = NSColor.tableCellEditingColor.cgColor
+        shadowView.layer?.backgroundColor = NSColor.tableCellEditing.cgColor
         shadowView.layer?.cornerRadius = 6
 
         let shadow = NSShadow()
@@ -161,7 +161,7 @@ final class BookmarkTableCellView: NSTableCellView {
         containerView.addSubview(bookmarkURLLabel)
         containerView.addSubview(favoriteButton)
 
-        faviconImageView.contentTintColor = .suggestionIconColor
+        faviconImageView.contentTintColor = .suggestionIcon
         faviconImageView.wantsLayer = true
         faviconImageView.layer?.cornerRadius = 2.0
         faviconImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
@@ -202,7 +202,7 @@ final class BookmarkTableCellView: NSTableCellView {
         accessoryImageView.widthAnchor.constraint(equalToConstant: 22).isActive = true
         accessoryImageView.heightAnchor.constraint(equalToConstant: 32).isActive = true
 
-        menuButton.contentTintColor = .buttonColor
+        menuButton.contentTintColor = .button
         menuButton.translatesAutoresizingMaskIntoConstraints = false
         menuButton.isBordered = false
         menuButton.isHidden = true
@@ -392,9 +392,9 @@ final class BookmarkTableCellView: NSTableCellView {
 
     private func updateColors() {
         titleLabel.textColor = isSelected && !editing ? .white : .controlTextColor
-        menuButton.contentTintColor = isSelected ? .white : .buttonColor
-        faviconImageView.contentTintColor = isSelected ? .white : .suggestionIconColor
-        accessoryImageView.contentTintColor = isSelected ? .white : .suggestionIconColor
+        menuButton.contentTintColor = isSelected ? .white : .button
+        faviconImageView.contentTintColor = isSelected ? .white : .suggestionIcon
+        accessoryImageView.contentTintColor = isSelected ? .white : .suggestionIcon
     }
 
     private func ensureTrackingArea() {

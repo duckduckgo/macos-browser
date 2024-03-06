@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1400"
+   LastUpgradeVersion = "1520"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -107,7 +107,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7B4CE8D926F02108009134B1"
-               BuildableName = ".xctest"
+               BuildableName = "UI Tests.xctest"
                BlueprintName = "UI Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>

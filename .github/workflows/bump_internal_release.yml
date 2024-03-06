@@ -129,6 +129,20 @@ jobs:
       branch: ${{ github.ref_name }}
       base-branch: ${{ github.event.inputs.base-branch || 'main' }}
       prerelease: true
+      internal-release-bump: true
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+
+  publish_release:
+    name: Publish DMG Release
+    needs: [ tag_and_merge ]
+    uses: ./.github/workflows/publish_dmg_release.yml
+    with:
+      asana-task-url: ${{ github.event.inputs.asana-task-url }}
+    secrets:
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+      SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}

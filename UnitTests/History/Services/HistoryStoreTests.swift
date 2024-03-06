@@ -20,13 +20,14 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 import Combine
 import class Persistence.CoreDataDatabase
+import History
 
 final class HistoryStoreTests: XCTestCase {
 
     private var cancellables = Set<AnyCancellable>()
 
     private var context: NSManagedObjectContext!
-    private var historyStore: HistoryStore!
+    private var historyStore: EncryptedHistoryStore!
     private var location: URL!
 
     override func setUp() {
@@ -40,7 +41,7 @@ final class HistoryStoreTests: XCTestCase {
             }
         }
         context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
-        historyStore = HistoryStore(context: context)
+        historyStore = EncryptedHistoryStore(context: context)
     }
 
     override func tearDownWithError() throws {

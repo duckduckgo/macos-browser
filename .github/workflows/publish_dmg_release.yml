@@ -19,16 +19,34 @@ on:
         - internal
         - public
         - hotfix
+  workflow_call:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
+      AWS_ACCESS_KEY_ID_RELEASE_S3:
+        required: true
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3:
+        required: true
+      GHA_ELEVATED_PERMISSIONS_TOKEN:
+        required: true
+      SPARKLE_PRIVATE_KEY:
+        required: true
 
 jobs:
 
-  # This is only run for public and hotfix releases
+  # This is only run for public and hotfix releases, so only when it's triggered manually.
   # Internal release has been tagged as part of code_freeze or bump_interal_release workflows
   tag-public-release:
 
     name: Tag public release
 
-    if: ${{ github.event.inputs.release-type != 'internal' }}
+    # Run if release-type is provided (not empty) an is not internal
+    if: contains(github.event.inputs.release-type, '') == false && github.event.inputs.release-type != 'internal'
 
     uses: ./.github/workflows/tag_release.yml
     with:
@@ -43,6 +61,10 @@ jobs:
 
     name: Publish a release to Sparkle
 
+    env:
+      RELEASE_TYPE: ${{ github.event.inputs.release-type || 'internal' }}
+      SPARKLE_DIR: ${{ github.workspace }}/sparkle-updates
+
     needs: [tag-public-release]
 
     # Allow to run even if the tag-public-release job was skipped (e.g. for internal releases)
@@ -52,23 +74,34 @@ jobs:
     runs-on: macos-13-xlarge
     timeout-minutes: 10
 
-    env:
-      SPARKLE_DIR: ${{ github.workspace }}/sparkle-updates
-
     steps:
+
+      - name: Download tag artifact
+        id: download-tag
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: tag
+          path: .github
+
+      - name: Set tag variable
+        run: |
+          if [[ "${{ steps.download-tag.outcome }}" == 'success' ]]; then
+            echo "TAG=$(<.github/tag)" >> $GITHUB_ENV
+          else
+            echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          fi
 
       - name: Verify the tag
         id: verify-tag
-        env:
-          tag: ${{ github.event.inputs.tag }}
         run: |
           tag_regex='^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$'
 
-          if [[ ! "$tag" =~ $tag_regex ]]; then
-            echo "::error::The provided tag ($tag) has incorrect format (attempted to match ${tag_regex})."
+          if [[ ! "$TAG" =~ $tag_regex ]]; then
+            echo "::error::The provided tag ($TAG) has incorrect format (attempted to match ${tag_regex})."
             exit 1
           fi
-          echo "release-version=${tag//-/.}" >> $GITHUB_OUTPUT
+          echo "release-version=${TAG//-/.}" >> $GITHUB_OUTPUT
 
       - name: Check out the code
         uses: actions/checkout@v4
@@ -87,12 +120,11 @@ jobs:
 
       - name: Fetch DMG
         id: fetch-dmg
-        if: ${{ github.event.inputs.release-type != 'public' }}
         env:
           DMG_NAME: duckduckgo-${{ steps.verify-tag.outputs.release-version }}.dmg
         run: |
           # Public release doesn't need fetching a DMG (it's already uploaded to S3)
-          if [[ "${{ github.event.inputs.release-type }}" != 'public' ]]; then
+          if [[ "${RELEASE_TYPE}" != 'public' ]]; then
             DMG_URL="${{ vars.DMG_URL_ROOT }}${DMG_NAME}"
             curl -fLSs -o "$DMG_NAME" "$DMG_URL"
           fi
@@ -121,7 +153,6 @@ jobs:
         env:
           DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
           VERSION: ${{ steps.verify-tag.outputs.release-version }}
         run: |
           echo -n "$SPARKLE_PRIVATE_KEY" > sparkle_private_key
@@ -169,7 +200,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
           VERSION: ${{ steps.verify-tag.outputs.release-version }}
         run: |
           # Back up existing appcast2.xml
@@ -192,7 +222,7 @@ jobs:
 
       - name: Update Asana for the release
         id: update-asana
-        if: ${{ github.event.inputs.release-type != 'internal' }}
+        if: ${{ env.RELEASE_TYPE != 'internal' }}
         continue-on-error: true
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -217,15 +247,12 @@ jobs:
           echo "RELEASE_BUCKET_NAME=${{ vars.RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_PREFIX=${{ vars.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
-          echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
           echo "VERSION=${{ steps.verify-tag.outputs.release-version }}" >> $GITHUB_ENV
           echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
 
       - name: Set up Asana templates
         if: always()
         id: asana-templates
-        env:
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
         run: |
           if [[ ${{ steps.upload.outcome }} == "success" ]]; then  
             if [[ "${RELEASE_TYPE}" == "internal" ]]; then
@@ -264,7 +291,7 @@ jobs:
 
       - name: Create Asana task to announce the release
         id: create-announcement-task
-        if: ${{ github.event.inputs.release-type != 'internal' }}
+        if: ${{ env.RELEASE_TYPE != 'internal' }}
         uses: ./.github/actions/asana-create-action-item
         env:
           html-notes: ${{ steps.update-asana.outputs.announcement-task-contents }}
@@ -328,9 +355,10 @@ jobs:
 
     needs: [publish-to-sparkle]
 
-    if: ${{ github.event.inputs.release-type != 'internal' }}
+    # Run if release-type is provided (not empty) an is not internal
+    if: contains(github.event.inputs.release-type, '') == false && github.event.inputs.release-type != 'internal'
 
-    uses: ./.github/workflows/create_variants.yml
+    uses: duckduckgo/macos-browser/.github/workflows/create_variants.yml@main
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}

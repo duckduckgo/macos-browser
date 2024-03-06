@@ -242,6 +242,9 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
+        case .setShowEntitlementAlert, .setShowEntitlementNotification:
+            // todo
+            break
         }
     }
 
@@ -279,6 +282,20 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
 
         let errorMessage: ExtensionMessageString? = try await session.sendProviderRequest(.changeTunnelSetting(change))
+        if let errorMessage {
+            throw TunnelFailureError(errorDescription: errorMessage.value)
+        }
+    }
+
+    // MARK: - Debug Command support
+
+    func relay(_ command: DebugCommand) async throws {
+        guard await isConnected,
+              let session = await session else {
+            return
+        }
+
+        let errorMessage: ExtensionMessageString? = try await session.sendProviderRequest(.debugCommand(command))
         if let errorMessage {
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }

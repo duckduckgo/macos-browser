@@ -28,7 +28,12 @@ extension Preferences {
         var body: some View {
             PreferencePane(UserText.downloads) {
 
-                // SECTION 1: Location
+                PreferencePaneSubSection {
+                    ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,
+                                   isOn: $model.shouldOpenPopupOnCompletion)
+                }
+
+                // MARK: Location
                 PreferencePaneSection(UserText.downloadsLocation) {
 
                     HStack {
@@ -40,9 +45,21 @@ extension Preferences {
 #endif
                     }
                     .disabled(model.alwaysRequestDownloadLocation)
-                    ToggleMenuItem(UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
+                    ToggleMenuItem(UserText.downloadsAlwaysAsk,
+                                   isOn: $model.alwaysRequestDownloadLocation)
                 }
             }
         }
     }
+}
+
+#Preview {
+    VStack {
+        HStack {
+            Preferences.DownloadsView(model: DownloadsPreferences())
+                .padding()
+            Spacer()
+        }.frame(width: 500)
+
+    }.background(Color.preferencesBackground)
 }

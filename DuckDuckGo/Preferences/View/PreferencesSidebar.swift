@@ -77,16 +77,7 @@ extension Preferences {
                 ScrollView {
                     VStack(spacing: 0) {
                         ForEach(model.sections) { section in
-                            ForEach(section.panes) { pane in
-                                SidebarItem(pane: pane, isSelected: model.selectedPane == pane) {
-                                    model.selectPane(pane)
-                                }
-                            }
-                            if section != model.sections.last {
-                                Color(NSColor.separatorColor)
-                                    .frame(height: 1)
-                                    .padding(8)
-                            }
+                            sidebarSection(section)
                         }
                     }
                 }
@@ -94,6 +85,20 @@ extension Preferences {
             }
             .padding(.top, 18)
             .padding(.horizontal, 20)
+        }
+
+        @ViewBuilder
+        private func sidebarSection(_ section: PreferencesSection) -> some View {
+            ForEach(section.panes) { pane in
+                SidebarItem(pane: pane, isSelected: model.selectedPane == pane) {
+                    model.selectPane(pane)
+                }
+            }
+            if section != model.sections.last {
+                Color(NSColor.separatorColor)
+                    .frame(height: 1)
+                    .padding(8)
+            }
         }
     }
 
@@ -107,10 +112,10 @@ extension Preferences {
 
             let bgColor: Color = {
                 if isSelected {
-                    return Color("RowHoverColor")
+                    return .rowHover
                 }
                 if isHovered {
-                    return Color("ButtonMouseOverColor")
+                    return .buttonMouseOver
                 }
                 return Color(NSColor.clear.withAlphaComponent(0.001))
             }()

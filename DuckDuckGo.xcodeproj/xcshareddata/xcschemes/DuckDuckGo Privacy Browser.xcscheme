@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1400"
+   LastUpgradeVersion = "1520"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -145,16 +145,7 @@
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenNavigationActionIsData_downloadStarts()">
-               </Test>
-               <Test
                   Identifier = "EncryptionKeyStoreTests">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenGoingBackToFailingPage_reloadIsTriggered()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenTabWithNoConnectionErrorActivated_reloadTriggered()">
                </Test>
                <Test
                   Identifier = "HTTPSUpgradeIntegrationTests">
@@ -164,9 +155,6 @@
                </Test>
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
-               </Test>
-               <Test
-                  Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainSuggestionChosen_redirectedToSERP()">
                </Test>
             </SkippedTests>
          </TestableReference>

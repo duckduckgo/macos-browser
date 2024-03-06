@@ -23,6 +23,7 @@ import DDGSync
 import PrivacyDashboard
 import WebKit
 import SecureStorage
+import History
 
 final class Fire {
 

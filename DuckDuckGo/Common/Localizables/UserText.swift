@@ -236,6 +236,9 @@ struct UserText {
     static let addressBarVisitSuffix = NSLocalizedString("address.bar.visit.suffix",
                                                          value: "Visit",
                                                          comment: "Address bar suffix of possibly visited website. Example: spreadprivacy.com . Visit spreadprivacy.com")
+    static let addressBarPlaceholder = NSLocalizedString("address.bar.placeholder",
+                                                         value: "Search or enter address",
+                                                         comment: "Empty Address Bar placeholder text displayed on the new tab page.")
 
     static let navigateBack = NSLocalizedString("navigate.back", value: "Back", comment: "Context menu item")
     static let closeAndReturnToParentFormat = NSLocalizedString("close.tab.on.back.format",
@@ -371,6 +374,8 @@ struct UserText {
     static let downloadsLocation = NSLocalizedString("downloads.location", value: "Location", comment: "Downloads directory location")
     static let downloadsAlwaysAsk = NSLocalizedString("downloads.always-ask", value: "Always ask where to save files", comment: "Downloads preferences checkbox")
     static let downloadsChangeDirectory = NSLocalizedString("downloads.change", value: "Change…", comment: "Change downloads directory button")
+
+    static let downloadsOpenPopupOnCompletion = NSLocalizedString("downloads.open.on.completion", value: "Automatically open the Downloads panel when downloads complete", comment: "Checkbox to open a Download Manager popover when downloads are completed")
 
     // MARK: Password Manager
     static let passwordManagement = NSLocalizedString("passsword.management", value: "Autofill", comment: "Used as title for password management user interface")
@@ -668,6 +673,8 @@ struct UserText {
     static let downloadCanceled = NSLocalizedString("downloads.error.canceled", value: "Canceled", comment: "Short error description when downloaded file download was canceled")
     static let downloadFailedToMoveFileToDownloads = NSLocalizedString("downloads.error.move.failed", value: "Could not move file to Downloads", comment: "Short error description when could not move downloaded file to the Downloads folder")
     static let downloadFailed = NSLocalizedString("downloads.error.other", value: "Error", comment: "Short error description when Download failed")
+    static let downloadBytesLoadedFormat = NSLocalizedString("downloads.bytes.format", value: "%@ of %@", comment: "Number of bytes out of total bytes downloaded (1Mb of 2Mb)")
+    static let downloadSpeedFormat = NSLocalizedString("downloads.speed.format", value: "%@/s", comment: "Download speed format (1Mb/sec)")
 
     static let cancelDownloadToolTip = NSLocalizedString("downloads.tooltip.cancel", value: "Cancel Download", comment: "Mouse-over tooltip for Cancel Download button")
     static let restartDownloadToolTip = NSLocalizedString("downloads.tooltip.restart", value: "Restart Download", comment: "Mouse-over tooltip for Restart Download button")
@@ -1001,6 +1008,7 @@ struct UserText {
 
     // "data-broker-protection.optionsMenu" - Menu item data broker protection feature
     static let dataBrokerProtectionOptionsMenuItem = "Personal Information Removal"
+    static let dataBrokerProtectionScanOptionsMenuItem = "Personal Information Removal Scan"
     // "tab.dbp.title" - Tab data broker protection title
     static let tabDataBrokerProtectionTitle = "Personal Information Removal"
 

@@ -81,7 +81,7 @@ struct DaxSpeech: View {
         .multilineTextAlignment(.leading)
         .font(.daxSpeech)
         .lineSpacing(2.5)
-        .foregroundColor(Color("OnboardingDaxSpeechTextColor"))
+        .foregroundColor(Color(.onboardingDaxSpeechText))
         .frame(width: speechWidth)
         .background(SpeechBubble())
         .onReceive(timer, perform: { _ in
@@ -161,8 +161,8 @@ fileprivate struct SpeechBubble: View {
                      )
 
                 }
-                .fill(Color(NSColor.interfaceBackgroundColor))
-                .shadow(color: Color("OnboardingDaxSpeechShadowColor"), radius: 2, x: 0, y: 0)
+                .fill(Color(.interfaceBackground))
+                .shadow(color: Color(.onboardingDaxSpeechShadow), radius: 2, x: 0, y: 0)
             }
 
         }
