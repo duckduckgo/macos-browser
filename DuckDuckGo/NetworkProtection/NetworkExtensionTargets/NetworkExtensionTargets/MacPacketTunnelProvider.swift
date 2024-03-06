@@ -220,12 +220,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         self.appLauncher = AppLauncher(appBundleURL: .mainAppBundleURL)
 
 #if NETP_SYSTEM_EXTENSION
-        let settings = VPNSettings(defaults: .standard)
         let defaults = UserDefaults.standard
 #else
-        let settings = VPNSettings(defaults: .netP)
         let defaults = UserDefaults.netP
 #endif
+        let settings = VPNSettings(defaults: defaults)
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
