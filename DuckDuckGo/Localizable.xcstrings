@@ -53,6 +53,9 @@
         }
       }
     },
+    " %@" : {
+
+    },
     "**%lld** tracking attempts blocked" : {
       "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
       "localizations" : {
@@ -2432,55 +2435,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "DuckDuckGo wird versuchen, die privatesten Einstellungen zu wählen und diese Pop-ups für dich auszublenden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you."
+            "value" : "When DuckDuckGo detects cookie pop-ups on sites you visit, we can automatically set your cookie preferences to minimize cookies and maximize privacy, then close pop-ups."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "DuckDuckGo intentará seleccionar la configuración más privada disponible y ocultar estas ventanas emergentes por ti."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "DuckDuckGo essaiera de sélectionner les paramètres de confidentialité les plus élevés et de masquer ces fenêtres contextuelles pour vous."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "DuckDuckGo cercherà di selezionare le impostazioni con la massima privacy e nasconderà questi popup per te."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "DuckDuckGo zal proberen de meest privacyvriendelijke instellingen te selecteren en deze pop-ups voor je verbergen."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "DuckDuckGo spróbuje wybrać najbardziej prywatne dostępne ustawienia i ukryć te wyskakujące okienka."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "O DuckDuckGo vai tentar selecionar as definições mais privadas disponíveis e ocultar pop-ups."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "DuckDuckGo по возможности откажется от куки-файлов и скроет подобные окна."
           }
         }
@@ -2908,7 +2911,7 @@
     },
     "autoconsent.title" : {
       "comment" : "Autoconsent settings section title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -15398,6 +15401,18 @@
         }
       }
     },
+    "email.protection.explanation" : {
+      "comment" : "feature explanation in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Block email trackers and hide your address without switching your email provider"
+          }
+        }
+      }
+    },
     "Enter Full Screen" : {
       "comment" : "Main Menu View item",
       "localizations" : {
@@ -19039,7 +19054,7 @@
     },
     "gpc.title" : {
       "comment" : "GPC settings title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -41655,8 +41670,32 @@
         }
       }
     },
+    "preferences.accessibility" : {
+      "comment" : "Show accessibility browser preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accessibility"
+          }
+        }
+      }
+    },
+    "preferences.always-on" : {
+      "comment" : "Status indicator of a privacy protection.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Always On"
+          }
+        }
+      }
+    },
     "preferences.appearance" : {
-      "comment" : "Show appearance preferences",
+      "comment" : "Show Appearance preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -42137,7 +42176,7 @@
     },
     "preferences.appearance.zoom" : {
       "comment" : "Zoom settings section title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -42261,63 +42300,99 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Autovervollständigen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Autofill"
+            "value" : "Passwords"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Autocompletar"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Saisie automatique"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Compilazione automatica"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Automatisch invullen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Autouzupełnianie"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Preenchimento automático"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Автозаполнение"
+          }
+        }
+      }
+    },
+    "preferences.autofill-enabled-for" : {
+      "comment" : "Label presented before the email account in email protection preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Autofill enabled in this browser for:"
+          }
+        }
+      }
+    },
+    "preferences.cookie-pop-up-protection" : {
+      "comment" : "Show cookie pop-up protection preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cookie Pop-up Protection"
+          }
+        }
+      }
+    },
+    "preferences.data-clearing" : {
+      "comment" : "Show Data Clearing preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Data Clearing"
           }
         }
       }
     },
     "preferences.default-browser" : {
       "comment" : "Show default browser preferences",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -42371,6 +42446,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Браузер по умолчанию"
+          }
+        }
+      }
+    },
+    "preferences.default-browser-app" : {
+      "comment" : "Show Default Browser App preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Default Browser App"
           }
         }
       }
@@ -42675,6 +42762,30 @@
         }
       }
     },
+    "preferences.duckduckgo-on-other-platforms" : {
+      "comment" : "Section in Preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo on Other Platforms"
+          }
+        }
+      }
+    },
+    "preferences.email-protection" : {
+      "comment" : "Show Email Protection preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Email Protection"
+          }
+        }
+      }
+    },
     "preferences.general" : {
       "comment" : "Show general preferences",
       "extractionState" : "extracted_with_value",
@@ -42731,6 +42842,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Основные"
+          }
+        }
+      }
+    },
+    "preferences.main-settings" : {
+      "comment" : "Section header in Preferences for main settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Main Settings"
+          }
+        }
+      }
+    },
+    "preferences.off" : {
+      "comment" : "Status indicator of a privacy protection.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Off"
+          }
+        }
+      }
+    },
+    "preferences.on" : {
+      "comment" : "Status indicator of a privacy protection.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "On"
           }
         }
       }
@@ -42797,7 +42944,7 @@
     },
     "preferences.privacy" : {
       "comment" : "Show privacy browser preferences",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -42851,6 +42998,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки конфиденциальности"
+          }
+        }
+      }
+    },
+    "preferences.privacy-protections" : {
+      "comment" : "Section header in Preferences for privacy protections",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Privacy Protections"
+          }
+        }
+      }
+    },
+    "preferences.private-search" : {
+      "comment" : "Show Private Search preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Private Search"
           }
         }
       }
@@ -42971,6 +43142,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть новое окно"
+          }
+        }
+      }
+    },
+    "preferences.support" : {
+      "comment" : "Open support page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Support"
           }
         }
       }
@@ -43155,6 +43338,18 @@
         }
       }
     },
+    "preferences.web-tracking-protection" : {
+      "comment" : "Show Web Tracking Protection preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Web Tracking Protection"
+          }
+        }
+      }
+    },
     "print.menu.item" : {
       "comment" : "Menu item title",
       "extractionState" : "extracted_with_value",
@@ -43211,6 +43406,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Распечатать…"
+          }
+        }
+      }
+    },
+    "private.search.explenation" : {
+      "comment" : "feature explanation in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked."
           }
         }
       }
@@ -49463,6 +49670,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не удалось импортировать пароли напрямую из %@."
+          }
+        }
+      }
+    },
+    "web.tracking.protection.explanation" : {
+      "comment" : "feature explanation in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo automatically blocks hidden trackers as you browse the web."
           }
         }
       }
