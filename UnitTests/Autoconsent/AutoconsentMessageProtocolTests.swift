@@ -25,7 +25,7 @@ class AutoconsentMessageProtocolTests: XCTestCase {
 
     let userScript = AutoconsentUserScript(
         scriptSource: ScriptSourceProvider(configStorage: MockConfigurationStore(),
-                                           privacyConfigurationManager: MockPrivacyConfigurationManager(), 
+                                           privacyConfigurationManager: MockPrivacyConfigurationManager(),
                                            webTrackingProtectionPreferences: WebTrackingProtectionPreferences.shared, // mock
                                            contentBlockingManager: ContentBlockerRulesManagerMock(),
                                            trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
