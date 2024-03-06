@@ -30,7 +30,7 @@ inputs:
 outputs:
   assignee-id:
     description: "Assignee ID"
-    value: ${{ steps.get-asana-user-id.outputs.user-id }}
+    value: ${{ steps.set-assignee-id.outputs.assignee-id }}
   new-task-id:
     description: "New task ID"
     value: ${{ steps.create-task.outputs.new-task-id }}
@@ -49,11 +49,18 @@ runs:
         access-token: ${{ inputs.access-token }}
         github-handle: ${{ github.actor }}
 
+    - id: set-assignee-id
+      shell: bash
+      env:
+        USER_ID: ${{ steps.get-asana-user-id.outputs.user-id || steps.get-automation-subtask.outputs.assignee-id }}
+      run: |
+        echo "ASSIGNEE_ID=${USER_ID}" >> $GITHUB_OUTPUT
+
     - id: process-template-payload
       if: ${{ inputs.template-name }}
       shell: bash
       env:
-        ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
+        ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
         AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         TEMPLATE_PATH: ${{ github.action_path }}/templates/${{ inputs.template-name }}.yml
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -71,7 +78,7 @@ runs:
       if: ${{ inputs.notes }}
       shell: bash
       env:
-        ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
+        ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
         AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         NOTES: ${{ inputs.notes }}
         TASK_NAME: ${{ inputs.task-name }}
@@ -84,7 +91,7 @@ runs:
       if: ${{ inputs.html-notes }}
       shell: bash
       env:
-        ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
+        ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
         AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         HTML_NOTES: ${{ inputs.html-notes }}
         TASK_NAME: ${{ inputs.task-name }}
@@ -97,7 +104,7 @@ runs:
       shell: bash
       env:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-        ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
+        ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
         TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-notes-payload.outputs.payload-base64 || steps.process-html-notes-payload.outputs.payload-base64 }}
       run: |
