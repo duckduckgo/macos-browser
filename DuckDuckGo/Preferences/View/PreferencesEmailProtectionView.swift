@@ -28,45 +28,52 @@ extension Preferences {
         var emailManager: EmailManager
         @ObservedObject var protectionStatus: PrivacyProtectionStatus = PrivacyProtectionStatus.status(for: .emailProtection)
 
-            var body: some View {
-                PreferencePane("Email Protection", spacing: 20) {
+        var body: some View {
+            PreferencePane("Email Protection", spacing: 20) {
 
-                    // Status Indicator
-                    StatusIndicatorView(status: protectionStatus.status ?? .off, isLarge: true).padding(.top, -16)
+                // Status Indicator
+                StatusIndicatorView(status: protectionStatus.status ?? .off, isLarge: true).padding(.top, -16)
 
-                    // SECTION 1: Description
-                    PreferencePaneSection {
-                        VStack(alignment: .leading, spacing: 1) {
-                            TextMenuItemCaption(UserText.emailProtectionExplanation)
-                            TextButton(UserText.learnMore) {
-                                openNewTab(with: .duckDuckGoEmailInfo)
-                            }
-                        }
-                    }
-
-                    // SECTION 2: Email Info
-                    PreferencePaneSubSection {
-                        if emailManager.isSignedIn {
-                            if let userEmail = emailManager.userEmail {
-                                Text("Autofill enabled in this browser for ").foregroundColor(Color("GreyTextColor")) + Text(userEmail).bold()
-                            }
-                            Button(UserText.emailOptionsMenuManageAccountSubItem + "…") {
-                                openNewTab(with: EmailUrls().emailProtectionAccountLink)
-                            }
-                            Button(UserText.emailOptionsMenuTurnOffSubItem) {
-                                let alert = NSAlert.disableEmailProtection()
-                                let response = alert.runModal()
-                                if response == .alertFirstButtonReturn {
-                                    try? emailManager.signOut()
-                                }
-                            }
-                        } else {
-                            Button(UserText.emailOptionsMenuTurnOnSubItem + "…") {
-                                openNewTab(with: EmailUrls().emailProtectionLink)
-                            }
+                // SECTION 1: Description
+                PreferencePaneSection {
+                    VStack(alignment: .leading, spacing: 1) {
+                        TextMenuItemCaption(UserText.emailProtectionExplanation)
+                        TextButton(UserText.learnMore) {
+                            openNewTab(with: .duckDuckGoEmailInfo)
                         }
                     }
                 }
+
+                // SECTION 2: Current Account Info
+                PreferencePaneSection {
+                    if emailManager.isSignedIn {
+                        if let userEmail = emailManager.userEmail {
+                            Text("Autofill enabled in this browser for ").foregroundColor(Color("GreyTextColor")) + Text(userEmail).bold()
+                        }
+                        Button(UserText.emailOptionsMenuManageAccountSubItem + "…") {
+                            openNewTab(with: EmailUrls().emailProtectionAccountLink)
+                        }
+                        Button(UserText.emailOptionsMenuTurnOffSubItem) {
+                            let alert = NSAlert.disableEmailProtection()
+                            let response = alert.runModal()
+                            if response == .alertFirstButtonReturn {
+                                try? emailManager.signOut()
+                            }
+                        }
+                    } else {
+                        Button(UserText.emailOptionsMenuTurnOnSubItem + "…") {
+                            openNewTab(with: EmailUrls().emailProtectionLink)
+                        }
+                    }
+                }
+
+                // Section 3: FAQ
+                PreferencePaneSection {
+                    TextButton("Support") {
+                        openNewTab(with: EmailUrls().emailProtectionSupportLink)
+                    }
+                }
             }
+        }
     }
 }

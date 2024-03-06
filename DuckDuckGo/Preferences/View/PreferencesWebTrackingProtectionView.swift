@@ -55,11 +55,7 @@ extension Preferences {
                 }
             }
         }
-
     }
-
-
-
 }
 
 extension View {
