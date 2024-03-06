@@ -87,9 +87,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
     case networkProtectionNoAuthTokenFoundError
 
-    case networkProtectionRekeyAttempted
+    case networkProtectionRekeyAttempt
     case networkProtectionRekeyCompleted
-    case networkProtectionRekeyFailed
+    case networkProtectionRekeyFailure
 
     case networkProtectionSystemExtensionActivationFailure
 
@@ -251,14 +251,14 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionNoAuthTokenFoundError:
             return "m_mac_netp_no_auth_token_found_error"
 
-        case .networkProtectionRekeyAttempted:
-            return "m_mac_netp_rekey_attempted"
+        case .networkProtectionRekeyAttempt:
+            return "m_mac_netp_rekey_attempt"
 
         case .networkProtectionRekeyCompleted:
             return "m_mac_netp_rekey_completed"
 
-        case .networkProtectionRekeyFailed:
-            return "m_mac_netp_rekey_completed"
+        case .networkProtectionRekeyFailure:
+            return "m_mac_netp_rekey_failure"
 
         case .networkProtectionSystemExtensionActivationFailure:
             return "m_mac_netp_system_extension_activation_failure"
@@ -351,9 +351,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionServerListStoreFailedToEncodeServerList,
              .networkProtectionServerListStoreFailedToDecodeServerList,
              .networkProtectionNoAuthTokenFoundError,
-             .networkProtectionRekeyAttempted,
+             .networkProtectionRekeyAttempt,
              .networkProtectionRekeyCompleted,
-             .networkProtectionRekeyFailed,
+             .networkProtectionRekeyFailure,
              .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
              .networkProtectionWireguardErrorFailedDNSResolution,
              .networkProtectionSystemExtensionActivationFailure,
