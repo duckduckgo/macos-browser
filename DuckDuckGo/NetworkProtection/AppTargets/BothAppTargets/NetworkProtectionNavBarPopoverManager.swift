@@ -23,7 +23,10 @@ import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+
+#if SUBSCRIPTION
 import Subscription
+#endif
 
 #if NETWORK_PROTECTION
 final class NetworkProtectionNavBarPopoverManager {
@@ -65,6 +68,15 @@ final class NetworkProtectionNavBarPopoverManager {
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
             _ = VPNSettings(defaults: .netP)
             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+#if SUBSCRIPTION
+            let entitlementsCheck = {
+                await AccountManager().hasEntitlement(for: .networkProtection)
+            }
+#else
+            let entitlementsCheck: (() async -> Result<Bool, Error>) = {
+                return .success(true)
+            }
+#endif
 
             let popover = NetworkProtectionPopover(controller: controller,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,
@@ -95,9 +107,7 @@ final class NetworkProtectionNavBarPopoverManager {
             },
                                                    agentLoginItem: LoginItem.vpnMenu,
                                                    isMenuBarStatusView: false,
-                                                   entitlementCheck: {
-                await AccountManager().hasEntitlement(for: .networkProtection)
-            })
+                                                   entitlementCheck: entitlementsCheck)
             popover.delegate = delegate
 
             networkProtectionPopover = popover

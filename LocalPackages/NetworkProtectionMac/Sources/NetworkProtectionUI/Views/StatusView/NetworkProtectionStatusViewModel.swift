@@ -57,7 +57,7 @@ extension NetworkProtectionStatusView {
         private(set) var onboardingStatus: OnboardingStatus = .completed
 
         var tunnelControllerViewDisabled: Bool {
-            onboardingStatus != .completed || loginItemNeedsApproval
+            onboardingStatus != .completed || loginItemNeedsApproval || shouldShowSubscriptionExpired
         }
 
         @MainActor
@@ -93,6 +93,8 @@ extension NetworkProtectionStatusView {
         /// The `RunLoop` for the timer.
         ///
         private let runLoopMode: RunLoop.Mode?
+
+        private let entitlementsMonitor = NetworkProtectionEntitlementMonitor()
 
         private var cancellables = Set<AnyCancellable>()
 
@@ -151,17 +153,16 @@ extension NetworkProtectionStatusView {
             }
             .store(in: &cancellables)
 
-            Timer.publish(every: 60, on: .main, in: .default).sink { [weak self] _ in
-                Task {
-                    let result = await entitlementCheck()
+            Task {
+                await entitlementsMonitor.start(entitlementCheck: entitlementCheck) { [weak self] result in
                     switch result {
-                    case .success(let enabled):
-                        self?.shouldShowSubscriptionExpired = !enabled
-                    case .failure:
-                        break
+                    case .validEntitlement, .error:
+                        self?.shouldShowSubscriptionExpired = false
+                    case .invalidEntitlement:
+                        self?.shouldShowSubscriptionExpired = true
                     }
                 }
-            }.store(in: &cancellables)
+            }
         }
 
         func refreshLoginItemStatus() {

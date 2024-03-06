@@ -34,6 +34,10 @@ import SystemExtensionManager
 import SystemExtensions
 #endif
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
@@ -67,6 +71,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
+
+#if SUBSCRIPTION
+    // MARK: - Subscriptions
+
+    private let accountManager = AccountManager()
+#endif
 
     // MARK: - Debug Options Support
 
@@ -517,13 +527,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         var options = [String: NSObject]()
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        if let accessToken = accountManager.accessToken  {
-            os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
-            options[NetworkProtectionOptionKey.authToken] = NetworkProtectionKeychainTokenStore.makeToken(from: accessToken) as NSString?
-        } else {
-            os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
-            options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
-        }
+        options[NetworkProtectionOptionKey.authToken] = try fetchAuthToken()
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 
@@ -709,6 +713,17 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         if let errorMessage {
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }
+    }
+
+    private func fetchAuthToken() throws -> NSString? {
+#if SUBSCRIPTION
+        if let accessToken = accountManager.accessToken  {
+            os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
+            return NetworkProtectionKeychainTokenStore.makeToken(from: accessToken)
+        }
+#endif
+        os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
+        return try tokenStore.fetchToken() as NSString?
     }
 }
 

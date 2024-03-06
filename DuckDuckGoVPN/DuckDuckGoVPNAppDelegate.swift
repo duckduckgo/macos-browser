@@ -27,7 +27,10 @@ import NetworkProtectionProxy
 import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
+
+#if SUBSCRIPTION
 import Subscription
+#endif
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -44,7 +47,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
-#if DEBUG
+#if DEBUG && SUBSCRIPTION
         let accountManager = AccountManager(appGroup: Bundle.main.appGroup(bundle: .subs))
 
         if let token = accountManager.accessToken {
@@ -220,6 +223,16 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         let model = StatusBarMenuModel(vpnSettings: .init(defaults: .netP))
 
+#if SUBSCRIPTION
+        let entitlementsCheck = {
+            await AccountManager().hasEntitlement(for: .networkProtection)
+        }
+#else
+        let entitlementsCheck: (() async -> Result<Bool, Error>) = {
+            return .success(true)
+        }
+#endif
+
         return StatusBarMenu(
             model: model,
             onboardingStatusPublisher: onboardingStatusPublisher,
@@ -242,9 +255,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             },
             agentLoginItem: nil,
             isMenuBarStatusView: true,
-            entitlementCheck: {
-                return await AccountManager(appGroup: Bundle.main.appGroup(bundle: .subs)).hasEntitlement(for: .networkProtection)
-            })
+            entitlementCheck: entitlementsCheck
+        )
     }
 
     @MainActor
