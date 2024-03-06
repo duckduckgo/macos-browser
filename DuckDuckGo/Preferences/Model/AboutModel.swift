@@ -38,11 +38,6 @@ final class AboutModel: ObservableObject {
         .toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: false)
 
     @MainActor
-    func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-    }
-
-    @MainActor
     func openFeedbackForm() {
         FeedbackPresenter.presentFeedbackForm()
     }

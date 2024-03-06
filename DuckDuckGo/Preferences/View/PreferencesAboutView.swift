@@ -68,11 +68,11 @@ extension Preferences {
                     .padding(.bottom, 8)
 
                     TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
-                        model.openURL(.aboutDuckDuckGo)
+                        openNewTab(with: .aboutDuckDuckGo)
                     }
 
                     TextButton(UserText.privacyPolicy) {
-                        model.openURL(.privacyPolicy)
+                        openNewTab(with: .privacyPolicy)
                     }
 
                     #if FEEDBACK
