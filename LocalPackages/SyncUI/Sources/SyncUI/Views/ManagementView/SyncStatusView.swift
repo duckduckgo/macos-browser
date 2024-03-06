@@ -24,10 +24,10 @@ struct SyncStatusView<ViewModel>: View where ViewModel: ManagementViewModel {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             SyncPreferencesRow {
-                Image("SolidCheckmark")
+                Image(.solidCheckmark)
             } centerContent: {
                 Text(UserText.syncConnected)
-                    .foregroundColor(Color("BlackWhite60"))
+                    .foregroundColor(Color(.blackWhite60))
             } rightContent: {
                 Button(UserText.turnOffSync) {
                     model.turnOffSyncPressed()

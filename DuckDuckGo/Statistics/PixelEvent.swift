@@ -208,6 +208,12 @@ extension Pixel {
         case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
         case dataBrokerProtectionRemoteMessageOpened(messageID: String)
 
+        // Login Item events
+        case dataBrokerEnableLoginItemDaily
+        case dataBrokerDisableLoginItemDaily
+        case dataBrokerResetLoginItemDaily
+        case dataBrokerDisableAndDeleteDaily
+
         // DataBrokerProtection Other
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
@@ -573,6 +579,11 @@ extension Pixel.Event {
             return "m_mac_dbp_remote_message_dismissed_\(messageID)"
         case .dataBrokerProtectionRemoteMessageOpened(let messageID):
             return "m_mac_dbp_remote_message_opened_\(messageID)"
+
+        case .dataBrokerEnableLoginItemDaily: return "m_mac_dbp_daily_login-item_enable"
+        case .dataBrokerDisableLoginItemDaily: return "m_mac_dbp_daily_login-item_disable"
+        case .dataBrokerResetLoginItemDaily: return "m_mac_dbp_daily_login-item_reset"
+        case .dataBrokerDisableAndDeleteDaily: return "m_mac_dbp_daily_disable-and-delete"
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")

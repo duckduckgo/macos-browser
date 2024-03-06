@@ -31,7 +31,7 @@ let package = Package(
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "cb11e5449e9767796ae539688fa4b9319db5024c"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "2fa74adb82a6478ee9f737f54d8bed75eefa725d"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../LoginItems"),

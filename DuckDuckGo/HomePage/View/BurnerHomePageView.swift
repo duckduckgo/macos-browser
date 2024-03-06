@@ -27,7 +27,7 @@ extension HomePage.Views {
 
         @Environment(\.colorScheme) var colorScheme
 
-        let backgroundColor = Color("NewTabPageBackgroundColor")
+        let backgroundColor = Color(.newTabPageBackground)
         private var infoBackgroundColor: Color {
             return colorScheme == .dark ? Color.white.opacity(0.03) : backgroundColor
         }
@@ -50,7 +50,7 @@ extension HomePage.Views {
 
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Image("BurnerWindowHomepageImage")
+                        Image(.burnerWindowHomepage)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 64, height: 48)
@@ -84,7 +84,7 @@ extension HomePage.Views {
             var body: some View {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Image("BurnerWindowIcon1")
+                        Image(.burnerWindowIcon1)
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
@@ -95,7 +95,7 @@ extension HomePage.Views {
                     }
 
                     HStack {
-                        Image("BurnerWindowIcon2")
+                        Image(.burnerWindowIcon2)
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
@@ -105,7 +105,7 @@ extension HomePage.Views {
                     }
 
                     HStack {
-                        Image("BurnerWindowIcon3")
+                        Image(.burnerWindowIcon3)
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
@@ -117,7 +117,7 @@ extension HomePage.Views {
                     Divider()
 
                     HStack {
-                        Image("BurnerWindowIcon4")
+                        Image(.burnerWindowIcon4)
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
