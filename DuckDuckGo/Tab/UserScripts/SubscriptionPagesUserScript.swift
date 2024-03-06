@@ -178,7 +178,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 #endif
     }
 
-    // swiftlint:disable:next function_body_length
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct SubscriptionSelection: Decodable {
             let id: String
@@ -224,14 +224,20 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
 
             let emailAccessToken = try? EmailManager().getToken()
+            let purchaseTransactionJWS: String
 
             os_log(.info, log: .subscription, "[Purchase] Purchasing")
             switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
-            case .success:
-                break
+            case .success(let transactionJWS):
+                purchaseTransactionJWS = transactionJWS
             case .failure(let error):
-                os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
-                await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                switch error {
+                case .cancelledByUser:
+                    os_log(.error, log: .subscription, "[Purchase] Cancelled by user")
+                default:
+                    os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                    await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                }
                 return nil
             }
 
@@ -239,7 +245,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
-            switch await AppStorePurchaseFlow.completeSubscriptionPurchase() {
+            switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS) {
             case .success(let purchaseUpdate):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
             case .failure(let error):
@@ -265,9 +271,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     }
                 },
                 openURLHandler: { url in
-                    WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-                }, goToSyncPreferences: {
-                    WindowControllersManager.shared.show(url: .settingsPane(.sync), source: .ui, newTab: true)
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
                 })
 
             let vc = SubscriptionAccessViewController(actionHandlers: actionHandlers)
@@ -307,7 +311,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
-            await WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
+            await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
         }
 
         return nil

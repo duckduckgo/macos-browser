@@ -1099,7 +1099,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
-        WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
+        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
     }
 #endif
 
