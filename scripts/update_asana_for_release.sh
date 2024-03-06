@@ -28,20 +28,18 @@ default_current_objectives_project_id="72649045549333"
 cwd="$(dirname "${BASH_SOURCE[0]}")"
 
 find_task_urls_in_git_log() {
+	local last_release_tag="$1"
+
 	git fetch -q --tags
-	last_release_tag="$(gh api /repos/duckduckgo/macos-browser/releases/latest --jq .tag_name)"
 
 	# 1. Fetch all commit messages since the last release tag
 	# 2. Extract Asana task URLs from the commit messages
 	#    (Use -A 1 to handle cases where URL is on the next line after "Task/Issue URL:")
-	# 3. Print the last space-separated field ($NF) of each line
-	# 4. Filter only Asana URLs
-	# 5. Remove duplicates
+	# 3. Filter only lines containing Asana URLs
+	# 4. Remove duplicates
 	git log "${last_release_tag}"..HEAD \
 		| grep -A 1 'Task.*URL' \
-		| awk '{ print $NF; }' \
-		| grep app\.asana\.com \
-		| sed -E 's/.*(https:.*)/\1/' \
+		| sed -nE 's|.*(https://app\.asana\.com.*)|\1|p' \
 		| uniq
 }
 
@@ -63,7 +61,6 @@ get_task_id() {
 construct_release_notes() {
 	local escaped_release_note
 
-	printf '%s' '<h1>Release notes</h1>'
 	if [[ -n "${release_notes[*]}" ]]; then
 		printf '%s' '<ul>'
 		for release_note in "${release_notes[@]}"; do
@@ -75,8 +72,6 @@ construct_release_notes() {
 }
 
 construct_this_release_includes() {
-	printf '%s' '<h2>This release includes:</h2>'
-
 	if [[ -n "${task_ids[*]}" ]]; then
 		printf '%s' '<ul>'
 		for task_id in "${task_ids[@]}"; do
@@ -93,7 +88,10 @@ construct_release_task_description() {
 	printf '%s' 'Only the <em>Release notes</em> section below should be modified manually.\n'
 	printf '%s' 'Please do not adjust formatting.'
 
+	printf '%s' '<h1>Release notes</h1>'
 	construct_release_notes
+
+	printf '%s' '<h2>This release includes:</h2>'
 	construct_this_release_includes
 
 	printf '%s' '</body>'
@@ -106,8 +104,11 @@ construct_release_announcement_task_description() {
 	printf '%s' '<li>Copy the content below (between separators) and paste as the message body.</li>'
 	printf '%s' '</ul>\n<hr>'
 	
+	printf '%s' '<h1>Release notes</h1>'
 	construct_release_notes
 	printf '%s' '\n'
+	printf '%s' '<h2>This release includes:</h2>'
+
 	construct_this_release_includes
 	printf '%s' '\n'
 
@@ -272,10 +273,13 @@ complete_tasks() {
 
 handle_internal_release() {
 	# 1. Fetch task URLs from git commit messages
+	local last_release_tag
+	last_release_tag="$(gh api /repos/duckduckgo/macos-browser/releases/latest --jq .tag_name)"
+
 	local task_ids=()
 	while read -r line; do
 		task_ids+=("$(get_task_id "$line")")
-	done <<< "$(find_task_urls_in_git_log)"
+	done <<< "$(find_task_urls_in_git_log "$last_release_tag")"
 
 	# 2. Fetch current release notes from Asana release task.
 	local release_notes=()
@@ -332,6 +336,21 @@ handle_public_release() {
 	cat > "${announcement_task_contents_file}" <<< "${html_notes}"
 }
 
+get_tasks_in_last_internal_release() {
+	# 1. Find last internal release tag (last internal release is the second one, because the first one is the release that's just created)
+	local last_release_tag
+	last_release_tag="$(gh api /repos/duckduckgo/macos-browser/releases?per_page=2 --jq .[1].tag_name)"
+
+	# 2. Convert Asana task URLs from git commit messages to task IDs
+	local task_ids=()
+	while read -r line; do
+		task_ids+=("$(get_task_id "$line")")
+	done <<< "$(find_task_urls_in_git_log "$last_release_tag")"
+
+	# 3. Construct a HTML list of task IDs
+	construct_this_release_includes
+}
+
 main() {
 	local release_type="$1"
 	local release_task_id="$2"
@@ -345,6 +364,9 @@ main() {
 		public | hotfix)
 			local announcement_task_contents_file="$5"
 			handle_public_release
+			;;
+		list-tasks-in-last-internal-release)
+			get_tasks_in_last_internal_release
 			;;
 		*)
 			echo "Invalid release type: ${release_type}" >&2
