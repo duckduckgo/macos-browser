@@ -98,7 +98,7 @@ enum ContextualMenu {
 private extension ContextualMenu {
 
     static func menuForNoSelection() -> NSMenu {
-        NSMenu(items: [addFolderMenuItem()])
+        NSMenu(items: [addFolderMenuItem(folder: nil)])
     }
 
     static func menu(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool) -> NSMenu {
@@ -111,31 +111,31 @@ private extension ContextualMenu {
 
     static func menuItems(for bookmark: Bookmark?, parent: BookmarkFolder?, isFavorite: Bool) -> [NSMenuItem] {
         [
-            openBookmarkInNewTabMenuItem().bookmark(bookmark),
-            openBookmarkInNewWindowMenuItem().bookmark(bookmark),
+            openBookmarkInNewTabMenuItem(bookmark: bookmark),
+            openBookmarkInNewWindowMenuItem(bookmark: bookmark),
             NSMenuItem.separator(),
-            addBookmarkToFavoritesMenuItem(isFavorite: isFavorite).bookmark(bookmark),
+            addBookmarkToFavoritesMenuItem(isFavorite: isFavorite, bookmark: bookmark),
             NSMenuItem.separator(),
-            editBookmarkMenuItem().bookmark(bookmark),
-            copyBookmarkMenuItem().bookmark(bookmark),
-            deleteBookmarkMenuItem().bookmark(bookmark),
-            moveToEndMenuItem().entityInfo(bookmark, parent: parent),
+            editBookmarkMenuItem(bookmark: bookmark),
+            copyBookmarkMenuItem(bookmark: bookmark),
+            deleteBookmarkMenuItem(bookmark: bookmark),
+            moveToEndMenuItem(entity: bookmark, parent: parent),
             NSMenuItem.separator(),
-            addFolderMenuItem(),
+            addFolderMenuItem(folder: nil),
             manageBookmarksMenuItem(),
         ]
     }
 
     static func menuItems(for folder: BookmarkFolder?, parent: BookmarkFolder?) -> [NSMenuItem] {
         [
-            openInNewTabsMenuItem().folder(folder),
-            openAllInNewWindowMenuItem().folder(folder),
+            openInNewTabsMenuItem(folder: folder),
+            openAllInNewWindowMenuItem(folder: folder),
             NSMenuItem.separator(),
-            editFolderMenuItem().entityInfo(folder, parent: parent),
-            deleteFolderMenuItem().folder(folder),
-            moveToEndMenuItem().entityInfo(folder, parent: parent),
+            editFolderMenuItem(folder: folder, parent: parent),
+            deleteFolderMenuItem(folder: folder),
+            moveToEndMenuItem(entity: folder, parent: parent),
             NSMenuItem.separator(),
-            addFolderMenuItem().folder(folder),
+            addFolderMenuItem(folder: folder),
             manageBookmarksMenuItem(),
         ]
     }
@@ -148,21 +148,21 @@ private extension ContextualMenu {
 
     // MARK: - Single Bookmark Menu Items
 
-    static func openBookmarkInNewTabMenuItem() -> NSMenuItem {
-        menuItem(UserText.openInNewTab, #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)))
+    static func openBookmarkInNewTabMenuItem(bookmark: Bookmark?) -> NSMenuItem {
+        menuItem(UserText.openInNewTab, #selector(BookmarkMenuItemSelectors.openBookmarkInNewTab(_:)), bookmark)
     }
 
-    static func openBookmarkInNewWindowMenuItem() -> NSMenuItem {
-        menuItem(UserText.openInNewWindow, #selector(BookmarkMenuItemSelectors.openBookmarkInNewWindow(_:)))
+    static func openBookmarkInNewWindowMenuItem(bookmark: Bookmark?) -> NSMenuItem {
+        menuItem(UserText.openInNewWindow, #selector(BookmarkMenuItemSelectors.openBookmarkInNewWindow(_:)), bookmark)
     }
 
     static func manageBookmarksMenuItem() -> NSMenuItem {
         menuItem(UserText.bookmarksManageBookmarks, #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
     }
 
-    static func addBookmarkToFavoritesMenuItem(isFavorite: Bool) -> NSMenuItem {
+    static func addBookmarkToFavoritesMenuItem(isFavorite: Bool, bookmark: Bookmark?) -> NSMenuItem {
         let title = isFavorite ? UserText.removeFromFavorites : UserText.addToFavorites
-        return menuItem(title, #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)))
+        return menuItem(title, #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), bookmark)
     }
 
     static func addBookmarksToFavoritesMenuItem(bookmarks: [Bookmark], allFavorites: Bool) -> NSMenuItem {
@@ -170,42 +170,44 @@ private extension ContextualMenu {
         return menuItem(title, #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), bookmarks)
     }
 
-    static func editBookmarkMenuItem() -> NSMenuItem {
-        menuItem(UserText.editBookmark, #selector(BookmarkMenuItemSelectors.editBookmark(_:)))
+    static func editBookmarkMenuItem(bookmark: Bookmark?) -> NSMenuItem {
+        menuItem(UserText.editBookmark, #selector(BookmarkMenuItemSelectors.editBookmark(_:)), bookmark)
     }
 
-    static func copyBookmarkMenuItem() -> NSMenuItem {
-        menuItem(UserText.copy, #selector(BookmarkMenuItemSelectors.copyBookmark(_:)))
+    static func copyBookmarkMenuItem(bookmark: Bookmark?) -> NSMenuItem {
+        menuItem(UserText.copy, #selector(BookmarkMenuItemSelectors.copyBookmark(_:)), bookmark)
     }
 
-    static func deleteBookmarkMenuItem() -> NSMenuItem {
-        menuItem(UserText.bookmarksBarContextMenuDelete, #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)))
+    static func deleteBookmarkMenuItem(bookmark: Bookmark?) -> NSMenuItem {
+        menuItem(UserText.bookmarksBarContextMenuDelete, #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), bookmark)
     }
 
-    static func moveToEndMenuItem() -> NSMenuItem {
-        menuItem(UserText.bookmarksBarContextMenuMoveToEnd, #selector(BookmarkMenuItemSelectors.moveToEnd(_:)))
+    static func moveToEndMenuItem(entity: BaseBookmarkEntity?, parent: BookmarkFolder?) -> NSMenuItem {
+        let bookmarkEntityInfo = entity.flatMap { BookmarkEntityInfo(entity: $0, parent: parent) }
+        return menuItem(UserText.bookmarksBarContextMenuMoveToEnd, #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), bookmarkEntityInfo)
     }
 
     // MARK: - Bookmark Folder Menu Items
 
-    static func openInNewTabsMenuItem() -> NSMenuItem {
-        menuItem(UserText.openAllInNewTabs, #selector(FolderMenuItemSelectors.openInNewTabs(_:)))
+    static func openInNewTabsMenuItem(folder: BookmarkFolder?) -> NSMenuItem {
+        menuItem(UserText.openAllInNewTabs, #selector(FolderMenuItemSelectors.openInNewTabs(_:)), folder)
     }
 
-    static func openAllInNewWindowMenuItem() -> NSMenuItem {
-        menuItem(UserText.openAllTabsInNewWindow, #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)))
+    static func openAllInNewWindowMenuItem(folder: BookmarkFolder?) -> NSMenuItem {
+        menuItem(UserText.openAllTabsInNewWindow, #selector(FolderMenuItemSelectors.openAllInNewWindow(_:)), folder)
     }
 
-    static func addFolderMenuItem() -> NSMenuItem {
-        menuItem(UserText.addFolder, #selector(FolderMenuItemSelectors.newFolder(_:)))
+    static func addFolderMenuItem(folder: BookmarkFolder?) -> NSMenuItem {
+        menuItem(UserText.addFolder, #selector(FolderMenuItemSelectors.newFolder(_:)), folder)
     }
 
-    static func editFolderMenuItem() -> NSMenuItem {
-        menuItem(UserText.editBookmark, #selector(FolderMenuItemSelectors.editFolder(_:)))
+    static func editFolderMenuItem(folder: BookmarkFolder?, parent: BookmarkFolder?) -> NSMenuItem {
+        let folderEntityInfo = folder.flatMap { BookmarkEntityInfo(entity: $0, parent: parent) }
+        return menuItem(UserText.editBookmark, #selector(FolderMenuItemSelectors.editFolder(_:)), folderEntityInfo)
     }
 
-    static func deleteFolderMenuItem() -> NSMenuItem {
-        menuItem(UserText.bookmarksBarContextMenuDelete, #selector(FolderMenuItemSelectors.deleteFolder(_:)))
+    static func deleteFolderMenuItem(folder: BookmarkFolder?) -> NSMenuItem {
+        menuItem(UserText.bookmarksBarContextMenuDelete, #selector(FolderMenuItemSelectors.deleteFolder(_:)), folder)
     }
 
     // MARK: - Multi-Item Menu Creation
@@ -242,26 +244,6 @@ private extension ContextualMenu {
         menu.items = menuItems
 
         return menu
-    }
-
-}
-
-private extension NSMenuItem {
-
-    func bookmark(_ bookmark: Bookmark?) -> NSMenuItem {
-        representedObject = bookmark
-        return self
-    }
-
-    func folder(_ folder: BookmarkFolder?) -> NSMenuItem {
-        representedObject = folder
-        return self
-    }
-
-    func entityInfo(_ entity: BaseBookmarkEntity?, parent: BookmarkFolder?) -> NSMenuItem {
-        guard let entity else { return self }
-        representedObject = BookmarkEntityInfo(entity: entity, parent: parent)
-        return self
     }
 
 }
