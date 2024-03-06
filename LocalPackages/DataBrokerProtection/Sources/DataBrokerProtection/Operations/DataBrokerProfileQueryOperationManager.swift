@@ -279,6 +279,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             return
         }
 
+        let retriesCalculatorUseCase = OperationRetriesCalculatorUseCase()
         let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
@@ -319,6 +320,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
 
+            let tries = retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+            stageDurationCalculator.fireOptOutSubmitSuccess(tries: tries)
+
             let updater = OperationPreferredDateUpdaterUseCase(database: database)
             updater.updateChildrenBrokerForParentBroker(brokerProfileQueryData.dataBroker,
                                                         profileQueryId: profileQueryId)
@@ -330,7 +334,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                 startTime: stageDurationCalculator.startTime)
             database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
         } catch {
-            stageDurationCalculator.fireOptOutFailure()
+            let tries = retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+            stageDurationCalculator.fireOptOutFailure(tries: tries)
             handleOperationError(
                 origin: .optOut,
                 brokerId: brokerId,
