@@ -99,7 +99,9 @@ extension DataBrokerOperation {
         if action.needsEmail {
             do {
                 stageCalculator?.setStage(.emailGenerate)
-                extractedProfile?.email = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url)
+                let emailData = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url)
+                extractedProfile?.email = emailData.emailAddress
+                stageCalculator?.setEmailPattern(emailData.pattern)
                 stageCalculator?.fireOptOutEmailGenerate()
             } catch {
                 await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))

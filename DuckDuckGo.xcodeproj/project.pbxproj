@@ -683,7 +683,6 @@
 		3706FCD9293F65D500E42796 /* trackers-1.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439732754D55100B241FA /* trackers-1.json */; };
 		3706FCDA293F65D500E42796 /* dark-trackers-1.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439762754D55100B241FA /* dark-trackers-1.json */; };
 		3706FCDB293F65D500E42796 /* Feedback.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA3863C427A1E28F00749AB5 /* Feedback.storyboard */; };
-		3706FCDE293F65D500E42796 /* HomePageAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */; };
 		3706FCDF293F65D500E42796 /* shield-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E627E8809D00036718 /* shield-mouse-over.json */; };
 		3706FCE1293F65D500E42796 /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
 		3706FCE2293F65D500E42796 /* dark-trackers-3.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439772754D55100B241FA /* dark-trackers-3.json */; };
@@ -1956,7 +1955,6 @@
 		4B957C122AC7AE700062CA31 /* trackers-1.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439732754D55100B241FA /* trackers-1.json */; };
 		4B957C132AC7AE700062CA31 /* dark-trackers-1.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439762754D55100B241FA /* dark-trackers-1.json */; };
 		4B957C142AC7AE700062CA31 /* Feedback.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA3863C427A1E28F00749AB5 /* Feedback.storyboard */; };
-		4B957C172AC7AE700062CA31 /* HomePageAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */; };
 		4B957C182AC7AE700062CA31 /* shield-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E627E8809D00036718 /* shield-mouse-over.json */; };
 		4B957C1A2AC7AE700062CA31 /* PermissionAuthorization.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B64C84DD2692D7400048FEBE /* PermissionAuthorization.storyboard */; };
 		4B957C1B2AC7AE700062CA31 /* dark-trackers-3.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439772754D55100B241FA /* dark-trackers-3.json */; };
@@ -2343,7 +2341,6 @@
 		85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */; };
 		85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B3425DA82A600C7D2AA /* DataTaskProviding.swift */; };
 		85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */; };
-		85AC7AD927BD625000FFB69B /* HomePageAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */; };
 		85AC7ADB27BD628400FFB69B /* HomePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC7ADA27BD628400FFB69B /* HomePage.swift */; };
 		85AC7ADD27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC7ADC27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift */; };
 		85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85B7184927677C2D00B4277F /* Onboarding.storyboard */; };
@@ -2757,6 +2754,9 @@
 		B65DA5F32A77D3C700CBEE8D /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
 		B65DA5F42A77D3FA00CBEE8D /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
 		B65DA5F52A77D3FA00CBEE8D /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
+		B65E5DAF2B74DE6D00480415 /* TrackerNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65E5DAE2B74DE6D00480415 /* TrackerNetwork.swift */; };
+		B65E5DB02B74E6A900480415 /* TrackerNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65E5DAE2B74DE6D00480415 /* TrackerNetwork.swift */; };
+		B65E5DB12B74E6AA00480415 /* TrackerNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65E5DAE2B74DE6D00480415 /* TrackerNetwork.swift */; };
 		B65E6B9E26D9EC0800095F96 /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65E6B9D26D9EC0800095F96 /* CircularProgressView.swift */; };
 		B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */; };
 		B6619EF62B10DFF700CD9186 /* InstructionsFormatParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF52B10DFF700CD9186 /* InstructionsFormatParserTests.swift */; };
@@ -3914,7 +3914,6 @@
 		85AC3B0425D6B1D800C7D2AA /* ScriptSourceProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptSourceProviding.swift; sourceTree = "<group>"; };
 		85AC3B3425DA82A600C7D2AA /* DataTaskProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTaskProviding.swift; sourceTree = "<group>"; };
 		85AC3B4825DAC9BD00C7D2AA /* ConfigurationStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStorageTests.swift; sourceTree = "<group>"; };
-		85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = HomePageAssets.xcassets; sourceTree = "<group>"; };
 		85AC7ADA27BD628400FFB69B /* HomePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePage.swift; sourceTree = "<group>"; };
 		85AC7ADC27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageDefaultBrowserModel.swift; sourceTree = "<group>"; };
 		85AE2FF124A33A2D002D507F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -4241,6 +4240,7 @@
 		B65C7DFA2B886CF0001E2D5C /* WKPDFHUDViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKPDFHUDViewWrapper.swift; sourceTree = "<group>"; };
 		B65CD8D42B316FCA00A595BB /* __Snapshots__ */ = {isa = PBXFileReference; lastKnownFileType = folder; path = __Snapshots__; sourceTree = "<group>"; };
 		B65CD8D72B341FD300A595BB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		B65E5DAE2B74DE6D00480415 /* TrackerNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerNetwork.swift; sourceTree = "<group>"; };
 		B65E6B9D26D9EC0800095F96 /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
 		B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSBezierPathExtension.swift; sourceTree = "<group>"; };
 		B6619EF52B10DFF700CD9186 /* InstructionsFormatParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsFormatParserTests.swift; sourceTree = "<group>"; };
@@ -7148,6 +7148,7 @@
 				1D77921B28FFF26100BE0210 /* RunningApplication */,
 				AA86491424D831C4001BABEE /* View */,
 				4B37EE5B2B4CFC3C00A89A61 /* Surveys */,
+				B65E5DAE2B74DE6D00480415 /* TrackerNetwork.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -7696,7 +7697,6 @@
 				85589E9D27BFE4500038AD11 /* DefaultBrowserPromptView.swift */,
 				85589E9327BFE1E70038AD11 /* FavoritesView.swift */,
 				56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */,
-				85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */,
 				85589E7C27BBB8630038AD11 /* HomePageView.swift */,
 				1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */,
 				85589E7D27BBB8630038AD11 /* HomePageViewController.swift */,
@@ -9016,7 +9016,6 @@
 				3706FCDA293F65D500E42796 /* dark-trackers-1.json in Resources */,
 				3706FCDB293F65D500E42796 /* Feedback.storyboard in Resources */,
 				B658BAB72B0F848D00D1F2C7 /* Localizable.xcstrings in Resources */,
-				3706FCDE293F65D500E42796 /* HomePageAssets.xcassets in Resources */,
 				3706FCDF293F65D500E42796 /* shield-mouse-over.json in Resources */,
 				3706FCE1293F65D500E42796 /* PermissionAuthorization.storyboard in Resources */,
 				3706FCE2293F65D500E42796 /* dark-trackers-3.json in Resources */,
@@ -9144,7 +9143,6 @@
 				4B957C132AC7AE700062CA31 /* dark-trackers-1.json in Resources */,
 				4B957C142AC7AE700062CA31 /* Feedback.storyboard in Resources */,
 				B658BAB92B0F849100D1F2C7 /* Localizable.xcstrings in Resources */,
-				4B957C172AC7AE700062CA31 /* HomePageAssets.xcassets in Resources */,
 				4B957C182AC7AE700062CA31 /* shield-mouse-over.json in Resources */,
 				4B957C1A2AC7AE700062CA31 /* PermissionAuthorization.storyboard in Resources */,
 				4B957C1B2AC7AE700062CA31 /* dark-trackers-3.json in Resources */,
@@ -9262,7 +9260,6 @@
 				AA34397C2754D55100B241FA /* dark-trackers-1.json in Resources */,
 				AA3863C527A1E28F00749AB5 /* Feedback.storyboard in Resources */,
 				B658BAB62B0F845D00D1F2C7 /* Localizable.xcstrings in Resources */,
-				85AC7AD927BD625000FFB69B /* HomePageAssets.xcassets in Resources */,
 				AA7EB6E727E8809D00036718 /* shield-mouse-over.json in Resources */,
 				B64C84DE2692D7400048FEBE /* PermissionAuthorization.storyboard in Resources */,
 				AA34397D2754D55100B241FA /* dark-trackers-3.json in Resources */,
@@ -10318,6 +10315,7 @@
 				3706FC7C293F65D500E42796 /* ImportedBookmarks.swift in Sources */,
 				3706FC7D293F65D500E42796 /* NSMenuExtension.swift in Sources */,
 				3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */,
+				B65E5DB02B74E6A900480415 /* TrackerNetwork.swift in Sources */,
 				3706FC7E293F65D500E42796 /* MainWindowController.swift in Sources */,
 				3706FC7F293F65D500E42796 /* Tab.swift in Sources */,
 				3706FC81293F65D500E42796 /* DispatchQueueExtensions.swift in Sources */,
@@ -11207,6 +11205,7 @@
 				4B957AA92AC7AE700062CA31 /* ContentOverlayPopover.swift in Sources */,
 				4B957AAA2AC7AE700062CA31 /* TabShadowView.swift in Sources */,
 				4B957AAB2AC7AE700062CA31 /* BWMessageIdGenerator.swift in Sources */,
+				B65E5DB12B74E6AA00480415 /* TrackerNetwork.swift in Sources */,
 				31F2D2022AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				4B957AAC2AC7AE700062CA31 /* EncryptedValueTransformer.swift in Sources */,
 				4B957AAD2AC7AE700062CA31 /* Tab+Dialogs.swift in Sources */,
@@ -11669,6 +11668,7 @@
 				B60D64492AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */,
 				3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */,
 				857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */,
+				B65E5DAF2B74DE6D00480415 /* TrackerNetwork.swift in Sources */,
 				37445F992A1566420029F789 /* SyncDataProviders.swift in Sources */,
 				4B9292A426670D2A00AD2C21 /* PasteboardWriting.swift in Sources */,
 				1D26EBAC2B74BECB0002A93F /* NSImageSendable.swift in Sources */,

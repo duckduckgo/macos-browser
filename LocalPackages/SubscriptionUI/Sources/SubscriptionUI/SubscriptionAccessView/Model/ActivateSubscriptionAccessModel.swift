@@ -24,7 +24,7 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
     public var title = UserText.activateModalTitle
     public var description = UserText.activateModalDescription
 
-    public var email: String? = nil
+    public var email: String?
     public var emailLabel: String { UserText.email }
     public var emailDescription = UserText.activateModalEmailDescription
     public var emailButtonTitle = UserText.enterEmailButton

@@ -178,7 +178,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 #endif
     }
 
-    // swiftlint:disable:next function_body_length
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct SubscriptionSelection: Decodable {
             let id: String

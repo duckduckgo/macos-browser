@@ -25,8 +25,8 @@ public struct StandardButtonStyle: ButtonStyle {
 
     public func makeBody(configuration: Self.Configuration) -> some View {
 
-        let backgroundColor = Color("PWMButtonBackground\(configuration.isPressed ? "-Pressed" : "")")
-        let labelColor = Color("PWMButtonLabel")
+        let backgroundColor = configuration.isPressed ? Color(.pwmButtonBackgroundPressed) : Color(.pwmButtonBackground)
+        let labelColor = Color(.pwmButtonLabel)
 
         configuration.label
             .font(.system(size: 13))
@@ -75,7 +75,7 @@ public struct DismissActionButtonStyle: ButtonStyle {
     public init() {}
 
     public func makeBody(configuration: Self.Configuration) -> some View {
-        let backgroundColor = configuration.isPressed ? Color(NSColor.windowBackgroundColor) : Color(NSColor.controlColor)
+        let backgroundColor = configuration.isPressed ? Color(.windowBackgroundColor) : Color(.controlColor)
         let labelColor = Color.primary
         let outerShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
 
@@ -110,7 +110,7 @@ public struct DestructiveActionButtonStyle: ButtonStyle {
     }
 
     public func makeBody(configuration: Self.Configuration) -> some View {
-        let enabledBackgroundColor = configuration.isPressed ? Color("PWMButtonBackground-Pressed") : Color.red
+        let enabledBackgroundColor = configuration.isPressed ? Color(.pwmButtonBackgroundPressed) : .red
         let disabledBackgroundColor = Color.gray.opacity(0.1)
         let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
 
