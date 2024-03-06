@@ -36,7 +36,7 @@ final class ContentBlockingUpdatingTests: XCTestCase {
                                                                                                                                               data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
                                                                                                                                               embeddedDataProvider: AppTrackerDataSetProvider(),
                                                                                                                                               errorReporting: nil),
-                                       configStorage: MockConfigurationStore(), 
+                                       configStorage: MockConfigurationStore(),
                                        webTrackingProtectionPreferences: preferences,
                                        tld: TLD())
     }
