@@ -230,7 +230,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
             case .success(let transactionJWS):
                 purchaseTransactionJWS = transactionJWS
-                break
             case .failure(let error):
                 switch error {
                 case .cancelledByUser:
