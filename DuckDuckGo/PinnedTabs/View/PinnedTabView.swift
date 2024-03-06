@@ -71,10 +71,10 @@ struct PinnedTabView: View {
 
     private var foregroundColor: Color {
         if isSelected {
-            return Color.navigationBarBackground
+            return .navigationBarBackground
         }
         let isHovered = collectionModel.hoveredItem == model
-        return showsHover && isHovered ? Color("TabMouseOverColor") : Color.clear
+        return showsHover && isHovered ? .tabMouseOver : Color.clear
     }
 
     @ViewBuilder
@@ -135,11 +135,11 @@ private struct BorderView: View {
     let size: CGFloat
 
     private var borderColor: Color {
-        isSelected ? Color(TabShadowConfig.colorName) : .clear
+        isSelected ? .tabShadowLine : .clear
     }
 
     private var bottomLineColor: Color {
-        isSelected ? Color.navigationBarBackground : Color(TabShadowConfig.colorName)
+        isSelected ? .navigationBarBackground : .tabShadowLine
     }
 
     private var cornerPixelsColor: Color {
@@ -184,7 +184,7 @@ struct PinnedTabInnerView: View {
             if drawSeparator {
                 GeometryReader { proxy in
                     Rectangle()
-                        .foregroundColor(Color("SeparatorColor"))
+                        .foregroundColor(.separator)
                         .frame(width: 1, height: 20)
                         .offset(x: proxy.size.width-1, y: 6)
                 }
@@ -205,9 +205,9 @@ struct PinnedTabInnerView: View {
             ZStack {
                 Circle()
                     .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
-                    .background(Circle().foregroundColor(Color("PinnedTabMuteStateCircleColor")))
+                    .background(Circle().foregroundColor(.pinnedTabMuteStateCircle))
                     .frame(width: 16, height: 16)
-                Image("Audio-Mute")
+                Image(.audioMute)
                     .resizable()
                     .renderingMode(.template)
                     .frame(width: 12, height: 12)
@@ -236,7 +236,7 @@ struct PinnedTabInnerView: View {
             .cornerRadius(4.0)
         } else {
             ZStack {
-                Image(nsImage: #imageLiteral(resourceName: "Web"))
+                Image(nsImage: .web)
                     .resizable()
                 mutedTabIndicator
             }

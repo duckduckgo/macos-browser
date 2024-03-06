@@ -75,7 +75,7 @@ struct BookmarksBarPromptView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image("BookmarksBarIllustration")
+            Image(.bookmarksBarIllustration)
                 .resizable()
                 .frame(width: 256, height: 96)
                 .padding(.bottom, 16)
@@ -121,7 +121,7 @@ struct BookmarksBarPromptView: View {
         .padding(.top, 20)
         .padding(.bottom, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color("InterfaceBackgroundColor"))
+        .background(Color(.interfaceBackground))
     }
 
 }

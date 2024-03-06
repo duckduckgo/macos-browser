@@ -43,7 +43,7 @@ struct LoginFaviconView: View {
 
     @MainActor(unsafe)
     var favicon: NSImage? {
-        return faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? NSImage(named: "Login")
+        return faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? .login
     }
 
 }

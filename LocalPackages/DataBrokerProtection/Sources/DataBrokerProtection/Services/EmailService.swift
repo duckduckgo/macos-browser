@@ -29,8 +29,13 @@ public enum EmailError: Error, Equatable, Codable {
     case cancelled
 }
 
+struct EmailData: Decodable {
+    let pattern: String?
+    let emailAddress: String
+}
+
 protocol EmailServiceProtocol {
-    func getEmail(dataBrokerURL: String?) async throws -> String
+    func getEmail(dataBrokerURL: String?) async throws -> EmailData
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int,
                              pollingInterval: TimeInterval,
@@ -51,7 +56,7 @@ struct EmailService: EmailServiceProtocol {
         self.redeemUseCase = redeemUseCase
     }
 
-    func getEmail(dataBrokerURL: String? = nil) async throws -> String {
+    func getEmail(dataBrokerURL: String? = nil) async throws -> EmailData {
         var urlString = Constants.baseUrl + "/generate"
 
         if let dataBrokerValue = dataBrokerURL {
@@ -68,10 +73,9 @@ struct EmailService: EmailServiceProtocol {
 
         let (data, _) = try await urlSession.data(for: request)
 
-        if let resJson = try? JSONSerialization.jsonObject(with: data) as? [String: AnyObject],
-           let email = resJson["emailAddress"] as? String {
-            return email
-        } else {
+        do {
+            return try JSONDecoder().decode(EmailData.self, from: data)
+        } catch {
             throw EmailError.cantFindEmail
         }
     }

@@ -43,7 +43,7 @@ extension Preferences {
 
                 PreferencePaneSection {
                     HStack {
-                        Image("AboutPageLogo")
+                        Image(.aboutPageLogo)
                         VStack(alignment: .leading, spacing: 8) {
 #if APPSTORE
                             Text(UserText.duckDuckGoForMacAppStore).font(.companyName)
@@ -54,7 +54,7 @@ extension Preferences {
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                                 .onTapGesture(count: 12) {
-#if NETWORK_PROTECTION && !SUBSCRIPTION
+#if NETWORK_PROTECTION
                                     model.displayNetPInvite()
 #endif
                                 }
@@ -121,7 +121,7 @@ extension Preferences {
         }
 
         var body: some View {
-            let image = Image("Alert-Color-16")
+            let image = Image(.alertColor16)
                 .resizable()
                 .frame(width: 16, height: 16)
                 .padding(.trailing, 4)
@@ -150,7 +150,7 @@ extension Preferences {
                 }
             }
             .padding()
-            .background(Color("UnsupportedOSWarningColor"))
+            .background(Color.unsupportedOSWarning)
             .cornerRadius(8)
             .frame(width: width, height: height)
         }

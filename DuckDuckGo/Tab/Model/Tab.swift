@@ -63,11 +63,12 @@ protocol NewWindowPolicyDecisionMaker {
         case none
         case dataBrokerProtection
         case subscription(URL)
+        case identityTheftRestoration(URL)
 
         enum URLSource: Equatable {
             case pendingStateRestoration
             case loadedByStateRestoration
-            case userEntered(String)
+            case userEntered(String, downloadRequested: Bool = false)
             case historyEntry
             case bookmark
             case ui
@@ -78,7 +79,7 @@ protocol NewWindowPolicyDecisionMaker {
             case webViewUpdated
 
             var userEnteredValue: String? {
-                if case .userEntered(let userEnteredValue) = self {
+                if case .userEntered(let userEnteredValue, _) = self {
                     userEnteredValue
                 } else {
                     nil
@@ -91,6 +92,8 @@ protocol NewWindowPolicyDecisionMaker {
 
             var navigationType: NavigationType {
                 switch self {
+                case .userEntered(_, downloadRequested: true):
+                    .custom(.userRequestedPageDownload)
                 case .userEntered:
                     .custom(.userEnteredUrl)
                 case .pendingStateRestoration:
@@ -138,8 +141,10 @@ protocol NewWindowPolicyDecisionMaker {
 
 #if SUBSCRIPTION
             if let url {
-                if url.isChild(of: URL.subscriptionBaseURL) || url.isChild(of: URL.identityTheftRestoration) {
+                if url.isChild(of: URL.subscriptionBaseURL) {
                     return .subscription(url)
+                } else if url.isChild(of: URL.identityTheftRestoration) {
+                    return .identityTheftRestoration(url)
                 }
             }
 #endif
@@ -172,7 +177,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isDisplayable: Bool {
             switch self {
-            case .settings, .bookmarks, .dataBrokerProtection:
+            case .settings, .bookmarks, .dataBrokerProtection, .subscription, .identityTheftRestoration:
                 return true
             default:
                 return false
@@ -187,6 +192,10 @@ protocol NewWindowPolicyDecisionMaker {
                 return true
             case (.dataBrokerProtection, .dataBrokerProtection):
                 return true
+            case (.subscription, .subscription):
+                return true
+            case (.identityTheftRestoration, .identityTheftRestoration):
+                return true
             default:
                 return false
             }
@@ -199,7 +208,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
             case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
-            case .subscription: return nil
+            case .subscription, .identityTheftRestoration: return nil
             }
         }
 
@@ -231,7 +240,7 @@ protocol NewWindowPolicyDecisionMaker {
                 return .welcome
             case .dataBrokerProtection:
                 return .dataBrokerProtection
-            case .subscription(let url):
+            case .subscription(let url), .identityTheftRestoration(let url):
                 return url
             case .none:
                 return nil
@@ -240,7 +249,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isUrl: Bool {
             switch self {
-            case .url, .subscription:
+            case .url, .subscription, .identityTheftRestoration:
                 return true
             default:
                 return false
@@ -258,6 +267,14 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isUserEnteredUrl: Bool {
             userEnteredValue != nil
+        }
+
+        var isUserRequestedPageDownload: Bool {
+            if case .url(_, credential: _, source: .userEntered(_, downloadRequested: true)) = self {
+                return true
+            } else {
+                return false
+            }
         }
 
         var displaysContentInWebView: Bool {
@@ -690,10 +707,7 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 
-        let title = webView.title?.trimmingWhitespace()
-        if title != self.title {
-            self.title = title
-        }
+        self.title = webView.title?.trimmingWhitespace()
 
         if let wkBackForwardListItem = webView.backForwardList.currentItem,
            content.urlForWebView == wkBackForwardListItem.url,
@@ -985,7 +999,7 @@ protocol NewWindowPolicyDecisionMaker {
             let forceReload = url.absoluteString == source.userEnteredValue ? shouldLoadInBackground : (source == .reload)
             return (url, source, forceReload: forceReload)
 
-        case .subscription(let url):
+        case .subscription(let url), .identityTheftRestoration(let url):
             return (url, .ui, forceReload: false)
 
         case .newtab, .bookmarks, .onboarding, .dataBrokerProtection, .settings:
@@ -1010,7 +1024,7 @@ protocol NewWindowPolicyDecisionMaker {
             return nil
         }
 
-        if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading {
+        if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading, !content.isUserRequestedPageDownload {
             return reload()
         }
         if restoreInteractionStateIfNeeded() { return nil /* session restored */ }

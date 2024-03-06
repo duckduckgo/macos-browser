@@ -195,6 +195,9 @@ final class FakeStageDurationCalculator: StageDurationCalculator {
     func fireOptOutStart() {
     }
 
+    func setEmailPattern(_ emailPattern: String?) {
+    }
+
     func fireOptOutEmailGenerate() {
     }
 

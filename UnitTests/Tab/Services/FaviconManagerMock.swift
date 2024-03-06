@@ -29,7 +29,7 @@ final class FaviconManagerMock: FaviconManagement {
     @Published var areFaviconsLoaded = true
     var faviconsLoadedPublisher: Published<Bool>.Publisher { $areFaviconsLoaded }
 
-    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping (Favicon?) -> Void) {
+    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping @MainActor (Favicon?) -> Void) {
         completion(nil)
     }
 
@@ -49,12 +49,12 @@ final class FaviconManagerMock: FaviconManagement {
         return nil
     }
 
-    func burnExcept(fireproofDomains: DuckDuckGo_Privacy_Browser.FireproofDomains, bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, savedLogins: Set<String>, completion: @escaping () -> Void) {
+    func burnExcept(fireproofDomains: DuckDuckGo_Privacy_Browser.FireproofDomains, bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, savedLogins: Set<String>, completion: @escaping @MainActor () -> Void) {
         completion()
     }
 
     // swiftlint:disable:next function_parameter_count
-    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, exceptExistingHistory history: History, tld: Common.TLD, completion: @escaping () -> Void) {
+    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, exceptExistingHistory history: History, tld: Common.TLD, completion: @escaping @MainActor () -> Void) {
         completion()
     }
 }
