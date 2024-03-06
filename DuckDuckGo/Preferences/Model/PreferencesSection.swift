@@ -40,20 +40,10 @@ struct PreferencesSection: Hashable, Identifiable {
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .dataClearing]
 
-#if SUBSCRIPTION
-
-            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
-                if let generalIndex = panes.firstIndex(of: .general) {
-                    panes.insert(.sync, at: generalIndex + 1)
-                }
-            }
-
-#else
-
             if includingSync {
                 panes.insert(.sync, at: 1)
             }
-#endif
+
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
             }
@@ -61,25 +51,22 @@ struct PreferencesSection: Hashable, Identifiable {
             return panes
         }()
 
-#if SUBSCRIPTION
-        var shouldIncludeSubscriptionPane = false
-        if AccountManager().isUserAuthenticated || SubscriptionPurchaseEnvironment.canPurchase {
-            shouldIncludeSubscriptionPane = true
-        }
+        let otherPanes: [PreferencePaneIdentifier] = [.about, .otherPlatforms]
 
-        return [
-            .init(id: .privacyProtections, panes: privacyPanes),
-            (shouldIncludeSubscriptionPane ? .init(id: .privacyPro, panes: [.subscription]) : nil),
-            .init(id: .regularPreferencePanes, panes: regularPanes),
-            .init(id: .about, panes: [.about, .otherPlatforms])
-        ].compactMap { $0 }
-#else
-        return [
+        var sections: [PreferencesSection] = [
             .init(id: .privacyProtections, panes: privacyPanes),
             .init(id: .regularPreferencePanes, panes: regularPanes),
-            .init(id: .about, panes: [.about, .otherPlatforms])
-        ].compactMap { $0 }
+            .init(id: .about, panes: otherPanes)
+        ]
+
+#if SUBSCRIPTION
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+            let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+            sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
+        }
 #endif
+
+        return sections
     }
 }
 

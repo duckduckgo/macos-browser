@@ -54,9 +54,11 @@ public struct NetworkProtectionStatusView: View {
                 PromptActionView(model: promptActionViewModel)
                     .padding(.horizontal, 5)
                     .padding(.top, 5)
+                    .transition(.slide)
             } else {
                 if let healthWarning = model.issueDescription {
                     connectionHealthWarningView(message: healthWarning)
+                        .transition(.slide)
                 }
             }
 
@@ -67,12 +69,14 @@ public struct NetworkProtectionStatusView: View {
 
             if model.showDebugInformation {
                 DebugInformationView(model: DebugInformationViewModel())
+                    .transition(.slide)
             }
 
             bottomMenuView()
         }
         .padding(5)
         .frame(maxWidth: 350, alignment: .top)
+        .transition(.slide)
     }
 
     // MARK: - Composite Views
@@ -80,7 +84,7 @@ public struct NetworkProtectionStatusView: View {
     private func connectionHealthWarningView(message: String) -> some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 12) {
-                Image("WarningColored", bundle: Bundle.module)
+                Image(.warningColored)
 
                 /// Text elements in SwiftUI don't expand horizontally more than needed, so we're adding an "optional" spacer at the end so that
                 /// the alert bubble won't shrink if there's not enough text.

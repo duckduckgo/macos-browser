@@ -41,6 +41,18 @@ enum Preferences {
 
         @ObservedObject var model: PreferencesSidebarModel
 
+#if SUBSCRIPTION
+        var subscriptionModel: PreferencesSubscriptionModel?
+#endif
+
+        init(model: PreferencesSidebarModel) {
+            self.model = model
+
+#if SUBSCRIPTION
+            self.subscriptionModel = makeSubscriptionViewModel()
+#endif
+        }
+
         var body: some View {
             HStack(spacing: 0) {
                 Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
@@ -81,7 +93,7 @@ enum Preferences {
 
 #if SUBSCRIPTION
                             case .subscription:
-                                makeSubscriptionView()
+                                SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
 #endif
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
@@ -116,18 +128,37 @@ enum Preferences {
         }
 
 #if SUBSCRIPTION
-        private func makeSubscriptionView() -> some View {
+        private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
-                WindowControllersManager.shared.showTab(with: .subscription(url))
+                DispatchQueue.main.async {
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
+                }
+            }
+
+            let openVPN: () -> Void = {
+                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
+            }
+
+            let openDBP: () -> Void = {
+                DispatchQueue.main.async {
+                    WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+                }
+            }
+
+            let openITR: () -> Void = {
+                DispatchQueue.main.async {
+                    WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+                }
             }
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
-                                                                      openURLHandler: openURL,
-                                                                      goToSyncPreferences: { self.model.selectPane(.sync) })
+                                                                      openURLHandler: openURL)
 
-            let model = PreferencesSubscriptionModel(openURLHandler: openURL,
-                                                     sheetActionHandler: sheetActionHandler)
-            return SubscriptionUI.PreferencesSubscriptionView(model: model)
+            return PreferencesSubscriptionModel(openURLHandler: openURL,
+                                                openVPNHandler: openVPN,
+                                                openDBPHandler: openDBP,
+                                                openITRHandler: openITR,
+                                                sheetActionHandler: sheetActionHandler)
         }
 #endif
     }

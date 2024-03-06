@@ -21,6 +21,7 @@ import Combine
 import ContentBlocking
 import Foundation
 import PrivacyDashboard
+import History
 
 /**
  Tab Extensions should conform to TabExtension protocol
@@ -77,6 +78,7 @@ typealias TabExtensionsBuilderArguments = (
     isTabPinned: () -> Bool,
     isTabBurner: Bool,
     contentPublisher: AnyPublisher<Tab.TabContent, Never>,
+    setContent: (Tab.TabContent) -> Void,
     titlePublisher: AnyPublisher<String?, Never>,
     userScriptsPublisher: AnyPublisher<UserScripts?, Never>,
     inheritedAttribution: AdClickAttributionLogic.State?,
@@ -161,7 +163,7 @@ extension TabExtensionsBuilder {
                                  isBurner: args.isTabBurner)
         }
         add {
-            SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)
+            SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher, setContent: args.setContent)
         }
         add {
             HistoryTabExtension(isBurner: args.isTabBurner,

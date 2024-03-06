@@ -1,6 +1,7 @@
 {
-  "name": "searchpeoplefree.com",
-  "version": "0.1.1",
+  "name": "Search People FREE",
+  "url": "searchpeoplefree.com",
+  "version": "0.1.5",
   "parent": "peoplefinders.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "2b537ff2-8967-465c-ad5c-c4c2d31f60e1",
+          "id": "a85625a6-4607-4fea-9fa4-38294a7de727",
           "url": "https://searchpeoplefree.com/find/${firstName}-${lastName}/${state}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "70728718-fe02-43f6-b86f-6d6c6bbbf009",
+          "id": "f41ee88d-149e-48ac-9371-efbaa151c773",
           "selector": "//li[@class='toc l-i mb-5']",
           "profile": {
             "name": {
@@ -50,7 +51,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": ".//a[contains(@class, 'btn-continue')]"
+              "selector": ".//a[contains(@class, 'btn-continue')]",
+              "identifierType": "path",
+              "identifier": "https://www.searchpeoplefree.com/find/${firstName}-${lastName}/${id}"
             }
           }
         }

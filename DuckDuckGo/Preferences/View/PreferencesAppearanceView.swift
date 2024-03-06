@@ -47,7 +47,7 @@ extension Preferences {
         private var selectionBackground: some View {
             if isSelected {
                 RoundedRectangle(cornerRadius: 6)
-                    .stroke(Color("LinkBlueColor"), lineWidth: 2)
+                    .stroke(Color(.linkBlue), lineWidth: 2)
             }
         }
 

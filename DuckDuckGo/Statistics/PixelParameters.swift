@@ -161,7 +161,11 @@ extension Pixel.Event {
              .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn,
              .dataBrokerProtectionRemoteMessageOpened,
              .dataBrokerProtectionRemoteMessageDisplayed,
-             .dataBrokerProtectionRemoteMessageDismissed:
+             .dataBrokerProtectionRemoteMessageDismissed,
+             .dataBrokerDisableAndDeleteDaily,
+             .dataBrokerEnableLoginItemDaily,
+             .dataBrokerDisableLoginItemDaily,
+             .dataBrokerResetLoginItemDaily:
             return nil
         }
     }
@@ -224,7 +228,6 @@ extension Pixel.Event.Debug {
                 .webKitDidTerminate,
                 .removedInvalidBookmarkManagedObjects,
                 .bitwardenNotResponding,
-                .bitwardenRespondedCannotDecrypt,
                 .bitwardenRespondedCannotDecryptUnique,
                 .bitwardenHandshakeFailed,
                 .bitwardenDecryptionOfSharedKeyFailed,

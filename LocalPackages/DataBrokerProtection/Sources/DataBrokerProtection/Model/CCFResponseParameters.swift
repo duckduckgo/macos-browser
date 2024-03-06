@@ -74,17 +74,20 @@ struct CCFSuccessResponse: Decodable {
     let actionID: String
     let actionType: ActionType
     let response: CCFSuccessData?
+    let meta: [String: Any]?
 
     enum CodingKeys: CodingKey {
         case actionID
         case actionType
         case response
+        case meta
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.actionID = try container.decode(String.self, forKey: .actionID)
         self.actionType = try container.decode(ActionType.self, forKey: .actionType)
+        self.meta = try container.decodeIfPresent([String: Any].self, forKey: .meta)
 
         switch actionType {
         case .navigate:

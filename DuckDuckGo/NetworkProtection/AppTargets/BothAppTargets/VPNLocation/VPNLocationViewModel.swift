@@ -69,6 +69,11 @@ final class VPNLocationViewModel: ObservableObject {
         await reloadList()
     }
 
+    func onViewDisappered() async {
+        selectedLocation = settings.selectedLocation
+        await reloadList()
+    }
+
     func onNearestItemSelection() async {
         DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount, includeAppVersionParameter: true)
         selectedLocation = .nearest
@@ -186,7 +191,8 @@ extension NetworkProtectionLocationListCompositeRepository {
         self.init(
             environment: settings.selectedEnvironment,
             tokenStore: NetworkProtectionKeychainTokenStore(),
-            errorEvents: .networkProtectionAppDebugEvents
+            errorEvents: .networkProtectionAppDebugEvents,
+            isSubscriptionEnabled: false
         )
     }
 }

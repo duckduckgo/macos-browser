@@ -1,6 +1,7 @@
 {
-  "name": "cyberbackgroundchecks.com",
-  "version": "0.1.1",
+  "name": "Cyber Background Checks",
+  "url": "cyberbackgroundchecks.com",
+  "version": "0.1.5",
   "parent": "peoplefinders.com",
   "addedDatetime": 1705644000000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "4b7037f3-9c6a-42b5-929e-621256e0a044",
+          "id": "9f5caaf9-5bd7-494e-bfbb-e33c4927cdb3",
           "url": "https://www.cyberbackgroundchecks.com/people/${firstName}-${lastName}/${state}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "f36a73d7-9efb-452e-8c60-6d9df2964bcf",
+          "id": "d6c07b68-7a33-45a4-9e8e-ae6f9262ef29",
           "selector": ".card",
           "profile": {
             "name": {
@@ -40,7 +41,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": ".//a[@class='btn btn-primary btn-block']"
+              "selector": ".//a[@class='btn btn-primary btn-block']",
+              "identifierType": "path",
+              "identifier": "https://www.cyberbackgroundchecks.com/detail/${firstName}-${middleName}-${lastName}/${id}"
             }
           }
         }

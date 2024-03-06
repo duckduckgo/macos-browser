@@ -24,7 +24,7 @@ struct SyncWithServerView: View {
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
-            Image("Sync-Server-96")
+            Image(.syncServer96)
             SyncUIViews.TextHeader(text: UserText.syncWithServerTitle)
             SyncUIViews.TextDetailMultiline(text: UserText.syncWithServerSubtitle1)
             SyncUIViews.TextDetailMultiline(text: UserText.syncWithServerSubtitle2)

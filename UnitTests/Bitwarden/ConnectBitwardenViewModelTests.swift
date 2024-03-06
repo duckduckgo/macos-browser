@@ -44,15 +44,18 @@ final class ConnectBitwardenViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.viewState, .disclaimer)
         viewModel.process(action: .confirm)
 
+        let expectation = expectation(description: "status changed to waitingForConnectionPermission")
+        let c = viewModel.$viewState.sink { viewState in
+            if viewState == .waitingForConnectionPermission {
+                expectation.fulfill()
+            }
+        }
+
         XCTAssertEqual(viewModel.viewState, .lookingForBitwarden)
         bitwardenManager.status = .notRunning
 
-        let predicate = NSPredicate { _, _ in
-            return viewModel.viewState == .waitingForConnectionPermission
-        }
-
-        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: .none)
-        wait(for: [expectation], timeout: 2.0)
+        waitForExpectations(timeout: 1)
+        withExtendedLifetime(c) {}
     }
 
     func testWhenViewModelIsInConnectToBitwardenState_AndNextIsClicked_ThenHandshakeIsSent() {

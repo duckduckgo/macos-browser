@@ -34,7 +34,7 @@ struct HyperLink: View {
 
     var body: some View {
         Text(text)
-            .foregroundColor(isHovering ? Color("LinkBlueColor") : textColor)
+            .foregroundColor(isHovering ? .linkBlue : textColor)
             .optionalUnderline(isHovering)
             .link {
                 isHovering = $0

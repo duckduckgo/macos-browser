@@ -48,7 +48,7 @@ extension Preferences {
                 PreferencePaneSection {
                     if emailManager.isSignedIn {
                         if let userEmail = emailManager.userEmail {
-                            Text("Autofill enabled in this browser for ").foregroundColor(Color("GreyTextColor")) + Text(userEmail).bold()
+                            Text("Autofill enabled in this browser for") + Text(" \(userEmail)").bold()
                         }
                         Button(UserText.emailOptionsMenuManageAccountSubItem + "…") {
                             openNewTab(with: EmailUrls().emailProtectionAccountLink)

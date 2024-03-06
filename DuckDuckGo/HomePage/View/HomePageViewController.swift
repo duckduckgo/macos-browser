@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import SwiftUI
+import History
 
 @MainActor
 final class HomePageViewController: NSViewController {

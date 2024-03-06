@@ -31,6 +31,10 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.fullScreenPlaceholderView))
     }
 
+    func testWebViewRespondsTo_loadAlternateHTMLString() {
+        XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.loadAlternateHTMLString))
+    }
+
     func testWKBackForwardListRespondsTo_removeAllItems() {
         XCTAssertTrue(WKBackForwardList.instancesRespond(to: WKBackForwardList.removeAllItemsSelector))
     }
@@ -43,6 +47,12 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         let pagePrefs = WKWebpagePreferences()
         pagePrefs.customHeaderFields = customHeaderFields.map { [$0] }
         XCTAssertEqual(pagePrefs.customHeaderFields, customHeaderFields.map { [$0] })
+    }
+
+    func testWKPDFHUDViewClassAvailable() {
+        XCTAssertNotNil(WKPDFHUDViewWrapper.WKPDFHUDViewClass)
+        XCTAssertTrue(WKPDFHUDViewWrapper.WKPDFHUDViewClass?.instancesRespond(to: WKPDFHUDViewWrapper.performActionForControlSelector) ==  true)
+        XCTAssertTrue(WKPDFHUDViewWrapper.WKPDFHUDViewClass?.instancesRespond(to: WKPDFHUDViewWrapper.setVisibleSelector) ==  true)
     }
 
 }

@@ -31,7 +31,6 @@ final class TabBarViewController: NSViewController {
     }
 
     @IBOutlet weak var visualEffectBackgroundView: NSVisualEffectView!
-    @IBOutlet weak var gradientBackgroundView: GradientView!
     @IBOutlet weak var pinnedTabsContainerView: NSView!
     @IBOutlet private weak var collectionView: TabBarCollectionView!
     @IBOutlet private weak var scrollView: TabBarScrollView!
@@ -168,9 +167,9 @@ final class TabBarViewController: NSViewController {
         if tabCollectionViewModel.isBurner {
             burnerWindowBackgroundView.isHidden = false
             fireButton.isAnimationEnabled = false
-            fireButton.backgroundColor = NSColor.fireButtonRedBackgroundColor
-            fireButton.mouseOverColor = NSColor.fireButtonRedHoverColor
-            fireButton.mouseDownColor = NSColor.fireButtonRedPressedColor
+            fireButton.backgroundColor = NSColor.fireButtonRedBackground
+            fireButton.mouseOverColor = NSColor.fireButtonRedHover
+            fireButton.mouseDownColor = NSColor.fireButtonRedPressed
             fireButton.normalTintColor = NSColor.white
             fireButton.mouseDownTintColor = NSColor.white
             fireButton.mouseOverTintColor = NSColor.white
@@ -314,6 +313,8 @@ final class TabBarViewController: NSViewController {
             removeFireproofing(from: tab)
         case let .close(index):
             tabCollectionViewModel.remove(at: .pinned(index))
+        case let .muteOrUnmute(tab):
+            tab.muteUnmuteTab()
         }
     }
 
@@ -486,7 +487,7 @@ final class TabBarViewController: NSViewController {
             if dividedWidth < TabBarViewItem.Width.minimumSelected.rawValue {
                 dividedWidth = (tabsWidth - TabBarViewItem.Width.minimumSelected.rawValue) / (numberOfItems - 1)
             }
-            return min(TabBarViewItem.Width.maximum.rawValue, max(minimumWidth, dividedWidth))
+            return min(TabBarViewItem.Width.maximum.rawValue, max(minimumWidth, dividedWidth)).rounded()
         } else {
             return minimumWidth
         }
@@ -558,11 +559,7 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Tab Preview
 
-    private var tabPreviewWindowController: TabPreviewWindowController = {
-        let storyboard = NSStoryboard(name: "TabPreview", bundle: nil)
-        // swiftlint:disable:next force_cast
-        return storyboard.instantiateController(withIdentifier: "TabPreviewWindowController") as! TabPreviewWindowController
-    }()
+    private lazy var tabPreviewWindowController = TabPreviewWindowController()
 
     private func showTabPreview(for tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
@@ -1105,6 +1102,17 @@ extension TabBarViewController: TabBarViewItemDelegate {
         fireproof(tab)
     }
 
+    func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
+        else {
+            assertionFailure("TabBarViewController: Failed to get tab from tab bar view item")
+            return
+        }
+
+        tab.muteUnmuteTab()
+    }
+
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
@@ -1114,6 +1122,16 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         removeFireproofing(from: tab)
+    }
+
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
+        else {
+            return .notSupported
+        }
+
+        return tab.audioState
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {

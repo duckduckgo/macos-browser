@@ -39,7 +39,7 @@ public struct PreferencesSubscriptionView: View {
                     SubscriptionAccessView(model: model.sheetModel)
                 }
                 .sheet(isPresented: $showingRemoveConfirmationDialog) {
-                    SubscriptionDialog(imageName: "Placeholder-96x64",
+                    SubscriptionDialog(imageName: "Privacy-Pro-128",
                                        title: UserText.removeSubscriptionDialogTitle,
                                        description: UserText.removeSubscriptionDialogDescription,
                                        buttons: {
@@ -83,7 +83,7 @@ public struct PreferencesSubscriptionView: View {
             VStack {
                 if model.isUserAuthenticated {
                     UniversalHeaderView {
-                        Image("subscription-active-icon", bundle: .module)
+                        Image(.subscriptionActiveIcon)
                             .padding(4)
                     } content: {
                         TextMenuItemHeader(UserText.preferencesSubscriptionActiveHeader)
@@ -116,15 +116,15 @@ public struct PreferencesSubscriptionView: View {
 
                 } else {
                     UniversalHeaderView {
-                        Image("subscription-inactive-icon", bundle: .module)
+                        Image(.privacyPro)
                             .padding(4)
-                            .background(Color.black.opacity(0.06))
+                            .background(Color("BadgeBackground", bundle: .module))
                             .cornerRadius(4)
                     } content: {
                         TextMenuItemHeader(UserText.preferencesSubscriptionInactiveHeader)
                         TextMenuItemCaption(UserText.preferencesSubscriptionInactiveCaption)
                     } buttons: {
-                        Button(UserText.learnMoreButton) { model.learnMoreAction() }
+                        Button(UserText.purchaseButton) { model.purchaseAction() }
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
                         Button(UserText.haveSubscriptionButton) { showingSheet.toggle() }
                     }
@@ -134,32 +134,32 @@ public struct PreferencesSubscriptionView: View {
                     .foregroundColor(Color.secondary)
                     .padding(.horizontal, -10)
 
-                SectionView(iconName: "vpn-service-icon",
+                SectionView(iconName: "VPN-Icon",
                             title: UserText.vpnServiceTitle,
                             description: UserText.vpnServiceDescription,
-                            buttonName: model.isUserAuthenticated ? "Manage" : nil,
+                            buttonName: model.isUserAuthenticated ? UserText.vpnServiceButtonTitle : nil,
                             buttonAction: { model.openVPN() },
-                            enabled: !model.isUserAuthenticated || model.hasEntitlements)
+                            enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.networkProtection))
 
                 Divider()
                     .foregroundColor(Color.secondary)
 
-                SectionView(iconName: "pir-service-icon",
+                SectionView(iconName: "PIR-Icon",
                             title: UserText.personalInformationRemovalServiceTitle,
                             description: UserText.personalInformationRemovalServiceDescription,
-                            buttonName: model.isUserAuthenticated ? "View" : nil,
+                            buttonName: model.isUserAuthenticated ? UserText.personalInformationRemovalServiceButtonTitle : nil,
                             buttonAction: { model.openPersonalInformationRemoval() },
-                            enabled: !model.isUserAuthenticated || model.hasEntitlements)
+                            enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.dataBrokerProtection))
 
                 Divider()
                     .foregroundColor(Color.secondary)
 
-                SectionView(iconName: "itr-service-icon",
+                SectionView(iconName: "ITR-Icon",
                             title: UserText.identityTheftRestorationServiceTitle,
                             description: UserText.identityTheftRestorationServiceDescription,
-                            buttonName: model.isUserAuthenticated ? "View" : nil,
+                            buttonName: model.isUserAuthenticated ? UserText.identityTheftRestorationServiceButtonTitle : nil,
                             buttonAction: { model.openIdentityTheftRestoration() },
-                            enabled: !model.isUserAuthenticated || model.hasEntitlements)
+                            enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.identityTheftRestoration))
             }
             .padding(10)
             .roundedBorder()
@@ -230,7 +230,7 @@ public struct SectionView: View {
                 HStack(alignment: .center, spacing: 8) {
                     Image(iconName, bundle: .module)
                         .padding(4)
-                        .background(Color("BadgeBackground", bundle: .module))
+                        .background(Color(.badgeBackground))
                         .cornerRadius(4)
 
                     VStack (alignment: .leading) {
@@ -238,12 +238,14 @@ public struct SectionView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .fixMultilineScrollableText()
                             .font(.body)
-                            .foregroundColor(Color("TextPrimary", bundle: .module))
+                            .foregroundColor(Color(.textPrimary))
+                        Spacer()
+                            .frame(height: 4)
                         Text(description)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .fixMultilineScrollableText()
                             .font(.system(size: 11, weight: .regular, design: .default))
-                            .foregroundColor(Color("TextSecondary", bundle: .module))
+                            .foregroundColor(Color(.textSecondary))
                     }
 
                     if let name = buttonName, !name.isEmpty, let action = buttonAction {
@@ -271,12 +273,12 @@ private struct SubscriptionDialog<Buttons>: View where Buttons: View {
             Text(title)
                 .font(.title2)
                 .bold()
-                .foregroundColor(Color("TextPrimary", bundle: .module))
+                .foregroundColor(Color(.textPrimary))
             Text(description)
                 .font(.body)
                 .multilineTextAlignment(.center)
                 .fixMultilineScrollableText()
-                .foregroundColor(Color("TextPrimary", bundle: .module))
+                .foregroundColor(Color(.textPrimary))
         } buttons: {
             buttons()
         }

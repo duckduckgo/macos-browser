@@ -23,7 +23,11 @@ import BrowserServicesKit
 final class WindowsManager {
 
     class var windows: [NSWindow] {
-        return NSApplication.shared.windows
+        NSApplication.shared.windows
+    }
+
+    class var mainWindows: [MainWindow] {
+        NSApplication.shared.windows.compactMap { $0 as? MainWindow }
     }
 
     class func closeWindows(except windows: [NSWindow] = []) {

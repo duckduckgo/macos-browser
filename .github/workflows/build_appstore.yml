@@ -63,13 +63,14 @@ jobs:
     env:
       destination: ${{ github.event.inputs.destination || inputs.destination }}
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      branch: ${{ inputs.branch || github.ref_name }}
 
     steps:
 
     - name: Assert release branch
       if: env.destination == 'appstore'
       run: |
-        case "${{ inputs.branch || github.ref_name }}" in
+        case "${branch}" in
           release/*) ;;
           hotfix/*) ;;
           *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
@@ -82,15 +83,15 @@ jobs:
           ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
     - name: Check out the code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
-        ref: ${{ inputs.branch || github.ref_name }}
+        ref: ${{ env.branch }}
 
     - name: Check if this is an official release build
       id: is-official-release
       env:
-        is-official-release: ${{ env.destination == 'appstore' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
+        is-official-release: ${{ env.destination == 'appstore' && (startsWith(env.branch, 'release') || startsWith(env.branch, 'hotfix')) }}
       run: |
         if [[ "${{ env.is-official-release }}" == "true" ]]; then
           upload_to=s3
@@ -149,6 +150,7 @@ jobs:
         template-name: debug-symbols-uploaded
 
     - name: Send Mattermost message
+      if: success() || failure() # Don't execute when cancelled
       env:
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         DESTINATION: ${{ env.destination }}
@@ -158,8 +160,7 @@ jobs:
         if [[ -z "${MM_USER_HANDLE}" ]]; then
             echo "Mattermost user handle not known for ${{ github.actor }}, skipping sending message"
         else
-
             curl -s -H 'Content-type: application/json' \
-                -d "$(envsubst < ./scripts/assets/appstore-release-mm-template.json)" \
+                -d "$(envsubst < ./scripts/assets/appstore-release-mm-template.json | jq ".${{ job.status }}")" \
                 ${{ secrets.MM_WEBHOOK_URL }}
         fi

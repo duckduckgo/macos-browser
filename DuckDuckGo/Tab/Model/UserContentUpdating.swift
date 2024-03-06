@@ -81,6 +81,7 @@ final class UserContentUpdating {
             .combineLatest(webTrackingProtectionPreferences.$isGPCEnabled)
             .map { $0.0 } // drop gpcEnabled value: $0.1
             .combineLatest(onNotificationWithInitial(.autofillUserSettingsDidChange), combine)
+            .combineLatest(onNotificationWithInitial(.autofillScriptDebugSettingsDidChange), combine)
             // DefaultScriptSourceProvider instance should be created once per rules/config change and fed into UserScripts initialization
             .map(makeValue)
             .assign(to: \.bufferedValue, onWeaklyHeld: self) // buffer latest update value
