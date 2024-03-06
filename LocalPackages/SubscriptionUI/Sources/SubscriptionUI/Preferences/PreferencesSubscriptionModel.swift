@@ -199,15 +199,15 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 }
             }
 
-            if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
-                if !response.isSubscriptionActive {
+            if case .success(let subscription) = await SubscriptionService.getSubscriptionDetails(token: token) {
+                if !subscription.isActive {
                     AccountManager().signOut()
                     return
                 }
 
-                self?.updateDescription(for: response.expiresOrRenewsAt)
+                self?.updateDescription(for: subscription.expiresOrRenewsAt)
 
-                self?.subscriptionPlatform = response.platform
+                self?.subscriptionPlatform = subscription.platform
             }
 
             if case let .success(entitlements) = await AccountManager().fetchEntitlements() {
