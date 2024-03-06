@@ -47,7 +47,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
-#if DEBUG
+#if DEBUG && SUBSCRIPTION
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
         if let token = accountManager.accessToken {
@@ -255,7 +255,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             },
             agentLoginItem: nil,
             isMenuBarStatusView: true,
-            entitlementCheck: entitlementsCheck
+            entitlementCheck: entitlementsCheck,
+            userDefaults: .netP
         )
     }
 
@@ -312,6 +313,24 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         let launchedOnStartup = launchInformation.wasLaunchedByStartup
         launchInformation.update()
 
+#if SUBSCRIPTION
+        let entitlementsCheck = {
+            await AccountManager().hasEntitlement(for: .networkProtection)
+        }
+#else
+        let entitlementsCheck: (() async -> Result<Bool, Error>) = {
+            return .success(true)
+        }
+#endif
+
+        Task {
+            await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { result in
+                if case .invalidEntitlement = result {
+                    UserDefaults.netP.networkProtectionEntitlementsValid = false
+                }
+            }
+        }
+
         if launchedOnStartup {
             Task {
                 let isConnected = await tunnelController.isConnected
@@ -341,6 +360,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             }
         }.store(in: &cancellables)
     }
+
+    private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
 }
 
 extension NSApplication {

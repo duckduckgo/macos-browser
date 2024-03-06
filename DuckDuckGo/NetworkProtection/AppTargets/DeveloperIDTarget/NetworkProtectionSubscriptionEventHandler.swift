@@ -21,6 +21,7 @@
 import Foundation
 import Subscription
 import NetworkProtection
+import NetworkProtectionUI
 
 final class NetworkProtectionSubscriptionEventHandler {
 
@@ -28,15 +29,18 @@ final class NetworkProtectionSubscriptionEventHandler {
     private let networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
+    private let userDefaults: UserDefaults
 
     init(accountManager: AccountManaging = AccountManager(),
          networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming = NetworkProtectionCodeRedemptionCoordinator(),
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
-         networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler()) {
+         networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         userDefaults: UserDefaults = .netP) {
         self.accountManager = accountManager
         self.networkProtectionRedemptionCoordinator = networkProtectionRedemptionCoordinator
         self.networkProtectionTokenStorage = networkProtectionTokenStorage
         self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
+        self.userDefaults = userDefaults
     }
 
     func registerForSubscriptionAccountManagerEvents() {
@@ -49,6 +53,7 @@ final class NetworkProtectionSubscriptionEventHandler {
             assertionFailure("[NetP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }
+        userDefaults.networkProtectionEntitlementsValid = true
 
         Task {
             do {
@@ -63,6 +68,7 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     @objc private func handleAccountDidSignOut() {
         print("[NetP Subscription] Deleted NetP auth token after signing out from Privacy Pro")
+        userDefaults.networkProtectionEntitlementsValid = false
 
         Task {
             await networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)

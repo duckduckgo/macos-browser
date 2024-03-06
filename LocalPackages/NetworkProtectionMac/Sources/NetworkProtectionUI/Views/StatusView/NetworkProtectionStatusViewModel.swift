@@ -116,7 +116,8 @@ extension NetworkProtectionStatusView {
                     agentLoginItem: LoginItem?,
                     isMenuBarStatusView: Bool,
                     runLoopMode: RunLoop.Mode? = nil,
-                    entitlementCheck: @escaping () async -> Swift.Result<Bool, Error>) {
+                    entitlementCheck: @escaping () async -> Swift.Result<Bool, Error>,
+                    userDefaults: UserDefaults) {
 
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -153,16 +154,22 @@ extension NetworkProtectionStatusView {
             }
             .store(in: &cancellables)
 
-            Task {
-                await entitlementsMonitor.start(entitlementCheck: entitlementCheck) { [weak self] result in
-                    switch result {
-                    case .validEntitlement, .error:
-                        self?.shouldShowSubscriptionExpired = false
-                    case .invalidEntitlement:
-                        self?.shouldShowSubscriptionExpired = true
-                    }
-                }
-            }
+            userDefaults
+                .publisher(for: \.networkProtectionEntitlementsValid)
+                .map { !$0 }
+                .assign(to: \.shouldShowSubscriptionExpired, onWeaklyHeld: self)
+                .store(in: &cancellables)
+
+//            Task {
+//                await entitlementsMonitor.start(entitlementCheck: entitlementCheck) { [weak self] result in
+//                    switch result {
+//                    case .validEntitlement, .error:
+//                        self?.shouldShowSubscriptionExpired = false
+//                    case .invalidEntitlement:
+//                        self?.shouldShowSubscriptionExpired = true
+//                    }
+//                }
+//            }
         }
 
         func refreshLoginItemStatus() {

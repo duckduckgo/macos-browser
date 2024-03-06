@@ -107,7 +107,8 @@ final class NetworkProtectionNavBarPopoverManager {
             },
                                                    agentLoginItem: LoginItem.vpnMenu,
                                                    isMenuBarStatusView: false,
-                                                   entitlementCheck: entitlementsCheck)
+                                                   entitlementCheck: entitlementsCheck,
+                                                   userDefaults: .netP)
             popover.delegate = delegate
 
             networkProtectionPopover = popover
