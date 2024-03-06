@@ -54,7 +54,7 @@ runs:
       env:
         USER_ID: ${{ steps.get-asana-user-id.outputs.user-id || steps.get-automation-subtask.outputs.assignee-id }}
       run: |
-        echo "ASSIGNEE_ID=${USER_ID}" >> $GITHUB_OUTPUT
+        echo "assignee-id=${USER_ID}" >> $GITHUB_OUTPUT
 
     - id: process-template-payload
       if: ${{ inputs.template-name }}
