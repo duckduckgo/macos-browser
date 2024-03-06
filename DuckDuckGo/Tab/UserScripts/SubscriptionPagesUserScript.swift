@@ -224,11 +224,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
 
             let emailAccessToken = try? EmailManager().getToken()
+            let purchaseTransactionJWS: String
 
             os_log(.info, log: .subscription, "[Purchase] Purchasing")
             switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
-            case .success:
-                break
+            case .success(let transactionJWS):
+                purchaseTransactionJWS = transactionJWS
             case .failure(let error):
                 switch error {
                 case .cancelledByUser:
@@ -244,7 +245,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
-            switch await AppStorePurchaseFlow.completeSubscriptionPurchase() {
+            switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS) {
             case .success(let purchaseUpdate):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
             case .failure(let error):
