@@ -453,7 +453,7 @@ extension URL {
 
     // MARK: - System Settings
 
-    static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+    static var fullDiskAccess = #URL("x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
 
     // MARK: - Blob URLs
 
@@ -478,6 +478,9 @@ extension URL {
     }
 
     public func isChild(of url: URL) -> Bool {
-        self.absoluteString.hasPrefix(url.absoluteString)
+        var components = URLComponents(string: url.absoluteString)
+        components?.query = nil
+
+        return self.absoluteString.hasPrefix(components?.url?.absoluteString ?? url.absoluteString)
     }
 }

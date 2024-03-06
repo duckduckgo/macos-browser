@@ -23,11 +23,13 @@ import BrowserServicesKit
 final class TabViewModel {
 
     enum Favicon {
-        static let home = NSImage(named: "HomeFavicon")!
-        static let burnerHome = NSImage(named: "BurnerTabFavicon")!
-        static let preferences = NSImage(named: "Preferences")!
-        static let bookmarks = NSImage(named: "Bookmarks")!
-        static let dataBrokerProtection = NSImage(named: "BurnerWindowIcon2")! // PLACEHOLDER: Change it once we have the final icon
+        static let home = NSImage.homeFavicon
+        static let burnerHome = NSImage.burnerTabFavicon
+        static let preferences = NSImage.preferences
+        static let bookmarks = NSImage.bookmarks
+        static let dataBrokerProtection = NSImage.dbpIcon
+        static let subscription = NSImage.subscriptionIcon
+        static let identityTheftRestoration = NSImage.itrIcon
     }
 
     private(set) var tab: Tab
@@ -112,6 +114,10 @@ final class TabViewModel {
                     // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
                     return tab.webViewDidCommitNavigationPublisher.map { .didCommit }.eraseToAnyPublisher()
 
+                case .url(_, _, source: .userEntered(_, downloadRequested: true)):
+                    // don‘t update the address bar for download navigations
+                    return Empty().eraseToAnyPublisher().eraseToAnyPublisher()
+
                 case .url(_, _, source: .pendingStateRestoration),
                      .url(_, _, source: .loadedByStateRestoration),
                      .url(_, _, source: .userEntered),
@@ -126,20 +132,19 @@ final class TabViewModel {
                      .onboarding,
                      .none,
                      .dataBrokerProtection,
-                     .subscription:
+                     .subscription,
+                     .identityTheftRestoration:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
                     return Just( .instant ).eraseToAnyPublisher()
                 }
             }
             .switchToLatest()
-            .sink { [weak self] event in
+            .sink { [weak self] _ in
                 guard let self else { return }
 
                 updateAddressBarStrings()
-                if case .didCommit = event {
-                    updateCanBeBookmarked()
-                    updateFavicon()
-                }
+                updateFavicon()
+                updateCanBeBookmarked()
             }
             .store(in: &cancellables)
     }
@@ -176,9 +181,8 @@ final class TabViewModel {
             .filter { [weak self] _ in
                 self?.tab.isLazyLoadingInProgress == false
             }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.updateFavicon()
+            .sink { [weak self] favicon in
+                self?.updateFavicon(favicon)
             }
             .store(in: &cancellables)
     }
@@ -295,7 +299,7 @@ final class TabViewModel {
             }
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .subscription:
+        case .url, .none, .subscription, .identityTheftRestoration:
             if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
@@ -311,7 +315,7 @@ final class TabViewModel {
         }
     }
 
-    private func updateFavicon() {
+    private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
             favicon = .alertCircleColor16
             return
@@ -334,13 +338,19 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .none, .subscription: break
+        case .subscription:
+            favicon = Favicon.subscription
+            return
+        case .identityTheftRestoration:
+            favicon = Favicon.identityTheftRestoration
+            return
+        case .url, .onboarding, .none: break
         }
 
-        if let favicon = tab.favicon {
+        if let favicon: NSImage? = tabFavicon {
             self.favicon = favicon
         } else {
-            favicon = nil
+            self.favicon = tab.favicon
         }
     }
 

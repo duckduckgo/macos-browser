@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import Combine
+import Macros
 import Navigation
 import WebKit
 import XCTest
-import Combine
-import BrowserServicesKit
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -205,6 +206,6 @@ class TabSnapshotExtensionTests: XCTestCase {
 
 fileprivate extension URL {
 
-    static let aURL = URL(string: "https://example.com")!
+    static let aURL = #URL("https://example.com")
 
 }

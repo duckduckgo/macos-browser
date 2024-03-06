@@ -82,6 +82,11 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         storedCredentials[accountId] = nil
     }
 
+    func deleteAllWebsiteCredentials() throws {
+        storedAccounts.removeAll()
+        storedCredentials.removeAll()
+    }
+
     func neverPromptWebsites() throws -> [SecureVaultModels.NeverPromptWebsites] {
         return storedNeverPromptWebsites
     }
@@ -225,6 +230,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
 // MARK: - Mock Providers
 
+private extension URL {
+    static let duckduckgo = #URL("https://duckduckgo.com/")
+}
+
 class MockDatabaseProvider: AutofillDatabaseProvider {
 
     // swiftlint:disable identifier_name
@@ -240,7 +249,7 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     var db: GRDB.DatabaseWriter
     // swiftlint:enable identifier_name
 
-    required init(file: URL = #URL("https://duckduckgo.com/"), key: Data = Data()) throws {
+    required init(file: URL = .duckduckgo, key: Data = Data()) throws {
         db = try! DatabaseQueue(named: "TestQueue")
     }
 
@@ -274,6 +283,11 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func deleteWebsiteCredentialsForAccountId(_ accountId: Int64) throws {
         self._accounts = self._accounts.filter { $0.id != String(accountId) }
+    }
+
+    func deleteAllWebsiteCredentials() throws {
+        self._accounts.removeAll()
+        self._credentialsDict.removeAll()
     }
 
     func accounts() throws -> [SecureVaultModels.WebsiteAccount] {

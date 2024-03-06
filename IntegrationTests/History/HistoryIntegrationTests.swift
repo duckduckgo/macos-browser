@@ -18,6 +18,7 @@
 
 import Combine
 import Common
+import History
 import Macros
 import Navigation
 import XCTest

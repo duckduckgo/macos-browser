@@ -141,7 +141,7 @@ extension DownloadListItem {
                                            added: Date(),
                                            modified: Date(),
                                            url: #URL("https://duckduckgo.com/testdload"),
-                                           websiteURL: URL(string: "https://duckduckgo.com"),
+                                           websiteURL: #URL("https://duckduckgo.com"),
                                            progress: nil,
                                            isBurner: false,
                                            fileType: .pdf,

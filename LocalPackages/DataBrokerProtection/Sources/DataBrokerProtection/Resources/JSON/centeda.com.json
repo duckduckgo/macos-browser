@@ -1,9 +1,9 @@
 {
   "name": "Centeda",
   "url": "centeda.com",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "parent": "verecor.com",
-  "addedDatetime": 1677715200000,
+  "addedDatetime": 1677736800000,
   "steps": [
     {
       "stepType": "scan",
@@ -11,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "af9c9f03-e778-4c29-85fc-e5cbbfec563c",
+          "id": "ce7caa09-bcf4-4bf9-bc7a-024c2c50bd1f",
           "url": "https://centeda.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -25,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "79fa2a1c-65b4-417a-a8ac-2ca6d729ffc1",
+          "id": "e779b827-702d-402d-ae79-f3681ad50008",
           "selector": ".search-result > a",
           "profile": {
             "name": {
@@ -47,7 +47,9 @@
               "selector": ".//div[@class='col-sm-24 col-md-8 related-to']//li"
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "param",
+              "identifier": "pid"
             }
           }
         }

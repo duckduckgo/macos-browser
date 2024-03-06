@@ -22,8 +22,10 @@ import UniformTypeIdentifiers
 
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class DownloadsTabExtensionTests: XCTestCase {
     private var testData: Data!
+    private var testOriginatingURL: URL!
     private let filename = "Document.pdf"
     private let fileManager = FileManager.default
     private var testDirectory: URL!
@@ -34,6 +36,9 @@ final class DownloadsTabExtensionTests: XCTestCase {
 
         testData = try XCTUnwrap("test".data(using: .utf8))
         testDirectory = fileManager.temporaryDirectory
+        testOriginatingURL = testDirectory.appendingPathComponent(UUID().uuidString + ".pdf")
+        try testData.write(to: testOriginatingURL)
+
         cancellables = []
     }
 
@@ -44,27 +49,44 @@ final class DownloadsTabExtensionTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    @MainActor
-    func testWhenAlwaysRequestDownloadLocationIsTrueThenShouldAskDownloadsTabExtensionToSaveData() throws {
+    func testWhenAlwaysRequestDownloadLocationIsTrueThenShouldAskDownloadsTabExtensionToSaveData() async throws {
         // GIVEN
         let expectedURL = testDirectory.appendingPathComponent(filename)
         let sut = makeSUT(downloadLocation: testDirectory, alwaysRequestDownloadLocation: true)
         XCTAssertFalse(fileManager.fileExists(atPath: expectedURL.path))
 
         // WHEN
-        sut.saveDownloaded(data: testData, suggestedFilename: filename, mimeType: "application/pdf")
         sut.$savePanelDialogRequest
             .sink { request in
                 request?.submit( (url: expectedURL, fileType: nil))
             }
             .store(in: &cancellables)
+        _=try await sut.saveDownloadedData(testData, suggestedFilename: filename, mimeType: "application/pdf",
+                                           originatingURL: testOriginatingURL.appendingPathExtension("fake"))
 
         // THEN
         XCTAssertTrue(fileManager.fileExists(atPath: expectedURL.path))
     }
 
-    @MainActor
-    func testWhenSaveDataAndFileExistThenURLShouldIncrementIndex() throws {
+    func testWhenAlwaysRequestDownloadLocationIsTrueAndNoDataProvidedAndOriginatingFileURLProvidedThenShouldAskDownloadsTabExtensionToSaveData() async throws {
+        // GIVEN
+        let expectedURL = testDirectory.appendingPathComponent(filename)
+        let sut = makeSUT(downloadLocation: testDirectory, alwaysRequestDownloadLocation: true)
+        XCTAssertFalse(fileManager.fileExists(atPath: expectedURL.path))
+
+        // WHEN
+        sut.$savePanelDialogRequest
+            .sink { request in
+                request?.submit( (url: expectedURL, fileType: nil))
+            }
+            .store(in: &cancellables)
+        _=try await sut.saveDownloadedData(nil, suggestedFilename: filename, mimeType: "application/pdf", originatingURL: testOriginatingURL)
+
+        // THEN
+        XCTAssertTrue(fileManager.fileExists(atPath: expectedURL.path))
+    }
+
+    func testWhenSaveDataAndFileExistThenURLShouldIncrementIndex() async throws {
         // GIVEN
         let destURL = testDirectory.appendingPathComponent(filename)
         let sut = makeSUT(downloadLocation: testDirectory, alwaysRequestDownloadLocation: false)
@@ -74,21 +96,51 @@ final class DownloadsTabExtensionTests: XCTestCase {
         XCTAssertFalse(fileManager.fileExists(atPath: expectedDestURL.path))
 
         // WHEN
-        sut.saveDownloaded(data: testData, suggestedFilename: filename, mimeType: "application/pdf")
+        _=try await sut.saveDownloadedData(testData, suggestedFilename: filename, mimeType: "application/pdf",
+                                           originatingURL: testOriginatingURL.appendingPathExtension("fake"))
 
         // THEN
         XCTAssertTrue(fileManager.fileExists(atPath: expectedDestURL.path))
     }
 
-    @MainActor
-    func testWhenSaveDataAndFileDoesNotExistThenURLShouldNotIncrementIndex() throws {
+    func testWhenNoDataProvidedAndOriginatingFileURLProvidedAndFileExistsThenFileShouldBeCopiedIncrementingIndex() async throws {
+        // GIVEN
+        let destURL = testDirectory.appendingPathComponent(filename)
+        let sut = makeSUT(downloadLocation: testDirectory, alwaysRequestDownloadLocation: false)
+        let expectedFilename = "Document 1.pdf"
+        let expectedDestURL = testDirectory.appendingPathComponent(expectedFilename)
+        try testData.write(to: destURL)
+        XCTAssertFalse(fileManager.fileExists(atPath: expectedDestURL.path))
+
+        // WHEN
+        _=try await sut.saveDownloadedData(nil, suggestedFilename: filename, mimeType: "application/pdf", originatingURL: testOriginatingURL)
+
+        // THEN
+        XCTAssertTrue(fileManager.fileExists(atPath: expectedDestURL.path))
+    }
+
+    func testWhenSaveDataAndFileDoesNotExistThenURLShouldNotIncrementIndex() async throws {
         // GIVEN
         let destURL = testDirectory.appendingPathComponent(filename)
         let sut = makeSUT(downloadLocation: testDirectory, alwaysRequestDownloadLocation: false)
         XCTAssertFalse(fileManager.fileExists(atPath: destURL.path))
 
         // WHEN
-        sut.saveDownloaded(data: testData, suggestedFilename: filename, mimeType: "application/pdf")
+        _=try await sut.saveDownloadedData(testData, suggestedFilename: filename, mimeType: "application/pdf",
+                                           originatingURL: testOriginatingURL.appendingPathExtension("fake"))
+
+        // THEN
+        XCTAssertTrue(fileManager.fileExists(atPath: destURL.path))
+    }
+
+    func testNoDataProvidedAndOriginatingFileURLProvidedAndFileDoesNotExistThenFileShouldBeCopiedNotIncrementingIndex() async throws {
+        // GIVEN
+        let destURL = testDirectory.appendingPathComponent(filename)
+        let sut = makeSUT(downloadLocation: testDirectory, alwaysRequestDownloadLocation: false)
+        XCTAssertFalse(fileManager.fileExists(atPath: destURL.path))
+
+        // WHEN
+        _=try await sut.saveDownloadedData(nil, suggestedFilename: filename, mimeType: "application/pdf", originatingURL: testOriginatingURL)
 
         // THEN
         XCTAssertTrue(fileManager.fileExists(atPath: destURL.path))

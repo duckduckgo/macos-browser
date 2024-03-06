@@ -143,11 +143,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
             } else if viewState == .disclaimer {
                 viewState = .lookingForBitwarden
             } else if viewState == .accessToContainersNotApproved {
-                guard let link = URL.fullDiskAccess else {
-                    assertionFailure("Can't initialize link to Settings")
-                    return
-                }
-                NSWorkspace.shared.open(link)
+                NSWorkspace.shared.open(.fullDiskAccess)
             }
 
         case .cancel:

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1410"
+   LastUpgradeVersion = "1520"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -132,12 +132,6 @@
                </Test>
                <Test
                   Identifier = "EncryptionKeyStoreTests">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenLoadingFailsAfterSessionRestoration_navigationHistoryIsPreserved()">
-               </Test>
-               <Test
-                  Identifier = "ErrorPageTests/testWhenPageLoadedAndFailsOnRefreshAndOnConsequentRefresh_errorPageIsUpdatedKeepingForwardHistory()">
                </Test>
                <Test
                   Identifier = "HTTPSUpgradeIntegrationTests">
