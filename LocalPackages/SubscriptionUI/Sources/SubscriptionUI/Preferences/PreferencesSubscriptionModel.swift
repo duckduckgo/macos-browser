@@ -25,7 +25,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var cachedEntitlements: [AccountManager.Entitlement] = []
     @Published var subscriptionDetails: String?
 
-    private var subscriptionPlatform: SubscriptionService.GetSubscriptionDetailsResponse.Platform?
+    private var subscriptionPlatform: Subscription.Platform?
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
@@ -56,7 +56,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
-        if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
+        if let cachedDate = SubscriptionService.cachedGetSubscriptionResponse?.expiresOrRenewsAt {
             updateDescription(for: cachedDate)
         }
 
@@ -191,7 +191,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             guard let token = self?.accountManager.accessToken else { return }
 
-            if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
+            if let cachedDate = SubscriptionService.cachedGetSubscriptionResponse?.expiresOrRenewsAt {
                 self?.updateDescription(for: cachedDate)
 
                 if cachedDate.timeIntervalSinceNow < 0 {
@@ -199,7 +199,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 }
             }
 
-            if case .success(let subscription) = await SubscriptionService.getSubscriptionDetails(token: token) {
+            if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token) {
                 if !subscription.isActive {
                     AccountManager().signOut()
                     return
