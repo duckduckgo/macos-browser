@@ -13709,8 +13709,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/apple-toolbox.git";
 			requirement = {
-				kind = revision;
-				revision = 2c598d005facc8799178853c6b5d63c231b897d1;
+				kind = exactVersion;
+				version = 2.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
