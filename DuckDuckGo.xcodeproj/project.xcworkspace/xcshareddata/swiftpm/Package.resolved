@@ -5,7 +5,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/apple-toolbox.git",
       "state" : {
-        "revision" : "b438ac3ca6c04209e93467f7b3e0aeaed6c442f1"
+        "revision" : "2c598d005facc8799178853c6b5d63c231b897d1"
       }
     },
     {
@@ -22,7 +22,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "fa9278c599c32bd5df61503adfb48de98d86b6a6"
+        "revision" : "d1483686abc1fc3e4268b587ae95a59b43e4f79b"
       }
     },
     {
@@ -30,8 +30,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "36ddba2cbac52a41b9a9275af06d32fa8a56d2d7",
-        "version" : "4.64.0"
+        "revision" : "59752eb7973d3e3b0c23255ff51359f48b343f15",
+        "version" : "5.2.0"
       }
     },
     {

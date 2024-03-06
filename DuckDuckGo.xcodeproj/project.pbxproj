@@ -13641,7 +13641,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = fa9278c599c32bd5df61503adfb48de98d86b6a6;
+				revision = d1483686abc1fc3e4268b587ae95a59b43e4f79b;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -13681,7 +13681,7 @@
 			repositoryURL = "https://github.com/duckduckgo/apple-toolbox.git";
 			requirement = {
 				kind = revision;
-				revision = b438ac3ca6c04209e93467f7b3e0aeaed6c442f1;
+				revision = 2c598d005facc8799178853c6b5d63c231b897d1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
