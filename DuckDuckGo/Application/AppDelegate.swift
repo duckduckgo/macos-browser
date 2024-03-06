@@ -313,6 +313,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidBecomeActive()
 #endif
+
+        updateSubscriptionStatus()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -547,6 +549,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 }
 
+func updateSubscriptionStatus() {
+#if SUBSCRIPTION
+    Task {
+        guard let token = AccountManager().accessToken else {
+            return
+        }
+        let result = await SubscriptionService.getSubscriptionDetails(token: token)
+
+        switch result {
+        case .success(let success):
+            if success.isSubscriptionActive {
+                DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
+            }
+        case .failure: break
+        }
+    }
+#endif
+}
+
 #if NETWORK_PROTECTION || DBP
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
@@ -565,7 +586,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 #if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
                     NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }

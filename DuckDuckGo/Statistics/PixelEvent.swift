@@ -217,6 +217,39 @@ extension Pixel {
         // DataBrokerProtection Other
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
+        // Subscription
+        case privacyProSubscriptionActive
+        case privacyProOfferScreenImpression
+        case privacyProPurchaseAttempt
+        case privacyProPurchaseFailure
+        case privacyProPurchaseFailureStoreError
+        case privacyProPurchaseFailureBackendError
+        case privacyProPurchaseFailureAccountNotCreated
+        case privacyProPurchaseSuccess
+        case privacyProRestorePurchaseOfferPageEntry
+        case privacyProRestorePurchaseSettingsMenuEntry
+        case privacyProRestorePurchaseEmailStart
+        case privacyProRestorePurchaseStoreStart
+        case privacyProRestorePurchaseEmailSuccess
+        case privacyProRestorePurchaseStoreSuccess
+        case privacyProRestorePurchaseStoreFailureNotFound
+        case privacyProRestorePurchaseStoreFailureOther
+        case privacyProRestoreAfterPurchaseAttempt
+        case privacyProSubscriptionActivated
+        case privacyProWelcomeAddDevice
+        case privacyProSettingsAddDevice
+        case privacyProAddDeviceEnterEmail
+        case privacyProWelcomeVPN
+        case privacyProWelcomePersonalInformationRemoval
+        case privacyProWelcomeIdentityRestoration
+        case privacyProSubscriptionSettings
+        case privacyProVPNSettings
+        case privacyProPersonalInformationRemovalSettings
+        case privacyProIdentityRestorationSettings
+        case privacyProSubscriptionManagementEmail
+        case privacyProSubscriptionManagementPlanBilling
+        case privacyProSubscriptionManagementRemoval
+
         case dailyPixel(Event, isFirst: Bool)
 
         enum Debug {
@@ -371,7 +404,6 @@ extension Pixel {
 
             case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
         }
-
     }
 }
 
@@ -595,9 +627,48 @@ extension Pixel.Event {
             return "m_mac_netp_ev_geoswitching_set_custom"
         case .networkProtectionGeoswitchingNoLocations:
             return "m_mac_netp_ev_geoswitching_no_locations"
+
+            // MARK: - Subscription
+        case .privacyProSubscriptionActive: return subsPixelPrefix + "privacy-pro_app_subscription_active"
+        case .privacyProOfferScreenImpression: return subsPixelPrefix + "offer_screen_impression"
+        case .privacyProPurchaseAttempt: return subsPixelPrefix + "terms-conditions_subscribe_click"
+        case .privacyProPurchaseFailure: return subsPixelPrefix + "app_subscription-purchase_failure_other"
+        case .privacyProPurchaseFailureStoreError: return subsPixelPrefix + "app_subscription-purchase_failure_store"
+        case .privacyProPurchaseFailureBackendError: return subsPixelPrefix + "app_subscription-purchase_failure_backend"
+        case .privacyProPurchaseFailureAccountNotCreated: return subsPixelPrefix + "app_subscription-purchase_failure_account-creation"
+        case .privacyProPurchaseSuccess: return subsPixelPrefix + "app_subscription-purchase_success"
+        case .privacyProRestorePurchaseOfferPageEntry: return subsPixelPrefix + "offer_restore-purchase_click"
+        case .privacyProRestorePurchaseSettingsMenuEntry: return subsPixelPrefix + "settings_restore-purchase_click"
+        case .privacyProRestorePurchaseEmailStart: return subsPixelPrefix + "activate-subscription_enter-email_click"
+        case .privacyProRestorePurchaseStoreStart: return subsPixelPrefix + "activate-subscription_restore-purchase_click"
+        case .privacyProRestorePurchaseEmailSuccess: return subsPixelPrefix + "app_subscription-restore-using-email_success"
+        case .privacyProRestorePurchaseStoreSuccess: return subsPixelPrefix + "app_subscription-restore-using-store_success"
+        case .privacyProRestorePurchaseStoreFailureNotFound: return subsPixelPrefix + "subscription-restore-using-store_failure_not-found"
+        case .privacyProRestorePurchaseStoreFailureOther: return subsPixelPrefix + "app_subscription-restore-using-store_failure_other"
+        case .privacyProRestoreAfterPurchaseAttempt: return subsPixelPrefix + "app_subscription-restore-after-purchase-attempt_success"
+        case .privacyProSubscriptionActivated: return subsPixelPrefix + "app_subscription_activated_u"
+        case .privacyProWelcomeAddDevice: return subsPixelPrefix + "welcome_add-device_click_u"
+        case .privacyProSettingsAddDevice: return subsPixelPrefix + "settings_add-device_click"
+        case .privacyProAddDeviceEnterEmail: return subsPixelPrefix + "add-device_enter-email_click"
+        case .privacyProWelcomeVPN: return subsPixelPrefix + "welcome_vpn_click_u"
+        case .privacyProWelcomePersonalInformationRemoval: return subsPixelPrefix + "welcome_personal-information-removal_click_u"
+        case .privacyProWelcomeIdentityRestoration: return subsPixelPrefix + "welcome_identity-theft-restoration_click_u"
+        case .privacyProSubscriptionSettings: return subsPixelPrefix + "settings_screen_impression"
+        case .privacyProVPNSettings: return subsPixelPrefix + "settings_vpn_click"
+        case .privacyProPersonalInformationRemovalSettings: return subsPixelPrefix + "settings_personal-information-removal_click"
+        case .privacyProIdentityRestorationSettings: return subsPixelPrefix + "settings_identity-theft-restoration_click"
+        case .privacyProSubscriptionManagementEmail: return subsPixelPrefix + "manage-email_edit_click"
+        case .privacyProSubscriptionManagementPlanBilling: return subsPixelPrefix + "settings_change-plan-or-billing_click"
+        case .privacyProSubscriptionManagementRemoval: return subsPixelPrefix + "settings_remove-from-device_click"
         }
     }
 }
+
+#if APPSTORE
+fileprivate let subsPixelPrefix = "m_mac_store_privacy-pro_"
+#else
+fileprivate let subsPixelPrefix = "m_mac_direct_privacy-pro_"
+#endif
 
 extension Pixel.Event: Equatable {
 
