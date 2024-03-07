@@ -27,7 +27,17 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionActiveUser
     case networkProtectionNewUser
 
-    case networkProtectionStartFailed
+    case networkProtectionControllerStartAttempt
+    case networkProtectionControllerStartSuccess
+    case networkProtectionControllerStartFailure
+
+    case networkProtectionTunnelStartAttempt
+    case networkProtectionTunnelStartSuccess
+    case networkProtectionTunnelStartFailure
+
+    case networkProtectionTunnelUpdateAttempt
+    case networkProtectionTunnelUpdateSuccess
+    case networkProtectionTunnelUpdateFailure
 
     case networkProtectionEnableAttemptConnecting
     case networkProtectionEnableAttemptSuccess
@@ -77,7 +87,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
     case networkProtectionNoAuthTokenFoundError
 
+    case networkProtectionRekeyAttempt
     case networkProtectionRekeyCompleted
+    case networkProtectionRekeyFailure
 
     case networkProtectionSystemExtensionActivationFailure
 
@@ -95,8 +107,32 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionNewUser:
             return "m_mac_netp_daily_active_u"
 
-        case .networkProtectionStartFailed:
-            return "m_mac_netp_start_failed"
+        case .networkProtectionControllerStartAttempt:
+            return "m_mac_netp_controller_start_attempt"
+
+        case .networkProtectionControllerStartSuccess:
+            return "m_mac_netp_controller_start_success"
+
+        case .networkProtectionControllerStartFailure:
+            return "m_mac_netp_controller_start_failure"
+
+        case .networkProtectionTunnelStartAttempt:
+            return "m_mac_netp_tunnel_start_attempt"
+
+        case .networkProtectionTunnelStartSuccess:
+            return "m_mac_netp_tunnel_start_success"
+
+        case .networkProtectionTunnelStartFailure:
+            return "m_mac_netp_tunnel_start_failure"
+
+        case .networkProtectionTunnelUpdateAttempt:
+            return "m_mac_netp_tunnel_update_attempt"
+
+        case .networkProtectionTunnelUpdateSuccess:
+            return "m_mac_netp_tunnel_update_success"
+
+        case .networkProtectionTunnelUpdateFailure:
+            return "m_mac_netp_tunnel_update_failure"
 
         case .networkProtectionEnableAttemptConnecting:
             return "m_mac_netp_ev_enable_attempt"
@@ -215,8 +251,14 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionNoAuthTokenFoundError:
             return "m_mac_netp_no_auth_token_found_error"
 
+        case .networkProtectionRekeyAttempt:
+            return "m_mac_netp_rekey_attempt"
+
         case .networkProtectionRekeyCompleted:
             return "m_mac_netp_rekey_completed"
+
+        case .networkProtectionRekeyFailure:
+            return "m_mac_netp_rekey_failure"
 
         case .networkProtectionSystemExtensionActivationFailure:
             return "m_mac_netp_system_extension_activation_failure"
@@ -309,7 +351,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionServerListStoreFailedToEncodeServerList,
              .networkProtectionServerListStoreFailedToDecodeServerList,
              .networkProtectionNoAuthTokenFoundError,
+             .networkProtectionRekeyAttempt,
              .networkProtectionRekeyCompleted,
+             .networkProtectionRekeyFailure,
              .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
              .networkProtectionWireguardErrorFailedDNSResolution,
              .networkProtectionSystemExtensionActivationFailure,
@@ -322,7 +366,15 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionTunnelFailureRecovered,
              .networkProtectionLatency,
              .networkProtectionLatencyError,
-             .networkProtectionStartFailed:
+             .networkProtectionControllerStartAttempt,
+             .networkProtectionControllerStartSuccess,
+             .networkProtectionControllerStartFailure,
+             .networkProtectionTunnelStartAttempt,
+             .networkProtectionTunnelStartSuccess,
+             .networkProtectionTunnelStartFailure,
+             .networkProtectionTunnelUpdateAttempt,
+             .networkProtectionTunnelUpdateSuccess,
+             .networkProtectionTunnelUpdateFailure:
 
             return nil
         }
