@@ -51,8 +51,8 @@ struct AddEditBookmarkFolderDialogView: ModalView {
     let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
     bookmarkManager.loadBookmarks()
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
-    return AddEditBookmarkFolderDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: nil, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.light)
 }
 
@@ -61,8 +61,8 @@ struct AddEditBookmarkFolderDialogView: ModalView {
     let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
     bookmarkManager.loadBookmarks()
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: bookmarkFolder), bookmarkManager: bookmarkManager)
-    return AddEditBookmarkFolderDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: bookmarkFolder, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.light)
 }
 
@@ -71,8 +71,8 @@ struct AddEditBookmarkFolderDialogView: ModalView {
     let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
     bookmarkManager.loadBookmarks()
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: bookmarkFolder, parentFolder: nil), bookmarkManager: bookmarkManager)
-    return AddEditBookmarkFolderDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: bookmarkFolder, parentFolder: nil, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.light)
 }
 
@@ -80,9 +80,8 @@ struct AddEditBookmarkFolderDialogView: ModalView {
     let store = BookmarkStoreMock(bookmarks: [])
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
     bookmarkManager.loadBookmarks()
-    customAssertionFailure = { _, _, _ in }
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
-    return AddEditBookmarkFolderDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: nil, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.dark)
 }
 
@@ -91,9 +90,8 @@ struct AddEditBookmarkFolderDialogView: ModalView {
     let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
     bookmarkManager.loadBookmarks()
-    customAssertionFailure = { _, _, _ in }
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: bookmarkFolder), bookmarkManager: bookmarkManager)
-    return AddEditBookmarkFolderDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: bookmarkFolder, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.dark)
 }
 
@@ -102,9 +100,8 @@ struct AddEditBookmarkFolderDialogView: ModalView {
     let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
     bookmarkManager.loadBookmarks()
-    customAssertionFailure = { _, _, _ in }
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: bookmarkFolder, parentFolder: bookmarkFolder), bookmarkManager: bookmarkManager)
-    return AddEditBookmarkFolderDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: bookmarkFolder, parentFolder: bookmarkFolder, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.dark)
 }
 #endif
