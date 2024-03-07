@@ -18,6 +18,7 @@
 
 #if NETWORK_PROTECTION || DBP
 
+import Macros
 import SwiftUI
 import SwiftUIExtensions
 
@@ -185,9 +186,8 @@ struct DataBrokerProtectionTermsAndConditionsContentView: View {
                         .foregroundColor(Color.blue)
                         .underline(color: .blue)
                         .onTapGesture {
-                            if let url = URL(string: "https://duckduckgo.com/privacy") {
-                                WindowsManager.openNewWindow(with: url, source: .ui, isBurner: false)
-                            }
+                            let url = #URL("https://duckduckgo.com/privacy")
+                            WindowsManager.openNewWindow(with: url, source: .ui, isBurner: false)
                         }
                     Text(verbatim: "also applies here.")
                 }

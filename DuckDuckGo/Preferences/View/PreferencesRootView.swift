@@ -84,7 +84,7 @@ enum Preferences {
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
-                                DownloadsView(model: DownloadsPreferences())
+                                DownloadsView(model: .shared)
                             case .duckPlayer:
                                 DuckPlayerView(model: .shared)
                             case .about:
@@ -127,14 +127,21 @@ enum Preferences {
                 }
             }
 
+            let openITR: () -> Void = {
+                DispatchQueue.main.async {
+                    WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+                }
+            }
+
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
-                                                                      openURLHandler: openURL,
-                                                                      goToSyncPreferences: { self.model.selectPane(.sync) })
+                                                                      openURLHandler: openURL)
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 openVPNHandler: openVPN,
                                                 openDBPHandler: openDBP,
-                                                sheetActionHandler: sheetActionHandler)
+                                                openITRHandler: openITR,
+                                                sheetActionHandler: sheetActionHandler,
+                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }
 #endif
     }

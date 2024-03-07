@@ -5,8 +5,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/apple-toolbox.git",
       "state" : {
-        "revision" : "e3dc4faf70ca09718a2d20d5c47b449389e8c153",
-        "version" : "1.0.0"
+        "revision" : "d51beaf1736013b530576ace13a16d6d1a63742c",
+        "version" : "2.0.0"
+      }
+    },
+    {
+      "identity" : "barebonesbrowser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/BareBonesBrowser.git",
+      "state" : {
+        "revision" : "31e5bfedc3c2ca005640c4bf2b6959d69b0e18b9",
+        "version" : "0.1.0"
       }
     },
     {
@@ -23,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "1fa06fb43fb0f26fc1a74b710fb1402573264bf5",
-        "version" : "114.3.0"
+        "revision" : "4504b1452d059e5a87220b402d939a33d33d07dc",
+        "version" : "119.0.0"
       }
     },
     {

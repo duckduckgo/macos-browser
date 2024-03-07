@@ -57,7 +57,7 @@ class DownloadsTabExtensionMock: NSObject, DownloadsTabExtensionProtocol {
         return nil
     }
 
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {}
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {}
 
     func fileIconFlyAnimationOriginalRect(for downloadTask: DuckDuckGo_Privacy_Browser.WebKitDownloadTask) -> NSRect? { .zero }
 

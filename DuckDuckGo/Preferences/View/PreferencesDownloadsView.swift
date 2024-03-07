@@ -56,7 +56,7 @@ extension Preferences {
 #Preview {
     VStack {
         HStack {
-            Preferences.DownloadsView(model: DownloadsPreferences())
+            Preferences.DownloadsView(model: DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor()))
                 .padding()
             Spacer()
         }.frame(width: 500)

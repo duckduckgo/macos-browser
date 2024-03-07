@@ -312,10 +312,10 @@ import SubscriptionUI
             NSMenuItem(title: UserText.favorites)
                 .submenu(favoritesMenu.buildItems {
                     NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
-                        .withImage(NSImage(named: "Favorite"))
+                        .withImage(.favorite)
                     NSMenuItem.separator()
                 })
-                .withImage(NSImage(named: "Favorite"))
+                .withImage(.favorite)
 
             NSMenuItem.separator()
         })
@@ -565,6 +565,8 @@ import SubscriptionUI
     // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
+            NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser))
+            NSMenuItem.separator()
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
@@ -626,7 +628,7 @@ import SubscriptionUI
                                   updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
                                   currentViewController: {
                 WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            })
+            }, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 #endif
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())

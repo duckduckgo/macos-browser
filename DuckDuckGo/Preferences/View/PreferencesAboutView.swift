@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Macros
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
@@ -43,7 +44,7 @@ extension Preferences {
 
                 PreferencePaneSection {
                     HStack {
-                        Image("AboutPageLogo")
+                        Image(.aboutPageLogo)
                         VStack(alignment: .leading, spacing: 8) {
 #if APPSTORE
                             Text(UserText.duckDuckGoForMacAppStore).font(.companyName)
@@ -96,7 +97,7 @@ extension Preferences {
 
     struct UnsupportedDeviceInfoBox: View {
 
-        static let softwareUpdateURL = URL(string: "x-apple.systempreferences:com.apple.preferences.softwareupdate")!
+        static let softwareUpdateURL = #URL("x-apple.systempreferences:com.apple.preferences.softwareupdate")
 
         var wide: Bool
 
@@ -121,7 +122,7 @@ extension Preferences {
         }
 
         var body: some View {
-            let image = Image("Alert-Color-16")
+            let image = Image(.alertColor16)
                 .resizable()
                 .frame(width: 16, height: 16)
                 .padding(.trailing, 4)
@@ -150,7 +151,7 @@ extension Preferences {
                 }
             }
             .padding()
-            .background(Color("UnsupportedOSWarningColor"))
+            .background(Color.unsupportedOSWarning)
             .cornerRadius(8)
             .frame(width: width, height: height)
         }

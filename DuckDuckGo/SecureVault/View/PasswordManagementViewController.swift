@@ -16,13 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
+import BrowserServicesKit
 import Combine
 import Common
 import DDGSync
-import SwiftUI
-import BrowserServicesKit
+import Foundation
 import SecureStorage
+import SwiftUI
 
 protocol PasswordManagementDelegate: AnyObject {
 
@@ -68,9 +69,9 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var lockScreenIconImageView: NSImageView! {
         didSet {
             if DeviceAuthenticator.deviceSupportsBiometrics {
-                lockScreenIconImageView.image = NSImage(named: "LoginsLockTouchID")
+                lockScreenIconImageView.image = .loginsLockTouchID
             } else {
-                lockScreenIconImageView.image = NSImage(named: "LoginsLockPassword")
+                lockScreenIconImageView.image = .loginsLockPassword
             }
         }
     }
@@ -81,7 +82,7 @@ final class PasswordManagementViewController: NSViewController {
             lockScreenOpenInPreferencesTextView.delegate = self
 
             let linkAttributes: [NSAttributedString.Key: Any] = [
-                .foregroundColor: NSColor(named: "LinkBlueColor")!,
+                .foregroundColor: NSColor.linkBlue,
                 .cursor: NSCursor.pointingHand
             ]
 
@@ -100,7 +101,7 @@ final class PasswordManagementViewController: NSViewController {
                 .cursor: NSCursor.arrow,
                 .paragraphStyle: paragraphStyle,
                 .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-                .foregroundColor: NSColor(named: "BlackWhite60")!
+                .foregroundColor: NSColor.blackWhite60
             ], range: NSRange(location: 0, length: string.length))
 
             lockScreenOpenInPreferencesTextView.textStorage?.setAttributedString(string)
@@ -818,22 +819,11 @@ final class PasswordManagementViewController: NSViewController {
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
-        let menu = NSMenu()
-
-        func createMenuItem(title: String, action: Selector, imageName: String) -> NSMenuItem {
-            let item = NSMenuItem(title: title, action: action, target: self, keyEquivalent: "")
-            item.image = NSImage(named: imageName)
-
-            return item
+        NSMenu {
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin)).withImage(.loginGlyph)
+            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity)).withImage(.identityGlyph)
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard)).withImage(.creditCardGlyph)
         }
-
-        menu.items = [
-            createMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), imageName: "LoginGlyph"),
-            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph"),
-            createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
-        ]
-
-        return menu
     }
 
     private func updateFilter() {
@@ -996,10 +986,10 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
-        case .logins: showEmptyState(imageName: "LoginsEmpty", title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
-        case .identities: showEmptyState(imageName: "IdentitiesEmpty", title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards: showEmptyState(imageName: "CreditCardsEmpty", title: UserText.pmEmptyStateCardsTitle)
+        case .allItems: showEmptyState(imageName: .loginsEmpty, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .logins: showEmptyState(imageName: .loginsEmpty, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
+        case .identities: showEmptyState(imageName: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(imageName: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
         }
     }
 
