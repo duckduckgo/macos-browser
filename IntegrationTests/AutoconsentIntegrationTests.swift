@@ -85,8 +85,7 @@ class AutoconsentIntegrationTests: XCTestCase {
     func testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
         // enable the feature
         CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
-        let url = 
-      (string: "http://privacy-test-pages.site/features/autoconsent/banner.html")
+        let url = #URL("http://privacy-test-pages.site/features/autoconsent/banner.html")
         let tab = self.tabViewModel.tab
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
