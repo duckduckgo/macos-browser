@@ -157,6 +157,14 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseSubscriptionPage),
                                                name: .subscriptionPageCloseAndOpenPreferences,
                                                object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onSubscriptionAccountDidSignIn),
+                                               name: .accountDidSignIn,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onSubscriptionAccountDidSignOut),
+                                               name: .accountDidSignOut,
+                                               object: nil)
 #endif
     }
 
@@ -230,6 +238,37 @@ final class BrowserTabViewController: NSViewController {
 
         openNewTab(with: .settings(pane: .subscription))
     }
+
+    @objc
+    private func onSubscriptionAccountDidSignIn(_ notification: Notification) {
+        tabCollectionViewModel.reloadAll { tabContent in
+            if case .subscription = tabContent {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
+    @objc
+    private func onSubscriptionAccountDidSignOut(_ notification: Notification) {
+        tabCollectionViewModel.reloadAll { tabContent in
+            if case .subscription = tabContent {
+                return true
+            } else {
+                return false
+            }
+        }
+        
+        tabCollectionViewModel.removeAll { tabContent in
+            if case .identityTheftRestoration = tabContent {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
 #endif
 
     private func subscribeToSelectedTabViewModel() {
