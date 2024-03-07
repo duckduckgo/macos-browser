@@ -88,20 +88,16 @@ struct AddEditBookmarkDialogView: ModalView {
 #Preview("Add Bookmark - Light Mode") {
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: []))
     bookmarkManager.loadBookmarks()
-    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
-    let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
-    let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
-    return AddEditBookmarkDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeAddBookmarkView(parent: nil, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.light)
 }
 
-#Preview("Add Bookmark - Light Mode") {
+#Preview("Add Bookmark - Dark Mode") {
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: []))
     bookmarkManager.loadBookmarks()
-    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
-    let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
-    let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
-    return AddEditBookmarkDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeAddBookmarkView(parent: nil, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.dark)
 }
 
@@ -110,10 +106,8 @@ struct AddEditBookmarkDialogView: ModalView {
     let bookmark = Bookmark(id: "1", url: "www.duckduckgo.com", title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "7")
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [bookmark, parentFolder]))
     bookmarkManager.loadBookmarks()
-    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-    let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
-    let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
-    return AddEditBookmarkDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.light)
 }
 
@@ -122,10 +116,8 @@ struct AddEditBookmarkDialogView: ModalView {
     let bookmark = Bookmark(id: "1", url: "www.duckduckgo.com", title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "7")
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [bookmark, parentFolder]))
     bookmarkManager.loadBookmarks()
-    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-    let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
-    let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
-    return AddEditBookmarkDialogView(viewModel: viewModel)
+
+    return BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.dark)
 }
 #endif
