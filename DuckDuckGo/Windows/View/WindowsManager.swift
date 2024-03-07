@@ -30,6 +30,9 @@ final class WindowsManager {
         NSApplication.shared.windows.compactMap { $0 as? MainWindow }
     }
 
+    // Shared type to enable managing `PasswordManagementPopover`s in multiple windows
+    private static let passwordPopoverPresenter: PasswordPopoverPresenter = DefaultPasswordPopoverPresenter()
+
     class func closeWindows(except windows: [NSWindow] = []) {
         for controller in WindowControllersManager.shared.mainWindowControllers {
             guard let window = controller.window, !windows.contains(window) else { continue }
@@ -61,7 +64,8 @@ final class WindowsManager {
                              lazyLoadTabs: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel,
                                                  popUp: popUp,
-                                                 burnerMode: burnerMode)
+                                                 burnerMode: burnerMode,
+                                                 passwordPopoverPresenter: passwordPopoverPresenter)
 
         if let contentSize {
             mainWindowController.window?.setContentSize(contentSize)
@@ -161,8 +165,9 @@ final class WindowsManager {
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil,
                                      contentSize: NSSize? = nil,
                                      popUp: Bool = false,
-                                     burnerMode: BurnerMode) -> MainWindowController {
-        let mainViewController = MainViewController(tabCollectionViewModel: tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode))
+                                     burnerMode: BurnerMode,
+                                     passwordPopoverPresenter: PasswordPopoverPresenter) -> MainWindowController {
+        let mainViewController = MainViewController(tabCollectionViewModel: tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode), passwordPopoverPresenter: passwordPopoverPresenter)
 
         var contentSize = contentSize ?? NSSize(width: 1024, height: 790)
         contentSize.width = min(NSScreen.main?.frame.size.width ?? 1024, max(contentSize.width, 300))
