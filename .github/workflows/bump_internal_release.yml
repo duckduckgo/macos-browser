@@ -2,12 +2,12 @@ name: Bump Internal Release
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Run every day at midnight
+    - cron: '0 5 * * 2,3,4,5' # Run at 05:00 UTC on Tuesday through Friday
   workflow_dispatch:
     inputs:
       asana-task-url:
         description: "Asana release task URL"
-        required: true
+        required: false
         type: string
       base-branch:
         description: "Base branch (defaults to main, only override for testing)"
@@ -30,6 +30,7 @@ jobs:
 
     outputs:
       skip-release: ${{ steps.check-for-changes.outputs.skip-release }}
+      asana-task-url: ${{ steps.set-parameters.outputs.asana-task-url }}
 
     steps:
 
@@ -46,10 +47,12 @@ jobs:
           fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
           ref: ${{ github.ref_name }}
 
-      - name: Check if there's are changes to release
+      - name: Check if there are changes to the release branch
         id: check-for-changes
         run: |
-          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+          if [[ "${{ github.event_name }}" != "schedule" ]]; then
+            echo "skip-release=false" >> $GITHUB_OUTPUT
+          else
             latest_tag="$(git describe --tags --abbrev=0)"
             changed_files="$(git diff --name-only "$latest_tag" | grep -v -E '.github|scripts')"
 
@@ -59,19 +62,34 @@ jobs:
             else
               echo "skip-release=false" >> $GITHUB_OUTPUT
             fi
-          else
-            echo "skip-release=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Find Asana release task
+        id: find-asana-task
+        if: github.event.inputs.asana-task-url == null
+        uses: ./.github/actions/asana-find-release-task
+        with:
+          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
 
       - name: Extract Asana Task ID
         id: task-id
+        if: github.event.inputs.asana-task-url
         uses: ./.github/actions/asana-extract-task-id
         with:
           task-url: ${{ github.event.inputs.asana-task-url }}
 
+      - name: Set parameters
+        id: set-parameters
+        env:
+          TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.task-id }}
+          ASANA_TASK_URL: ${{ steps.find-asana-task.outputs.task-url || github.event.inputs.asana-task-url }}
+        run: |
+          echo "task-id=${TASK_ID}" >> $GITHUB_OUTPUT
+          echo "asana-task-url=${ASANA_TASK_URL}" >> $GITHUB_OUTPUT
+
       - name: Validate release notes
         env:
-          TASK_ID: ${{ steps.task-id.outputs.task-id }}
+          TASK_ID: ${{ steps.set-parameters.outputs.task-id }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
           curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes" \
@@ -99,7 +117,7 @@ jobs:
 
     name: Increment Build Number
 
-    needs: run_tests
+    needs: [ validate_input_conditions, run_tests ]
     runs-on: macos-13-xlarge
     timeout-minutes: 10
 
@@ -132,7 +150,7 @@ jobs:
         id: task-id
         uses: ./.github/actions/asana-extract-task-id
         with:
-          task-url: ${{ github.event.inputs.asana-task-url }}
+          task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
 
       - name: Update Asana tasks for the release
         env:
@@ -145,10 +163,10 @@ jobs:
 
   prepare_release:
     name: Prepare Release
-    needs: increment_build_number
+    needs: [ validate_input_conditions, increment_build_number ]
     uses: ./.github/workflows/release.yml
     with:
-      asana-task-url: ${{ github.event.inputs.asana-task-url }}
+      asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
@@ -178,10 +196,10 @@ jobs:
 
   tag_and_merge:
     name: Tag and Merge Branch
-    needs: [ prepare_release ]
+    needs: [ validate_input_conditions, prepare_release ]
     uses: ./.github/workflows/tag_release.yml
     with:
-      asana-task-url: ${{ github.event.inputs.asana-task-url }}
+      asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
       branch: ${{ github.ref_name }}
       base-branch: ${{ github.event.inputs.base-branch || 'main' }}
       prerelease: true
@@ -192,10 +210,10 @@ jobs:
 
   publish_release:
     name: Publish DMG Release
-    needs: [ tag_and_merge ]
+    needs: [ validate_input_conditions, tag_and_merge ]
     uses: ./.github/workflows/publish_dmg_release.yml
     with:
-      asana-task-url: ${{ github.event.inputs.asana-task-url }}
+      asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
