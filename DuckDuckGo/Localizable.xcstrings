@@ -3870,10 +3870,58 @@
       "comment" : "Message displayed on completion of multiple password deletion",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Passwörter gelöscht (%d)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "All passwords deleted (%d)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se han eliminado todas las contraseñas (%d)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous les mots de passe sont supprimés (%d)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte le password sono state eliminate (%d)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle wachtwoorden verwijderd (%d)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usunięto wszystkie hasła (%d)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas as palavras-passe eliminadas (%d)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все пароли (%d) удалены"
           }
         }
       }
@@ -25150,7 +25198,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редактировать"
+            "value" : "Правка"
           }
         }
       }
