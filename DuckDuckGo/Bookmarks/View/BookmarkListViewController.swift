@@ -347,8 +347,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
-        WindowControllersManager.shared.showBookmarksTab()
-        delegate?.popoverShouldClose(self)
+        showManageBookmarks()
     }
 
     @objc func handleClick(_ sender: NSOutlineView) {
@@ -445,6 +444,11 @@ private extension BookmarkListViewController {
         view.show(in: parent?.view.window) { [weak delegate] in
             delegate?.popover(shouldPreventClosure: false)
         }
+    }
+
+    func showManageBookmarks() {
+        WindowControllersManager.shared.showBookmarksTab()
+        delegate?.popoverShouldClose(self)
     }
 
 }
@@ -555,6 +559,20 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         bookmarkManager.remove(objectsWithUUIDs: uuids)
     }
 
+    func manageBookmarks(_ sender: NSMenuItem) {
+        showManageBookmarks()
+    }
+
+    func moveToEnd(_ sender: NSMenuItem) {
+        guard let bookmarkEntity = sender.representedObject as? BookmarksEntityIdentifiable else {
+            assertionFailure("Failed to cast menu item's represented object to BookmarkEntity")
+            return
+        }
+
+        let parentFolderType: ParentFolderType = bookmarkEntity.parentId.flatMap { .parent(uuid: $0) } ?? .root
+        bookmarkManager.move(objectUUIDs: [bookmarkEntity.entityId], toIndex: nil, withinParentFolder: parentFolderType) { _ in }
+    }
+
 }
 
 extension BookmarkListViewController: FolderMenuItemSelectors {
@@ -563,27 +581,15 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         newFolderButtonClicked(sender)
     }
 
-    func renameFolder(_ sender: NSMenuItem) {
-        guard let folder = sender.representedObject as? BookmarkFolder else {
-            assertionFailure("Failed to retrieve Bookmark from Rename Folder context menu item")
-            return
-        }
-
-        delegate?.popover(shouldPreventClosure: true)
-
-        AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
-            .show(in: parent?.view.window) { [weak delegate] in
-                delegate?.popover(shouldPreventClosure: false)
-            }
-    }
-
     func editFolder(_ sender: NSMenuItem) {
-        guard let (folder, parent) = sender.representedObject as? (BookmarkFolder, BookmarkFolder?) else {
+        guard let bookmarkEntityInfo = sender.representedObject as? BookmarkEntityInfo,
+              let folder = bookmarkEntityInfo.entity as? BookmarkFolder
+        else {
             assertionFailure("Failed to retrieve Bookmark from Edit Folder context menu item")
             return
         }
 
-        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: parent)
+        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: bookmarkEntityInfo.parent)
         showDialog(view: view)
     }
 
@@ -598,13 +604,26 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
     func openInNewTabs(_ sender: NSMenuItem) {
         guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
-              let children = (sender.representedObject as? BookmarkFolder)?.children else {
-            assertionFailure("Cannot open in new tabs")
+              let folder = sender.representedObject as? BookmarkFolder
+        else {
+            assertionFailure("Cannot open all in new tabs")
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0, source: .bookmark), shouldLoadInBackground: true, burnerMode: tabCollection.burnerMode) }
+        let tabs = Tab.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
         tabCollection.append(tabs: tabs)
+    }
+
+    func openAllInNewWindow(_ sender: NSMenuItem) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
+              let folder = sender.representedObject as? BookmarkFolder
+        else {
+            assertionFailure("Cannot open all in new window")
+            return
+        }
+
+        let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
+        WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
     }
 
 }
