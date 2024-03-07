@@ -22,8 +22,9 @@ import SwiftUI
 
 extension MainViewController: BareBonesBrowserUIDelegate {
 
+    fileprivate static let ddgURL = URL(string: "https://duckduckgo.com/")!
     @objc func openVanillaBrowser(_ sender: Any?) {
-        let currentURL = WindowControllersManager.shared.selectedTab?.url ?? URL(string: "https://duckduckgo.com/")!
+        let currentURL = WindowControllersManager.shared.selectedTab?.url ?? MainViewController.ddgURL
         openVanillaBrowser(url: currentURL)
     }
 
@@ -36,7 +37,7 @@ extension MainViewController: BareBonesBrowserUIDelegate {
 
     private func openVanillaBrowser(url: URL) {
         let browserView = NSHostingView(rootView: BareBonesBrowserView(initialURL: url,
-                                                                       homeURL: url,
+                                                                       homeURL: MainViewController.ddgURL,
                                                                        uiDelegate: self,
                                                                        configuration: Self.webViewConfiguration,
                                                                        userAgent: UserAgent.brandedDefault))
