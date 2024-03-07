@@ -657,6 +657,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
     var brokerProfileQueryDataToReturn = [BrokerProfileQueryData]()
     var profile: DataBrokerProtectionProfile?
+    var attemptInformation: AttemptInformation?
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -767,7 +768,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     }
 
     func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
-        return nil
+        return attemptInformation
     }
 
     func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
@@ -802,6 +803,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
         brokerProfileQueryDataToReturn.removeAll()
         profile = nil
+        attemptInformation = nil
     }
 }
 

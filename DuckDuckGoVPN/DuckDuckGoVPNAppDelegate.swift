@@ -28,6 +28,10 @@ import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
     private let _delegate = DuckDuckGoVPNAppDelegate()
@@ -43,6 +47,15 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
+#if DEBUG && SUBSCRIPTION
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+
+        if let token = accountManager.accessToken {
+            os_log(.error, log: .networkProtection, "🟢 VPN Agent found token: %{public}d", token)
+        } else {
+            os_log(.error, log: .networkProtection, "🔴 VPN Agent found no token")
+        }
+#endif
     }
 
     required init?(coder: NSCoder) {
