@@ -16,12 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import BrowserServicesKit
+import Combine
 import Common
-import SecureStorage
+import Foundation
 import GRDB
+import Macros
+import SecureStorage
+
 @testable import DataBrokerProtection
 
 extension BrokerProfileQueryData {
@@ -239,7 +241,7 @@ final class EmailServiceMock: EmailServiceProtocol {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return URL(string: "https://www.duckduckgo.com")!
+        return #URL("https://www.duckduckgo.com")
     }
 
     func reset() {

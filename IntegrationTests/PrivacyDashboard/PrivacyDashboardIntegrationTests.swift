@@ -18,7 +18,9 @@
 
 import Combine
 import Common
+import Macros
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -65,7 +67,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .promise()
 
         // load the test page
-        let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")!
+        let url = #URL("http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")
         _=await tab.setUrl(url, source: .link)?.result
 
         let trackersCount = try await trackersCountPromise.value
