@@ -16,9 +16,11 @@
 //  limitations under the License.
 //
 
+import Macros
 import Navigation
 import WebKit
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -35,9 +37,9 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
     ]
 
     let nonDdgUrls = [
-        URL(string: "https://duckduckgo.com.local/")!,
-        URL(string: "https://my.duckduckgo.com/")!,
-        URL(string: "https://youtube.com/")!,
+        #URL("https://duckduckgo.com.local/"),
+        #URL("https://my.duckduckgo.com/"),
+        #URL("https://youtube.com/"),
 
         URL.duckDuckGoMorePrivacyInfo,
         URL.gpcLearnMore,
