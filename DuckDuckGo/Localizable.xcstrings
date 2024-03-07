@@ -10343,7 +10343,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Начать с заглавной"
+            "value" : "С заглавной буквы"
           }
         }
       }
@@ -12454,7 +12454,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Разработчик"
+            "value" : "Разработка"
           }
         }
       }
@@ -19769,7 +19769,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Помощь"
+            "value" : "Справка"
           }
         }
       }
@@ -24898,7 +24898,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скрыть другие службы"
+            "value" : "Скрыть остальные"
           }
         }
       }
@@ -24958,7 +24958,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Предпочтения…"
+            "value" : "Настройки…"
           }
         }
       }
@@ -25018,7 +25018,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрыть DuckDuckGo"
+            "value" : "Завершить DuckDuckGo"
           }
         }
       }
@@ -25798,7 +25798,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вставить и подогнать стиль"
+            "value" : "Вставить и согласовать стиль"
           }
         }
       }
@@ -26278,7 +26278,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Функции работы с текстом"
+            "value" : "Замены"
           }
         }
       }
@@ -26878,7 +26878,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открыть местоположение..."
+            "value" : "Открыть адрес…"
           }
         }
       }
@@ -27231,7 +27231,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Преобразовать в строчные"
+            "value" : "Строчные"
           }
         }
       }
@@ -27284,7 +27284,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Преобразовать в заглавные"
+            "value" : "Прописные"
           }
         }
       }
@@ -41914,7 +41914,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Несколько слов о DuckDuckGo"
+            "value" : "О приложении DuckDuckGo"
           }
         }
       }
@@ -43834,7 +43834,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Распечатать…"
+            "value" : "Печать…"
           }
         }
       }
@@ -49355,7 +49355,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Трансформации"
+            "value" : "Преобразования"
           }
         }
       }
@@ -49874,7 +49874,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Просмотр"
+            "value" : "Вид"
           }
         }
       }
