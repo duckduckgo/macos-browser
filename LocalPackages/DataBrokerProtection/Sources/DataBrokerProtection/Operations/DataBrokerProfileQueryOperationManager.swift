@@ -204,7 +204,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                             let calculateDurationSinceLastStage = now.timeIntervalSince(attempt.lastStageDate) * 1000
                             let calculateDurationSinceStart = now.timeIntervalSince(attempt.startDate) * 1000
                             pixelHandler.fire(.optOutFinish(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceLastStage))
-                            pixelHandler.fire(.optOutSuccess(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceStart))
+                            pixelHandler.fire(.optOutSuccess(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceStart, brokerType: brokerProfileQueryData.dataBroker.type))
                         }
                     }
                 }

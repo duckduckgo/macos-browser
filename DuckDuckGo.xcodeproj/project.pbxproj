@@ -2720,6 +2720,24 @@
 		B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C85412694590B0048FEBE /* PermissionButton.swift */; };
 		B64CE01E2B8622D700126CA5 /* AddressBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64CE01D2B8622D700126CA5 /* AddressBarTests.swift */; };
 		B64CE01F2B8622D700126CA5 /* AddressBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64CE01D2B8622D700126CA5 /* AddressBarTests.swift */; };
+		B64E42872B908501006C1346 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = B65CD8D22B316E1700A595BB /* SnapshotTesting */; };
+		B64E42892B90865F006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42882B90865F006C1346 /* Macros */; };
+		B64E428B2B908666006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E428A2B908666006C1346 /* Macros */; };
+		B64E428D2B90866C006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E428C2B90866C006C1346 /* Macros */; };
+		B64E428F2B908670006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E428E2B908670006C1346 /* Macros */; };
+		B64E42912B908675006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42902B908675006C1346 /* Macros */; };
+		B64E42932B90867B006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42922B90867B006C1346 /* Macros */; };
+		B64E42952B908680006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42942B908680006C1346 /* Macros */; };
+		B64E42972B908685006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42962B908685006C1346 /* Macros */; };
+		B64E42992B908689006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42982B908689006C1346 /* Macros */; };
+		B64E429B2B90868E006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E429A2B90868E006C1346 /* Macros */; };
+		B64E429D2B908696006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E429C2B908696006C1346 /* Macros */; };
+		B64E429F2B90869A006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E429E2B90869A006C1346 /* Macros */; };
+		B64E42A12B9086A1006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42A02B9086A1006C1346 /* Macros */; };
+		B64E42A32B9086A7006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42A22B9086A7006C1346 /* Macros */; };
+		B64E42A52B9086AC006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42A42B9086AC006C1346 /* Macros */; };
+		B64E42A72B9086B1006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42A62B9086B1006C1346 /* Macros */; };
+		B64E42A92B9086BE006C1346 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B64E42A82B9086BE006C1346 /* Macros */; };
 		B64E42AB2B909DC9006C1346 /* test.pdf in Resources */ = {isa = PBXBuildFile; fileRef = B64E42AA2B909DC9006C1346 /* test.pdf */; };
 		B64E42AC2B909DC9006C1346 /* test.pdf in Resources */ = {isa = PBXBuildFile; fileRef = B64E42AA2B909DC9006C1346 /* test.pdf */; };
 		B65211252B29A42C00B30633 /* BookmarkStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CDA25DDAB32009059CC /* BookmarkStoreMock.swift */; };
@@ -3088,6 +3106,12 @@
 		EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */ = {isa = PBXBuildFile; fileRef = EAC80DDF271F6C0100BBF02D /* fb-sdk.js */; };
 		EAE42800275D47FA00DAC26B /* ClickToLoadModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */; };
 		EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */ = {isa = PBXBuildFile; fileRef = EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */; };
+		EE0629722B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */; };
+		EE0629732B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */; };
+		EE0629742B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */; };
+		EE0629752B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */; };
+		EE0629762B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */; };
+		EE2F9C5B2B90F2FF00D45FC9 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = EE2F9C5A2B90F2FF00D45FC9 /* Subscription */; };
 		EE339228291BDEFD009F62C1 /* JSAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE339227291BDEFD009F62C1 /* JSAlertController.swift */; };
 		EE66666F2B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */; };
 		EE6666702B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */; };
@@ -4457,6 +4481,7 @@
 		EAC80DDF271F6C0100BBF02D /* fb-sdk.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fb-sdk.js"; sourceTree = "<group>"; };
 		EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadModel.swift; sourceTree = "<group>"; };
 		EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = clickToLoad.js; sourceTree = "<group>"; };
+		EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountManagerExtension.swift; sourceTree = "<group>"; };
 		EE339227291BDEFD009F62C1 /* JSAlertController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSAlertController.swift; sourceTree = "<group>"; };
 		EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationsHostingViewController.swift; sourceTree = "<group>"; };
 		EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionVPNCountryLabelsModel.swift; sourceTree = "<group>"; };
@@ -4497,6 +4522,7 @@
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
 				3129788A2B64131200B67619 /* DataBrokerProtection in Frameworks */,
 				3706FCA9293F65D500E42796 /* ContentBlocking in Frameworks */,
+				B64E428B2B908666006C1346 /* Macros in Frameworks */,
 				4BF97AD12B43C43F00EB4240 /* NetworkProtectionIPC in Frameworks */,
 				37F44A5F298C17830025E7FE /* Navigation in Frameworks */,
 				B6EC37FF29B8D915001ACE79 /* Configuration in Frameworks */,
@@ -4517,6 +4543,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B64E42972B908685006C1346 /* Macros in Frameworks */,
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
 				B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
@@ -4529,6 +4556,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B65CD8D12B316E0C00A595BB /* SnapshotTesting in Frameworks */,
+				B64E42992B908689006C1346 /* Macros in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4536,6 +4564,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B64E42912B908675006C1346 /* Macros in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4546,6 +4575,7 @@
 				B65CD8CD2B316DFC00A595BB /* SnapshotTesting in Frameworks */,
 				B6AE39F329374AEC00C37AA4 /* OHHTTPStubs in Frameworks */,
 				B6AE39F529374AEC00C37AA4 /* OHHTTPStubsSwift in Frameworks */,
+				B64E42952B908680006C1346 /* Macros in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4554,6 +4584,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37269F012B332FC8005E8E46 /* Common in Frameworks */,
+				B64E429D2B908696006C1346 /* Macros in Frameworks */,
 				EE7295E92A545BC4008C0991 /* NetworkProtection in Frameworks */,
 				4B2537772A11BFE100610219 /* PixelKit in Frameworks */,
 				7BBE2B7B2B61663C00697445 /* NetworkProtectionProxy in Frameworks */,
@@ -4572,7 +4603,9 @@
 				7BA7CC5F2AD1210C0042E5CE /* Networking in Frameworks */,
 				7BEEA5162AD1236E00A9E72B /* NetworkProtectionUI in Frameworks */,
 				7BFCB74E2ADE7E1A00DA3EA7 /* PixelKit in Frameworks */,
+				B64E42A12B9086A1006C1346 /* Macros in Frameworks */,
 				EE7295ED2A545C0A008C0991 /* NetworkProtection in Frameworks */,
+				EE2F9C5B2B90F2FF00D45FC9 /* Subscription in Frameworks */,
 				7BEC182F2AD5D8DC00D30536 /* SystemExtensionManager in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4584,6 +4617,7 @@
 				7BFCB7502ADE7E2300DA3EA7 /* PixelKit in Frameworks */,
 				7BA7CC612AD1211C0042E5CE /* Networking in Frameworks */,
 				7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */,
+				B64E42A32B9086A7006C1346 /* Macros in Frameworks */,
 				7B00997F2B6508C200FE7C31 /* NetworkProtectionProxy in Frameworks */,
 				EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */,
 				4B2D067F2A1334D700DE1F49 /* NetworkProtectionUI in Frameworks */,
@@ -4595,6 +4629,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B64E429F2B90869A006C1346 /* Macros in Frameworks */,
 				EE7295EB2A545BFC008C0991 /* NetworkProtection in Frameworks */,
 				37269F052B3332C2005E8E46 /* Common in Frameworks */,
 			);
@@ -4607,6 +4642,7 @@
 				37269EFF2B332FBB005E8E46 /* Common in Frameworks */,
 				EE7295E72A545BBB008C0991 /* NetworkProtection in Frameworks */,
 				4B4D60982A0B2A5C00BCD287 /* PixelKit in Frameworks */,
+				B64E429B2B90868E006C1346 /* Macros in Frameworks */,
 				4B4D60AF2A0C837F00BCD287 /* Networking in Frameworks */,
 				4B4D603F2A0B290200BCD287 /* NetworkExtension.framework in Frameworks */,
 			);
@@ -4632,6 +4668,7 @@
 				7B31FD902AD1257B0086AA24 /* NetworkProtectionIPC in Frameworks */,
 				4B957BDE2AC7AE700062CA31 /* Configuration in Frameworks */,
 				4B957BE02AC7AE700062CA31 /* Lottie in Frameworks */,
+				B64E42A92B9086BE006C1346 /* Macros in Frameworks */,
 				4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */,
 				373FB4B52B4D6C57004C88D6 /* PreferencesViews in Frameworks */,
 				4B957BE32AC7AE700062CA31 /* Navigation in Frameworks */,
@@ -4654,6 +4691,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B64E428F2B908670006C1346 /* Macros in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4661,6 +4699,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B64E42872B908501006C1346 /* SnapshotTesting in Frameworks */,
+				B64E428D2B90866C006C1346 /* Macros in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4683,6 +4723,7 @@
 				9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */,
 				9D6983F92AC773C3002C02FC /* PixelKit in Frameworks */,
 				9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */,
+				B64E42A52B9086AC006C1346 /* Macros in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4693,6 +4734,7 @@
 				9D6983FB2AC773C8002C02FC /* PixelKit in Frameworks */,
 				315A023F2B6421AE00BFA577 /* Networking in Frameworks */,
 				9D9AE8FB2AAA3AD90026E7DC /* DataBrokerProtection in Frameworks */,
+				B64E42A72B9086B1006C1346 /* Macros in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4717,6 +4759,7 @@
 				CBC83E3629B63D380008E19C /* Configuration in Frameworks */,
 				7B31FD8C2AD125620086AA24 /* NetworkProtectionIPC in Frameworks */,
 				37269EFB2B332F9E005E8E46 /* Common in Frameworks */,
+				B64E42892B90865F006C1346 /* Macros in Frameworks */,
 				4B2AAAF529E70DEA0026AFC0 /* Lottie in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
 				1EA7B8D52B7E078C000330A4 /* Subscription in Frameworks */,
@@ -4738,6 +4781,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B64E42932B90867B006C1346 /* Macros in Frameworks */,
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
 				B65CD8CB2B316DF100A595BB /* SnapshotTesting in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
@@ -4932,6 +4976,7 @@
 		1EA7B8D62B7E124E000330A4 /* Subscription */ = {
 			isa = PBXGroup;
 			children = (
+				EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */,
 				1EA7B8D72B7E1283000330A4 /* SubscriptionFeatureAvailability.swift */,
 			);
 			path = Subscription;
@@ -6749,6 +6794,7 @@
 				565E46DE2B2725DD0013AC2A /* SyncE2EUITests */,
 				AA585D7F248FD31100E9A3E2 /* Products */,
 				85AE2FF024A33A2D002D507F /* Frameworks */,
+				EE0629702B90EE3500D868B4 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -6781,12 +6827,13 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
-				B658BAB52B0F845D00D1F2C7 /* Localizable.xcstrings */,
 				AA4D700525545EDE00C3411E /* Application */,
+				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
 				B31055BB27A1BA0E001AC618 /* Autoconsent */,
 				7B1E819A27C8874900FF0E60 /* Autofill */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
 				4BFD356E283ADE8B00CE9234 /* BookmarksBar */,
+				4B677454255DC18000025BD8 /* Bridging.h */,
 				AA86491324D831B9001BABEE /* Common */,
 				85D33F1025C82E93002B91A6 /* Configuration */,
 				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
@@ -6795,6 +6842,11 @@
 				4B723DEA26B0002B00E14D75 /* DataImport */,
 				3192EC862A4DCF0E001E97A5 /* DBP */,
 				4B379C1C27BDB7EA008A968E /* DeviceAuthentication */,
+				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
+				37D9BBA329376EE8000B99F9 /* DuckDuckGoAppStore.entitlements */,
+				377E54382937B7C400780A0A /* DuckDuckGoAppStoreCI.entitlements */,
+				AAD86E502678D104005C11BE /* DuckDuckGoCI.entitlements */,
+				4B5F15032A1570F10060320F /* DuckDuckGoDebug.entitlements */,
 				4B65143C26392483005B46EB /* Email */,
 				B68412192B6A16030092F66A /* ErrorPage */,
 				AA5FA695275F823900DCE9C9 /* Favicons */,
@@ -6807,13 +6859,18 @@
 				B65536902684409300085A79 /* Geolocation */,
 				AAE75275263B036300B973F8 /* History */,
 				AAE71DB225F66A0900D74437 /* HomePage */,
+				56CEE9092B7A66C500CF10AA /* Info.plist */,
+				56CEE90D2B7A6DE100CF10AA /* InfoPlist.xcstrings */,
 				EEAEA3F4294D05CF00D04DF3 /* JSAlert */,
+				B658BAB52B0F845D00D1F2C7 /* Localizable.xcstrings */,
 				9D03F5A22AA74829001A50E8 /* LoginItems */,
 				AA585DB02490E6FA00E9A3E2 /* MainWindow */,
 				AA97BF4425135CB60014931A /* Menus */,
 				85378D9A274E618C007C5CBF /* MessageViews */,
 				AA86491524D83384001BABEE /* NavigationBar */,
 				4B4D60542A0B29FA00BCD287 /* NetworkProtection */,
+				4B2D06642A132F3A00DE1F49 /* NetworkProtectionAppExtension.entitlements */,
+				4B5F14C42A145D6A0060320F /* NetworkProtectionVPNController.entitlements */,
 				85B7184727677A7D00B4277F /* Onboarding */,
 				1D074B252909A371006E4AC3 /* PasswordManager */,
 				B64C84DB2692D6E80048FEBE /* Permissions */,
@@ -6838,17 +6895,6 @@
 				4B9DB0062A983B23000927DB /* Waitlist */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
 				31F28C4B28C8EE9000119F70 /* YoutubePlayer */,
-				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
-				4B677454255DC18000025BD8 /* Bridging.h */,
-				AAD86E502678D104005C11BE /* DuckDuckGoCI.entitlements */,
-				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
-				4B5F15032A1570F10060320F /* DuckDuckGoDebug.entitlements */,
-				37D9BBA329376EE8000B99F9 /* DuckDuckGoAppStore.entitlements */,
-				377E54382937B7C400780A0A /* DuckDuckGoAppStoreCI.entitlements */,
-				4B2D06642A132F3A00DE1F49 /* NetworkProtectionAppExtension.entitlements */,
-				4B5F14C42A145D6A0060320F /* NetworkProtectionVPNController.entitlements */,
-				56CEE9092B7A66C500CF10AA /* Info.plist */,
-				56CEE90D2B7A6DE100CF10AA /* InfoPlist.xcstrings */,
 			);
 			path = DuckDuckGo;
 			sourceTree = "<group>";
@@ -8281,6 +8327,13 @@
 			path = fonts;
 			sourceTree = "<group>";
 		};
+		EE0629702B90EE3500D868B4 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		EEA3EEAF2B24EB5100E8333A /* VPNLocation */ = {
 			isa = PBXGroup;
 			children = (
@@ -8372,6 +8425,7 @@
 				373FB4B22B4D6C4B004C88D6 /* PreferencesViews */,
 				312978892B64131200B67619 /* DataBrokerProtection */,
 				7B1459562B7D43E500047F2C /* NetworkProtectionProxy */,
+				B64E428A2B908666006C1346 /* Macros */,
 				85E2BBCF2B8F534A00DBEC7A /* History */,
 				F1D43AF42B98E48900BAB743 /* BareBonesBrowserKit */,
 			);
@@ -8399,6 +8453,7 @@
 				3706FDD8293F661700E42796 /* OHHTTPStubsSwift */,
 				4B81AD362B29513100706C96 /* PixelKitTestingUtilities */,
 				B65CD8CE2B316E0200A595BB /* SnapshotTesting */,
+				B64E42962B908685006C1346 /* Macros */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -8422,6 +8477,7 @@
 			name = "Integration Tests App Store";
 			packageProductDependencies = (
 				B65CD8D02B316E0C00A595BB /* SnapshotTesting */,
+				B64E42982B908689006C1346 /* Macros */,
 			);
 			productName = "Integration Tests";
 			productReference = 3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */;
@@ -8442,6 +8498,9 @@
 				376113D62B29CD6800E794BB /* PBXTargetDependency */,
 			);
 			name = "SyncE2EUITests App Store";
+			packageProductDependencies = (
+				B64E42902B908675006C1346 /* Macros */,
+			);
 			productName = DuckDuckGoSyncUITests;
 			productReference = 376113D42B29CD5B00E794BB /* SyncE2EUITests App Store.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -8466,6 +8525,7 @@
 				B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */,
 				B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */,
 				B65CD8CC2B316DFC00A595BB /* SnapshotTesting */,
+				B64E42942B908680006C1346 /* Macros */,
 			);
 			productName = "Integration Tests";
 			productReference = 4B1AD89D25FC27E200261379 /* Integration Tests.xctest */;
@@ -8492,6 +8552,7 @@
 				EE7295E82A545BC4008C0991 /* NetworkProtection */,
 				37269F002B332FC8005E8E46 /* Common */,
 				7BBE2B7A2B61663C00697445 /* NetworkProtectionProxy */,
+				B64E429C2B908696006C1346 /* Macros */,
 			);
 			productName = NetworkProtectionSystemExtension;
 			productReference = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.vpn.network-extension.debug.systemextension */;
@@ -8523,6 +8584,8 @@
 				7BFCB74D2ADE7E1A00DA3EA7 /* PixelKit */,
 				4B41EDAA2B1544B2001EEDF4 /* LoginItems */,
 				7B00997C2B6508B700FE7C31 /* NetworkProtectionProxy */,
+				B64E42A02B9086A1006C1346 /* Macros */,
+				EE2F9C5A2B90F2FF00D45FC9 /* Subscription */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo VPN.app */;
@@ -8555,6 +8618,7 @@
 				7BFCB74F2ADE7E2300DA3EA7 /* PixelKit */,
 				7B00997E2B6508C200FE7C31 /* NetworkProtectionProxy */,
 				4BA7C4DC2B3F64E500AFE511 /* LoginItems */,
+				B64E42A22B9086A7006C1346 /* Macros */,
 			);
 			productName = DuckDuckGoAgentAppStore;
 			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGo VPN App Store.app */;
@@ -8578,6 +8642,7 @@
 			packageProductDependencies = (
 				EE7295EA2A545BFC008C0991 /* NetworkProtection */,
 				37269F042B3332C2005E8E46 /* Common */,
+				B64E429E2B90869A006C1346 /* Macros */,
 			);
 			productName = DuckDuckGoNotifications;
 			productReference = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */;
@@ -8603,6 +8668,7 @@
 				4B4D60AE2A0C837F00BCD287 /* Networking */,
 				EE7295E62A545BBB008C0991 /* NetworkProtection */,
 				37269EFE2B332FBB005E8E46 /* Common */,
+				B64E429A2B90868E006C1346 /* Macros */,
 			);
 			productName = NetworkProtectionAppExtension;
 			productReference = 4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */;
@@ -8655,6 +8721,7 @@
 				373FB4B42B4D6C57004C88D6 /* PreferencesViews */,
 				1E21F8E22B73E48600FB272E /* Subscription */,
 				7B94E1642B7ED95100E32B96 /* NetworkProtectionProxy */,
+				B64E42A82B9086BE006C1346 /* Macros */,
 				85E2BBD12B8F536F00DBEC7A /* History */,
 				F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */,
 			);
@@ -8676,6 +8743,9 @@
 				B6F997BF2B8F35F400476735 /* PBXTargetDependency */,
 			);
 			name = SyncE2EUITests;
+			packageProductDependencies = (
+				B64E428E2B908670006C1346 /* Macros */,
+			);
 			productName = DuckDuckGoSyncUITests;
 			productReference = 565E46DD2B2725DC0013AC2A /* SyncE2EUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -8696,6 +8766,8 @@
 			);
 			name = "UI Tests";
 			packageProductDependencies = (
+				B65CD8D22B316E1700A595BB /* SnapshotTesting */,
+				B64E428C2B90866C006C1346 /* Macros */,
 			);
 			productName = "UI Tests";
 			productReference = 7B4CE8DA26F02108009134B1 /* UI Tests.xctest */;
@@ -8743,6 +8815,7 @@
 				9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */,
 				9D6983F82AC773C3002C02FC /* PixelKit */,
 				9DEF97E02B06C4EE00764F03 /* Networking */,
+				B64E42A42B9086AC006C1346 /* Macros */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */;
@@ -8767,6 +8840,7 @@
 				9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */,
 				9D6983FA2AC773C8002C02FC /* PixelKit */,
 				315A023E2B6421AE00BFA577 /* Networking */,
+				B64E42A62B9086B1006C1346 /* Macros */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */;
@@ -8823,6 +8897,7 @@
 				1EA7B8D22B7E078C000330A4 /* SubscriptionUI */,
 				1EA7B8D42B7E078C000330A4 /* Subscription */,
 				F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */,
+				B64E42882B90865F006C1346 /* Macros */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -8848,6 +8923,7 @@
 				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
 				4B81AD342B29512B00706C96 /* PixelKitTestingUtilities */,
 				B65CD8CA2B316DF100A595BB /* SnapshotTesting */,
+				B64E42922B90867B006C1346 /* Macros */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -10103,6 +10179,7 @@
 				B684121D2B6A1D880092F66A /* ErrorPageHTMLTemplate.swift in Sources */,
 				3706FBD2293F65D500E42796 /* RunningApplicationCheck.swift in Sources */,
 				3706FBD3293F65D500E42796 /* StatePersistenceService.swift in Sources */,
+				EE0629732B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */,
 				3706FBD4293F65D500E42796 /* WindowManager+StateRestoration.swift in Sources */,
 				7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */,
 				3706FBD5293F65D500E42796 /* TabCollection+NSSecureCoding.swift in Sources */,
@@ -10740,6 +10817,7 @@
 				7B8DB31A2B504D7500EC16DA /* VPNAppEventsHandler.swift in Sources */,
 				7BA7CC532AD11FCE0042E5CE /* Bundle+VPN.swift in Sources */,
 				7BFE95562A9DF29B0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
+				EE0629742B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */,
 				7BA7CC5D2AD120C30042E5CE /* EventMapping+NetworkProtectionError.swift in Sources */,
 				7BA7CC4A2AD11EA00042E5CE /* NetworkProtectionTunnelController.swift in Sources */,
 				7BD1688E2AD4A4C400D24876 /* NetworkExtensionController.swift in Sources */,
@@ -10773,6 +10851,7 @@
 				4B0EF7292B5780EB009D6481 /* VPNAppEventsHandler.swift in Sources */,
 				7BA7CC412AD11E420042E5CE /* NetworkProtectionBouncer.swift in Sources */,
 				4BF0E5082AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
+				EE0629752B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */,
 				7BA7CC582AD1203A0042E5CE /* UserText+NetworkProtection.swift in Sources */,
 				7BA7CC4B2AD11EC60042E5CE /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				4BF0E5152AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
@@ -11241,6 +11320,7 @@
 				4B957AB92AC7AE700062CA31 /* SerpHeadersNavigationResponder.swift in Sources */,
 				4B957ABA2AC7AE700062CA31 /* HomePageContinueSetUpModel.swift in Sources */,
 				4B957ABB2AC7AE700062CA31 /* WebKitDownloadTask.swift in Sources */,
+				EE0629762B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */,
 				4B957ABC2AC7AE700062CA31 /* ChromiumLoginReader.swift in Sources */,
 				B6BCC5522AFE4F7D002C5499 /* DataImportTypePicker.swift in Sources */,
 				4B957ABD2AC7AE700062CA31 /* NSAlert+PasswordManager.swift in Sources */,
@@ -12024,6 +12104,7 @@
 				7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */,
 				B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */,
 				85589E8227BBB8630038AD11 /* HomePageView.swift in Sources */,
+				EE0629722B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */,
 				B6BF5D932947199A006742B1 /* SerpHeadersNavigationResponder.swift in Sources */,
 				569277C129DDCBB500B633EF /* HomePageContinueSetUpModel.swift in Sources */,
 				B68D21CF2ACBC9FC002DA3C2 /* ContentBlockerRulesManagerMock.swift in Sources */,
@@ -13630,7 +13711,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 115.0.0;
+				version = 118.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -13670,7 +13751,7 @@
 			repositoryURL = "https://github.com/duckduckgo/apple-toolbox.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.0;
+				version = 2.0.0;
 			};
 		};
 		F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */ = {
@@ -14217,6 +14298,91 @@
 			package = AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
 		};
+		B64E42882B90865F006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E428A2B908666006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E428C2B90866C006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E428E2B908670006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42902B908675006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42922B90867B006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42942B908680006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42962B908685006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42982B908689006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E429A2B90868E006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E429C2B908696006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E429E2B90869A006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42A02B9086A1006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42A22B9086A7006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42A42B9086AC006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42A62B9086B1006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
+		B64E42A82B9086BE006C1346 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = Macros;
+		};
 		B65CD8CA2B316DF100A595BB /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
@@ -14233,6 +14399,11 @@
 			productName = SnapshotTesting;
 		};
 		B65CD8D02B316E0C00A595BB /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		B65CD8D22B316E1700A595BB /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
@@ -14296,6 +14467,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Configuration;
+		};
+		EE2F9C5A2B90F2FF00D45FC9 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
 		};
 		EE7295E22A545B9A008C0991 /* NetworkProtection */ = {
 			isa = XCSwiftPackageProductDependency;

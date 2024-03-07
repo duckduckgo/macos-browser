@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Macros
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -139,7 +140,7 @@ final class TabBarViewItemTests: XCTestCase {
 
         // Update url
         let tab = Tab()
-        tab.url = URL(string: "https://www.apple.com")
+        tab.url = #URL("https://www.apple.com")
         let vm = TabViewModel(tab: tab)
         tabBarViewItem.subscribe(to: vm, tabCollectionViewModel: TabCollectionViewModel())
         // update menu

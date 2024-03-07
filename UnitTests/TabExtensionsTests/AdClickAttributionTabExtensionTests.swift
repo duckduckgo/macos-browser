@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import ContentBlocking
+import Macros
 import TrackerRadarKit
 import WebKit
 import XCTest
@@ -31,8 +32,8 @@ import XCTest
 @MainActor
 class AdClickAttributionTabExtensionTests: XCTestCase {
     struct URLs {
-        let url1 = URL(string: "https://my-host.com/")!
-        let url2 = URL(string: "http://another-host.org/1")!
+        let url1 = #URL("https://my-host.com/")
+        let url2 = #URL("http://another-host.org/1")
     }
     struct DataSource {
         let empty = Data()
