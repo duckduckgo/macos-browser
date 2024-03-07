@@ -31,21 +31,22 @@ jobs:
     outputs:
       skip-release: ${{ steps.check-for-changes.outputs.skip-release }}
       asana-task-url: ${{ steps.set-parameters.outputs.asana-task-url }}
+      release-branch: ${{ steps.set-parameters.outputs.release-branch }}
 
     steps:
 
       - name: Assert release branch
         run: |
-          case "${{ github.ref }}" in
-            refs/heads/release/*) ;;
-            *) echo "👎 Not a release branch"; exit 1 ;;
+          case "${{ github.ref_name }}" in
+            release/*) ;;
+            main) ;;
+            *) echo "👎 Not a release or main branch"; exit 1 ;;
           esac
 
       - name: Check out the code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
-          ref: ${{ github.ref_name }}
 
       - name: Check if there are changes to the release branch
         id: check-for-changes
@@ -81,9 +82,15 @@ jobs:
       - name: Set parameters
         id: set-parameters
         env:
-          TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.task-id }}
           ASANA_TASK_URL: ${{ steps.find-asana-task.outputs.task-url || github.event.inputs.asana-task-url }}
+          RELEASE_BRANCH: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
+          TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.task-id }}
         run: |
+          if [[ "${RELEASE_BRANCH}" == "main" ]]; then
+            echo "::error::Workflow run from main branch and release branch wasn't found. Please re-run the workflow and specify a release branch."
+            exit 1
+          fi
+          echo "release-branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
           echo "task-id=${TASK_ID}" >> $GITHUB_OUTPUT
           echo "asana-task-url=${ASANA_TASK_URL}" >> $GITHUB_OUTPUT
 
@@ -110,6 +117,8 @@ jobs:
 
     if: needs.validate_input_conditions.outputs.skip-release == 'false'
     uses: ./.github/workflows/pr.yml
+    with:
+      branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
 
@@ -127,7 +136,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
-          ref: ${{ github.ref_name }}
+          ref: ${{ needs.validate_input_conditions.outputs.release-branch }}
           submodules: recursive
 
       - name: Select Xcode
@@ -167,6 +176,7 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
+      branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
@@ -200,7 +210,7 @@ jobs:
     uses: ./.github/workflows/tag_release.yml
     with:
       asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
-      branch: ${{ github.ref_name }}
+      branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
       base-branch: ${{ github.event.inputs.base-branch || 'main' }}
       prerelease: true
       internal-release-bump: true

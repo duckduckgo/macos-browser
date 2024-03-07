@@ -83,6 +83,8 @@ main() {
 
 	if [[ -n "$release_task_id" && "$release_task_id" != "null" ]]; then
 		echo "Found ${latest_marketing_version} release task: ${asana_app_url}/${release_task_id}/f"
+		# shellcheck disable=SC2129
+		echo "release-branch=release/${latest_marketing_version}" >> "$GITHUB_OUTPUT"
 		echo "task-id=${release_task_id}" >> "$GITHUB_OUTPUT"
 		echo "task-url=${asana_app_url}/${release_task_id}/f" >> "$GITHUB_OUTPUT"
 	else

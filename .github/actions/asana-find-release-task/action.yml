@@ -13,6 +13,9 @@ inputs:
     required: false
     type: string
 outputs:
+  release-branch:
+    description: "Release branch"
+    value: ${{ steps.find-release-task.outputs.release-branch }}
   task-id:
     description: "Release task ID"
     value: ${{ steps.find-release-task.outputs.task-id }}
