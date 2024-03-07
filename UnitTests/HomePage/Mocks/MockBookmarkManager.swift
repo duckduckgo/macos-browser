@@ -59,6 +59,8 @@ class MockBookmarkManager: BookmarkManager {
 
     func update(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {}
 
+    func update(bookmark: DuckDuckGo_Privacy_Browser.Bookmark, withURL url: URL, title: String, isFavorite: Bool) {}
+
     func update(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder) {}
 
     func update(folder: DuckDuckGo_Privacy_Browser.BookmarkFolder, andMoveToParent parent: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
