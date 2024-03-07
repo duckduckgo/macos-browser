@@ -986,10 +986,10 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showEmptyState(imageName: .loginsEmpty, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
-        case .logins: showEmptyState(imageName: .loginsEmpty, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
-        case .identities: showEmptyState(imageName: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
-        case .cards: showEmptyState(imageName: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
+        case .allItems: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .logins: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
+        case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
+        case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
         }
     }
 
@@ -997,9 +997,9 @@ final class PasswordManagementViewController: NSViewController {
         emptyState.isHidden = true
     }
 
-    private func showEmptyState(imageName: String, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true) {
+    private func showEmptyState(image: NSImage, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true) {
         emptyState.isHidden = false
-        emptyStateImageView.image = NSImage(named: imageName)
+        emptyStateImageView.image = image
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
         if let message {
             emptyStateMessage.attributedStringValue = NSAttributedString.make(message, lineHeight: 1.05, kern: -0.08)
