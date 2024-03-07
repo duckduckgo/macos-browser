@@ -44,6 +44,7 @@ final class FileDownloadManagerTests: XCTestCase {
         defaults.removePersistentDomain(forName: testGroupName)
         preferences = DownloadsPreferences(persistor: DownloadsPreferencesPersistorMock())
         preferences.alwaysRequestDownloadLocation = false
+        preferences.lastUsedCustomDownloadLocation = fm.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
         self.workspace = TestWorkspace()
         self.dm = FileDownloadManager(preferences: preferences)
         let tempDir = fm.temporaryDirectory
@@ -111,6 +112,7 @@ final class FileDownloadManagerTests: XCTestCase {
     func testWhenRequiredByDownloadRequestThenDownloadLocationChooserIsCalled() {
         let downloadsURL = fm.temporaryDirectory
         preferences.selectedDownloadLocation = downloadsURL
+        let lastUsedCustomDownloadLocation = preferences.lastUsedCustomDownloadLocation
 
         let e1 = expectation(description: "chooseDestinationCallback called")
         self.chooseDestination = { suggestedFilename, fileTypes, callback in
@@ -136,6 +138,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 0.3)
+        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, lastUsedCustomDownloadLocation, "lastUsedCustomDownloadLocation shouldn‘t change")
     }
 
     func testWhenRequiredByPreferencesThenDownloadLocationChooserIsCalled() {
@@ -169,6 +172,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 0.3)
+        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, downloadsURL, "lastUsedCustomDownloadLocation should be saved")
     }
 
     func testWhenChosenDownloadLocationExistsThenItsOverwritten() {
@@ -191,6 +195,7 @@ final class FileDownloadManagerTests: XCTestCase {
         waitForExpectations(timeout: 0.3)
 
         XCTAssertFalse(fm.fileExists(atPath: localURL.path))
+        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, localURL.deletingLastPathComponent(), "lastUsedCustomDownloadLocation should be saved")
     }
 
     func testWhenDownloadingLocalFileThenLocationChooserIsCalled() {
@@ -217,6 +222,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 0.3)
+        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, downloadsURL, "lastUsedCustomDownloadLocation should be saved")
     }
 
     func testWhenNotRequiredByPreferencesThenDefaultDownloadLocationIsChosen() {
