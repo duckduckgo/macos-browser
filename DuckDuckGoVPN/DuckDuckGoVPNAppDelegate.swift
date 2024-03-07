@@ -313,23 +313,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         let launchedOnStartup = launchInformation.wasLaunchedByStartup
         launchInformation.update()
 
-#if SUBSCRIPTION
-        let entitlementsCheck = {
-            await AccountManager().hasEntitlement(for: .networkProtection)
-        }
-#else
-        let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-            return .success(true)
-        }
-#endif
-
-        Task {
-            await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { result in
-                if case .invalidEntitlement = result {
-                    UserDefaults.netP.networkProtectionEntitlementsValid = false
-                }
-            }
-        }
+        setUpSubscriptionMonitoring()
 
         if launchedOnStartup {
             Task {
@@ -359,6 +343,40 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }.store(in: &cancellables)
+    }
+
+    private func setUpSubscriptionMonitoring() {
+#if SUBSCRIPTION
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
+
+        let entitlementsCheck = {
+            await AccountManager().hasEntitlement(for: .networkProtection)
+        }
+
+        Task {
+            await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { [weak self] result in
+                switch result {
+                case .validEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsValid = true
+                case .invalidEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsValid = false
+                    guard let self else { return }
+                    Task {
+                        let isConnected = await self.tunnelController.isConnected
+                        if isConnected {
+                            await self.tunnelController.stop()
+                        }
+                    }
+                case .error:
+                    break
+                }
+            }
+        }
+#else
+        let entitlementsCheck: (() async -> Result<Bool, Error>) = {
+            return .success(false)
+        }
+#endif
     }
 
     private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
