@@ -113,7 +113,6 @@ final class PreferencesSidebarModel: ObservableObject {
                 self.refreshSections()
             }
             .store(in: &cancellables)
-        UserDefaults.netP.publisher(for: \.networkProtectionEntitlementsValid).receive(subscriber: DispatchQueue.main).sink { }
     }
 #endif
 

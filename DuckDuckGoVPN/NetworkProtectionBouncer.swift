@@ -31,7 +31,7 @@ final class NetworkProtectionBouncer {
     /// current app.
     ///
     func requireAuthTokenOrKillApp() {
-        let accountManager = AccountManager(appGroup: Bundle.main.appGroup(bundle: .subs))
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil, isSubscriptionEnabled: false)
 
         // TODO: Do entitlements check, not this
