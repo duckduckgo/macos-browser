@@ -3153,6 +3153,12 @@
 		EECE10E629DD77E60044D027 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECE10E429DD77E60044D027 /* FeatureFlag.swift */; };
 		EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
+		F1D43AEE2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
+		F1D43AEF2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
+		F1D43AF02B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
+		F1D43AF32B98E47800BAB743 /* BareBonesBrowserKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */; };
+		F1D43AF52B98E48900BAB743 /* BareBonesBrowserKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1D43AF42B98E48900BAB743 /* BareBonesBrowserKit */; };
+		F1D43AF72B98E48F00BAB743 /* BareBonesBrowserKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 		F4A6198C283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */; };
@@ -4489,6 +4495,7 @@
 		EECE10E429DD77E60044D027 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
+		F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MainMenuActions+VanillaBrowser.swift"; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
 		F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentScopeFeatureFlagging.swift; sourceTree = "<group>"; };
@@ -4510,6 +4517,7 @@
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
 				9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */,
 				37269EFD2B332FAC005E8E46 /* Common in Frameworks */,
+				F1D43AF52B98E48900BAB743 /* BareBonesBrowserKit in Frameworks */,
 				378F44E629B4BDEE00899924 /* SwiftUIExtensions in Frameworks */,
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
 				3129788A2B64131200B67619 /* DataBrokerProtection in Frameworks */,
@@ -4656,6 +4664,7 @@
 				4B957BDC2AC7AE700062CA31 /* SwiftUIExtensions in Frameworks */,
 				4B957BDD2AC7AE700062CA31 /* UserScript in Frameworks */,
 				7BBD44282AD730A400D0A064 /* PixelKit in Frameworks */,
+				F1D43AF72B98E48F00BAB743 /* BareBonesBrowserKit in Frameworks */,
 				7B31FD902AD1257B0086AA24 /* NetworkProtectionIPC in Frameworks */,
 				4B957BDE2AC7AE700062CA31 /* Configuration in Frameworks */,
 				4B957BE02AC7AE700062CA31 /* Lottie in Frameworks */,
@@ -4745,6 +4754,7 @@
 				1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */,
 				31A3A4E32B0C115F0021063C /* DataBrokerProtection in Frameworks */,
 				378F44E429B4BDE900899924 /* SwiftUIExtensions in Frameworks */,
+				F1D43AF32B98E47800BAB743 /* BareBonesBrowserKit in Frameworks */,
 				1E950E432912A10D0051A99B /* UserScript in Frameworks */,
 				CBC83E3629B63D380008E19C /* Configuration in Frameworks */,
 				7B31FD8C2AD125620086AA24 /* NetworkProtectionIPC in Frameworks */,
@@ -7360,6 +7370,7 @@
 				AA7E919628746BCC00AB6B62 /* HistoryMenu.swift */,
 				AA4BBA3A25C58FA200C4FB0F /* MainMenu.swift */,
 				AA6EF9B425081B4C004754E6 /* MainMenuActions.swift */,
+				F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */,
 				AAAB9115288EB46B00A057A9 /* VisitMenuItem.swift */,
 			);
 			path = Menus;
@@ -8416,6 +8427,7 @@
 				7B1459562B7D43E500047F2C /* NetworkProtectionProxy */,
 				B64E428A2B908666006C1346 /* Macros */,
 				85E2BBCF2B8F534A00DBEC7A /* History */,
+				F1D43AF42B98E48900BAB743 /* BareBonesBrowserKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -8711,6 +8723,7 @@
 				7B94E1642B7ED95100E32B96 /* NetworkProtectionProxy */,
 				B64E42A82B9086BE006C1346 /* Macros */,
 				85E2BBD12B8F536F00DBEC7A /* History */,
+				F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -8883,6 +8896,7 @@
 				85E2BBCD2B8F534000DBEC7A /* History */,
 				1EA7B8D22B7E078C000330A4 /* SubscriptionUI */,
 				1EA7B8D42B7E078C000330A4 /* Subscription */,
+				F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */,
 				B64E42882B90865F006C1346 /* Macros */,
 			);
 			productName = DuckDuckGo;
@@ -9024,6 +9038,7 @@
 				4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 				B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */,
+				F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -9805,6 +9820,7 @@
 				3706FAC1293F65D500E42796 /* FeedbackViewController.swift in Sources */,
 				3706FAC2293F65D500E42796 /* FaviconSelector.swift in Sources */,
 				B696AFFC2AC5924800C93203 /* FileLineError.swift in Sources */,
+				F1D43AEF2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */,
 				B6E1491129A5C30A00AAFBE8 /* FBProtectionTabExtension.swift in Sources */,
 				3706FAC4293F65D500E42796 /* PrintingUserScript.swift in Sources */,
 				9D9AE86C2AA76D1B0026E7DC /* LoginItemsManager.swift in Sources */,
@@ -11149,6 +11165,7 @@
 				4B957A302AC7AE700062CA31 /* NavigationBarViewController.swift in Sources */,
 				4B957A312AC7AE700062CA31 /* MainViewController.swift in Sources */,
 				4B957A322AC7AE700062CA31 /* DuckPlayer.swift in Sources */,
+				F1D43AF02B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */,
 				4B957A332AC7AE700062CA31 /* Favicon.swift in Sources */,
 				1E2AE4CA2ACB21A000684E0A /* NetworkProtectionRemoteMessage.swift in Sources */,
 				4B957A342AC7AE700062CA31 /* SuggestionContainerViewModel.swift in Sources */,
@@ -11932,6 +11949,7 @@
 				4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
+				F1D43AEE2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */,
 				37F19A6A28E2F2D000740DC6 /* DuckPlayer.swift in Sources */,
 				AA5FA69A275F91C700DCE9C9 /* Favicon.swift in Sources */,
 				AABEE69A24A902A90043105B /* SuggestionContainerViewModel.swift in Sources */,
@@ -13736,6 +13754,14 @@
 				version = 2.0.0;
 			};
 		};
+		F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/duckduckgo/BareBonesBrowser.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -14476,6 +14502,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = NetworkProtection;
+		};
+		F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
+		};
+		F1D43AF42B98E48900BAB743 /* BareBonesBrowserKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
+		};
+		F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 
