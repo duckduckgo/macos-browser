@@ -23,7 +23,8 @@ import SwiftUI
 extension MainViewController: BareBonesBrowserUIDelegate {
 
     @objc func openVanillaBrowser(_ sender: Any?) {
-        openVanillaBrowser(url: URL(string: "https://duckduckgo.com/")!)
+        let currentURL = WindowControllersManager.shared.selectedTab?.url ?? URL(string: "https://duckduckgo.com/")!
+        openVanillaBrowser(url: currentURL)
     }
 
     static var webViewConfiguration: WKWebViewConfiguration = {
