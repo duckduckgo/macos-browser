@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/apple-toolbox.git",
       "state" : {
-        "revision" : "e3dc4faf70ca09718a2d20d5c47b449389e8c153",
-        "version" : "1.0.0"
+        "revision" : "d51beaf1736013b530576ace13a16d6d1a63742c",
+        "version" : "2.0.0"
       }
     },
     {
@@ -24,7 +24,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "mariusz/cleanup-cpm-default",
-        "revision" : "17f57b5543250cc16a6d61985a6267589f6ef658"
+        "revision" : "44b5c63907a98ec83d2237fbf504f50478d7ca43"
       }
     },
     {

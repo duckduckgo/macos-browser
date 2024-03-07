@@ -178,7 +178,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 #endif
     }
 
-    // swiftlint:disable:next function_body_length
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct SubscriptionSelection: Decodable {
             let id: String
@@ -189,7 +189,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 #if STRIPE
         let emailAccessToken = try? EmailManager().getToken()
 
-        switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken) {
+        switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
         case .success(let purchaseUpdate):
             await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
         case .failure:
@@ -224,14 +224,20 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
 
             let emailAccessToken = try? EmailManager().getToken()
+            let purchaseTransactionJWS: String
 
             os_log(.info, log: .subscription, "[Purchase] Purchasing")
-            switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
-            case .success:
-                break
+            switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+            case .success(let transactionJWS):
+                purchaseTransactionJWS = transactionJWS
             case .failure(let error):
-                os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
-                await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                switch error {
+                case .cancelledByUser:
+                    os_log(.error, log: .subscription, "[Purchase] Cancelled by user")
+                default:
+                    os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                    await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                }
                 return nil
             }
 
@@ -239,7 +245,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
-            switch await AppStorePurchaseFlow.completeSubscriptionPurchase() {
+            switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
             case .success(let purchaseUpdate):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
             case .failure(let error):
@@ -265,12 +271,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     }
                 },
                 openURLHandler: { url in
-                    WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-                }, goToSyncPreferences: {
-                    WindowControllersManager.shared.show(url: .settingsPane(.sync), source: .ui, newTab: true)
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
                 })
 
-            let vc = SubscriptionAccessViewController(actionHandlers: actionHandlers)
+            let vc = SubscriptionAccessViewController(accountManager: AccountManager(), actionHandlers: actionHandlers, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
         }
 
@@ -307,7 +311,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
-            await WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
+            await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
         }
 
         return nil
@@ -318,7 +322,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let progressViewController = await ProgressViewController(title: UserText.completingPurchaseTitle)
 
         await mainViewController?.presentAsSheet(progressViewController)
-        await StripePurchaseFlow.completeSubscriptionPurchase()
+        await StripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         await mainViewController?.dismiss(progressViewController)
 
         return [String: String]() // cannot be nil
@@ -355,7 +359,7 @@ extension SubscriptionPagesUseSubscriptionFeature {
 
                 guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
-                switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
+                switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
                 case .success:
                     onSuccessHandler()
                 case .failure(let error):
@@ -412,7 +416,7 @@ extension MainWindowController {
         window.show(.subscriptionFoundAlert(), firstButtonAction: {
             if #available(macOS 12.0, *) {
                 Task {
-                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
+                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
                     originalMessage.webView?.reload()
                 }
             }

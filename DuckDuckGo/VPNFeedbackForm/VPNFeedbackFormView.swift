@@ -149,9 +149,9 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
                 .background(
                     ZStack {
                         RoundedRectangle(cornerRadius: 8.0)
-                            .stroke(Color(NSColor.textEditorBorderColor), lineWidth: 0.4)
+                            .stroke(Color(.textEditorBorder), lineWidth: 0.4)
                         RoundedRectangle(cornerRadius: 8.0)
-                            .fill(Color(NSColor.textEditorBackgroundColor))
+                            .fill(Color(.textEditorBackground))
                     }
                 )
         }
@@ -164,7 +164,7 @@ private struct VPNFeedbackFormSentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image("VPNFeedbackSent")
+            Image(.vpnFeedbackSent)
                 .padding(.top, 20)
 
             Text(UserText.vpnFeedbackFormSendingConfirmationTitle)
