@@ -331,9 +331,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
-            let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
-            if alert.runModal() == .cancel {
-                return .terminateCancel
+            // if there‘re downloads without location chosen yet (save dialog should display) - ignore them
+            if FileDownloadManager.shared.downloads.contains(where: { $0.location.destinationURL != nil }) {
+                let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
+                if alert.runModal() == .cancel {
+                    return .terminateCancel
+                }
             }
             FileDownloadManager.shared.cancelAll(waitUntilDone: true)
             DownloadListCoordinator.shared.sync()
