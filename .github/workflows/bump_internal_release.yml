@@ -1,6 +1,8 @@
 name: Bump Internal Release
 
 on:
+  schedule:
+    - cron: '0 0 * * *' # Run every day at midnight
   workflow_dispatch:
     inputs:
       asana-task-url:
@@ -14,12 +16,20 @@ on:
 
 jobs:
 
-  assert_release_branch:
+  # when on schedule:
+  # 1. find the release branch - check out the repository, find the latest tag, strip build number, check out the branch.
+  # 2. find asana task - "macOS App Release x.y.z", incomplete, in macOS App Development.
+  # 3. find hotfix task - if there's any 'macOS App Hotfix Release a.b.c', incomplete, in macOS App Development, skip the release.
 
-    name: Assert Release Branch
+  validate_input_conditions:
+
+    name: Validate Input Conditions
 
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
+    outputs:
+      skip-release: ${{ steps.check-for-changes.outputs.skip-release }}
 
     steps:
 
@@ -33,8 +43,26 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
           ref: ${{ github.ref_name }}
-  
+
+      - name: Check if there's are changes to release
+        id: check-for-changes
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            latest_tag="$(git describe --tags --abbrev=0)"
+            changed_files="$(git diff --name-only "$latest_tag" | grep -v -E '.github|scripts')"
+
+            if [[ ${#changed_files} == 0 ]]; then
+              echo "::warning::No changes to the release branch (or only scripts and workflows). Skipping automatic release."
+              echo "skip-release=true" >> $GITHUB_OUTPUT
+            else
+              echo "skip-release=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "skip-release=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Extract Asana Task ID
         id: task-id
         uses: ./.github/actions/asana-extract-task-id
@@ -60,7 +88,9 @@ jobs:
 
     name: Run Tests
 
-    needs: assert_release_branch
+    needs: validate_input_conditions
+
+    if: needs.validate_input_conditions.outputs.skip-release == 'false'
     uses: ./.github/workflows/pr.yml
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
