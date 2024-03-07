@@ -374,6 +374,16 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
+    func removeAll(matching condition: (Tab.TabContent) -> Bool) {
+        let tabs = tabCollection.tabs.filter { condition($0.content) }
+
+        for tab in tabs {
+            if let index = indexInAllTabs(of: tab) {
+                remove(at: index)
+            }
+        }
+    }
+
     func remove(at index: TabIndex, published: Bool = true, forceChange: Bool = false) {
         switch index {
         case .unpinned(let i):
@@ -688,6 +698,23 @@ final class TabCollectionViewModel: NSObject {
             self.selectedTabViewModel = selectedTabViewModel
         }
     }
+
+    func reloadAll(matching condition: (Tab.TabContent) -> Bool, ignoreCurrentTab: Bool = false) {
+        let tabs = tabCollection.tabs.filter { condition($0.content) }
+
+        for tab in tabs {
+            if ignoreCurrentTab && tab == selectedTab {
+                continue
+            }
+            
+            if let index = indexInAllTabs(of: tab) {
+                Task { @MainActor in
+                    tab.reload()
+                }
+            }
+        }
+    }
+
 }
 
 extension TabCollectionViewModel {
