@@ -43,9 +43,33 @@ final class NetworkProtectionSubscriptionEventHandler {
         self.userDefaults = userDefaults
     }
 
+    private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
+
+    private func setUpEntitlementMonitoring() {
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
+
+        let entitlementsCheck = {
+            await AccountManager().hasEntitlement(for: .networkProtection)
+        }
+
+        Task {
+            await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { result in
+                switch result {
+                case .validEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsValid = true
+                case .invalidEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsValid = false
+                case .error:
+                    break
+                }
+            }
+        }
+    }
+
     func registerForSubscriptionAccountManagerEvents() {
         NotificationCenter.default.addObserver(self, selector: #selector(handleAccountDidSignIn), name: .accountDidSignIn, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleAccountDidSignOut), name: .accountDidSignOut, object: nil)
+        setUpEntitlementMonitoring()
     }
 
     @objc private func handleAccountDidSignIn() {
