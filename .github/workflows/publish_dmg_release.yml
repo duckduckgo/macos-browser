@@ -106,6 +106,7 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
           submodules: recursive
 
       - name: Select Xcode
@@ -241,6 +242,15 @@ jobs:
             announcement-task-contents.txt
           echo "announcement-task-contents=$(sed 's/"/\\"/g' < announcement-task-contents.txt)" >> $GITHUB_OUTPUT
 
+      - name: Get tasks since last internal release
+        id: get-tasks-since-last-internal-release
+        if: contains(github.event.inputs.release-type, '') == false
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tasks="$(./scripts/update_asana_for_release.sh list-tasks-in-last-internal-release)"
+          echo "tasks=$tasks" >> $GITHUB_OUTPUT
+
       - name: Set common environment variables
         if: always()
         env:
@@ -252,6 +262,7 @@ jobs:
           echo "RELEASE_BUCKET_NAME=${{ vars.TEST_RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_PREFIX=${{ vars.TEST_RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
+          echo "TASKS_SINCE_LAST_INTERNAL_RELEASE=${{ steps.get-tasks-since-last-internal-release.outputs.tasks }}" >> $GITHUB_ENV
           echo "VERSION=${{ steps.verify-tag.outputs.release-version }}" >> $GITHUB_ENV
           echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
 
@@ -263,7 +274,11 @@ jobs:
             if [[ "${RELEASE_TYPE}" == "internal" ]]; then
               echo "task-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
               echo "comment-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
-              echo "release-task-comment-template=internal-release-complete" >> $GITHUB_OUTPUT
+              if [[ -n "${TASKS_SINCE_LAST_INTERNAL_RELEASE}" ]]; then
+                echo "release-task-comment-template=internal-release-complete-with-tasks" >> $GITHUB_OUTPUT
+              else
+                echo "release-task-comment-template=internal-release-complete" >> $GITHUB_OUTPUT
+              fi
             else
               echo "task-template=validate-check-for-updates-public" >> $GITHUB_OUTPUT
               echo "comment-template=validate-check-for-updates-public" >> $GITHUB_OUTPUT
