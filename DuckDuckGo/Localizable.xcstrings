@@ -4005,7 +4005,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your passwords will be deleted from this device. Asegúrate de seguir teniendo una forma de acceder a tus cuentas."
+            "value" : "Tus contraseñas se borrarán de este dispositivo. Asegúrate de seguir teniendo una forma de acceder a tus cuentas."
           }
         },
         "fr" : {
@@ -4035,13 +4035,13 @@
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your passwords will be deleted from this device. Confirma que ainda tens uma forma de aceder às contas."
+            "value" : "As tuas palavras-passe serão apagadas deste dispositivo. Certifica-te de que continuas a ter forma de aceder às tuas contas."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your passwords will be deleted from this device. Убедитесь, что вы по-прежнему можете войти в свои учетные записи."
+            "value" : "Пароли будут удалены с данного устройства. Убедитесь, что вы по-прежнему можете войти в свои учетные записи."
           }
         }
       }
