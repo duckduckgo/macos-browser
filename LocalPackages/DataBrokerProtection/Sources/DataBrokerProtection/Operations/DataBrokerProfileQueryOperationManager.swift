@@ -321,6 +321,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                     shouldRunNextStep: shouldRunNextStep)
 
             let tries = retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+            stageDurationCalculator.fireOptOutValidate()
             stageDurationCalculator.fireOptOutSubmitSuccess(tries: tries)
 
             let updater = OperationPreferredDateUpdaterUseCase(database: database)
