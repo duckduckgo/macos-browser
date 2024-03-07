@@ -1398,6 +1398,9 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         guard navigation.isCurrent else { return }
 
         invalidateInteractionStateData()
+        if navigation.url.host == committedURL?.host {
+            committedURL = navigation.url
+        }
     }
 
     @MainActor

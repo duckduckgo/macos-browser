@@ -108,14 +108,13 @@ final class TabViewModel {
         }
         tab.$content
             .map { [tab] content -> AnyPublisher<Event, Never> in
-                os_log(log: .navigation, "🥫 tab content updated: \(content)")
                 switch content {
                 case .url(let url, _, source: .webViewUpdated),
                      .url(let url, _, source: .link):
 
                     // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
                     return tab.$committedURL.filter { committedURL in
-                        committedURL?.isSameDocument(url) == true
+                        committedURL == url
                     }.map { _ in
                         .didCommit
                     }.eraseToAnyPublisher()
