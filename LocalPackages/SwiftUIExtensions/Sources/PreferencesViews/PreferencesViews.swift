@@ -59,7 +59,7 @@ public struct TextMenuItemCaption: View {
         Text(text)
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixMultilineScrollableText()
-            .foregroundColor(Color("GreyTextColor"))
+            .foregroundColor(Color(.greyText))
     }
 }
 

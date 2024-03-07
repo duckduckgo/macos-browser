@@ -8,6 +8,8 @@
 	<string>$(NETP_APP_GROUP)</string>
 	<key>PROXY_EXTENSION_BUNDLE_ID</key>
 	<string>$(PROXY_EXTENSION_BUNDLE_ID)</string>
+	<key>SUBSCRIPTION_APP_GROUP</key>
+	<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	<key>TUNNEL_EXTENSION_BUNDLE_ID</key>
 	<string>$(TUNNEL_EXTENSION_BUNDLE_ID)</string>
 	<key>LSApplicationCategoryType</key>

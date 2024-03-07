@@ -97,7 +97,18 @@ final class DownloadsViewController: NSViewController {
                 self.tableView.reloadData(forRowIndexes: IndexSet(integer: value.new.count), columnIndexes: IndexSet(integer: 0))
                 self.tableView.endUpdates()
                 self.updateHeight()
+
+                // at this point all visible cells have started their progress animation
+                for change in diff {
+                    if case .insert(_, element: let item, _) = change {
+                        item.didAppear() // yet invisible cells shouldn‘t animate their progress when scrolled to
+                    }
+                }
             }
+
+        for item in viewModel.items {
+            item.didAppear() // initial table appearance should have no progress animations
+        }
         tableView.reloadData()
         updateHeight()
     }
@@ -147,7 +158,7 @@ final class DownloadsViewController: NSViewController {
     // MARK: User Actions
 
     @IBAction func openDownloadsFolderAction(_ sender: Any) {
-        let prefs = DownloadsPreferences()
+        let prefs = DownloadsPreferences.shared
         var url: URL?
         var itemToSelect: URL?
 
@@ -304,7 +315,7 @@ extension DownloadsViewController: NSMenuDelegate {
 extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return viewModel.items.count + 1
+        return downloadsCancellable == nil ? 0 : viewModel.items.count + 1 // updated on viewDidAppear
     }
 
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {

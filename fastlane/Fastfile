@@ -351,7 +351,7 @@ platform :mac do
       export_method: "app-store",
       scheme: "DuckDuckGo Privacy Browser App Store",
       export_options: "scripts/assets/AppStoreExportOptions.plist",
-      xcargs: "-skipPackagePluginValidation RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo"
+      xcargs: "-skipPackagePluginValidation -skipMacroValidation RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo"
     )
   end
 
@@ -364,7 +364,7 @@ platform :mac do
       export_method: "app-store",
       scheme: "Product Review Release App Store",
       export_options: "scripts/assets/AppStoreExportOptions.plist",
-      xcargs: "-skipPackagePluginValidation"
+      xcargs: "-skipPackagePluginValidation -skipMacroValidation"
     )
   end
 

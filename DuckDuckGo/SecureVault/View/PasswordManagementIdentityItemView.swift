@@ -41,7 +41,7 @@ struct PasswordManagementIdentityItemView: View {
                 if editMode {
 
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .foregroundColor(Color(.editingPanel))
                         .shadow(radius: 6)
 
                 }
@@ -297,7 +297,7 @@ private struct HeaderView: View {
 
         HStack(alignment: .center, spacing: 0) {
 
-            Image("Identity")
+            Image(.identity)
                 .padding(.trailing, 10)
 
             if model.isNew || model.isEditing {
@@ -398,7 +398,7 @@ private struct EditableIdentityField: View {
                             Button {
                                 model.copy(textFieldValue)
                             } label: {
-                                Image("Copy")
+                                Image(.copy)
                             }.buttonStyle(PlainButtonStyle())
                         }
 

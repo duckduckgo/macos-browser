@@ -16,11 +16,13 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import DuckDuckGo_Privacy_Browser
-import Combine
 import class Persistence.CoreDataDatabase
+import Combine
 import History
+import Macros
+import XCTest
+
+@testable import DuckDuckGo_Privacy_Browser
 
 final class HistoryStoreTests: XCTestCase {
 
@@ -76,7 +78,7 @@ final class HistoryStoreTests: XCTestCase {
     func testWhenCleanOldIsCalled_ThenOlderEntriesThanDateAreCleaned() {
         let toBeKeptIdentifier = UUID()
         let newHistoryEntry = HistoryEntry(identifier: toBeKeptIdentifier,
-                                           url: URL(string: "wikipedia.org")!,
+                                           url: #URL("http://wikipedia.org"),
                                            title: nil,
                                            numberOfVisits: 1,
                                            lastVisit: Date(),

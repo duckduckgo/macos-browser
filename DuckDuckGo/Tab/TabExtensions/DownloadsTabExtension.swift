@@ -57,7 +57,7 @@ final class DownloadsTabExtension: NSObject {
 
     weak var delegate: TabDownloadsDelegate?
 
-    init(downloadManager: FileDownloadManagerProtocol, isBurner: Bool, downloadsPreferences: DownloadsPreferences = DownloadsPreferences()) {
+    init(downloadManager: FileDownloadManagerProtocol, isBurner: Bool, downloadsPreferences: DownloadsPreferences = .shared) {
         self.downloadManager = downloadManager
         self.isBurner = isBurner
         self.downloadsPreferences = downloadsPreferences
@@ -259,7 +259,7 @@ extension DownloadsTabExtension: WKNavigationDelegate {
 extension DownloadsTabExtension: DownloadTaskDelegate {
 
     @MainActor
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
         savePanelDialogRequest = SavePanelDialogRequest(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { result in
             guard case let .success(.some( (url: url, fileType: fileType) )) = result else {
                 callback(nil, nil)
@@ -310,7 +310,7 @@ extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
         case .prompt:
             let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
             let url: URL? = await withCheckedContinuation { continuation in
-                chooseDestination(suggestedFilename: suggestedFilename, directoryURL: nil, fileTypes: fileTypes) { url, _ in
+                chooseDestination(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { url, _ in
                     continuation.resume(returning: url)
                 }
             }
