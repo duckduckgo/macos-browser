@@ -54,25 +54,25 @@ final class FBProtectionTabExtension {
 
 extension FBProtectionTabExtension {
 
-    private func toggleFBProtection(for url: URL) {
+    private func enableFBProtection(for url: URL) {
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
         let privacyConfiguration = privacyConfigurationManager.privacyConfig
 
         let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
-        setFBProtection(enabled: featureEnabled)
+        setFBProtection(enable: featureEnabled)
     }
 
     @discardableResult
-    private func setFBProtection(enabled: Bool) -> Bool {
+    private func setFBProtection(enable: Bool) -> Bool {
         if #unavailable(OSX 11) {  // disable CTL for Catalina and earlier
             return false
         }
-        guard self.fbBlockingEnabled != enabled else { return false }
+        guard self.fbBlockingEnabled != enable else { return false }
         guard let userContentController else {
             assertionFailure("Missing UserContentController")
             return false
         }
-        if enabled {
+        if enable {
             do {
                 try userContentController.enableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
             } catch {
@@ -87,7 +87,7 @@ extension FBProtectionTabExtension {
                 return false
             }
         }
-        self.fbBlockingEnabled = enabled
+        self.fbBlockingEnabled = enable
 
         return true
     }
@@ -101,18 +101,22 @@ extension FBProtectionTabExtension: ClickToLoadUserScriptDelegate {
             return true
         }
 
-        if setFBProtection(enabled: false) {
+        if setFBProtection(enable: false) {
             return true
         } else {
             return false
         }
     }
+
 }
 
 extension FBProtectionTabExtension: NavigationResponder {
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        toggleFBProtection(for: navigationAction.url)
+        if navigationAction.navigationType == NavigationType.other && navigationAction.isUserInitiated == false {
+            return .next
+        }
+        enableFBProtection(for: navigationAction.url)
         return .next
     }
 
