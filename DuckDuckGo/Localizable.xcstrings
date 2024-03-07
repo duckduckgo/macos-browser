@@ -53,9 +53,6 @@
         }
       }
     },
-    "-1 -> 0 ... 1" : {
-
-    },
     "**%lld** tracking attempts blocked" : {
       "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
       "localizations" : {
@@ -430,24 +427,6 @@
           }
         }
       }
-    },
-    "0->1->nil" : {
-
-    },
-    "10%" : {
-
-    },
-    "20%" : {
-
-    },
-    "50%" : {
-
-    },
-    "80%" : {
-
-    },
-    "100%" : {
-
     },
     "about.app_name" : {
       "comment" : "Application name to be displayed in the About dialog",
@@ -2026,9 +2005,6 @@
           }
         }
       }
-    },
-    "Animate" : {
-
     },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
@@ -23671,9 +23647,6 @@
         }
       }
     },
-    "Indeterminate (-1)" : {
-
-    },
     "invite.dialog.get.started.button" : {
       "comment" : "Get Started button on an invite dialog",
       "extractionState" : "extracted_with_value",
@@ -29303,9 +29276,6 @@
           }
         }
       }
-    },
-    "nil->0->nil" : {
-
     },
     "no.access.to.downloads.folder.header" : {
       "comment" : "Header of the alert dialog warning the user they need to give the browser permission to access the Downloads folder",
@@ -43877,9 +43847,6 @@
         }
       }
     },
-    "Reset (nil)" : {
-
-    },
     "restart.bitwarden" : {
       "comment" : "Button to restart Bitwarden application",
       "extractionState" : "extracted_with_value",
@@ -45986,9 +45953,6 @@
           }
         }
       }
-    },
-    "Slow animations" : {
-
     },
     "Smart Copy/Paste" : {
       "comment" : "Main Menu Edit-Substitutions item",
@@ -49728,9 +49692,6 @@
           }
         }
       }
-    },
-    "Zero" : {
-
     },
     "zoom" : {
       "comment" : "Menu with Zooming commands",
