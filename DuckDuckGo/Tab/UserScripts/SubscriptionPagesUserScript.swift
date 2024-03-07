@@ -158,24 +158,25 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-#if STRIPE
-        switch await StripePurchaseFlow.subscriptionOptions() {
-        case .success(let subscriptionOptions):
-            return subscriptionOptions
-        case .failure:
-            return nil
-        }
-#else
-        if #available(macOS 12.0, *) {
-            switch await AppStorePurchaseFlow.subscriptionOptions() {
+        if SubscriptionPurchaseEnvironment.current == .appStore {
+            if #available(macOS 12.0, *) {
+                switch await AppStorePurchaseFlow.subscriptionOptions() {
+                case .success(let subscriptionOptions):
+                    return subscriptionOptions
+                case .failure:
+                    break
+                }
+            }
+        } else if SubscriptionPurchaseEnvironment.current == .stripe {
+            switch await StripePurchaseFlow.subscriptionOptions() {
             case .success(let subscriptionOptions):
                 return subscriptionOptions
             case .failure:
-                return nil
+                break
             }
         }
+
         return nil
-#endif
     }
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
@@ -186,76 +187,76 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         let message = original
 
-#if STRIPE
-        let emailAccessToken = try? EmailManager().getToken()
+        if SubscriptionPurchaseEnvironment.current == .appStore {
+            if #available(macOS 12.0, *) {
+                let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+                let progressViewController = await ProgressViewController(title: UserText.purchasingSubscriptionTitle)
 
-        switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
-        case .success(let purchaseUpdate):
-            await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
-        case .failure:
-            await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
-            return nil
-        }
-#else
-        if #available(macOS 12.0, *) {
-            let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            let progressViewController = await ProgressViewController(title: UserText.purchasingSubscriptionTitle)
-
-            defer {
-                Task {
-                    await mainViewController?.dismiss(progressViewController)
+                defer {
+                    Task {
+                        await mainViewController?.dismiss(progressViewController)
+                    }
                 }
-            }
 
-            guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
-                assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
-                return nil
-            }
+                guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
+                    assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
+                    return nil
+                }
 
-            os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %{public}s", subscriptionSelection.id)
+                os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %{public}s", subscriptionSelection.id)
 
-            await mainViewController?.presentAsSheet(progressViewController)
+                await mainViewController?.presentAsSheet(progressViewController)
 
-            // Check for active subscriptions
-            if await PurchaseManager.hasActiveSubscription() {
-                os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
-                await WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionFoundAlert(originalMessage: message)
-                return nil
-            }
+                // Check for active subscriptions
+                if await PurchaseManager.hasActiveSubscription() {
+                    os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
+                    await WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionFoundAlert(originalMessage: message)
+                    return nil
+                }
 
-            let emailAccessToken = try? EmailManager().getToken()
-            let purchaseTransactionJWS: String
+                let emailAccessToken = try? EmailManager().getToken()
+                let purchaseTransactionJWS: String
 
-            os_log(.info, log: .subscription, "[Purchase] Purchasing")
-            switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
-            case .success(let transactionJWS):
-                purchaseTransactionJWS = transactionJWS
-            case .failure(let error):
-                switch error {
-                case .cancelledByUser:
-                    os_log(.error, log: .subscription, "[Purchase] Cancelled by user")
-                default:
+                os_log(.info, log: .subscription, "[Purchase] Purchasing")
+                switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+                case .success(let transactionJWS):
+                    purchaseTransactionJWS = transactionJWS
+                case .failure(let error):
+                    switch error {
+                    case .cancelledByUser:
+                        os_log(.error, log: .subscription, "[Purchase] Cancelled by user")
+                    default:
+                        os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                        await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                    }
+                    return nil
+                }
+
+                await progressViewController.updateTitleText(UserText.completingPurchaseTitle)
+
+                os_log(.info, log: .subscription, "[Purchase] Completing purchase")
+
+                switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+                case .success(let purchaseUpdate):
+                    await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
+                case .failure(let error):
                     os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
-                    await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                    await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "completed"))
                 }
-                return nil
+
+                os_log(.info, log: .subscription, "[Purchase] Purchase complete")
             }
+        } else if SubscriptionPurchaseEnvironment.current == .stripe {
+            let emailAccessToken = try? EmailManager().getToken()
 
-            await progressViewController.updateTitleText(UserText.completingPurchaseTitle)
-
-            os_log(.info, log: .subscription, "[Purchase] Completing purchase")
-
-            switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+            switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
             case .success(let purchaseUpdate):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
-            case .failure(let error):
-                os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
-                await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "completed"))
+            case .failure:
+                await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                return nil
             }
-
-            os_log(.info, log: .subscription, "[Purchase] Purchase complete")
         }
-#endif
 
         return nil
     }

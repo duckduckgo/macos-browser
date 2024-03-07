@@ -287,10 +287,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                          defaultValue: defaultEnvironment).wrappedValue
             SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
 
-    #if STRIPE
-            SubscriptionPurchaseEnvironment.current = .stripe
-    #else
+    #if APPSTORE || !STRIPE
             SubscriptionPurchaseEnvironment.current = .appStore
+    #else
+            SubscriptionPurchaseEnvironment.current = .stripe
     #endif
             let accountManager = AccountManager()
             do {
