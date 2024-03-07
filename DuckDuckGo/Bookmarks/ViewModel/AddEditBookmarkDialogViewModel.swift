@@ -132,24 +132,17 @@ private extension AddEditBookmarkDialogViewModel {
     func bind() {
         folderCancellable = bookmarkManager.listPublisher
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { bookmarkList in
-                self.folders = .init(bookmarkList)
+            .sink(receiveValue: { [weak self] bookmarkList in
+                self?.folders = .init(bookmarkList)
             })
     }
 
     func updateBookmark(_ bookmark: Bookmark, url: URL, name: String, isFavorite: Bool, location: BookmarkFolder?) {
-        var bookmark = bookmark
+        // If the URL or Title or Favorite is changed update bookmark
+        if bookmark.url != url.absoluteString || bookmark.title != name || bookmark.isFavorite != isBookmarkFavorite {
+            bookmarkManager.update(bookmark: bookmark, withURL: url, title: name, isFavorite: isFavorite)
+        }
 
-        // If URL changed update URL first as updating the Bookmark altogether will throw an error as the bookmark can't be fetched by URL.
-        if bookmark.url != url.absoluteString {
-            bookmark = bookmarkManager.updateUrl(of: bookmark, to: url) ?? bookmark
-        }
-        // If the title or isFavorite changed, update the Bookmark
-        if bookmark.title != name || bookmark.isFavorite != isBookmarkFavorite {
-            bookmark.title = name
-            bookmark.isFavorite = isBookmarkFavorite
-            bookmarkManager.update(bookmark: bookmark)
-        }
         // If the bookmark changed parent location, move it.
         if shouldMove(bookmark: bookmark) {
             let parentFolder: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
