@@ -439,8 +439,12 @@ struct CircularProgress: NSViewRepresentable {
         var body: some View {
             HStack {
                 VStack {
-                    Toggle("Animate", isOn: $animate)
-                    Toggle("Slow animations", isOn: $slowAnimations)
+                    Toggle(isOn: $animate) {
+                        Text(verbatim: "Animate")
+                    }
+                    Toggle(isOn: $slowAnimations) {
+                        Text(verbatim: "Slow animations")
+                    }
                     Divider()
 
                     Button {
@@ -448,63 +452,62 @@ struct CircularProgress: NSViewRepresentable {
                             progress = nil
                         }
                     } label: {
-                        Text("Reset (nil)").frame(width: 120)
+                        Text(verbatim: "Reset (nil)").frame(width: 120)
                     }
                     Button {
                         perform {
                             progress = -1
                         }
                     } label: {
-                        Text("Indeterminate (-1)").frame(width: 120)
+                        Text(verbatim: "Indeterminate (-1)").frame(width: 120)
                     }
                     Button {
                         perform {
                             progress = 0
                         }
                     } label: {
-                        Text("Zero").frame(width: 120)
+                        Text(verbatim: "Zero").frame(width: 120)
                     }
                     Button {
                         perform {
                             progress = 0.1
                         }
                     } label: {
-                        Text("10%").frame(width: 120)
+                        Text(verbatim: "10%").frame(width: 120)
                     }
                     Button {
                         perform {
                             progress = 0.2
                         }
                     } label: {
-                        Text("20%").frame(width: 120)
+                        Text(verbatim: "20%").frame(width: 120)
                     }
                     Button {
                         perform {
                             progress = 0.5
                         }
                     } label: {
-                        Text("50%").frame(width: 120)
+                        Text(verbatim: "50%").frame(width: 120)
                     }
                     Button {
                         perform {
                             progress = 0.8
                         }
                     } label: {
-                        Text("80%").frame(width: 120)
+                        Text(verbatim: "80%").frame(width: 120)
                     }
                     Button {
                         perform {
                             progress = 1
                         }
                     } label: {
-                        Text("100%").frame(width: 120)
+                        Text(verbatim: "100%").frame(width: 120)
                     }
                     Divider()
 
                     Button {
                         Task {
                             progress = nil
-
                             perform {
                                 progress = 0
                             }
@@ -515,7 +518,7 @@ struct CircularProgress: NSViewRepresentable {
                             }
                         }
                     } label: {
-                        Text("nil->0->nil").frame(width: 120)
+                        Text(verbatim: "nil->0->nil").frame(width: 120)
                     }
 
                     Button {
@@ -532,7 +535,7 @@ struct CircularProgress: NSViewRepresentable {
                             }
                         }
                     } label: {
-                        Text("0->1->nil").frame(width: 120)
+                        Text(verbatim: "0->1->nil").frame(width: 120)
                     }
 
                     Button {
@@ -561,7 +564,7 @@ struct CircularProgress: NSViewRepresentable {
                             }
                         }
                     } label: {
-                        Text("-1 -> 0 ... 1").frame(width: 120)
+                        Text(verbatim: "-1 -> 0 ... 1").frame(width: 120)
                     }
 
                     Spacer()
