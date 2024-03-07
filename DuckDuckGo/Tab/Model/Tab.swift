@@ -622,7 +622,9 @@ protocol NewWindowPolicyDecisionMaker {
     let webViewDidStartNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidReceiveUserInteractiveChallengePublisher = PassthroughSubject<Void, Never>()
     let webViewDidReceiveRedirectPublisher = PassthroughSubject<Void, Never>()
-    let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
+    var webViewDidCommitNavigationPublisher: some Publisher<Void, Never> {
+        $committedURL.dropFirst().asVoid()
+    }
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
 
     // MARK: - Properties
@@ -647,6 +649,13 @@ protocol NewWindowPolicyDecisionMaker {
             error = nil
         }
     }
+
+    /// Use this property to obtain the accurate URL of the displayed content
+    ///
+    /// When a navigation request is made, the web view goes through a series of steps to load and display the requested content.
+    /// The committedURL property reflects the URL of the web page that has undergone this process and is currently being displayed in the web view.
+    /// Navigations that are still in progress or not yet committed won't have their URLs reflected in the committedURL property.
+    @PublishedAfter private(set) var committedURL: URL?
 
     @discardableResult
     func setContent(_ newContent: TabContent) -> ExpectedNavigation? {
@@ -690,6 +699,8 @@ protocol NewWindowPolicyDecisionMaker {
                 self.content = content
             }
         } else if self.content.isUrl {
+            // when e.g. opening a download in new tab - web view restores `nil` after the navigation is interrupted
+            // maybe it worths adding another content type like .interruptedLoad(URL) to display a URL in the address bar
             self.content = .none
         }
         self.updateTitle() // The title might not change if webView doesn't think anything is different so update title here as well
@@ -1304,7 +1315,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func didCommit(_ navigation: Navigation) {
-        webViewDidCommitNavigationPublisher.send()
+        committedURL = navigation.url
     }
 
     @MainActor
@@ -1383,12 +1394,20 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     }
 
     @MainActor
+    func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
+        guard navigation.isCurrent else { return }
+
+        invalidateInteractionStateData()
+    }
+
+    @MainActor
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
+        let url = error.failingUrl ?? navigation.url
+        guard navigation.isCurrent else { return }
+
         invalidateInteractionStateData()
 
-        let url = error.failingUrl ?? navigation.url
-        if navigation.isCurrent,
-           !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
+        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
            // don‘t show an error page if the error was already handled
            // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
            self.content.urlForWebView == url {
