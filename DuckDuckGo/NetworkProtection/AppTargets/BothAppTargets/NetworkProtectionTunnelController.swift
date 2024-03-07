@@ -719,7 +719,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 #if SUBSCRIPTION
         if let accessToken = accountManager.accessToken  {
             os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
-            return NetworkProtectionKeychainTokenStore.makeToken(from: accessToken)
+            return NetworkProtectionKeychainTokenStore.makeToken(from: accessToken) as NSString?
         }
 #endif
         os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
