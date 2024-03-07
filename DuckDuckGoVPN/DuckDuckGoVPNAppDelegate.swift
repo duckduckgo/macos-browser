@@ -345,6 +345,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         }.store(in: &cancellables)
     }
 
+    private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
+
     private func setUpSubscriptionMonitoring() {
 #if SUBSCRIPTION
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
@@ -378,8 +380,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         }
 #endif
     }
-
-    private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
 }
 
 extension NSApplication {
