@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Macros
 import Navigation
 import XCTest
 
@@ -28,10 +29,10 @@ import XCTest
 final class TabTests: XCTestCase {
 
     struct URLs {
-        let url = URL(string: "http://testhost.com/")!
-        let url1 = URL(string: "https://localhost/1")!
-        let url2 = URL(string: "http://something-else.biz/2")!
-        let url3 = URL(string: "https://local-domain/3")!
+        let url = #URL("http://testhost.com/")
+        let url1 = #URL("https://localhost/1")
+        let url2 = #URL("http://something-else.biz/2")
+        let url3 = #URL("https://local-domain/3")
     }
     let urls = URLs()
 

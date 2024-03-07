@@ -158,7 +158,8 @@ enum Preferences {
                                                 openVPNHandler: openVPN,
                                                 openDBPHandler: openDBP,
                                                 openITRHandler: openITR,
-                                                sheetActionHandler: sheetActionHandler)
+                                                sheetActionHandler: sheetActionHandler,
+                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }
 #endif
     }

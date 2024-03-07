@@ -27,7 +27,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     var updateInternalTestingFlag: (Bool) -> Void
 
     var currentViewController: () -> NSViewController?
-    private let accountManager = AccountManager()
+    private let accountManager: AccountManager
+    private let subscriptionAppGroup: String
 
     private var _purchaseManager: Any?
     @available(macOS 12.0, *)
@@ -47,13 +48,15 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 updateEnvironment: @escaping (String) -> Void,
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
-                currentViewController: @escaping () -> NSViewController?) {
+                currentViewController: @escaping () -> NSViewController?,
+                subscriptionAppGroup: String) {
         self.currentEnvironment = currentEnvironment
         self.updateEnvironment = updateEnvironment
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
-
+        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
+        self.subscriptionAppGroup = subscriptionAppGroup
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
     }
@@ -157,7 +160,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
             let entitlements: [AccountManager.Entitlement] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
             for entitlement in entitlements {
-                if case let .success(result) = await AccountManager().hasEntitlement(for: entitlement) {
+                if case let .success(result) = await accountManager.hasEntitlement(for: entitlement) {
                     let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
                     results.append(resultSummary)
                     print(resultSummary)
@@ -172,7 +175,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func getSubscriptionDetails() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await SubscriptionService.getSubscriptionDetails(token: token) {
+            switch await SubscriptionService.getSubscription(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")
             case .failure(let error):
@@ -191,7 +194,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            currentViewController()?.presentAsSheet(DebugPurchaseViewController())
+            currentViewController()?.presentAsSheet(DebugPurchaseViewController(subscriptionAppGroup: subscriptionAppGroup))
         }
     }
 
@@ -219,7 +222,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
-                await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
+                await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: subscriptionAppGroup)
             }
         }
     }

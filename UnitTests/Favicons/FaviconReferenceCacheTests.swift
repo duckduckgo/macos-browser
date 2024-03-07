@@ -17,7 +17,9 @@
 //
 
 import Foundation
+import Macros
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -91,12 +93,12 @@ class FaviconReferenceCacheTests: XCTestCase {
 
 private extension URL {
 
-    static let aFaviconUrl1 = URL(string: "https://fav.com/fav.ico")!
-    static let aDocumentUrl1 = URL(string: "https://fav.com/index.html")!
+    static let aFaviconUrl1 = #URL("https://fav.com/fav.ico")
+    static let aDocumentUrl1 = #URL("https://fav.com/index.html")
 
-    static let aFaviconUrl2 = URL(string: "https://fav.com/fav-specialized.ico")!
-    static let aDocumentUrl2 = URL(string: "https://fav.com/special/site/index.html")!
+    static let aFaviconUrl2 = #URL("https://fav.com/fav-specialized.ico")
+    static let aDocumentUrl2 = #URL("https://fav.com/special/site/index.html")
 
-    static let aDocumentUrl3 = URL(string: "https://duckduckgo.com/")!
+    static let aDocumentUrl3 = #URL("https://duckduckgo.com/")
 
 }

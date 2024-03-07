@@ -236,7 +236,7 @@ archive_and_export() {
 		-configuration "${configuration}" \
 		-archivePath "${archive}" \
 		-derivedDataPath "${derived_data}" \
-		-skipPackagePluginValidation \
+		-skipPackagePluginValidation -skipMacroValidation \
 		MARKETING_VERSION="${app_version}" \
 		CURRENT_PROJECT_VERSION="${build_number}" \
 		RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo \
@@ -252,7 +252,7 @@ archive_and_export() {
 		-exportPath "${workdir}" \
 		-exportOptionsPlist "${export_options_plist}" \
 		-configuration "${configuration}" \
-		-skipPackagePluginValidation \
+		-skipPackagePluginValidation -skipMacroValidation \
 		2>&1 \
 		| ${log_formatter}
 }

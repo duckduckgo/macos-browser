@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import AppKit
+import Combine
+import Foundation
+import Macros
 
 protocol ConnectBitwardenViewModelDelegate: AnyObject {
 
@@ -76,7 +77,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
     }
 
     private enum Constants {
-        static let bitwardenAppStoreURL = URL(string: "macappstores://apps.apple.com/app/bitwarden/id1352778147")!
+        static let bitwardenAppStoreURL = #URL("macappstores://apps.apple.com/app/bitwarden/id1352778147")
     }
 
     weak var delegate: ConnectBitwardenViewModelDelegate?
@@ -142,11 +143,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
             } else if viewState == .disclaimer {
                 viewState = .lookingForBitwarden
             } else if viewState == .accessToContainersNotApproved {
-                guard let link = URL.fullDiskAccess else {
-                    assertionFailure("Can't initialize link to Settings")
-                    return
-                }
-                NSWorkspace.shared.open(link)
+                NSWorkspace.shared.open(.fullDiskAccess)
             }
 
         case .cancel:

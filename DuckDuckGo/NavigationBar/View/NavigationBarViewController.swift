@@ -696,7 +696,9 @@ final class NavigationBarViewController: NSViewController {
                 let progress = downloadListCoordinator.progress
                 return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
             }
-            .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
+            .sink { [weak downloadsProgressView] progress in
+                downloadsProgressView?.setProgress(progress, animated: true)
+            }
             .store(in: &downloadsCancellables)
     }
 

@@ -18,8 +18,10 @@
 
 import Combine
 import Common
+import Macros
 import PrivacyDashboard
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -57,8 +59,7 @@ class AutoconsentIntegrationTests: XCTestCase {
     func testWhenAutoconsentEnabled_cookieConsentManaged() async throws {
         // enable the feature
         CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
-        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/")!
-
+        let url = #URL("http://privacy-test-pages.site/features/autoconsent/")
         let tab = self.tabViewModel.tab
 
         // expect cookieConsentManaged to be published
@@ -84,8 +85,8 @@ class AutoconsentIntegrationTests: XCTestCase {
     func testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
         // enable the feature
         CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
-        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/banner.html")!
-
+        let url = 
+      (string: "http://privacy-test-pages.site/features/autoconsent/banner.html")
         let tab = self.tabViewModel.tab
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
@@ -135,8 +136,7 @@ class AutoconsentIntegrationTests: XCTestCase {
     func testCosmeticRule_whenFakeCookieBannerIsDisplayedAndScriptsAreReloaded_bannerIsHidden() async throws {
         // enable the feature
         CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
-        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/banner.html")!
-
+        let url = #URL("http://privacy-test-pages.site/features/autoconsent/banner.html")
         let tab = self.tabViewModel.tab
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
