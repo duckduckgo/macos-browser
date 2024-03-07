@@ -96,6 +96,8 @@ extension NetworkProtectionStatusView {
 
         private let entitlementsMonitor = NetworkProtectionEntitlementMonitor()
 
+        private let appLauncher: AppLaunching
+
         private var cancellables = Set<AnyCancellable>()
 
         // MARK: - Dispatch Queues
@@ -127,6 +129,7 @@ extension NetworkProtectionStatusView {
             self.agentLoginItem = agentLoginItem
             self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
+            self.appLauncher = appLauncher
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
@@ -175,6 +178,12 @@ extension NetworkProtectionStatusView {
                 }
 
                 NSWorkspace.shared.open(loginItemsURL)
+            }
+        }
+
+        func openPrivacyPro() {
+            Task {
+                await appLauncher.launchApp(withCommand: .showPrivacyPro)
             }
         }
 

@@ -21,6 +21,9 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct SubscriptionExpiredView: View {
+    let subscribeButtonHandler: () -> Void
+    let uninstallButtonHandler: () -> Void
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("VPN disconnected due to expired subscription")
@@ -33,9 +36,7 @@ struct SubscriptionExpiredView: View {
                 .foregroundColor(Color(.defaultText))
                 .multilineText()
 
-            Button("Subscribe to Privacy Pro") {
-                // TODO:
-            }
+            Button("Subscribe to Privacy Pro", action: subscribeButtonHandler)
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
             .padding(.top, 3)
 
@@ -64,6 +65,6 @@ struct SubscriptionExpiredView: View {
 
 struct SubscriptionExpiredView_Preview: PreviewProvider {
     static var previews: some View {
-        SubscriptionExpiredView()
+        SubscriptionExpiredView(subscribeButtonHandler: {}, uninstallButtonHandler: {})
     }
 }
