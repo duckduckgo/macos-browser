@@ -35,10 +35,10 @@ extension MainViewController: BareBonesBrowserUIDelegate {
 
     private func openVanillaBrowser(url: URL) {
         let browserView = NSHostingView(rootView: BareBonesBrowserView(initialURL: url,
-                                                                  homeURL: url,
-                                                                  uiDelegate: self,
-                                                                  configuration: Self.webViewConfiguration,
-                                                                  userAgent: UserAgent.brandedDefault))
+                                                                       homeURL: url,
+                                                                       uiDelegate: self,
+                                                                       configuration: Self.webViewConfiguration,
+                                                                       userAgent: UserAgent.brandedDefault))
         browserView.translatesAutoresizingMaskIntoConstraints = false
         browserView.widthAnchor.constraint(greaterThanOrEqualToConstant: 640).isActive = true
         browserView.heightAnchor.constraint(greaterThanOrEqualToConstant: 480).isActive = true
