@@ -3870,10 +3870,58 @@
       "comment" : "Message displayed on completion of multiple password deletion",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Passwörter gelöscht (%d)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "All passwords deleted (%d)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se han eliminado todas las contraseñas (%d)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous les mots de passe sont supprimés (%d)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte le password sono state eliminate (%d)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle wachtwoorden verwijderd (%d)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usunięto wszystkie hasła (%d)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas as palavras-passe eliminadas (%d)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все пароли (%d) удалены"
           }
         }
       }
@@ -3957,7 +4005,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your passwords will be deleted from this device. Asegúrate de seguir teniendo una forma de acceder a tus cuentas."
+            "value" : "Tus contraseñas se borrarán de este dispositivo. Asegúrate de seguir teniendo una forma de acceder a tus cuentas."
           }
         },
         "fr" : {
@@ -3987,13 +4035,13 @@
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your passwords will be deleted from this device. Confirma que ainda tens uma forma de aceder às contas."
+            "value" : "As tuas palavras-passe serão apagadas deste dispositivo. Certifica-te de que continuas a ter forma de aceder às tuas contas."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your passwords will be deleted from this device. Убедитесь, что вы по-прежнему можете войти в свои учетные записи."
+            "value" : "Пароли будут удалены с данного устройства. Убедитесь, что вы по-прежнему можете войти в свои учетные записи."
           }
         }
       }
@@ -10295,7 +10343,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Начать с заглавной"
+            "value" : "С заглавной буквы"
           }
         }
       }
@@ -12406,7 +12454,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Разработчик"
+            "value" : "Разработка"
           }
         }
       }
@@ -19721,7 +19769,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Помощь"
+            "value" : "Справка"
           }
         }
       }
@@ -24850,7 +24898,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скрыть другие службы"
+            "value" : "Скрыть остальные"
           }
         }
       }
@@ -24910,7 +24958,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Предпочтения…"
+            "value" : "Настройки…"
           }
         }
       }
@@ -24970,7 +25018,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрыть DuckDuckGo"
+            "value" : "Завершить DuckDuckGo"
           }
         }
       }
@@ -25150,7 +25198,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редактировать"
+            "value" : "Правка"
           }
         }
       }
@@ -25750,7 +25798,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вставить и подогнать стиль"
+            "value" : "Вставить и согласовать стиль"
           }
         }
       }
@@ -26230,7 +26278,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Функции работы с текстом"
+            "value" : "Замены"
           }
         }
       }
@@ -26830,7 +26878,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открыть местоположение..."
+            "value" : "Открыть адрес…"
           }
         }
       }
@@ -27183,7 +27231,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Преобразовать в строчные"
+            "value" : "Строчные"
           }
         }
       }
@@ -27236,7 +27284,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Преобразовать в заглавные"
+            "value" : "Прописные"
           }
         }
       }
@@ -41866,7 +41914,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Несколько слов о DuckDuckGo"
+            "value" : "О приложении DuckDuckGo"
           }
         }
       }
@@ -43786,7 +43834,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Распечатать…"
+            "value" : "Печать…"
           }
         }
       }
@@ -49307,7 +49355,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Трансформации"
+            "value" : "Преобразования"
           }
         }
       }
@@ -49826,7 +49874,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Просмотр"
+            "value" : "Вид"
           }
         }
       }
