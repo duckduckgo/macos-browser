@@ -37,13 +37,6 @@ jobs:
           git config --global user.name "Dax the Duck"
           git config --global user.email "dax@duckduckgo.com"
           bundle exec fastlane make_release_branch
-      
-      - name: Get Asana user ID
-        id: get-asana-user-id
-        uses: duckduckgo/apple-infra/actions/asana-get-user-id-for-github-handle@main
-        with:
-          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          github-handle: ${{ github.actor }}
 
       - name: Get Asana user ID
         id: get-asana-user-id
