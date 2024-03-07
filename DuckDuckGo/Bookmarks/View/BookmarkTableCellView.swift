@@ -96,7 +96,6 @@ final class BookmarkTableCellView: NSTableCellView {
 
         addSubview(containerView)
 
-
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(faviconImageView)
         containerView.addSubview(titleLabel)
