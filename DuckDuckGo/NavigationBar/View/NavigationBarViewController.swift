@@ -689,12 +689,12 @@ final class NavigationBarViewController: NSViewController {
                 updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
-        downloadListCoordinator.progress
-            .publisher(for: \.fractionCompleted)
+        downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
+            .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
-            .map { [downloadListCoordinator] _ in
-                let progress = downloadListCoordinator.progress
-                return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
+            .map { (total, completed) -> Double? in
+                guard total > 0, completed < total else { return nil }
+                return Double(completed) / Double(total)
             }
             .sink { [weak downloadsProgressView] progress in
                 downloadsProgressView?.setProgress(progress, animated: true)
