@@ -71,7 +71,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
                 NSAppearance.withAppAppearance {
                     if editingBookmarkIndex != nil {
-                        view.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
+                        view.animator().layer?.backgroundColor = NSColor.backgroundSecondary.cgColor
                     } else {
                         view.animator().layer?.backgroundColor = NSColor.bookmarkPageBackground.cgColor
                     }
@@ -107,8 +107,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         newBookmarkButton.bezelStyle = .shadowlessSquare
         newBookmarkButton.cornerRadius = 4
         newBookmarkButton.normalTintColor = .button
-        newBookmarkButton.mouseDownColor = .buttonMouseDownColor
-        newBookmarkButton.mouseOverColor = .buttonMouseOverColor
+        newBookmarkButton.mouseDownColor = .buttonMouseDown
+        newBookmarkButton.mouseOverColor = .buttonMouseOver
         newBookmarkButton.imageHugsTitle = true
         newBookmarkButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
         newBookmarkButton.translatesAutoresizingMaskIntoConstraints = false
@@ -120,8 +120,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         newFolderButton.bezelStyle = .shadowlessSquare
         newFolderButton.cornerRadius = 4
         newFolderButton.normalTintColor = .button
-        newFolderButton.mouseDownColor = .buttonMouseDownColor
-        newFolderButton.mouseOverColor = .buttonMouseOverColor
+        newFolderButton.mouseDownColor = .buttonMouseDown
+        newFolderButton.mouseOverColor = .buttonMouseOver
         newFolderButton.imageHugsTitle = true
         newFolderButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
         newFolderButton.translatesAutoresizingMaskIntoConstraints = false

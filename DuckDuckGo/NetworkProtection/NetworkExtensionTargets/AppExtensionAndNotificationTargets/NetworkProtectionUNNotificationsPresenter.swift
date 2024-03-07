@@ -140,7 +140,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         showNotification(.test, content)
     }
 
-    func showEntitlementNotification(completion: @escaping (Error?) -> Void) {
+    func showEntitlementNotification() {
         // todo
     }
 

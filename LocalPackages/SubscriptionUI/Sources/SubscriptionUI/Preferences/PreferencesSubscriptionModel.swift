@@ -25,7 +25,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var cachedEntitlements: [AccountManager.Entitlement] = []
     @Published var subscriptionDetails: String?
 
-    private var subscriptionPlatform: SubscriptionService.GetSubscriptionDetailsResponse.Platform?
+    private var subscriptionPlatform: Subscription.Platform?
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
@@ -33,27 +33,32 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private let openURLHandler: (URL) -> Void
     private let openVPNHandler: () -> Void
     private let openDBPHandler: () -> Void
+    private let openITRHandler: () -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
+    private let subscriptionAppGroup: String
 
     private var fetchSubscriptionDetailsTask: Task<(), Never>?
 
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(accountManager: AccountManager = AccountManager(),
-                openURLHandler: @escaping (URL) -> Void,
+    public init(openURLHandler: @escaping (URL) -> Void,
                 openVPNHandler: @escaping () -> Void,
                 openDBPHandler: @escaping () -> Void,
-                sheetActionHandler: SubscriptionAccessActionHandlers) {
-        self.accountManager = accountManager
+                openITRHandler: @escaping () -> Void,
+                sheetActionHandler: SubscriptionAccessActionHandlers,
+                subscriptionAppGroup: String) {
+        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
         self.openURLHandler = openURLHandler
         self.openVPNHandler = openVPNHandler
         self.openDBPHandler = openDBPHandler
+        self.openITRHandler = openITRHandler
         self.sheetActionHandler = sheetActionHandler
+        self.subscriptionAppGroup = subscriptionAppGroup
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
-        if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
+        if let cachedDate = SubscriptionService.cachedGetSubscriptionResponse?.expiresOrRenewsAt {
             updateDescription(for: cachedDate)
         }
 
@@ -78,9 +83,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
         if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email)
+            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, subscriptionAppGroup: subscriptionAppGroup)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
         }
     }
 
@@ -90,7 +95,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func learnMoreAction() {
+    func purchaseAction() {
         openURLHandler(.subscriptionPurchase)
     }
 
@@ -128,7 +133,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
         case .stripe:
             Task {
-                guard let accessToken = AccountManager().accessToken, let externalID = AccountManager().externalID,
+                guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
                       case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
@@ -143,7 +148,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
-                return response.externalID == AccountManager().externalID
+                return response.externalID == accountManager.externalID
             case .failure:
                 return false
             }
@@ -169,7 +174,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openIdentityTheftRestoration() {
-        openURLHandler(.identityTheftRestoration)
+        openITRHandler()
     }
 
     @MainActor
@@ -188,7 +193,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             guard let token = self?.accountManager.accessToken else { return }
 
-            if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
+            if let cachedDate = SubscriptionService.cachedGetSubscriptionResponse?.expiresOrRenewsAt {
                 self?.updateDescription(for: cachedDate)
 
                 if cachedDate.timeIntervalSinceNow < 0 {
@@ -196,18 +201,18 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 }
             }
 
-            if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
-                if !response.isSubscriptionActive {
-                    AccountManager().signOut()
+            if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token) {
+                if !subscription.isActive {
+                    self?.accountManager.signOut()
                     return
                 }
 
-                self?.updateDescription(for: response.expiresOrRenewsAt)
+                self?.updateDescription(for: subscription.expiresOrRenewsAt)
 
-                self?.subscriptionPlatform = response.platform
+                self?.subscriptionPlatform = subscription.platform
             }
 
-            if case let .success(entitlements) = await AccountManager().fetchEntitlements() {
+            if case let .success(entitlements) = await self?.accountManager.fetchEntitlements() {
                 self?.cachedEntitlements = entitlements
             }
         }

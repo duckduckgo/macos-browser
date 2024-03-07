@@ -312,10 +312,10 @@ import SubscriptionUI
             NSMenuItem(title: UserText.favorites)
                 .submenu(favoritesMenu.buildItems {
                     NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
-                        .withImage(NSImage(named: "Favorite"))
+                        .withImage(.favorite)
                     NSMenuItem.separator()
                 })
-                .withImage(NSImage(named: "Favorite"))
+                .withImage(.favorite)
 
             NSMenuItem.separator()
         })
@@ -626,7 +626,7 @@ import SubscriptionUI
                                   updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
                                   currentViewController: {
                 WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            })
+            }, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 #endif
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())

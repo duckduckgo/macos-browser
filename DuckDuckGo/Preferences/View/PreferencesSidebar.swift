@@ -112,10 +112,10 @@ extension Preferences {
 
             let bgColor: Color = {
                 if isSelected {
-                    return Color("RowHoverColor")
+                    return .rowHover
                 }
                 if isHovered {
-                    return Color("ButtonMouseOverColor")
+                    return .buttonMouseOver
                 }
                 return Color(NSColor.clear.withAlphaComponent(0.001))
             }()
