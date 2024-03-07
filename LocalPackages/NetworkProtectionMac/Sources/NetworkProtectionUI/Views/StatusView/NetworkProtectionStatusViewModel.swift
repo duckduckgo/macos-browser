@@ -159,17 +159,6 @@ extension NetworkProtectionStatusView {
                 .map { !$0 }
                 .assign(to: \.shouldShowSubscriptionExpired, onWeaklyHeld: self)
                 .store(in: &cancellables)
-
-//            Task {
-//                await entitlementsMonitor.start(entitlementCheck: entitlementCheck) { [weak self] result in
-//                    switch result {
-//                    case .validEntitlement, .error:
-//                        self?.shouldShowSubscriptionExpired = false
-//                    case .invalidEntitlement:
-//                        self?.shouldShowSubscriptionExpired = true
-//                    }
-//                }
-//            }
         }
 
         func refreshLoginItemStatus() {
