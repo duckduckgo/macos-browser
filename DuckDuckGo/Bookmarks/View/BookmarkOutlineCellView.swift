@@ -103,7 +103,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         countLabel.lineBreakMode = .byClipping
 
         menuButton.translatesAutoresizingMaskIntoConstraints = false
-        menuButton.contentTintColor = .buttonColor
+        menuButton.contentTintColor = .button
         menuButton.imagePosition = .imageTrailing
         menuButton.isBordered = false
         menuButton.isHidden = true
