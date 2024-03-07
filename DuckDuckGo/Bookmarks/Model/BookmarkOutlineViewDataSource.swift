@@ -241,7 +241,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         // Folders cannot be dragged onto any of their descendants:
 
         let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
-            let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name)
+            let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name, parentFolderUUID: draggedFolder.parentFolderUUID, children: draggedFolder.children)
 
             guard let draggedNode = treeController.node(representing: folder) else {
                 return false
