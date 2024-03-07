@@ -374,10 +374,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
-#else
-        let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-            return .success(false)
-        }
 #endif
     }
 }
