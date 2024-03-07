@@ -603,7 +603,8 @@ extension BookmarkManagementDetailViewController: NSMenuDelegate {
             return ContextualMenu.menu(for: nil)
         }
 
-        if tableView.selectedRowIndexes.contains(row) {
+        // If only one item is selected try to get the item and its parent folder otherwise show the menu for multiple items.
+        if tableView.selectedRowIndexes.contains(row), tableView.selectedRowIndexes.count > 1  {
             return ContextualMenu.menu(for: self.selectedItems())
         }
 
@@ -640,23 +641,15 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
         presentAddFolderModal(sender)
     }
 
-    func renameFolder(_ sender: NSMenuItem) {
-        guard let folder = sender.representedObject as? BookmarkFolder else {
-            assertionFailure("Failed to cast menu represented object to BookmarkFolder")
-            return
-        }
-
-        AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
-            .show(in: view.window)
-    }
-
     func editFolder(_ sender: NSMenuItem) {
-        guard let (folder, parent) = sender.representedObject as? (BookmarkFolder, BookmarkFolder?) else {
+        guard let bookmarkEntityInfo = sender.representedObject as? BookmarkEntityInfo,
+              let folder = bookmarkEntityInfo.entity as? BookmarkFolder
+        else {
             assertionFailure("Failed to cast menu represented object to BookmarkFolder")
             return
         }
 
-        BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: parent)
+        BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: bookmarkEntityInfo.parent)
             .show(in: view.window)
     }
 
@@ -669,6 +662,16 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
         bookmarkManager.remove(folder: folder)
     }
 
+    func moveToEnd(_ sender: NSMenuItem) {
+        guard let bookmarkEntity = sender.representedObject as? BookmarksEntityIdentifiable else {
+            assertionFailure("Failed to cast menu item's represented object to BookmarkEntity")
+            return
+        }
+
+        let parentFolderType: ParentFolderType = bookmarkEntity.parentId.flatMap { .parent(uuid: $0) } ?? .root
+        bookmarkManager.move(objectUUIDs: [bookmarkEntity.entityId], toIndex: nil, withinParentFolder: parentFolderType) { _ in }
+    }
+
     func openInNewTabs(_ sender: NSMenuItem) {
         if let children = (sender.representedObject as? BookmarkFolder)?.children {
             let bookmarks = children.compactMap { $0 as? Bookmark }
@@ -678,6 +681,18 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
         } else {
             assertionFailure("Failed to open entity in new tabs")
         }
+    }
+
+    func openAllInNewWindow(_ sender: NSMenuItem) {
+        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
+              let folder = sender.representedObject as? BookmarkFolder
+        else {
+            assertionFailure("Cannot open all in new window")
+            return
+        }
+
+        let newTabCollection = TabCollection.withContentOfBookmark(folder: folder, burnerMode: tabCollection.burnerMode)
+        WindowsManager.openNewWindow(with: newTabCollection, isBurner: tabCollection.isBurner)
     }
 
 }
