@@ -117,19 +117,6 @@ struct CaptchaService: CaptchaServiceProtocol {
         static let endpointSubPath = "/dbp/captcha/v0"
     }
 
-//    private struct Constants {
-//        struct URL {
-//            // private static let baseURL = "https://dbp.duckduckgo.com/dbp/captcha/v0/"
-//            private static let result = "result"
-//
-//           // static let submit = Constants.URL.baseURL + "submit"
-//
-//            static func result(for transactionID: CaptchaTransactionId) -> String {
-//                "\(Constants.URL.baseURL)\(Constants.URL.result)?transactionId=\(transactionID)"
-//            }
-//        }
-//    }
-
     private let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let settings: DataBrokerProtectionSettings
@@ -178,8 +165,10 @@ struct CaptchaService: CaptchaServiceProtocol {
     }
 
     private func submitCaptchaInformationRequest(_ captchaInfo: GetCaptchaInfoResponse) async throws -> CaptchaTransaction {
-        
-        guard let url = URL(string: Constants.URL.submit) else {
+        var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
+        urlComponents?.path = "\(Constants.endpointSubPath)/submit"
+
+        guard let url = urlComponents?.url else {
             throw CaptchaServiceError.cantGenerateCaptchaServiceURL
         }
 
@@ -244,7 +233,13 @@ struct CaptchaService: CaptchaServiceProtocol {
     }
 
     private func submitCaptchaToBeResolvedRequest(_ transactionID: CaptchaTransactionId) async throws -> CaptchaResult {
-        guard let url = URL(string: Constants.URL.result(for: transactionID)) else {
+
+        var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
+        urlComponents?.path = "\(Constants.endpointSubPath)/result"
+
+        urlComponents?.queryItems = [URLQueryItem(name: "transactionId", value: transactionID)]
+
+        guard let url = urlComponents?.url else {
             throw CaptchaServiceError.cantGenerateCaptchaServiceURL
         }
 
