@@ -250,7 +250,7 @@ jobs:
 
       - name: Get tasks since last internal release
         id: get-tasks-since-last-internal-release
-        if: contains(github.event.inputs.release-type, '') == false
+        if: contains(github.event.inputs.release-type, '') || github.event.inputs.release-type == 'internal'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -381,7 +381,7 @@ jobs:
 
     needs: [publish-to-sparkle]
 
-    # Run if release-type is provided (not empty) an is not internal
+    # Run if release-type is provided (not empty) and is not internal
     if: contains(github.event.inputs.release-type, '') == false && github.event.inputs.release-type != 'internal'
 
     uses: duckduckgo/macos-browser/.github/workflows/create_variants.yml@main
