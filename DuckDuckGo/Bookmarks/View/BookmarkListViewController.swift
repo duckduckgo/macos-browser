@@ -314,9 +314,6 @@ final class BookmarkListViewController: NSViewController {
                                              FolderPasteboardWriter.folderUTIInternalType])
 
         bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] list in
-            list?.bookmarks().forEach({ item in
-                print("UPDATING LIST - ID: \(item.id) TITLE: \(item.title) URL: \(item.url) ISFAVORITE: \(item.isFavorite)")
-            })
             self?.reloadData()
             let isEmpty = list?.topLevelEntities.isEmpty ?? true
             self?.emptyState.isHidden = !isEmpty
