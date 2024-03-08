@@ -228,5 +228,4 @@ extension NSAlert {
             continuation.resume(returning: self.runModal())
         }
     }
-
 }

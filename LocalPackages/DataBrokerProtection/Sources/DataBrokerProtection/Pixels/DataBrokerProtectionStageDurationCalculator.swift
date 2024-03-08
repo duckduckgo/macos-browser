@@ -46,8 +46,8 @@ protocol StageDurationCalculator {
     func fireOptOutEmailReceive()
     func fireOptOutEmailConfirm()
     func fireOptOutValidate()
-    func fireOptOutSubmitSuccess()
-    func fireOptOutFailure()
+    func fireOptOutSubmitSuccess(tries: Int)
+    func fireOptOutFailure(tries: Int)
     func fireScanSuccess(matchesFound: Int)
     func fireScanFailed()
     func fireScanError(error: Error)
@@ -129,18 +129,20 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
         handler.fire(.optOutValidate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
-    func fireOptOutSubmitSuccess() {
+    func fireOptOutSubmitSuccess(tries: Int) {
         handler.fire(.optOutSubmitSuccess(dataBroker: dataBroker,
                                           attemptId: attemptId,
                                           duration: durationSinceStartTime(),
+                                          tries: tries,
                                           emailPattern: emailPattern))
     }
 
-    func fireOptOutFailure() {
+    func fireOptOutFailure(tries: Int) {
         handler.fire(.optOutFailure(dataBroker: dataBroker,
                                     attemptId: attemptId,
                                     duration: durationSinceStartTime(),
                                     stage: stage.rawValue,
+                                    tries: tries,
                                     emailPattern: emailPattern))
     }
 

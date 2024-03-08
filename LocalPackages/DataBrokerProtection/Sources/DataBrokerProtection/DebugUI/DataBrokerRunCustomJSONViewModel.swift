@@ -222,10 +222,10 @@ final class FakeStageDurationCalculator: StageDurationCalculator {
     func fireOptOutValidate() {
     }
 
-    func fireOptOutSubmitSuccess() {
+    func fireOptOutSubmitSuccess(tries: Int) {
     }
 
-    func fireOptOutFailure() {
+    func fireOptOutFailure(tries: Int) {
     }
 
     func fireScanSuccess(matchesFound: Int) {

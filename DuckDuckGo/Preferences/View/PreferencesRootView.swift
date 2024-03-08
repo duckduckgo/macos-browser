@@ -84,7 +84,7 @@ enum Preferences {
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
-                                DownloadsView(model: DownloadsPreferences())
+                                DownloadsView(model: .shared)
                             case .duckPlayer:
                                 DuckPlayerView(model: .shared)
                             case .about:
@@ -140,7 +140,8 @@ enum Preferences {
                                                 openVPNHandler: openVPN,
                                                 openDBPHandler: openDBP,
                                                 openITRHandler: openITR,
-                                                sheetActionHandler: sheetActionHandler)
+                                                sheetActionHandler: sheetActionHandler,
+                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }
 #endif
     }
