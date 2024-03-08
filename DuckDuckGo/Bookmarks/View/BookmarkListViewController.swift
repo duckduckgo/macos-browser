@@ -426,7 +426,7 @@ final class BookmarkListViewController: NSViewController {
         let row = outlineView.row(for: cell)
         guard
             let item = outlineView.item(atRow: row),
-            let contextMenu = ContextualMenu.menu(for: [item])
+            let contextMenu = ContextualMenu.menu(for: [item], target: self)
         else {
             return
         }
