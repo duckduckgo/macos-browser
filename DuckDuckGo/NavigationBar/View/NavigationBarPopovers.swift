@@ -109,7 +109,7 @@ final class NavigationBarPopovers: PopoverPresenter {
     }
 
     func passwordManagementButtonPressed(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        if passwordPopoverPresenter.popoverIsDisplayed == true {
+        if passwordPopoverPresenter.popoverIsDisplayed == true && passwordPopoverPresenter.popoverIsInCurrentWindow  {
             passwordPopoverPresenter.dismiss()
         } else {
             showPasswordManagementPopover(selectedCategory: nil, usingView: view, withDelegate: delegate)

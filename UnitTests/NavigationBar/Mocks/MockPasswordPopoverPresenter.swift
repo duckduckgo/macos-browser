@@ -36,6 +36,10 @@ final class MockPasswordPopoverPresenter: PasswordPopoverPresenter {
         isDisplayed
     }
 
+    var popoverIsInCurrentWindow: Bool {
+        false
+    }
+
     func show(under view: NSView, withDomain domain: String?, selectedCategory category: DuckDuckGo_Privacy_Browser.SecureVaultSorting.Category?) {
         didShowWithCategory = true
     }
