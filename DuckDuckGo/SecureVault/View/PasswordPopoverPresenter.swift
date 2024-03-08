@@ -29,7 +29,7 @@ protocol PasswordPopoverPresenter {
     func dismiss()
 }
 
-final class DefaultPasswordPopoverPresenter: NSObject, PasswordPopoverPresenter, PopoverPresenter {
+final class DefaultPasswordPopoverPresenter: PasswordPopoverPresenter, PopoverPresenter {
 
     private var popover: PasswordManagementPopover?
 
@@ -70,14 +70,7 @@ final class DefaultPasswordPopoverPresenter: NSObject, PasswordPopoverPresenter,
         let popover = PasswordManagementPopover()
         self.popover = popover
         popover.viewController.domain = domain
-        popover.delegate = self
         show(popover, positionedBelow: view)
         return popover
-    }
-}
-
-extension DefaultPasswordPopoverPresenter: NSPopoverDelegate {
-    func popoverDidClose(_ notification: Notification) {
-        popover = nil
     }
 }
