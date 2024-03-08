@@ -405,8 +405,6 @@ final class MoreOptionsMenu: NSMenu {
 #endif // DBP
 
 #if SUBSCRIPTION
-
-
         if AccountManager().isUserAuthenticated {
             let identityTheftRestorationItem = NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
                                                           action: #selector(openIdentityTheftRestoration),
@@ -428,7 +426,6 @@ final class MoreOptionsMenu: NSMenu {
                 identityTheftRestorationItem.isEnabled = isMenuItemEnabled
             }
         }
-
 #endif
 
         return items
