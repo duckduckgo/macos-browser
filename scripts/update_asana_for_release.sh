@@ -349,7 +349,7 @@ get_tasks_in_last_internal_release() {
 
 	# 3. Construct a HTML list of task IDs
 	local tasks_list
-	tasks_list=construct_this_release_includes
+	tasks_list="$(construct_this_release_includes)"
 	local escaped_tasks_list="${tasks_list//\"/\\\"}"
 	echo "$escaped_tasks_list"
 }
