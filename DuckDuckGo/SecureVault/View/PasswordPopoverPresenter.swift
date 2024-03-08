@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Foundation
 
+/// Conforming types provide methods to show and dismiss a `PasswordManagementPopover`
 protocol PasswordPopoverPresenter {
     var passwordDomain: String? { get set }
     var popoverIsDirty: Bool { get }
@@ -48,10 +49,12 @@ final class DefaultPasswordPopoverPresenter: NSObject, PasswordPopoverPresenter,
         popover?.isShown ?? false
     }
 
+    /// Note: Dismisses any previously displayed popover before showing a new one
     func show(under view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?) {
         show(under: view, withDomain: domain).select(category: category)
     }
 
+    /// Note: Dismisses any previously displayed popover before showing a new one
     func show(under view: NSView, withSelectedAccount account: SecureVaultModels.WebsiteAccount) {
         show(under: view, withDomain: nil).select(websiteAccount: account)
     }
