@@ -51,7 +51,7 @@ extension NetworkProtectionKeychainTokenStore {
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
                   isSubscriptionEnabled: false,
-                  subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                  accessTokenProvider: { nil })
     }
 }
 

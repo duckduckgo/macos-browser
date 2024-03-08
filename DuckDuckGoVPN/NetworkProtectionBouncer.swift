@@ -33,7 +33,7 @@ final class NetworkProtectionBouncer {
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
                                                                 errorEvents: nil,
                                                                 isSubscriptionEnabled: false,
-                                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                                                                accessTokenProvider: { nil })
 
         guard keychainStore.isFeatureActivated else {
             os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
