@@ -30,7 +30,10 @@ final class NetworkProtectionBouncer {
     /// current app.
     ///
     func requireAuthTokenOrKillApp() {
-        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil, isSubscriptionEnabled: false)
+        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
+                                                                errorEvents: nil,
+                                                                isSubscriptionEnabled: false,
+                                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
         guard keychainStore.isFeatureActivated else {
             os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")

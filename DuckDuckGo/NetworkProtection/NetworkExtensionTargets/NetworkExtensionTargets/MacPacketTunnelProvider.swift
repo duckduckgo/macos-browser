@@ -283,7 +283,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                              serviceName: Self.tokenServiceName,
                                                              errorEvents: debugEvents,
-                                                             isSubscriptionEnabled: false)
+                                                             isSubscriptionEnabled: false,
+                                                             subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 
         super.init(notificationsPresenter: notificationsPresenter,
