@@ -113,27 +113,33 @@ extension CaptchaServiceProtocol {
 }
 
 struct CaptchaService: CaptchaServiceProtocol {
-
     private struct Constants {
-        struct URL {
-            private static let baseURL = "https://dbp.duckduckgo.com/dbp/captcha/v0/"
-            private static let result = "result"
-
-            static let submit = Constants.URL.baseURL + "submit"
-
-            static func result(for transactionID: CaptchaTransactionId) -> String {
-                "\(Constants.URL.baseURL)\(Constants.URL.result)?transactionId=\(transactionID)"
-            }
-        }
+        static let endpointSubPath = "/dbp/captcha/v0"
     }
+
+//    private struct Constants {
+//        struct URL {
+//            // private static let baseURL = "https://dbp.duckduckgo.com/dbp/captcha/v0/"
+//            private static let result = "result"
+//
+//           // static let submit = Constants.URL.baseURL + "submit"
+//
+//            static func result(for transactionID: CaptchaTransactionId) -> String {
+//                "\(Constants.URL.baseURL)\(Constants.URL.result)?transactionId=\(transactionID)"
+//            }
+//        }
+//    }
 
     private let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let settings: DataBrokerProtectionSettings
 
     init(urlSession: URLSession = URLSession.shared,
-         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase()) {
+         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
+         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
+        self.settings = settings
     }
 
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
@@ -172,9 +178,11 @@ struct CaptchaService: CaptchaServiceProtocol {
     }
 
     private func submitCaptchaInformationRequest(_ captchaInfo: GetCaptchaInfoResponse) async throws -> CaptchaTransaction {
+        
         guard let url = URL(string: Constants.URL.submit) else {
             throw CaptchaServiceError.cantGenerateCaptchaServiceURL
         }
+
         os_log("Submitting captcha request ...", log: .service)
         var request = URLRequest(url: url)
         let authHeader = try await redeemUseCase.getAuthHeader()
