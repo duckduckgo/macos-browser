@@ -54,7 +54,7 @@ jobs:
 
     uses: ./.github/workflows/tag_release.yml
     with:
-      asana-task-url: ${{ github.event.inputs.asana-task-url }}
+      asana-task-url: ${{ inputs.asana-task-url || github.event.inputs.asana-task-url }}
       branch: ${{ github.ref_name }}
       prerelease: false
     secrets:
@@ -68,6 +68,7 @@ jobs:
     env:
       RELEASE_TYPE: ${{ github.event.inputs.release-type || 'internal' }}
       SPARKLE_DIR: ${{ github.workspace }}/sparkle-updates
+      asana-task-url: ${{ inputs.asana-task-url || github.event.inputs.asana-task-url }}
 
     needs: [tag-public-release]
 
@@ -121,7 +122,7 @@ jobs:
         id: task-id
         uses: ./.github/actions/asana-extract-task-id
         with:
-          task-url: ${{ github.event.inputs.asana-task-url }}
+          task-url: ${{ env.asana-task-url }}
 
       - name: Fetch and validate release notes
         env:
@@ -300,7 +301,7 @@ jobs:
         uses: ./.github/actions/asana-create-action-item
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          release-task-url: ${{ github.event.inputs.asana-task-url }}
+          release-task-url: ${{ env.asana-task-url }}
           template-name: ${{ steps.asana-templates.outputs.task-template }}
 
       - name: Create Asana task to handle Asana paperwork
@@ -311,7 +312,7 @@ jobs:
           APP_BOARD_ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          release-task-url: ${{ github.event.inputs.asana-task-url }}
+          release-task-url: ${{ env.asana-task-url }}
           template-name: update-asana-for-public-release
 
       - name: Create Asana task to announce the release
@@ -323,7 +324,7 @@ jobs:
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           html-notes: ${{ env.html-notes }}
-          release-task-url: ${{ github.event.inputs.asana-task-url }}
+          release-task-url: ${{ env.asana-task-url }}
           task-name: Announce the release to the company
 
       - name: Upload patch to the Asana task
@@ -362,7 +363,7 @@ jobs:
           TASK_ID: ${{ steps.create-task.outputs.new-task-id }}
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          task-url: ${{ github.event.inputs.asana-task-url }}
+          task-url: ${{ env.asana-task-url }}
           template-name: ${{ steps.asana-templates.outputs.comment-template }}
 
       - name: Add a comment to the release task
@@ -370,7 +371,7 @@ jobs:
         uses: ./.github/actions/asana-add-comment
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          task-url: ${{ github.event.inputs.asana-task-url }}
+          task-url: ${{ env.asana-task-url }}
           template-name: ${{ steps.asana-templates.outputs.release-task-comment-template }}
 
   # This is only run for public and hotfix releases
