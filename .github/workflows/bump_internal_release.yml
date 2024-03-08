@@ -16,11 +16,6 @@ on:
 
 jobs:
 
-  # when on schedule:
-  # 1. find the release branch - check out the repository, find the latest tag, strip build number, check out the branch.
-  # 2. find asana task - "macOS App Release x.y.z", incomplete, in macOS App Development.
-  # 3. find hotfix task - if there's any 'macOS App Hotfix Release a.b.c', incomplete, in macOS App Development, skip the release.
-
   validate_input_conditions:
 
     name: Validate Input Conditions
@@ -48,6 +43,7 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
 
+      # When running on schedule, only proceed if there are changes to the release branch (i.e. HEAD is not tagged)
       - name: Check if there are changes to the release branch
         id: check-for-changes
         run: |
@@ -65,6 +61,7 @@ jobs:
             fi
           fi
 
+      # When running on schedule there are no inputs, so the workflow has to find the Asana task
       - name: Find Asana release task
         id: find-asana-task
         if: github.event.inputs.asana-task-url == null
