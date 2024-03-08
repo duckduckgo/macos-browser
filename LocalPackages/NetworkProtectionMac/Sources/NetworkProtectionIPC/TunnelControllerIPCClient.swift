@@ -74,6 +74,14 @@ public final class TunnelControllerIPCClient {
             serverInterface: serverInterface)
 
         xpc.delegate = xpcDelegate
+        xpc.onDisconnect = { [weak self] in
+            guard let self else { return }
+
+            // By calling register we make sure that XPC will connect as soon as it
+            // becomes available again, as requests are queued.  This helps ensure
+            // that the client app will always be connected to XPC.
+            self.register()
+        }
     }
 }
 
@@ -116,7 +124,6 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
         connectionStatusObserver.publish(status)
         clientDelegate?.statusChanged(status)
     }
-
 }
 
 // MARK: - Outgoing communication to the server
