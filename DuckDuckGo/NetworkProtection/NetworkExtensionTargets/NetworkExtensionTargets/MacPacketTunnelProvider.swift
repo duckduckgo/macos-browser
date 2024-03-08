@@ -223,6 +223,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     @objc public init() {
         self.appLauncher = AppLauncher(appBundleURL: .mainAppBundleURL)
 
+#if SUBSCRIPTION
+        let isSubscriptionEnabled = true
+#else
+        let isSubscriptionEnabled = false
+#endif
+
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard
 #else
@@ -235,16 +241,15 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                              serviceName: Self.tokenServiceName,
                                                              errorEvents: debugEvents,
-                                                             isSubscriptionEnabled: true)
+                                                             isSubscriptionEnabled: isSubscriptionEnabled)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 #if SUBSCRIPTION
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
         let entitlementsCheck = {
             await AccountManager(accessTokenStorage: tokenStore).hasEntitlement(for: .networkProtection)
         }
-        let isSubscriptionEnabled = true
 #else
         let entitlementsCheck: (() async -> Result<Bool, Error>)? = nil
-        let isSubscriptionEnabled = false
 #endif
 
         super.init(notificationsPresenter: notificationsPresenter,
