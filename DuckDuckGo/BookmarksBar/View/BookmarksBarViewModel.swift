@@ -160,10 +160,6 @@ final class BookmarksBarViewModel: NSObject {
         }
 
         self.bookmarksBarItems = displayableItems
-        bookmarksBarItems.forEach({ item in
-            guard let bookmark = item.entity as? Bookmark else { return }
-            print("UPDATING BAR - ID: \(bookmark.id) TITLE: \(bookmark.title) URL: \(bookmark.url) ISFAVORITE: \(bookmark.isFavorite)")
-        })
 
         if let clippedItemsStartingIndex = clippedItemsStartingIndex {
             let clippedEntities = bookmarkEntities[clippedItemsStartingIndex...]
