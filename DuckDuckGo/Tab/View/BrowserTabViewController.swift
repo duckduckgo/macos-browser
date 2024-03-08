@@ -934,9 +934,11 @@ extension BrowserTabViewController: TabDelegate {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let window = view.window else { return nil }
 
+        let preferences = DownloadsPreferences.shared
+        let directoryURL = preferences.lastUsedCustomDownloadLocation ?? preferences.effectiveDownloadLocation
         let savePanel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: request.parameters.fileTypes,
                                                                  suggestedFilename: request.parameters.suggestedFilename,
-                                                                 directoryURL: DownloadsPreferences().effectiveDownloadLocation)
+                                                                 directoryURL: directoryURL)
 
         savePanel.beginSheetModal(for: window) { [request] response in
             if case .abort = response {

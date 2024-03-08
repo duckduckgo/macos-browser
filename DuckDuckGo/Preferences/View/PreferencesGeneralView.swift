@@ -98,19 +98,25 @@ extension Preferences {
 
                 // SECTION 4: Downloads
                 PreferencePaneSection(UserText.downloads) {
-
                     PreferencePaneSubSection {
-                        Text(UserText.downloadsLocation + ":").bold()
+                        ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,
+                                       isOn: $downloadsModel.shouldOpenPopupOnCompletion)
+                    }.padding(.bottom, 5)
+
+                    // MARK: Location
+                    PreferencePaneSubSection {
+                        Text(UserText.downloadsLocation).bold()
                         HStack {
                             NSPathControlView(url: downloadsModel.selectedDownloadLocation)
-    #if !APPSTORE
+#if !APPSTORE
                             Button(UserText.downloadsChangeDirectory) {
                                 downloadsModel.presentDownloadDirectoryPanel()
                             }
-    #endif
+#endif
                         }
                         .disabled(downloadsModel.alwaysRequestDownloadLocation)
-                        ToggleMenuItem(UserText.downloadsAlwaysAsk, isOn: $downloadsModel.alwaysRequestDownloadLocation)
+                        ToggleMenuItem(UserText.downloadsAlwaysAsk,
+                                       isOn: $downloadsModel.alwaysRequestDownloadLocation)
                     }
                 }
             }

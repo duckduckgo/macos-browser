@@ -198,11 +198,63 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndContinuous,
                     includeAppVersionParameter: true)
             }
-        case .rekeyCompleted:
-            PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
-                frequency: .dailyAndContinuous,
-                includeAppVersionParameter: true)
+        case .rekeyAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                    frequency: .dailyAndContinuous,
+                    withError: error,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
+        case .tunnelStartAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStartAttempt,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStartAttempt,
+                    frequency: .dailyAndContinuous,
+                    withError: error,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStartSuccess,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
+        case .tunnelUpdateAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelUpdateAttempt,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelUpdateFailure,
+                    frequency: .dailyAndContinuous,
+                    withError: error,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelUpdateSuccess,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
         }
     }
 

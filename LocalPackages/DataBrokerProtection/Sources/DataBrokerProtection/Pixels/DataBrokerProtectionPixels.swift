@@ -71,9 +71,9 @@ public enum DataBrokerProtectionPixels {
     case optOutFinish(dataBroker: String, attemptId: UUID, duration: Double)
 
     // Process Pixels
-    case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double, emailPattern: String?)
+    case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double, tries: Int, emailPattern: String?)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double, brokerType: DataBrokerHierarchy)
-    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String, emailPattern: String?)
+    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String, tries: Int, emailPattern: String?)
 
     // Backgrond Agent events
     case backgroundAgentStarted
@@ -227,16 +227,16 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutFinish(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
-        case .optOutSubmitSuccess(let dataBroker, let attemptId, let duration, let pattern):
-            var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
+        case .optOutSubmitSuccess(let dataBroker, let attemptId, let duration, let tries, let pattern):
+            var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries)]
             if let pattern = pattern {
                 params[Consts.pattern] = pattern
             }
             return params
         case .optOutSuccess(let dataBroker, let attemptId, let duration, let type):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.isParent: String(type.rawValue)]
-        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage, let pattern):
-            var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage]
+        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage, let tries, let pattern):
+            var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage, Consts.triesKey: String(tries)]
             if let pattern = pattern {
                 params[Consts.pattern] = pattern
             }

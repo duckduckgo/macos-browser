@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "barebonesbrowser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/BareBonesBrowser.git",
+      "state" : {
+        "revision" : "31e5bfedc3c2ca005640c4bf2b6959d69b0e18b9",
+        "version" : "0.1.0"
+      }
+    },
+    {
       "identity" : "bloom_cpp",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/bloom_cpp.git",
@@ -23,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "dbe75fa0ee9e3b740d520d5be7967e2c5239dfb5",
-        "version" : "117.0.0"
+        "revision" : "a32ff4084e910354bdd948812793de6b04804a1b",
+        "version" : "119.0.1"
       }
     },
     {
@@ -32,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "59752eb7973d3e3b0c23255ff51359f48b343f15",
-        "version" : "5.2.0"
+        "revision" : "f6241631fc14cc2d0f47950bfdc4d6c30bf90130",
+        "version" : "5.4.0"
       }
     },
     {

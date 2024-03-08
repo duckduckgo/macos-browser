@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
-import BrowserServicesKit
+import Common
 
 final class TabViewModel {
 
@@ -112,15 +113,19 @@ final class TabViewModel {
         tab.$content
             .map { [tab] content -> AnyPublisher<Event, Never> in
                 switch content {
-                case .url(_, _, source: .webViewUpdated),
-                     .url(_, _, source: .link):
+                case .url(let url, _, source: .webViewUpdated),
+                     .url(let url, _, source: .link):
 
                     // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
-                    return tab.webViewDidCommitNavigationPublisher.map { .didCommit }.eraseToAnyPublisher()
+                    return tab.$committedURL.filter { committedURL in
+                        committedURL == url
+                    }.map { _ in
+                        .didCommit
+                    }.eraseToAnyPublisher()
 
                 case .url(_, _, source: .userEntered(_, downloadRequested: true)):
                     // don‘t update the address bar for download navigations
-                    return Empty().eraseToAnyPublisher().eraseToAnyPublisher()
+                    return Empty().eraseToAnyPublisher()
 
                 case .url(_, _, source: .pendingStateRestoration),
                      .url(_, _, source: .loadedByStateRestoration),
