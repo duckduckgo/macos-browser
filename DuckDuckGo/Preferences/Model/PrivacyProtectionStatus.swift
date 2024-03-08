@@ -1,5 +1,5 @@
 //
-//  PreferencesProtectionStatus.swift
+//  PrivacyProtectionStatus.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //

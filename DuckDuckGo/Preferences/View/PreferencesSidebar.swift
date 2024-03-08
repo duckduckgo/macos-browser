@@ -69,7 +69,7 @@ extension Preferences {
         }
     }
 
-    enum StatusIndicator {
+    enum StatusIndicator: Equatable {
         case alwaysOn
         case on
         case off
