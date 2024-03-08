@@ -53,6 +53,7 @@ public enum DataBrokerProtectionPixels {
         static let errorDetailsKey = "error_details"
         static let pattern = "pattern"
         static let isParent = "is_parent"
+        static let actionIDKey = "action_id"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -69,11 +70,12 @@ public enum DataBrokerProtectionPixels {
     case optOutEmailConfirm(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutValidate(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutFinish(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutFillForm(dataBroker: String, attemptId: UUID, duration: Double)
 
     // Process Pixels
     case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double, tries: Int, emailPattern: String?)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double, brokerType: DataBrokerHierarchy)
-    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String, tries: Int, emailPattern: String?)
+    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String, tries: Int, emailPattern: String?, actionID: String?)
 
     // Backgrond Agent events
     case backgroundAgentStarted
@@ -133,6 +135,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .optOutEmailConfirm: return "m_mac_dbp_macos_optout_stage_email-confirm"
         case .optOutValidate: return "m_mac_dbp_macos_optout_stage_validate"
         case .optOutFinish: return "m_mac_dbp_macos_optout_stage_finish"
+        case .optOutFillForm: return "m_mac_dbp_macos_optout_stage_fill-form"
 
             // Process Pixels
         case .optOutSubmitSuccess: return "m_mac_dbp_macos_optout_process_submit-success"
@@ -227,6 +230,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutFinish(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
+        case .optOutFillForm(let dataBroker, let attemptId, let duration):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutSubmitSuccess(let dataBroker, let attemptId, let duration, let tries, let pattern):
             var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries)]
             if let pattern = pattern {
@@ -235,11 +240,16 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return params
         case .optOutSuccess(let dataBroker, let attemptId, let duration, let type):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.isParent: String(type.rawValue)]
-        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage, let tries, let pattern):
+        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage, let tries, let pattern, let actionID):
             var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage, Consts.triesKey: String(tries)]
             if let pattern = pattern {
                 params[Consts.pattern] = pattern
             }
+
+            if let actionID = actionID {
+                params[Consts.actionIDKey] = actionID
+            }
+
             return params
         case .backgroundAgentStarted,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
@@ -303,6 +313,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutValidate,
                     .optOutFinish,
                     .optOutSubmitSuccess,
+                    .optOutFillForm,
                     .optOutSuccess,
                     .optOutFailure,
                     .backgroundAgentStarted,
