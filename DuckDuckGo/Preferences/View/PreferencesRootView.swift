@@ -93,7 +93,7 @@ enum Preferences {
                 case .appearance:
                     AppearanceView(model: .shared)
                 case .dataClearing:
-                    DataClearingView(model: FireButtonPreferences())
+                    DataClearingView(model: DataClearingPreferences())
 
 #if NETWORK_PROTECTION
                 case .vpn:

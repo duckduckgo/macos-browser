@@ -1,5 +1,5 @@
 //
-//  FireButtonPreferences.swift
+//  DataClearingPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,9 +18,9 @@
 
 import Foundation
 
-final class FireButtonPreferences: ObservableObject {
+final class DataClearingPreferences: ObservableObject {
 
-    static let shared = FireButtonPreferences()
+    static let shared = DataClearingPreferences()
 
     @Published
     var isLoginDetectionEnabled: Bool {
@@ -36,7 +36,7 @@ final class FireButtonPreferences: ObservableObject {
         guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         else {
-            assertionFailure("Privacy Preferences: Failed to present FireproofDomainsViewController")
+            assertionFailure("DataClearingPreferences: Failed to present FireproofDomainsViewController")
             return
         }
 

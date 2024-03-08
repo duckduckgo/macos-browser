@@ -23,7 +23,7 @@ import SwiftUIExtensions
 extension Preferences {
 
     struct DataClearingView: View {
-        @ObservedObject var model: FireButtonPreferences
+        @ObservedObject var model: DataClearingPreferences
 
         var body: some View {
             PreferencePane(UserText.dataClearing) {
