@@ -21,7 +21,6 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-import os.log // swiftlint:disable:next os_log
 
 /// Takes care of handling incoming IPC requests from clients that need to be relayed to the tunnel, and handling state
 /// changes that need to be relayed back to IPC clients.
