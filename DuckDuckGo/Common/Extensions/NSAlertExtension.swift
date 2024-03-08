@@ -21,45 +21,12 @@ import Cocoa
 
 extension NSAlert {
 
-    static var cautionImage = NSImage(named: "NSCaution")
-
-    static func javascriptAlert(with message: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = message
-        alert.addButton(withTitle: UserText.ok)
-        return alert
-    }
-
-    static func javascriptConfirmation(with message: String) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = message
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func javascriptTextInput(prompt: String, defaultText: String?) -> NSAlert {
-        let alert = NSAlert()
-        alert.icon = Self.cautionImage
-        alert.messageText = prompt
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.cancel)
-        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        textField.stringValue = defaultText ?? ""
-        textField.placeholderString = defaultText
-        alert.accessoryView = textField
-        alert.window.initialFirstResponder = textField
-        return alert
-    }
-
     static func fireproofAlert(with domain: String) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.fireproofConfirmationTitle(domain: domain)
         alert.informativeText = UserText.fireproofConfirmationMessage
         alert.alertStyle = .warning
-        alert.icon = NSImage(named: "Fireproof")
+        alert.icon = .fireproof
         alert.addButton(withTitle: UserText.fireproof)
         alert.addButton(withTitle: UserText.notNow)
         return alert
@@ -70,7 +37,7 @@ extension NSAlert {
         alert.messageText = UserText.clearAllDataQuestion
         alert.informativeText = UserText.clearAllDataDescription
         alert.alertStyle = .warning
-        alert.icon = NSImage(named: "BurnAlert")
+        alert.icon = .burnAlert
         alert.addButton(withTitle: UserText.clear)
         alert.addButton(withTitle: UserText.cancel)
         return alert
@@ -86,7 +53,7 @@ extension NSAlert {
             alert.informativeText = UserText.clearDataTodayDescription
         }
         alert.alertStyle = .warning
-        alert.icon = NSImage(named: "BurnAlert")
+        alert.icon = .burnAlert
         alert.addButton(withTitle: UserText.clear)
         alert.addButton(withTitle: UserText.cancel)
         return alert
@@ -261,5 +228,4 @@ extension NSAlert {
             continuation.resume(returning: self.runModal())
         }
     }
-
 }

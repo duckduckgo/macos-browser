@@ -190,14 +190,6 @@ jobs:
       with:
         task-url: ${{ env.asana-task-url }}
 
-    - name: Upload dSYMs to Asana
-      if: ${{ env.upload-to == 'asana' }}
-      uses: ./.github/actions/asana-upload
-      with:
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        file-name: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
-        task-id: ${{ steps.task-id.outputs.task-id }}
-
     - name: Upload dSYMs to S3
       id: upload-dsyms-to-s3
       if: ${{ env.upload-to == 's3' }}

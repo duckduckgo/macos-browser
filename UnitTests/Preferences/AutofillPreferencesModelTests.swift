@@ -32,14 +32,17 @@ final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
 }
 
 final class UserAuthenticatorMock: UserAuthenticating {
+    var didCallAuthenticate = false
     var _authenticateUser: (DeviceAuthenticator.AuthenticationReason) -> DeviceAuthenticationResult = { _ in return .success }
 
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
+        didCallAuthenticate = true
         let authenticationResult = _authenticateUser(reason)
         result(authenticationResult)
     }
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
-        _authenticateUser(reason)
+        didCallAuthenticate = true
+        return _authenticateUser(reason)
     }
 }
 

@@ -269,7 +269,12 @@ final class FaviconManager: FaviconManagement {
     // MARK: - Private
 
     private nonisolated func createFallbackLinksIfNeeded(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) -> [FaviconUserScript.FaviconLink] {
-        guard faviconLinks.isEmpty, let host = documentUrl.host else { return faviconLinks }
+        let validSchemes: [URL.NavigationalScheme?] = [.http, .https]
+        guard faviconLinks.isEmpty,
+              let host = documentUrl.host,
+              validSchemes.contains(documentUrl.navigationalScheme) else {
+            return faviconLinks
+        }
         return [
             FaviconUserScript.FaviconLink(href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
                                           rel: "favicon.ico")

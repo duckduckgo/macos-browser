@@ -17,8 +17,10 @@
 //
 
 import Foundation
+import Macros
 import UniformTypeIdentifiers
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -464,8 +466,8 @@ private extension DownloadListItem {
     static let testFailedItem = DownloadListItem(identifier: UUID(),
                                                  added: Date(),
                                                  modified: Date(),
-                                                 url: URL(string: "https://duckduckgo.com/testdload")!,
-                                                 websiteURL: URL(string: "https://duckduckgo.com"),
+                                                 url: #URL("https://duckduckgo.com/testdload"),
+                                                 websiteURL: #URL("https://duckduckgo.com"),
                                                  progress: nil,
                                                  isBurner: false,
                                                  fileType: .pdf,

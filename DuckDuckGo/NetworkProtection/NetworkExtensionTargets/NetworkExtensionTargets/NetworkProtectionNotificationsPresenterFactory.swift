@@ -22,11 +22,12 @@ import NetworkProtection
 /// A convenience class for making notification presenters.
 ///
 struct NetworkProtectionNotificationsPresenterFactory {
-    func make(settings: VPNSettings) -> NetworkProtectionNotificationsPresenter {
+    func make(settings: VPNSettings, defaults: UserDefaults) -> NetworkProtectionNotificationsPresenter {
         let presenterForBuildType = makePresenterForBuildType()
 
         return NetworkProtectionNotificationsPresenterTogglableDecorator(
             settings: settings,
+            defaults: defaults,
             wrappee: presenterForBuildType)
     }
 

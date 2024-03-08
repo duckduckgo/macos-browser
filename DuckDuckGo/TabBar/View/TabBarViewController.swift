@@ -31,7 +31,6 @@ final class TabBarViewController: NSViewController {
     }
 
     @IBOutlet weak var visualEffectBackgroundView: NSVisualEffectView!
-    @IBOutlet weak var gradientBackgroundView: GradientView!
     @IBOutlet weak var pinnedTabsContainerView: NSView!
     @IBOutlet private weak var collectionView: TabBarCollectionView!
     @IBOutlet private weak var scrollView: TabBarScrollView!
@@ -159,6 +158,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupFireButton() {
+        fireButton.image = .burn
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
         fireButton.sendAction(on: .leftMouseDown)
@@ -168,9 +168,9 @@ final class TabBarViewController: NSViewController {
         if tabCollectionViewModel.isBurner {
             burnerWindowBackgroundView.isHidden = false
             fireButton.isAnimationEnabled = false
-            fireButton.backgroundColor = NSColor.fireButtonRedBackgroundColor
-            fireButton.mouseOverColor = NSColor.fireButtonRedHoverColor
-            fireButton.mouseDownColor = NSColor.fireButtonRedPressedColor
+            fireButton.backgroundColor = NSColor.fireButtonRedBackground
+            fireButton.mouseOverColor = NSColor.fireButtonRedHover
+            fireButton.mouseDownColor = NSColor.fireButtonRedPressed
             fireButton.normalTintColor = NSColor.white
             fireButton.mouseDownTintColor = NSColor.white
             fireButton.mouseOverTintColor = NSColor.white

@@ -58,14 +58,14 @@ extension Preferences {
 
                     VStack(alignment: .leading) {
                         HStack(spacing: 10) {
-                            Image("InfoSubtle-16")
+                            Image(.infoSubtle16)
 
                             VStack {
                                 HStack {
                                     Text(UserText.vpnSecureDNSSettingDescription)
                                         .padding(0)
                                         .font(.system(size: 11))
-                                        .foregroundColor(Color("BlackWhite60"))
+                                        .foregroundColor(Color(.blackWhite60))
                                         .multilineTextAlignment(.leading)
                                         .fixMultilineScrollableText()
 
@@ -79,7 +79,7 @@ extension Preferences {
                     }.frame(alignment: .topLeading)
                         .frame(idealWidth: .infinity, maxWidth: .infinity)
                         .padding(10)
-                        .background(Color("BlackWhite1"))
+                        .background(Color(.blackWhite1))
                         .roundedBorder()
                 }
 
