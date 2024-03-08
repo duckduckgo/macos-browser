@@ -276,9 +276,10 @@ extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelega
 extension PrivacyDashboardViewController: PrivacyDashboardToggleReportDelegate {
 
    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController,
-                                   didRequestSubmitToggleReportWithSource source: BrokenSiteReport.Source) {
+                                   didRequestSubmitToggleReportWithSource source: BrokenSiteReport.Source,
+                                   didOpenReportInfo: Bool) {
        do {
-           let report = try makeBrokenSiteReport(source: source)
+           let report = try makeBrokenSiteReport(source: source, didOpenReportInfo: didOpenReportInfo)
            try toggleProtectionsOffReporter.report(report, reportMode: .toggle)
        } catch {
            os_log("Failed to generate or send the broken site report: %@", type: .error, error.localizedDescription)
@@ -297,7 +298,8 @@ extension PrivacyDashboardViewController {
 
     private func makeBrokenSiteReport(category: String = "",
                                       description: String = "",
-                                      source: BrokenSiteReport.Source) throws -> BrokenSiteReport {
+                                      source: BrokenSiteReport.Source,
+                                      didOpenReportInfo: Bool = false) throws -> BrokenSiteReport {
 
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         guard let currentTab = tabViewModel?.tab,
@@ -337,7 +339,8 @@ extension PrivacyDashboardViewController {
                                                protectionsState: protectionsState,
                                                reportFlow: source,
                                                errors: errors,
-                                               httpStatusCodes: statusCodes)
+                                               httpStatusCodes: statusCodes,
+                                               didOpenReportInfo: didOpenReportInfo)
         return websiteBreakage
     }
 }
