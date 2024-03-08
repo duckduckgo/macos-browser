@@ -56,68 +56,10 @@ enum Preferences {
         var body: some View {
             HStack(spacing: 0) {
                 Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
-
                 Color(NSColor.separatorColor).frame(width: 1)
-
                 ScrollView(.vertical) {
                     HStack(spacing: 0) {
-                        VStack(alignment: .leading) {
-
-                            switch model.selectedPane {
-                            case .defaultBrowser:
-                                DefaultBrowserView(defaultBrowserModel: DefaultBrowserPreferences.shared,
-                                                   status: PrivacyProtectionStatus.status(for: .defaultBrowser))
-                            case .privateSearch:
-                                PrivateSearchView(model: SearchPreferences.shared)
-                            case .webTrackingProtection:
-                                WebTrackingProtectionView(model: WebTrackingProtectionPreferences.shared)
-                            case .cookiePopupProtection:
-                                CookiePopupProtectionView(model: CookiePopupProtectionPreferences.shared)
-                            case .emailProtection:
-                                EmailProtectionView(emailManager: EmailManager())
-                            case .general:
-                                GeneralView(startupModel: StartupPreferences.shared,
-                                            downloadsModel: DownloadsPreferences.shared,
-                                            searchModel: SearchPreferences.shared)
-                            case .sync:
-                                SyncView()
-                            case .appearance:
-                                AppearanceView(model: .shared)
-                            case .dataClearing:
-                                DataClearingView(model: FireButtonPreferences())
-
-#if NETWORK_PROTECTION
-                            case .vpn:
-                                VPNView(model: VPNPreferencesModel())
-#endif
-
-#if SUBSCRIPTION
-                            case .subscription:
-                                SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
-#endif
-                            case .autofill:
-                                AutofillView(model: AutofillPreferencesModel())
-                            case .accessibility:
-                                AccessibilityView(model: AccessibilityPreferences.shared)
-                            case .duckPlayer:
-                                DuckPlayerView(model: .shared)
-                            case .otherPlatforms:
-                                // Opens a new tab
-                                Spacer()
-                            case .about:
-#if NETWORK_PROTECTION
-                                let netPInvitePresenter = NetworkProtectionInvitePresenter()
-                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
-#else
-                                AboutView(model: AboutModel())
-#endif
-
-                            }
-                        }
-                        .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
-                        .padding(.vertical, Const.panePaddingVertical)
-                        .padding(.horizontal, Const.panePaddingHorizontal)
-
+                        contentView
                         Spacer()
                     }
                 }
@@ -125,6 +67,64 @@ enum Preferences {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.preferencesBackground)
+        }
+
+        @ViewBuilder
+        var contentView: some View {
+            VStack(alignment: .leading) {
+                switch model.selectedPane {
+                case .defaultBrowser:
+                    DefaultBrowserView(defaultBrowserModel: DefaultBrowserPreferences.shared,
+                                       status: PrivacyProtectionStatus.status(for: .defaultBrowser))
+                case .privateSearch:
+                    PrivateSearchView(model: SearchPreferences.shared)
+                case .webTrackingProtection:
+                    WebTrackingProtectionView(model: WebTrackingProtectionPreferences.shared)
+                case .cookiePopupProtection:
+                    CookiePopupProtectionView(model: CookiePopupProtectionPreferences.shared)
+                case .emailProtection:
+                    EmailProtectionView(emailManager: EmailManager())
+                case .general:
+                    GeneralView(startupModel: StartupPreferences.shared,
+                                downloadsModel: DownloadsPreferences.shared,
+                                searchModel: SearchPreferences.shared)
+                case .sync:
+                    SyncView()
+                case .appearance:
+                    AppearanceView(model: .shared)
+                case .dataClearing:
+                    DataClearingView(model: FireButtonPreferences())
+
+#if NETWORK_PROTECTION
+                case .vpn:
+                    VPNView(model: VPNPreferencesModel())
+#endif
+
+#if SUBSCRIPTION
+                case .subscription:
+                    SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
+#endif
+                case .autofill:
+                    AutofillView(model: AutofillPreferencesModel())
+                case .accessibility:
+                    AccessibilityView(model: AccessibilityPreferences.shared)
+                case .duckPlayer:
+                    DuckPlayerView(model: .shared)
+                case .otherPlatforms:
+                    // Opens a new tab
+                    Spacer()
+                case .about:
+#if NETWORK_PROTECTION
+                    let netPInvitePresenter = NetworkProtectionInvitePresenter()
+                    AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
+#else
+                    AboutView(model: AboutModel())
+#endif
+                }
+            }
+            .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
+            .padding(.vertical, Const.panePaddingVertical)
+            .padding(.horizontal, Const.panePaddingHorizontal)
         }
 
 #if SUBSCRIPTION
