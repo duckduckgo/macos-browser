@@ -22,8 +22,11 @@ import Subscription
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
-    @Published var cachedEntitlements: [AccountManager.Entitlement] = []
     @Published var subscriptionDetails: String?
+
+    @Published var hasAccessToVPN: Bool = false
+    @Published var hasAccessToDBP: Bool = false
+    @Published var hasAccessToITR: Bool = false
 
     private var subscriptionPlatform: Subscription.Platform?
 
@@ -182,6 +185,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         openURLHandler(.subscriptionFAQ)
     }
 
+    // swiftlint:disable cyclomatic_complexity
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
         guard fetchSubscriptionDetailsTask == nil else { return }
@@ -197,7 +201,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.updateDescription(for: cachedDate)
 
                 if cachedDate.timeIntervalSinceNow < 0 {
-                    self?.cachedEntitlements = []
+                    self?.hasAccessToVPN = false
+                    self?.hasAccessToDBP = false
+                    self?.hasAccessToITR = false
                 }
             }
 
@@ -211,12 +217,31 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
                 self?.subscriptionPlatform = subscription.platform
             }
+            if let self {
+                switch await self.accountManager.hasEntitlement(for: .networkProtection) {
+                case let .success(result):
+                    hasAccessToVPN = result
+                case .failure:
+                    hasAccessToVPN = false
+                }
 
-            if case let .success(entitlements) = await self?.accountManager.fetchEntitlements() {
-                self?.cachedEntitlements = entitlements
+                switch await self.accountManager.hasEntitlement(for: .dataBrokerProtection) {
+                case let .success(result):
+                    hasAccessToDBP = result
+                case .failure:
+                    hasAccessToDBP = false
+                }
+
+                switch await self.accountManager.hasEntitlement(for: .identityTheftRestoration) {
+                case let .success(result):
+                    hasAccessToITR = result
+                case .failure:
+                    hasAccessToITR = false
+                }
             }
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     private func updateDescription(for date: Date) {
         self.subscriptionDetails = UserText.preferencesSubscriptionActiveCaption(formattedDate: dateFormatter.string(from: date))
