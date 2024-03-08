@@ -357,6 +357,7 @@ final class MoreOptionsMenu: NSMenu {
 
             items.append(networkProtectionItem)
 
+#if SUBSCRIPTION
             Task {
                 let isMenuItemEnabled: Bool
 
@@ -369,6 +370,7 @@ final class MoreOptionsMenu: NSMenu {
 
                 networkProtectionItem.isEnabled = isMenuItemEnabled
             }
+#endif
 
             DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else {
@@ -385,6 +387,7 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.dbpIcon)
             items.append(dataBrokerProtectionItem)
 
+#if SUBSCRIPTION
             Task {
                 let isMenuItemEnabled: Bool
 
@@ -397,6 +400,7 @@ final class MoreOptionsMenu: NSMenu {
 
                 dataBrokerProtectionItem.isEnabled = isMenuItemEnabled
             }
+#endif
 
             DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
 
