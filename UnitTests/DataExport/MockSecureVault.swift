@@ -228,6 +228,24 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
 }
 
+extension MockSecureVault {
+    func addWebsiteCredentials(identifiers: [Int64]) {
+        var credentials = [Int64: SecureVaultModels.WebsiteCredentials]()
+
+        for identifier in identifiers {
+            let account = SecureVaultModels.WebsiteAccount(id: String(identifier),
+                                                           title: "title-\(identifier)",
+                                                           username: "user-\(identifier)",
+                                                           domain: "domain-\(identifier)")
+            let credential = SecureVaultModels.WebsiteCredentials(account: account, password: "password\"containing\"quotes".data(using: .utf8)!)
+            credentials[identifier] = credential
+        }
+
+        self.storedAccounts = credentials.map(\.value.account)
+        self.storedCredentials = credentials
+    }
+}
+
 // MARK: - Mock Providers
 
 private extension URL {
