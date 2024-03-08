@@ -331,10 +331,10 @@ struct UserText {
     static let webTrackingProtectionSettingsTitle = NSLocalizedString("web.tracking.protection.title", value: "Web Tracking Protection", comment: "Web tracking protection settings section title")
     static let webTrackingProtectionExplenation = NSLocalizedString("web.tracking.protection.explenation", value: "DuckDuckGo automatically blocks hidden trackers as you browse the web.", comment: "feature explanation in settings") 
     static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Automatically handle cookie pop-ups", comment: "Autoconsent settings checkbox title")
-    static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "When DuckDuckGo detects cookie pop-ups on sites you visit, we can automatically set your cookie preferences to minimize cookies and maximize privacy, then close pop-ups.", comment: "Autoconsent feature explanation in settings")
+    static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.", comment: "Autoconsent feature explanation in settings")
     static let privateSearchExplanation = NSLocalizedString("private.search.explenation", value: "DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked.", comment: "feature explanation in settings")
     static let webTrackingProtectionExplanation = NSLocalizedString("web.tracking.protection.explanation", value: "DuckDuckGo automatically blocks hidden trackers as you browse the web.", comment: "feature explanation in settings")
-    static let emailProtectionExplanation = NSLocalizedString("email.protection.explanation", value: "Block email trackers and hide your address without switching your email provider", comment: "feature explanation in settings")
+    static let emailProtectionExplanation = NSLocalizedString("email.protection.explanation", value: "Block email trackers and hide your address without switching your email provider.", comment: "feature explanation in settings")
 
     // Misc
 
@@ -535,7 +535,7 @@ struct UserText {
     static let preferencesOff = NSLocalizedString("preferences.off", value: "Off", comment: "Status indicator of a privacy protection.")
     static let preferencesAlwaysOn = NSLocalizedString("preferences.always-on", value: "Always On", comment: "Status indicator of a privacy protection.")
     static let duckduckgoOnOtherPlatforms = NSLocalizedString("preferences.duckduckgo-on-other-platforms", value: "DuckDuckGo on Other Platforms", comment: "Section in Preferences")
-    static let defaultBrowser = NSLocalizedString("preferences.default-browser-app", value: "Default Browser App", comment: "Show Default Browser App preferences")
+    static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show Default Browser preferences")
     static let privateSearch = NSLocalizedString("preferences.private-search", value: "Private Search", comment: "Show Private Search preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show Appearance preferences")
     static let dataClearing = NSLocalizedString("preferences.data-clearing", value: "Data Clearing", comment: "Show Data Clearing preferences")
@@ -549,7 +549,7 @@ struct UserText {
 
     static let downloads = NSLocalizedString("preferences.downloads", value: "Downloads", comment: "Show downloads browser preferences")
     static let accessibility = NSLocalizedString("preferences.accessibility", value: "Accessibility", comment: "Show accessibility browser preferences")
-    static let cookiePopUpProtection = NSLocalizedString("preferences.cookie-pop-up-protection", value: "Cookie Pop-up Protection", comment: "Show cookie pop-up protection preferences")
+    static let cookiePopUpProtection = NSLocalizedString("preferences.cookie-pop-up-protection", value: "Cookie Pop-Up Protection", comment: "Show cookie pop-up protection preferences")
     static let support = NSLocalizedString("preferences.support", value: "Support", comment: "Open support page")
 
     static let isDefaultBrowser = NSLocalizedString("preferences.default-browser.active", value: "DuckDuckGo is your default browser", comment: "Indicate that the browser is the default")

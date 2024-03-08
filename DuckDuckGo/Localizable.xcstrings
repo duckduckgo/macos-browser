@@ -54,8 +54,10 @@
       }
     },
     " %@" : {
+
     },
     "-1 -> 0 ... 1" : {
+
     },
     "**%lld** tracking attempts blocked" : {
       "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
@@ -2464,7 +2466,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "When DuckDuckGo detects cookie pop-ups on sites you visit, we can automatically set your cookie preferences to minimize cookies and maximize privacy, then close pop-ups."
+            "value" : "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you."
           }
         },
         "es" : {
@@ -15430,7 +15432,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Block email trackers and hide your address without switching your email provider"
+            "value" : "Block email trackers and hide your address without switching your email provider."
           }
         }
       }
@@ -42401,7 +42403,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Cookie Pop-up Protection"
+            "value" : "Cookie Pop-Up Protection"
           }
         }
       }
@@ -42419,8 +42421,8 @@
       }
     },
     "preferences.default-browser" : {
-      "comment" : "Show default browser preferences",
-      "extractionState" : "stale",
+      "comment" : "Show Default Browser preferences",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -42474,18 +42476,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Браузер по умолчанию"
-          }
-        }
-      }
-    },
-    "preferences.default-browser-app" : {
-      "comment" : "Show Default Browser App preferences",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Default Browser App"
           }
         }
       }
