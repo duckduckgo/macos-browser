@@ -67,6 +67,8 @@ struct AddBookmarkFolderPopoverView: ModalView {
 
 #Preview("Add Folder - Dark") {
     let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: []))
+    bkman.loadBookmarks()
+    customAssertionFailure = { _, _, _ in }
 
     return AddBookmarkFolderPopoverView(model: AddBookmarkFolderPopoverViewModel(bookmarkManager: bkman) {
         print("CompletionHandler:", $0?.title ?? "<nil>")
