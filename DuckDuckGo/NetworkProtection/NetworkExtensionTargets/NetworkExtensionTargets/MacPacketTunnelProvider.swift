@@ -239,10 +239,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 #if SUBSCRIPTION
         let entitlementsCheck = {
-            await AccountManager().hasEntitlement(for: .networkProtection)
+            await AccountManager(accessTokenStorage: tokenStore).hasEntitlement(for: .networkProtection)
         }
+        let isSubscriptionEnabled = true
 #else
         let entitlementsCheck: (() async -> Result<Bool, Error>)? = nil
+        let isSubscriptionEnabled = false
 #endif
 
         super.init(notificationsPresenter: notificationsPresenter,
@@ -254,7 +256,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
                    defaults: defaults,
-                   isSubscriptionEnabled: false,
+                   isSubscriptionEnabled: isSubscriptionEnabled,
                    entitlementCheck: entitlementsCheck)
 
         observeServerChanges()
