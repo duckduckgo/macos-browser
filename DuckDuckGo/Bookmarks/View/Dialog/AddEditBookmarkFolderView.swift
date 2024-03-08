@@ -63,7 +63,7 @@ struct AddEditBookmarkFolderView: View {
             },
             bottomSection: {
                 BookmarkDialogButtonsView(
-                    viewState: .compressed,
+                    viewState: .init(buttonsState),
                     otherButtonAction: .init(
                         title: cancelActionTitle,
                         keyboardShortCut: .cancelAction,
