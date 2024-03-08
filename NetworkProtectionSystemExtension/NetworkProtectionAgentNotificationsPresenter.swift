@@ -48,7 +48,7 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
         notificationCenter.post(.showVPNSupersededNotification)
     }
 
-    func showEntitlementNotification(completion: @escaping (Error?) -> Void) {
+    func showEntitlementNotification() {
         notificationCenter.post(.showExpiredEntitlementNotification)
     }
 

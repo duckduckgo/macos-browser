@@ -13,7 +13,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "1.0.0"),
+        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "2.0.0"),
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "a5b3ae827b9b659fc6cde49e7729a9e1bb1044ac")
     ],
     targets: [

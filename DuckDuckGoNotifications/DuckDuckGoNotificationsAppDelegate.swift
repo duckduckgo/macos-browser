@@ -148,7 +148,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     func showEntitlementNotification() {
         os_log("Presenting Entitlements notification", log: .networkProtection, type: .info)
 
-        notificationsPresenter.showEntitlementNotification { _ in }
+        notificationsPresenter.showEntitlementNotification()
     }
 
     func showTestNotification() {

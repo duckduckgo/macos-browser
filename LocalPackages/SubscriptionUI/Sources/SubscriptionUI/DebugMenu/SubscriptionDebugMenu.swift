@@ -175,7 +175,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func getSubscriptionDetails() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await SubscriptionService.getSubscriptionDetails(token: token) {
+            switch await SubscriptionService.getSubscription(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")
             case .failure(let error):

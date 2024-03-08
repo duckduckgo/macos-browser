@@ -63,6 +63,8 @@ struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor 
 
 final class DownloadsPreferences: ObservableObject {
 
+    static let shared = DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor())
+
     private func validatedDownloadLocation(_ location: String?) -> URL? {
         if let selectedLocation = location,
            let selectedLocationURL = URL(string: selectedLocation),
@@ -81,9 +83,13 @@ final class DownloadsPreferences: ObservableObject {
 
     var lastUsedCustomDownloadLocation: URL? {
         get {
-            persistor.lastUsedCustomDownloadLocation?.url
+            let url = persistor.lastUsedCustomDownloadLocation?.url
+            var isDirectory: ObjCBool = false
+            guard let url, FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+                return nil
+            }
+            return url
         }
-
         set {
             defer {
                 objectWillChange.send()
@@ -148,7 +154,7 @@ final class DownloadsPreferences: ObservableObject {
         }
     }
 
-    init(persistor: DownloadsPreferencesPersistor = DownloadsPreferencesUserDefaultsPersistor()) {
+    init(persistor: DownloadsPreferencesPersistor) {
         self.persistor = persistor
 
         // Fix the selected download location if it needs it

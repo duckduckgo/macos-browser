@@ -641,6 +641,149 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         }
     }
 
+    func testCorrectDataBrokerTypeIsSent_whenOptOutIsDoneInChildSite() async {
+        do {
+            mockDatabase.attemptInformation = .mock
+            mockWebOperationRunner.scanResults = [.mockWithoutId]
+            _ = try await sut.runScanOperation(
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mockWithParentOptOut,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
+                shouldRunNextStep: { true }
+            )
+
+            if let lastPixelFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last {
+                switch lastPixelFired {
+                case .optOutSuccess(_, _, _, let type):
+                    XCTAssertEqual(type, .child)
+                default: XCTFail("We should be firing the opt-out submit pixel last")
+                }
+            } else {
+                XCTFail("We should be firing the opt-out submit pixel")
+            }
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testCorrectDataBrokerTypeIsSent_whenOptOutIsDoneInParentSite() async {
+        do {
+            mockDatabase.attemptInformation = .mock
+            mockWebOperationRunner.scanResults = [.mockWithoutId]
+            _ = try await sut.runScanOperation(
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
+                shouldRunNextStep: { true }
+            )
+
+            if let lastPixelFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last {
+                switch lastPixelFired {
+                case .optOutSuccess(_, _, _, let type):
+                    XCTAssertEqual(type, .parent)
+                default: XCTFail("We should be firing the opt-out submit pixel last")
+                }
+            } else {
+                XCTFail("We should be firing the opt-out submit pixel")
+            }
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testCorrectNumberOfTriesIsFired_whenOptOutSucceeds() async {
+        do {
+            mockDatabase.historyEvents = [
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+                .init(brokerId: 1, profileQueryId: 1, type: .error(error: .cancelled)),
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+                .init(brokerId: 1, profileQueryId: 1, type: .error(error: .cancelled)),
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+            ]
+            _ = try await sut.runOptOutOperation(
+                for: .mockWithoutRemovedDate,
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
+                shouldRunNextStep: { true }
+            )
+            if let lastPixelFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last {
+                switch lastPixelFired {
+                case .optOutSubmitSuccess(_, _, _, let tries, _):
+                    XCTAssertEqual(tries, 3)
+                default: XCTFail("We should be firing the opt-out submit-success pixel last")
+                }
+            } else {
+                XCTFail("We should be firing the opt-out submit-success pixel")
+            }
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testCorrectNumberOfTriesIsFired_whenOptOutFails() async {
+        do {
+            mockWebOperationRunner.shouldOptOutThrow = true
+            mockDatabase.historyEvents = [
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+                .init(brokerId: 1, profileQueryId: 1, type: .error(error: .cancelled)),
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+                .init(brokerId: 1, profileQueryId: 1, type: .error(error: .cancelled)),
+                .init(brokerId: 1, profileQueryId: 1, type: .optOutStarted),
+            ]
+            _ = try await sut.runOptOutOperation(
+                for: .mockWithoutRemovedDate,
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
+                shouldRunNextStep: { true }
+            )
+            XCTFail("The code above should throw")
+        } catch {
+            if let lastPixelFired = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last {
+                switch lastPixelFired {
+                case .optOutFailure(_, _, _, _, let tries, _):
+                    XCTAssertEqual(tries, 3)
+                default: XCTFail("We should be firing the opt-out submit-success pixel last")
+                }
+            } else {
+                XCTFail("We should be firing the opt-out submit-success pixel")
+            }
+        }
+    }
+
     // MARK: - Update operation dates tests
 
     func testWhenUpdatingDatesOnOptOutAndLastEventIsError_thenWeSetPreferredRunDateWithRetryErrorDate() throws {
@@ -874,7 +1017,8 @@ extension DataBroker {
                 retryError: 0,
                 confirmOptOutScan: 0,
                 maintenanceScan: 0
-            )
+            ),
+            parent: "some"
         )
     }
 
@@ -957,6 +1101,17 @@ final class MockUserNotification: DataBrokerProtectionUserNotificationService {
         firstRemovedNotificationWasSent = false
         checkInNotificationWasScheduled = false
         allInfoRemovedWasSent = false
+    }
+}
+
+extension AttemptInformation {
+
+    static var mock: AttemptInformation {
+        AttemptInformation(extractedProfileId: 1,
+                           dataBroker: "broker",
+                           attemptId: UUID().uuidString,
+                           lastStageDate: Date(),
+                           startDate: Date())
     }
 }
 

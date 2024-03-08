@@ -33,7 +33,7 @@ let package = Package(
         .package(path: "../PixelKit"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../XPCHelper"),
-        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "1.0.0"),
+        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "2.0.0"),
     ],
     targets: [
         .target(
@@ -55,6 +55,7 @@ let package = Package(
             dependencies: [
                 "DataBrokerProtection",
                 "BrowserServicesKit",
+                .product(name: "Macros", package: "apple-toolbox"),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         )

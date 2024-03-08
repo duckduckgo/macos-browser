@@ -16,21 +16,22 @@
 //  limitations under the License.
 //
 
+import Bookmarks
+import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
-import CoreData
-import BrowserServicesKit
-import Persistence
 import Configuration
-import Networking
-import Bookmarks
+import CoreData
 import DDGSync
+import History
+import Macros
+import Networking
+import Persistence
+import PixelKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
-import PixelKit
-import History
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -330,9 +331,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
-            let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
-            if alert.runModal() == .cancel {
-                return .terminateCancel
+            // if there‘re downloads without location chosen yet (save dialog should display) - ignore them
+            if FileDownloadManager.shared.downloads.contains(where: { $0.location.destinationURL != nil }) {
+                let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
+                if alert.runModal() == .cancel {
+                    return .terminateCancel
+                }
             }
             FileDownloadManager.shared.cancelAll(waitUntilDone: true)
             DownloadListCoordinator.shared.sync()
@@ -346,10 +350,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
             let alert = NSAlert.noAccessToDownloads()
             if alert.runModal() != .cancel {
-                guard let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder") else {
-                    assertionFailure("Can't initialize preferences link")
-                    return
-                }
+                let preferencesLink = #URL("x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")
                 NSWorkspace.shared.open(preferencesLink)
                 return
             }

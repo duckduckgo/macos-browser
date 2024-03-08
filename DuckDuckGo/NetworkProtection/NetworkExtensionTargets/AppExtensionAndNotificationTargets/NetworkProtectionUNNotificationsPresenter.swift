@@ -134,7 +134,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         showNotification(.superseded, content)
     }
 
-    func showEntitlementNotification(completion: @escaping (Error?) -> Void) {
+    func showEntitlementNotification() {
         let content = notificationContent(title: UserText.networkProtectionEntitlementExpiredNotificationTitle,
                                           subtitle: UserText.networkProtectionEntitlementExpiredNotificationBody)
         showNotification(.expiredEntitlement, content)

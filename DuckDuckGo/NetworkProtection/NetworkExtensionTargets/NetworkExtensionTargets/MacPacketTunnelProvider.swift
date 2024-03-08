@@ -224,10 +224,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         self.appLauncher = AppLauncher(appBundleURL: .mainAppBundleURL)
 
 #if NETP_SYSTEM_EXTENSION
-        let settings = VPNSettings(defaults: .standard)
+        let defaults = UserDefaults.standard
 #else
-        let settings = VPNSettings(defaults: .netP)
+        let defaults = UserDefaults.netP
 #endif
+        let settings = VPNSettings(defaults: defaults)
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
@@ -235,7 +236,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                                              serviceName: Self.tokenServiceName,
                                                              errorEvents: debugEvents,
                                                              isSubscriptionEnabled: true)
-        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings)
+        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 #if SUBSCRIPTION
         let entitlementsCheck = {
             await AccountManager().hasEntitlement(for: .networkProtection)
@@ -252,7 +253,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
-                   isSubscriptionEnabled: true,
+                   defaults: defaults,
+                   isSubscriptionEnabled: false,
                    entitlementCheck: entitlementsCheck)
 
         observeServerChanges()
