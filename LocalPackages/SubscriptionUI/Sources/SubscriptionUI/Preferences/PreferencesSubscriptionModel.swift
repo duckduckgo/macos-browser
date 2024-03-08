@@ -185,6 +185,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         openURLHandler(.subscriptionFAQ)
     }
 
+    // swiftlint:disable cyclomatic_complexity
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
         guard fetchSubscriptionDetailsTask == nil else { return }
@@ -240,6 +241,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             }
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     private func updateDescription(for date: Date) {
         self.subscriptionDetails = UserText.preferencesSubscriptionActiveCaption(formattedDate: dateFormatter.string(from: date))

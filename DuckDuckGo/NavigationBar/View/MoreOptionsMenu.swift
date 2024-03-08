@@ -336,6 +336,7 @@ final class MoreOptionsMenu: NSMenu {
         }
     }
 
+    // swiftlint:disable:next function_body_length
     private func makeActiveSubscriptionItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = []
 
