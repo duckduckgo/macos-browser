@@ -55,8 +55,7 @@ final class VPNAppEventsHandler {
         Task {
             // Restart NetP SysEx on app update
             if await tunnelController.isConnected {
-                await tunnelController.stop()
-                await tunnelController.start()
+                await tunnelController.restart()
             }
         }
     }

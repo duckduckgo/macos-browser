@@ -579,17 +579,15 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             return
         }
 
-        do {
-            try await stop(tunnelManager: manager)
-        } catch {
-            controllerErrorStore.lastErrorMessage = error.localizedDescription
-        }
+        await stop(tunnelManager: manager, disableOnDemand: true)
     }
 
     @MainActor
-    func stop(tunnelManager: NETunnelProviderManager) async throws {
-        // disable reconnect on demand if requested to stop
-        try? await disableOnDemand(tunnelManager: tunnelManager)
+    private func stop(tunnelManager: NETunnelProviderManager, disableOnDemand: Bool) async {
+        if disableOnDemand {
+            // disable reconnect on demand if requested to stop
+            try? await self.disableOnDemand(tunnelManager: tunnelManager)
+        }
 
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
@@ -597,6 +595,18 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         default:
             break
         }
+    }
+
+    /// Restarts the tunnel.
+    ///
+    @MainActor
+    func restart() async {
+        guard let manager = await manager else {
+            return
+        }
+
+        await stop(tunnelManager: manager, disableOnDemand: false)
+        await start()
     }
 
     // MARK: - On Demand & Kill Switch

@@ -226,7 +226,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             case .failure(let error):
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionTunnelStartAttempt,
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStartFailure,
                     frequency: .dailyAndContinuous,
                     withError: error,
                     includeAppVersionParameter: true)
@@ -298,6 +298,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    isSubscriptionEnabled: false,
                    entitlementCheck: nil)
 
+        setupPixels()
         observeServerChanges()
         observeStatusUpdateRequests()
     }
@@ -441,7 +442,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Pixels
 
-    private func setupPixels(defaultHeaders: [String: String]) {
+    private func setupPixels(defaultHeaders: [String: String] = [:]) {
         let dryRun: Bool
 #if DEBUG
         dryRun = true
