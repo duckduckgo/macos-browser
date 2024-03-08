@@ -206,6 +206,30 @@ final class BaseBookmarkEntityTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
+    func testTwoBookmarkFoldersAddedToRootFolderReturnTrueWhenLeftParentIsBookmarksRootAndRightIsNil() {
+        // GIVEN
+        let lhs = BookmarkFolder(id: "1", title: "A", parentFolderUUID: "bookmarks_root", children: [])
+        let rhs = BookmarkFolder(id: "1", title: "A", parentFolderUUID: nil, children: [])
+
+        // WHEN
+        let result = lhs == rhs
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
+    func testTwoBookmarkFoldersAddedToRootFolderReturnTrueWhenLeftParentIsNilAndRightParentIsRootBookmarks() {
+        // GIVEN
+        let lhs = BookmarkFolder(id: "1", title: "A", parentFolderUUID: nil, children: [])
+        let rhs = BookmarkFolder(id: "1", title: "A", parentFolderUUID: "bookmarks_root", children: [])
+
+        // WHEN
+        let result = lhs == rhs
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
     // MARK: - Base Entity
 
     func testDifferentBookmarkEntitiesReturnFalseWhenIsEqualCalled() {
