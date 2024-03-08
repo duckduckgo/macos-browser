@@ -40,7 +40,7 @@ struct AddBookmarkPopoverView: View {
     private var addBookmarkView: some View {
         AddEditBookmarkView(
             title: UserText.Bookmarks.Dialog.Title.addedBookmark,
-            buttonsState: .compressed,
+            buttonsState: .expanded,
             bookmarkName: $model.bookmarkTitle,
             bookmarkURLPath: nil,
             isBookmarkFavorite: $model.isBookmarkFavorite,
