@@ -367,6 +367,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                         let isConnected = await self.tunnelController.isConnected
                         if isConnected {
                             await self.tunnelController.stop()
+                            DistributedNotificationCenter.default().post(.showExpiredEntitlementNotification)
                         }
                     }
                 case .error:
