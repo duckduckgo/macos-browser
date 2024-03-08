@@ -219,6 +219,12 @@ extension Pixel {
 
         case dailyPixel(Event, isFirst: Bool)
 
+        // Default Browser
+        case defaultRequestedFromHomepage
+        case defaultRequestedFromHomepageSetupView
+        case defaultRequestedFromSettings
+        case defaultRequestedFromOnboarding
+
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
             /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
@@ -595,6 +601,11 @@ extension Pixel.Event {
             return "m_mac_netp_ev_geoswitching_set_custom"
         case .networkProtectionGeoswitchingNoLocations:
             return "m_mac_netp_ev_geoswitching_no_locations"
+
+        case .defaultRequestedFromHomepage: return "default_requested_from_homepage"
+        case .defaultRequestedFromHomepageSetupView: return "default_requested_from_homepage_setup_view"
+        case .defaultRequestedFromSettings: return "default_requested_from_settings"
+        case .defaultRequestedFromOnboarding: return "default_requested_from_onboarding"
         }
     }
 }

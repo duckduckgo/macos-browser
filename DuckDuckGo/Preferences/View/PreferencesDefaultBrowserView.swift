@@ -47,6 +47,7 @@ extension Preferences {
                                 Image(.warning).foregroundColor(Color(.linkBlue))
                                 Text(UserText.isNotDefaultBrowser)
                                 Button(action: {
+                                    Pixel.fire(.defaultRequestedFromSettings)
                                     defaultBrowserModel.becomeDefault()
                                 }) {
                                     Text(UserText.makeDefaultBrowser)

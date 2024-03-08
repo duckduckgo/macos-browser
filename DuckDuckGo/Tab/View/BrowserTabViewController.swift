@@ -1077,6 +1077,7 @@ extension BrowserTabViewController: OnboardingDelegate {
             return
         }
 
+        Pixel.fire(.defaultRequestedFromOnboarding)
         defaultBrowserPreferences.becomeDefault { _ in
             _ = defaultBrowserPreferences
             withAnimation {

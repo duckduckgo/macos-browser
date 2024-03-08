@@ -156,6 +156,7 @@ extension HomePage.Models {
             switch featureType {
             case .defaultBrowser:
                 do {
+                    Pixel.fire(.defaultRequestedFromHomepageSetupView)
                     try defaultBrowserProvider.presentDefaultBrowserPrompt()
                 } catch {
                     defaultBrowserProvider.openSystemPreferences()
