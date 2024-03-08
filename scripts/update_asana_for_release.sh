@@ -348,7 +348,10 @@ get_tasks_in_last_internal_release() {
 	done <<< "$(find_task_urls_in_git_log "$last_release_tag")"
 
 	# 3. Construct a HTML list of task IDs
-	construct_this_release_includes
+	local tasks_list
+	tasks_list=construct_this_release_includes
+	local escaped_tasks_list="${tasks_list//\"/\\\"}"
+	echo "$escaped_tasks_list"
 }
 
 main() {
