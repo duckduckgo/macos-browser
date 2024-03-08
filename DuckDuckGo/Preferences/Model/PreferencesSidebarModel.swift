@@ -27,7 +27,7 @@ final class PreferencesSidebarModel: ObservableObject {
 
     @Published private(set) var sections: [PreferencesSection] = []
     @Published var selectedTabIndex: Int = 0
-    @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
+    @Published private(set) var selectedPane: PreferencePaneIdentifier = .defaultBrowser
 
     var selectedTabContent: AnyPublisher<Tab.TabContent, Never> {
         $selectedTabIndex.map { [tabSwitcherTabs] in tabSwitcherTabs[$0] }.eraseToAnyPublisher()
