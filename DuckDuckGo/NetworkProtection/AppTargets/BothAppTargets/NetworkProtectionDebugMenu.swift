@@ -480,6 +480,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
         switch settings.registrationKeyValidity {
         case .automatic:
             registrationKeyValidityMenu.items.first?.state = .on
+
+            // We're skipping the first two items because they're the automatic menu item and
+            // the separator line.
+            let serverItems = registrationKeyValidityMenu.items.dropFirst(2)
+
+            for item in serverItems {
+                item.state = .off
+            }
         case .custom(let timeInterval):
             registrationKeyValidityMenu.items.first?.state = .off
 
