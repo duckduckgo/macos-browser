@@ -202,28 +202,25 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             guard let token = self?.accountManager.accessToken else { return }
             
-                let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
+            let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
+
+            if case .success(let subscription) = subscriptionResult {
+                self?.updateDescription(for: subscription.expiresOrRenewsAt)
+                self?.subscriptionPlatform = subscription.platform
                 
-                if case .success(let subscription) = subscriptionResult {
-                    self?.updateDescription(for: subscription.expiresOrRenewsAt)
+                if subscription.expiresOrRenewsAt.timeIntervalSinceNow < 0 || !subscription.isActive {
+                    self?.hasAccessToVPN = false
+                    self?.hasAccessToDBP = false
+                    self?.hasAccessToITR = false
                     
-                    if subscription.expiresOrRenewsAt.timeIntervalSinceNow < 0 {
-                        self?.hasAccessToVPN = false
-                        self?.hasAccessToDBP = false
-                        self?.hasAccessToITR = false
-                        
-                        if !subscription.isActive {
-                            self?.accountManager.signOut()
-                            return
-                        }
-                        
-                        self?.updateDescription(for: subscription.expiresOrRenewsAt)
-                        self?.subscriptionPlatform = subscription.platform
-                        
+                    if !subscription.isActive {
+                        self?.accountManager.signOut()
+                        return
                     }
-                } else {
-                    self?.accountManager.signOut()
                 }
+            } else {
+                self?.accountManager.signOut()
+            }
            
             if let self {
                 switch await self.accountManager.hasEntitlement(for: .networkProtection) {
