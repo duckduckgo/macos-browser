@@ -60,11 +60,16 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.subscriptionAppGroup = subscriptionAppGroup
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
-
-        if let cachedDate = SubscriptionService.cachedGetSubscriptionResponse?.expiresOrRenewsAt {
-            updateDescription(for: cachedDate)
+        
+        if let token = accountManager.accessToken {
+            Task {
+                let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
+                if case .success(let subscription) = subscriptionResult {
+                    self.updateDescription(for: subscription.expiresOrRenewsAt)
+                }
+            }
         }
-
+        
         signInObserver = NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { [weak self] _ in
             self?.updateUserAuthenticatedState(true)
         }
@@ -196,27 +201,30 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             }
 
             guard let token = self?.accountManager.accessToken else { return }
-
-            if let cachedDate = SubscriptionService.cachedGetSubscriptionResponse?.expiresOrRenewsAt {
-                self?.updateDescription(for: cachedDate)
-
-                if cachedDate.timeIntervalSinceNow < 0 {
-                    self?.hasAccessToVPN = false
-                    self?.hasAccessToDBP = false
-                    self?.hasAccessToITR = false
-                }
-            }
-
-            if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token) {
-                if !subscription.isActive {
+            
+                let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
+                
+                if case .success(let subscription) = subscriptionResult {
+                    self?.updateDescription(for: subscription.expiresOrRenewsAt)
+                    
+                    if subscription.expiresOrRenewsAt.timeIntervalSinceNow < 0 {
+                        self?.hasAccessToVPN = false
+                        self?.hasAccessToDBP = false
+                        self?.hasAccessToITR = false
+                        
+                        if !subscription.isActive {
+                            self?.accountManager.signOut()
+                            return
+                        }
+                        
+                        self?.updateDescription(for: subscription.expiresOrRenewsAt)
+                        self?.subscriptionPlatform = subscription.platform
+                        
+                    }
+                } else {
                     self?.accountManager.signOut()
-                    return
                 }
-
-                self?.updateDescription(for: subscription.expiresOrRenewsAt)
-
-                self?.subscriptionPlatform = subscription.platform
-            }
+           
             if let self {
                 switch await self.accountManager.hasEntitlement(for: .networkProtection) {
                 case let .success(result):
