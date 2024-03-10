@@ -376,8 +376,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private static let registrationKeyValidityOptions: [NetworkProtectionKeyValidityOption] = [
-        .init(title: "15 seconds", validity: .seconds(15)),
-        .init(title: "30 seconds", validity: .seconds(30)),
         .init(title: "1 minute", validity: .minutes(1)),
         .init(title: "5 minutes", validity: .minutes(5)),
         .init(title: "30 minutes", validity: .minutes(30)),
