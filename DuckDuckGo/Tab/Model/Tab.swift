@@ -247,6 +247,16 @@ protocol NewWindowPolicyDecisionMaker {
             }
         }
 
+        var source: URLSource {
+            switch self {
+            case .url(_, _, source: let source):
+                return source
+            case .newtab, .settings, .bookmarks, .onboarding, .dataBrokerProtection,
+                 .subscription, .identityTheftRestoration, .none:
+                return .ui
+            }
+        }
+
         var isUrl: Bool {
             switch self {
             case .url, .subscription, .identityTheftRestoration:
@@ -681,7 +691,7 @@ protocol NewWindowPolicyDecisionMaker {
             self.title = title
         }
 
-        return reloadIfNeeded(shouldLoadInBackground: true)
+        return reloadIfNeeded(source: .contentUpdated)
     }
 
     @discardableResult
@@ -987,10 +997,10 @@ protocol NewWindowPolicyDecisionMaker {
             return nil
         }
 
+        self.content = content.forceReload()
         if webView.url == nil, content.isUrl {
-            self.content = content.forceReload()
             // load from cache or interactionStateData when called by lazy loader
-            return reloadIfNeeded(shouldLoadInBackground: true)
+            return reloadIfNeeded(source: .lazyLoad)
         } else {
             return webView.navigator(distributedNavigationDelegate: navigationDelegate).reload(withExpectedNavigationType: .reload)
         }
@@ -1006,8 +1016,13 @@ protocol NewWindowPolicyDecisionMaker {
 
     private func tabContentReloadInfo(for content: TabContent, shouldLoadInBackground: Bool) -> (url: URL, source: TabContent.URLSource, forceReload: Bool)? {
         switch content {
+        case .url(let url, credential: let credential, source: .reload):
+            // reset content after forced reload to prevent reloading on each appearance
+            self.content = .url(url, credential: credential, source: .webViewUpdated)
+            return (url, .reload, forceReload: true)
+
         case .url(let url, _, source: let source):
-            let forceReload = url.absoluteString == source.userEnteredValue ? shouldLoadInBackground : (source == .reload)
+            let forceReload = (url.absoluteString == source.userEnteredValue) ? shouldLoadInBackground : false
             return (url, source, forceReload: forceReload)
 
         case .subscription(let url), .identityTheftRestoration(let url):
@@ -1023,11 +1038,17 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
+    private enum ReloadIfNeededSource {
+        case contentUpdated
+        case webViewDisplayed
+        case loadInBackgroundIfNeeded(shouldLoadInBackground: Bool)
+        case lazyLoad
+    }
     @MainActor(unsafe)
     @discardableResult
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) -> ExpectedNavigation? {
-        guard let (url, source, forceReload) = tabContentReloadInfo(for: content, shouldLoadInBackground: shouldLoadInBackground),
-              forceReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) else { return nil }
+    private func reloadIfNeeded(source reloadIfNeededSource: ReloadIfNeededSource) -> ExpectedNavigation? {
+        guard let url = content.urlForWebView,
+              shouldReload(url, source: reloadIfNeededSource) else { return nil }
 
         if case .settings = content, case .settings = webView.url.flatMap({ TabContent.contentFromURL($0, source: .ui) }) {
             // replace WebView URL without adding a new history item if switching settings panes
@@ -1041,6 +1062,7 @@ protocol NewWindowPolicyDecisionMaker {
         if restoreInteractionStateIfNeeded() { return nil /* session restored */ }
         invalidateInteractionStateData()
 
+        let source = content.source
         if url.isFileURL {
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
@@ -1056,23 +1078,43 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     @MainActor
-    private func shouldReload(_ url: URL, shouldLoadInBackground: Bool) -> Bool {
-        // don‘t reload in background unless shouldLoadInBackground
-        guard url.isValid,
-              webView.superview != nil || shouldLoadInBackground,
-              // don‘t reload when already loaded
-              webView.url != url || error != nil else { return false }
+    private func shouldReload(_ url: URL, source: ReloadIfNeededSource) -> Bool {
+        guard url.isValid else { return false }
 
-        // if content not loaded inspect error
-        switch error {
-        case .none, // no error
-            // error due to connection failure
-             .some(URLError.notConnectedToInternet),
-             .some(URLError.networkConnectionLost):
+        switch source {
+        // should load when Web View is displayed?
+        case .webViewDisplayed:
+            // yes if not loaded yet
+            if webView.url == nil {
+                return true
+            }
+
+            switch error {
+            case .some(URLError.notConnectedToInternet),
+                 .some(URLError.networkConnectionLost):
+                // reload when showing error due to connection failure
+                return true
+            default:
+                // don‘t autoreload on other kinds of errors
+                return false
+            }
+
+        // should load on Web View instantiation?
+        case .loadInBackgroundIfNeeded(shouldLoadInBackground: let shouldLoadInBackground):
+            switch content {
+            case .newtab, .bookmarks, .settings:
+                return webView.url == nil // navigate to empty pages loaded for duck:// urls
+            default:
+                return shouldLoadInBackground
+            }
+
+        // lazy loading triggered
+        case .lazyLoad:
+            return webView.url == nil
+
+        // `.setContent()` called - always load
+        case .contentUpdated:
             return true
-        case .some:
-            // don‘t autoreload on other kinds of errors
-            return false
         }
     }
 
@@ -1105,13 +1147,6 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
         webView.interactionState = interactionStateData
-    }
-
-    private func addHomePageToWebViewIfNeeded() {
-        guard NSApp.runType.requiresEnvironment else { return }
-        if content == .newtab && webView.url == nil {
-            webView.load(URLRequest(url: .newtab))
-        }
     }
 
     func stopLoading() {
@@ -1147,7 +1182,7 @@ protocol NewWindowPolicyDecisionMaker {
         webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
             if case .some(.none) = change.oldValue {
-                self?.reloadIfNeeded()
+                self?.reloadIfNeeded(source: .webViewDisplayed)
             }
         }.store(in: &webViewCancellables)
 
@@ -1190,10 +1225,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         // background tab loading should start immediately
         DispatchQueue.main.async {
-            self.reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
-            if !shouldLoadInBackground {
-                self.addHomePageToWebViewIfNeeded()
-            }
+            self.reloadIfNeeded(source: .loadInBackgroundIfNeeded(shouldLoadInBackground: shouldLoadInBackground))
         }
     }
 
