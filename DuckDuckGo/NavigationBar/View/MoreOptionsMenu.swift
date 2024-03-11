@@ -358,19 +358,17 @@ final class MoreOptionsMenu: NSMenu {
             items.append(networkProtectionItem)
 
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated {
-                Task {
-                    let isMenuItemEnabled: Bool
-                    
-                    switch await AccountManager().hasEntitlement(for: .networkProtection) {
-                    case let .success(result):
-                        isMenuItemEnabled = result
-                    case .failure:
-                        isMenuItemEnabled = false
-                    }
-                    
-                    networkProtectionItem.isEnabled = isMenuItemEnabled
+            Task {
+                let isMenuItemEnabled: Bool
+
+                switch await AccountManager().hasEntitlement(for: .networkProtection) {
+                case let .success(result):
+                    isMenuItemEnabled = result
+                case .failure:
+                    isMenuItemEnabled = false
                 }
+
+                networkProtectionItem.isEnabled = isMenuItemEnabled
             }
 #endif
 
@@ -390,19 +388,17 @@ final class MoreOptionsMenu: NSMenu {
             items.append(dataBrokerProtectionItem)
 
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
-                Task {
-                    let isMenuItemEnabled: Bool
+            Task {
+                let isMenuItemEnabled: Bool
 
-                    switch await AccountManager().hasEntitlement(for: .dataBrokerProtection) {
-                    case let .success(result):
-                        isMenuItemEnabled = result
-                    case .failure:
-                        isMenuItemEnabled = false
-                    }
-
-                    dataBrokerProtectionItem.isEnabled = isMenuItemEnabled
+                switch await AccountManager().hasEntitlement(for: .dataBrokerProtection) {
+                case let .success(result):
+                    isMenuItemEnabled = result
+                case .failure:
+                    isMenuItemEnabled = false
                 }
+
+                dataBrokerProtectionItem.isEnabled = isMenuItemEnabled
             }
 #endif
 
@@ -422,19 +418,17 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.itrIcon)
             items.append(identityTheftRestorationItem)
 
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
-                Task {
-                    let isMenuItemEnabled: Bool
+            Task {
+                let isMenuItemEnabled: Bool
 
-                    switch await AccountManager().hasEntitlement(for: .identityTheftRestoration) {
-                    case let .success(result):
-                        isMenuItemEnabled = result
-                    case .failure:
-                        isMenuItemEnabled = false
-                    }
-
-                    identityTheftRestorationItem.isEnabled = isMenuItemEnabled
+                switch await AccountManager().hasEntitlement(for: .identityTheftRestoration) {
+                case let .success(result):
+                    isMenuItemEnabled = result
+                case .failure:
+                    isMenuItemEnabled = false
                 }
+
+                identityTheftRestorationItem.isEnabled = isMenuItemEnabled
             }
         }
 #endif
