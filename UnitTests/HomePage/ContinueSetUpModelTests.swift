@@ -80,6 +80,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
         userDefaults.set(nil, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay0in10Percent.rawValue)
         userDefaults.set(nil, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
         capturingDefaultBrowserProvider = CapturingDefaultBrowserProvider()
         capturingDataImportProvider = CapturingDataImportProvider()
         tabCollectionVM = TabCollectionViewModel()
@@ -225,6 +226,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     @MainActor func testWhenInstallDateIsMoreThan14daysAgoDay14SurveyCardIsShown() {
         let twoWeeksAgo = Calendar.current.date(byAdding: .day, value: -14, to: Date())!
         userDefaults.set(twoWeeksAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults)
         vm.shouldShowAllFeatures = true
 
@@ -236,6 +238,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         let twoWeeksAgo = Calendar.current.date(byAdding: .day, value: -14, to: Date())!
         userDefaults.set(twoWeeksAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
         userDefaults.set(nil, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
 
         var randomGenerator = MockRandomNumberGenerator()
         randomGenerator.numberToReturn = 60
@@ -249,6 +252,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     @MainActor func testWhenInstallDateIsMoreThan15daysAgoDay14SurveyCardIsShown() {
         let twoWeeksAgo = Calendar.current.date(byAdding: .day, value: -16, to: Date())!
         userDefaults.set(twoWeeksAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults)
         vm.shouldShowAllFeatures = true
 
@@ -262,6 +266,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm.performAction(for: .surveyDay0)
         let aDayAgo = Calendar.current.date(byAdding: .day, value: -14, to: Date())!
         userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults)
         vm.shouldShowAllFeatures = true
 
@@ -275,6 +280,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm.removeItem(for: .surveyDay0)
         let aDayAgo = Calendar.current.date(byAdding: .day, value: -14, to: Date())!
         userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults)
         vm.shouldShowAllFeatures = true
 
