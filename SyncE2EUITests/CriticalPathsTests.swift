@@ -33,16 +33,16 @@ final class CriticalPathsTests: XCTestCase {
         toggleInternalUserState()
         cleanupAndResetData()
     }
-    
+
     override func tearDown() {
         toggleInternalUserState()
         cleanupAndResetData()
     }
-    
+
     private func accessSettings() {
         app.menuItems["openPreferences:"].click()
     }
-    
+
     private func toggleInternalUserState() {
         let menuBarsQuery = app.menuBars
         debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
@@ -60,19 +60,19 @@ final class CriticalPathsTests: XCTestCase {
         resetDataMenuItem.hover()
         let resetBookMarksData = resetDataMenuItem.menuItems["Reset Bookmarks"]
         resetBookMarksData.click()
-        
+
         debugMenuBarItem.click()
         resetDataMenuItem.hover()
         let resetAutofillData = resetDataMenuItem.menuItems["Reset Autofill Data"]
         resetAutofillData.click()
     }
-    
+
     func testCanCreateSyncAccount() throws {
         // Go to Sync Set up
         accessSettings()
         let settingsWindow = app.windows["Settings"]
         XCTAssertTrue(settingsWindow.exists, "Begin Syncing text is not visible")
-        
+
         settingsWindow.buttons["Sync & Backup"].click()
 
         // Create Account
@@ -128,11 +128,11 @@ final class CriticalPathsTests: XCTestCase {
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
         XCTAssertTrue(beginSync.exists, "Begin Sync text is not visible")
-        
+
     }
 
     func testCanRemoveData() {
-        
+
         // Go to Sync Set up
         accessSettings()
 
@@ -240,7 +240,7 @@ final class CriticalPathsTests: XCTestCase {
         // Check Logins
         //checkLogins()
     }
-    
+
     private func logIn() {
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
