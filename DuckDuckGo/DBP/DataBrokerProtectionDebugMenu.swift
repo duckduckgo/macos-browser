@@ -77,7 +77,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 waitlistTermsAndConditionsAcceptedItem
             }
 
-
             NSMenuItem(title: "Environment")
                 .submenu(environmentMenu)
 
