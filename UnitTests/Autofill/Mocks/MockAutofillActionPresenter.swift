@@ -1,7 +1,7 @@
 //
-//  NSNotificationName+PasswordManager.swift
+//  MockAutofillActionPresenter.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,7 +17,14 @@
 //
 
 import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
-extension NSNotification.Name {
-    static let PasswordManagerChanged = NSNotification.Name("PasswordManagerChanged")
+final class MockAutofillActionPresenter: AutofillActionPresenter {
+
+    var didCallShow = false
+
+    func show(actionExecutor: AutofillActionExecutor, completion: () -> Void) {
+        didCallShow = true
+        actionExecutor.execute(nil)
+    }
 }
