@@ -165,7 +165,11 @@ extension Pixel.Event {
              .dataBrokerDisableAndDeleteDaily,
              .dataBrokerEnableLoginItemDaily,
              .dataBrokerDisableLoginItemDaily,
-             .dataBrokerResetLoginItemDaily:
+             .dataBrokerResetLoginItemDaily,
+             .protectionToggledOffBreakageReport,
+             .toggleProtectionsDailyCount,
+             .toggleReportDoNotSend,
+             .toggleReportDismiss:
             return nil
         }
     }

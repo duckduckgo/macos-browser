@@ -62,9 +62,13 @@ final class FirefoxBookmarksReader {
 
     private let firefoxPlacesDatabaseURL: URL
     private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
+    private let otherBookmarksFolderTitle: String
+    private let mobileBookmarksFolderTitle: String
 
-    init(firefoxDataDirectoryURL: URL) {
+    init(firefoxDataDirectoryURL: URL, otherBookmarksFolderTitle: String = UserText.otherBookmarksImportedFolderTitle, mobileBookmarksFolderTitle: String = UserText.mobileBookmarksImportedFolderTitle) {
         self.firefoxPlacesDatabaseURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.placesDatabaseName)
+        self.otherBookmarksFolderTitle = otherBookmarksFolderTitle
+        self.mobileBookmarksFolderTitle = mobileBookmarksFolderTitle
     }
 
     func readBookmarks() -> DataImportResult<ImportedBookmarks> {
@@ -181,8 +185,8 @@ final class FirefoxBookmarksReader {
                                                                urlString: nil,
                                                                children: toolbarBookmarksAndFolders + menuBookmarksAndFolders)
 
-        let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: UserText.otherBookmarksImportedFolderTitle, type: .folder, urlString: nil, children: unfiledBookmarksAndFolders)
-        let syncedFolder = ImportedBookmarks.BookmarkOrFolder(name: UserText.mobileBookmarksImportedFolderTitle, type: .folder, urlString: nil, children: syncedBookmarksAndFolders)
+        let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: self.otherBookmarksFolderTitle, type: .folder, urlString: nil, children: unfiledBookmarksAndFolders)
+        let syncedFolder = ImportedBookmarks.BookmarkOrFolder(name: self.mobileBookmarksFolderTitle, type: .folder, urlString: nil, children: syncedBookmarksAndFolders)
         let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder, syncedBookmarks: syncedFolder)
 
         return ImportedBookmarks(topLevelFolders: folders)

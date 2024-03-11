@@ -23,6 +23,7 @@ import Common
 import SwiftUI
 import WebKit
 
+// swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
 
@@ -157,6 +158,10 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseSubscriptionPage),
                                                name: .subscriptionPageCloseAndOpenPreferences,
                                                object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onSubscriptionAccountDidSignOut),
+                                               name: .accountDidSignOut,
+                                               object: nil)
 #endif
     }
 
@@ -230,6 +235,22 @@ final class BrowserTabViewController: NSViewController {
 
         openNewTab(with: .settings(pane: .subscription))
     }
+
+    @objc
+    private func onSubscriptionAccountDidSignOut(_ notification: Notification) {
+        Task { @MainActor in
+            tabCollectionViewModel.removeAll { tabContent in
+                if case .subscription = tabContent {
+                    return true
+                } else if case .identityTheftRestoration = tabContent {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+    }
+
 #endif
 
     private func subscribeToSelectedTabViewModel() {
@@ -1190,3 +1211,5 @@ extension BrowserTabViewController {
 #Preview {
     BrowserTabViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: [.init(content: .url(.duckDuckGo, source: .ui))])))
 }
+
+// swiftlint:enable file_length
