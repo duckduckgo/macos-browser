@@ -277,6 +277,7 @@ extension HomePage.Models {
                 case .surveyDay0:
                     if shouldSurveyDay0BeVisible {
                         features.append(feature)
+                        userInteractedWithSurveyDay0 = true
                     }
                 case .surveyDay14:
                     if shouldSurveyDay14BeVisible {
@@ -364,7 +365,6 @@ extension HomePage.Models {
             let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
             return !isDay0SurveyEnabled &&
             shouldShowSurveyDay0 &&
-            !userInteractedWithSurveyDay0 &&
             firstLaunchDate >= oneDayAgo &&
             Bundle.main.preferredLocalizations.first == "en" &&
             isPartOfSurveyDay0On10Percent ?? calculateIfIn10percent(day: .day0)
@@ -414,7 +414,7 @@ extension HomePage.Models {
                 tabCollectionViewModel.append(tab: tab)
                 switch day {
                 case .day0:
-                    userInteractedWithSurveyDay0 = true
+                    shouldShowSurveyDay0 = false
                 case .day14:
                     shouldShowSurveyDay14 = false
                 }
