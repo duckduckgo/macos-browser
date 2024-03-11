@@ -169,7 +169,11 @@ extension Pixel.Event {
              .defaultRequestedFromHomepage,
              .defaultRequestedFromHomepageSetupView,
              .defaultRequestedFromSettings,
-             .defaultRequestedFromOnboarding:
+             .defaultRequestedFromOnboarding,
+             .protectionToggledOffBreakageReport,
+             .toggleProtectionsDailyCount,
+             .toggleReportDoNotSend,
+             .toggleReportDismiss:
             return nil
         }
     }

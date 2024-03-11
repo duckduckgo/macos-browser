@@ -54,7 +54,8 @@ class AppPrivacyConfigurationTests: XCTestCase {
         let config = AppPrivacyConfiguration(data: configData,
                                              identifier: "",
                                              localProtection: MockDomainsProtectionStore(),
-                                             internalUserDecider: DefaultInternalUserDecider(store: InternalUserDeciderStoreMock()))
+                                             internalUserDecider: DefaultInternalUserDecider(store: InternalUserDeciderStoreMock()),
+                                             toggleProtectionsCounter: ToggleProtectionsCounter(eventReporting: nil))
 
         XCTAssert(config.isEnabled(featureKey: .contentBlocking))
 

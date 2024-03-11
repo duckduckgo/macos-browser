@@ -38,7 +38,6 @@ final class NavigationBarViewController: NSViewController {
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
         static let homeButtonSeparatorSpacing: CGFloat = 12
-        static let homeButtonSeparatorHeight: CGFloat = 20
     }
 
     @IBOutlet weak var goBackButton: NSButton!
@@ -760,15 +759,6 @@ final class NavigationBarViewController: NSViewController {
                     // Set spacing/size for the separator
                     navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[0])
                     navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[1])
-                    homeButtonSeparator.heightAnchor.constraint(equalToConstant: Constants.homeButtonSeparatorHeight).isActive = true
-                    homeButtonSeparator.translatesAutoresizingMaskIntoConstraints = false
-                    NSLayoutConstraint.activate([NSLayoutConstraint(item: homeButtonSeparator as Any,
-                                                                        attribute: .centerY,
-                                                                        relatedBy: .equal,
-                                                                        toItem: navigationButtons,
-                                                                        attribute: .centerY,
-                                                                        multiplier: 1,
-                                                                        constant: 0)])
                 } else {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: navigationButtons.arrangedSubviews.count)
                     homeButtonSeparator.isHidden = true

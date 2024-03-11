@@ -43,6 +43,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     let settings: VPNSettings
 
+    // MARK: - Defaults
+
+    let defaults: UserDefaults
+
     // MARK: - Combine Cancellables
 
     private var cancellables = Set<AnyCancellable>()
@@ -153,6 +157,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
          settings: VPNSettings,
+         defaults: UserDefaults,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          notificationCenter: NotificationCenter = .default,
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
@@ -162,6 +167,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         self.networkExtensionController = networkExtensionController
         self.notificationCenter = notificationCenter
         self.settings = settings
+        self.defaults = defaults
         self.tokenStore = tokenStore
 
         subscribeToSettingsChanges()
@@ -237,8 +243,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 .setSelectedEnvironment,
                 .setSelectedLocation,
                 .setShowInMenuBar,
-                .setNetworkPathChange,
-                .setVPNFirstEnabled,
                 .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
@@ -567,7 +571,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             frequency: .justOnce,
             includeAppVersionParameter: true) { [weak self] fired, error in
                 guard let self, error == nil, fired else { return }
-                self.settings.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)
+                self.defaults.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)
             }
     }
 
@@ -579,17 +583,15 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             return
         }
 
-        do {
-            try await stop(tunnelManager: manager)
-        } catch {
-            controllerErrorStore.lastErrorMessage = error.localizedDescription
-        }
+        await stop(tunnelManager: manager, disableOnDemand: true)
     }
 
     @MainActor
-    func stop(tunnelManager: NETunnelProviderManager) async throws {
-        // disable reconnect on demand if requested to stop
-        try? await disableOnDemand(tunnelManager: tunnelManager)
+    private func stop(tunnelManager: NETunnelProviderManager, disableOnDemand: Bool) async {
+        if disableOnDemand {
+            // disable reconnect on demand if requested to stop
+            try? await self.disableOnDemand(tunnelManager: tunnelManager)
+        }
 
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
@@ -597,6 +599,18 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         default:
             break
         }
+    }
+
+    /// Restarts the tunnel.
+    ///
+    @MainActor
+    func restart() async {
+        guard let manager = await manager else {
+            return
+        }
+
+        await stop(tunnelManager: manager, disableOnDemand: false)
+        await start()
     }
 
     // MARK: - On Demand & Kill Switch

@@ -25,6 +25,10 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
     secrets:
       ASANA_ACCESS_TOKEN:
         required: true
@@ -46,11 +50,11 @@ jobs:
     name: Tag public release
 
     # Run if release-type is provided (not empty) and is not internal
-    if: contains(github.event.inputs.release-type, '') == false && github.event.inputs.release-type != 'internal'
+    if: github.event.inputs.release-type != null && github.event.inputs.release-type != 'internal'
 
     uses: ./.github/workflows/tag_release.yml
     with:
-      asana-task-url: ${{ github.event.inputs.asana-task-url }}
+      asana-task-url: ${{ inputs.asana-task-url || github.event.inputs.asana-task-url }}
       branch: ${{ github.ref_name }}
       prerelease: false
     secrets:
@@ -64,6 +68,7 @@ jobs:
     env:
       RELEASE_TYPE: ${{ github.event.inputs.release-type || 'internal' }}
       SPARKLE_DIR: ${{ github.workspace }}/sparkle-updates
+      asana-task-url: ${{ inputs.asana-task-url || github.event.inputs.asana-task-url }}
 
     needs: [tag-public-release]
 
@@ -78,6 +83,8 @@ jobs:
 
       - name: Download tag artifact
         id: download-tag
+        # Only look for the tag artifact when the tag input is empty
+        if: github.event.inputs.tag == null || github.event.inputs.tag == ''
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
@@ -106,7 +113,9 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
           submodules: recursive
+          ref: ${{ inputs.branch || github.ref_name }}
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
@@ -115,7 +124,7 @@ jobs:
         id: task-id
         uses: ./.github/actions/asana-extract-task-id
         with:
-          task-url: ${{ github.event.inputs.asana-task-url }}
+          task-url: ${{ env.asana-task-url }}
 
       - name: Fetch and validate release notes
         env:
@@ -241,6 +250,15 @@ jobs:
             announcement-task-contents.txt
           echo "announcement-task-contents=$(sed 's/"/\\"/g' < announcement-task-contents.txt)" >> $GITHUB_OUTPUT
 
+      - name: Get tasks since last internal release
+        id: get-tasks-since-last-internal-release
+        if: contains(github.event.inputs.release-type, '') || github.event.inputs.release-type == 'internal'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tasks="$(./scripts/update_asana_for_release.sh list-tasks-in-last-internal-release)"
+          echo "tasks=$tasks" >> $GITHUB_OUTPUT
+
       - name: Set common environment variables
         if: always()
         env:
@@ -252,6 +270,7 @@ jobs:
           echo "RELEASE_BUCKET_NAME=${{ vars.RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_PREFIX=${{ vars.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
+          echo "TASKS_SINCE_LAST_INTERNAL_RELEASE=${{ steps.get-tasks-since-last-internal-release.outputs.tasks }}" >> $GITHUB_ENV
           echo "VERSION=${{ steps.verify-tag.outputs.release-version }}" >> $GITHUB_ENV
           echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
 
@@ -263,7 +282,11 @@ jobs:
             if [[ "${RELEASE_TYPE}" == "internal" ]]; then
               echo "task-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
               echo "comment-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
-              echo "release-task-comment-template=internal-release-complete" >> $GITHUB_OUTPUT
+              if [[ -n "${TASKS_SINCE_LAST_INTERNAL_RELEASE}" ]]; then
+                echo "release-task-comment-template=internal-release-complete-with-tasks" >> $GITHUB_OUTPUT
+              else
+                echo "release-task-comment-template=internal-release-complete" >> $GITHUB_OUTPUT
+              fi
             else
               echo "task-template=validate-check-for-updates-public" >> $GITHUB_OUTPUT
               echo "comment-template=validate-check-for-updates-public" >> $GITHUB_OUTPUT
@@ -280,7 +303,7 @@ jobs:
         uses: ./.github/actions/asana-create-action-item
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          release-task-url: ${{ github.event.inputs.asana-task-url }}
+          release-task-url: ${{ env.asana-task-url }}
           template-name: ${{ steps.asana-templates.outputs.task-template }}
 
       - name: Create Asana task to handle Asana paperwork
@@ -291,7 +314,7 @@ jobs:
           APP_BOARD_ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          release-task-url: ${{ github.event.inputs.asana-task-url }}
+          release-task-url: ${{ env.asana-task-url }}
           template-name: update-asana-for-public-release
 
       - name: Create Asana task to announce the release
@@ -303,7 +326,7 @@ jobs:
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           html-notes: ${{ env.html-notes }}
-          release-task-url: ${{ github.event.inputs.asana-task-url }}
+          release-task-url: ${{ env.asana-task-url }}
           task-name: Announce the release to the company
 
       - name: Upload patch to the Asana task
@@ -342,7 +365,7 @@ jobs:
           TASK_ID: ${{ steps.create-task.outputs.new-task-id }}
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          task-url: ${{ github.event.inputs.asana-task-url }}
+          task-url: ${{ env.asana-task-url }}
           template-name: ${{ steps.asana-templates.outputs.comment-template }}
 
       - name: Add a comment to the release task
@@ -350,7 +373,7 @@ jobs:
         uses: ./.github/actions/asana-add-comment
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          task-url: ${{ github.event.inputs.asana-task-url }}
+          task-url: ${{ env.asana-task-url }}
           template-name: ${{ steps.asana-templates.outputs.release-task-comment-template }}
 
   # This is only run for public and hotfix releases
@@ -361,7 +384,7 @@ jobs:
     needs: [publish-to-sparkle]
 
     # Run if release-type is provided (not empty) an is not internal
-    if: contains(github.event.inputs.release-type, '') == false && github.event.inputs.release-type != 'internal'
+    if: github.event.inputs.release-type != null && github.event.inputs.release-type != 'internal'
 
     uses: duckduckgo/macos-browser/.github/workflows/create_variants.yml@main
     secrets:

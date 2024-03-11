@@ -225,6 +225,11 @@ extension Pixel {
         case defaultRequestedFromSettings
         case defaultRequestedFromOnboarding
 
+        case protectionToggledOffBreakageReport
+        case toggleProtectionsDailyCount
+        case toggleReportDoNotSend
+        case toggleReportDismiss
+
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
             /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
@@ -606,6 +611,12 @@ extension Pixel.Event {
         case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
         case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+
+        case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
+        case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
+        case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
+        case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
+
         }
     }
 }
