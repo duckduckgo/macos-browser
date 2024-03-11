@@ -163,15 +163,23 @@ final class OnboardingViewModel: ObservableObject {
         // Update the plist
         dockPlistDict["persistent-apps"] = persistentApps as AnyObject?
         dockPlistDict["recent-apps"] = recentApps as AnyObject?
-        (dockPlistDict as NSDictionary).write(to: dockPlistURL, atomically: true)
+        do {
+            try (dockPlistDict as NSDictionary).write(to: dockPlistURL)
+        } catch {
+            return
+        }
 
         // Restart the Dock to apply changes
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            let task = Process()
-            task.launchPath = "/usr/bin/killall"
-            task.arguments = ["Dock"]
-            task.launch()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            self?.restartDock()
         }
+    }
+
+    func restartDock() {
+        let task = Process()
+        task.launchPath = "/usr/bin/killall"
+        task.arguments = ["Dock"]
+        task.launch()
     }
 
     @MainActor
