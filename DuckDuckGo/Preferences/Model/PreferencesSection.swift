@@ -156,7 +156,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
 #endif
 #if SUBSCRIPTION
         case .subscription:
-            return "Privacy"
+            return "PrivacyPro"
 #endif
         case .autofill:
             return "Autofill"

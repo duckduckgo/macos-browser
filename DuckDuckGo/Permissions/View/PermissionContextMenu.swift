@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Macros
 import WebKit
 
 protocol PermissionContextMenuDelegate: AnyObject {
@@ -225,11 +226,11 @@ final class PermissionContextMenu: NSMenu {
         let deeplink: URL
         switch permission {
         case .camera:
-            deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera")!
+            deeplink = #URL("x-apple.systempreferences:com.apple.preference.security?Privacy_Camera")
         case .microphone:
-            deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")!
+            deeplink = #URL("x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")
         case .geolocation:
-            deeplink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!
+            deeplink = #URL("x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")
         case .popups, .externalScheme:
             assertionFailure("No settings available")
             return

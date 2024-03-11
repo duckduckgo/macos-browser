@@ -129,7 +129,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
                     }
                     progress.completedUnitCount = completed
 
-                    if total > 0, completed > 0 {
+                    if completed > 0 {
                         guard let startTime else {
                             startTime = Date()
                             return
@@ -146,7 +146,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
                             throughput = Constants.downloadSpeedSmoothingFactor * throughput + (1 - Constants.downloadSpeedSmoothingFactor) * oldThroughput
                         }
                         progress.throughput = Int(throughput)
-                        progress.estimatedTimeRemaining = Double(total - completed) / throughput
+                    }
+                    if total > 0, completed > 0, let throughput = progress.throughput {
+                        progress.estimatedTimeRemaining = Double(total - completed) / Double(throughput)
                     }
                 }
         }
@@ -237,7 +239,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
                 progress.fileURL = url
             }
             if self.progress.totalUnitCount == -1 {
-                self.progress.totalUnitCount = 1
+                self.progress.totalUnitCount = self.progress.completedUnitCount
             }
             self.progress.completedUnitCount = self.progress.totalUnitCount
         }

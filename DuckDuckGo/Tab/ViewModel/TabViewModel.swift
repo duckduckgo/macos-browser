@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
-import BrowserServicesKit
+import Common
 
 final class TabViewModel {
 
@@ -27,7 +28,9 @@ final class TabViewModel {
         static let burnerHome = NSImage.burnerTabFavicon
         static let preferences = NSImage.preferences
         static let bookmarks = NSImage.bookmarks
-        static let dataBrokerProtection = NSImage.burnerWindowIcon2 // PLACEHOLDER: Change it once we have the final icon
+        static let dataBrokerProtection = NSImage.dbpIcon
+        static let subscription = NSImage.subscriptionIcon
+        static let identityTheftRestoration = NSImage.itrIcon
     }
 
     private(set) var tab: Tab
@@ -106,15 +109,19 @@ final class TabViewModel {
         tab.$content
             .map { [tab] content -> AnyPublisher<Event, Never> in
                 switch content {
-                case .url(_, _, source: .webViewUpdated),
-                     .url(_, _, source: .link):
+                case .url(let url, _, source: .webViewUpdated),
+                     .url(let url, _, source: .link):
 
                     // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
-                    return tab.webViewDidCommitNavigationPublisher.map { .didCommit }.eraseToAnyPublisher()
+                    return tab.$committedURL.filter { committedURL in
+                        committedURL == url
+                    }.map { _ in
+                        .didCommit
+                    }.eraseToAnyPublisher()
 
                 case .url(_, _, source: .userEntered(_, downloadRequested: true)):
                     // don‘t update the address bar for download navigations
-                    return Empty().eraseToAnyPublisher().eraseToAnyPublisher()
+                    return Empty().eraseToAnyPublisher()
 
                 case .url(_, _, source: .pendingStateRestoration),
                      .url(_, _, source: .loadedByStateRestoration),
@@ -130,7 +137,8 @@ final class TabViewModel {
                      .onboarding,
                      .none,
                      .dataBrokerProtection,
-                     .subscription:
+                     .subscription,
+                     .identityTheftRestoration:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
                     return Just( .instant ).eraseToAnyPublisher()
                 }
@@ -296,7 +304,7 @@ final class TabViewModel {
             }
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .subscription:
+        case .url, .none, .subscription, .identityTheftRestoration:
             if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
@@ -335,7 +343,13 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .none, .subscription: break
+        case .subscription:
+            favicon = Favicon.subscription
+            return
+        case .identityTheftRestoration:
+            favicon = Favicon.identityTheftRestoration
+            return
+        case .url, .onboarding, .none: break
         }
 
         if let favicon: NSImage? = tabFavicon {

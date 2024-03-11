@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import SwiftUI
 import Combine
 import Common
+import Foundation
+import Macros
+import SwiftUI
 
 protocol DefaultBrowserProvider {
     var bundleIdentifier: String { get }
@@ -37,7 +38,7 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
     let bundleIdentifier: String
 
     var isDefault: Bool {
-        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
+        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: #URL("http://")),
               let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
         else {
             return false

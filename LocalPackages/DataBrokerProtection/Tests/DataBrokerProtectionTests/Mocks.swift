@@ -16,12 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import BrowserServicesKit
+import Combine
 import Common
-import SecureStorage
+import Foundation
 import GRDB
+import Macros
+import SecureStorage
+
 @testable import DataBrokerProtection
 
 extension BrokerProfileQueryData {
@@ -228,12 +230,12 @@ final class EmailServiceMock: EmailServiceProtocol {
 
     var shouldThrow: Bool = false
 
-    func getEmail(dataBrokerURL: String?) async throws -> String {
+    func getEmail(dataBrokerURL: String?) async throws -> EmailData {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return "test@duck.com"
+        return EmailData(pattern: nil, emailAddress: "test@duck.com")
     }
 
     func getConfirmationLink(from email: String, numberOfRetries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
@@ -241,7 +243,7 @@ final class EmailServiceMock: EmailServiceProtocol {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return URL(string: "https://www.duckduckgo.com")!
+        return #URL("https://www.duckduckgo.com")
     }
 
     func reset() {
@@ -657,6 +659,8 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
     var brokerProfileQueryDataToReturn = [BrokerProfileQueryData]()
     var profile: DataBrokerProtectionProfile?
+    var attemptInformation: AttemptInformation?
+    var historyEvents = [HistoryEvent]()
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -758,6 +762,14 @@ final class MockDatabase: DataBrokerProtectionRepository {
         return lastHistoryEventToReturn
     }
 
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) -> [HistoryEvent] {
+        return [HistoryEvent]()
+    }
+
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) -> [HistoryEvent] {
+        return historyEvents
+    }
+
     func hasMatches() -> Bool {
         false
     }
@@ -767,7 +779,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     }
 
     func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
-        return nil
+        return attemptInformation
     }
 
     func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
@@ -802,6 +814,8 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
         brokerProfileQueryDataToReturn.removeAll()
         profile = nil
+        attemptInformation = nil
+        historyEvents.removeAll()
     }
 }
 

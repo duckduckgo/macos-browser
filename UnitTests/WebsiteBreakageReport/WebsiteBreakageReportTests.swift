@@ -16,16 +16,18 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import Networking
-@testable import DuckDuckGo_Privacy_Browser
+import Macros
 import PrivacyDashboard
+import XCTest
+
+@testable import DuckDuckGo_Privacy_Browser
+@testable import Networking
 
 class WebsiteBreakageReportTests: XCTestCase {
 
     func testCommonSetOfFields() throws {
         let breakage = BrokenSiteReport(
-            siteUrl: URL(string: "https://example.test/")!,
+            siteUrl: #URL("https://example.test/"),
             category: "contentIsMissing",
             description: nil,
             osVersion: "12.3.0",
@@ -68,7 +70,7 @@ class WebsiteBreakageReportTests: XCTestCase {
 
     func testThatNativeAppSpecificFieldsAreReported() throws {
         let breakage = BrokenSiteReport(
-            siteUrl: URL(string: "http://unsafe.example.test/path/to/thing.html")!,
+            siteUrl: #URL("http://unsafe.example.test/path/to/thing.html"),
             category: "videoOrImagesDidntLoad",
             description: nil,
             osVersion: "12",
