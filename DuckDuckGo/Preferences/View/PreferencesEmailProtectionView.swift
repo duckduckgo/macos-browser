@@ -67,7 +67,7 @@ extension Preferences {
                     }
                 }
 
-                // Section 3: FAQ
+                // SECTION 3: FAQ
                 PreferencePaneSection {
                     TextButton(UserText.support) {
                         openNewTab(with: EmailUrls().emailProtectionSupportLink)

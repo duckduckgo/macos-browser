@@ -41845,7 +41845,7 @@
       }
     },
     "preferences.about" : {
-      "comment" : "Show about screen",
+      "comment" : "Title of the option to show the About screen",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -42325,7 +42325,7 @@
       }
     },
     "preferences.accessibility" : {
-      "comment" : "Show accessibility browser preferences",
+      "comment" : "Title of the option to show the Accessibility browser preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -42337,7 +42337,7 @@
       }
     },
     "preferences.always-on" : {
-      "comment" : "Status indicator of a privacy protection.",
+      "comment" : "Status indicator of a browser privacy protection feature.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -42349,7 +42349,7 @@
       }
     },
     "preferences.appearance" : {
-      "comment" : "Show Appearance preferences",
+      "comment" : "Title of the option to show the Appearance preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43021,7 +43021,7 @@
       }
     },
     "preferences.cookie-pop-up-protection" : {
-      "comment" : "Show cookie pop-up protection preferences",
+      "comment" : "Title of the option to show the Cookie Pop-Up Protection preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -43033,7 +43033,7 @@
       }
     },
     "preferences.data-clearing" : {
-      "comment" : "Show Data Clearing preferences",
+      "comment" : "Title of the option to show the Data Clearing preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -43045,7 +43045,7 @@
       }
     },
     "preferences.default-browser" : {
-      "comment" : "Show Default Browser preferences",
+      "comment" : "Title of the option to show the Default Browser Preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43285,7 +43285,7 @@
       }
     },
     "preferences.downloads" : {
-      "comment" : "Show downloads browser preferences",
+      "comment" : "Title of the downloads browser preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43345,7 +43345,7 @@
       }
     },
     "preferences.duck-player" : {
-      "comment" : "Show Duck Player browser preferences",
+      "comment" : "Title of the option to show the Duck Player browser preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43405,7 +43405,7 @@
       }
     },
     "preferences.duckduckgo-on-other-platforms" : {
-      "comment" : "Section in Preferences",
+      "comment" : "Button presented to users to navigate them to our product page which presents all other products for other platforms",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -43417,7 +43417,7 @@
       }
     },
     "preferences.email-protection" : {
-      "comment" : "Show Email Protection preferences",
+      "comment" : "Title of the option to show the Email Protection preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -43429,7 +43429,7 @@
       }
     },
     "preferences.general" : {
-      "comment" : "Show general preferences",
+      "comment" : "Title of the option to show the General preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43501,7 +43501,7 @@
       }
     },
     "preferences.off" : {
-      "comment" : "Status indicator of a privacy protection.",
+      "comment" : "Status indicator of a browser privacy protection feature.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -43513,7 +43513,7 @@
       }
     },
     "preferences.on" : {
-      "comment" : "Status indicator of a privacy protection.",
+      "comment" : "Status indicator of a browser privacy protection feature.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -43645,7 +43645,7 @@
       }
     },
     "preferences.privacy-protections" : {
-      "comment" : "Section header in Preferences for privacy protections",
+      "comment" : "The section header in Preferences representing browser features related to privacy protection",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -43657,7 +43657,7 @@
       }
     },
     "preferences.private-search" : {
-      "comment" : "Show Private Search preferences",
+      "comment" : "Title of the option to show the Private Search preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -43801,7 +43801,7 @@
       }
     },
     "preferences.sync" : {
-      "comment" : "Show sync preferences",
+      "comment" : "Title of the option to show the Sync preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43921,7 +43921,7 @@
       }
     },
     "preferences.vpn" : {
-      "comment" : "Show VPN preferences",
+      "comment" : "Title of the option to show the VPN preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43981,7 +43981,7 @@
       }
     },
     "preferences.web-tracking-protection" : {
-      "comment" : "Show Web Tracking Protection preferences",
+      "comment" : "Title of the option to show the Web Tracking Protection preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -50335,7 +50335,7 @@
       }
     },
     "web.tracking.protection.explenation" : {
-      "comment" : "feature explanation in settings",
+      "comment" : "Privacy feature explanation in the browser settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {

@@ -42,8 +42,9 @@ final class HomePageViewController: NSViewController {
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
-    var accessibilityPreferences: AccessibilityPreferences!
-    var appearancePreferences: AppearancePreferences!
+    let accessibilityPreferences: AccessibilityPreferences
+    let appearancePreferences: AppearancePreferences
+    let defaultBrowserPreferences: DefaultBrowserPreferences
     var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
@@ -57,13 +58,19 @@ final class HomePageViewController: NSViewController {
          bookmarkManager: BookmarkManager,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          fireViewModel: FireViewModel? = nil,
-         onboardingViewModel: OnboardingViewModel = OnboardingViewModel()) {
+         onboardingViewModel: OnboardingViewModel = OnboardingViewModel(),
+         accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
+         appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
+         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
         self.onboardingViewModel = onboardingViewModel
+        self.accessibilityPreferences = accessibilityPreferences
+        self.appearancePreferences = appearancePreferences
+        self.defaultBrowserPreferences = defaultBrowserPreferences
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -73,8 +80,6 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
-        accessibilityPreferences = AccessibilityPreferences.shared
-        appearancePreferences = AppearancePreferences.shared
 
         refreshModels()
 

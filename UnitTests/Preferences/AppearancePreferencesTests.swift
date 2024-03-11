@@ -129,18 +129,6 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(NSApp.appearance?.name, ThemeName.systemDefault.appearance?.name)
     }
 
-//    func testWhenZoomLevelChangedInAppearancePreferencesThenThePersisterAndUserDefaultsZoomValuesAreUpdated() {
-//        UserDefaultsWrapper<Any>.clearAll()
-//        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
-//        let persister = AppearancePreferencesUserDefaultsPersistor()
-//        let model = AppearancePreferences(persistor: persister)
-//        model.defaultPageZoom = randomZoomLevel
-//
-//        XCTAssertEqual(persister.defaultPageZoom, randomZoomLevel.rawValue)
-//        let savedZoomValue = UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue).wrappedValue
-//        XCTAssertEqual(savedZoomValue, randomZoomLevel.rawValue)
-//    }
-
     func testWhenNewTabPreferencesAreUpdatedThenPersistedValuesAreUpdated() throws {
         let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())
 

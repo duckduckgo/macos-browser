@@ -602,10 +602,10 @@ extension Pixel.Event {
         case .networkProtectionGeoswitchingNoLocations:
             return "m_mac_netp_ev_geoswitching_no_locations"
 
-        case .defaultRequestedFromHomepage: return "default_requested_from_homepage"
-        case .defaultRequestedFromHomepageSetupView: return "default_requested_from_homepage_setup_view"
-        case .defaultRequestedFromSettings: return "default_requested_from_settings"
-        case .defaultRequestedFromOnboarding: return "default_requested_from_onboarding"
+        case .defaultRequestedFromHomepage: return "m_mac_default_requested_from_homepage"
+        case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
+        case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
+        case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
         }
     }
 }
