@@ -41,6 +41,9 @@ final class CriticalPathsTests: XCTestCase {
 
     private func accessSettings() {
         app.menuItems["openPreferences:"].click()
+        let settingsWindow = app.windows["Settings"]
+        _ = settingsWindow.waitForExistence(timeout: 5)
+        XCTAssertTrue(settingsWindow.exists, "Settings window is not visible")
     }
 
     private func toggleInternalUserState() {
@@ -71,8 +74,6 @@ final class CriticalPathsTests: XCTestCase {
         // Go to Sync Set up
         accessSettings()
         let settingsWindow = app.windows["Settings"]
-        XCTAssertTrue(settingsWindow.exists, "Begin Syncing text is not visible")
-
         settingsWindow.buttons["Sync & Backup"].click()
 
         // Create Account
