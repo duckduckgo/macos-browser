@@ -48,7 +48,10 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         guard let dataManager = self.dataManager else { return }
 
         Task {
-            let data = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+            guard let data = try? await dataManager.fetchBrokerProfileQueryData(ignoresCache: true) else {
+                assertionFailure("DataManager error during DataBrokerDatavaseBrowserViewModel.updateTables")
+                return
+            }
 
             let profileBrokers = data.map { $0.dataBroker }
             let dataBrokers = Array(Set(profileBrokers)).sorted { $0.id ?? 0 < $1.id ?? 0 }

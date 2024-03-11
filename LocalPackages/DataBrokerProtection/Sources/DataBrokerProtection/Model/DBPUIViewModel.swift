@@ -77,6 +77,6 @@ extension DBPUIViewModel: DBPUIScanOps {
     }
 
     func updateCacheWithCurrentScans() async {
-        _ = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+        _ = try? await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
     }
 }

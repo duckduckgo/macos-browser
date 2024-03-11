@@ -46,7 +46,11 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
 
             scheduler.disableLoginItem()
 
-            dataManager.removeAllData()
+            do {
+                try dataManager.removeAllData()
+            } catch {
+                os_log("Database error during DataBrokerProtectionFeatureDisabler.disableAndDelete", log: .dataBrokerProtection)
+            }
 
             DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerDisableAndDeleteDaily, frequency: .dailyOnly)
             NotificationCenter.default.post(name: .dbpWasDisabled, object: nil)

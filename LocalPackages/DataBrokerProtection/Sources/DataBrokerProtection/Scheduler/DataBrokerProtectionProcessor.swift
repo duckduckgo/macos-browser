@@ -116,14 +116,19 @@ final class DataBrokerProtectionProcessor {
         // This will fire the DAU/WAU/MAU pixels,
         engagementPixels.fireEngagementPixel()
 
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData()
-        let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
-                                                                                  operationType: operationType,
-                                                                                  priorityDate: priorityDate,
-                                                                                  showWebView: showWebView)
+        do {
+            // Temporary do/catch to allow merging error handling work in stages
+            let brokersProfileData = try database.fetchAllBrokerProfileQueryData()
+            let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
+                                                                                      operationType: operationType,
+                                                                                      priorityDate: priorityDate,
+                                                                                      showWebView: showWebView)
 
-        for collection in dataBrokerOperationCollections {
-            operationQueue.addOperation(collection)
+            for collection in dataBrokerOperationCollections {
+                operationQueue.addOperation(collection)
+            }
+        } catch {
+            os_log("Database error during Processor.runOperations", log: .dataBrokerProtection)
         }
 
         operationQueue.addBarrierBlock {

@@ -30,7 +30,10 @@ final class DataBrokerForceOptOutViewModel: ObservableObject {
 
     private func loadNotRemovedOptOutData() {
         Task { @MainActor in
-            let brokerProfileData = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+            guard let brokerProfileData = try? await dataManager.fetchBrokerProfileQueryData(ignoresCache: true) else {
+                assertionFailure()
+                return
+            }
             self.optOutData = brokerProfileData
                 .flatMap { profileData in
                     profileData.optOutOperationsData.map { ($0, profileData.dataBroker.name) }
@@ -70,6 +73,10 @@ struct OptOutViewData: Identifiable {
 private extension DataBrokerProtectionDataManager {
 
     func setAsRemoved(_ extractedProfileID: Int64) {
-        self.database.updateRemovedDate(Date(), on: extractedProfileID)
+        do {
+            try self.database.updateRemovedDate(Date(), on: extractedProfileID)
+        } catch {
+            assertionFailure()
+        }
     }
 }

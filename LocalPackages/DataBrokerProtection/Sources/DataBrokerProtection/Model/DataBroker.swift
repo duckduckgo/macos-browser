@@ -167,13 +167,11 @@ struct DataBroker: Codable, Sendable {
         return optOutType == .parentSiteOptOut
     }
 
-    static func initFromResource(_ url: URL) -> DataBroker {
-        // swiftlint:disable:next force_try
-        let data = try! Data(contentsOf: url)
+    static func initFromResource(_ url: URL) throws -> DataBroker {
+        let data = try Data(contentsOf: url)
         let jsonDecoder = JSONDecoder()
         jsonDecoder.dateDecodingStrategy = .millisecondsSince1970
-        // swiftlint:disable:next force_try
-        let broker = try! jsonDecoder.decode(DataBroker.self, from: data)
+        let broker = try jsonDecoder.decode(DataBroker.self, from: data)
         return broker
     }
 }

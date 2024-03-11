@@ -51,7 +51,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
                                              webView: webView)
 
         Task {
-            _ = dataManager.fetchProfile(ignoresCache: true)
+            _ = try? dataManager.fetchProfile(ignoresCache: true)
         }
 
         super.init(nibName: nil, bundle: nil)

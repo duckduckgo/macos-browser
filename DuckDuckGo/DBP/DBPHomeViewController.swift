@@ -83,9 +83,13 @@ final class DBPHomeViewController: NSViewController {
             attachDataBrokerContainerView()
         }
 
-        if dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
-            let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
-            dbpDateStore.updateLastActiveDate()
+        do {
+            if try dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
+                let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+                dbpDateStore.updateLastActiveDate()
+            }
+        } catch {
+            os_log("Database error during DBPHomeViewController.viewDidLoad", log: .dataBrokerProtection)
         }
     }
 

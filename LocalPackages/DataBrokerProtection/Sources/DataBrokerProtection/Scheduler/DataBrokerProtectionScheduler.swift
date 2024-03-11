@@ -177,7 +177,8 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             self.userNotificationService.sendFirstScanCompletedNotification()
 
-            if self.dataManager.hasMatches() {
+            if let hasMatches = try? self.dataManager.hasMatches(),
+                hasMatches {
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 

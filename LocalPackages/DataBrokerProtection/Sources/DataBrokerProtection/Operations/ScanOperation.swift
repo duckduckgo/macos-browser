@@ -57,7 +57,7 @@ final class ScanOperation: DataBrokerOperation {
         self.shouldRunNextStep = shouldRunNextStep
     }
 
-    func run(inputValue: Void,
+    func run(inputValue: InputValue,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
              stageCalculator: StageDurationCalculator, // We do not need it for scans - for now.

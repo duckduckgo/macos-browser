@@ -112,7 +112,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         defer {
-            database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId)
+            try? database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId)
             os_log("Finished scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
@@ -121,7 +121,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         do {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
-            database.add(event)
+            try database.add(event)
 
             let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
@@ -129,19 +129,19 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             if !extractedProfiles.isEmpty {
                 stageCalculator.fireScanSuccess(matchesFound: extractedProfiles.count)
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: extractedProfiles.count))
-                database.add(event)
+                try database.add(event)
 
                 for extractedProfile in extractedProfiles {
 
                     // We check if the profile exists in the database.
-                    let extractedProfilesForBroker = database.fetchExtractedProfiles(for: brokerId)
+                    let extractedProfilesForBroker = try database.fetchExtractedProfiles(for: brokerId)
                     let doesProfileExistsInDatabase = extractedProfilesForBroker.contains { $0.identifier == extractedProfile.identifier }
 
                     // If the profile exists we do not create a new opt-out operation
                     if doesProfileExistsInDatabase, let alreadyInDatabaseProfile = extractedProfilesForBroker.first(where: { $0.identifier == extractedProfile.identifier }), let id = alreadyInDatabaseProfile.id {
                         // If it was removed in the past but was found again when scanning, it means it appearead again, so we reset the remove date.
                         if alreadyInDatabaseProfile.removedDate != nil {
-                            database.updateRemovedDate(nil, on: id)
+                            try database.updateRemovedDate(nil, on: id)
                         }
 
                         os_log("Extracted profile already exists in database: %@", log: .dataBrokerProtection, id.description)
@@ -170,7 +170,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             } else {
                 stageCalculator.fireScanFailed()
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .noMatchFound)
-                database.add(event)
+                try database.add(event)
             }
 
             // Check for removed profiles
@@ -185,8 +185,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 for removedProfile in removedProfiles {
                     if let extractedProfileId = removedProfile.id {
                         let event = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutConfirmed)
-                        database.add(event)
-                        database.updateRemovedDate(Date(), on: extractedProfileId)
+                        try database.add(event)
+                        try database.updateRemovedDate(Date(), on: extractedProfileId)
                         shouldSendProfileRemovedNotification = true
                         try updateOperationDataDates(
                             origin: .scan,
@@ -199,7 +199,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
                         os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
 
-                        if let attempt = database.fetchAttemptInformation(for: extractedProfileId), let attemptUUID = UUID(uuidString: attempt.attemptId) {
+                        if let attempt = try database.fetchAttemptInformation(for: extractedProfileId), let attemptUUID = UUID(uuidString: attempt.attemptId) {
                             let now = Date()
                             let calculateDurationSinceLastStage = now.timeIntervalSince(attempt.lastStageDate) * 1000
                             let calculateDurationSinceStart = now.timeIntervalSince(attempt.startDate) * 1000
@@ -237,9 +237,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     }
 
     private func sendProfileRemovedNotificationIfNecessary(userNotificationService: DataBrokerProtectionUserNotificationService, database: DataBrokerProtectionRepository) {
-        let savedExtractedProfiles = database.fetchAllBrokerProfileQueryData().flatMap { $0.extractedProfiles }
 
-        guard savedExtractedProfiles.count > 0 else {
+        guard let savedExtractedProfiles = try? database.fetchAllBrokerProfileQueryData().flatMap({ $0.extractedProfiles }),
+            savedExtractedProfiles.count > 0 else {
             return
         }
 
@@ -286,7 +286,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         defer {
             os_log("Finished opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
-            database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+            try? database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             do {
                 try updateOperationDataDates(
                     origin: .optOut,
@@ -311,7 +311,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         do {
-            database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutStarted))
+            try database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutStarted))
 
             try await runner.optOut(profileQuery: brokerProfileQueryData,
                                     extractedProfile: extractedProfile,
@@ -323,12 +323,12 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             updater.updateChildrenBrokerForParentBroker(brokerProfileQueryData.dataBroker,
                                                         profileQueryId: profileQueryId)
 
-            database.addAttempt(extractedProfileId: extractedProfileId,
+            try database.addAttempt(extractedProfileId: extractedProfileId,
                                 attemptUUID: stageDurationCalculator.attemptId,
                                 dataBroker: stageDurationCalculator.dataBroker,
                                 lastStageDate: stageDurationCalculator.lastStateTime,
                                 startTime: stageDurationCalculator.startTime)
-            database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
+            try database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
         } catch {
             stageDurationCalculator.fireOptOutFailure()
             handleOperationError(
@@ -383,7 +383,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             }
         }
 
-        database.add(event)
+        try? database.add(event)
 
         do {
             try updateOperationDataDates(
