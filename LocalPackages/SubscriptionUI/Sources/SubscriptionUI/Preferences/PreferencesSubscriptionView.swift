@@ -126,7 +126,10 @@ public struct PreferencesSubscriptionView: View {
                     } buttons: {
                         Button(UserText.purchaseButton) { model.purchaseAction() }
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
-                        Button(UserText.haveSubscriptionButton) { showingSheet.toggle() }
+                        Button(UserText.haveSubscriptionButton) {
+                            showingSheet.toggle()
+                            model.uiEventHandler(.iHaveASubscriptionClick)
+                        }
                     }
                 }
 

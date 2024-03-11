@@ -3166,9 +3166,6 @@
 		EECE10E629DD77E60044D027 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECE10E429DD77E60044D027 /* FeatureFlag.swift */; };
 		EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
-		F1B58B322B97935100ECB3DC /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B58B312B97935100ECB3DC /* SubscriptionPixels.swift */; };
-		F1B58B332B97935100ECB3DC /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B58B312B97935100ECB3DC /* SubscriptionPixels.swift */; };
-		F1B58B342B97935100ECB3DC /* SubscriptionPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B58B312B97935100ECB3DC /* SubscriptionPixels.swift */; };
 		F1D43AEE2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
 		F1D43AEF2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
 		F1D43AF02B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
@@ -4522,7 +4519,6 @@
 		EECE10E429DD77E60044D027 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
-		F1B58B312B97935100ECB3DC /* SubscriptionPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPixels.swift; sourceTree = "<group>"; };
 		F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MainMenuActions+VanillaBrowser.swift"; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
@@ -5004,7 +5000,6 @@
 		1EA7B8D62B7E124E000330A4 /* Subscription */ = {
 			isa = PBXGroup;
 			children = (
-				F1B58B312B97935100ECB3DC /* SubscriptionPixels.swift */,
 				EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */,
 				1EA7B8D72B7E1283000330A4 /* SubscriptionFeatureAvailability.swift */,
 			);
@@ -10040,7 +10035,6 @@
 				3706FB4C293F65D500E42796 /* SharingMenu.swift in Sources */,
 				3706FB4D293F65D500E42796 /* GrammarFeaturesManager.swift in Sources */,
 				3706FB50293F65D500E42796 /* SafariFaviconsReader.swift in Sources */,
-				F1B58B322B97935100ECB3DC /* SubscriptionPixels.swift in Sources */,
 				31267C692B640C4200FEF811 /* DataBrokerProtectionFeatureVisibility.swift in Sources */,
 				3706FB51293F65D500E42796 /* NSScreenExtension.swift in Sources */,
 				EEC4A66A2B2C87D300F7C0AA /* VPNLocationView.swift in Sources */,
@@ -11330,7 +11324,6 @@
 				4B957A8D2AC7AE700062CA31 /* BookmarkTreeController.swift in Sources */,
 				EEC4A6602B277F0D00F7C0AA /* VPNLocationViewModel.swift in Sources */,
 				4B957A8E2AC7AE700062CA31 /* FirefoxEncryptionKeyReader.swift in Sources */,
-				F1B58B342B97935100ECB3DC /* SubscriptionPixels.swift in Sources */,
 				4B957A8F2AC7AE700062CA31 /* EventMapping+NetworkProtectionError.swift in Sources */,
 				4B957A902AC7AE700062CA31 /* BookmarkManagementSplitViewController.swift in Sources */,
 				4B957A912AC7AE700062CA31 /* CookieManagedNotificationContainerView.swift in Sources */,
@@ -12116,7 +12109,6 @@
 				4B9292A126670D2A00AD2C21 /* BookmarkTreeController.swift in Sources */,
 				4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */,
 				4B4D60C22A0C849000BCD287 /* EventMapping+NetworkProtectionError.swift in Sources */,
-				F1B58B332B97935100ECB3DC /* SubscriptionPixels.swift in Sources */,
 				4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */,
 				31F2D1FF2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				B6B140882ABDBCC1004F8E85 /* HoverTrackingArea.swift in Sources */,

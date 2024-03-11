@@ -249,6 +249,7 @@ extension Pixel {
         case privacyProSubscriptionManagementEmail
         case privacyProSubscriptionManagementPlanBilling
         case privacyProSubscriptionManagementRemoval
+        case privacyProRestorePurchaseClick
 
         case dailyPixel(Event, isFirst: Bool)
 
@@ -629,46 +630,49 @@ extension Pixel.Event {
             return "m_mac_netp_ev_geoswitching_no_locations"
 
             // MARK: - Subscription
-        case .privacyProSubscriptionActive: return subsPixelPrefix + "privacy-pro_app_subscription_active"
-        case .privacyProOfferScreenImpression: return subsPixelPrefix + "offer_screen_impression"
-        case .privacyProPurchaseAttempt: return subsPixelPrefix + "terms-conditions_subscribe_click"
-        case .privacyProPurchaseFailure: return subsPixelPrefix + "app_subscription-purchase_failure_other"
-        case .privacyProPurchaseFailureStoreError: return subsPixelPrefix + "app_subscription-purchase_failure_store"
-        case .privacyProPurchaseFailureBackendError: return subsPixelPrefix + "app_subscription-purchase_failure_backend"
-        case .privacyProPurchaseFailureAccountNotCreated: return subsPixelPrefix + "app_subscription-purchase_failure_account-creation"
-        case .privacyProPurchaseSuccess: return subsPixelPrefix + "app_subscription-purchase_success"
-        case .privacyProRestorePurchaseOfferPageEntry: return subsPixelPrefix + "offer_restore-purchase_click"
-        case .privacyProRestorePurchaseSettingsMenuEntry: return subsPixelPrefix + "settings_restore-purchase_click"
-        case .privacyProRestorePurchaseEmailStart: return subsPixelPrefix + "activate-subscription_enter-email_click"
-        case .privacyProRestorePurchaseStoreStart: return subsPixelPrefix + "activate-subscription_restore-purchase_click"
-        case .privacyProRestorePurchaseEmailSuccess: return subsPixelPrefix + "app_subscription-restore-using-email_success"
-        case .privacyProRestorePurchaseStoreSuccess: return subsPixelPrefix + "app_subscription-restore-using-store_success"
-        case .privacyProRestorePurchaseStoreFailureNotFound: return subsPixelPrefix + "subscription-restore-using-store_failure_not-found"
-        case .privacyProRestorePurchaseStoreFailureOther: return subsPixelPrefix + "app_subscription-restore-using-store_failure_other"
-        case .privacyProRestoreAfterPurchaseAttempt: return subsPixelPrefix + "app_subscription-restore-after-purchase-attempt_success"
-        case .privacyProSubscriptionActivated: return subsPixelPrefix + "app_subscription_activated_u"
-        case .privacyProWelcomeAddDevice: return subsPixelPrefix + "welcome_add-device_click_u"
-        case .privacyProSettingsAddDevice: return subsPixelPrefix + "settings_add-device_click"
-        case .privacyProAddDeviceEnterEmail: return subsPixelPrefix + "add-device_enter-email_click"
-        case .privacyProWelcomeVPN: return subsPixelPrefix + "welcome_vpn_click_u"
-        case .privacyProWelcomePersonalInformationRemoval: return subsPixelPrefix + "welcome_personal-information-removal_click_u"
-        case .privacyProWelcomeIdentityRestoration: return subsPixelPrefix + "welcome_identity-theft-restoration_click_u"
-        case .privacyProSubscriptionSettings: return subsPixelPrefix + "settings_screen_impression"
-        case .privacyProVPNSettings: return subsPixelPrefix + "settings_vpn_click"
-        case .privacyProPersonalInformationRemovalSettings: return subsPixelPrefix + "settings_personal-information-removal_click"
-        case .privacyProIdentityRestorationSettings: return subsPixelPrefix + "settings_identity-theft-restoration_click"
-        case .privacyProSubscriptionManagementEmail: return subsPixelPrefix + "manage-email_edit_click"
-        case .privacyProSubscriptionManagementPlanBilling: return subsPixelPrefix + "settings_change-plan-or-billing_click"
-        case .privacyProSubscriptionManagementRemoval: return subsPixelPrefix + "settings_remove-from-device_click"
+        case .privacyProSubscriptionActive: return privacyProPixelPrefix + "privacy-pro_app_subscription_active"
+        case .privacyProOfferScreenImpression: return privacyProPixelPrefix + "offer_screen_impression"
+        case .privacyProPurchaseAttempt: return privacyProPixelPrefix + "terms-conditions_subscribe_click"
+        case .privacyProPurchaseFailure: return privacyProPixelPrefix + "app_subscription-purchase_failure_other"
+        case .privacyProPurchaseFailureStoreError: return privacyProPixelPrefix + "app_subscription-purchase_failure_store"
+        case .privacyProPurchaseFailureBackendError: return privacyProPixelPrefix + "app_subscription-purchase_failure_backend"
+        case .privacyProPurchaseFailureAccountNotCreated: return privacyProPixelPrefix + "app_subscription-purchase_failure_account-creation"
+        case .privacyProPurchaseSuccess: return privacyProPixelPrefix + "app_subscription-purchase_success"
+        case .privacyProRestorePurchaseOfferPageEntry: return privacyProPixelPrefix + "offer_restore-purchase_click"
+        case .privacyProRestorePurchaseSettingsMenuEntry: return privacyProPixelPrefix + "settings_restore-purchase_click"
+        case .privacyProRestorePurchaseEmailStart: return privacyProPixelPrefix + "activate-subscription_enter-email_click"
+        case .privacyProRestorePurchaseStoreStart: return privacyProPixelPrefix + "activate-subscription_restore-purchase_click"
+        case .privacyProRestorePurchaseEmailSuccess: return privacyProPixelPrefix + "app_subscription-restore-using-email_success"
+        case .privacyProRestorePurchaseStoreSuccess: return privacyProPixelPrefix + "app_subscription-restore-using-store_success"
+        case .privacyProRestorePurchaseStoreFailureNotFound: return privacyProPixelPrefix + "subscription-restore-using-store_failure_not-found"
+        case .privacyProRestorePurchaseStoreFailureOther: return privacyProPixelPrefix + "app_subscription-restore-using-store_failure_other"
+        case .privacyProRestoreAfterPurchaseAttempt: return privacyProPixelPrefix + "app_subscription-restore-after-purchase-attempt_success"
+        case .privacyProSubscriptionActivated: return privacyProPixelPrefix + "app_subscription_activated_u"
+        case .privacyProWelcomeAddDevice: return privacyProPixelPrefix + "welcome_add-device_click_u"
+        case .privacyProSettingsAddDevice: return privacyProPixelPrefix + "settings_add-device_click"
+        case .privacyProAddDeviceEnterEmail: return privacyProPixelPrefix + "add-device_enter-email_click"
+        case .privacyProWelcomeVPN: return privacyProPixelPrefix + "welcome_vpn_click_u"
+        case .privacyProWelcomePersonalInformationRemoval: return privacyProPixelPrefix + "welcome_personal-information-removal_click_u"
+        case .privacyProWelcomeIdentityRestoration: return privacyProPixelPrefix + "welcome_identity-theft-restoration_click_u"
+        case .privacyProSubscriptionSettings: return privacyProPixelPrefix + "settings_screen_impression"
+        case .privacyProVPNSettings: return privacyProPixelPrefix + "settings_vpn_click"
+        case .privacyProPersonalInformationRemovalSettings: return privacyProPixelPrefix + "settings_personal-information-removal_click"
+        case .privacyProIdentityRestorationSettings: return privacyProPixelPrefix + "settings_identity-theft-restoration_click"
+        case .privacyProSubscriptionManagementEmail: return privacyProPixelPrefix + "manage-email_edit_click"
+        case .privacyProSubscriptionManagementPlanBilling: return privacyProPixelPrefix + "settings_change-plan-or-billing_click"
+        case .privacyProSubscriptionManagementRemoval: return privacyProPixelPrefix + "settings_remove-from-device_click"
+        case .privacyProRestorePurchaseClick: return privacyProPixelPrefix + "settings_restore-purchase_click"
         }
     }
 }
 
+// swiftlint:disable private_over_fileprivate
 #if APPSTORE
-fileprivate let subsPixelPrefix = "m_mac_store_privacy-pro_"
+fileprivate let privacyProPixelPrefix = "m_mac_store_privacy-pro_"
 #else
-fileprivate let subsPixelPrefix = "m_mac_direct_privacy-pro_"
+fileprivate let privacyProPixelPrefix = "m_mac_direct_privacy-pro_"
 #endif
+// swiftlint:enable private_over_fileprivate
 
 extension Pixel.Event: Equatable {
 

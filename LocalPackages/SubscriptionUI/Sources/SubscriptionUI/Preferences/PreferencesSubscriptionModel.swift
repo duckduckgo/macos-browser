@@ -34,9 +34,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private let accountManager: AccountManager
     private let openURLHandler: (URL) -> Void
-    private let openVPNHandler: () -> Void
-    private let openDBPHandler: () -> Void
-    private let openITRHandler: () -> Void
+    let uiEventHandler: (UIEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
     private let subscriptionAppGroup: String
 
@@ -45,17 +43,22 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
+    public enum UIEvent {
+        case openVPN,
+             openDB,
+             openITR,
+             iHaveASubscriptionClick,
+             addEmailClick,
+             restorePurchaseStoreClick
+    }
+
     public init(openURLHandler: @escaping (URL) -> Void,
-                openVPNHandler: @escaping () -> Void,
-                openDBPHandler: @escaping () -> Void,
-                openITRHandler: @escaping () -> Void,
+                uiEventHandler: @escaping (UIEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
                 subscriptionAppGroup: String) {
         self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
         self.openURLHandler = openURLHandler
-        self.openVPNHandler = openVPNHandler
-        self.openDBPHandler = openDBPHandler
-        self.openITRHandler = openITRHandler
+        self.uiEventHandler = uiEventHandler
         self.sheetActionHandler = sheetActionHandler
         self.subscriptionAppGroup = subscriptionAppGroup
 
@@ -167,17 +170,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openVPN() {
-        openVPNHandler()
+        uiEventHandler(.openVPN)
     }
 
     @MainActor
     func openPersonalInformationRemoval() {
-        openDBPHandler()
+        uiEventHandler(.openDB)
     }
 
     @MainActor
     func openIdentityTheftRestoration() {
-        openITRHandler()
+        uiEventHandler(.openITR)
     }
 
     @MainActor

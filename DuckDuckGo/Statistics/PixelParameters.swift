@@ -196,7 +196,8 @@ extension Pixel.Event {
              .privacyProIdentityRestorationSettings,
              .privacyProSubscriptionManagementEmail,
              .privacyProSubscriptionManagementPlanBilling,
-             .privacyProSubscriptionManagementRemoval:
+             .privacyProSubscriptionManagementRemoval,
+             .privacyProRestorePurchaseClick:
             return nil
         }
     }
