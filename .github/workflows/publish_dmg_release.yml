@@ -83,6 +83,8 @@ jobs:
 
       - name: Download tag artifact
         id: download-tag
+        # Only look for the tag artifact when the tag input is empty
+        if: github.event.inputs.tag == null || github.event.inputs.tag == ''
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
