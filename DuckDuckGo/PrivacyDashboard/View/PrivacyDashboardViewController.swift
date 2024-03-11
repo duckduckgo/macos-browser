@@ -61,13 +61,13 @@ final class PrivacyDashboardViewController: NSViewController {
         }, keyValueStoring: UserDefaults.standard)
     }()
 
-    private let toggleReportEvents = EventMapping<ToggleReportEvents> { event, _, _, _ in
+    private let toggleReportEvents = EventMapping<ToggleReportEvents> { event, _, parameters, _ in
         let domainEvent: Pixel.Event
         switch event {
         case .toggleReportDismiss: domainEvent = .toggleReportDismiss
         case .toggleReportDoNotSend: domainEvent = .toggleReportDoNotSend
         }
-        Pixel.fire(domainEvent)
+        Pixel.fire(domainEvent, withAdditionalParameters: parameters)
     }
 
     private let permissionHandler = PrivacyDashboardPermissionHandler()
@@ -279,9 +279,12 @@ extension PrivacyDashboardViewController: PrivacyDashboardToggleReportDelegate {
 
    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController,
                                    didRequestSubmitToggleReportWithSource source: BrokenSiteReport.Source,
-                                   didOpenReportInfo: Bool) {
+                                   didOpenReportInfo: Bool,
+                                   toggleReportCounter: Int?) {
        do {
-           let report = try makeBrokenSiteReport(source: source, didOpenReportInfo: didOpenReportInfo)
+           let report = try makeBrokenSiteReport(source: source,
+                                                 didOpenReportInfo: didOpenReportInfo,
+                                                 toggleReportCounter: toggleReportCounter)
            try toggleProtectionsOffReporter.report(report, reportMode: .toggle)
        } catch {
            os_log("Failed to generate or send the broken site report: %@", type: .error, error.localizedDescription)
@@ -301,7 +304,8 @@ extension PrivacyDashboardViewController {
     private func makeBrokenSiteReport(category: String = "",
                                       description: String = "",
                                       source: BrokenSiteReport.Source,
-                                      didOpenReportInfo: Bool = false) throws -> BrokenSiteReport {
+                                      didOpenReportInfo: Bool = false,
+                                      toggleReportCounter: Int? = nil) throws -> BrokenSiteReport {
 
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         guard let currentTab = tabViewModel?.tab,
@@ -342,7 +346,8 @@ extension PrivacyDashboardViewController {
                                                reportFlow: source,
                                                errors: errors,
                                                httpStatusCodes: statusCodes,
-                                               didOpenReportInfo: didOpenReportInfo)
+                                               didOpenReportInfo: didOpenReportInfo,
+                                               toggleReportCounter: toggleReportCounter)
         return websiteBreakage
     }
 }
