@@ -225,11 +225,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     switch error {
                     case .cancelledByUser:
                         os_log(.error, log: .subscription, "[Purchase] Cancelled by user")
-                        await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
                     default:
                         os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
                         await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
                     }
+                    await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
                     return nil
                 }
 
@@ -242,6 +242,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
                 case .failure(let error):
                     os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                    await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
                 }
 
                 os_log(.info, log: .subscription, "[Purchase] Purchase complete")
