@@ -22,10 +22,13 @@ import Subscription
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
-    @Published var cachedEntitlements: [AccountManager.Entitlement] = []
     @Published var subscriptionDetails: String?
 
-    private var subscriptionPlatform: SubscriptionService.GetSubscriptionDetailsResponse.Platform?
+    @Published var hasAccessToVPN: Bool = false
+    @Published var hasAccessToDBP: Bool = false
+    @Published var hasAccessToITR: Bool = false
+
+    private var subscriptionPlatform: Subscription.Platform?
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
@@ -35,28 +38,30 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private let openDBPHandler: () -> Void
     private let openITRHandler: () -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
+    private let subscriptionAppGroup: String
 
     private var fetchSubscriptionDetailsTask: Task<(), Never>?
 
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(accountManager: AccountManager = AccountManager(),
-                openURLHandler: @escaping (URL) -> Void,
+    public init(openURLHandler: @escaping (URL) -> Void,
                 openVPNHandler: @escaping () -> Void,
                 openDBPHandler: @escaping () -> Void,
                 openITRHandler: @escaping () -> Void,
-                sheetActionHandler: SubscriptionAccessActionHandlers) {
-        self.accountManager = accountManager
+                sheetActionHandler: SubscriptionAccessActionHandlers,
+                subscriptionAppGroup: String) {
+        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
         self.openURLHandler = openURLHandler
         self.openVPNHandler = openVPNHandler
         self.openDBPHandler = openDBPHandler
         self.openITRHandler = openITRHandler
         self.sheetActionHandler = sheetActionHandler
+        self.subscriptionAppGroup = subscriptionAppGroup
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
-        if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
+        if let cachedDate = SubscriptionService.cachedGetSubscriptionResponse?.expiresOrRenewsAt {
             updateDescription(for: cachedDate)
         }
 
@@ -81,7 +86,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
         if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email)
+            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, subscriptionAppGroup: subscriptionAppGroup)
         } else {
             ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
         }
@@ -131,7 +136,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
         case .stripe:
             Task {
-                guard let accessToken = AccountManager().accessToken, let externalID = AccountManager().externalID,
+                guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
                       case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
@@ -146,7 +151,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
-                return response.externalID == AccountManager().externalID
+                return response.externalID == accountManager.externalID
             case .failure:
                 return false
             }
@@ -180,6 +185,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         openURLHandler(.subscriptionFAQ)
     }
 
+    // swiftlint:disable cyclomatic_complexity
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
         guard fetchSubscriptionDetailsTask == nil else { return }
@@ -191,30 +197,51 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             guard let token = self?.accountManager.accessToken else { return }
 
-            if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
+            if let cachedDate = SubscriptionService.cachedGetSubscriptionResponse?.expiresOrRenewsAt {
                 self?.updateDescription(for: cachedDate)
 
                 if cachedDate.timeIntervalSinceNow < 0 {
-                    self?.cachedEntitlements = []
+                    self?.hasAccessToVPN = false
+                    self?.hasAccessToDBP = false
+                    self?.hasAccessToITR = false
                 }
             }
 
-            if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
-                if !response.isSubscriptionActive {
-                    AccountManager().signOut()
+            if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token) {
+                if !subscription.isActive {
+                    self?.accountManager.signOut()
                     return
                 }
 
-                self?.updateDescription(for: response.expiresOrRenewsAt)
+                self?.updateDescription(for: subscription.expiresOrRenewsAt)
 
-                self?.subscriptionPlatform = response.platform
+                self?.subscriptionPlatform = subscription.platform
             }
+            if let self {
+                switch await self.accountManager.hasEntitlement(for: .networkProtection) {
+                case let .success(result):
+                    hasAccessToVPN = result
+                case .failure:
+                    hasAccessToVPN = false
+                }
 
-            if case let .success(entitlements) = await AccountManager().fetchEntitlements() {
-                self?.cachedEntitlements = entitlements
+                switch await self.accountManager.hasEntitlement(for: .dataBrokerProtection) {
+                case let .success(result):
+                    hasAccessToDBP = result
+                case .failure:
+                    hasAccessToDBP = false
+                }
+
+                switch await self.accountManager.hasEntitlement(for: .identityTheftRestoration) {
+                case let .success(result):
+                    hasAccessToITR = result
+                case .failure:
+                    hasAccessToITR = false
+                }
             }
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     private func updateDescription(for date: Date) {
         self.subscriptionDetails = UserText.preferencesSubscriptionActiveCaption(formattedDate: dateFormatter.string(from: date))

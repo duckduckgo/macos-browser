@@ -53,6 +53,9 @@
         }
       }
     },
+    "-1 -> 0 ... 1" : {
+
+    },
     "**%lld** tracking attempts blocked" : {
       "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
       "localizations" : {
@@ -427,6 +430,24 @@
           }
         }
       }
+    },
+    "0->1->nil" : {
+
+    },
+    "10%" : {
+
+    },
+    "20%" : {
+
+    },
+    "50%" : {
+
+    },
+    "80%" : {
+
+    },
+    "100%" : {
+
     },
     "about.app_name" : {
       "comment" : "Application name to be displayed in the About dialog",
@@ -2005,6 +2026,9 @@
           }
         }
       }
+    },
+    "Animate" : {
+
     },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
@@ -3742,6 +3766,486 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скрыть пароль"
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords" : {
+      "comment" : "Opens Delete All Passwords dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Passwörter löschen ..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete All Passwords…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar todas las contraseñas..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer tous les mots de passe…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina tutte le password..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle wachtwoorden verwijderen ..."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń wszystkie hasła"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todas as palavras-passe…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все пароли..."
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-completion-button-texy" : {
+      "comment" : "Button text on dialog confirming deletion was completed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sluiten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zamknij"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть"
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-completion-message-text" : {
+      "comment" : "Message displayed on completion of multiple password deletion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Passwörter gelöscht (%d)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "All passwords deleted (%d)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se han eliminado todas las contraseñas (%d)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous les mots de passe sont supprimés (%d)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte le password sono state eliminate (%d)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle wachtwoorden verwijderd (%d)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usunięto wszystkie hasła (%d)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas as palavras-passe eliminadas (%d)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все пароли (%d) удалены"
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-confirmation-message-text" : {
+      "comment" : "Message displayed on dialog asking user to confirm deletion of all passwords",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchtest du wirklich alle Passwörter (%d) löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to delete all passwords (%d)?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro que quieres borrar todas las contraseñas (%d)?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment supprimer tous les mots de passe (%d) ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuoi davvero eliminare tutte le password (%d)?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weet je zeker dat je alle %d wachtwoorden wilt verwijderen?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czy na pewno chcesz usunąć wszystkie hasła (%d)?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tens a certeza de que pretendes eliminar todas as palavras-passe (%d)?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы точно хотите удалить все пароли (%d)?"
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-device-confirmation-information-text" : {
+      "comment" : "Information message displayed when deleting all passwords on a device",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Passwörter werden von diesem Gerät gelöscht. Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf deine Konten zuzugreifen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your passwords will be deleted from this device. Make sure you still have a way to access your accounts."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus contraseñas se borrarán de este dispositivo. Asegúrate de seguir teniendo una forma de acceder a tus cuentas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos mots de passe seront supprimés de cet appareil. Assurez-vous d'avoir toujours un moyen d'accéder à vos comptes."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le tue password verranno eliminate da questo dispositivo. Assicurati di poter ancora accedere ai tuoi account."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je wachtwoorden worden van dit apparaat verwijderd. Zorg ervoor dat je nog steeds toegang hebt tot je accounts."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje hasła zostaną usunięte z tego urządzenia. Upewnij się, że nadal masz możliwość dostępu do swoich kont."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As tuas palavras-passe serão apagadas deste dispositivo. Certifica-te de que continuas a ter forma de aceder às tuas contas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли будут удалены с данного устройства. Убедитесь, что вы по-прежнему можете войти в свои учетные записи."
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-permisson-text" : {
+      "comment" : "Message displayed in system authentication dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Passwörter löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "delete all passwords"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar todas las contraseñas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer tous les mots de passe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina tutte le password"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle wachtwoorden verwijderen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń wszystkie hasła"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todas as palavras-passe"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все пароли"
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-synced-completion-information-text" : {
+      "comment" : "Information message displayed on completion of multiple password deletion when devices are synced",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Passwörter wurden von allen synchronisierten Geräten gelöscht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your passwords have been deleted from all synced devices."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus contraseñas se han borrado de todos los dispositivos sincronizados."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos mots de passe ont été supprimés de tous les appareils synchronisés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password sono state eliminate da tutti i dispositivi sincronizzati."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je wachtwoorden zijn verwijderd van alle gesynchroniseerde apparaten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje hasła zostaną usunięte ze wszystkich zsynchronizowanych urządzeń."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As tuas palavras-passe foram eliminadas de todos os dispositivos sincronizados."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваши пароли были удалены со всех синхронизированных устройств."
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-synced-confirmation-information-text" : {
+      "comment" : "Information message displayed when deleting all passwords on a synced device",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Passwörter werden von allen synchronisierten Geräten gelöscht. Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf deine Konten zuzugreifen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus contraseñas se borrarán en todos los dispositivos sincronizados. Asegúrate de seguir teniendo una forma de acceder a tus cuentas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos mots de passe seront supprimés de tous les appareils synchronisés. Assurez-vous d'avoir toujours un moyen d'accéder à vos comptes."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le password verranno eliminate da tutti i dispositivi sincronizzati. Assicurati di avere ancora la possibilità di accedere ai tuoi account."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je wachtwoorden worden verwijderd van alle gesynchroniseerde apparaten. Zorg ervoor dat je nog steeds toegang hebt tot je accounts."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje hasła zostaną usunięte ze wszystkich zsynchronizowanych urządzeń. Upewnij się, że nadal masz możliwość dostępu do swoich kont."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As tuas palavras-passe serão eliminadas de todos os dispositivos sincronizados. Confirma que ainda tens uma forma de aceder às contas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пароли будут удалены со всех синхронизированных устройств. Убедитесь, что вы по-прежнему можете войти в свои учетные записи."
           }
         }
       }
@@ -9863,7 +10367,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Начать с заглавной"
+            "value" : "С заглавной буквы"
           }
         }
       }
@@ -11974,7 +12478,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Разработчик"
+            "value" : "Разработка"
           }
         }
       }
@@ -12935,10 +13439,58 @@
       "comment" : "Number of bytes out of total bytes downloaded (1Mb of 2Mb)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ von %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ of %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ de %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ sur %2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ of %2$@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ van %2$@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ z %2$@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ de %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ из %2$@"
           }
         }
       }
@@ -13727,10 +14279,58 @@
       "comment" : "Checkbox to open a Download Manager popover when downloads are completed",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download-Bedienfeld automatisch öffnen, wenn Downloads abgeschlossen sind"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Automatically open the Downloads panel when downloads complete"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir automáticamente el panel Descargas cuando se completen las descargas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir automatiquement le volet Téléchargements une fois les téléchargements terminés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri automaticamente il pannello Download al termine dei download"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deelvenster 'Downloads' automatisch openen wanneer het downloaden is voltooid"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatycznie otwieraj panel Pobieranie po zakończeniu pobierania"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir automaticamente o painel Transferências quando as transferências terminarem"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически открывать панель «Загрузки» по завершении скачивания"
           }
         }
       }
@@ -13919,10 +14519,58 @@
       "comment" : "Download speed format (1Mb/sec)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/s"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%@/s"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/s"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/s"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/s"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/sec."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/s"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/s"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/с"
           }
         }
       }
@@ -19145,7 +19793,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Помощь"
+            "value" : "Справка"
           }
         }
       }
@@ -23647,6 +24295,9 @@
         }
       }
     },
+    "Indeterminate (-1)" : {
+
+    },
     "invite.dialog.get.started.button" : {
       "comment" : "Get Started button on an invite dialog",
       "extractionState" : "extracted_with_value",
@@ -24274,7 +24925,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скрыть другие службы"
+            "value" : "Скрыть остальные"
           }
         }
       }
@@ -24334,7 +24985,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Предпочтения…"
+            "value" : "Настройки…"
           }
         }
       }
@@ -24394,7 +25045,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрыть DuckDuckGo"
+            "value" : "Завершить DuckDuckGo"
           }
         }
       }
@@ -24574,7 +25225,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редактировать"
+            "value" : "Правка"
           }
         }
       }
@@ -25174,7 +25825,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вставить и подогнать стиль"
+            "value" : "Вставить и согласовать стиль"
           }
         }
       }
@@ -25654,7 +26305,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Функции работы с текстом"
+            "value" : "Замены"
           }
         }
       }
@@ -26254,7 +26905,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открыть местоположение..."
+            "value" : "Открыть адрес…"
           }
         }
       }
@@ -26607,7 +27258,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Преобразовать в строчные"
+            "value" : "Строчные"
           }
         }
       }
@@ -26660,7 +27311,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Преобразовать в заглавные"
+            "value" : "Прописные"
           }
         }
       }
@@ -29276,6 +29927,9 @@
           }
         }
       }
+    },
+    "nil->0->nil" : {
+
     },
     "no.access.to.downloads.folder.header" : {
       "comment" : "Header of the alert dialog warning the user they need to give the browser permission to access the Downloads folder",
@@ -41290,7 +41944,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Несколько слов о DuckDuckGo"
+            "value" : "О приложении DuckDuckGo"
           }
         }
       }
@@ -43210,7 +43864,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Распечатать…"
+            "value" : "Печать…"
           }
         }
       }
@@ -43846,6 +44500,9 @@
           }
         }
       }
+    },
+    "Reset (nil)" : {
+
     },
     "restart.bitwarden" : {
       "comment" : "Button to restart Bitwarden application",
@@ -45953,6 +46610,9 @@
           }
         }
       }
+    },
+    "Slow animations" : {
+
     },
     "Smart Copy/Paste" : {
       "comment" : "Main Menu Edit-Substitutions item",
@@ -48731,7 +49391,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Трансформации"
+            "value" : "Преобразования"
           }
         }
       }
@@ -49250,7 +49910,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Просмотр"
+            "value" : "Вид"
           }
         }
       }
@@ -49692,6 +50352,9 @@
           }
         }
       }
+    },
+    "Zero" : {
+
     },
     "zoom" : {
       "comment" : "Menu with Zooming commands",
