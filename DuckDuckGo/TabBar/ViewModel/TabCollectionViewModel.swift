@@ -698,23 +698,6 @@ final class TabCollectionViewModel: NSObject {
             self.selectedTabViewModel = selectedTabViewModel
         }
     }
-
-    func reloadAll(matching condition: (Tab.TabContent) -> Bool, ignoreCurrentTab: Bool = false) {
-        let tabs = tabCollection.tabs.filter { condition($0.content) }
-
-        for tab in tabs {
-            if ignoreCurrentTab && tab == selectedTab {
-                continue
-            }
-            
-            if let index = indexInAllTabs(of: tab) {
-                Task { @MainActor in
-                    tab.reload()
-                }
-            }
-        }
-    }
-
 }
 
 extension TabCollectionViewModel {
