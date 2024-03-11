@@ -336,7 +336,7 @@ final class MoreOptionsMenu: NSMenu {
         }
     }
 
-    // swiftlint:disable:next function_body_length
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private func makeActiveSubscriptionItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = []
 
@@ -361,14 +361,14 @@ final class MoreOptionsMenu: NSMenu {
             if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
-                    
+
                     switch await AccountManager().hasEntitlement(for: .networkProtection) {
                     case let .success(result):
                         isMenuItemEnabled = result
                     case .failure:
                         isMenuItemEnabled = false
                     }
-                    
+
                     networkProtectionItem.isEnabled = isMenuItemEnabled
                 }
             }
