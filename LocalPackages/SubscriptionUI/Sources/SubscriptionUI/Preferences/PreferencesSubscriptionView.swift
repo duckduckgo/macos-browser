@@ -139,7 +139,7 @@ public struct PreferencesSubscriptionView: View {
                             description: UserText.vpnServiceDescription,
                             buttonName: model.isUserAuthenticated ? UserText.vpnServiceButtonTitle : nil,
                             buttonAction: { model.openVPN() },
-                            enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.networkProtection))
+                            enabled: !model.isUserAuthenticated || model.hasAccessToVPN)
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -149,7 +149,7 @@ public struct PreferencesSubscriptionView: View {
                             description: UserText.personalInformationRemovalServiceDescription,
                             buttonName: model.isUserAuthenticated ? UserText.personalInformationRemovalServiceButtonTitle : nil,
                             buttonAction: { model.openPersonalInformationRemoval() },
-                            enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.dataBrokerProtection))
+                            enabled: !model.isUserAuthenticated || model.hasAccessToDBP)
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -159,7 +159,7 @@ public struct PreferencesSubscriptionView: View {
                             description: UserText.identityTheftRestorationServiceDescription,
                             buttonName: model.isUserAuthenticated ? UserText.identityTheftRestorationServiceButtonTitle : nil,
                             buttonAction: { model.openIdentityTheftRestoration() },
-                            enabled: !model.isUserAuthenticated || model.cachedEntitlements.contains(.identityTheftRestoration))
+                            enabled: !model.isUserAuthenticated || model.hasAccessToITR)
             }
             .padding(10)
             .roundedBorder()

@@ -143,8 +143,7 @@ final class DataBrokerProtectionProcessor {
             guard let dataBrokerID = queryData.dataBroker.id else { continue }
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
-                let matchingQueriesData = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }
-                let collection = DataBrokerOperationsCollection(brokerProfileQueriesData: matchingQueriesData,
+                let collection = DataBrokerOperationsCollection(dataBrokerID: dataBrokerID,
                                                                 database: database,
                                                                 operationType: operationType,
                                                                 intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,

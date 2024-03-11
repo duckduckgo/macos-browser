@@ -916,7 +916,6 @@
 		3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2324923E980071C2E8 /* URLExtension.swift */; };
 		3707C72D294B5D4100682A9F /* EmptyAttributionRulesProver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */; };
 		3707C72F294B5D4F00682A9F /* WebViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783F92229432E1800BCA897 /* WebViewTests.swift */; };
-		3707C730294B5D5C00682A9F /* DuckPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */; };
 		370A34B12AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
 		370A34B22AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
 		3714B1E728EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E628EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift */; };
@@ -2931,7 +2930,6 @@
 		B6AE39F129373AF200C37AA4 /* EmptyAttributionRulesProver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */; };
 		B6AE39F329374AEC00C37AA4 /* OHHTTPStubs in Frameworks */ = {isa = PBXBuildFile; productRef = B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */; };
 		B6AE39F529374AEC00C37AA4 /* OHHTTPStubsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */; };
-		B6AE39F729374B9900C37AA4 /* DuckPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */; };
 		B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */; };
 		B6AFE6BC29A5D3F8002FF962 /* PrivacyDashboardTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BF5D842946FFDA006742B1 /* PrivacyDashboardTabExtension.swift */; };
 		B6AFE6BD29A5D621002FF962 /* HTTPSUpgradeTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BF5D8829470BC4006742B1 /* HTTPSUpgradeTabExtension.swift */; };
@@ -3235,6 +3233,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 9D9AE8D32AAA39D30026E7DC;
 			remoteInfo = DuckDuckGoDBPBackgroundAgentAppStore;
+		};
+		7B4627732B9AF2C8004ACE0B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B2537592A11BE7300610219;
+			remoteInfo = NetworkProtectionSystemExtension;
 		};
 		7BDA36F72B7E082100AD5388 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -8898,6 +8903,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				7B4627742B9AF2C8004ACE0B /* PBXTargetDependency */,
 				B6F997BB2B8F353F00476735 /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				31C6E9AD2B0C07BA0086DC30 /* PBXTargetDependency */,
@@ -10748,7 +10754,6 @@
 				3706FEA0293F662100E42796 /* EncryptionMocks.swift in Sources */,
 				B62A233D29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift in Sources */,
 				3706FEA1293F662100E42796 /* TestNavigationDelegate.swift in Sources */,
-				3707C730294B5D5C00682A9F /* DuckPlayerTests.swift in Sources */,
 				B6EC37DF29B5D05A001ACE79 /* DownloadsIntegrationTests.swift in Sources */,
 				B6EC37FD29B83E99001ACE79 /* TestsURLExtension.swift in Sources */,
 				B603973529BEF86200902A34 /* HTTPSUpgradeIntegrationTests.swift in Sources */,
@@ -10788,7 +10793,6 @@
 			files = (
 				B603971129B9D67E00902A34 /* PublishersExtensions.swift in Sources */,
 				B662D3DF275616FF0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
-				B6AE39F729374B9900C37AA4 /* DuckPlayerTests.swift in Sources */,
 				B62A233C29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift in Sources */,
 				B6EC37DE29B5D05A001ACE79 /* DownloadsIntegrationTests.swift in Sources */,
 				4B1AD8E225FC390B00261379 /* EncryptionMocks.swift in Sources */,
@@ -12777,6 +12781,11 @@
 			target = 9D9AE8D32AAA39D30026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore */;
 			targetProxy = 4BBA2D2A2B6AD01E00F6A470 /* PBXContainerItemProxy */;
 		};
+		7B4627742B9AF2C8004ACE0B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */;
+			targetProxy = 7B4627732B9AF2C8004ACE0B /* PBXContainerItemProxy */;
+		};
 		7BDA36F82B7E082100AD5388 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 7BDA36E42B7E037100AD5388 /* VPNProxyExtension */;
@@ -13760,7 +13769,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = 2404060d63af176050954050c403af92600fe97e;
+				branch = f2962e552278d2938e0c033ee5ed10b0cc13418d;
 				kind = branch;
 			};
 		};
