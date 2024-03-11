@@ -353,12 +353,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         }
 
         settings.selectedEnvironment = selectedEnvironment
-
-        Task {
-            await MainActor.run {
-                populateDataBrokerProtectionEnvironmentListMenuItems()
-            }
-        }
     }
 
     // MARK: - Utility Functions
