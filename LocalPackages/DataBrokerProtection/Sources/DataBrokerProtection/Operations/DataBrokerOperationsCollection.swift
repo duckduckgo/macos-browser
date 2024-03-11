@@ -27,7 +27,7 @@ final class DataBrokerOperationsCollection: Operation {
         case all
     }
 
-    private let brokerProfileQueriesData: [BrokerProfileQueryData]
+    private let dataBrokerID: Int64
     private let database: DataBrokerProtectionRepository
     private let id = UUID()
     private var _isExecuting = false
@@ -45,7 +45,7 @@ final class DataBrokerOperationsCollection: Operation {
         os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 
-    init(brokerProfileQueriesData: [BrokerProfileQueryData],
+    init(dataBrokerID: Int64,
          database: DataBrokerProtectionRepository,
          operationType: OperationType,
          intervalBetweenOperations: TimeInterval? = nil,
@@ -56,7 +56,7 @@ final class DataBrokerOperationsCollection: Operation {
          userNotificationService: DataBrokerProtectionUserNotificationService,
          showWebView: Bool) {
 
-        self.brokerProfileQueriesData = brokerProfileQueriesData
+        self.dataBrokerID = dataBrokerID
         self.database = database
         self.intervalBetweenOperations = intervalBetweenOperations
         self.priorityDate = priorityDate
@@ -101,10 +101,7 @@ final class DataBrokerOperationsCollection: Operation {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
-    // swiftlint:disable:next function_body_length
-    private func runOperation() async {
-        let filteredAndSortedOperationsData: [BrokerOperationData]
+    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerOperationData] {
         let operationsData: [BrokerOperationData]
 
         switch operationType {
@@ -116,14 +113,28 @@ final class DataBrokerOperationsCollection: Operation {
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
         }
 
+        let filteredAndSortedOperationsData: [BrokerOperationData]
+
         if let priorityDate = priorityDate {
             filteredAndSortedOperationsData = operationsData
                 .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
                 .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
-
         } else {
             filteredAndSortedOperationsData = operationsData
         }
+
+        return filteredAndSortedOperationsData
+    }
+
+    private func runOperation() async {
+        let allBrokerProfileQueryData = database.fetchAllBrokerProfileQueryData()
+        let brokerProfileQueriesData = allBrokerProfileQueryData.filter { $0.dataBroker.id == dataBrokerID }
+
+        let filteredAndSortedOperationsData = filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,
+                                                                          operationType: operationType,
+                                                                          priorityDate: priorityDate)
+
+        os_log("filteredAndSortedOperationsData count: %{public}d for brokerID %{public}d", log: .dataBrokerProtection, filteredAndSortedOperationsData.count, dataBrokerID)
 
         for operationData in filteredAndSortedOperationsData {
             if isCancelled {
@@ -172,7 +183,6 @@ final class DataBrokerOperationsCollection: Operation {
             }
         }
     }
-    // swiftlint:enable cyclomatic_complexity
 
     private func finish() {
         willChangeValue(forKey: #keyPath(isExecuting))

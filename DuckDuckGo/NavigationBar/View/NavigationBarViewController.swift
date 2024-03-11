@@ -37,11 +37,7 @@ final class NavigationBarViewController: NSViewController {
 
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
-        static let activeDownloadsImage = NSImage(named: "DownloadsActive")
-        static let inactiveDownloadsImage = NSImage(named: "Downloads")
-        static let autosavePopoverImageName = "PasswordManagement"
         static let homeButtonSeparatorSpacing: CGFloat = 12
-        static let homeButtonSeparatorHeight: CGFloat = 20
     }
 
     @IBOutlet weak var goBackButton: NSButton!
@@ -491,7 +487,7 @@ final class NavigationBarViewController: NSViewController {
                 self.showPasswordManagerPopover(selectedWebsiteAccount: account)
             }
             let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerAutosavePopoverText(domain: domain),
-                                                              image: Self.Constants.autosavePopoverImageName,
+                                                              image: .passwordManagement,
                                                               buttonText: UserText.passwordManagerAutosaveButtonText,
                                                               buttonAction: action,
                                                               onDismiss: {
@@ -670,35 +666,38 @@ final class NavigationBarViewController: NSViewController {
         downloadListCoordinator.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 let shouldShowPopover = update.kind == .updated
-                    && update.item.destinationURL != nil
-                    && update.item.tempURL == nil
-                    && !update.item.isBurner
-                    && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
+                && DownloadsPreferences.shared.shouldOpenPopupOnCompletion
+                && update.item.destinationURL != nil
+                && update.item.tempURL == nil
+                && !update.item.isBurner
+                && WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window
 
                 if shouldShowPopover {
-                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: self.downloadsButton,
+                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: downloadsButton,
                                                                   popoverDelegate: self,
                                                                   downloadsDelegate: self)
                 } else {
                     if update.item.isBurner {
-                        self.invalidateDownloadButtonHidingTimer()
-                        self.updateDownloadsButton(updatingFromPinnedViewsNotification: false)
+                        invalidateDownloadButtonHidingTimer()
+                        updateDownloadsButton(updatingFromPinnedViewsNotification: false)
                     }
                 }
-                self.updateDownloadsButton()
+                updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
-        downloadListCoordinator.progress
-            .publisher(for: \.fractionCompleted)
+        downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
+            .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
-            .map { [downloadListCoordinator] _ in
-                let progress = downloadListCoordinator.progress
-                return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
+            .map { (total, completed) -> Double? in
+                guard total > 0, completed < total else { return nil }
+                return Double(completed) / Double(total)
             }
-            .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
+            .sink { [weak downloadsProgressView] progress in
+                downloadsProgressView?.setProgress(progress, animated: true)
+            }
             .store(in: &downloadsCancellables)
     }
 
@@ -718,14 +717,14 @@ final class NavigationBarViewController: NSViewController {
 
         let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
 
-        passwordManagementButton.image = NSImage(named: "PasswordManagement")
+        passwordManagementButton.image = .passwordManagement
 
         if popovers.hasAnySavePopoversVisible() {
             return
         }
 
         if popovers.isPasswordManagementDirty {
-            passwordManagementButton.image = NSImage(named: "PasswordManagementDirty")
+            passwordManagementButton.image = .passwordManagementDirty
             return
         }
 
@@ -760,15 +759,6 @@ final class NavigationBarViewController: NSViewController {
                     // Set spacing/size for the separator
                     navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[0])
                     navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[1])
-                    homeButtonSeparator.heightAnchor.constraint(equalToConstant: Constants.homeButtonSeparatorHeight).isActive = true
-                    homeButtonSeparator.translatesAutoresizingMaskIntoConstraints = false
-                    NSLayoutConstraint.activate([NSLayoutConstraint(item: homeButtonSeparator as Any,
-                                                                        attribute: .centerY,
-                                                                        relatedBy: .equal,
-                                                                        toItem: navigationButtons,
-                                                                        attribute: .centerY,
-                                                                        multiplier: 1,
-                                                                        constant: 0)])
                 } else {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: navigationButtons.arrangedSubviews.count)
                     homeButtonSeparator.isHidden = true
@@ -794,7 +784,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads
-        downloadsButton.image = hasActiveDownloads ? Self.Constants.activeDownloadsImage : Self.Constants.inactiveDownloadsImage
+        downloadsButton.image = hasActiveDownloads ? .downloadsActive : .downloads
         let isTimerActive = downloadsButtonHidingTimer != nil
 
         if popovers.isDownloadsPopoverShown {
@@ -919,7 +909,7 @@ final class NavigationBarViewController: NSViewController {
         selectedTabViewModel.$isLoading
             .removeDuplicates()
             .sink { [weak refreshOrStopButton] isLoading in
-                refreshOrStopButton?.image = isLoading ? NSImage(named: "Stop") : NSImage(named: "Refresh")
+                refreshOrStopButton?.image = isLoading ? .stop : .refresh
                 refreshOrStopButton?.toolTip = isLoading ? UserText.stopLoadingTooltip : UserText.refreshPageTooltip
             }
             .store(in: &navigationButtonsCancellables)
@@ -1101,7 +1091,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
-        WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
+        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
     }
 #endif
 

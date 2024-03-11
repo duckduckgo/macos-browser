@@ -66,6 +66,7 @@ extension UserAgent {
         "Safari/537.36"
     static let `default` = UserAgent.safari
     static let webViewDefault = ""
+    static let brandedDefault = Self.default.appending(ddgVersion)
 
     static let localUserAgentConfiguration: KeyValuePairs<RegEx, String> = [
         // use safari when serving up PDFs from duckduckgo directly
@@ -94,7 +95,7 @@ extension UserAgent {
         }
 
         if isBrandPolicy(forConfig: privacyConfig) {
-            return Self.default.appending(ddgVersion)
+            return Self.brandedDefault
         } else {
             return Self.default
         }

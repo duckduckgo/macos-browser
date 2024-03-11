@@ -16,17 +16,20 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import DuckDuckGo_Privacy_Browser
-import Combine
 import class Persistence.CoreDataDatabase
+import Combine
+import History
+import Macros
+import XCTest
+
+@testable import DuckDuckGo_Privacy_Browser
 
 final class HistoryStoreTests: XCTestCase {
 
     private var cancellables = Set<AnyCancellable>()
 
     private var context: NSManagedObjectContext!
-    private var historyStore: HistoryStore!
+    private var historyStore: EncryptedHistoryStore!
     private var location: URL!
 
     override func setUp() {
@@ -40,7 +43,7 @@ final class HistoryStoreTests: XCTestCase {
             }
         }
         context = database.makeContext(concurrencyType: .mainQueueConcurrencyType)
-        historyStore = HistoryStore(context: context)
+        historyStore = EncryptedHistoryStore(context: context)
     }
 
     override func tearDownWithError() throws {
@@ -75,7 +78,7 @@ final class HistoryStoreTests: XCTestCase {
     func testWhenCleanOldIsCalled_ThenOlderEntriesThanDateAreCleaned() {
         let toBeKeptIdentifier = UUID()
         let newHistoryEntry = HistoryEntry(identifier: toBeKeptIdentifier,
-                                           url: URL(string: "wikipedia.org")!,
+                                           url: #URL("http://wikipedia.org"),
                                            title: nil,
                                            numberOfVisits: 1,
                                            lastVisit: Date(),

@@ -19,7 +19,12 @@ data:
         <li><code>git pull origin ${BASE_BRANCH}</code> pull the latest code</li>
         <li><code>git merge ${BRANCH}</code>
           <ul>
-            <li>resolve conflicts as needed</li>
+            <li>Resolve conflicts as needed</li>
+            <li>When merging a hotfix branch into an internal release branch, you will get conflicts in version and build number xcconfig files:
+              <ul>
+                <li>In the version file: accept the internal version number (higher).</li>
+                <li>In the build number file: accept the hotfix build number (higher). This step is very important in order to calculate the build number of the next internal release correctly.</li>
+              </ul></li>
           </ul></li>
         <li><code>git push origin ${BASE_BRANCH}</code> push merged branch</li>
       </ul>
@@ -33,7 +38,8 @@ data:
         </ul></li>
       </ul>
 
-      Complete this task when ready and proceed with testing the build.
+      Complete this task when ready and proceed with testing the build. If you're bumping an internal release, you should get another task asking you to publish the release in Sparkle. 
+      Look for other tasks in <a data-asana-gid='${AUTOMATION_TASK_ID}'/> task and handle them as needed.
 
 
       🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.

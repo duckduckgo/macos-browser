@@ -16,20 +16,22 @@
 //  limitations under the License.
 //
 
+import Bookmarks
+import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
-import CoreData
-import BrowserServicesKit
-import Persistence
 import Configuration
-import Networking
-import Bookmarks
+import CoreData
 import DDGSync
+import History
+import Macros
+import Networking
+import Persistence
+import PixelKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
-import PixelKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -102,14 +104,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         } catch {
             os_log("App Encryption Key could not be read: %s", "\(error)")
             fileStore = EncryptedFileStore()
-        }
-
-        // keep this on top!
-        // disable onboarding for existing users
-        let isOnboardingFinished = UserDefaultsWrapper<Bool>(key: .onboardingFinished, defaultValue: false)
-        if !isOnboardingFinished.wrappedValue,
-           FileManager.default.fileExists(atPath: URL.sandboxApplicationSupportURL.path) {
-            isOnboardingFinished.wrappedValue = true
         }
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
@@ -212,7 +206,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             didFinishLaunching = true
         }
 
-        HistoryCoordinator.shared.loadHistory()
+        HistoryCoordinator.shared.loadHistory {
+            HistoryCoordinator.shared.migrateModelV5toV6IfNeeded()
+        }
+
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
         if case .normal = NSApp.runType {
@@ -284,18 +281,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if SUBSCRIPTION
         Task {
-            var defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
+            let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
 
             let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
                                                          defaultValue: defaultEnvironment).wrappedValue
             SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
 
-    #if STRIPE
-            SubscriptionPurchaseEnvironment.current = .stripe
-    #else
+    #if APPSTORE || !STRIPE
             SubscriptionPurchaseEnvironment.current = .appStore
+    #else
+            SubscriptionPurchaseEnvironment.current = .stripe
     #endif
-            await AccountManager().checkSubscriptionState()
+            let accountManager = AccountManager()
+            do {
+                try accountManager.migrateAccessTokenToNewStore()
+            } catch {
+                if let error = error as? AccountManager.MigrationError {
+                    switch error {
+                    case AccountManager.MigrationError.migrationFailed:
+                        os_log(.default, log: .subscription, "Access token migration failed")
+                    case AccountManager.MigrationError.noMigrationNeeded:
+                        os_log(.default, log: .subscription, "No access token migration needed")
+                    }
+                }
+            }
+            await accountManager.checkSubscriptionState()
         }
 #endif
     }
@@ -321,9 +331,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
-            let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
-            if alert.runModal() == .cancel {
-                return .terminateCancel
+            // if there‘re downloads without location chosen yet (save dialog should display) - ignore them
+            if FileDownloadManager.shared.downloads.contains(where: { $0.location.destinationURL != nil }) {
+                let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
+                if alert.runModal() == .cancel {
+                    return .terminateCancel
+                }
             }
             FileDownloadManager.shared.cancelAll(waitUntilDone: true)
             DownloadListCoordinator.shared.sync()
@@ -337,10 +350,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
             let alert = NSAlert.noAccessToDownloads()
             if alert.runModal() != .cancel {
-                guard let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder") else {
-                    assertionFailure("Can't initialize preferences link")
-                    return
-                }
+                let preferencesLink = #URL("x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")
                 NSWorkspace.shared.open(preferencesLink)
                 return
             }

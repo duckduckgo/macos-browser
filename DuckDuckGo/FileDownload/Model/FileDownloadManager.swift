@@ -56,7 +56,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
     weak var delegate: FileDownloadManagerDelegate?
 
-    init(preferences: DownloadsPreferences = .init()) {
+    init(preferences: DownloadsPreferences = .shared) {
         self.preferences = preferences
     }
 
@@ -83,10 +83,11 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
             return url
         }
 
-        var promptForLocation: Bool {
+        func shouldPromptForLocation(for url: URL?) -> Bool {
             switch self {
             case .prompt: return true
-            case .preset, .auto: return false
+            case .preset: return false
+            case .auto: return url?.isFileURL ?? true // always prompt when "downloading" a local file
             }
         }
     }
@@ -96,12 +97,22 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let task = WebKitDownloadTask(download: download,
-                                      promptForLocation: location.promptForLocation,
+                                      promptForLocation: location.shouldPromptForLocation(for: download.originalRequest?.url),
                                       destinationURL: location.destinationURL,
                                       tempURL: location.tempURL,
                                       isBurner: fromBurnerWindow)
 
-        self.downloadTaskDelegates[task] = { [weak delegate] in delegate }
+        let shouldCancelDownloadIfDelegateIsGone = delegate != nil
+        self.downloadTaskDelegates[task] = { [weak delegate] in
+            if let delegate {
+                return delegate
+            }
+            // if the delegate was originally provided but deallocated since then – the download task should be cancelled
+            if shouldCancelDownloadIfDelegateIsGone {
+                return CancelledDownloadTaskDelegate()
+            }
+            return nil
+        }
 
         downloads.insert(task)
         downloadAddedSubject.send(task)
@@ -204,7 +215,7 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             fileTypes.append(fileType)
         }
 
-        delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: downloadLocation, fileTypes: fileTypes) { [weak self] url, fileType in
+        delegate.chooseDestination(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { [weak self] url, fileType in
             guard let self, let url else {
                 completion(nil, nil)
                 return
@@ -258,8 +269,21 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 protocol DownloadTaskDelegate: AnyObject {
 
     @MainActor
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void)
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void)
     @MainActor
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
+
+}
+
+// if the original Download Task delegate is gone, this one is used to cancel the download
+final class CancelledDownloadTaskDelegate: DownloadTaskDelegate {
+
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
+        callback(nil, nil)
+    }
+
+    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
+        nil
+    }
 
 }

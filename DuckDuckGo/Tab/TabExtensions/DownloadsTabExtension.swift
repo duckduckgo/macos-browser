@@ -34,10 +34,17 @@ final class DownloadsTabExtension: NSObject {
     private let isBurner: Bool
     private var isRestoringSessionState = false
 
+    enum DownloadLocation {
+        case auto
+        case prompt
+        case temporary
+    }
+    private var nextSaveDataRequestDownloadLocation: DownloadLocation = .auto
+
     @Published
     private(set) var savePanelDialogRequest: SavePanelDialogRequest? {
-        didSet {
-            savePanelDialogRequest?.addCompletionHandler { [weak self, weak savePanelDialogRequest] _ in
+        willSet {
+            newValue?.addCompletionHandler { [weak self, weak savePanelDialogRequest=newValue] _ in
                 if let self,
                     let savePanelDialogRequest,
                     self.savePanelDialogRequest === savePanelDialogRequest {
@@ -50,51 +57,95 @@ final class DownloadsTabExtension: NSObject {
 
     weak var delegate: TabDownloadsDelegate?
 
-    init(downloadManager: FileDownloadManagerProtocol, isBurner: Bool, downloadsPreferences: DownloadsPreferences = DownloadsPreferences()) {
+    init(downloadManager: FileDownloadManagerProtocol, isBurner: Bool, downloadsPreferences: DownloadsPreferences = .shared) {
         self.downloadManager = downloadManager
         self.isBurner = isBurner
         self.downloadsPreferences = downloadsPreferences
         super.init()
     }
 
-    func saveWebViewContentAs(_ webView: WKWebView) {
+    func saveWebViewContent(from webView: WKWebView, pdfHUD: WKPDFHUDViewWrapper?, location: DownloadLocation) {
         Task { @MainActor in
-            await saveWebViewContentAs(webView)
+            await saveWebViewContent(from: webView, pdfHUD: pdfHUD, location: location)
         }
     }
 
     @MainActor
-    private func saveWebViewContentAs(_ webView: WKWebView) async {
-        guard await webView.mimeType == UTType.html.preferredMIMEType else {
-            if let url = webView.url {
-                webView.startDownload(using: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
-                    self.downloadManager.add(download,
-                                             fromBurnerWindow: self.isBurner,
-                                             delegate: self, location: .prompt)
-                }
+    private func saveWebViewContent(from webView: WKWebView, pdfHUD: WKPDFHUDViewWrapper?, location: DownloadLocation) async {
+        let mimeType = pdfHUD != nil ? UTType.pdf.preferredMIMEType : await webView.mimeType
+        switch mimeType {
+        case UTType.html.preferredMIMEType:
+            assert([.prompt, .auto].contains(location))
+
+            let parameters = SavePanelParameters(suggestedFilename: webView.suggestedFilename, fileTypes: [.html, .webArchive, .pdf])
+            self.savePanelDialogRequest = SavePanelDialogRequest(parameters) { result in
+                guard let (url, fileType) = try? result.get() else { return }
+                webView.exportWebContent(to: url, as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html)
+            }
+
+        case UTType.pdf.preferredMIMEType:
+            self.nextSaveDataRequestDownloadLocation = location
+            let success = webView.savePDF(pdfHUD) // calls `saveDownloadedData(_:suggestedFilename:mimeType:originatingURL)`
+            guard success else { fallthrough }
+
+        default:
+            guard let url = webView.url else {
+                assertionFailure("Can‘t save web content without URL loaded")
+                return
+            }
+            if url.isFileURL {
+                self.nextSaveDataRequestDownloadLocation = location
+                _=try? await self.saveDownloadedData(nil, suggestedFilename: url.lastPathComponent, mimeType: mimeType ?? "text/html", originatingURL: url)
+                return
+            }
+
+            let download = await webView.startDownload(using: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad))
+
+            let location = self.downloadLocation(for: location, suggestedFilename: download.webView?.suggestedFilename ?? "")
+            self.downloadManager.add(download,
+                                     fromBurnerWindow: self.isBurner,
+                                     delegate: self,
+                                     location: location)
+        }
+
+    }
+
+    private func downloadLocation(for location: DownloadLocation, suggestedFilename: String) -> FileDownloadManager.DownloadLocationPreference {
+        switch location {
+        case .auto:
+            return .auto
+        case .prompt:
+            return .prompt
+        case .temporary:
+            let suggestedFilename = suggestedFilename.isEmpty ? UUID().uuidString : suggestedFilename
+            let fm = FileManager.default
+            let dirURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
+            try? fm.createDirectory(at: dirURL, withIntermediateDirectories: true)
+            return .preset(destinationURL: dirURL.appendingPathComponent(suggestedFilename), tempURL: nil)
+        }
+    }
+
+    private func saveDownloadedData(_ data: Data?, to toURL: URL, originatingURL: URL) throws {
+        let fm = FileManager.default
+
+        // if no data provided - copy file from local url to the destination url
+        guard let data else {
+            guard originatingURL.isFileURL else {
+                assertionFailure("No data provided for non-file URL")
+                return
+            }
+            try Progress.withPublishedProgress(url: toURL) {
+                try fm.copyItem(at: originatingURL, to: toURL, incrementingIndexIfExists: true)
             }
             return
         }
 
-        let parameters = SavePanelParameters(suggestedFilename: webView.suggestedFilename, fileTypes: [.html, .webArchive, .pdf])
-        self.savePanelDialogRequest = SavePanelDialogRequest(parameters) { result in
-            guard let (url, fileType) = try? result.get() else { return }
-            webView.exportWebContent(to: url, as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html)
-        }
-    }
-
-    private func saveDownloaded(data: Data, to toURL: URL) {
-        let fm = FileManager.default
         let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
-        do {
-            // First save file in a temporary directory
-            try data.write(to: tempURL)
-            // Then move the file to the download location and show a bounce if the file is in a location on the user's dock.
-            try Progress.withPublishedProgress(url: toURL) {
-                _ = try fm.moveItem(at: tempURL, to: toURL, incrementingIndexIfExists: true)
-            }
-        } catch {
-            os_log("Failed to save PDF file to Downloads folder", type: .error)
+        // First save file in a temporary directory
+        try data.write(to: tempURL)
+        // Then move the file to the download location and show a bounce if the file is in a location on the user's dock.
+        try Progress.withPublishedProgress(url: toURL) {
+            try fm.moveItem(at: tempURL, to: toURL, incrementingIndexIfExists: true)
         }
     }
 
@@ -129,8 +180,11 @@ extension DownloadsTabExtension: NavigationResponder {
         let firstNavigationAction = navigationResponse.mainFrameNavigation?.redirectHistory.first
             ?? navigationResponse.mainFrameNavigation?.navigationAction
 
-        guard navigationResponse.httpResponse?.isSuccessful == true,
-              !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload else {
+        guard navigationResponse.httpResponse?.isSuccessful != false, // download non-http responses
+              !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload
+                // if user pressed Opt+Enter in the Address bar to download from a URL
+                || (navigationResponse.mainFrameNavigation?.redirectHistory.last ?? navigationResponse.mainFrameNavigation?.navigationAction)?.navigationType == .custom(.userRequestedPageDownload)
+        else {
             return .next // proceed with normal page loading
         }
 
@@ -205,9 +259,8 @@ extension DownloadsTabExtension: WKNavigationDelegate {
 extension DownloadsTabExtension: DownloadTaskDelegate {
 
     @MainActor
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
-        savePanelDialogRequest = SavePanelDialogRequest(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { [weak self] result in
-            self?.savePanelDialogRequest = nil
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
+        savePanelDialogRequest = SavePanelDialogRequest(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { result in
             guard case let .success(.some( (url: url, fileType: fileType) )) = result else {
                 callback(nil, nil)
                 return
@@ -226,9 +279,9 @@ protocol DownloadsTabExtensionProtocol: AnyObject, NavigationResponder, Download
     var delegate: TabDownloadsDelegate? { get set }
     var savePanelDialogPublisher: AnyPublisher<Tab.UserDialog?, Never> { get }
 
-    func saveWebViewContentAs(_ webView: WKWebView)
+    func saveWebViewContent(from webView: WKWebView, pdfHUD: WKPDFHUDViewWrapper?, location: DownloadsTabExtension.DownloadLocation)
 
-    func saveDownloaded(data: Data, suggestedFilename: String, mimeType: String)
+    func saveDownloadedData(_ data: Data?, suggestedFilename: String, mimeType: String, originatingURL: URL) async throws -> URL?
 }
 
 extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
@@ -241,19 +294,35 @@ extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
     }
 
     @MainActor
-    func saveDownloaded(data: Data, suggestedFilename: String, mimeType: String) {
-        if !downloadsPreferences.alwaysRequestDownloadLocation,
-           let location = downloadsPreferences.effectiveDownloadLocation {
-            let url = location.appendingPathComponent(suggestedFilename)
-            saveDownloaded(data: data, to: url)
-            return
+    func saveDownloadedData(_ data: Data?, suggestedFilename: String, mimeType: String, originatingURL: URL) async throws -> URL? {
+        defer {
+            self.nextSaveDataRequestDownloadLocation = .auto
         }
+        switch downloadLocation(for: nextSaveDataRequestDownloadLocation, suggestedFilename: suggestedFilename) {
+        case .auto:
+            guard !downloadsPreferences.alwaysRequestDownloadLocation,
+                  let location = downloadsPreferences.effectiveDownloadLocation else { fallthrough /* prompt */ }
 
-        let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
-        chooseDestination(suggestedFilename: suggestedFilename, directoryURL: nil, fileTypes: fileTypes) { [weak self] url, _ in
-            guard let url else { return }
+            let url = location.appendingPathComponent(suggestedFilename)
+            try saveDownloadedData(data, to: url, originatingURL: originatingURL)
+            return url
 
-            self?.saveDownloaded(data: data, to: url)
+        case .prompt:
+            let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
+            let url: URL? = await withCheckedContinuation { continuation in
+                chooseDestination(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { url, _ in
+                    continuation.resume(returning: url)
+                }
+            }
+
+            guard let url else { return nil }
+
+            try saveDownloadedData(data, to: url, originatingURL: originatingURL)
+            return url
+
+        case .preset(destinationURL: let destinationURL, tempURL: _):
+            try saveDownloadedData(data, to: destinationURL, originatingURL: originatingURL)
+            return destinationURL
         }
     }
 }
@@ -266,12 +335,12 @@ extension TabExtensions {
 
 extension Tab {
 
-    func saveWebContentAs() {
-        self.downloads?.saveWebViewContentAs(webView)
+    func saveWebContent(pdfHUD: WKPDFHUDViewWrapper?, location: DownloadsTabExtension.DownloadLocation) {
+        self.downloads?.saveWebViewContent(from: webView, pdfHUD: pdfHUD, location: location)
     }
 
-    func saveDownloaded(data: Data, suggestedFilename: String, mimeType: String) {
-        self.downloads?.saveDownloaded(data: data, suggestedFilename: suggestedFilename, mimeType: mimeType)
+    func saveDownloadedData(_ data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) async throws -> URL? {
+        try await self.downloads?.saveDownloadedData(data, suggestedFilename: suggestedFilename, mimeType: mimeType, originatingURL: originatingURL)
     }
 
 }

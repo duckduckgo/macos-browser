@@ -123,6 +123,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     .failedToParseLocationListResponse:
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
+            case .vpnAccessRevoked:
+                // todo
+                return
             }
 
             PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
@@ -136,17 +139,18 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
 
 #if NETP_SYSTEM_EXTENSION
-        let settings = VPNSettings(defaults: .standard)
+        let defaults = UserDefaults.standard
 #else
-        let settings = VPNSettings(defaults: .netP)
+        let defaults = UserDefaults.netP
 #endif
+        let settings = VPNSettings(defaults: defaults)
 
         switch event {
         case .userBecameActive:
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionActiveUser,
                 frequency: .dailyOnly,
-                withAdditionalParameters: ["cohort": PixelKit.dateString(for: settings.vpnFirstEnabled)],
+                withAdditionalParameters: ["cohort": PixelKit.dateString(for: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
         case .reportConnectionAttempt(attempt: let attempt):
             switch attempt {
@@ -195,11 +199,63 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndContinuous,
                     includeAppVersionParameter: true)
             }
-        case .rekeyCompleted:
-            PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
-                frequency: .dailyAndContinuous,
-                includeAppVersionParameter: true)
+        case .rekeyAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                    frequency: .dailyAndContinuous,
+                    withError: error,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
+        case .tunnelStartAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStartAttempt,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStartFailure,
+                    frequency: .dailyAndContinuous,
+                    withError: error,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStartSuccess,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
+        case .tunnelUpdateAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelUpdateAttempt,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelUpdateFailure,
+                    frequency: .dailyAndContinuous,
+                    withError: error,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelUpdateSuccess,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
         }
     }
 
@@ -217,17 +273,19 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         self.appLauncher = AppLauncher(appBundleURL: .mainAppBundleURL)
 
 #if NETP_SYSTEM_EXTENSION
-        let settings = VPNSettings(defaults: .standard)
+        let defaults = UserDefaults.standard
 #else
-        let settings = VPNSettings(defaults: .netP)
+        let defaults = UserDefaults.netP
 #endif
+        let settings = VPNSettings(defaults: defaults)
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                              serviceName: Self.tokenServiceName,
-                                                             errorEvents: debugEvents)
-        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings)
+                                                             errorEvents: debugEvents,
+                                                             isSubscriptionEnabled: false)
+        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
@@ -236,8 +294,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    tokenStore: tokenStore,
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
-                   settings: settings)
+                   settings: settings,
+                   defaults: defaults,
+                   isSubscriptionEnabled: false,
+                   entitlementCheck: nil)
 
+        setupPixels()
         observeServerChanges()
         observeStatusUpdateRequests()
     }
@@ -381,7 +443,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Pixels
 
-    private func setupPixels(defaultHeaders: [String: String]) {
+    private func setupPixels(defaultHeaders: [String: String] = [:]) {
         let dryRun: Bool
 #if DEBUG
         dryRun = true

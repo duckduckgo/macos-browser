@@ -26,14 +26,10 @@ final class AppIconChanger {
         subscribeToIsInternal(internalUserDecider)
     }
 
-    enum Icons: String {
-        case internalChannelIcon = "InternalChannelIcon"
-    }
-
     func updateIcon(isInternalChannel: Bool) {
         let icon: NSImage?
         if isInternalChannel {
-            icon = NSImage(named: Icons.internalChannelIcon.rawValue)
+            icon = .internalChannelIcon
         } else {
             icon = nil
         }

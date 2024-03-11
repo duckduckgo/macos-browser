@@ -55,6 +55,7 @@
 		<string>$(DBP_APP_GROUP)</string>
 		<string>$(AppIdentifierPrefix)com.duckduckgo.mobile.ios</string>
 		<string>$(NETP_APP_GROUP)</string>
+		<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	</array>
 </dict>
 </plist>

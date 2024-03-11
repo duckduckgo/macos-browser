@@ -46,12 +46,13 @@ protocol StageDurationCalculator {
     func fireOptOutEmailReceive()
     func fireOptOutEmailConfirm()
     func fireOptOutValidate()
-    func fireOptOutSubmitSuccess()
-    func fireOptOutFailure()
+    func fireOptOutSubmitSuccess(tries: Int)
+    func fireOptOutFailure(tries: Int)
     func fireScanSuccess(matchesFound: Int)
     func fireScanFailed()
     func fireScanError(error: Error)
     func setStage(_ stage: Stage)
+    func setEmailPattern(_ emailPattern: String?)
 }
 
 final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator {
@@ -60,7 +61,8 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     let dataBroker: String
     let startTime: Date
     var lastStateTime: Date
-    var stage: Stage = .other
+    private (set) var stage: Stage = .other
+    private (set) var emailPattern: String?
 
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),
@@ -127,12 +129,21 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
         handler.fire(.optOutValidate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
-    func fireOptOutSubmitSuccess() {
-        handler.fire(.optOutSubmitSuccess(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
+    func fireOptOutSubmitSuccess(tries: Int) {
+        handler.fire(.optOutSubmitSuccess(dataBroker: dataBroker,
+                                          attemptId: attemptId,
+                                          duration: durationSinceStartTime(),
+                                          tries: tries,
+                                          emailPattern: emailPattern))
     }
 
-    func fireOptOutFailure() {
-        handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime(), stage: stage.rawValue))
+    func fireOptOutFailure(tries: Int) {
+        handler.fire(.optOutFailure(dataBroker: dataBroker,
+                                    attemptId: attemptId,
+                                    duration: durationSinceStartTime(),
+                                    stage: stage.rawValue,
+                                    tries: tries,
+                                    emailPattern: emailPattern))
     }
 
     func fireScanSuccess(matchesFound: Int) {
@@ -180,5 +191,9 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
 
     func setStage(_ stage: Stage) {
         self.stage = stage
+    }
+
+    func setEmailPattern(_ emailPattern: String?) {
+        self.emailPattern = emailPattern
     }
 }

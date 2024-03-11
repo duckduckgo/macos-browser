@@ -200,14 +200,14 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "VPNMetadataCollector.NWPathMonitor.paths"))
 
-        var path: Network.NWPath?
         let startTime = CFAbsoluteTimeGetCurrent()
 
         while true {
             if !monitor.currentPath.availableInterfaces.isEmpty {
-                path = monitor.currentPath
+                let path = monitor.currentPath
                 monitor.cancel()
-                return .init(currentPath: path.debugDescription)
+
+                return .init(currentPath: path.anonymousDescription)
             }
 
             // Wait up to 3 seconds to fetch the path.
@@ -283,6 +283,27 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         )
     }
 
+}
+
+extension Network.NWPath {
+    /// A description that's safe from a privacy standpoint.
+    ///
+    /// Ref: https://app.asana.com/0/0/1206712493935053/1206712516729780/f
+    ///
+    var anonymousDescription: String {
+        var description = "NWPath("
+
+        description += "status: \(status), "
+
+        if case .unsatisfied = status {
+            description += "unsatisfiedReason: \(unsatisfiedReason), "
+        }
+
+        description += "availableInterfaces: \(availableInterfaces)"
+        description += ")"
+
+        return description
+    }
 }
 
 #endif

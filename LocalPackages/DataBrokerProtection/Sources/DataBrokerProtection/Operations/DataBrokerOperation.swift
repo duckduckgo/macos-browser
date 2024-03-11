@@ -99,7 +99,9 @@ extension DataBrokerOperation {
         if action.needsEmail {
             do {
                 stageCalculator?.setStage(.emailGenerate)
-                extractedProfile?.email = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url)
+                let emailData = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url)
+                extractedProfile?.email = emailData.emailAddress
+                stageCalculator?.setEmailPattern(emailData.pattern)
                 stageCalculator?.fireOptOutEmailGenerate()
             } catch {
                 await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
@@ -111,11 +113,7 @@ extension DataBrokerOperation {
             stageCalculator?.setStage(.captchaParse)
         }
 
-        if let extractedProfile = self.extractedProfile {
-            await webViewHandler?.execute(action: action, data: .extractedProfile(extractedProfile))
-        } else {
-            await webViewHandler?.execute(action: action, data: .profile(query.profileQuery))
-        }
+        await webViewHandler?.execute(action: action, data: .userData(query.profileQuery, self.extractedProfile))
     }
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {

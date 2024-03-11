@@ -16,7 +16,10 @@
 //  limitations under the License.
 //
 
+import History
+import Macros
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -31,7 +34,7 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenAddVisitIsCalledBeforeHistoryIsLoadedFromStorage_ThenVisitIsIgnored() {
         let historyStoringMock = HistoryStoringMock()
         historyStoringMock.cleanOldResult = nil
-        let historyCoordinator = HistoryCoordinator()
+        let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
 
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
@@ -111,10 +114,10 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenHistoryIsBurning_ThenHistoryIsCleanedIncludingFireproofDomains() {
         let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
 
-        let url1 = URL(string: "https://duckduckgo.com")!
+        let url1 = #URL("https://duckduckgo.com")
         historyCoordinator.addVisit(of: url1)
 
-        let url2 = URL(string: "https://test.duckduckgo.com")!
+        let url2 = #URL("https://test.duckduckgo.com")
         historyCoordinator.addVisit(of: url2)
 
         let fireproofDomain = "wikipedia.org"
@@ -138,7 +141,7 @@ class HistoryCoordinatorTests: XCTestCase {
         historyStoringMock.removeEntriesResult = .success(())
         historyStoringMock.removeVisitsResult = .success(())
 
-        let url1 = URL(string: "https://duckduckgo.com")!
+        let url1 = #URL("https://duckduckgo.com")
         historyCoordinator.addVisit(of: url1)
         historyCoordinator.addVisit(of: url1)
         historyCoordinator.addVisit(of: url1)
@@ -159,7 +162,7 @@ class HistoryCoordinatorTests: XCTestCase {
         historyStoringMock.removeEntriesResult = .success(())
         historyStoringMock.removeVisitsResult = .success(())
 
-        let url1 = URL(string: "https://duckduckgo.com")!
+        let url1 = #URL("https://duckduckgo.com")
         historyCoordinator.addVisit(of: url1)
         historyCoordinator.addVisit(of: url1)
         historyCoordinator.addVisit(of: url1)
@@ -177,15 +180,16 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenBurningVisits_DoesntDeleteHistoryBeforeVisits() {
         // Needs real store to catch assertion which can be raised by improper call ordering in the coordinator
         let context = CoreData.historyStoreContainer().newBackgroundContext()
-        let historyStore = HistoryStore(context: context)
+        let historyStore = EncryptedHistoryStore(context: context)
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStore)
+        historyCoordinator.loadHistory { }
 
-        let url1 = URL(string: "https://duckduckgo.com")!
+        let url1 = #URL("https://duckduckgo.com")
         historyCoordinator.addVisit(of: url1)
         historyCoordinator.addVisit(of: url1)
         historyCoordinator.addVisit(of: url1)
 
-        let url2 = URL(string: "https://test.duckduckgo.com")!
+        let url2 = #URL("https://test.duckduckgo.com")
         historyCoordinator.addVisit(of: url2)
         historyCoordinator.addVisit(of: url2)
         historyCoordinator.addVisit(of: url2)
@@ -203,7 +207,7 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenUrlIsMarkedAsFailedToLoad_ThenFailedToLoadFlagIsStored() {
         let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
 
-        let url = URL(string: "https://duckduckgo.com")!
+        let url = #URL("https://duckduckgo.com")
         historyCoordinator.addVisit(of: url)
 
         historyCoordinator.markFailedToLoadUrl(url)
@@ -216,7 +220,7 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenUrlIsMarkedAsFailedToLoadAndItIsVisitedAgain_ThenFailedToLoadFlagIsSetToFalse() {
         let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
 
-        let url = URL(string: "https://duckduckgo.com")!
+        let url = #URL("https://duckduckgo.com")
         historyCoordinator.addVisit(of: url)
 
         historyCoordinator.markFailedToLoadUrl(url)
@@ -261,7 +265,7 @@ fileprivate extension HistoryCoordinator {
         historyStoringMock.cleanOldResult = .success(History())
         historyStoringMock.removeEntriesResult = .success(())
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
-        historyCoordinator.loadHistory()
+        historyCoordinator.loadHistory { }
 
         return (historyStoringMock, historyCoordinator)
     }
