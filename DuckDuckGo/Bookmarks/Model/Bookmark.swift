@@ -154,7 +154,7 @@ final class BookmarkFolder: BaseBookmarkEntity {
         return id == folder.id &&
         title == folder.title &&
         isFolder == folder.isFolder &&
-        parentFolderUUID == folder.parentFolderUUID &&
+        isParentFolderEqual(lhs: parentFolderUUID, rhs: folder.parentFolderUUID) &&
         children == folder.children
     }
 
@@ -164,6 +164,18 @@ final class BookmarkFolder: BaseBookmarkEntity {
         hasher.combine(isFolder)
         hasher.combine(parentFolderUUID)
         hasher.combine(children)
+    }
+
+    // In some cases a bookmark folder that is child of the root folder has its `parentFolderUUID` set to `bookmarks_root`. In some other cases is nil. Making sure that comparing a `nil` and a `bookmarks_root` does not return false. Probably would be good idea to remove the optionality of `parentFolderUUID` in the future and set it to `bookmarks_root` when needed.
+    private func isParentFolderEqual(lhs: String?, rhs: String?) -> Bool {
+        switch (lhs, rhs) {
+        case (.none, .none):
+            return true
+        case (.some(let lhsValue), .some(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.some(let value), .none), (.none, .some(let value)):
+            return value == "bookmarks_root"
+        }
     }
 
 }
