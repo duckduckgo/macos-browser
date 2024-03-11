@@ -142,6 +142,9 @@ protocol NewWindowPolicyDecisionMaker {
 #if SUBSCRIPTION
             if let url {
                 if url.isChild(of: URL.subscriptionBaseURL) {
+                    if SubscriptionPurchaseEnvironment.currentServiceEnvironment == .staging, url.getParameter(named: "environment") == nil {
+                        return .subscription(url.appendingParameter(name: "environment", value: "staging"))
+                    }
                     return .subscription(url)
                 } else if url.isChild(of: URL.identityTheftRestoration) {
                     return .identityTheftRestoration(url)
@@ -215,6 +218,7 @@ protocol NewWindowPolicyDecisionMaker {
         var url: URL? {
             userEditableUrl
         }
+
         var userEditableUrl: URL? {
             switch self {
             case .url(let url, credential: _, source: _) where !(url.isDuckPlayer || url.isDuckURLScheme):
