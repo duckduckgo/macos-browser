@@ -139,17 +139,18 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
 
 #if NETP_SYSTEM_EXTENSION
-        let settings = VPNSettings(defaults: .standard)
+        let defaults = UserDefaults.standard
 #else
-        let settings = VPNSettings(defaults: .netP)
+        let defaults = UserDefaults.netP
 #endif
+        let settings = VPNSettings(defaults: defaults)
 
         switch event {
         case .userBecameActive:
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionActiveUser,
                 frequency: .dailyOnly,
-                withAdditionalParameters: ["cohort": PixelKit.dateString(for: settings.vpnFirstEnabled)],
+                withAdditionalParameters: ["cohort": PixelKit.dateString(for: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
         case .reportConnectionAttempt(attempt: let attempt):
             switch attempt {
