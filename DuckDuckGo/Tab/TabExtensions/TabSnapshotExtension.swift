@@ -78,24 +78,26 @@ final class TabSnapshotExtension {
         self.identifier = identifier
 
         // Restore the snapshot
-        Task {
-            guard let image = await store.loadSnapshot(for: identifier) as NSImage? else {
+        Task { [weak self] in
+            guard let self = self else { return }
+
+            guard let image = await self.store.loadSnapshot(for: identifier) as NSImage? else {
                 os_log("No snapshot restored", log: .tabSnapshots)
                 return
             }
 
-            guard snapshotData == nil else {
+            guard self.snapshotData == nil else {
                 // Snapshot has been rendered in the meantime
                 return
             }
 
-            snapshotData = SnapshotData(url: nil,
-                                        image: image,
-                                        webviewBoundsSize: NSSize.zero,
-                                        isRestored: true)
+            self.snapshotData = SnapshotData(url: nil,
+                                             image: image,
+                                             webviewBoundsSize: NSSize.zero,
+                                             isRestored: true)
             os_log("Snapshot restored", log: .tabSnapshots)
 
-            renderSnapshotAfterLoad = false
+            self.renderSnapshotAfterLoad = false
         }
     }
 
@@ -252,8 +254,8 @@ extension TabSnapshotExtension: NavigationResponder {
     @MainActor
     func didFinishLoad(with request: URLRequest, in frame: WKFrameInfo) {
         if renderSnapshotAfterLoad {
-            Task {
-                await renderWebViewSnapshot()
+            Task { [weak self] in
+                await self?.renderWebViewSnapshot()
             }
         }
     }
@@ -295,8 +297,8 @@ extension Tab {
 
     // Called from the outside of extension when a tab is unselected
     func renderTabSnapshot() {
-        Task {
-            await self.tabSnapshots?.renderWebViewSnapshot()
+        Task { [weak self] in
+            await self?.tabSnapshots?.renderWebViewSnapshot()
         }
     }
 
