@@ -358,7 +358,7 @@ final class MoreOptionsMenu: NSMenu {
             items.append(networkProtectionItem)
 
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
                     
@@ -390,7 +390,7 @@ final class MoreOptionsMenu: NSMenu {
             items.append(dataBrokerProtectionItem)
 
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -422,7 +422,7 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.itrIcon)
             items.append(identityTheftRestorationItem)
 
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
                 Task {
                     let isMenuItemEnabled: Bool
 
