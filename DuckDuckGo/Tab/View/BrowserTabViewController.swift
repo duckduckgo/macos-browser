@@ -23,6 +23,7 @@ import Common
 import SwiftUI
 import WebKit
 
+// swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
 
@@ -1210,3 +1211,5 @@ extension BrowserTabViewController {
 #Preview {
     BrowserTabViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: [.init(content: .url(.duckDuckGo, source: .ui))])))
 }
+
+// swiftlint:enable file_length
