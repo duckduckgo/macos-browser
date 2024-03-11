@@ -29509,120 +29509,120 @@
       }
     },
     "newTab.setup.survey.day.0.action" : {
-      "comment" : "Action title of the Day 0 durvey of the Set Up section in the home page",
+      "comment" : "Action title of the Day 0 survey of the Set Up section in the home page",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Teile deine Gedanken"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Share Your Thoughts"
+            "value" : "Sign Up To Participate"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Comparte tus ideas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Partagez votre avis"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Comunicaci la tua opinione"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Deel je gedachten"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Podziel się przemyśleniami"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Partilha as tuas opiniões"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Поделиться соображениями"
           }
         }
       }
     },
     "newTab.setup.survey.day.0.summary" : {
-      "comment" : "Summary of the Day 0 durvey of the Set Up section in the home page",
+      "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nimm an unserer kurzen Umfrage teil und hilf uns, den besten Browser zu entwickeln."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Take our short survey and help us build the best browser."
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Responde a nuestra breve encuesta y ayúdanos a crear el mejor navegador."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Répondez à notre courte enquête et aidez-nous à créer le meilleur navigateur."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Rispondi al nostro breve sondaggio e aiutaci a creare il browser migliore."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vul onze korte enquête in en help ons de beste browser te bouwen."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Weź udział w krótkiej ankiecie i pomóż nam opracować najlepszą przeglądarkę."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Responde ao nosso curto inquérito e ajuda-nos a criar o melhor navegador."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Пройдите короткий опрос и помогите DuckDuckGo стать лучшим из браузеров."
           }
         }
@@ -29634,55 +29634,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Sag uns, was dich hierher gebracht hat"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Tell Us What Brought You Here"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Cuéntanos qué te ha traído hasta aquí"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dites-nous ce qui vous amène ici"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Raccontaci cosa ti ha portato qui"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vertel ons wat je hier heeft gebracht"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Powiedz nam, co Cię tu sprowadziło"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Diz-nos o que te trouxe aqui"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Что привело вас к нам"
           }
         }
@@ -29690,7 +29690,7 @@
     },
     "newTab.setup.survey.day.7.action" : {
       "comment" : "Action title of the Day 7 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -29750,7 +29750,7 @@
     },
     "newTab.setup.survey.day.7.summary" : {
       "comment" : "Summary of the Day 7 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -29810,7 +29810,7 @@
     },
     "newTab.setup.survey.day.7.title" : {
       "comment" : "Title of the Day 7 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -29864,6 +29864,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Помогите нам стать лучше"
+          }
+        }
+      }
+    },
+    "newTab.setup.survey.day.14.action" : {
+      "comment" : "Action title of the Day 14 survey of the Set Up section in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sign Up To Participate"
+          }
+        }
+      }
+    },
+    "newTab.setup.survey.day.14.summary" : {
+      "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        }
+      }
+    },
+    "newTab.setup.survey.day.14.title" : {
+      "comment" : "Title of the Day 14 durvey of the Set Up section in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Share Your Thoughts With Us"
           }
         }
       }
