@@ -24,19 +24,19 @@ public protocol DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
     init(fakeBrokerFlag: DataBrokerDebugFlag)
-    func saveProfile(_ profile: DataBrokerProtectionProfile) async -> Bool
-    func fetchProfile(ignoresCache: Bool) -> DataBrokerProtectionProfile?
-    func fetchBrokerProfileQueryData(ignoresCache: Bool) async -> [BrokerProfileQueryData]
-    func hasMatches() -> Bool
+    func saveProfile(_ profile: DataBrokerProtectionProfile) async throws
+    func fetchProfile(ignoresCache: Bool) throws -> DataBrokerProtectionProfile?
+    func fetchBrokerProfileQueryData(ignoresCache: Bool) async throws -> [BrokerProfileQueryData]
+    func hasMatches() throws -> Bool
 }
 
 extension DataBrokerProtectionDataManaging {
-    func fetchProfile() -> DataBrokerProtectionProfile? {
-        fetchProfile(ignoresCache: false)
+    func fetchProfile() throws -> DataBrokerProtectionProfile? {
+        try fetchProfile(ignoresCache: false)
     }
 
-    func fetchBrokerProfileQueryData() async -> [BrokerProfileQueryData] {
-        await fetchBrokerProfileQueryData(ignoresCache: false)
+    func fetchBrokerProfileQueryData() async throws -> [BrokerProfileQueryData] {
+        try await fetchBrokerProfileQueryData(ignoresCache: false)
     }
 }
 
@@ -58,21 +58,26 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         cache.delegate = self
     }
 
-    public func saveProfile(_ profile: DataBrokerProtectionProfile) async -> Bool {
-        let result = await database.save(profile)
+    public func saveProfile(_ profile: DataBrokerProtectionProfile) async throws {
+        do {
+            try await database.save(profile)
+        } catch {
+            // We should still invalidate the cache if the save fails
+            // TODO might be a good place to send a pixel
+            cache.invalidate()
+            throw error
+        }
         cache.invalidate()
         cache.profile = profile
-
-        return result
     }
 
-    public func fetchProfile(ignoresCache: Bool = false) -> DataBrokerProtectionProfile? {
+    public func fetchProfile(ignoresCache: Bool = false) throws -> DataBrokerProtectionProfile? {
         if !ignoresCache, cache.profile != nil {
             os_log("Returning cached profile", log: .dataBrokerProtection)
             return cache.profile
         }
 
-        if let profile = database.fetchProfile() {
+        if let profile = try database.fetchProfile() {
             cache.profile = profile
             return profile
         } else {
@@ -81,42 +86,40 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         }
     }
 
-    public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) async -> [BrokerProfileQueryData] {
+    public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) async throws -> [BrokerProfileQueryData] {
         if !ignoresCache, !cache.brokerProfileQueryData.isEmpty {
             os_log("Returning cached brokerProfileQueryData", log: .dataBrokerProtection)
             return cache.brokerProfileQueryData
         }
 
-        let queryData = database.fetchAllBrokerProfileQueryData()
+        let queryData = try database.fetchAllBrokerProfileQueryData()
         cache.brokerProfileQueryData = queryData
         return queryData
     }
 
-    public func hasMatches() -> Bool {
-        return database.hasMatches()
+    public func hasMatches() throws -> Bool {
+        return try database.hasMatches()
     }
 }
 
 extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
-    public func flushCache(profile: DataBrokerProtectionProfile?) async -> Bool {
-        guard let profile = profile else { return false }
-        let result = await saveProfile(profile)
+    public func flushCache(profile: DataBrokerProtectionProfile?) async throws {
+        guard let profile = profile else { return }
+        try await saveProfile(profile)
 
         delegate?.dataBrokerProtectionDataManagerDidUpdateData()
-
-        return result
     }
 
-    public func removeAllData() {
-        database.deleteProfileData()
+    public func removeAllData() throws {
+        try database.deleteProfileData()
 
         delegate?.dataBrokerProtectionDataManagerDidDeleteData()
     }
 }
 
 public protocol InMemoryDataCacheDelegate: AnyObject {
-    func flushCache(profile: DataBrokerProtectionProfile?) async -> Bool
-    func removeAllData()
+    func flushCache(profile: DataBrokerProtectionProfile?) async throws
+    func removeAllData() throws
 }
 
 public final class InMemoryDataCache {
@@ -138,10 +141,8 @@ public final class InMemoryDataCache {
 }
 
 extension InMemoryDataCache: DBPUICommunicationDelegate {
-    func saveProfile() async -> Bool {
-        _ = await delegate?.flushCache(profile: profile)
-
-        return true
+    func saveProfile() async throws {
+        try await delegate?.flushCache(profile: profile)
     }
 
     private func indexForName(matching name: DBPUIUserProfileName, in profile: DataBrokerProtectionProfile) -> Int? {
@@ -177,9 +178,9 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         return DBPUIUserProfile(names: names, birthYear: profile.birthYear, addresses: addresses)
     }
 
-    func deleteProfileData() {
+    func deleteProfileData() throws {
         profile = emptyProfile
-        delegate?.removeAllData()
+        try delegate?.removeAllData()
     }
 
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool {
