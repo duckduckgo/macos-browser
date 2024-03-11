@@ -281,6 +281,33 @@ protocol NewWindowPolicyDecisionMaker {
             isUrl
         }
 
+        var canBeDuplicated: Bool {
+            switch self {
+            case .settings, .subscription, .identityTheftRestoration, .dataBrokerProtection:
+                return false
+            default:
+                return true
+            }
+        }
+
+        var canBePinned: Bool {
+            switch self {
+            case .subscription, .identityTheftRestoration, .dataBrokerProtection:
+                return false
+            default:
+                return isUrl
+            }
+        }
+
+        var canBeBookmarked: Bool {
+            switch self {
+            case .subscription, .identityTheftRestoration, .dataBrokerProtection:
+                return false
+            default:
+                return isUrl
+            }
+        }
+
     }
     private struct ExtensionDependencies: TabExtensionDependencies {
         let privacyFeatures: PrivacyFeaturesProtocol
