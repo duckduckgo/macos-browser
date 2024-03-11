@@ -363,7 +363,7 @@ extension HomePage.Models {
 
         private var shouldSurveyDay0BeVisible: Bool {
             let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
-            return !isDay0SurveyEnabled &&
+            return isDay0SurveyEnabled &&
             shouldShowSurveyDay0 &&
             firstLaunchDate >= oneDayAgo &&
             Bundle.main.preferredLocalizations.first == "en" &&
@@ -373,7 +373,7 @@ extension HomePage.Models {
         private var shouldSurveyDay14BeVisible: Bool {
             let fourteenDaysAgo = Calendar.current.date(byAdding: .weekday, value: -14, to: Date())!
             let fifteenDaysAgo = Calendar.current.date(byAdding: .weekday, value: -15, to: Date())!
-            return !isDay14SurveyEnabled &&
+            return isDay14SurveyEnabled &&
             shouldShowSurveyDay0 &&
             shouldShowSurveyDay14 &&
             !userInteractedWithSurveyDay0 &&
