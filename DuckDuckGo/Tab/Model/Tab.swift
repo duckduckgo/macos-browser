@@ -1014,30 +1014,6 @@ protocol NewWindowPolicyDecisionMaker {
         audioState = webView.audioState()
     }
 
-    private func tabContentReloadInfo(for content: TabContent, shouldLoadInBackground: Bool) -> (url: URL, source: TabContent.URLSource, forceReload: Bool)? {
-        switch content {
-        case .url(let url, credential: let credential, source: .reload):
-            // reset content after forced reload to prevent reloading on each appearance
-            self.content = .url(url, credential: credential, source: .webViewUpdated)
-            return (url, .reload, forceReload: true)
-
-        case .url(let url, _, source: let source):
-            let forceReload = (url.absoluteString == source.userEnteredValue) ? shouldLoadInBackground : false
-            return (url, source, forceReload: forceReload)
-
-        case .subscription(let url), .identityTheftRestoration(let url):
-            return (url, .ui, forceReload: false)
-
-        case .newtab, .bookmarks, .onboarding, .dataBrokerProtection, .settings:
-            guard let contentUrl = content.urlForWebView, webView.url != contentUrl else { return nil }
-
-            return (contentUrl, .ui, forceReload: true) // always navigate built-in ui (duck://) urls
-
-        case .none:
-            return nil
-        }
-    }
-
     private enum ReloadIfNeededSource {
         case contentUpdated
         case webViewDisplayed
