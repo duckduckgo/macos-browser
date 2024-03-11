@@ -78,6 +78,7 @@ jobs:
           -configuration Review \
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
+          -skipMacroValidation \
           -test-iterations 2 \
           -retry-tests-on-failure \
         | tee xcodebuild.log \

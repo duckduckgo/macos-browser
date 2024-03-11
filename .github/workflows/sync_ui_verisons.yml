@@ -12,7 +12,6 @@ jobs:
     with:
       release-type: review
       create-dmg: false
-      asana-task-url: ""
       branch: "kieran/sync-tests" #temp
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
