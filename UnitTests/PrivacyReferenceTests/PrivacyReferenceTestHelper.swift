@@ -56,6 +56,7 @@ struct PrivacyReferenceTestHelper {
         return AppPrivacyConfiguration(data: data,
                                        identifier: UUID().uuidString,
                                        localProtection: domain,
-                                       internalUserDecider: DefaultInternalUserDecider(store: InternalUserDeciderStoreMock()))
+                                       internalUserDecider: DefaultInternalUserDecider(store: InternalUserDeciderStoreMock()),
+                                       toggleProtectionsCounter: ToggleProtectionsCounter(eventReporting: nil))
     }
 }

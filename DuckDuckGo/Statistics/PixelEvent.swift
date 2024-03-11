@@ -219,6 +219,11 @@ extension Pixel {
 
         case dailyPixel(Event, isFirst: Bool)
 
+        case protectionToggledOffBreakageReport
+        case toggleProtectionsDailyCount
+        case toggleReportDoNotSend
+        case toggleReportDismiss
+
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
             /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
@@ -595,6 +600,10 @@ extension Pixel.Event {
             return "m_mac_netp_ev_geoswitching_set_custom"
         case .networkProtectionGeoswitchingNoLocations:
             return "m_mac_netp_ev_geoswitching_no_locations"
+        case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
+        case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
+        case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
+        case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
         }
     }
 }
