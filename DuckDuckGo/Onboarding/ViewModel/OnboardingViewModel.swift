@@ -75,6 +75,8 @@ final class OnboardingViewModel: ObservableObject {
         }
         set {
             _isOnboardingFinished = newValue
+
+
         }
     }
 
@@ -107,7 +109,68 @@ final class OnboardingViewModel: ObservableObject {
         delegate?.onboardingDidRequestSetDefault { [weak self] in
             self?.state = .startBrowsing
             Self.isOnboardingFinished = true
+            self?.addCurrentApplicationToDock()
             self?.delegate?.onboardingHasFinished()
+        }
+    }
+
+    func addCurrentApplicationToDock() {
+        let appPath = Bundle.main.bundleURL.path
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+            return
+        }
+
+        let dockPlistPath = NSString(string: "~/Library/Preferences/com.apple.dock.plist").expandingTildeInPath
+        let dockPlistURL = URL(fileURLWithPath: dockPlistPath)
+
+        guard var dockPlistDict = NSDictionary(contentsOf: dockPlistURL) as? [String: AnyObject] else {
+            return
+        }
+
+        var persistentApps = dockPlistDict["persistent-apps"] as? [[String: AnyObject]] ?? []
+        var recentApps = dockPlistDict["recent-apps"] as? [[String: AnyObject]] ?? []
+
+        // Check if the application is already in the persistent apps
+        let isAppAlreadyInPersistentApps = persistentApps.contains { appDict in
+            if let tileData = appDict["tile-data"] as? [String: AnyObject],
+               let appBundleIdentifier = tileData["bundle-identifier"] as? String {
+                return appBundleIdentifier == bundleIdentifier
+            }
+            return false
+        }
+
+        if isAppAlreadyInPersistentApps {
+            return
+        }
+
+        // Find the app in recent apps
+        if let recentAppIndex = recentApps.firstIndex(where: { appDict in
+            if let tileData = appDict["tile-data"] as? [String: AnyObject],
+               let appBundleIdentifier = tileData["bundle-identifier"] as? String {
+                return appBundleIdentifier == bundleIdentifier
+            }
+            return false
+        }) {
+            // Move from recent to persistent
+            let appDict = recentApps.remove(at: recentAppIndex)
+            persistentApps.append(appDict)
+        } else {
+            // Create the dictionary for the current application if not found in recent apps
+            let appDict: [String: AnyObject] = ["tile-data": ["file-data": ["_CFURLString": "file://" + appPath + "/", "_CFURLStringType": 0]] as AnyObject]
+            persistentApps.append(appDict)
+        }
+
+        // Update the plist
+        dockPlistDict["persistent-apps"] = persistentApps as AnyObject?
+        dockPlistDict["recent-apps"] = recentApps as AnyObject?
+        (dockPlistDict as NSDictionary).write(to: dockPlistURL, atomically: true)
+
+        // Restart the Dock to apply changes
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            let task = Process()
+            task.launchPath = "/usr/bin/killall"
+            task.arguments = ["Dock"]
+            task.launch()
         }
     }
 
@@ -115,6 +178,7 @@ final class OnboardingViewModel: ObservableObject {
     func onSetDefaultSkipped() {
         state = .startBrowsing
         Self.isOnboardingFinished = true
+        addCurrentApplicationToDock()
         delegate?.onboardingHasFinished()
     }
 
