@@ -397,7 +397,7 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
-            WindowControllersManager.shared.show(url: .subscriptionPurchase, source: .ui, newTab: true)
+            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
         })
     }
 
@@ -406,7 +406,7 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
-            WindowControllersManager.shared.show(url: .subscriptionPurchase, source: .ui, newTab: true)
+            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
         })
     }
 
