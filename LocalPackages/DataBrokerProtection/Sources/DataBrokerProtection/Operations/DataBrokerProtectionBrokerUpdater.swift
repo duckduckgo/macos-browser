@@ -20,10 +20,14 @@ import Foundation
 import Common
 
 protocol ResourcesRepository {
-    func fetchBrokerFromResourceFiles() -> [DataBroker]?
+    func fetchBrokerFromResourceFiles() throws -> [DataBroker]?
 }
 
 final class FileResources: ResourcesRepository {
+
+    enum FileResourcesError: Error {
+        case bundleResourceURLNil
+    }
 
     private let fileManager: FileManager
 
@@ -31,27 +35,25 @@ final class FileResources: ResourcesRepository {
         self.fileManager = fileManager
     }
 
-    func fetchBrokerFromResourceFiles() -> [DataBroker]? {
+    func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
         guard let resourceURL = Bundle.module.resourceURL else {
-            return nil
+            //TODO haven't decided the best course of action here. Something has gone horribly wrong. Pixel? Assert?
+            // I don't think we have the means to fire a pixel here :Sob:
+            // "This property may not contain a path for non-standard bundle formats or for some older bundle formats"
+            throw FileResourcesError.bundleResourceURLNil
         }
 
-        do {
-            let fileURLs = try fileManager.contentsOfDirectory(
-                at: resourceURL,
-                includingPropertiesForKeys: nil,
-                options: [.skipsHiddenFiles]
-            )
+        let fileURLs = try fileManager.contentsOfDirectory(
+            at: resourceURL,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        )
 
-            let brokerJSONFiles = fileURLs.filter {
-                $0.isJSON && !$0.hasFakePrefix
-            }
-
-            return brokerJSONFiles.map(DataBroker.initFromResource(_:))
-        } catch {
-            os_log("Error fetching brokers JSON files from resources", log: .dataBrokerProtection)
-            return nil
+        let brokerJSONFiles = fileURLs.filter {
+            $0.isJSON && !$0.hasFakePrefix
         }
+
+        return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
     }
 }
 
@@ -118,7 +120,7 @@ public struct DataBrokerProtectionBrokerUpdater {
     }
 
     public func updateBrokers() {
-        guard let brokers = resources.fetchBrokerFromResourceFiles() else { return }
+        guard let brokers = try? resources.fetchBrokerFromResourceFiles() else { return } //TODO not this
 
         for broker in brokers {
             do {
