@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "daniel/subscription.cache",
-        "revision" : "844a9e49d7bd8aa253a4bd00efcc73b8594086f2"
+        "revision" : "8197cab1d79097a69140a6d00e35411112da5508"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "c67d268bf234760f49034a0fe7a6137a1b216b05",
-        "version" : "3.2.0"
+        "revision" : "43a6e1c1864846679a254e60c91332c3fbd922ee",
+        "version" : "3.3.0"
       }
     },
     {
