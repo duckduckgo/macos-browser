@@ -987,8 +987,8 @@ protocol NewWindowPolicyDecisionMaker {
             return nil
         }
 
-        self.content = content.forceReload()
         if webView.url == nil, content.isUrl {
+            self.content = content.forceReload()
             // load from cache or interactionStateData when called by lazy loader
             return reloadIfNeeded(shouldLoadInBackground: true)
         } else {
