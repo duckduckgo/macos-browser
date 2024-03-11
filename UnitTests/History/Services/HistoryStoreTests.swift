@@ -325,7 +325,7 @@ final class HistoryStoreTests: XCTestCase {
         waitForExpectations(timeout: 2, handler: nil)
     }
 
-    private func cleanOldAndWait(cleanUntil date: Date, assertion: @escaping (History) -> Void, file: StaticString = #file, line: UInt = #line) {
+    private func cleanOldAndWait(cleanUntil date: Date, assertion: @escaping (BrowsingHistory) -> Void, file: StaticString = #file, line: UInt = #line) {
         let loadingExpectation = self.expectation(description: "Loading")
         historyStore.cleanOld(until: date)
             .receive(on: DispatchQueue.main)

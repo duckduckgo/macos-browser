@@ -67,7 +67,7 @@ final class DuckPlayerTests: XCTestCase {
     }
 
     func testThatSharingDataStripsDuckPlayerPrefixFromTitleAndReturnsYoutubeURL() {
-        let sharingData = duckPlayer.sharingData(for: "Duck Player - sample video", url: "duck://player/12345678?t=10".url!)
+        let sharingData = duckPlayer.sharingData(for: "\(UserText.duckPlayer) - sample video", url: "duck://player/12345678?t=10".url!)
         XCTAssertEqual(sharingData?.title, "sample video")
         XCTAssertEqual(sharingData?.url, URL.youtube("12345678", timestamp: "10"))
     }
@@ -78,7 +78,7 @@ final class DuckPlayerTests: XCTestCase {
 
     func testThatTitleForRecentlyVisitedPageIsGeneratedForDuckPlayerFeedItems() {
         let feedItem = HomePage.Models.RecentlyVisitedPageModel(
-            actualTitle: "Duck Player - A sample video title",
+            actualTitle: "\(UserText.duckPlayer) - A sample video title",
             url: duckPlayerURL(),
             visited: Date()
         )
