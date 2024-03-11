@@ -47,7 +47,9 @@ class WebsiteBreakageReportTests: XCTestCase {
             protectionsState: true,
             reportFlow: .appMenu,
             errors: nil,
-            httpStatusCodes: nil
+            httpStatusCodes: nil,
+            didOpenReportInfo: false,
+            toggleReportCounter: nil
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -90,7 +92,9 @@ class WebsiteBreakageReportTests: XCTestCase {
             protectionsState: true,
             reportFlow: .appMenu,
             errors: nil,
-            httpStatusCodes: nil
+            httpStatusCodes: nil,
+            didOpenReportInfo: false,
+            toggleReportCounter: nil
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
