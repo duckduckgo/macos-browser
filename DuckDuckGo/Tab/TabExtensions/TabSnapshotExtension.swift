@@ -67,6 +67,12 @@ final class TabSnapshotExtension {
     }
 
     deinit {
+        cancellables.forEach { $0.cancel() }
+        cancellables.removeAll()
+
+        webView?.interactionEventsDelegate = nil
+        webView = nil
+
         store.clearSnapshot(tabID: identifier)
     }
 
