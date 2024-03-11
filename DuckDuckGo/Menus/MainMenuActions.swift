@@ -747,7 +747,7 @@ extension MainViewController {
     }
 
     @objc func changeInstallDateToMoreThan14DaysAgoButLessThan15(_ sender: Any?) {
-        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -15, to: Date())
+        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -14, to: Date())
         UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 

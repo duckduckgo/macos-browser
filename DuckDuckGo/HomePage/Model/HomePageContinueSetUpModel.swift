@@ -362,41 +362,24 @@ extension HomePage.Models {
 
         private var shouldSurveyDay0BeVisible: Bool {
             let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
-            print("--- 0 ----")
-            print(shouldShowSurveyDay0)
-            print(shouldShowSurveyDay14)
-            print(!userInteractedWithSurveyDay0)
-            print(firstLaunchDate >= oneDayAgo)
-            print(firstLaunchDate)
-            print(oneDayAgo)
-            print(isPartOfSurveyDay14On10Percent)
-            print("--- 0 ----")
             return !isDay0SurveyEnabled &&
             shouldShowSurveyDay0 &&
             !userInteractedWithSurveyDay0 &&
             firstLaunchDate >= oneDayAgo &&
+            Bundle.main.preferredLocalizations.first == "en" &&
             isPartOfSurveyDay0On10Percent ?? calculateIfIn10percent(day: .day0)
         }
 
         private var shouldSurveyDay14BeVisible: Bool {
             let fourteenDaysAgo = Calendar.current.date(byAdding: .weekday, value: -14, to: Date())!
             let fifteenDaysAgo = Calendar.current.date(byAdding: .weekday, value: -15, to: Date())!
-            print("--- 14 ----")
-            print(shouldShowSurveyDay0)
-            print(shouldShowSurveyDay14)
-            print(!userInteractedWithSurveyDay0)
-            print(firstLaunchDate >= fifteenDaysAgo)
-            print(firstLaunchDate <= fourteenDaysAgo)
-            print(firstLaunchDate)
-            print(fourteenDaysAgo)
-            print(isPartOfSurveyDay14On10Percent)
-            print("--- 14 ----")
             return !isDay14SurveyEnabled &&
             shouldShowSurveyDay0 &&
             shouldShowSurveyDay14 &&
             !userInteractedWithSurveyDay0 &&
             firstLaunchDate >= fifteenDaysAgo &&
             firstLaunchDate <= fourteenDaysAgo &&
+            Bundle.main.preferredLocalizations.first == "en" &&
             isPartOfSurveyDay14On10Percent ?? calculateIfIn10percent(day: .day14)
         }
 
@@ -593,9 +576,9 @@ extension HomePage.Models {
             case .emailProtection:
                 return .inbox128.resized(to: iconSize)!
             case .surveyDay0:
-                return .survey128.resized(to: iconSize)!
+                return .qandA128.resized(to: iconSize)!
             case .surveyDay14:
-                return .survey128.resized(to: iconSize)!
+                return .qandA128.resized(to: iconSize)!
             case .networkProtectionRemoteMessage:
                 return .vpnEnded.resized(to: iconSize)!
             case .dataBrokerProtectionRemoteMessage:
@@ -658,7 +641,6 @@ struct HomePageRemoteMessaging {
 #endif
 
 }
-
 
 public protocol RandomNumberGenerating {
     func random(in range: Range<Int>) -> Int
