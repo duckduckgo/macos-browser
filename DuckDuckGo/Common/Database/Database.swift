@@ -41,17 +41,10 @@ final class Database {
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
         func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
-            let useEncryptedValueTransformers: Bool = {
-#if REVIEW
-                return ProcessInfo.processInfo.environment["UITEST_MODE"] == nil
-#else
-                return true
-#endif
-            }()
 
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
 
-            if useEncryptedValueTransformers {
+            if NSApp.runType != .uiTests {
                 _=mainModel.registerValueTransformers(withAllowedPropertyClasses: [
                     NSImage.self,
                     NSString.self,

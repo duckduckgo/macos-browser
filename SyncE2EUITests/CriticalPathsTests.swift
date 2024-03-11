@@ -238,7 +238,7 @@ final class CriticalPathsTests: XCTestCase {
         checkUnifiedFavorites()
 
         // Check Logins
-        //checkLogins()
+        // checkLogins()
     }
 
     private func logIn() {
