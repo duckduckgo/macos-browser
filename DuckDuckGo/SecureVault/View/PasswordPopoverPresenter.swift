@@ -23,6 +23,7 @@ protocol PasswordPopoverPresenter {
     var passwordDomain: String? { get set }
     var popoverIsDirty: Bool { get }
     var popoverIsDisplayed: Bool { get }
+    var popoverIsInCurrentWindow: Bool { get }
     func show(under view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?)
     func show(under view: NSView, withSelectedAccount: SecureVaultModels.WebsiteAccount)
     func dismiss()
@@ -48,6 +49,11 @@ final class DefaultPasswordPopoverPresenter: PasswordPopoverPresenter, PopoverPr
         popover?.isShown ?? false
     }
 
+    var popoverIsInCurrentWindow: Bool {
+        popover?.mainWindow == NSApplication.shared.keyWindow
+    }
+
+    /// Note: Dismisses any previously displayed popover before showing a new one
     func show(under view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?) {
         show(under: view, withDomain: domain).select(category: category)
     }
