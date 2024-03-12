@@ -2274,9 +2274,6 @@
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
 		850E8DFB2A6FEC5E00691187 /* BookmarksBarAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
-		851F74202B99F55000747C42 /* Suggestions in Frameworks */ = {isa = PBXBuildFile; productRef = 851F741F2B99F55000747C42 /* Suggestions */; };
-		851F74222B99F55B00747C42 /* Suggestions in Frameworks */ = {isa = PBXBuildFile; productRef = 851F74212B99F55B00747C42 /* Suggestions */; };
-		851F74242B99F56900747C42 /* Suggestions in Frameworks */ = {isa = PBXBuildFile; productRef = 851F74232B99F56900747C42 /* Suggestions */; };
 		853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853014D525E671A000FB8205 /* PageObserverUserScript.swift */; };
 		85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */; };
 		85378D9E274E664C007C5CBF /* PopoverMessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378D9D274E664C007C5CBF /* PopoverMessageViewController.swift */; };
@@ -4561,7 +4558,6 @@
 				3706FCAE293F65D500E42796 /* Lottie in Frameworks */,
 				37BA812F29B3CD6E0053F1A3 /* SyncUI in Frameworks */,
 				3706FCAF293F65D500E42796 /* PrivacyDashboard in Frameworks */,
-				851F74222B99F55B00747C42 /* Suggestions in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4698,7 +4694,6 @@
 				4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */,
 				373FB4B52B4D6C57004C88D6 /* PreferencesViews in Frameworks */,
 				4B957BE32AC7AE700062CA31 /* Navigation in Frameworks */,
-				851F74242B99F56900747C42 /* Suggestions in Frameworks */,
 				1E21F8E32B73E48600FB272E /* Subscription in Frameworks */,
 				4B957BE42AC7AE700062CA31 /* DDGSync in Frameworks */,
 				4B957BE52AC7AE700062CA31 /* OpenSSL in Frameworks */,
@@ -4789,7 +4784,6 @@
 				B64E42892B90865F006C1346 /* Macros in Frameworks */,
 				4B2AAAF529E70DEA0026AFC0 /* Lottie in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
-				851F74202B99F55000747C42 /* Suggestions in Frameworks */,
 				1EA7B8D52B7E078C000330A4 /* Subscription in Frameworks */,
 				B6B77BE8297973D4001E68A1 /* Navigation in Frameworks */,
 				3739326729AE4B42009346AE /* DDGSync in Frameworks */,
@@ -8476,7 +8470,6 @@
 				B64E428A2B908666006C1346 /* Macros */,
 				85E2BBCF2B8F534A00DBEC7A /* History */,
 				F1D43AF42B98E48900BAB743 /* BareBonesBrowserKit */,
-				851F74212B99F55B00747C42 /* Suggestions */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -8773,7 +8766,6 @@
 				B64E42A82B9086BE006C1346 /* Macros */,
 				85E2BBD12B8F536F00DBEC7A /* History */,
 				F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */,
-				851F74232B99F56900747C42 /* Suggestions */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -8949,7 +8941,6 @@
 				1EA7B8D42B7E078C000330A4 /* Subscription */,
 				F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */,
 				B64E42882B90865F006C1346 /* Macros */,
-				851F741F2B99F55000747C42 /* Suggestions */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -13778,8 +13769,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = cc323b1a38288c6dd32593b58ab19ace033247b7;
-				kind = branch;
+				kind = exactVersion;
+				version = 122.1.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -14296,21 +14287,6 @@
 		7BFCB74F2ADE7E2300DA3EA7 /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PixelKit;
-		};
-		851F741F2B99F55000747C42 /* Suggestions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = Suggestions;
-		};
-		851F74212B99F55B00747C42 /* Suggestions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = Suggestions;
-		};
-		851F74232B99F56900747C42 /* Suggestions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = Suggestions;
 		};
 		85E2BBCD2B8F534000DBEC7A /* History */ = {
 			isa = XCSwiftPackageProductDependency;
