@@ -3,7 +3,7 @@ name: Sync-End-to-End tests MacOS11/12
 on:
   workflow_dispatch:
   # schedule:
-  #   - cron: '0 5 * * *' # run at 5 AM UTC
+  #   - cron: '0 4 * * *' # run at 4 AM UTC
 
 jobs:
   create-notarized-app:
@@ -12,7 +12,7 @@ jobs:
     with:
       release-type: review
       create-dmg: false
-      branch: "kieran/sync-tests" #temp
+      branch: ${{ inputs.branch }}
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
