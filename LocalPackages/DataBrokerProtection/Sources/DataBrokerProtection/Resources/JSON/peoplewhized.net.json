@@ -1,0 +1,51 @@
+{
+  "name": "PeopleWhized",
+  "url": "peoplewhized.net",
+  "version": "0.1.5",
+  "parent": "peoplewhiz.com",
+  "addedDatetime": 1709445600000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "f9e61593-21b0-4ffd-8546-511cd73a1696",
+          "url": "https://www.peoplewhized.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+        },
+        {
+          "actionType": "extract",
+          "id": "53e20125-4103-4fc3-b245-a4f33119252e",
+          "selector": "[class^='ResultsTable__Record-sc']",
+          "profile": {
+            "name": {
+              "selector": "[class^='ResultsTable__Name-sc']"
+            },
+            "age": {
+              "selector": "[class^='ResultsTable__Age-sc']"
+            },
+            "addressCityState": {
+              "selector": ".MuiGrid-item:nth-child(3) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".MuiGrid-item:nth-child(4) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}
