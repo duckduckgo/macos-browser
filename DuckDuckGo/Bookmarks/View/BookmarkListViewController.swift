@@ -342,7 +342,8 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func newFolderButtonClicked(_ sender: AnyObject) {
-        let view = BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: nil)
+        let parentFolder = sender.representedObject as? BookmarkFolder
+        let view = BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parentFolder)
         showDialog(view: view)
     }
 
