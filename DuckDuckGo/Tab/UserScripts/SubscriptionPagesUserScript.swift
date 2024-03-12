@@ -562,7 +562,7 @@ extension MainWindowController {
                 Task {
                     let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
                     switch result {
-                    case .success(let success):
+                    case .success:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
                     case .failure: break
                     }

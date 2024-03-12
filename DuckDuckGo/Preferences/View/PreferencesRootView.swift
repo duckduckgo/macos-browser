@@ -110,6 +110,7 @@ enum Preferences {
         }
 
 #if SUBSCRIPTION
+        // swiftlint:disable:next cyclomatic_complexity
         private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
                 DispatchQueue.main.async {
