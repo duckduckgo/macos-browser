@@ -42,7 +42,6 @@ final class CriticalPathsTests: XCTestCase {
     private func accessSettings() {
         app.menuItems["openPreferences:"].click()
         let settingsWindow = app.windows["Settings"]
-        _ = settingsWindow.waitForExistence(timeout: 5)
         XCTAssertTrue(settingsWindow.exists, "Settings window is not visible")
     }
 
