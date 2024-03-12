@@ -30,7 +30,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     @Published var selectedFolders: [BookmarkFolder] = []
 
     let treeController: BookmarkTreeController
-    var expandedNodesIDs = Set<String>()
+    private(set) var expandedNodesIDs = Set<String>()
 
     private let contentMode: ContentMode
     private let bookmarkManager: BookmarkManager
