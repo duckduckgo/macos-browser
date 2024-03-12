@@ -94,13 +94,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
         case "getSubscription": return getSubscription
-        case "setSubscription": return setSubscription
+        case "setSubscription": return setSubscription //mail
         case "backToSettings": return backToSettings
         case "getSubscriptionOptions": return getSubscriptionOptions
         case "subscriptionSelected": return subscriptionSelected
-        case "activateSubscription":
-            Pixel.fire(.privacyProRestorePurchaseOfferPageEntry)
-            return activateSubscription
+        case "activateSubscription": return activateSubscription //appstore
         case "featureSelected": return featureSelected
         case "completeStripePayment": return completeStripePayment
         default:
@@ -129,6 +127,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+
+        DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailSuccess, frequency: .dailyAndCount)
+
         guard let subscriptionValues: SubscriptionValues = DecodableHelper.decode(from: params) else {
             assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionValues")
             return nil
@@ -215,6 +216,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 // Check for active subscriptions
                 if await PurchaseManager.hasActiveSubscription() {
+
+                    Pixel.fire(.privacyProRestoreAfterPurchaseAttempt)
+
                     os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
                     report(subscriptionActivationError: .hasActiveSubscription)
                     await WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionFoundAlert(originalMessage: message)
@@ -337,28 +341,21 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         switch subscriptionActivationError {
         case .purchaseFailed:
             isStoreError = true
-//            transactionError = .purchaseFailed
         case .missingEntitlements:
             isBackendError = true
-//            transactionError = .missingEntitlements
         case .failedToGetSubscriptionOptions:
             isStoreError = true
-//            transactionError = .failedToGetSubscriptionOptions
         case .failedToSetSubscription:
             isBackendError = true
-//            transactionError = .failedToSetSubscription
         case .failedToRestoreFromEmail, .failedToRestoreFromEmailSubscriptionInactive:
             isBackendError = true
-//            transactionError = .generalError
         case .failedToRestorePastPurchase:
             isStoreError = true
-//            transactionError = .failedToRestorePastPurchase
         case .subscriptionNotFound:
+            DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreFailureNotFound, frequency: .dailyAndCount)
             isStoreError = true
-//            transactionError = .generalError
         case .subscriptionExpired:
             isStoreError = true
-//            transactionError = .subscriptionExpired
         case .hasActiveSubscription:
             isStoreError = true
             isBackendError = true
@@ -383,6 +380,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+
+        Pixel.fire(.privacyProRestorePurchaseOfferPageEntry)
+
         let message = original
 
         Task { @MainActor in
@@ -392,10 +392,18 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                     if #available(macOS 12.0, *) {
                         Self.startAppStoreRestoreFlow { result in
+                            
                             switch result {
                             case .success:
-                                message.webView?.reload()
+                                DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
+
                             case .failure(let error):
+
+                                switch error {
+                                case .missingAccountOrTransactions: break
+                                default:
+                                    DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreFailureOther, frequency: .dailyAndCount)
+                                }
 
                                 switch error {
                                 case .missingAccountOrTransactions:
@@ -409,6 +417,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                                     WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
                                 }
                             }
+                            message.webView?.reload()
                         }
                     }
                 },
@@ -504,7 +513,6 @@ extension SubscriptionPagesUseSubscriptionFeature {
             defer { mainViewController?.dismiss(progressViewController) }
             mainViewController?.presentAsSheet(progressViewController)
             guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
-
             onResultHandler(await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)))
         }
     }
@@ -549,7 +557,12 @@ extension MainWindowController {
         window.show(.subscriptionFoundAlert(), firstButtonAction: {
             if #available(macOS 12.0, *) {
                 Task {
-                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                    let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                    switch result {
+                    case .success(let success):
+                        DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
+                    case .failure: break
+                    }
                     originalMessage.webView?.reload()
                 }
             }
