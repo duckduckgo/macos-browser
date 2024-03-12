@@ -171,7 +171,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         bookmarkManager.update(folder: folder, andMoveToParent: .parent(uuid: parent.id))
 
-        let topLevelEntities = try XCTUnwrap(bookmarkList?.topLevelEntities)
+        withExtendedLifetime(cancellable) {}
         XCTAssertTrue(bookmarkStoreMock.updateFolderAndMoveToParentCalled)
         XCTAssertEqual(bookmarkStoreMock.capturedFolder, folder)
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: parent.id))
