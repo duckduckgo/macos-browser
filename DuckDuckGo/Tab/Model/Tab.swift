@@ -142,6 +142,7 @@ protocol NewWindowPolicyDecisionMaker {
 #if SUBSCRIPTION
             if let url {
                 if url.isChild(of: URL.subscriptionBaseURL) {
+                    // TODO:
                     if SubscriptionPurchaseEnvironment.currentServiceEnvironment == .staging, url.getParameter(named: "environment") == nil {
                         return .subscription(url.appendingParameter(name: "environment", value: "staging"))
                     }

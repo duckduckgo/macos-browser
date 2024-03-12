@@ -22,13 +22,13 @@ import Subscription
 public final class SubscriptionDebugMenu: NSMenuItem {
 
     private var subscriptionManager: SubscriptionManaging
+    var persistSubscriptionServiceEnvironment: (SubscriptionServiceEnvironment) -> Void
 
-    var currentEnvironment: () -> String
-    var updateEnvironment: (String) -> Void
     var isInternalTestingEnabled: () -> Bool
     var updateInternalTestingFlag: (Bool) -> Void
 
     private var purchasePlatformItem: NSMenuItem?
+    private var serviceEnvironmentItem: NSMenuItem?
 
     var currentViewController: () -> NSViewController?
     private let accountManager: AccountManager
@@ -49,15 +49,13 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     }
 
     public init(subscriptionManager: SubscriptionManaging,
-                currentEnvironment: @escaping () -> String,
-                updateEnvironment: @escaping (String) -> Void,
+                persistSubscriptionServiceEnvironment: @escaping (SubscriptionServiceEnvironment) -> Void,
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
                 subscriptionAppGroup: String) {
         self.subscriptionManager = subscriptionManager
-        self.currentEnvironment = currentEnvironment
-        self.updateEnvironment = updateEnvironment
+        self.persistSubscriptionServiceEnvironment = persistSubscriptionServiceEnvironment
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
@@ -92,8 +90,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         self.purchasePlatformItem = purchasePlatformItem
 
         let environmentItem = NSMenuItem(title: "Environment", action: nil, target: nil)
-        environmentItem.submenu = makeEnvironmentSubmenu()
         menu.addItem(environmentItem)
+        self.serviceEnvironmentItem = environmentItem
 
         menu.addItem(.separator())
 
@@ -140,11 +138,11 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private func makeEnvironmentSubmenu() -> NSMenu {
         let menu = NSMenu(title: "Select environment:")
 
-        let currentEnvironment = currentEnvironment()
+        let currentEnvironment = subscriptionManager.configuration.currentServiceEnvironment
 
         let stagingItem = NSMenuItem(title: "Staging", action: #selector(setEnvironmentToStaging), target: self)
-        stagingItem.state = currentEnvironment == "staging" ? .on : .off
-        if currentEnvironment == "staging" {
+        stagingItem.state = currentEnvironment == .staging ? .on : .off
+        if currentEnvironment == .staging {
             stagingItem.isEnabled = false
             stagingItem.action = nil
             stagingItem.target = nil
@@ -152,8 +150,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(stagingItem)
 
         let productionItem = NSMenuItem(title: "Production", action: #selector(setEnvironmentToProduction), target: self)
-        productionItem.state = currentEnvironment == "production" ? .on : .off
-        if currentEnvironment == "production" {
+        productionItem.state = currentEnvironment == .production ? .on : .off
+        if currentEnvironment == .production {
             productionItem.isEnabled = false
             productionItem.action = nil
             productionItem.target = nil
@@ -161,10 +159,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(productionItem)
 
         return menu
-    }
-
-    private func refreshSubmenu() {
-        self.submenu = makeSubmenu()
     }
 
     @objc
@@ -261,30 +255,31 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         guard case .alertFirstButtonReturn = response else { return }
 
         if let configuration = subscriptionManager.configuration as? DebugSubscriptionConfiguration {
-            configuration.updateCurrentPurchasePlatform(to: newPlatform)
+            configuration.updatePurchasePlatform(to: newPlatform)
         }
-
-        refreshSubmenu()
     }
 
     @IBAction func setEnvironmentToStaging(_ sender: Any?) {
-        askAndUpdateEnvironment(to: "staging")
+        askAndUpdateEnvironment(to: .staging)
     }
 
     @IBAction func setEnvironmentToProduction(_ sender: Any?) {
-        askAndUpdateEnvironment(to: "production")
+        askAndUpdateEnvironment(to: .production)
     }
 
-    private func askAndUpdateEnvironment(to newEnvironmentString: String) {
-        let alert = makeAlert(title: "Are you sure you want to change the environment to \(newEnvironmentString.capitalized)",
+    private func askAndUpdateEnvironment(to newEnvironment: SubscriptionServiceEnvironment) {
+        let alert = makeAlert(title: "Are you sure you want to change the environment to \(newEnvironment.rawValue.capitalized)",
                               message: "Please make sure you have manually removed your current active Subscription and reset all related features. \nYou may also need to change environment of related features e.g. Network Protection's to a matching one.",
                               buttonNames: ["Yes", "No"])
         let response = alert.runModal()
 
         guard case .alertFirstButtonReturn = response else { return }
 
-        updateEnvironment(newEnvironmentString)
-        refreshSubmenu()
+
+        if let configuration = subscriptionManager.configuration as? DebugSubscriptionConfiguration {
+            configuration.updateServiceEnvironment(to: newEnvironment)
+            persistSubscriptionServiceEnvironment(newEnvironment)
+        }
     }
 
     @objc
@@ -317,7 +312,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
             }
 
             updateInternalTestingFlag(!currentValue)
-            self.refreshSubmenu()
         }
     }
 
@@ -355,5 +349,6 @@ extension SubscriptionDebugMenu: NSMenuDelegate {
 
     public func menuWillOpen(_ menu: NSMenu) {
         purchasePlatformItem?.submenu = makePurchasePlatformSubmenu()
+        serviceEnvironmentItem?.submenu = makeEnvironmentSubmenu()
     }
 }

@@ -616,15 +616,11 @@ import SubscriptionUI
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
 #if SUBSCRIPTION
-            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
+            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
 
             SubscriptionDebugMenu(subscriptionManager: NSApp.delegateTyped.subscriptionManager,
-                                  currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
-                                  updateEnvironment: {
-                guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
-                currentEnvironmentWrapper.wrappedValue = newEnvironment
-                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment },
+                                  persistSubscriptionServiceEnvironment: { currentEnvironmentWrapper.wrappedValue = $0 },
                                   isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
                                   updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
                                   currentViewController: {

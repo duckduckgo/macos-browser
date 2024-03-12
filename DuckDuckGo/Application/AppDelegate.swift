@@ -94,11 +94,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let subscriptionManager: SubscriptionManaging = {
 
         // SubscriptionConfiguration
+        let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
+                                                     defaultValue: SubscriptionServiceEnvironment.default).wrappedValue
         let configuration: SubscriptionConfiguration
 #if APPSTORE || !STRIPE
-        configuration = DefaultSubscriptionConfiguration(currentPurchasePlatform: .appStore)
+        configuration = DefaultSubscriptionConfiguration(currentPurchasePlatform: .appStore,
+                                                         currentServiceEnvironment: currentEnvironment)
 #else
-        configuration = DefaultSubscriptionConfiguration(currentPurchasePlatform: .stripe)
+        configuration = DefaultSubscriptionConfiguration(currentPurchasePlatform: .stripe,
+                                                         currentServiceEnvironment: currentEnvironment)
 #endif
 
         // AccountManager
@@ -272,12 +276,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         startupSync()
 
 #if SUBSCRIPTION
-        let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
-
-        let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
-                                                     defaultValue: defaultEnvironment).wrappedValue
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
-
         Task {
             await subscriptionManager.accountManager.checkSubscriptionState()
         }
