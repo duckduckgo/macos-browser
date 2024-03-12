@@ -94,11 +94,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
         case "getSubscription": return getSubscription
-        case "setSubscription": return setSubscription // mail
+        case "setSubscription": return setSubscription
         case "backToSettings": return backToSettings
         case "getSubscriptionOptions": return getSubscriptionOptions
         case "subscriptionSelected": return subscriptionSelected
-        case "activateSubscription": return activateSubscription // appstore
+        case "activateSubscription": return activateSubscription
         case "featureSelected": return featureSelected
         case "completeStripePayment": return completeStripePayment
         default:
