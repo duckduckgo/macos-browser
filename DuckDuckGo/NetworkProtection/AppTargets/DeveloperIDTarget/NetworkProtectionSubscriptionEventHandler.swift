@@ -81,7 +81,6 @@ final class NetworkProtectionSubscriptionEventHandler {
 
         Task {
             do {
-                // todo - https://app.asana.com/0/0/1206541966681608/f
                 try NetworkProtectionKeychainTokenStore().store(NetworkProtectionKeychainTokenStore.makeToken(from: token))
                 print("[NetP Subscription] Stored derived NetP auth token")
             } catch {

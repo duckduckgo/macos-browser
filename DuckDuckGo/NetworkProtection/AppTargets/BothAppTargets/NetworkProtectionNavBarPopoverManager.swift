@@ -71,15 +71,6 @@ final class NetworkProtectionNavBarPopoverManager {
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
             _ = VPNSettings(defaults: .netP)
             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-#if SUBSCRIPTION
-            let entitlementsCheck = {
-                await AccountManager().hasEntitlement(for: .networkProtection)
-            }
-#else
-            let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-                return .success(true)
-            }
-#endif
 
             let popover = NetworkProtectionPopover(controller: controller,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,

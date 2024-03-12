@@ -79,11 +79,12 @@ final class PreferencesSidebarModel: ObservableObject {
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
         syncService: DDGSyncing,
-        includeDuckPlayer: Bool
+        includeDuckPlayer: Bool,
+        userDefaults: UserDefaults = .netP
     ) {
         let loadSections = {
 #if SUBSCRIPTION
-            let includingVPN = UserDefaults.netP.networkProtectionEntitlementsValid && DefaultNetworkProtectionVisibility().isOnboarded
+            let includingVPN = userDefaults.networkProtectionEntitlementsValid && DefaultNetworkProtectionVisibility().isOnboarded
 #elseif NETWORK_PROTECTION
             let includingVPN = DefaultNetworkProtectionVisibility().isOnboarded
 #else

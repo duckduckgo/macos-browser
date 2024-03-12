@@ -1,5 +1,4 @@
 //
-//
 //  UserDefaults+NetworkProtectionWaitlist.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
@@ -64,7 +63,6 @@ extension UserDefaults {
         }
     }
 
-    // Convenience declaration
     // Convenience declaration
     var networkProtectionWaitlistEnabledOverrideRawValueKey: String {
         UserDefaultsWrapper<Any>.Key.networkProtectionWaitlistEnabledOverrideRawValue.rawValue
