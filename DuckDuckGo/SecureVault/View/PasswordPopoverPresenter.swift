@@ -66,7 +66,7 @@ final class DefaultPasswordPopoverPresenter: PasswordPopoverPresenter, PopoverPr
 
     func dismiss() {
         guard let popover else { return }
-        self.popover?.close()
+        popover.close()
     }
 
     private func show(under view: NSView, withDomain domain: String?) -> PasswordManagementPopover {
