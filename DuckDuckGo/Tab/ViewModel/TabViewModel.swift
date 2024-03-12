@@ -28,7 +28,7 @@ final class TabViewModel {
         static let burnerHome = NSImage.burnerTabFavicon
         static let preferences = NSImage.preferences
         static let bookmarks = NSImage.bookmarks
-        static let dataBrokerProtection = NSImage.dbpIconMulticolor
+        static let dataBrokerProtection = NSImage.dbpIcon
         static let subscription = NSImage.subscriptionIcon
         static let identityTheftRestoration = NSImage.itrIcon
     }
