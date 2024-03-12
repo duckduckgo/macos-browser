@@ -30,6 +30,9 @@ final class CriticalPathsTests: XCTestCase {
         app = XCUIApplication(bundleIdentifier: "com.duckduckgo.macos.browser.review")
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
+        if app.windows.count == 0 {
+            app.menuItems["newWindow:"].click()
+        }
         toggleInternalUserState()
         cleanupAndResetData()
     }
