@@ -279,7 +279,7 @@ final class NavigationBarPopovers {
         popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
     }
 
-    // MARK: - Network Protection
+    // MARK: - VPN
 
 #if NETWORK_PROTECTION
     func showNetworkProtectionPopover(

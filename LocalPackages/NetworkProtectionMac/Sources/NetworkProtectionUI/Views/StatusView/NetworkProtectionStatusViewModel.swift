@@ -24,8 +24,8 @@ import NetworkProtection
 import ServiceManagement
 import SwiftUI
 
-/// This view can be shown from any location where we want the user to be able to interact with NetP.
-/// This view shows status information about Network Protection, and offers a chance to toggle it ON and OFF.
+/// This view can be shown from any location where we want the user to be able to interact with VPN.
+/// This view shows status information about the VPN, and offers a chance to toggle it ON and OFF.
 ///
 extension NetworkProtectionStatusView {
 

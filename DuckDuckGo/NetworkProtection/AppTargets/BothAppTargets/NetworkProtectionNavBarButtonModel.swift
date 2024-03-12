@@ -239,7 +239,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         pinningManager.togglePinning(for: .networkProtection)
     }
 
-    /// We want to pin Network Protection to the navigation bar the first time it's enabled, and only
+    /// We want to pin the VPN to the navigation bar the first time it's enabled, and only
     /// if the user hasn't toggled it manually before.
     /// 
     private func pinNetworkProtectionToNavBarIfNeverPinnedBefore() {

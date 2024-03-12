@@ -449,7 +449,7 @@ final class NavigationBarViewController: NSViewController {
         guard view.window?.isKeyWindow == true else { return }
 
         DispatchQueue.main.async {
-            let viewController = PopoverMessageViewController(message: "Network Protection was uninstalled")
+            let viewController = PopoverMessageViewController(message: "DuckDuckGo VPN was uninstalled")
             viewController.show(onParent: self, relativeTo: self.optionsButton)
         }
     }
@@ -968,7 +968,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 #endif
     }
 
-    // MARK: - Network Protection
+    // MARK: - VPN
 
 #if NETWORK_PROTECTION
     func showNetworkProtectionStatus() {
@@ -982,7 +982,7 @@ extension NavigationBarViewController: NSMenuDelegate {
         }
     }
 
-    /// Sets up the Network Protection button.
+    /// Sets up the VPN button.
     ///
     /// This method should be run just once during the lifecycle of this view.
     /// .
@@ -1065,7 +1065,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 #if NETWORK_PROTECTION
         toggleNetworkProtectionPopover()
 #else
-        fatalError("Tried to open Network Protection when it was disabled")
+        fatalError("Tried to open the VPN when it was disabled")
 #endif
     }
 

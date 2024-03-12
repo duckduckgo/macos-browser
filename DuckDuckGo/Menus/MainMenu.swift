@@ -609,7 +609,7 @@ import SubscriptionUI
 #endif
 
 #if NETWORK_PROTECTION
-            NSMenuItem(title: "Network Protection")
+            NSMenuItem(title: "VPN")
                 .submenu(NetworkProtectionDebugMenu())
 #endif
 
