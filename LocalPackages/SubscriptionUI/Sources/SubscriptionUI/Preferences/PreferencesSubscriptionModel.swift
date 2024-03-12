@@ -34,7 +34,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private let accountManager: AccountManager
     private let openURLHandler: (URL) -> Void
-    let uiEventHandler: (UIEvent) -> Void
+    public let uiEventHandler: (UIEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
     private let subscriptionAppGroup: String
 
@@ -48,8 +48,14 @@ public final class PreferencesSubscriptionModel: ObservableObject {
              openDB,
              openITR,
              iHaveASubscriptionClick,
-             addEmailClick,
-             restorePurchaseStoreClick
+             activateAddEmailClick,
+             postSubscriptionAddEmailClick,
+             addToAnotherDeviceClick,
+             addDeviceEnterEmail,
+             restorePurchaseStoreClick,
+             activeSubscriptionSettingsClick,
+             changePlanOrBillingClick,
+             removeSubscriptionClick
     }
 
     public init(openURLHandler: @escaping (URL) -> Void,

@@ -89,10 +89,14 @@ public struct PreferencesSubscriptionView: View {
                         TextMenuItemHeader(UserText.preferencesSubscriptionActiveHeader)
                         TextMenuItemCaption(model.subscriptionDetails ?? "")
                     } buttons: {
-                        Button(UserText.addToAnotherDeviceButton) { showingSheet.toggle() }
+                        Button(UserText.addToAnotherDeviceButton) {
+                            model.uiEventHandler(.addToAnotherDeviceClick)
+                            showingSheet.toggle()
+                        }
 
                         Menu {
                             Button(UserText.changePlanOrBillingButton, action: {
+                                model.uiEventHandler(.changePlanOrBillingClick)
                                 Task {
                                     switch await model.changePlanOrBillingAction() {
                                     case .presentSheet(let sheet):
@@ -103,6 +107,7 @@ public struct PreferencesSubscriptionView: View {
                                 }
                             })
                             Button(UserText.removeFromThisDeviceButton, action: {
+                                model.uiEventHandler(.removeSubscriptionClick)
                                 showingRemoveConfirmationDialog.toggle()
                             })
                         } label: {
@@ -178,6 +183,11 @@ public struct PreferencesSubscriptionView: View {
                 }
             }
         }
+        .onAppear(perform: {
+            if model.isUserAuthenticated {
+                model.uiEventHandler(.activeSubscriptionSettingsClick)
+            }
+        })
     }
 }
 

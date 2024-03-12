@@ -121,17 +121,32 @@ enum Preferences {
                 DispatchQueue.main.async {
                     switch event {
                     case .openVPN:
+                        Pixel.fire(.privacyProVPNSettings)
                         NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
                     case .openDB:
+                        Pixel.fire(.privacyProPersonalInformationRemovalSettings)
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
                     case .openITR:
+                        Pixel.fire(.privacyProIdentityRestorationSettings)
                         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
                     case .iHaveASubscriptionClick:
                         Pixel.fire(.privacyProRestorePurchaseClick)
-                    case .addEmailClick:
+                    case .activateAddEmailClick:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                    case .postSubscriptionAddEmailClick:
+                        Pixel.fire(.privacyProWelcomeAddDevice, limitTo: .initial)
                     case .restorePurchaseStoreClick:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
+                    case .addToAnotherDeviceClick:
+                        Pixel.fire(.privacyProSettingsAddDevice)
+                    case .addDeviceEnterEmail:
+                        Pixel.fire(.privacyProAddDeviceEnterEmail)
+                    case .activeSubscriptionSettingsClick:
+                        Pixel.fire(.privacyProSubscriptionSettings)
+                    case .changePlanOrBillingClick:
+                        Pixel.fire(.privacyProSubscriptionManagementPlanBilling)
+                    case .removeSubscriptionClick:
+                        Pixel.fire(.privacyProSubscriptionManagementRemoval)
                     }
                 }
             }

@@ -425,7 +425,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     WindowControllersManager.shared.showTab(with: .subscription(url))
                 }, uiActionHandler: { event in
                     switch event {
-                    case .addEmailClick:
+                    case .activateAddEmailClick:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
                     default:
                         break
@@ -464,11 +464,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .appTrackingProtection:
             NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
         case .vpn:
+            Pixel.fire(.privacyProWelcomeVPN, limitTo: .initial)
             NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
         case .personalInformationRemoval:
+            Pixel.fire(.privacyProWelcomePersonalInformationRemoval, limitTo: .initial)
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
+            Pixel.fire(.privacyProWelcomeIdentityRestoration, limitTo: .initial)
             await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
         }
 
