@@ -376,6 +376,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private static let registrationKeyValidityOptions: [NetworkProtectionKeyValidityOption] = [
+        .init(title: "15 seconds", validity: .seconds(15)),
+        .init(title: "30 seconds", validity: .seconds(30)),
         .init(title: "1 minute", validity: .minutes(1)),
         .init(title: "5 minutes", validity: .minutes(5)),
         .init(title: "30 minutes", validity: .minutes(30)),
@@ -478,14 +480,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         switch settings.registrationKeyValidity {
         case .automatic:
             registrationKeyValidityMenu.items.first?.state = .on
-
-            // We're skipping the first two items because they're the automatic menu item and
-            // the separator line.
-            let serverItems = registrationKeyValidityMenu.items.dropFirst(2)
-
-            for item in serverItems {
-                item.state = .off
-            }
         case .custom(let timeInterval):
             registrationKeyValidityMenu.items.first?.state = .off
 
