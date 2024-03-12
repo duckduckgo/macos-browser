@@ -203,12 +203,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             switch step {
             case .begin:
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                    NetworkProtectionPixelEvent.networkProtectionRekeyAttempt,
                     frequency: .dailyAndContinuous,
                     includeAppVersionParameter: true)
             case .failure(let error):
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                    NetworkProtectionPixelEvent.networkProtectionRekeyFailure,
                     frequency: .dailyAndContinuous,
                     withError: error,
                     includeAppVersionParameter: true)
