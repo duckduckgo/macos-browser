@@ -54,6 +54,8 @@ final class VPNUninstaller: VPNUninstalling {
             defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
         }
 
+        defaults.networkProtectionShouldShowVPNUninstalledMessage = true
+
         exit(EXIT_SUCCESS)
     }
 }

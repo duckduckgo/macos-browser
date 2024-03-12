@@ -24,6 +24,7 @@ import Common
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
+import LoginItems
 
 protocol NetworkProtectionFeatureVisibility {
     func isNetworkProtectionVisible() -> Bool
@@ -72,11 +73,15 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Returns whether Network Protection should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
+#if SUBSCRIPTION
+        return !defaults.networkProtectionEntitlementsValid && LoginItem.vpnMenu.status.isInstalled
+#else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
         let isOnboarded = UserDefaults.netP.networkProtectionOnboardingStatus != .default
 
         return isNotEasterEggUser && waitlistAccessEnded && isOnboarded
+#endif
     }
 
     /// Whether the user is fully onboarded
