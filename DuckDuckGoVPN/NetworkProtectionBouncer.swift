@@ -30,12 +30,25 @@ final class NetworkProtectionBouncer {
     /// Simply verifies that the Network Protection feature is enabled and if not, takes care of killing the
     /// current app.
     ///
-    func requireAuthTokenOrKillApp() {
-        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+    func requireAuthenticationOrKillApp() {
+#if SUBSCRIPTION
+        Task {
+            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            guard case .success(let result) = await accountManager.hasEntitlement(for: .networkProtection), result == true else {
+                os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
+
+                // EXIT_SUCCESS ensures the login item won't relaunch
+                // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
+                // See where it mentions:
+                //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
+                exit(EXIT_SUCCESS)
+                return
+            }
+        }
+#else
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil, isSubscriptionEnabled: false)
 
-        // TODO: Do entitlements check, not this
-        guard accountManager.accessToken != nil || keychainStore.isFeatureActivated else {
+        guard keychainStore.isFeatureActivated else {
             os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
 
             // EXIT_SUCCESS ensures the login item won't relaunch
@@ -44,5 +57,6 @@ final class NetworkProtectionBouncer {
             //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
             exit(EXIT_SUCCESS)
         }
+#endif
     }
 }

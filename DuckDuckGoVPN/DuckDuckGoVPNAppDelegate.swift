@@ -267,7 +267,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         setupMenuVisibility()
 
-        bouncer.requireAuthTokenOrKillApp()
+        bouncer.requireAuthenticationOrKillApp()
 
         // Initialize lazy properties
         _ = tunnelControllerIPCService
