@@ -19,13 +19,13 @@
 import Foundation
 
 public extension UserDefaults {
-    private enum Key: String {
-        case networkProtectionEntitlementsValid = "networkProtectionEntitlementsValid"
+    private enum Key {
+        static var networkProtectionEntitlementsValid = "networkProtectionEntitlementsValid"
     }
 
     // Convenience declaration
     private var networkProtectionEntitlementsValidRawValueKey: String {
-        Key.networkProtectionEntitlementsValid.rawValue
+        Key.networkProtectionEntitlementsValid
     }
 
     /// For KVO to work across processes (Menu App + Main App) we need to declare this dynamic var in a `UserDefaults`
