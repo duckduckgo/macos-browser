@@ -33,17 +33,22 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var emailDescription: String { hasEmail ? UserText.shareModalHasEmailDescription : UserText.shareModalNoEmailDescription }
     public var emailButtonTitle: String { hasEmail ? UserText.manageEmailButton : UserText.addEmailButton }
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, subscriptionAppGroup: String, refreshAuthTokenOnOpenURL: Bool) {
+    private var addEmailURL: URL
+    private var manageEmailURL: URL
+
+    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, subscriptionAppGroup: String, refreshAuthTokenOnOpenURL: Bool, addEmailURL: URL, manageEmailURL: URL) {
         self.actionHandlers = actionHandlers
         self.email = email
         self.subscriptionAppGroup = subscriptionAppGroup
         self.refreshAuthTokenOnOpenURL = refreshAuthTokenOnOpenURL
+        self.addEmailURL = addEmailURL
+        self.manageEmailURL = manageEmailURL
     }
 
     private var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
     public func handleEmailAction() {
-        let url: URL = hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription
+        let url: URL = hasEmail ? manageEmailURL : addEmailURL
 
         Task {
             if refreshAuthTokenOnOpenURL {

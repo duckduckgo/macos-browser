@@ -95,13 +95,22 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
         if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler,
-                                         email: accountManager.email,
-                                         subscriptionAppGroup: subscriptionAppGroup,
-                                         refreshAuthTokenOnOpenURL: subscriptionManager.configuration.currentPurchasePlatform == .appStore)
+            let shouldRefreshAuthToken = subscriptionManager.configuration.currentPurchasePlatform == .appStore
+            let addEmailURL = subscriptionManager.urlProvider.url(for: .addEmail)
+            let manageEmailURL = subscriptionManager.urlProvider.url(for: .manageEmail)
+            return ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler,
+                                                email: accountManager.email,
+                                                subscriptionAppGroup: subscriptionAppGroup,
+                                                refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
+                                                addEmailURL: addEmailURL,
+                                                manageEmailURL: manageEmailURL)
 
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, shouldShowRestorePurchase: subscriptionManager.configuration.currentPurchasePlatform == .appStore)
+            let shouldShowRestore = subscriptionManager.configuration.currentPurchasePlatform == .appStore
+            let activateURL = subscriptionManager.urlProvider.url(for: .activateWithEmail)
+            return ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler,
+                                                   shouldShowRestorePurchase: shouldShowRestore,
+                                                   activateViaEmailURL: activateURL)
         }
     }
 

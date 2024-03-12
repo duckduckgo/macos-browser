@@ -59,12 +59,21 @@ public final class SubscriptionAccessViewController: NSViewController {
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
         if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: actionHandlers, 
-                                         email: accountManager.email,
-                                         subscriptionAppGroup: subscriptionAppGroup,
-                                         refreshAuthTokenOnOpenURL: subscriptionManager.configuration.currentPurchasePlatform == .appStore)
+            let shouldRefreshAuthToken = subscriptionManager.configuration.currentPurchasePlatform == .appStore
+            let addEmailURL = subscriptionManager.urlProvider.url(for: .addEmail)
+            let manageEmailURL = subscriptionManager.urlProvider.url(for: .manageEmail)
+            return ShareSubscriptionAccessModel(actionHandlers: actionHandlers,
+                                                email: accountManager.email,
+                                                subscriptionAppGroup: subscriptionAppGroup,
+                                                refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
+                                                addEmailURL: addEmailURL,
+                                                manageEmailURL: manageEmailURL)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, shouldShowRestorePurchase: subscriptionManager.configuration.currentPurchasePlatform == .appStore)
+            let shouldShowRestore = subscriptionManager.configuration.currentPurchasePlatform == .appStore
+            let activateURL = subscriptionManager.urlProvider.url(for: .activateWithEmail)
+            return ActivateSubscriptionAccessModel(actionHandlers: actionHandlers,
+                                                   shouldShowRestorePurchase: shouldShowRestore,
+                                                   activateViaEmailURL: activateURL)
         }
     }
 }

@@ -32,14 +32,17 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
     public private(set) var shouldShowRestorePurchase: Bool
     public var restorePurchaseDescription = UserText.restorePurchaseDescription
     public var restorePurchaseButtonTitle = UserText.restorePurchasesButton
+    
+    private var activateViaEmailURL: URL
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers, shouldShowRestorePurchase: Bool) {
+    public init(actionHandlers: SubscriptionAccessActionHandlers, shouldShowRestorePurchase: Bool, activateViaEmailURL: URL) {
         self.actionHandlers = actionHandlers
         self.shouldShowRestorePurchase = shouldShowRestorePurchase
+        self.activateViaEmailURL = activateViaEmailURL
     }
 
     public func handleEmailAction() {
-        actionHandlers.openURLHandler(.activateSubscriptionViaEmail)
+        actionHandlers.openURLHandler(activateViaEmailURL)
     }
 
     public func handleRestorePurchaseAction() {
