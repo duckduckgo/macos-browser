@@ -223,16 +223,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         let model = StatusBarMenuModel(vpnSettings: .init(defaults: .netP))
 
-#if SUBSCRIPTION
-        let entitlementsCheck = {
-            await AccountManager().hasEntitlement(for: .networkProtection)
-        }
-#else
-        let entitlementsCheck: (() async -> Result<Bool, Error>) = {
-            return .success(true)
-        }
-#endif
-
         return StatusBarMenu(
             model: model,
             onboardingStatusPublisher: onboardingStatusPublisher,
@@ -255,7 +245,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             },
             agentLoginItem: nil,
             isMenuBarStatusView: true,
-            entitlementCheck: entitlementsCheck,
             userDefaults: .netP
         )
     }

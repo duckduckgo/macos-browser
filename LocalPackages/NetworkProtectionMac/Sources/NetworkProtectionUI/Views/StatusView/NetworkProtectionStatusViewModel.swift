@@ -95,8 +95,6 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
-        private let entitlementsMonitor = NetworkProtectionEntitlementMonitor()
-
         private let appLauncher: AppLaunching
 
         private var cancellables = Set<AnyCancellable>()
@@ -119,7 +117,6 @@ extension NetworkProtectionStatusView {
                     agentLoginItem: LoginItem?,
                     isMenuBarStatusView: Bool,
                     runLoopMode: RunLoop.Mode? = nil,
-                    entitlementCheck: @escaping () async -> Swift.Result<Bool, Error>,
                     userDefaults: UserDefaults) {
 
             self.tunnelController = controller
