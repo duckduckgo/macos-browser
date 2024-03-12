@@ -94,11 +94,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
         case "getSubscription": return getSubscription
-        case "setSubscription": return setSubscription //mail
+        case "setSubscription": return setSubscription // mail
         case "backToSettings": return backToSettings
         case "getSubscriptionOptions": return getSubscriptionOptions
         case "subscriptionSelected": return subscriptionSelected
-        case "activateSubscription": return activateSubscription //appstore
+        case "activateSubscription": return activateSubscription // appstore
         case "featureSelected": return featureSelected
         case "completeStripePayment": return completeStripePayment
         default:
@@ -386,13 +386,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let message = original
 
         Task { @MainActor in
-            
+
             let actionHandlers = SubscriptionAccessActionHandlers(
                 restorePurchases: {
 
                     if #available(macOS 12.0, *) {
                         Self.startAppStoreRestoreFlow { result in
-                            
+
                             switch result {
                             case .success:
                                 DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)

@@ -29,8 +29,8 @@ extension Pixel.Event {
 
         /// fires at most once per day
         case dailyFirst = "first-in-a-day"
-        
-        ///fires every time
+
+        /// fires every time
         case repetitive = "repetitive"
 
         init(key: String, store: PixelDataStore = LocalPixelDataStore.shared, now: Date = Date(), update: Bool = true) {

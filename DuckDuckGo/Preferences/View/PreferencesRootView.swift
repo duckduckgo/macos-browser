@@ -141,7 +141,7 @@ enum Preferences {
                     SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow { _ in }
                 }
             },
-                                                                      openURLHandler: openURL, 
+                                                                      openURLHandler: openURL,
                                                                       uiActionHandler: handleUIEvent)
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
