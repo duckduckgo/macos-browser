@@ -50,7 +50,7 @@ jobs:
     name: Tag public release
 
     # Run if release-type is provided (not empty) and is not internal
-    if: contains(github.event.inputs.release-type, '') == false && github.event.inputs.release-type != 'internal'
+    if: github.event.inputs.release-type != null && github.event.inputs.release-type != 'internal'
 
     uses: ./.github/workflows/tag_release.yml
     with:
@@ -83,6 +83,8 @@ jobs:
 
       - name: Download tag artifact
         id: download-tag
+        # Only look for the tag artifact when the tag input is empty
+        if: github.event.inputs.tag == null || github.event.inputs.tag == ''
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
@@ -381,8 +383,8 @@ jobs:
 
     needs: [publish-to-sparkle]
 
-    # Run if release-type is provided (not empty) and is not internal
-    if: contains(github.event.inputs.release-type, '') == false && github.event.inputs.release-type != 'internal'
+    # Run if release-type is provided (not empty) an is not internal
+    if: github.event.inputs.release-type != null && github.event.inputs.release-type != 'internal'
 
     uses: duckduckgo/macos-browser/.github/workflows/create_variants.yml@main
     secrets:

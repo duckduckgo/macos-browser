@@ -197,7 +197,11 @@ extension Pixel.Event {
              .privacyProSubscriptionManagementEmail,
              .privacyProSubscriptionManagementPlanBilling,
              .privacyProSubscriptionManagementRemoval,
-             .privacyProRestorePurchaseClick:
+             .privacyProRestorePurchaseClick,
+             .protectionToggledOffBreakageReport,
+             .toggleProtectionsDailyCount,
+             .toggleReportDoNotSend,
+             .toggleReportDismiss:
             return nil
         }
     }

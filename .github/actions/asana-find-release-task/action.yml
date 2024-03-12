@@ -31,4 +31,4 @@ runs:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
       run: |
-        ${{ github.action_path }}/find-release-task.sh
+        ${{ github.action_path }}/find_release_task.sh

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1709563256742,
+    "version": 1710170291349,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -262,6 +262,9 @@
                     "domain": "newsmax.com"
                 },
                 {
+                    "domain": "meneame.net"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -284,7 +287,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "1ba9ece92f6e27c88a54cc69b63b3df1"
+            "hash": "8458a9cc012a9613e1497204003be946"
         },
         "autofill": {
             "exceptions": [
@@ -1097,6 +1100,10 @@
                     {
                         "domain": "discord.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1839"
+                    },
+                    {
+                        "domain": "spectrum.net",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1876"
                     }
                 ],
                 "webViewDefault": [
@@ -1120,7 +1127,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "9b6023fe353530899b721c7e2eba4119"
+            "hash": "150400f9bcd5a8d7eb6fa7589047fe45"
         },
         "dbp": {
             "state": "enabled",
@@ -2985,6 +2992,9 @@
                         "domain": "newser.com",
                         "rules": [
                             {
+                                "type": "disable-default"
+                            },
+                            {
                                 "selector": ".RightRailAds",
                                 "type": "hide-empty"
                             },
@@ -3974,7 +3984,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "d0c2a82c472355a8396b1f2c5af8cf6e"
+            "hash": "3dc2d5b9a38827f46503a3b5882c7e33"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4710,11 +4720,6 @@
             "state": "disabled",
             "hash": "d07b5bf740e4d648c94e1ac65c4305d9"
         },
-        "notificationPermissions": {
-            "exceptions": [],
-            "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
-        },
         "privacyDashboard": {
             "exceptions": [],
             "features": {
@@ -4968,6 +4973,16 @@
                                 "rule": "c1.adform.net/serving/cookie/match",
                                 "domains": [
                                     "dhl.de"
+                                ]
+                            }
+                        ]
+                    },
+                    "adition.com": {
+                        "rules": [
+                            {
+                                "rule": "ad3.adfarm1.adition.com/js",
+                                "domains": [
+                                    "servustv.com"
                                 ]
                             }
                         ]
@@ -5629,7 +5644,8 @@
                                 "rule": "dpm.demdex.net/id",
                                 "domains": [
                                     "dhl.de",
-                                    "homedepot.com"
+                                    "homedepot.com",
+                                    "sbs.com.au"
                                 ]
                             }
                         ]
@@ -5998,6 +6014,12 @@
                         "rules": [
                             {
                                 "rule": "2a7e9.v.fwmrm.net/ad/g/1",
+                                "domains": [
+                                    "channel4.com"
+                                ]
+                            },
+                            {
+                                "rule": "2a7e9.v.fwmrm.net/ad/l/1",
                                 "domains": [
                                     "channel4.com"
                                 ]
@@ -7924,7 +7946,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "58e30d6e8e826a78d0c9bd448f50ae5d"
+            "hash": "4325ed151d126936fbeb9a608d77da86"
         },
         "trackingCookies1p": {
             "settings": {
