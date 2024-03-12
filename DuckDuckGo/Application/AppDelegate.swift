@@ -98,11 +98,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                      defaultValue: SubscriptionServiceEnvironment.default).wrappedValue
         let configuration: SubscriptionConfiguration
 #if APPSTORE || !STRIPE
-        configuration = DefaultSubscriptionConfiguration(currentPurchasePlatform: .appStore,
-                                                         currentServiceEnvironment: currentEnvironment)
+        configuration = DefaultSubscriptionConfiguration(purchasePlatform: .appStore, serviceEnvironment: currentEnvironment)
 #else
-        configuration = DefaultSubscriptionConfiguration(currentPurchasePlatform: .stripe,
-                                                         currentServiceEnvironment: currentEnvironment)
+        configuration = DefaultSubscriptionConfiguration(purchasePlatform: .stripe, serviceEnvironment: currentEnvironment)
 #endif
 
         // AccountManager

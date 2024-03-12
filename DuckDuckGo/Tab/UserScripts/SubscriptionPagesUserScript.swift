@@ -315,7 +315,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
-            await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+            let itrURL = subscriptionManager.urlProvider.url(for: .identityTheftRestoration)
+            await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(itrURL))
         }
 
         return nil
@@ -400,7 +401,8 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
-            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            let purchaseURL = NSApp.delegateTyped.subscriptionManager.urlProvider.url(for: .purchase)
+            WindowControllersManager.shared.showTab(with: .subscription(purchaseURL))
         })
     }
 
@@ -409,7 +411,8 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
-            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            let purchaseURL = NSApp.delegateTyped.subscriptionManager.urlProvider.url(for: .purchase)
+            WindowControllersManager.shared.showTab(with: .subscription(purchaseURL))
         })
     }
 

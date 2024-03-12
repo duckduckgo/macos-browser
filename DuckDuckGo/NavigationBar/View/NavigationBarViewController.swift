@@ -1087,11 +1087,13 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
 #if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
-        WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+        let purchaseURL = NSApp.delegateTyped.subscriptionManager.urlProvider.url(for: .purchase)
+        WindowControllersManager.shared.showTab(with: .subscription(purchaseURL))
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
-        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+        let itrURL = NSApp.delegateTyped.subscriptionManager.urlProvider.url(for: .identityTheftRestoration)
+        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(itrURL))
     }
 #endif
 

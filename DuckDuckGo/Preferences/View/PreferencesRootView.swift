@@ -129,7 +129,8 @@ enum Preferences {
 
             let openITR: () -> Void = {
                 DispatchQueue.main.async {
-                    WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+                    let itrURL = NSApp.delegateTyped.subscriptionManager.urlProvider.url(for: .identityTheftRestoration)
+                    WindowControllersManager.shared.showTab(with: .identityTheftRestoration(itrURL))
                 }
             }
 

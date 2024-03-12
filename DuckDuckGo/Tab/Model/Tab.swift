@@ -147,7 +147,7 @@ protocol NewWindowPolicyDecisionMaker {
                         return .subscription(url.appendingParameter(name: "environment", value: "staging"))
                     }
                     return .subscription(url)
-                } else if url.isChild(of: URL.identityTheftRestoration) {
+                } else if url.isChild(of: URL.identityTheftRestorationBaseURL) {
                     return .identityTheftRestoration(url)
                 }
             }

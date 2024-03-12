@@ -112,7 +112,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func purchaseAction() {
-        openURLHandler(.subscriptionPurchase)
+        openURLHandler(subscriptionManager.urlProvider.url(for: .purchase))
     }
 
     enum ChangePlanOrBillingAction {
