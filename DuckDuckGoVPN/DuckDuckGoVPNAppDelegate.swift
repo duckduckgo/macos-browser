@@ -47,6 +47,10 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
+#if SUBSCRIPTION
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
+#endif
+
 #if DEBUG && SUBSCRIPTION
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
@@ -348,8 +352,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUpSubscriptionMonitoring() {
 #if SUBSCRIPTION
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
-
         let entitlementsCheck = {
             await AccountManager().hasEntitlement(for: .networkProtection)
         }

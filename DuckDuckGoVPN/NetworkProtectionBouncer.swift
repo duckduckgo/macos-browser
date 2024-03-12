@@ -34,22 +34,25 @@ final class NetworkProtectionBouncer {
 #if SUBSCRIPTION
         Task {
             let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-            guard case .success(let result) = await accountManager.hasEntitlement(for: .networkProtection), result == true else {
-                os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
+            let result = await accountManager.hasEntitlement(for: .networkProtection)
+            switch result {
+            case .success(true), .failure:
+                return
+            case .success(false):
+                os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized. Missing entitlement.")
 
                 // EXIT_SUCCESS ensures the login item won't relaunch
                 // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
                 // See where it mentions:
                 //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
                 exit(EXIT_SUCCESS)
-                return
             }
         }
 #else
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil, isSubscriptionEnabled: false)
 
         guard keychainStore.isFeatureActivated else {
-            os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
+            os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized. Missing token.")
 
             // EXIT_SUCCESS ensures the login item won't relaunch
             // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
