@@ -198,6 +198,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         VPNAppEventsHandler(tunnelController: tunnelController)
     }()
 
+    private lazy var vpnUninstaller: VPNUninstaller = {
+        VPNUninstaller(networkExtensionController: networkExtensionController, vpnConfigurationManager: VPNConfigurationManager())
+    }()
+
     /// The status bar NetworkProtection menu
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
@@ -245,7 +249,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             },
             agentLoginItem: nil,
             isMenuBarStatusView: true,
-            userDefaults: .netP
+            userDefaults: .netP,
+            uninstallHandler: { [weak self] in
+                Task { [weak self] in
+                    guard let self else { return }
+                    await self.vpnUninstaller.uninstall(includingSystemExtension: true)
+                }
+            }
         )
     }
 

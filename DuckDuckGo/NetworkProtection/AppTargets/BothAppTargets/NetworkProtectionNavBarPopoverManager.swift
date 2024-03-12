@@ -32,9 +32,12 @@ import Subscription
 final class NetworkProtectionNavBarPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: TunnelControllerIPCClient
+    let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
 
-    init(ipcClient: TunnelControllerIPCClient) {
+    init(ipcClient: TunnelControllerIPCClient,
+         networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling) {
         self.ipcClient = ipcClient
+        self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
     }
 
     var isShown: Bool {
@@ -107,7 +110,12 @@ final class NetworkProtectionNavBarPopoverManager {
             },
                                                    agentLoginItem: LoginItem.vpnMenu,
                                                    isMenuBarStatusView: false,
-                                                   userDefaults: .netP)
+                                                   userDefaults: .netP,
+                                                   uninstallHandler: { [weak self] in
+                Task { [weak self] in
+                    await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
+                }
+            })
             popover.delegate = delegate
 
             networkProtectionPopover = popover

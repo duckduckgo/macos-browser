@@ -54,9 +54,8 @@ public struct NetworkProtectionStatusView: View {
                 SubscriptionExpiredView {
                     model.openPrivacyPro()
                 } uninstallButtonHandler: {
-
+                    model.uninstallVPN()
                 }
-
             } else if let promptActionViewModel = model.promptActionViewModel {
                 PromptActionView(model: promptActionViewModel)
                     .padding(.horizontal, 5)

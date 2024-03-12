@@ -126,7 +126,10 @@ final class NavigationBarViewController: NSViewController {
         let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
         ipcClient.register()
 
-        let networkProtectionPopoverManager = NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
+        let networkProtectionPopoverManager = NetworkProtectionNavBarPopoverManager(
+            ipcClient: ipcClient,
+            networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler()
+        )
 
         self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager)
         self.tabCollectionViewModel = tabCollectionViewModel

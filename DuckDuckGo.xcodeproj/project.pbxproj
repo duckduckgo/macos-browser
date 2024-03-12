@@ -3113,6 +3113,8 @@
 		EE0629762B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */; };
 		EE2F9C5B2B90F2FF00D45FC9 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = EE2F9C5A2B90F2FF00D45FC9 /* Subscription */; };
 		EE339228291BDEFD009F62C1 /* JSAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE339227291BDEFD009F62C1 /* JSAlertController.swift */; };
+		EE3424602BA0853900173B1B /* VPNUninstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE34245D2BA0853900173B1B /* VPNUninstaller.swift */; };
+		EE3424612BA0853900173B1B /* VPNUninstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE34245D2BA0853900173B1B /* VPNUninstaller.swift */; };
 		EE66418C2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */; };
 		EE66418D2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */; };
 		EE66418F2B9B1BD1005BCD17 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = EE66418E2B9B1BD1005BCD17 /* Subscription */; };
@@ -4486,6 +4488,7 @@
 		EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = clickToLoad.js; sourceTree = "<group>"; };
 		EE0629712B90EE8C00D868B4 /* AccountManagerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountManagerExtension.swift; sourceTree = "<group>"; };
 		EE339227291BDEFD009F62C1 /* JSAlertController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSAlertController.swift; sourceTree = "<group>"; };
+		EE34245D2BA0853900173B1B /* VPNUninstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNUninstaller.swift; sourceTree = "<group>"; };
 		EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift"; sourceTree = "<group>"; };
 		EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationsHostingViewController.swift; sourceTree = "<group>"; };
 		EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionVPNCountryLabelsModel.swift; sourceTree = "<group>"; };
@@ -6267,6 +6270,7 @@
 				7BA7CC152AD11DC80042E5CE /* NetworkProtectionBouncer.swift */,
 				7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */,
 				7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */,
+				EE34245D2BA0853900173B1B /* VPNUninstaller.swift */,
 				7BA7CC112AD11DC80042E5CE /* TunnelControllerIPCService.swift */,
 				7BA7CC172AD11DC80042E5CE /* UserText.swift */,
 				7BA7CC122AD11DC80042E5CE /* Assets.xcassets */,
@@ -10828,6 +10832,7 @@
 				EE0629742B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */,
 				7BA7CC5D2AD120C30042E5CE /* EventMapping+NetworkProtectionError.swift in Sources */,
 				7BA7CC4A2AD11EA00042E5CE /* NetworkProtectionTunnelController.swift in Sources */,
+				EE3424602BA0853900173B1B /* VPNUninstaller.swift in Sources */,
 				7BD1688E2AD4A4C400D24876 /* NetworkExtensionController.swift in Sources */,
 				7BA7CC3E2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */,
 				7BA7CC402AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */,
@@ -10862,6 +10867,7 @@
 				EE0629752B90EE8C00D868B4 /* AccountManagerExtension.swift in Sources */,
 				7BA7CC582AD1203A0042E5CE /* UserText+NetworkProtection.swift in Sources */,
 				7BA7CC4B2AD11EC60042E5CE /* NetworkProtectionControllerErrorStore.swift in Sources */,
+				EE3424612BA0853900173B1B /* VPNUninstaller.swift in Sources */,
 				4BF0E5152AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				7BFE95592A9DF2AF0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
 				7BA7CC5C2AD120C30042E5CE /* EventMapping+NetworkProtectionError.swift in Sources */,

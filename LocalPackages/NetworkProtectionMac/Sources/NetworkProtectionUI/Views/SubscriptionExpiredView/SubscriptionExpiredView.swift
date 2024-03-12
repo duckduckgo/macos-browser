@@ -42,9 +42,7 @@ struct SubscriptionExpiredView: View {
 
             Divider().padding(.top, 8).padding(.bottom, 3)
 
-            Button("Uninstall DuckDuckGo VPN") {
-                // TODO:
-            }
+            Button("Uninstall DuckDuckGo VPN", action: uninstallButtonHandler)
             .buttonStyle(.borderless)
             .foregroundColor(.accentColor)
             .padding(.top, 3)

@@ -97,6 +97,8 @@ extension NetworkProtectionStatusView {
 
         private let appLauncher: AppLaunching
 
+        private let uninstallHandler: () async -> Void
+
         private var cancellables = Set<AnyCancellable>()
 
         // MARK: - Dispatch Queues
@@ -117,7 +119,8 @@ extension NetworkProtectionStatusView {
                     agentLoginItem: LoginItem?,
                     isMenuBarStatusView: Bool,
                     runLoopMode: RunLoop.Mode? = nil,
-                    userDefaults: UserDefaults) {
+                    userDefaults: UserDefaults,
+                    uninstallHandler: @escaping () async -> Void) {
 
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -128,6 +131,7 @@ extension NetworkProtectionStatusView {
             self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
             self.appLauncher = appLauncher
+            self.uninstallHandler = uninstallHandler
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
@@ -179,6 +183,12 @@ extension NetworkProtectionStatusView {
         func openPrivacyPro() {
             Task {
                 await appLauncher.launchApp(withCommand: .showPrivacyPro)
+            }
+        }
+
+        func uninstallVPN() {
+            Task {
+                await uninstallHandler()
             }
         }
 
