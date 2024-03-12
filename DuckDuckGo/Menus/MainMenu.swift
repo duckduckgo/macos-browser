@@ -619,7 +619,8 @@ import SubscriptionUI
             let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
 
-            SubscriptionDebugMenu(currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
+            SubscriptionDebugMenu(subscriptionManager: NSApp.delegateTyped.subscriptionManager,
+                                  currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
                                   updateEnvironment: {
                 guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
                 currentEnvironmentWrapper.wrappedValue = newEnvironment

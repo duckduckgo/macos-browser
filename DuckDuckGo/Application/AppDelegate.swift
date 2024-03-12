@@ -92,10 +92,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if SUBSCRIPTION
     let subscriptionManager: SubscriptionManaging = {
+
+        // SubscriptionConfiguration
+        let configuration: SubscriptionConfiguration
+#if APPSTORE || !STRIPE
+        configuration = DefaultSubscriptionConfiguration(currentPurchasePlatform: .appStore)
+#else
+        configuration = DefaultSubscriptionConfiguration(currentPurchasePlatform: .stripe)
+#endif
+
+        // AccountManager
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
-        // perform token migration if needed (to be removed before release)
         do {
+            // perform token migration if needed (to be removed before release)
             try accountManager.migrateAccessTokenToNewStore()
         } catch {
             if let error = error as? AccountManager.MigrationError {
@@ -108,7 +118,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             }
         }
 
-        return SubscriptionManager(accountManager: accountManager)
+        return SubscriptionManager(configuration: configuration,
+                                   accountManager: accountManager)
     }()
 #endif
 
@@ -266,12 +277,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
                                                      defaultValue: defaultEnvironment).wrappedValue
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
-
-    #if APPSTORE || !STRIPE
-        SubscriptionPurchaseEnvironment.current = .appStore
-    #else
-        SubscriptionPurchaseEnvironment.current = .stripe
-    #endif
 
         Task {
             await subscriptionManager.accountManager.checkSubscriptionState()

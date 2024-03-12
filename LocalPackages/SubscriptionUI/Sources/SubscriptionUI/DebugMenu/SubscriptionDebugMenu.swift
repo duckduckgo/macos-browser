@@ -21,6 +21,8 @@ import Subscription
 
 public final class SubscriptionDebugMenu: NSMenuItem {
 
+    private var subscriptionManager: SubscriptionManaging
+
     var currentEnvironment: () -> String
     var updateEnvironment: (String) -> Void
     var isInternalTestingEnabled: () -> Bool
@@ -46,12 +48,14 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(currentEnvironment: @escaping () -> String,
+    public init(subscriptionManager: SubscriptionManaging,
+                currentEnvironment: @escaping () -> String,
                 updateEnvironment: @escaping (String) -> Void,
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
                 subscriptionAppGroup: String) {
+        self.subscriptionManager = subscriptionManager
         self.currentEnvironment = currentEnvironment
         self.updateEnvironment = updateEnvironment
         self.isInternalTestingEnabled = isInternalTestingEnabled
@@ -105,7 +109,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private func makePurchasePlatformSubmenu() -> NSMenu {
         let menu = NSMenu(title: "Select purchase platform:")
 
-        let currentPlatform = SubscriptionPurchaseEnvironment.current
+        let currentPlatform = subscriptionManager.configuration.currentPurchasePlatform
 
         let appStoreItem = NSMenuItem(title: "App Store", action: #selector(setPlatformToAppStore), target: self)
         if currentPlatform == .appStore {
@@ -248,7 +252,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         askAndUpdatePlatform(to: .stripe)
     }
 
-    private func askAndUpdatePlatform(to newPlatform: SubscriptionPurchaseEnvironment.Environment) {
+    private func askAndUpdatePlatform(to newPlatform: SubscriptionPurchasePlatform) {
         let alert = makeAlert(title: "Are you sure you want to change the purchase platform to \(newPlatform.rawValue.capitalized)",
                               message: "This setting is not persisted between app runs. After restarting the app it returns to the default determined on app's distribution method.",
                               buttonNames: ["Yes", "No"])
@@ -256,7 +260,9 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
         guard case .alertFirstButtonReturn = response else { return }
 
-        SubscriptionPurchaseEnvironment.current = newPlatform
+        if let configuration = subscriptionManager.configuration as? DebugSubscriptionConfiguration {
+            configuration.updateCurrentPurchasePlatform(to: newPlatform)
+        }
 
         refreshSubmenu()
     }

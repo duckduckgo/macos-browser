@@ -32,6 +32,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
+    private var subscriptionManager: SubscriptionManaging
     private let accountManager: AccountManaging
     private let openURLHandler: (URL) -> Void
     private let openVPNHandler: () -> Void
@@ -45,13 +46,15 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(accountManager: AccountManaging,
+    public init(subscriptionManager: SubscriptionManaging,
+                accountManager: AccountManaging,
                 openURLHandler: @escaping (URL) -> Void,
                 openVPNHandler: @escaping () -> Void,
                 openDBPHandler: @escaping () -> Void,
                 openITRHandler: @escaping () -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
                 subscriptionAppGroup: String) {
+        self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
         self.openURLHandler = openURLHandler
         self.openVPNHandler = openVPNHandler
@@ -92,9 +95,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
         if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email, subscriptionAppGroup: subscriptionAppGroup)
+            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler,
+                                         email: accountManager.email,
+                                         subscriptionAppGroup: subscriptionAppGroup,
+                                         refreshAuthTokenOnOpenURL: subscriptionManager.configuration.currentPurchasePlatform == .appStore)
+
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
+            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler, shouldShowRestorePurchase: subscriptionManager.configuration.currentPurchasePlatform == .appStore)
         }
     }
 
@@ -136,8 +143,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
     }
 
-    private func changePlanOrBilling(for environment: SubscriptionPurchaseEnvironment.Environment) {
-        switch environment {
+    private func changePlanOrBilling(for purchasePlatform: SubscriptionPurchasePlatform) {
+        switch purchasePlatform {
         case .appStore:
             NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
         case .stripe:

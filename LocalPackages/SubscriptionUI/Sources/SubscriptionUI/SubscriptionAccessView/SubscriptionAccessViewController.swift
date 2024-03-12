@@ -22,6 +22,7 @@ import SwiftUI
 
 public final class SubscriptionAccessViewController: NSViewController {
 
+    private var subscriptionManager: SubscriptionManaging
     private let accountManager: AccountManaging
     private var actionHandlers: SubscriptionAccessActionHandlers
     private let subscriptionAppGroup: String
@@ -30,7 +31,8 @@ public final class SubscriptionAccessViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(accountManager: AccountManaging, actionHandlers: SubscriptionAccessActionHandlers, subscriptionAppGroup: String) {
+    public init(subscriptionManager: SubscriptionManaging, accountManager: AccountManaging, actionHandlers: SubscriptionAccessActionHandlers, subscriptionAppGroup: String) {
+        self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
         self.actionHandlers = actionHandlers
         self.subscriptionAppGroup = subscriptionAppGroup
@@ -57,9 +59,12 @@ public final class SubscriptionAccessViewController: NSViewController {
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
         if accountManager.isUserAuthenticated {
-            ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: accountManager.email, subscriptionAppGroup: subscriptionAppGroup)
+            ShareSubscriptionAccessModel(actionHandlers: actionHandlers, 
+                                         email: accountManager.email,
+                                         subscriptionAppGroup: subscriptionAppGroup,
+                                         refreshAuthTokenOnOpenURL: subscriptionManager.configuration.currentPurchasePlatform == .appStore)
         } else {
-            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, shouldShowRestorePurchase: SubscriptionPurchaseEnvironment.current == .appStore)
+            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers, shouldShowRestorePurchase: subscriptionManager.configuration.currentPurchasePlatform == .appStore)
         }
     }
 }

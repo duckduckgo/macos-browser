@@ -79,6 +79,7 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 ///
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
+    private var subscriptionManager = NSApp.delegateTyped.subscriptionManager
     private var accountManager = NSApp.delegateTyped.subscriptionManager.accountManager
 
     var broker: UserScriptMessageBroker?
@@ -159,7 +160,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if SubscriptionPurchaseEnvironment.current == .appStore {
+        if subscriptionManager.configuration.currentPurchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 switch await AppStorePurchaseFlow.subscriptionOptions() {
                 case .success(let subscriptionOptions):
@@ -168,7 +169,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     break
                 }
             }
-        } else if SubscriptionPurchaseEnvironment.current == .stripe {
+        } else if subscriptionManager.configuration.currentPurchasePlatform == .stripe {
             switch await StripePurchaseFlow.subscriptionOptions() {
             case .success(let subscriptionOptions):
                 return subscriptionOptions
@@ -188,7 +189,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         let message = original
 
-        if SubscriptionPurchaseEnvironment.current == .appStore {
+        if subscriptionManager.configuration.currentPurchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
                 let progressViewController = await ProgressViewController(title: UserText.purchasingSubscriptionTitle)
@@ -248,7 +249,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 os_log(.info, log: .subscription, "[Purchase] Purchase complete")
             }
-        } else if SubscriptionPurchaseEnvironment.current == .stripe {
+        } else if subscriptionManager.configuration.currentPurchasePlatform == .stripe {
             let emailAccessToken = try? EmailManager().getToken()
 
             switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
@@ -277,7 +278,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     WindowControllersManager.shared.showTab(with: .subscription(url))
                 })
 
-            let vc = SubscriptionAccessViewController(accountManager: accountManager, actionHandlers: actionHandlers, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            let vc = SubscriptionAccessViewController(subscriptionManager: subscriptionManager, accountManager: accountManager, actionHandlers: actionHandlers, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
         }
 
@@ -383,10 +384,10 @@ extension SubscriptionPagesUseSubscriptionFeature {
 extension MainWindowController {
 
     @MainActor
-    func showSomethingWentWrongAlert(environment: SubscriptionPurchaseEnvironment.Environment = SubscriptionPurchaseEnvironment.current) {
+    func showSomethingWentWrongAlert() {
         guard let window else { return }
 
-        switch environment {
+        switch NSApp.delegateTyped.subscriptionManager.configuration.currentPurchasePlatform {
         case .appStore:
             window.show(.somethingWentWrongAlert())
         case .stripe:
