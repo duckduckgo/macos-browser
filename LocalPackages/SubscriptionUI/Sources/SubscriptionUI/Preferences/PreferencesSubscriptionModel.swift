@@ -32,7 +32,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
-    private let accountManager: AccountManager
+    private let accountManager: AccountManaging
     private let openURLHandler: (URL) -> Void
     private let openVPNHandler: () -> Void
     private let openDBPHandler: () -> Void
@@ -45,13 +45,14 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(openURLHandler: @escaping (URL) -> Void,
+    public init(accountManager: AccountManaging,
+                openURLHandler: @escaping (URL) -> Void,
                 openVPNHandler: @escaping () -> Void,
                 openDBPHandler: @escaping () -> Void,
                 openITRHandler: @escaping () -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
                 subscriptionAppGroup: String) {
-        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
+        self.accountManager = accountManager
         self.openURLHandler = openURLHandler
         self.openVPNHandler = openVPNHandler
         self.openDBPHandler = openDBPHandler

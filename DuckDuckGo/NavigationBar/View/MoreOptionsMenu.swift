@@ -67,6 +67,10 @@ final class MoreOptionsMenu: NSMenu {
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
 #endif
 
+#if SUBSCRIPTION
+    private let subscriptionAccountManager: AccountManaging = NSApp.delegateTyped.subscriptionManager.accountManager
+#endif
+
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
     }
@@ -321,7 +325,7 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && !AccountManager().isUserAuthenticated {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && !subscriptionAccountManager.isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
         } else {
             items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
@@ -358,11 +362,11 @@ final class MoreOptionsMenu: NSMenu {
             items.append(networkProtectionItem)
 
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionAccountManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
-                    switch await AccountManager().hasEntitlement(for: .networkProtection) {
+                    switch await subscriptionAccountManager.hasEntitlement(for: .networkProtection) {
                     case let .success(result):
                         isMenuItemEnabled = result
                     case .failure:
@@ -390,11 +394,11 @@ final class MoreOptionsMenu: NSMenu {
             items.append(dataBrokerProtectionItem)
 
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionAccountManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
-                    switch await AccountManager().hasEntitlement(for: .dataBrokerProtection) {
+                    switch await subscriptionAccountManager.hasEntitlement(for: .dataBrokerProtection) {
                     case let .success(result):
                         isMenuItemEnabled = result
                     case .failure:
@@ -414,7 +418,7 @@ final class MoreOptionsMenu: NSMenu {
 #endif // DBP
 
 #if SUBSCRIPTION
-        if AccountManager().isUserAuthenticated {
+        if subscriptionAccountManager.isUserAuthenticated {
             let identityTheftRestorationItem = NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
                                                           action: #selector(openIdentityTheftRestoration),
                                                           keyEquivalent: "")
@@ -422,11 +426,11 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.itrIcon)
             items.append(identityTheftRestorationItem)
 
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionAccountManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
-                    switch await AccountManager().hasEntitlement(for: .identityTheftRestoration) {
+                    switch await subscriptionAccountManager.hasEntitlement(for: .identityTheftRestoration) {
                     case let .success(result):
                         isMenuItemEnabled = result
                     case .failure:

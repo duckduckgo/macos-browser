@@ -22,7 +22,7 @@ import SwiftUI
 
 public final class SubscriptionAccessViewController: NSViewController {
 
-    private let accountManager: AccountManager
+    private let accountManager: AccountManaging
     private var actionHandlers: SubscriptionAccessActionHandlers
     private let subscriptionAppGroup: String
 
@@ -30,7 +30,7 @@ public final class SubscriptionAccessViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(accountManager: AccountManager, actionHandlers: SubscriptionAccessActionHandlers, subscriptionAppGroup: String) {
+    public init(accountManager: AccountManaging, actionHandlers: SubscriptionAccessActionHandlers, subscriptionAppGroup: String) {
         self.accountManager = accountManager
         self.actionHandlers = actionHandlers
         self.subscriptionAppGroup = subscriptionAppGroup

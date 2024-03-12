@@ -136,7 +136,8 @@ enum Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
                                                                       openURLHandler: openURL)
 
-            return PreferencesSubscriptionModel(openURLHandler: openURL,
+            return PreferencesSubscriptionModel(accountManager: NSApp.delegateTyped.subscriptionManager.accountManager,
+                                                openURLHandler: openURL,
                                                 openVPNHandler: openVPN,
                                                 openDBPHandler: openDBP,
                                                 openITRHandler: openITR,

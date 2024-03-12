@@ -90,6 +90,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
 #endif
 
+#if SUBSCRIPTION
+    let subscriptionManager: SubscriptionManaging = {
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+
+        // perform token migration if needed (to be removed before release)
+        do {
+            try accountManager.migrateAccessTokenToNewStore()
+        } catch {
+            if let error = error as? AccountManager.MigrationError {
+                switch error {
+                case AccountManager.MigrationError.migrationFailed:
+                    os_log(.default, log: .subscription, "Access token migration failed")
+                case AccountManager.MigrationError.noMigrationNeeded:
+                    os_log(.default, log: .subscription, "No access token migration needed")
+                }
+            }
+        }
+
+        return SubscriptionManager(accountManager: accountManager)
+    }()
+#endif
+
     private var didFinishLaunching = false
 
 #if SPARKLE
@@ -252,20 +274,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     #endif
 
         Task {
-            let accountManager = AccountManager()
-            do {
-                try accountManager.migrateAccessTokenToNewStore()
-            } catch {
-                if let error = error as? AccountManager.MigrationError {
-                    switch error {
-                    case AccountManager.MigrationError.migrationFailed:
-                        os_log(.default, log: .subscription, "Access token migration failed")
-                    case AccountManager.MigrationError.noMigrationNeeded:
-                        os_log(.default, log: .subscription, "No access token migration needed")
-                    }
-                }
-            }
-            await accountManager.checkSubscriptionState()
+            await subscriptionManager.accountManager.checkSubscriptionState()
         }
 #endif
 

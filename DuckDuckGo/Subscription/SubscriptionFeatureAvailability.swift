@@ -32,12 +32,14 @@ protocol SubscriptionFeatureAvailability {
 
 struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
 
+    let accountManager = NSApp.delegateTyped.subscriptionManager
+
     func isFeatureAvailable() -> Bool {
 #if SUBSCRIPTION_OVERRIDE_ENABLED
         return true
 #elseif SUBSCRIPTION
-        print("isUserAuthenticated: [\(AccountManager().isUserAuthenticated)] | isSubscriptionInternalTestingEnabled: [\(isSubscriptionInternalTestingEnabled)] isInternalUser: [\(isInternalUser)] | isVPNActivated: [\(isVPNActivated)] | isDBPActivated: [\(isDBPActivated)]")
-        return AccountManager().isUserAuthenticated || (isSubscriptionInternalTestingEnabled && isInternalUser && !isVPNActivated && !isDBPActivated)
+        print("isUserAuthenticated: [\(accountManager.isUserAuthenticated)] | isSubscriptionInternalTestingEnabled: [\(isSubscriptionInternalTestingEnabled)] isInternalUser: [\(isInternalUser)] | isVPNActivated: [\(isVPNActivated)] | isDBPActivated: [\(isDBPActivated)]")
+        return accountManager.isUserAuthenticated || (isSubscriptionInternalTestingEnabled && isInternalUser && !isVPNActivated && !isDBPActivated)
 #else
         return false
 #endif

@@ -78,6 +78,9 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 /// Use Subscription sub-feature
 ///
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
+
+    private var accountManager = NSApp.delegateTyped.subscriptionManager.accountManager
+
     var broker: UserScriptMessageBroker?
 
     var featureName = "useSubscription"
@@ -119,7 +122,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let authToken = AccountManager().authToken, AccountManager().accessToken != nil {
+        if let authToken = accountManager.authToken, accountManager.accessToken != nil {
             return Subscription(token: authToken)
         } else {
             return Subscription(token: "")
@@ -133,7 +136,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
 
         let authToken = subscriptionValues.token
-        let accountManager = AccountManager()
         if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(authToken),
            case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
             accountManager.storeAuthToken(token: authToken)
@@ -144,7 +146,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let accountManager = AccountManager()
         if let accessToken = accountManager.accessToken,
            case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
@@ -276,7 +277,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     WindowControllersManager.shared.showTab(with: .subscription(url))
                 })
 
-            let vc = SubscriptionAccessViewController(accountManager: AccountManager(), actionHandlers: actionHandlers, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            let vc = SubscriptionAccessViewController(accountManager: accountManager, actionHandlers: actionHandlers, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
         }
 

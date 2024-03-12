@@ -72,6 +72,9 @@ extension IdentityTheftRestorationPagesUserScript: WKScriptMessageHandler {
 /// Use Subscription sub-feature
 ///
 final class IdentityTheftRestorationPagesFeature: Subfeature {
+
+    private var accountManager = NSApp.delegateTyped.subscriptionManager.accountManager
+
     var broker: UserScriptMessageBroker?
 
     var featureName = "useIdentityTheftRestoration"
@@ -94,7 +97,7 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
     }
 
     func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let accessToken = AccountManager().accessToken {
+        if let accessToken = accountManager.accessToken {
             return ["token": accessToken]
         } else {
             return [String: String]()
