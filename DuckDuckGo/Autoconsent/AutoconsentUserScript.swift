@@ -73,7 +73,7 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     func userContentController(_ userContentController: WKUserContentController,
                                didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
-//        os_log("Message received: %s", log: .autoconsent, type: .debug, String(describing: message.body))
+        //too noisy os_log("Message received: %s", log: .autoconsent, type: .debug, String(describing: message.body))
         return handleMessage(replyHandler: replyHandler, message: message)
     }
 }
