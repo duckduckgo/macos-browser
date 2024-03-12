@@ -27,7 +27,7 @@ extension UserText {
 
     // MARK: - Navigation Bar
     // "network.protection.status.button.tooltip" - The tooltip for NetP's nav bar button
-    static let networkProtectionButtonTooltip = "DuckDuckGo VPN"
+    static let networkProtectionButtonTooltip = "VPN"
 
     // MARK: - Invite Code
     // "network.protection.invite.dialog.title" - Title for the VPN invite dialog
