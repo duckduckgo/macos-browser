@@ -113,13 +113,16 @@ final class NavigationBarViewController: NSViewController {
 #endif
 
 #if NETWORK_PROTECTION
-    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(), downloadListCoordinator: DownloadListCoordinator = .shared) -> NavigationBarViewController {
+    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool,
+                       networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
+                       downloadListCoordinator: DownloadListCoordinator = .shared,
+                       passwordPopoverPresenter: PasswordPopoverPresenter) -> NavigationBarViewController {
         NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator)
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator, passwordPopoverPresenter: passwordPopoverPresenter)
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator, passwordPopoverPresenter: PasswordPopoverPresenter) {
 
         let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
         let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
@@ -127,7 +130,7 @@ final class NavigationBarViewController: NSViewController {
 
         let networkProtectionPopoverManager = NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
 
-        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager)
+        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager, passwordPopoverPresenter: passwordPopoverPresenter)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager)
         self.isBurner = isBurner
@@ -138,14 +141,15 @@ final class NavigationBarViewController: NSViewController {
         super.init(coder: coder)
     }
 #else
-    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, downloadListCoordinator: DownloadListCoordinator = .shared) -> NavigationBarViewController {
+    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, downloadListCoordinator: DownloadListCoordinator = .shared, passwordPopoverPresenter: PasswordPopoverPresenter) -> NavigationBarViewController {
         NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, downloadListCoordinator: downloadListCoordinator)
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, downloadListCoordinator: downloadListCoordinator, passwordPopoverPresenter: passwordPopoverPresenter)
         }!
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, downloadListCoordinator: DownloadListCoordinator) {
-        self.popovers = NavigationBarPopovers()
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, downloadListCoordinator: DownloadListCoordinator,
+          passwordPopoverPresenter: PasswordPopoverPresenter) {
+        self.popovers = NavigationBarPopovers(passwordPopoverPresenter: passwordPopoverPresenter)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = isBurner
         self.downloadListCoordinator = downloadListCoordinator
@@ -1109,8 +1113,6 @@ extension NavigationBarViewController: NSPopoverDelegate {
         } else if let popover = popovers.bookmarkListPopover, notification.object as AnyObject? === popover {
             popovers.bookmarkListPopoverClosed()
             updateBookmarksButton()
-        } else if let popover = popovers.passwordManagementPopover, notification.object as AnyObject? === popover {
-            popovers.passwordManagementPopoverClosed()
         } else if let popover = popovers.saveIdentityPopover, notification.object as AnyObject? === popover {
             popovers.saveIdentityPopoverClosed()
             updatePasswordManagementButton()
