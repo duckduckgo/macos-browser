@@ -21,7 +21,7 @@
 import AppKit
 import Foundation
 import Common
-import NetworkProtection
+import NetworkProtectionUI
 
 extension AppLaunchCommand {
     var rawValue: String {
