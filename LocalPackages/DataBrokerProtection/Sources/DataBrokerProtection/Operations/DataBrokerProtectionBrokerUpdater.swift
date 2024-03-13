@@ -37,9 +37,8 @@ final class FileResources: ResourcesRepository {
 
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
         guard let resourceURL = Bundle.module.resourceURL else {
-            //TODO haven't decided the best course of action here. Something has gone horribly wrong. Pixel? Assert?
-            // I don't think we have the means to fire a pixel here :Sob:
-            // "This property may not contain a path for non-standard bundle formats or for some older bundle formats"
+            assertionFailure()
+            os_log("DataBrokerProtectionUpdater FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
             throw FileResourcesError.bundleResourceURLNil
         }
 
@@ -120,7 +119,14 @@ public struct DataBrokerProtectionBrokerUpdater {
     }
 
     public func updateBrokers() {
-        guard let brokers = try? resources.fetchBrokerFromResourceFiles() else { return } //TODO not this
+        let brokers: [DataBroker]?
+        do {
+            brokers = try resources.fetchBrokerFromResourceFiles()
+        } catch {
+            os_log("DataBrokerProtectionBrokerUpdater updateBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            return
+        }
+        guard let brokers = brokers else { return }
 
         for broker in brokers {
             do {

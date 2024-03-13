@@ -131,6 +131,7 @@ struct DBPUICommunicationLayer: Subfeature {
             try await delegate?.saveProfile()
             return DBPUIStandardResponse(version: Constants.version, success: true)
         } catch {
+            os_log("DBPUICommunicationLayer saveProfile, error: %{public}@", log: .error, error.localizedDescription)
             return DBPUIStandardResponse(version: Constants.version, success: false)
         }
     }
@@ -148,6 +149,7 @@ struct DBPUICommunicationLayer: Subfeature {
             try delegate?.deleteProfileData()
             return DBPUIStandardResponse(version: Constants.version, success: true)
         } catch {
+            os_log("DBPUICommunicationLayer deleteUserProfileData, error: %{public}@", log: .error, error.localizedDescription)
             return DBPUIStandardResponse(version: Constants.version, success: false)
         }
     }

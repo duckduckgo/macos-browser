@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import WebKit
 import BrowserServicesKit
+import Common
 
 protocol DBPUIScanOps: AnyObject {
     func startScan() -> Bool
@@ -77,6 +78,10 @@ extension DBPUIViewModel: DBPUIScanOps {
     }
 
     func updateCacheWithCurrentScans() async {
-        _ = try? await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+        do {
+            _ = try await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+        } catch {
+            os_log("DBPUIViewModel updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
+        }
     }
 }

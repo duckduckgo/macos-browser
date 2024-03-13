@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 struct DataBrokerScheduleConfig: Codable {
     let retryError: Int
@@ -168,11 +169,16 @@ struct DataBroker: Codable, Sendable {
     }
 
     static func initFromResource(_ url: URL) throws -> DataBroker {
-        let data = try Data(contentsOf: url)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.dateDecodingStrategy = .millisecondsSince1970
-        let broker = try jsonDecoder.decode(DataBroker.self, from: data)
-        return broker
+        do {
+            let data = try Data(contentsOf: url)
+            let jsonDecoder = JSONDecoder()
+            jsonDecoder.dateDecodingStrategy = .millisecondsSince1970
+            let broker = try jsonDecoder.decode(DataBroker.self, from: data)
+            return broker
+        } catch {
+            os_log("DataBroker initFromResource, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 }
 
