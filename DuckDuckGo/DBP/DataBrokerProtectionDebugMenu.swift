@@ -28,6 +28,11 @@ import NetworkProtectionProxy
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
 
+    enum EnvironmentTitle: String {
+      case staging = "Staging"
+      case production = "Production"
+    }
+
     private let waitlistTokenItem = NSMenuItem(title: "Waitlist Token:")
     private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
     private let waitlistInviteCodeItem = NSMenuItem(title: "Waitlist Invite Code:")
@@ -346,7 +351,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         let title = menuItem.title
         let selectedEnvironment: DataBrokerProtectionSettings.SelectedEnvironment
 
-        if title == "Staging" {
+        if title == EnvironmentTitle.staging.rawValue {
             selectedEnvironment = .staging
         } else {
             selectedEnvironment = .production
@@ -359,8 +364,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     private func populateDataBrokerProtectionEnvironmentListMenuItems() {
         environmentMenu.items = [
-            NSMenuItem(title: "Production", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
-            NSMenuItem(title: "Staging", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: EnvironmentTitle.production.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: EnvironmentTitle.staging.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
         ]
     }
 
@@ -415,14 +420,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private func updateEnvironmentMenu() {
         let selectedEnvironment = settings.selectedEnvironment
 
-        switch selectedEnvironment {
-        case .production:
-            environmentMenu.items.first?.state = .on
-            environmentMenu.items.last?.state = .off
-        case .staging:
-            environmentMenu.items.first?.state = .off
-            environmentMenu.items.last?.state = .on
-        }
+        environmentMenu.items.first?.state = selectedEnvironment == .production ? .on: .off
+        environmentMenu.items.last?.state = selectedEnvironment == .staging ? .on: .off
     }
 }
 
