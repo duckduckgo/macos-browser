@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionLoginItemPixels.swift
+//  DataBrokerProtectionBundleExtension.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,18 +18,20 @@
 
 import Foundation
 
-struct DataBrokerProtectionLoginItemPixels {
+extension UserDefaults {
+    static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
+}
 
-    static func fire(pixel: Pixel.Event, frequency: DailyPixel.PixelFrequency) {
+extension Bundle {
+    func appGroup(bundle: BundleGroup) -> String {
 
-        DispatchQueue.main.async { // delegateTyped needs to be called in the main thread
-            let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
-            DailyPixel.fire(pixel: pixel,
-                            frequency: frequency,
-                            withAdditionalParameters: [
-                                "isInternalUser": isInternalUser.description
-                            ]
-            )
+        guard let appGroup = object(forInfoDictionaryKey: "DBP_APP_GROUP") as? String else {
+            fatalError("Info.plist is missing \(appGroupName)")
         }
+        return appGroup
     }
+}
+
+enum BundleGroup {
+    case dbp
 }
