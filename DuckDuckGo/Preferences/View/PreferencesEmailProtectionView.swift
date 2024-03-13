@@ -60,17 +60,17 @@ extension Preferences {
                                 try? emailManager.signOut()
                             }
                         }
+
+                        // Support
+                        PreferencePaneSubSection {
+                            TextButton(UserText.support) {
+                                openNewTab(with: EmailUrls().emailProtectionSupportLink)
+                            }
+                        }
                     } else {
                         Button(UserText.emailOptionsMenuTurnOnSubItem + "…") {
                             openNewTab(with: EmailUrls().emailProtectionLink)
                         }
-                    }
-                }
-
-                // SECTION 3: FAQ
-                PreferencePaneSection {
-                    TextButton(UserText.support) {
-                        openNewTab(with: EmailUrls().emailProtectionSupportLink)
                     }
                 }
             }
