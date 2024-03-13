@@ -303,7 +303,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         )
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
         let entitlementsCheck = {
-            await accountManager.hasEntitlement(for: .networkProtection)
+            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 #else
         let entitlementsCheck: (() async -> Result<Bool, Error>)? = nil
