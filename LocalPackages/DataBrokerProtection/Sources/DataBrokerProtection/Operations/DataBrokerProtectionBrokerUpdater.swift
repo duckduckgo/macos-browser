@@ -38,21 +38,26 @@ final class FileResources: ResourcesRepository {
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
         guard let resourceURL = Bundle.module.resourceURL else {
             assertionFailure()
-            os_log("DataBrokerProtectionUpdater FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
+            os_log("DataBrokerProtectionUpdater error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
             throw FileResourcesError.bundleResourceURLNil
         }
 
-        let fileURLs = try fileManager.contentsOfDirectory(
-            at: resourceURL,
-            includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles]
-        )
+        do {
+            let fileURLs = try fileManager.contentsOfDirectory(
+                at: resourceURL,
+                includingPropertiesForKeys: nil,
+                options: [.skipsHiddenFiles]
+            )
 
-        let brokerJSONFiles = fileURLs.filter {
-            $0.isJSON && !$0.hasFakePrefix
+            let brokerJSONFiles = fileURLs.filter {
+                $0.isJSON && !$0.hasFakePrefix
+            }
+
+            return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
+        } catch {
+            os_log("DataBrokerProtectionUpdater error FileResources error: fetchBrokerFromResourceFiles, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
-
-        return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
     }
 }
 
