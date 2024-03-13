@@ -31,7 +31,7 @@ struct SubscriptionExpiredView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(UserText.networkProtectionSubscriptionExpiredTitle)
-                .font(.system(size: 14).weight(.bold))
+                .font(.system(size: 13).weight(.bold))
                 .foregroundColor(Color(.defaultText))
                 .multilineText()
 
