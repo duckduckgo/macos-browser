@@ -452,7 +452,7 @@ final class MainViewController: NSViewController {
 #if NETWORK_PROTECTION
     private func sendActiveNetworkProtectionWaitlistUserPixel() {
         if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
-            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly)
         }
     }
 #endif
