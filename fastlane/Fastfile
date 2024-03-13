@@ -535,7 +535,7 @@ release in progress and you're making a follow-up internal release that includes
     source_version = options[:source_version]
     version = options[:new_version]
     UI.message("Creating new hotfix release branch for #{version}")
-    release_branch = "#{RELEASE_BRANCH}/#{version}"
+    release_branch = "#{HOTFIX_BRANCH}/#{version}"
 
     # Abort if the branch already exists
     UI.abort_with_message!("Branch #{release_branch} already exists in this repository. Aborting.") unless Action.sh(

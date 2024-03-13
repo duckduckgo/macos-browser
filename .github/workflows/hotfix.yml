@@ -48,6 +48,7 @@ jobs:
           APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+          GH_TOKEN: ${{ github.token }}
           LAST_RELEASE: ${{ steps.find_last_release.outputs.last_release }}
         run: |
           git config --global user.name "Dax the Duck"
