@@ -28,12 +28,14 @@ extension Preferences {
         @ObservedObject var model: WebTrackingProtectionPreferences
 
         var body: some View {
-            PreferencePane(UserText.webTrackingProtection, spacing: 20) {
+            PreferencePane(UserText.webTrackingProtection, spacing: 4) {
 
-                // Status Indicator
-                StatusIndicatorView(status: .alwaysOn, isLarge: true).padding(.top, -16)
+                // SECTION 1: Status Indicator
+                PreferencePaneSection {
+                    StatusIndicatorView(status: .alwaysOn, isLarge: true)
+                }
 
-                // SECTION 1: Description
+                // SECTION 2: Description
                 PreferencePaneSection {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.webTrackingProtectionExplanation)
@@ -43,7 +45,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 2: Global privacy control
+                // SECTION 3: Global privacy control
                 PreferencePaneSection {
                     ToggleMenuItem(UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
                     VStack(alignment: .leading, spacing: 1) {

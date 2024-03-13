@@ -28,12 +28,14 @@ extension Preferences {
         @ObservedObject var model: CookiePopupProtectionPreferences
 
         var body: some View {
-            PreferencePane(UserText.cookiePopUpProtection, spacing: 20) {
+            PreferencePane(UserText.cookiePopUpProtection, spacing: 4) {
 
-                // Status Indicator
-                StatusIndicatorView(status: model.isAutoconsentEnabled ? .on : .off, isLarge: true).padding(.top, -16)
+                // SECTION 1: Status Indicator
+                PreferencePaneSection {
+                    StatusIndicatorView(status: model.isAutoconsentEnabled ? .on : .off, isLarge: true)
+                }
 
-                // SECTION 1: Description
+                // SECTION 2: Description
                 PreferencePaneSection {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.autoconsentExplanation)
@@ -43,7 +45,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 2: Search Settings
+                // SECTION 3: Search Settings
                 PreferencePaneSection {
                     ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
                 }

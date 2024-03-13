@@ -29,14 +29,16 @@ extension Preferences {
         let status: PrivacyProtectionStatus
 
         var body: some View {
-            PreferencePane(UserText.defaultBrowser, spacing: 20) {
+            PreferencePane(UserText.defaultBrowser, spacing: 4) {
 
-                // Status Indicator
+                // SECTION 1: Status Indicator
                 if let status = status.status {
-                    StatusIndicatorView(status: status, isLarge: true).padding(.top, -16)
+                    PreferencePaneSection {
+                        StatusIndicatorView(status: status, isLarge: true)
+                    }
                 }
 
-                // SECTION 1: Default Browser
+                // SECTION 2: Default Browser
                 PreferencePaneSection {
 
                     PreferencePaneSubSection {

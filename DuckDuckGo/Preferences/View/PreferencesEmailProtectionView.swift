@@ -29,12 +29,14 @@ extension Preferences {
         @ObservedObject var protectionStatus: PrivacyProtectionStatus = PrivacyProtectionStatus.status(for: .emailProtection)
 
         var body: some View {
-            PreferencePane(UserText.emailProtectionPreferences, spacing: 20) {
+            PreferencePane(UserText.emailProtectionPreferences, spacing: 4) {
 
-                // Status Indicator
-                StatusIndicatorView(status: protectionStatus.status ?? .off, isLarge: true).padding(.top, -16)
+                // SECTION 1: Status Indicator
+                PreferencePaneSection {
+                    StatusIndicatorView(status: protectionStatus.status ?? .off, isLarge: true)
+                }
 
-                // SECTION 1: Description
+                // SECTION 2: Description
                 PreferencePaneSection {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.emailProtectionExplanation)
@@ -44,7 +46,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 2: Current Account Info
+                // SECTION 3: Current Account Info
                 PreferencePaneSection {
                     if emailManager.isSignedIn {
                         if let userEmail = emailManager.userEmail {
