@@ -141,7 +141,7 @@ final class ContextualMenuTests: XCTestCase {
         assertMenu(item: items[7], withTitle: UserText.bookmarksBarContextMenuDelete, selector: #selector(BookmarkMenuItemSelectors.deleteBookmark(_:)), representedObject: bookmark)
         assertMenu(item: items[8], withTitle: UserText.bookmarksBarContextMenuMoveToEnd, selector: #selector(BookmarkMenuItemSelectors.moveToEnd(_:)), representedObject: BookmarkEntityInfo(entity: bookmark, parent: parent))
         assertMenu(item: items[9], withTitle: "", selector: nil) // Separator
-        assertMenu(item: items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)))
+        assertMenu(item: items[10], withTitle: UserText.addFolder, selector: #selector(BookmarkMenuItemSelectors.newFolder(_:)), representedObject: parent)
         assertMenu(item: items[11], withTitle: UserText.bookmarksManageBookmarks, selector: #selector(BookmarkMenuItemSelectors.manageBookmarks(_:)))
     }
 
