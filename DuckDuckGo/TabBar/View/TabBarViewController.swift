@@ -158,6 +158,7 @@ final class TabBarViewController: NSViewController {
     }
 
     private func setupFireButton() {
+        fireButton.image = .burn
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
         fireButton.sendAction(on: .leftMouseDown)
@@ -990,6 +991,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
     }
 
+    func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
+            return false
+        }
+
+        return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.content.canBeDuplicated ?? false
+    }
+
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
@@ -1005,7 +1015,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return false
         }
 
-        return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.isUrl ?? false
+        return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.content.canBePinned ?? false
     }
 
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem) {
@@ -1016,6 +1026,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
 
         collectionView.clearSelection()
         tabCollectionViewModel.pinTab(at: indexPath.item)
+    }
+
+    func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
+            return false
+        }
+
+        return tabCollectionViewModel.tabViewModel(at: indexPath.item)?.tab.content.canBeBookmarked ?? false
     }
 
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {

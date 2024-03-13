@@ -26,6 +26,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     var isInternalTestingEnabled: () -> Bool
     var updateInternalTestingFlag: (Bool) -> Void
 
+    private var purchasePlatformItem: NSMenuItem?
+
     var currentViewController: () -> NSViewController?
     private let accountManager: AccountManager
     private let subscriptionAppGroup: String
@@ -72,11 +74,18 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(NSMenuItem(title: "Check Entitlements", action: #selector(checkEntitlements), target: self))
         menu.addItem(NSMenuItem(title: "Get Subscription Info", action: #selector(getSubscriptionDetails), target: self))
         menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
+        menu.addItem(NSMenuItem(title: "Post didSignIn notification", action: #selector(postDidSignInNotification), target: self))
         menu.addItem(.separator())
         if #available(macOS 12.0, *) {
             menu.addItem(NSMenuItem(title: "Sync App Store AppleID Account (re- sign-in)", action: #selector(syncAppleIDAccount), target: self))
             menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
         }
+
+        menu.addItem(.separator())
+
+        let purchasePlatformItem = NSMenuItem(title: "Purchase platform", action: nil, target: nil)
+        menu.addItem(purchasePlatformItem)
+        self.purchasePlatformItem = purchasePlatformItem
 
         let environmentItem = NSMenuItem(title: "Environment", action: nil, target: nil)
         environmentItem.submenu = makeEnvironmentSubmenu()
@@ -87,6 +96,39 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         let internalTestingItem = NSMenuItem(title: "Internal testing", action: #selector(toggleInternalTesting), target: self)
         internalTestingItem.state = isInternalTestingEnabled() ? .on : .off
         menu.addItem(internalTestingItem)
+
+        menu.delegate = self
+
+        return menu
+    }
+
+    private func makePurchasePlatformSubmenu() -> NSMenu {
+        let menu = NSMenu(title: "Select purchase platform:")
+
+        let currentPlatform = SubscriptionPurchaseEnvironment.current
+
+        let appStoreItem = NSMenuItem(title: "App Store", action: #selector(setPlatformToAppStore), target: self)
+        if currentPlatform == .appStore {
+            appStoreItem.state = .on
+            appStoreItem.isEnabled = false
+            appStoreItem.action = nil
+            appStoreItem.target = nil
+        }
+        menu.addItem(appStoreItem)
+
+        let stripeItem = NSMenuItem(title: "Stripe", action: #selector(setPlatformToStripe), target: self)
+        if currentPlatform == .stripe {
+            stripeItem.state = .on
+            stripeItem.isEnabled = false
+            stripeItem.action = nil
+            stripeItem.target = nil
+        }
+        menu.addItem(stripeItem)
+
+        menu.addItem(.separator())
+
+        let disclaimerItem = NSMenuItem(title: "⚠️ Change not persisted between app restarts", action: nil, target: nil)
+        menu.addItem(disclaimerItem)
 
         return menu
     }
@@ -158,7 +200,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         Task {
             var results: [String] = []
 
-            let entitlements: [AccountManager.Entitlement] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
+            let entitlements: [Entitlement.ProductName] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
             for entitlement in entitlements {
                 if case let .success(result) = await accountManager.hasEntitlement(for: entitlement) {
                     let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
@@ -198,6 +240,27 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         }
     }
 
+    @IBAction func setPlatformToAppStore(_ sender: Any?) {
+        askAndUpdatePlatform(to: .appStore)
+    }
+
+    @IBAction func setPlatformToStripe(_ sender: Any?) {
+        askAndUpdatePlatform(to: .stripe)
+    }
+
+    private func askAndUpdatePlatform(to newPlatform: SubscriptionPurchaseEnvironment.Environment) {
+        let alert = makeAlert(title: "Are you sure you want to change the purchase platform to \(newPlatform.rawValue.capitalized)",
+                              message: "This setting is not persisted between app runs. After restarting the app it returns to the default determined on app's distribution method.",
+                              buttonNames: ["Yes", "No"])
+        let response = alert.runModal()
+
+        guard case .alertFirstButtonReturn = response else { return }
+
+        SubscriptionPurchaseEnvironment.current = newPlatform
+
+        refreshSubmenu()
+    }
+
     @IBAction func setEnvironmentToStaging(_ sender: Any?) {
         askAndUpdateEnvironment(to: "staging")
     }
@@ -216,6 +279,11 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
         updateEnvironment(newEnvironmentString)
         refreshSubmenu()
+    }
+
+    @objc
+    func postDidSignInNotification(_ sender: Any?) {
+        NotificationCenter.default.post(name: .accountDidSignIn, object: self, userInfo: nil)
     }
 
     @objc
@@ -274,5 +342,12 @@ extension NSMenuItem {
         self.init(title: string, action: selector, keyEquivalent: charCode)
         self.target = target
         self.representedObject = representedObject
+    }
+}
+
+extension SubscriptionDebugMenu: NSMenuDelegate {
+
+    public func menuWillOpen(_ menu: NSMenu) {
+        purchasePlatformItem?.submenu = makePurchasePlatformSubmenu()
     }
 }

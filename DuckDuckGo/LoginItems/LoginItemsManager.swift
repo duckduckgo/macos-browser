@@ -68,7 +68,9 @@ final class LoginItemsManager {
         )
         DailyPixel.fire(pixel: .debug(event: event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
 
-        logOrAssertionFailure("🔴 Could not enable \(item): \(error.debugDescription)")
+        os_log("🔴 Could not enable %{public}@: %{public}@",
+               item.debugDescription,
+               error.debugDescription)
     }
 
     // MARK: - Debug Interactions

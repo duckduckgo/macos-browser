@@ -47,6 +47,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     let settings: VPNSettings
 
+    // MARK: - Defaults
+
+    let defaults: UserDefaults
+
     // MARK: - Combine Cancellables
 
     private var cancellables = Set<AnyCancellable>()
@@ -163,6 +167,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
          settings: VPNSettings,
+         defaults: UserDefaults,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          notificationCenter: NotificationCenter = .default,
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
@@ -172,6 +177,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         self.networkExtensionController = networkExtensionController
         self.notificationCenter = notificationCenter
         self.settings = settings
+        self.defaults = defaults
         self.tokenStore = tokenStore
 
         subscribeToSettingsChanges()
@@ -247,8 +253,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 .setSelectedEnvironment,
                 .setSelectedLocation,
                 .setShowInMenuBar,
-                .setNetworkPathChange,
-                .setVPNFirstEnabled,
                 .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
@@ -452,10 +456,18 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     enum StartError: LocalizedError {
         case connectionStatusInvalid
+        case connectionAlreadyStarted
         case simulateControllerFailureError
 
         var errorDescription: String? {
             switch self {
+            case .connectionAlreadyStarted:
+#if DEBUG
+                return "[Debug] Connection already started"
+#else
+                return nil
+#endif
+
             case .connectionStatusInvalid:
 #if DEBUG
                 return "[DEBUG] Connection status invalid"
@@ -471,23 +483,20 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async {
+        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
+                      frequency: .dailyAndContinuous)
         controllerErrorStore.lastErrorMessage = nil
 
-#if NETP_SYSTEM_EXTENSION
         do {
+#if NETP_SYSTEM_EXTENSION
             try await activateSystemExtension { [weak self] in
                 // If we're waiting for user approval we wanna make sure the
                 // onboarding step is set correctly.  This can be useful to
                 // help prevent the value from being de-synchronized.
                 self?.onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
             }
-        } catch {
-            await stop()
-            return
-        }
 #endif
 
-        do {
             let tunnelManager: NETunnelProviderManager
 
             do {
@@ -505,18 +514,30 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             case .invalid:
                 throw StartError.connectionStatusInvalid
             case .connected:
-                // Intentional no-op
-                break
+                throw StartError.connectionAlreadyStarted
             default:
                 try await start(tunnelManager)
+
+                // It's important to note that we've seen instances where the above call to start()
+                // doesn't throw any errors, yet the tunnel fails to start.  In any case this pixel
+                // should be interpreted as "the controller successfully requrested the tunnel to be
+                // started".  Meaning there's no error caught in this start attempt.  There are pixels
+                // in the packet tunnel provider side that can be used to debug additional logic.
+                //
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartSuccess,
+                              frequency: .dailyAndContinuous)
             }
         } catch {
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionStartFailed, frequency: .standard, withError: error, includeAppVersionParameter: true
+                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure, frequency: .dailyAndContinuous, withError: error, includeAppVersionParameter: true
             )
 
             await stop()
-            controllerErrorStore.lastErrorMessage = error.localizedDescription
+
+            // Always keep the first error message shown, as it's the more actionable one.
+            if controllerErrorStore.lastErrorMessage == nil {
+                controllerErrorStore.lastErrorMessage = error.localizedDescription
+            }
         }
     }
 
@@ -560,7 +581,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             frequency: .justOnce,
             includeAppVersionParameter: true) { [weak self] fired, error in
                 guard let self, error == nil, fired else { return }
-                self.settings.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)
+                self.defaults.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)
             }
     }
 
@@ -572,17 +593,15 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             return
         }
 
-        do {
-            try await stop(tunnelManager: manager)
-        } catch {
-            controllerErrorStore.lastErrorMessage = error.localizedDescription
-        }
+        await stop(tunnelManager: manager, disableOnDemand: true)
     }
 
     @MainActor
-    func stop(tunnelManager: NETunnelProviderManager) async throws {
-        // disable reconnect on demand if requested to stop
-        try? await disableOnDemand(tunnelManager: tunnelManager)
+    private func stop(tunnelManager: NETunnelProviderManager, disableOnDemand: Bool) async {
+        if disableOnDemand {
+            // disable reconnect on demand if requested to stop
+            try? await self.disableOnDemand(tunnelManager: tunnelManager)
+        }
 
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
@@ -590,6 +609,18 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         default:
             break
         }
+    }
+
+    /// Restarts the tunnel.
+    ///
+    @MainActor
+    func restart() async {
+        guard let manager = await manager else {
+            return
+        }
+
+        await stop(tunnelManager: manager, disableOnDemand: false)
+        await start()
     }
 
     // MARK: - On Demand & Kill Switch

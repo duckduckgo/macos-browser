@@ -1,0 +1,34 @@
+name: Find Release Task in Asana
+description: |
+  Searches macOS App Development Asana project for an active release task matching the latest version
+  (as specified by GitHub releases). Returns an error when no release task is found, or when there's
+  an active (incomplete) hotfix release task. Tasks are identified by the name.
+inputs:
+  access-token:
+    description: "Asana access token"
+    required: true
+    type: string
+  github-token:
+    description: "GitHub Token"
+    required: false
+    type: string
+outputs:
+  release-branch:
+    description: "Release branch"
+    value: ${{ steps.find-release-task.outputs.release-branch }}
+  task-id:
+    description: "Release task ID"
+    value: ${{ steps.find-release-task.outputs.task-id }}
+  task-url:
+    description: "Release task URL"
+    value: ${{ steps.find-release-task.outputs.task-url }}
+runs:
+  using: "composite"
+  steps:
+    - id: find-release-task
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+        GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+      run: |
+        ${{ github.action_path }}/find_release_task.sh

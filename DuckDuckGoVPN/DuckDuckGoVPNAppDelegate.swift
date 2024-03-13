@@ -96,6 +96,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private lazy var tunnelSettings = VPNSettings(defaults: .netP)
+    private lazy var userDefaults = UserDefaults.netP
     private lazy var proxySettings = TransparentProxySettings(defaults: .netP)
 
     @MainActor
@@ -154,7 +155,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: tunnelExtensionBundleID,
         networkExtensionController: networkExtensionController,
-        settings: tunnelSettings)
+        settings: tunnelSettings,
+        defaults: userDefaults)
 
     /// An IPC server that provides access to the tunnel controller.
     ///
