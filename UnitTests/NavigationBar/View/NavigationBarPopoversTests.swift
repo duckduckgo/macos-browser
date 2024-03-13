@@ -25,17 +25,16 @@ private final class MockNSPopoverDelegate: NSObject, NSPopoverDelegate {}
 final class NavigationBarPopoversTests: XCTestCase {
 
     private var sut: NavigationBarPopovers!
-    private var popoverPresenter: MockPasswordPopoverPresenter!
+    private var autofillPopoverPresenter: MockAutofillPopoverPresenter!
 
     override func setUpWithError() throws {
-        popoverPresenter = MockPasswordPopoverPresenter()
+        autofillPopoverPresenter = MockAutofillPopoverPresenter()
 
         #if NETWORK_PROTECTION
-            sut = NavigationBarPopovers(networkProtectionPopoverManager: NetPPopoverManagerMock(), passwordPopoverPresenter: popoverPresenter)
+            sut = NavigationBarPopovers(networkProtectionPopoverManager: NetPPopoverManagerMock(), autofillPopoverPresenter: autofillPopoverPresenter)
         #else
             sut = NavigationBarPopovers(passwordPopoverPresenter: popoverPresenter)
         #endif
-
     }
 
     func testSetsPasswordPopoverDomainOnPopover() throws {
@@ -46,7 +45,7 @@ final class NavigationBarPopoversTests: XCTestCase {
         sut.passwordManagementDomain = domain
 
         // Then
-        XCTAssertEqual(popoverPresenter.passwordDomain, domain)
+        XCTAssertEqual(autofillPopoverPresenter.passwordDomain, domain)
     }
 
     func testGetsPasswordPopoverDirtyState() throws {
@@ -57,7 +56,7 @@ final class NavigationBarPopoversTests: XCTestCase {
         XCTAssertFalse(dirtyResult)
 
         // Given
-        popoverPresenter.isDirty = true
+        autofillPopoverPresenter.isDirty = true
 
         // When
         dirtyResult = sut.isPasswordManagementDirty
@@ -66,7 +65,7 @@ final class NavigationBarPopoversTests: XCTestCase {
         XCTAssertTrue(dirtyResult)
     }
 
-    func testGetsPasswordPopoverDisplayedState() throws {
+    func testGetsPasswordPopoverShownState() throws {
         // When
         var displayedResult = sut.isPasswordManagementPopoverShown
 
@@ -74,7 +73,7 @@ final class NavigationBarPopoversTests: XCTestCase {
         XCTAssertFalse(displayedResult)
 
         // Given
-        popoverPresenter.isDisplayed = true
+        autofillPopoverPresenter.isShown = true
 
         // When
         displayedResult = sut.isPasswordManagementPopoverShown
@@ -82,4 +81,24 @@ final class NavigationBarPopoversTests: XCTestCase {
         // Then
         XCTAssertTrue(displayedResult)
     }
+
+    func testShowsPasswordPopoverWithCategory() throws {
+        // When
+        sut.showPasswordManagementPopover(selectedCategory: nil, usingView: NSView(), withDelegate: MockNSPopoverDelegate())
+
+        // Then
+        XCTAssertTrue(autofillPopoverPresenter.didShowWithCategory)
+    }
+
+    func testShowsPasswordPopoverWithSelectedWebsite() throws {
+        // Given
+        let account = SecureVaultModels.WebsiteAccount(id: "")
+
+        // When
+        sut.showPasswordManagerPopover(selectedWebsiteAccount: account, usingView: NSView(), withDelegate: MockNSPopoverDelegate())
+
+        // Then
+        XCTAssertTrue(autofillPopoverPresenter.didShowWithSelectedAccount)
+    }
+
 }

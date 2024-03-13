@@ -20,31 +20,29 @@ import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 import Foundation
 
-final class MockPasswordPopoverPresenter: PasswordPopoverPresenter {
+final class MockAutofillPopoverPresenter: AutofillPopoverPresenter {
 
     var didShowWithCategory = false
     var didShowWithSelectedAccount = false
     var didDismiss = false
     var isDirty = false
-    var isDisplayed = false
+    var isShown = false
 
     var passwordDomain: String?
     var popoverIsDirty: Bool {
         isDirty
     }
-    var popoverIsDisplayed: Bool {
-        isDisplayed
+    var popoverIsShown: Bool {
+        isShown
     }
 
-    var popoverIsInCurrentWindow: Bool {
-        return false
-    }
+    var popoverPresentingWindow: NSWindow? = nil
 
-    func show(under view: NSView, withDomain domain: String?, selectedCategory category: DuckDuckGo_Privacy_Browser.SecureVaultSorting.Category?) {
+    func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: DuckDuckGo_Privacy_Browser.SecureVaultSorting.Category?) {
         didShowWithCategory = true
     }
 
-    func show(under view: NSView, withSelectedAccount: BrowserServicesKit.SecureVaultModels.WebsiteAccount) {
+    func show(positionedBelow view: NSView, withSelectedAccount: BrowserServicesKit.SecureVaultModels.WebsiteAccount) {
         didShowWithSelectedAccount = true
     }
 
