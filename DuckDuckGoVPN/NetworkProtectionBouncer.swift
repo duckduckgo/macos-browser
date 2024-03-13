@@ -21,8 +21,10 @@ import Foundation
 import NetworkProtection
 import ServiceManagement
 import AppKit
-import Subscription
 
+#if SUBSCRIPTION
+import Subscription
+#endif
 /// Class that implements the necessary logic to ensure Network Protection is enabled, or prevent the app from running otherwise.
 ///
 final class NetworkProtectionBouncer {

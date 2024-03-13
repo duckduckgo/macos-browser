@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if SUBSCRIPTION
+
 import Foundation
 import Subscription
 import NetworkProtection
@@ -40,3 +42,5 @@ extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStorage {
         try deleteToken()
     }
 }
+
+#endif
