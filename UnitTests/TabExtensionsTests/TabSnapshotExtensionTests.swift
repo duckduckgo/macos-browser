@@ -18,7 +18,6 @@
 
 import BrowserServicesKit
 import Combine
-import Macros
 import Navigation
 import WebKit
 import XCTest
@@ -206,6 +205,6 @@ class TabSnapshotExtensionTests: XCTestCase {
 
 fileprivate extension URL {
 
-    static let aURL = #URL("https://example.com")
+    static let aURL = URL(string: "https://example.com")!
 
 }

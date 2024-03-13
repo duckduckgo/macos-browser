@@ -18,7 +18,6 @@
 
 import Combine
 import Common
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -62,8 +61,8 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let url = #URL("http://privacy-test-pages.site/privacy-protections/https-upgrades/")
-        let upgradableUrl = #URL("http://good.third-party.site/privacy-protections/https-upgrades/frame.html")
+        let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-upgrades/")!
+        let upgradableUrl = URL(string: "http://good.third-party.site/privacy-protections/https-upgrades/frame.html")!
         let upgradedUrl = try? await AppPrivacyFeatures.shared.httpsUpgrade.upgrade(url: upgradableUrl).get()
         XCTAssertEqual(upgradedUrl, upgradableUrl.toHttps()!, "URL not upgraded")
 
@@ -122,7 +121,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let url = #URL("http://privacy-test-pages.site/privacy-protections/https-loop-protection/")
+        let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-loop-protection/")!
 
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
@@ -194,8 +193,8 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let connectionUpgradedTo = try await connectionUpgradedPromise.value
 
         XCTAssertNotNil(upgradeNavigation)
-        XCTAssertEqual(upgradeNavigation?.value, #URL("http://good.third-party.site/privacy-protections/https-loop-protection/http-only.html"))
-        XCTAssertEqual(connectionUpgradedTo, #URL("https://good.third-party.site/privacy-protections/https-loop-protection/http-only.html"))
+        XCTAssertEqual(upgradeNavigation?.value, URL(string: "http://good.third-party.site/privacy-protections/https-loop-protection/http-only.html")!)
+        XCTAssertEqual(connectionUpgradedTo, URL(string: "https://good.third-party.site/privacy-protections/https-loop-protection/http-only.html")!)
     }
 
 }
