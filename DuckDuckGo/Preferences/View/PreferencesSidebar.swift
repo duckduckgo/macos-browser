@@ -167,7 +167,7 @@ extension Preferences {
                             SidebarSectionHeader(section: section.id)
                             sidebarSection(section)
                         }
-                    }
+                    }.padding(.bottom, 16)
                 }
 
             }
