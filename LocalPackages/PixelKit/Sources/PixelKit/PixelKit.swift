@@ -18,7 +18,6 @@
 
 import Foundation
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
-import Macros
 
 public final class PixelKit {
     /// `true` if a request is fired, `false` otherwise
@@ -62,7 +61,7 @@ public final class PixelKit {
 
     public typealias Event = PixelKitEvent
 
-    public static let duckDuckGoMorePrivacyInfo = #URL("https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")
+    public static let duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
     private let defaults: UserDefaults
 

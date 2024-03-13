@@ -28,6 +28,11 @@ import NetworkProtectionProxy
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
 
+    enum EnvironmentTitle: String {
+      case staging = "Staging"
+      case production = "Production"
+    }
+
     private let waitlistTokenItem = NSMenuItem(title: "Waitlist Token:")
     private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
     private let waitlistInviteCodeItem = NSMenuItem(title: "Waitlist Invite Code:")
@@ -42,7 +47,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private var dataBrokerForceOptOutWindowController: NSWindowController?
     private let customURLLabelMenuItem = NSMenuItem(title: "")
 
+    private let environmentMenu = NSMenu()
+
     private let webUISettings = DataBrokerProtectionWebUIURLSettings(.dbp)
+    private let settings = DataBrokerProtectionSettings(defaults: .dbp)
 
     // swiftlint:disable:next function_body_length
     init() {
@@ -73,6 +81,9 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 waitlistInviteCodeItem
                 waitlistTermsAndConditionsAcceptedItem
             }
+
+            NSMenuItem(title: "Environment")
+                .submenu(environmentMenu)
 
             NSMenuItem(title: "Background Agent") {
                 NSMenuItem(title: "Enable", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentEnable))
@@ -146,6 +157,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 .targetting(self)
             NSMenuItem(title: "Reset All State and Delete All Data", action: #selector(DataBrokerProtectionDebugMenu.deleteAllDataAndStopAgent))
                 .targetting(self)
+
+            populateDataBrokerProtectionEnvironmentListMenuItems()
         }
     }
 
@@ -158,6 +171,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     override func update() {
         updateWaitlistItems()
         updateWebUIMenuItemsState()
+        updateEnvironmentMenu()
     }
 
     // MARK: - Menu functions
@@ -334,7 +348,27 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         }
     }
 
+    @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
+        let title = menuItem.title
+        let selectedEnvironment: DataBrokerProtectionSettings.SelectedEnvironment
+
+        if title == EnvironmentTitle.staging.rawValue {
+            selectedEnvironment = .staging
+        } else {
+            selectedEnvironment = .production
+        }
+
+        settings.selectedEnvironment = selectedEnvironment
+    }
+
     // MARK: - Utility Functions
+
+    private func populateDataBrokerProtectionEnvironmentListMenuItems() {
+        environmentMenu.items = [
+            NSMenuItem(title: EnvironmentTitle.production.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: EnvironmentTitle.staging.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+        ]
+    }
 
     func showCustomURLAlert(callback: @escaping (String?) -> Bool) {
         let alert = NSAlert()
@@ -388,6 +422,13 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
 
         waitlistBypassItem.state = DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist ? .on : .off
+    }
+
+    private func updateEnvironmentMenu() {
+        let selectedEnvironment = settings.selectedEnvironment
+
+        environmentMenu.items.first?.state = selectedEnvironment == .production ? .on: .off
+        environmentMenu.items.last?.state = selectedEnvironment == .staging ? .on: .off
     }
 }
 
