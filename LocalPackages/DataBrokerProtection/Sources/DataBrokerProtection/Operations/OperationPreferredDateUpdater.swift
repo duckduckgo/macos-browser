@@ -84,7 +84,7 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                 }
             }
         } catch {
-            os_log("Database error during updateChildrenBrokerForParentBroker", log: .dataBrokerProtection)
+            os_log("OperationPreferredDateUpdaterUseCase error: updateChildrenBrokerForParentBroker, error: %{public}@", log: .error, error.localizedDescription)
         }
     }
 
@@ -160,7 +160,7 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                 try database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
             }
         } catch {
-            os_log("Database error during updatePreferredRunDate", log: .dataBrokerProtection)
+            os_log("OperationPreferredDateUpdaterUseCase error: updatePreferredRunDate, error: %{public}@", log: .error, error.localizedDescription)
         }
 
         os_log("Updating preferredRunDate on operation with brokerId %{public}@ and profileQueryId %{public}@", log: .dataBrokerProtection, brokerId.description, profileQueryId.description)

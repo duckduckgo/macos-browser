@@ -128,7 +128,7 @@ final class DataBrokerProtectionProcessor {
                 operationQueue.addOperation(collection)
             }
         } catch {
-            os_log("Database error during Processor.runOperations", log: .dataBrokerProtection)
+            os_log("DataBrokerProtectionProcessor error: runOperations, error: %{public}@", log: .error, error.localizedDescription)
         }
 
         operationQueue.addBarrierBlock {

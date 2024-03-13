@@ -81,7 +81,7 @@ extension DBPUIViewModel: DBPUIScanOps {
         do {
             _ = try await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
         } catch {
-            os_log("DBPUIViewModel updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("DBPUIViewModel error: updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
         }
     }
 }

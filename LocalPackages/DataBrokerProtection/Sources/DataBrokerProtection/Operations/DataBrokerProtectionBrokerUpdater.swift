@@ -38,7 +38,7 @@ final class FileResources: ResourcesRepository {
     func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
         guard let resourceURL = Bundle.module.resourceURL else {
             assertionFailure()
-            os_log("DataBrokerProtectionUpdater error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
+            os_log("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
             throw FileResourcesError.bundleResourceURLNil
         }
 
@@ -55,7 +55,7 @@ final class FileResources: ResourcesRepository {
 
             return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
         } catch {
-            os_log("DataBrokerProtectionUpdater error FileResources error: fetchBrokerFromResourceFiles, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("DataBrokerProtectionUpdater: error FileResources error: fetchBrokerFromResourceFiles, error: %{public}@", log: .error, error.localizedDescription)
             throw error
         }
     }

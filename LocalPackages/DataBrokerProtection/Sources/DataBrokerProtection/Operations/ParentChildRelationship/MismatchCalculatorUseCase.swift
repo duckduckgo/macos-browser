@@ -41,10 +41,14 @@ struct MismatchCalculatorUseCase {
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     func calculateMismatches() {
-        guard let brokerProfileQueryData = try? database.fetchAllBrokerProfileQueryData() else {
-            os_log("Database error during MismatchCalculatorUseCase.calculateMismatches", log: .dataBrokerProtection)
+        let brokerProfileQueryData: [BrokerProfileQueryData]
+        do {
+            brokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
+        } catch {
+            os_log("MismatchCalculatorUseCase error: calculateMismatches, error: %{public}@", log: .error, error.localizedDescription)
             return
         }
+
         let parentBrokerProfileQueryData = brokerProfileQueryData.filter { $0.dataBroker.parent == nil }
 
         for parent in parentBrokerProfileQueryData {
