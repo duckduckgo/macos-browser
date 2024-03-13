@@ -76,7 +76,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
             captchaService: CaptchaService())
 
         let fileResources = FileResources()
-        self.brokers = (try? fileResources.fetchBrokerFromResourceFiles()) ?? [DataBroker]() // TODO not this
+        self.brokers = (try? fileResources.fetchBrokerFromResourceFiles()) ?? [DataBroker]()
     }
 
     func runJSON(jsonString: String) {
