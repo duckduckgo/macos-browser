@@ -41,9 +41,9 @@ public protocol PurchaseRestoringSubscriptionAccessModel {
 public final class SubscriptionAccessActionHandlers {
     var restorePurchases: () -> Void
     var openURLHandler: (URL) -> Void
-    var uiActionHandler: (PreferencesSubscriptionModel.UIEvent) -> Void
+    var uiActionHandler: (PreferencesSubscriptionModel.UserEvent) -> Void
 
-    public init(restorePurchases: @escaping () -> Void, openURLHandler: @escaping (URL) -> Void, uiActionHandler: @escaping (PreferencesSubscriptionModel.UIEvent) -> Void) {
+    public init(restorePurchases: @escaping () -> Void, openURLHandler: @escaping (URL) -> Void, uiActionHandler: @escaping (PreferencesSubscriptionModel.UserEvent) -> Void) {
         self.restorePurchases = restorePurchases
         self.openURLHandler = openURLHandler
         self.uiActionHandler = uiActionHandler

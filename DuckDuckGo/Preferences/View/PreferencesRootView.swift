@@ -118,7 +118,7 @@ enum Preferences {
                 }
             }
 
-            let handleUIEvent: (PreferencesSubscriptionModel.UIEvent) -> Void = { event in
+            let handleUIEvent: (PreferencesSubscriptionModel.UserEvent) -> Void = { event in
                 DispatchQueue.main.async {
                     switch event {
                     case .openVPN:
@@ -161,7 +161,7 @@ enum Preferences {
                                                                       uiActionHandler: handleUIEvent)
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
-                                                uiEventHandler: handleUIEvent,
+                                                userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
                                                 subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }

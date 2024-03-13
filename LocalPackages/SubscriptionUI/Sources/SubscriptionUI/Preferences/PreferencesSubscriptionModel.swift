@@ -34,7 +34,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private let accountManager: AccountManager
     private let openURLHandler: (URL) -> Void
-    public let uiEventHandler: (UIEvent) -> Void
+    public let userEventHandler: (UserEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
     private let subscriptionAppGroup: String
 
@@ -43,7 +43,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public enum UIEvent {
+    public enum UserEvent {
         case openVPN,
              openDB,
              openITR,
@@ -59,12 +59,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     public init(openURLHandler: @escaping (URL) -> Void,
-                uiEventHandler: @escaping (UIEvent) -> Void,
+                userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
                 subscriptionAppGroup: String) {
         self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
         self.openURLHandler = openURLHandler
-        self.uiEventHandler = uiEventHandler
+        self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
         self.subscriptionAppGroup = subscriptionAppGroup
 
@@ -181,17 +181,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openVPN() {
-        uiEventHandler(.openVPN)
+        userEventHandler(.openVPN)
     }
 
     @MainActor
     func openPersonalInformationRemoval() {
-        uiEventHandler(.openDB)
+        userEventHandler(.openDB)
     }
 
     @MainActor
     func openIdentityTheftRestoration() {
-        uiEventHandler(.openITR)
+        userEventHandler(.openITR)
     }
 
     @MainActor

@@ -90,13 +90,13 @@ public struct PreferencesSubscriptionView: View {
                         TextMenuItemCaption(model.subscriptionDetails ?? "")
                     } buttons: {
                         Button(UserText.addToAnotherDeviceButton) {
-                            model.uiEventHandler(.addToAnotherDeviceClick)
+                            model.userEventHandler(.addToAnotherDeviceClick)
                             showingSheet.toggle()
                         }
 
                         Menu {
                             Button(UserText.changePlanOrBillingButton, action: {
-                                model.uiEventHandler(.changePlanOrBillingClick)
+                                model.userEventHandler(.changePlanOrBillingClick)
                                 Task {
                                     switch await model.changePlanOrBillingAction() {
                                     case .presentSheet(let sheet):
@@ -107,7 +107,7 @@ public struct PreferencesSubscriptionView: View {
                                 }
                             })
                             Button(UserText.removeFromThisDeviceButton, action: {
-                                model.uiEventHandler(.removeSubscriptionClick)
+                                model.userEventHandler(.removeSubscriptionClick)
                                 showingRemoveConfirmationDialog.toggle()
                             })
                         } label: {
@@ -133,7 +133,7 @@ public struct PreferencesSubscriptionView: View {
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
                         Button(UserText.haveSubscriptionButton) {
                             showingSheet.toggle()
-                            model.uiEventHandler(.iHaveASubscriptionClick)
+                            model.userEventHandler(.iHaveASubscriptionClick)
                         }
                     }
                 }
@@ -185,7 +185,7 @@ public struct PreferencesSubscriptionView: View {
         }
         .onAppear(perform: {
             if model.isUserAuthenticated {
-                model.uiEventHandler(.activeSubscriptionSettingsClick)
+                model.userEventHandler(.activeSubscriptionSettingsClick)
             }
         })
     }
