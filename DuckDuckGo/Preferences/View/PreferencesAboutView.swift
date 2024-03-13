@@ -52,6 +52,8 @@ extension Preferences {
                             Text(UserText.duckDuckGo).font(.companyName)
 #endif
                             Text(UserText.privacySimplified).font(.privacySimplified)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.leading)
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                                 .onTapGesture(count: 12) {
