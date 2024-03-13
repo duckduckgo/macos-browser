@@ -524,15 +524,10 @@ extension SubscriptionPagesUseSubscriptionFeature {
 extension MainWindowController {
 
     @MainActor
-    func showSomethingWentWrongAlert(environment: SubscriptionPurchaseEnvironment.Environment = SubscriptionPurchaseEnvironment.current) {
+    func showSomethingWentWrongAlert() {
         guard let window else { return }
 
-        switch environment {
-        case .appStore:
-            window.show(.somethingWentWrongAlert())
-        case .stripe:
-            window.show(.somethingWentWrongStripeAlert())
-        }
+        window.show(.somethingWentWrongAlert())
     }
 
     @MainActor
