@@ -31,9 +31,9 @@ public final class DataBrokerProtectionSettings {
         public var endpointURL: URL {
             switch self {
             case .production:
-                return #URL("https://dbp.duckduckgo.com")
+                return URL(string: "https://dbp.duckduckgo.com")!
             case .staging:
-                return #URL("https://dbp-staging.duckduckgo.com")
+                return URL(string: "https://dbp-staging.duckduckgo.com")!
             }
         }
     }
