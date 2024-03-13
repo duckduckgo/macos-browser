@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-
 import Foundation
 import BrowserServicesKit
 import SecureStorage
@@ -40,5 +39,4 @@ final class DataBrokerProtectionSecureVaultErrorReporter: SecureVaultErrorReport
 //            Pixel.fire(.debug(event: .secureVaultError, error: error))
 //        }
     }
-
 }

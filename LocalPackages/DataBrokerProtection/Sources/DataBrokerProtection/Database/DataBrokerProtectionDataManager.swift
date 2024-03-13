@@ -63,7 +63,6 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
             try await database.save(profile)
         } catch {
             // We should still invalidate the cache if the save fails
-            // TODO might be a good place to send a pixel
             cache.invalidate()
             throw error
         }
