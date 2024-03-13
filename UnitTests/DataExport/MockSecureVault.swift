@@ -19,7 +19,6 @@
 import BrowserServicesKit
 import Foundation
 import GRDB
-import Macros
 import SecureStorage
 
 typealias MockVaultFactory = SecureVaultFactory<MockSecureVault<MockDatabaseProvider>>
@@ -249,7 +248,7 @@ extension MockSecureVault {
 // MARK: - Mock Providers
 
 private extension URL {
-    static let duckduckgo = #URL("https://duckduckgo.com/")
+    static let duckduckgo = URL(string: "https://duckduckgo.com/")!
 }
 
 class MockDatabaseProvider: AutofillDatabaseProvider {
@@ -272,7 +271,7 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     }
 
     static func recreateDatabase(withKey key: Data) throws -> Self {
-        return try MockDatabaseProvider(file: #URL("https://duck.com"), key: Data()) as! Self
+        return try MockDatabaseProvider(file: URL(string: "https://duck.com")!, key: Data()) as! Self
     }
 
     func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) throws -> Int64 {

@@ -23,46 +23,19 @@
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Review"
-      selectedDebuggerIdentifier = ""
-      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
-      <PreActions>
-         <ExecutionAction
-            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
-            <ActionContent
-               title = "Run Script"
-               scriptText = "killall tests-server&#10;# integration tests resources dir&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;&quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
-               <EnvironmentBuildable>
-                  <BuildableReference
-                     BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "4B1AD89C25FC27E200261379"
-                     BuildableName = "Integration Tests.xctest"
-                     BlueprintName = "Integration Tests"
-                     ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-                  </BuildableReference>
-               </EnvironmentBuildable>
-            </ActionContent>
-         </ExecutionAction>
-      </PreActions>
-      <PostActions>
-         <ExecutionAction
-            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
-            <ActionContent
-               title = "Run Script"
-               scriptText = "killall tests-server&#10;">
-            </ActionContent>
-         </ExecutionAction>
-      </PostActions>
+      shouldAutocreateTestPlan = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "565E46DC2B2725DC0013AC2A"
-               BuildableName = "SyncE2EUITests.xctest"
-               BlueprintName = "SyncE2EUITests"
+               BlueprintIdentifier = "7B4CE8D926F02108009134B1"
+               BuildableName = "UI Tests.xctest"
+               BlueprintName = "UI Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -118,8 +91,7 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AA585D7D248FD31100E9A3E2"
@@ -127,7 +99,7 @@
             BlueprintName = "DuckDuckGo Privacy Browser"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

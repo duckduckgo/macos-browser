@@ -18,7 +18,6 @@
 
 import BrowserServicesKit
 import Combine
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -37,7 +36,7 @@ final class DuckPlayerTests: XCTestCase {
 
     func testThatImageForFaviconViewReturnsHardcodedFaviconForDuckPlayer() {
         let duckPlayerFaviconView = FaviconView(url: duckPlayerURL())
-        let otherFaviconView = FaviconView(url: #URL("http://example.com"))
+        let otherFaviconView = FaviconView(url: URL(string: "http://example.com")!)
 
         duckPlayer.mode = .enabled
         XCTAssertEqual(duckPlayer.image(for: duckPlayerFaviconView)?.tiffRepresentation, NSImage.duckPlayer.tiffRepresentation)

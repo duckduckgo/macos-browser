@@ -18,7 +18,6 @@
 
 import Combine
 import LoginItems
-import Macros
 import NetworkExtension
 import NetworkProtection
 import ServiceManagement
@@ -160,7 +159,7 @@ extension NetworkProtectionStatusView {
             if #available(macOS 13.0, *) {
                 SMAppService.openSystemSettingsLoginItems()
             } else {
-                let loginItemsURL = #URL("x-apple.systempreferences:com.apple.LoginItems-Settings.extension")
+                let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension")!
                 NSWorkspace.shared.open(loginItemsURL)
             }
         }
