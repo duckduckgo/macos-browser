@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import Macros
 
 public final class DataBrokerProtectionSettings {
     private let defaults: UserDefaults
