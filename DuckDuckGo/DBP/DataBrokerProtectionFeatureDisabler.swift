@@ -49,7 +49,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
             do {
                 try dataManager.removeAllData()
             } catch {
-                os_log("Database error during DataBrokerProtectionFeatureDisabler.disableAndDelete", log: .dataBrokerProtection)
+                os_log("DataBrokerProtectionFeatureDisabler error: disableAndDelete, error: %{public}@", log: .error, error.localizedDescription)
             }
 
             DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerDisableAndDeleteDaily, frequency: .dailyOnly)

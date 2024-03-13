@@ -89,7 +89,7 @@ final class DBPHomeViewController: NSViewController {
                 dbpDateStore.updateLastActiveDate()
             }
         } catch {
-            os_log("Database error during DBPHomeViewController.viewDidLoad", log: .dataBrokerProtection)
+            os_log("DBPHomeViewController error: viewDidLoad, error: %{public}@", log: .error, error.localizedDescription)
         }
     }
 
