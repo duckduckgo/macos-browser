@@ -77,6 +77,10 @@ final class NetworkProtectionNavBarPopoverManager {
                                 await appLauncher.launchApp(withCommand: .showSettings)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                                await appLauncher.launchApp(withCommand: .showSettings)
+                            }),
+                        NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {
                                 await appLauncher.launchApp(withCommand: .shareFeedback)
@@ -84,6 +88,10 @@ final class NetworkProtectionNavBarPopoverManager {
                     ]
                 } else {
                     return [
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                                await appLauncher.launchApp(withCommand: .showSettings)
+                            }),
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {
