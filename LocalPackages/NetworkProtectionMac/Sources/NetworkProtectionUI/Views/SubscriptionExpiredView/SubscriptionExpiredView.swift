@@ -21,40 +21,46 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct SubscriptionExpiredView: View {
+    enum Constants {
+        static let backgroundCornerRadius = 6.0
+    }
+
     let subscribeButtonHandler: () -> Void
     let uninstallButtonHandler: () -> Void
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text("VPN disconnected due to expired subscription")
+            Text(UserText.networkProtectionSubscriptionExpiredTitle)
                 .font(.system(size: 14).weight(.bold))
                 .foregroundColor(Color(.defaultText))
                 .multilineText()
 
-            Text("Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.")
+            Text(UserText.networkProtectionSubscriptionExpiredSubtitle)
                 .font(.system(size: 13))
                 .foregroundColor(Color(.defaultText))
                 .multilineText()
 
-            Button("Subscribe to Privacy Pro", action: subscribeButtonHandler)
-            .buttonStyle(DefaultActionButtonStyle(enabled: true))
-            .padding(.top, 3)
+            Button(UserText.networkProtectionSubscriptionExpiredResubscribeButton, action: subscribeButtonHandler)
+                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                .padding(.top, 3)
 
-            Divider().padding(.top, 8).padding(.bottom, 3)
+            Divider()
+                .padding(.top, 8)
+                .padding(.bottom, 3)
 
-            Button("Uninstall DuckDuckGo VPN", action: uninstallButtonHandler)
-            .buttonStyle(.borderless)
-            .foregroundColor(.accentColor)
-            .padding(.top, 3)
+            Button(UserText.networkProtectionSubscriptionExpiredUninstallButton, action: uninstallButtonHandler)
+                .buttonStyle(.borderless)
+                .foregroundColor(.accentColor)
+                .padding(.top, 3)
         }
         .padding(.vertical, 16)
         .padding(.horizontal, 10)
         .cornerRadius(8)
         .background(
-            RoundedRectangle(cornerRadius: 6, style: .circular)
+            RoundedRectangle(cornerRadius: Constants.backgroundCornerRadius, style: .circular)
                 .stroke(Color(.onboardingStepBorder), lineWidth: 1)
                 .background(
-                    RoundedRectangle(cornerRadius: 6, style: .circular)
+                    RoundedRectangle(cornerRadius: Constants.backgroundCornerRadius, style: .circular)
                         .fill(Color(.onboardingStepBackground))
                 )
         )
