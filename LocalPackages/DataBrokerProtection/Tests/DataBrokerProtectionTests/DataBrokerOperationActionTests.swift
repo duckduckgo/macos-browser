@@ -19,7 +19,6 @@
 import BrowserServicesKit
 import Combine
 import Foundation
-import Macros
 import XCTest
 
 @testable import DataBrokerProtection
@@ -326,7 +325,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
         )
         sut.webViewHandler = webViewHandler
 
-        await sut.loadURL(url: #URL("https://www.duckduckgo.com"))
+        await sut.loadURL(url: URL(string: "https://www.duckduckgo.com")!)
 
         XCTAssertEqual(webViewHandler.wasLoadCalledWithURL?.absoluteString, "https://www.duckduckgo.com")
     }

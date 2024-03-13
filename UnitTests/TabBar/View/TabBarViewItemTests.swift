@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Macros
 import XCTest
 
 #if SUBSCRIPTION
@@ -145,7 +144,7 @@ final class TabBarViewItemTests: XCTestCase {
 
         // Update url
         let tab = Tab()
-        tab.url = #URL("https://www.apple.com")
+        tab.url = URL(string: "https://www.apple.com")!
         delegate.mockedCurrentTab = tab
         let vm = TabViewModel(tab: tab)
         tabBarViewItem.subscribe(to: vm, tabCollectionViewModel: TabCollectionViewModel())
