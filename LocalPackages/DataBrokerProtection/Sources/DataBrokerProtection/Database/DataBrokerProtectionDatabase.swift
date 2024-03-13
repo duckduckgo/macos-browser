@@ -373,7 +373,7 @@ extension DataBrokerProtectionDatabase {
         let databaseProfileQueries = databaseBrokerProfileQueryData.map { $0.profileQuery }
 
         // The queries we need to create are the one that exist on the new ones but not in the database
-        var profileQueriesToCreate = Set(newProfileQueries).subtracting(Set(databaseProfileQueries))
+        let profileQueriesToCreate = Set(newProfileQueries).subtracting(Set(databaseProfileQueries))
 
         // The queries that need update exist in both the new and the database
         // We assume updated queries will be not deprecated
