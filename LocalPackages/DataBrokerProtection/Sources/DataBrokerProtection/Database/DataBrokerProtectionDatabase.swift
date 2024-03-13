@@ -58,153 +58,238 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
     }
 
     func save(_ profile: DataBrokerProtectionProfile) async throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
 
-        if try vault.fetchProfile(with: Self.profileId) != nil {
-            try await updateProfile(profile, vault: vault)
-        } else {
-            try await saveNewProfile(profile, vault: vault)
+            if try vault.fetchProfile(with: Self.profileId) != nil {
+                try await updateProfile(profile, vault: vault)
+            } else {
+                try await saveNewProfile(profile, vault: vault)
+            }
+        } catch {
+            os_log("Database error: save profile, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
     }
 
     public func fetchProfile() throws -> DataBrokerProtectionProfile? {
-        let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        return try vault.fetchProfile(with: Self.profileId)
+        do {
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.fetchProfile(with: Self.profileId)
+        } catch {
+            os_log("Database error: fetchProfile, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     public func deleteProfileData() throws {
-        let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        try vault.deleteProfileData()
+        do {
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            try vault.deleteProfileData()
+        } catch {
+            os_log("Database error: deleteProfileData, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker] {
-        let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        return try vault.fetchChildBrokers(for: parentBroker)
+        do {
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.fetchChildBrokers(for: parentBroker)
+        } catch {
+            os_log("Database error: fetchChildBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func save(_ extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> Int64 {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
 
-        return try vault.save(extractedProfile: extractedProfile, brokerId: brokerId, profileQueryId: profileQueryId)
+            return try vault.save(extractedProfile: extractedProfile, brokerId: brokerId, profileQueryId: profileQueryId)
+        } catch {
+            os_log("Database error: extractedProfile, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) throws -> BrokerProfileQueryData? {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        guard let broker = try vault.fetchBroker(with: brokerId),
-              let profileQuery = try vault.fetchProfileQuery(with: profileQueryId),
-              let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
-            // TODO perhaps this should error if we query for things that don't exist?
-            return nil
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            guard let broker = try vault.fetchBroker(with: brokerId),
+                  let profileQuery = try vault.fetchProfileQuery(with: profileQueryId),
+                  let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
+                // TODO perhaps this should error if we query for things that don't exist?
+                return nil
+            }
+
+            let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
+
+            return BrokerProfileQueryData(
+                dataBroker: broker,
+                profileQuery: profileQuery,
+                scanOperationData: scanOperation,
+                optOutOperationsData: optOutOperations
+            )
+        } catch {
+            os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
-
-        let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
-
-        return BrokerProfileQueryData(
-            dataBroker: broker,
-            profileQuery: profileQuery,
-            scanOperationData: scanOperation,
-            optOutOperationsData: optOutOperations
-        )
     }
 
     func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile] {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        return try vault.fetchExtractedProfiles(for: brokerId)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.fetchExtractedProfiles(for: brokerId)
+        } catch {
+            os_log("Database error: fetchExtractedProfiles, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        try vault.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            try vault.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
+        } catch {
+            os_log("Database error: updatePreferredRunDate without extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
 
-        try vault.updatePreferredRunDate(
-            date,
-            brokerId: brokerId,
-            profileQueryId: profileQueryId,
-            extractedProfileId: extractedProfileId)
+            try vault.updatePreferredRunDate(
+                date,
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId)
+        } catch {
+            os_log("Database error: updatePreferredRunDate with extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        try vault.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            try vault.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
+        } catch {
+            os_log("Database error: updateLastRunDate without extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
 
-        try vault.updateLastRunDate(
-            date,
-            brokerId: brokerId,
-            profileQueryId: profileQueryId,
-            extractedProfileId: extractedProfileId
-        )
+            try vault.updateLastRunDate(
+                date,
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId
+            )
+        } catch {
+            os_log("Database error: updateLastRunDate with extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        try vault.updateRemovedDate(for: extractedProfileId, with: date)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            try vault.updateRemovedDate(for: extractedProfileId, with: date)
+        } catch {
+            os_log("Database error: updateRemovedDate, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func add(_ historyEvent: HistoryEvent) throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
 
-        if  let extractedProfileId = historyEvent.extractedProfileId {
-            try vault.save(historyEvent: historyEvent, brokerId: historyEvent.brokerId, profileQueryId: historyEvent.profileQueryId, extractedProfileId: extractedProfileId)
-        } else {
-            try vault.save(historyEvent: historyEvent, brokerId: historyEvent.brokerId, profileQueryId: historyEvent.profileQueryId)
+            if  let extractedProfileId = historyEvent.extractedProfileId {
+                try vault.save(historyEvent: historyEvent, brokerId: historyEvent.brokerId, profileQueryId: historyEvent.profileQueryId, extractedProfileId: extractedProfileId)
+            } else {
+                try vault.save(historyEvent: historyEvent, brokerId: historyEvent.brokerId, profileQueryId: historyEvent.profileQueryId)
+            }
+        } catch {
+            os_log("Database error: add historyEvent, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
     }
 
     func fetchAllBrokerProfileQueryData() throws -> [BrokerProfileQueryData] {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        let brokers = try vault.fetchAllBrokers()
-        let profileQueries = try vault.fetchAllProfileQueries(for: Self.profileId)
-        var brokerProfileQueryDataList = [BrokerProfileQueryData]()
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let brokers = try vault.fetchAllBrokers()
+            let profileQueries = try vault.fetchAllProfileQueries(for: Self.profileId)
+            var brokerProfileQueryDataList = [BrokerProfileQueryData]()
 
-        for broker in brokers {
-            for profileQuery in profileQueries {
-                if let brokerId = broker.id, let profileQueryId = profileQuery.id {
-                    guard let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else { continue }
-                    let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
+            for broker in brokers {
+                for profileQuery in profileQueries {
+                    if let brokerId = broker.id, let profileQueryId = profileQuery.id {
+                        guard let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else { continue }
+                        let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
 
-                    let brokerProfileQueryData = BrokerProfileQueryData(
-                        dataBroker: broker,
-                        profileQuery: profileQuery,
-                        scanOperationData: scanOperation,
-                        optOutOperationsData: optOutOperations
-                    )
+                        let brokerProfileQueryData = BrokerProfileQueryData(
+                            dataBroker: broker,
+                            profileQuery: profileQuery,
+                            scanOperationData: scanOperation,
+                            optOutOperationsData: optOutOperations
+                        )
 
-                    brokerProfileQueryDataList.append(brokerProfileQueryData)
+                        brokerProfileQueryDataList.append(brokerProfileQueryData)
+                    }
                 }
             }
-        }
 
-        return brokerProfileQueryDataList
+            return brokerProfileQueryDataList
+        } catch {
+            os_log("Database error: fetchAllBrokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
 
-        try vault.save(brokerId: optOut.brokerId,
-                       profileQueryId: optOut.profileQueryId,
-                       extractedProfile: extractedProfile,
-                       lastRunDate: optOut.lastRunDate,
-                       preferredRunDate: optOut.preferredRunDate)
+            try vault.save(brokerId: optOut.brokerId,
+                           profileQueryId: optOut.profileQueryId,
+                           extractedProfile: extractedProfile,
+                           lastRunDate: optOut.lastRunDate,
+                           preferredRunDate: optOut.preferredRunDate)
+        } catch {
+            os_log("Database error: saveOptOutOperation, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) throws -> HistoryEvent? {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        let events = try vault.fetchEvents(brokerId: brokerId, profileQueryId: profileQueryId)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let events = try vault.fetchEvents(brokerId: brokerId, profileQueryId: profileQueryId)
 
-        return events.max(by: { $0.date < $1.date })
+            return events.max(by: { $0.date < $1.date })
+        } catch {
+            os_log("Database error: fetchLastEvent, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func hasMatches() throws -> Bool {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        return try vault.hasMatches()
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.hasMatches()
+        } catch {
+            os_log("Database error: hasMatches, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {
@@ -213,17 +298,22 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             return try vault.fetchAttemptInformation(for: extractedProfileId)
         } catch {
             os_log("Database error: fetchAttemptInformation, error: %{public}@", log: .error, error.localizedDescription)
-            return nil
+            throw error
         }
     }
 
     func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-        try vault.save(extractedProfileId: extractedProfileId,
-                       attemptUUID: attemptUUID,
-                       dataBroker: dataBroker,
-                       lastStageDate: lastStageDate,
-                       startTime: startTime)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            try vault.save(extractedProfileId: extractedProfileId,
+                           attemptUUID: attemptUUID,
+                           dataBroker: dataBroker,
+                           lastStageDate: lastStageDate,
+                           startTime: startTime)
+        } catch {
+            os_log("Database error: addAttempt, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
     }
 }
 
