@@ -20,12 +20,6 @@ import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 import XCTest
 
-#if NETWORK_PROTECTION
-import NetworkProtection
-import NetworkProtectionIPC
-import NetworkProtectionUI
-#endif
-
 private final class MockNSPopoverDelegate: NSObject, NSPopoverDelegate {}
 
 final class NavigationBarPopoversTests: XCTestCase {

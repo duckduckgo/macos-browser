@@ -8937,6 +8937,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B60293EA2BA1A5ED0033186B /* PBXTargetDependency */,
 				7B4627742B9AF2C8004ACE0B /* PBXTargetDependency */,
 				B6F997BB2B8F353F00476735 /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
@@ -12840,6 +12841,10 @@
 			target = 4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */;
 			targetProxy = 7BEC18302AD5DA3300D30536 /* PBXContainerItemProxy */;
 		};
+		B60293EA2BA1A5ED0033186B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B60293E92BA1A5ED0033186B /* NetworkProtectionTestUtils */;
+		};
 		B6080B9D2B20AF7700B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
@@ -14400,6 +14405,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		B60293E92BA1A5ED0033186B /* NetworkProtectionTestUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtectionTestUtils;
 		};
 		B64E42882B90865F006C1346 /* Macros */ = {
 			isa = XCSwiftPackageProductDependency;

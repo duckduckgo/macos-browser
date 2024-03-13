@@ -72,19 +72,12 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     init(popoverManager: NetPPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
-         statusReporter: NetworkProtectionStatusReporter? = nil,
+         statusReporter: NetworkProtectionStatusReporter,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         self.popoverManager = popoverManager
         let ipcClient = popoverManager.ipcClient
         self.networkProtectionStatusReporter = statusReporter
-            ?? DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.ipcStatusObserver,
-                serverInfoObserver: ipcClient.ipcServerInfoObserver,
-                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
-                connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
-                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-        )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.pinningManager = pinningManager
         self.shortcutTitle = pinningManager.shortcutTitle(for: .networkProtection)
@@ -117,6 +110,9 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     /// This will be removed once the waitlist beta has ended.
     private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
         let icon = icon ?? iconPublisher.icon
+#if DEBUG
+        guard [.normal, .integrationTests].contains(NSApp.runType) else { return NSImage() }
+#endif
 
         let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
         let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated

@@ -69,4 +69,14 @@ final class IPCClientMock: NetworkProtectionIPCClient {
 
 }
 
+final class ConnectivityIssueObserverMock: ConnectivityIssueObserver {
+    var publisher: AnyPublisher<Bool, Never> = PassthroughSubject().eraseToAnyPublisher()
+    var recentValue = false
+}
+
+final class ControllerErrorMesssageObserverMock: ControllerErrorMesssageObserver {
+    var publisher: AnyPublisher<String?, Never> = PassthroughSubject().eraseToAnyPublisher()
+    var recentValue: String?
+}
+
 #endif

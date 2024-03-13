@@ -609,8 +609,10 @@ import SubscriptionUI
 #endif
 
 #if NETWORK_PROTECTION
-            NSMenuItem(title: "Network Protection")
-                .submenu(NetworkProtectionDebugMenu())
+            if case .normal = NSApp.runType {
+                NSMenuItem(title: "Network Protection")
+                    .submenu(NetworkProtectionDebugMenu())
+            }
 #endif
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))

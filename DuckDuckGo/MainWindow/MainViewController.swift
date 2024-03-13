@@ -77,8 +77,29 @@ final class MainViewController: NSViewController {
 
             return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
         }()
+        let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
+            var connectivityIssuesObserver: ConnectivityIssueObserver!
+            var controllerErrorMessageObserver: ControllerErrorMesssageObserver!
+#if DEBUG
+            if ![.normal, .integrationTests].contains(NSApp.runType) {
+                connectivityIssuesObserver = ConnectivityIssueObserverMock()
+                controllerErrorMessageObserver = ControllerErrorMesssageObserverMock()
+            }
+#endif
+            connectivityIssuesObserver = connectivityIssuesObserver ?? DisabledConnectivityIssueObserver()
+            controllerErrorMessageObserver = controllerErrorMessageObserver ?? ControllerErrorMesssageObserverThroughDistributedNotifications()
 
-        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionPopoverManager: networkProtectionPopoverManager, passwordPopoverPresenter: passwordPopoverPresenter)
+            let ipcClient = networkProtectionPopoverManager.ipcClient
+            return DefaultNetworkProtectionStatusReporter(
+                statusObserver: ipcClient.ipcStatusObserver,
+                serverInfoObserver: ipcClient.ipcServerInfoObserver,
+                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
+                connectivityIssuesObserver: connectivityIssuesObserver,
+                controllerErrorMessageObserver: controllerErrorMessageObserver
+            )
+        }()
+
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, passwordPopoverPresenter: passwordPopoverPresenter)
 #else
         navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, passwordPopoverPresenter: passwordPopoverPresenter)
 #endif
