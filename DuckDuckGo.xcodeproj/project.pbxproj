@@ -13763,8 +13763,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 122.1.1;
+				kind = revision;
+				revision = 47c343fcc7e5cfdcdb37c5c5ae1935a7839a3599;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
