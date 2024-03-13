@@ -148,7 +148,7 @@ extension Preferences {
                 return button
             })
             .padding(.horizontal, 3)
-            .frame(height: 60)
+            .frame(height: 50)
             .onAppear(perform: model.resetTabSelectionIfNeeded)
         }
     }
