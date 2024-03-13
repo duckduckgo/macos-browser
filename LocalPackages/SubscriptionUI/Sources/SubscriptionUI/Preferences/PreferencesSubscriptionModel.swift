@@ -34,9 +34,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private let accountManager: AccountManager
     private let openURLHandler: (URL) -> Void
-    private let openVPNHandler: () -> Void
-    private let openDBPHandler: () -> Void
-    private let openITRHandler: () -> Void
+    public let userEventHandler: (UserEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
     private let subscriptionAppGroup: String
 
@@ -45,17 +43,28 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
+    public enum UserEvent {
+        case openVPN,
+             openDB,
+             openITR,
+             iHaveASubscriptionClick,
+             activateAddEmailClick,
+             postSubscriptionAddEmailClick,
+             addToAnotherDeviceClick,
+             addDeviceEnterEmail,
+             restorePurchaseStoreClick,
+             activeSubscriptionSettingsClick,
+             changePlanOrBillingClick,
+             removeSubscriptionClick
+    }
+
     public init(openURLHandler: @escaping (URL) -> Void,
-                openVPNHandler: @escaping () -> Void,
-                openDBPHandler: @escaping () -> Void,
-                openITRHandler: @escaping () -> Void,
+                userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
                 subscriptionAppGroup: String) {
         self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
         self.openURLHandler = openURLHandler
-        self.openVPNHandler = openVPNHandler
-        self.openDBPHandler = openDBPHandler
-        self.openITRHandler = openITRHandler
+        self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
         self.subscriptionAppGroup = subscriptionAppGroup
 
@@ -172,17 +181,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openVPN() {
-        openVPNHandler()
+        userEventHandler(.openVPN)
     }
 
     @MainActor
     func openPersonalInformationRemoval() {
-        openDBPHandler()
+        userEventHandler(.openDB)
     }
 
     @MainActor
     func openIdentityTheftRestoration() {
-        openITRHandler()
+        userEventHandler(.openITR)
     }
 
     @MainActor

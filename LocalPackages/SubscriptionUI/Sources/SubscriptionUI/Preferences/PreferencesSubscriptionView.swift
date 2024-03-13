@@ -89,10 +89,14 @@ public struct PreferencesSubscriptionView: View {
                         TextMenuItemHeader(UserText.preferencesSubscriptionActiveHeader)
                         TextMenuItemCaption(model.subscriptionDetails ?? "")
                     } buttons: {
-                        Button(UserText.addToAnotherDeviceButton) { showingSheet.toggle() }
+                        Button(UserText.addToAnotherDeviceButton) {
+                            model.userEventHandler(.addToAnotherDeviceClick)
+                            showingSheet.toggle()
+                        }
 
                         Menu {
                             Button(UserText.changePlanOrBillingButton, action: {
+                                model.userEventHandler(.changePlanOrBillingClick)
                                 Task {
                                     switch await model.changePlanOrBillingAction() {
                                     case .presentSheet(let sheet):
@@ -103,6 +107,7 @@ public struct PreferencesSubscriptionView: View {
                                 }
                             })
                             Button(UserText.removeFromThisDeviceButton, action: {
+                                model.userEventHandler(.removeSubscriptionClick)
                                 showingRemoveConfirmationDialog.toggle()
                             })
                         } label: {
@@ -126,7 +131,10 @@ public struct PreferencesSubscriptionView: View {
                     } buttons: {
                         Button(UserText.purchaseButton) { model.purchaseAction() }
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
-                        Button(UserText.haveSubscriptionButton) { showingSheet.toggle() }
+                        Button(UserText.haveSubscriptionButton) {
+                            showingSheet.toggle()
+                            model.userEventHandler(.iHaveASubscriptionClick)
+                        }
                     }
                 }
 
@@ -175,6 +183,11 @@ public struct PreferencesSubscriptionView: View {
                 }
             }
         }
+        .onAppear(perform: {
+            if model.isUserAuthenticated {
+                model.userEventHandler(.activeSubscriptionSettingsClick)
+            }
+        })
     }
 }
 
