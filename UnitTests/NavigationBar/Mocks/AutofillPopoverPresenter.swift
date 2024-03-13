@@ -29,7 +29,7 @@ final class MockAutofillPopoverPresenter: AutofillPopoverPresenter {
     var isShown = false
 
     var passwordDomain: String?
-    
+
     var popoverIsDirty: Bool {
         isDirty
     }
@@ -37,7 +37,7 @@ final class MockAutofillPopoverPresenter: AutofillPopoverPresenter {
         isShown
     }
 
-    var popoverPresentingWindow: NSWindow? = nil
+    var popoverPresentingWindow: NSWindow?
 
     func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: DuckDuckGo_Privacy_Browser.SecureVaultSorting.Category?) {
         didShowWithCategory = true
