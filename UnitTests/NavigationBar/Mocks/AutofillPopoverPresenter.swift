@@ -29,6 +29,7 @@ final class MockAutofillPopoverPresenter: AutofillPopoverPresenter {
     var isShown = false
 
     var passwordDomain: String?
+    
     var popoverIsDirty: Bool {
         isDirty
     }

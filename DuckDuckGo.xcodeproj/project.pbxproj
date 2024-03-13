@@ -3095,11 +3095,11 @@
 		C168B9AE2B31DC7F001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
 		C17CA7AD2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */; };
 		C17CA7AE2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */; };
-		C17CA7B22B9B5317008EC3C1 /* MockPasswordPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockPasswordPopoverPresenter.swift */; };
-		C17CA7B32B9B5317008EC3C1 /* MockPasswordPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* MockPasswordPopoverPresenter.swift */; };
-		C1DAF3B52B9A44860059244F /* PasswordPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DAF3B42B9A44860059244F /* PasswordPopoverPresenter.swift */; };
-		C1DAF3B62B9A44860059244F /* PasswordPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DAF3B42B9A44860059244F /* PasswordPopoverPresenter.swift */; };
-		C1DAF3B72B9A44860059244F /* PasswordPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DAF3B42B9A44860059244F /* PasswordPopoverPresenter.swift */; };
+		C17CA7B22B9B5317008EC3C1 /* AutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* AutofillPopoverPresenter.swift */; };
+		C17CA7B32B9B5317008EC3C1 /* AutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17CA7B12B9B5317008EC3C1 /* AutofillPopoverPresenter.swift */; };
+		C1DAF3B52B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */; };
+		C1DAF3B62B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */; };
+		C1DAF3B72B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */; };
 		C1E961EB2B879E79001760E1 /* MockAutofillActionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E961E72B879E4D001760E1 /* MockAutofillActionPresenter.swift */; };
 		C1E961ED2B879ED9001760E1 /* MockAutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E961EC2B879ED9001760E1 /* MockAutofillActionExecutor.swift */; };
 		C1E961EF2B87AA29001760E1 /* AutofillActionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E961EE2B87AA29001760E1 /* AutofillActionBuilder.swift */; };
@@ -4497,8 +4497,8 @@
 		C13909FA2B861039001626ED /* AutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionPresenter.swift; sourceTree = "<group>"; };
 		C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillNeverPromptWebsitesManager.swift; sourceTree = "<group>"; };
 		C17CA7AC2B9B52E6008EC3C1 /* NavigationBarPopoversTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopoversTests.swift; sourceTree = "<group>"; };
-		C17CA7B12B9B5317008EC3C1 /* MockPasswordPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPasswordPopoverPresenter.swift; sourceTree = "<group>"; };
-		C1DAF3B42B9A44860059244F /* PasswordPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordPopoverPresenter.swift; sourceTree = "<group>"; };
+		C17CA7B12B9B5317008EC3C1 /* AutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPopoverPresenter.swift; sourceTree = "<group>"; };
+		C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPopoverPresenter.swift; sourceTree = "<group>"; };
 		C1E961E72B879E4D001760E1 /* MockAutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillActionPresenter.swift; sourceTree = "<group>"; };
 		C1E961EC2B879ED9001760E1 /* MockAutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAutofillActionExecutor.swift; sourceTree = "<group>"; };
 		C1E961EE2B87AA29001760E1 /* AutofillActionBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionBuilder.swift; sourceTree = "<group>"; };
@@ -6594,7 +6594,7 @@
 				4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */,
 				4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */,
 				4BE4005427CF3F19007D3161 /* SavePaymentMethodViewController.swift */,
-				C1DAF3B42B9A44860059244F /* PasswordPopoverPresenter.swift */,
+				C1DAF3B42B9A44860059244F /* AutofillPopoverPresenter.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -8370,7 +8370,7 @@
 		C17CA7B02B9B52FF008EC3C1 /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
-				C17CA7B12B9B5317008EC3C1 /* MockPasswordPopoverPresenter.swift */,
+				C17CA7B12B9B5317008EC3C1 /* AutofillPopoverPresenter.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -10344,7 +10344,7 @@
 				4B9DB0452A983B24000927DB /* WaitlistModalViewController.swift in Sources */,
 				B66CA41F2AD910B300447CF0 /* DataImportView.swift in Sources */,
 				3706FC0C293F65D500E42796 /* NSAttributedStringExtension.swift in Sources */,
-				C1DAF3B62B9A44860059244F /* PasswordPopoverPresenter.swift in Sources */,
+				C1DAF3B62B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */,
 				3706FC0D293F65D500E42796 /* AnimationView.swift in Sources */,
 				3706FC0E293F65D500E42796 /* NSRectExtension.swift in Sources */,
 				3706FC0F293F65D500E42796 /* YoutubeOverlayUserScript.swift in Sources */,
@@ -10673,7 +10673,7 @@
 				3706FE3C293F661700E42796 /* FireproofDomainsStoreMock.swift in Sources */,
 				3706FE3D293F661700E42796 /* DataEncryptionTests.swift in Sources */,
 				3706FE3E293F661700E42796 /* ClickToLoadModelTests.swift in Sources */,
-				C17CA7B32B9B5317008EC3C1 /* MockPasswordPopoverPresenter.swift in Sources */,
+				C17CA7B32B9B5317008EC3C1 /* AutofillPopoverPresenter.swift in Sources */,
 				3706FE3F293F661700E42796 /* FileStoreMock.swift in Sources */,
 				B6619F042B17123200CD9186 /* DataImportViewModelTests.swift in Sources */,
 				1D8C2FE62B70F4C4005E4BBD /* TabSnapshotExtensionTests.swift in Sources */,
@@ -11621,7 +11621,7 @@
 				4B957B7B2AC7AE700062CA31 /* DeviceAuthenticator.swift in Sources */,
 				4B957B7C2AC7AE700062CA31 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift in Sources */,
 				4B957B7D2AC7AE700062CA31 /* TabBarCollectionView.swift in Sources */,
-				C1DAF3B72B9A44860059244F /* PasswordPopoverPresenter.swift in Sources */,
+				C1DAF3B72B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */,
 				4B957B7E2AC7AE700062CA31 /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
 				7BA7CC502AD11F6F0042E5CE /* NetworkProtectionIPCTunnelController.swift in Sources */,
 				4B957B7F2AC7AE700062CA31 /* NavigationActionExtension.swift in Sources */,
@@ -12410,7 +12410,7 @@
 				4B9292AF26670F5300AD2C21 /* NSOutlineViewExtensions.swift in Sources */,
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
 				7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */,
-				C1DAF3B52B9A44860059244F /* PasswordPopoverPresenter.swift in Sources */,
+				C1DAF3B52B9A44860059244F /* AutofillPopoverPresenter.swift in Sources */,
 				B687B7CA2947A029001DEA6F /* ContentBlockingTabExtension.swift in Sources */,
 				85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */,
 				4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */,
@@ -12533,7 +12533,7 @@
 				569277C429DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */,
 				85F1B0C925EF9759004792B6 /* URLEventHandlerTests.swift in Sources */,
 				4B9292BD2667103100AD2C21 /* BookmarkOutlineViewDataSourceTests.swift in Sources */,
-				C17CA7B22B9B5317008EC3C1 /* MockPasswordPopoverPresenter.swift in Sources */,
+				C17CA7B22B9B5317008EC3C1 /* AutofillPopoverPresenter.swift in Sources */,
 				4BF6961D28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift in Sources */,
 				B6619F062B17138D00CD9186 /* DataImportSourceViewModelTests.swift in Sources */,
 				4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */,
