@@ -182,20 +182,21 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     @objc private func useWebUICustomURL() {
         webUISettings.setURLType(.custom)
+        webUISettings.setCustomURL(webUISettings.productionURL)
     }
 
     @objc private func resetCustomURL() {
         webUISettings.setURLType(.production)
-        webUISettings.setCustomURL("")
+        webUISettings.setCustomURL(webUISettings.productionURL)
     }
 
     @objc private func setWebUICustomURL() {
         showCustomURLAlert { [weak self] value in
 
-            guard let value = value,
-                  URL(string: value) != nil else { return }
+            guard let value = value, let url = URL(string: value), url.isValid else { return false }
 
             self?.webUISettings.setCustomURL(value)
+            return true
         }
     }
 
@@ -369,7 +370,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         ]
     }
 
-    func showCustomURLAlert(callback: @escaping (String?) -> Void) {
+    func showCustomURLAlert(callback: @escaping (String?) -> Bool) {
         let alert = NSAlert()
         alert.messageText = "Enter URL"
         alert.addButton(withTitle: "Accept")
@@ -380,9 +381,15 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
-            callback(inputTextField.stringValue)
+            if !callback(inputTextField.stringValue) {
+                let invalidAlert = NSAlert()
+                invalidAlert.messageText = "Invalid URL"
+                invalidAlert.informativeText = "Please enter a valid URL."
+                invalidAlert.addButton(withTitle: "OK")
+                invalidAlert.runModal()
+            }
         } else {
-            callback(nil)
+            _ = callback(nil)
         }
     }
 

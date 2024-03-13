@@ -1,7 +1,7 @@
 {
   "name": "PeopleWhiz",
   "url": "peoplewhiz.com",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "addedDatetime": 1676181600000,
   "steps": [
     {
@@ -10,12 +10,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "d18d8f5a-bca6-42ee-90ee-d1af921ba1fd",
+          "id": "25f11594-f04a-4d46-a7ef-9fb3ed237c2d",
           "url": "https://www.peoplewhiz.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
         },
         {
           "actionType": "extract",
-          "id": "41576d32-7ba9-4543-92aa-0f288e51c877",
+          "id": "eb93e81d-36d1-4a8a-ad3d-a87ae2018e74",
           "selector": "[class^='ResultsTable__Record-sc']",
           "profile": {
             "name": {
@@ -42,12 +42,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "0df0df62-6d73-4cee-ad35-7081d0d8aa1c",
+          "id": "ffb90236-10e7-4969-a305-1eb729a1177d",
           "url": "https://www.peoplewhiz.com/optout/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
         },
         {
           "actionType": "click",
-          "id": "4b827bda-039d-4e23-bb3e-9049d9eb5998",
+          "id": "4ee5b821-8b26-4a16-928b-5dd20a7292a2",
           "elements": [
             {
               "selector": "button",
@@ -74,7 +74,7 @@
         },
         {
           "actionType": "fillForm",
-          "id": "079a83ab-9634-4917-818c-2e895c130302",
+          "id": "64f99a6d-f4bb-425e-a430-dded77ed24d0",
           "selector": "form",
           "elements": [
             {
@@ -85,7 +85,7 @@
         },
         {
           "actionType": "click",
-          "id": "e9b9069b-cb9b-42e1-a55a-6f975a810311",
+          "id": "c39d5b51-794a-4c2f-8acc-ed999b5b2245",
           "elements": [
             {
               "type": "button",
@@ -95,7 +95,7 @@
         },
         {
           "actionType": "click",
-          "id": "f3562abe-002e-4df0-b162-79617d3eb08d",
+          "id": "9dec9932-00ba-4a7d-85b3-d3d5e5ee7bcc",
           "elements": [
             {
               "type": "button",
@@ -105,7 +105,7 @@
         },
         {
           "actionType": "fillForm",
-          "id": "82c1556a-8a3b-4a6d-bf1a-531f589dca07",
+          "id": "00405f21-3fcf-4114-9d56-233abceff54a",
           "selector": "form",
           "elements": [
             {
@@ -116,17 +116,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "8fd3a55d-645b-40ae-b5d8-910d99ee0258",
+          "id": "4e2b5224-9293-45d0-98fa-2b088079ff83",
           "selector": "[class^='Confirm__ReCaptchaContainer-sc']"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "ef6dcf5b-de5a-4f4a-8878-8b3ea8f39eac",
+          "id": "006b796c-cf4e-4a7e-a10c-f5c202dfa52e",
           "selector": "[class^='Confirm__ReCaptchaContainer-sc']"
         },
         {
           "actionType": "click",
-          "id": "8120761f-81cd-4fca-9a4c-1292d0488b9c",
+          "id": "003e51ee-6ccb-49eb-b820-e1af2e6fc407",
           "elements": [
             {
               "type": "button",
@@ -135,18 +135,29 @@
           ]
         },
         {
-          "actionType": "emailConfirmation",
-          "id": "483f9d6d-c3b5-4e5a-b3dc-346b7c2e00fa",
-          "pollingTime": 30
-        },
-        {
           "actionType": "expectation",
-          "id": "a3c4abb1-5f65-4a8e-9767-ab5b18d1b90a",
+          "id": "9866e653-d719-4796-8153-4fa89f673d70",
           "expectations": [
             {
               "type": "text",
               "selector": "body",
               "expect": "We have Received Your Request"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "efa0d7c1-2081-4bb5-bff9-5d60eef4e8c8",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "id": "71781ca0-881f-4cc3-b918-0112f952a05e",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your request for optout is confirmed"
             }
           ]
         }

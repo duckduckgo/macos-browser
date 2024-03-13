@@ -122,7 +122,7 @@ extension AppDelegate {
     @objc func openReportBrokenSite(_ sender: Any?) {
         let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
         let privacyDashboardViewController = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { coder in
-            PrivacyDashboardViewController(coder: coder, initMode: .reportBrokenSite)
+            PrivacyDashboardViewController(coder: coder, privacyInfo: nil, dashboardMode: .report)
         }
 
         privacyDashboardViewController.sizeDelegate = self
