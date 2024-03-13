@@ -19,17 +19,17 @@
 import BrowserServicesKit
 import Foundation
 
-protocol PasswordPopoverPresenter {
+protocol AutofillPopoverPresenter {
     var passwordDomain: String? { get set }
     var popoverIsDirty: Bool { get }
-    var popoverIsDisplayed: Bool { get }
-    var popoverIsInCurrentWindow: Bool { get }
-    func show(under view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?)
-    func show(under view: NSView, withSelectedAccount: SecureVaultModels.WebsiteAccount)
+    var popoverIsShown: Bool { get }
+    var popoverPresentingWindow: NSWindow? { get }
+    func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?)
+    func show(positionedBelow view: NSView, withSelectedAccount: SecureVaultModels.WebsiteAccount)
     func dismiss()
 }
 
-final class DefaultPasswordPopoverPresenter: PasswordPopoverPresenter, PopoverPresenter {
+final class DefaultAutofillPopoverPresenter: AutofillPopoverPresenter, PopoverPresenter {
 
     private var popover: PasswordManagementPopover?
 
@@ -41,33 +41,38 @@ final class DefaultPasswordPopoverPresenter: PasswordPopoverPresenter, PopoverPr
         }
     }
 
+    /// Property indicating whether the popover view controller is "dirty", i.e it's state has been edited but is unsaved
     var popoverIsDirty: Bool {
         popover?.viewController.isDirty ?? false
     }
 
-    var popoverIsDisplayed: Bool {
+    var popoverIsShown: Bool {
         popover?.isShown ?? false
     }
 
-    var popoverIsInCurrentWindow: Bool {
-        popover?.mainWindow == NSApplication.shared.keyWindow
+    var popoverPresentingWindow: NSWindow? {
+        popover?.mainWindow
     }
 
     /// Note: Dismisses any previously displayed popover before showing a new one
-    func show(under view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?) {
+    func show(positionedBelow view: NSView, withDomain domain: String?, selectedCategory category: SecureVaultSorting.Category?) {
         show(under: view, withDomain: domain).select(category: category)
     }
 
-    func show(under view: NSView, withSelectedAccount account: SecureVaultModels.WebsiteAccount) {
+    func show(positionedBelow view: NSView, withSelectedAccount account: SecureVaultModels.WebsiteAccount) {
         show(under: view, withDomain: nil).select(websiteAccount: account)
     }
 
     func dismiss() {
-        guard let popover else { return }
+        guard popoverIsShown, let popover else { return }
         popover.close()
+        self.popover = nil
     }
+}
 
-    private func show(under view: NSView, withDomain domain: String?) -> PasswordManagementPopover {
+private extension DefaultAutofillPopoverPresenter {
+
+    func show(under view: NSView, withDomain domain: String?) -> PasswordManagementPopover {
         dismiss()
 
         let popover = PasswordManagementPopover()

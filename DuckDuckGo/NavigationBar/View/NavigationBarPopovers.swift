@@ -60,15 +60,15 @@ final class NavigationBarPopovers: PopoverPresenter {
     private(set) var saveCredentialsPopover: SaveCredentialsPopover?
     private(set) var saveIdentityPopover: SaveIdentityPopover?
     private(set) var savePaymentMethodPopover: SavePaymentMethodPopover?
-    private(set) var passwordPopoverPresenter: PasswordPopoverPresenter
+    private(set) var autofillPopoverPresenter: AutofillPopoverPresenter
     private(set) var downloadsPopover: DownloadsPopover?
 
 #if NETWORK_PROTECTION
     private let networkProtectionPopoverManager: NetPPopoverManager
 
-    init(networkProtectionPopoverManager: NetPPopoverManager, passwordPopoverPresenter: PasswordPopoverPresenter) {
+    init(networkProtectionPopoverManager: NetPPopoverManager, autofillPopoverPresenter: AutofillPopoverPresenter) {
         self.networkProtectionPopoverManager = networkProtectionPopoverManager
-        self.passwordPopoverPresenter = passwordPopoverPresenter
+        self.autofillPopoverPresenter = autofillPopoverPresenter
     }
 
 #else
@@ -79,7 +79,7 @@ final class NavigationBarPopovers: PopoverPresenter {
 
     var passwordManagementDomain: String? {
         didSet {
-            passwordPopoverPresenter.passwordDomain = passwordManagementDomain
+            autofillPopoverPresenter.passwordDomain = passwordManagementDomain
         }
     }
 
@@ -92,11 +92,11 @@ final class NavigationBarPopovers: PopoverPresenter {
     }
 
     var isPasswordManagementDirty: Bool {
-        passwordPopoverPresenter.popoverIsDirty
+        autofillPopoverPresenter.popoverIsDirty
     }
 
     var isPasswordManagementPopoverShown: Bool {
-        passwordPopoverPresenter.popoverIsDisplayed
+        autofillPopoverPresenter.popoverIsShown
     }
 
     @MainActor
@@ -121,8 +121,8 @@ final class NavigationBarPopovers: PopoverPresenter {
     }
 
     func passwordManagementButtonPressed(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        if passwordPopoverPresenter.popoverIsDisplayed == true && passwordPopoverPresenter.popoverIsInCurrentWindow  {
-            passwordPopoverPresenter.dismiss()
+        if autofillPopoverPresenter.popoverIsShown == true && view.window == autofillPopoverPresenter.popoverPresentingWindow  {
+            autofillPopoverPresenter.dismiss()
         } else {
             showPasswordManagementPopover(selectedCategory: nil, usingView: view, withDelegate: delegate)
         }
@@ -181,8 +181,8 @@ final class NavigationBarPopovers: PopoverPresenter {
             bookmarkListPopover?.close()
         }
 
-        if passwordPopoverPresenter.popoverIsDisplayed {
-            passwordPopoverPresenter.dismiss()
+        if autofillPopoverPresenter.popoverIsShown {
+            autofillPopoverPresenter.dismiss()
         }
 
         if downloadsPopover?.isShown ?? false {
@@ -216,11 +216,11 @@ final class NavigationBarPopovers: PopoverPresenter {
     func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         guard closeTransientPopovers() else { return }
 
-        passwordPopoverPresenter.show(under: view, withDomain: passwordManagementDomain, selectedCategory: selectedCategory)
+        autofillPopoverPresenter.show(positionedBelow: view, withDomain: passwordManagementDomain, selectedCategory: selectedCategory)
     }
 
     func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        passwordPopoverPresenter.show(under: view, withSelectedAccount: selectedWebsiteAccount)
+        autofillPopoverPresenter.show(positionedBelow: view, withSelectedAccount: selectedWebsiteAccount)
     }
 
     func hasAnySavePopoversVisible() -> Bool {
