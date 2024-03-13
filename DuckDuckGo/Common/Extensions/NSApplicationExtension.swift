@@ -54,9 +54,16 @@ extension NSApplication {
             }
         } else if ProcessInfo().environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             return .xcPreviews
+        } else if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+            return .uiTests
         } else {
             return .normal
         }
+#elseif REVIEW
+        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+            return .uiTests
+        }
+        return .normal
 #else
         return .normal
 #endif
