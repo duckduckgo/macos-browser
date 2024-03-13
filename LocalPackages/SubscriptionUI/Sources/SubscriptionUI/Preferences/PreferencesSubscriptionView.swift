@@ -39,41 +39,14 @@ public struct PreferencesSubscriptionView: View {
                     SubscriptionAccessView(model: model.sheetModel)
                 }
                 .sheet(isPresented: $showingRemoveConfirmationDialog) {
-                    SubscriptionDialog(imageName: "Privacy-Pro-128",
-                                       title: UserText.removeSubscriptionDialogTitle,
-                                       description: UserText.removeSubscriptionDialogDescription,
-                                       buttons: {
-                        Button(UserText.removeSubscriptionDialogCancel) { showingRemoveConfirmationDialog = false }
-                        Button(action: {
-                            showingRemoveConfirmationDialog = false
-                            model.removeFromThisDeviceAction()
-                        }, label: {
-                            Text(UserText.removeSubscriptionDialogConfirm)
-                                .foregroundColor(.red)
-                        })
-                    })
-                    .frame(width: 320)
+                    removeConfirmationDialog
                 }
                 .sheet(item: $manageSubscriptionSheet) { sheet in
                     switch sheet {
                     case .apple:
-                        SubscriptionDialog(imageName: "app-store",
-                                           title: UserText.changeSubscriptionDialogTitle,
-                                           description: UserText.changeSubscriptionAppleDialogDescription,
-                                           buttons: {
-                            Button(UserText.changeSubscriptionDialogDone) { manageSubscriptionSheet = nil }
-                                .buttonStyle(DefaultActionButtonStyle(enabled: true))
-                        })
-                        .frame(width: 360)
+                        manageSubscriptionAppStoreDialog
                     case .google:
-                        SubscriptionDialog(imageName: "google-play",
-                                           title: UserText.changeSubscriptionDialogTitle,
-                                           description: UserText.changeSubscriptionGoogleDialogDescription,
-                                           buttons: {
-                            Button(UserText.changeSubscriptionDialogDone) { manageSubscriptionSheet = nil }
-                                .buttonStyle(DefaultActionButtonStyle(enabled: true))
-                        })
-                        .frame(width: 360)
+                        manageSubscriptionGooglePlayDialog
                     }
                 }
 
@@ -82,92 +55,16 @@ public struct PreferencesSubscriptionView: View {
 
             VStack {
                 if model.isUserAuthenticated {
-                    UniversalHeaderView {
-                        Image(.subscriptionActiveIcon)
-                            .padding(4)
-                    } content: {
-                        TextMenuItemHeader(UserText.preferencesSubscriptionActiveHeader)
-                        TextMenuItemCaption(model.subscriptionDetails ?? "")
-                    } buttons: {
-                        Button(UserText.addToAnotherDeviceButton) {
-                            model.userEventHandler(.addToAnotherDeviceClick)
-                            showingSheet.toggle()
-                        }
-
-                        Menu {
-                            Button(UserText.changePlanOrBillingButton, action: {
-                                model.userEventHandler(.changePlanOrBillingClick)
-                                Task {
-                                    switch await model.changePlanOrBillingAction() {
-                                    case .presentSheet(let sheet):
-                                        manageSubscriptionSheet = sheet
-                                    case .navigateToManageSubscription(let navigationAction):
-                                        navigationAction()
-                                    }
-                                }
-                            })
-                            Button(UserText.removeFromThisDeviceButton, action: {
-                                model.userEventHandler(.removeSubscriptionClick)
-                                showingRemoveConfirmationDialog.toggle()
-                            })
-                        } label: {
-                            Text(UserText.manageSubscriptionButton)
-                        }
-                        .fixedSize()
-                    }
-                    .onAppear {
-                        model.fetchAndUpdateSubscriptionDetails()
-                    }
-
+                    authenticatedHeaderView
                 } else {
-                    UniversalHeaderView {
-                        Image(.privacyPro)
-                            .padding(4)
-                            .background(Color("BadgeBackground", bundle: .module))
-                            .cornerRadius(4)
-                    } content: {
-                        TextMenuItemHeader(UserText.preferencesSubscriptionInactiveHeader)
-                        TextMenuItemCaption(UserText.preferencesSubscriptionInactiveCaption)
-                    } buttons: {
-                        Button(UserText.purchaseButton) { model.purchaseAction() }
-                            .buttonStyle(DefaultActionButtonStyle(enabled: true))
-                        Button(UserText.haveSubscriptionButton) {
-                            showingSheet.toggle()
-                            model.userEventHandler(.iHaveASubscriptionClick)
-                        }
-                    }
+                    unauthenticatedHeaderView
                 }
 
                 Divider()
                     .foregroundColor(Color.secondary)
                     .padding(.horizontal, -10)
 
-                SectionView(iconName: "VPN-Icon",
-                            title: UserText.vpnServiceTitle,
-                            description: UserText.vpnServiceDescription,
-                            buttonName: model.isUserAuthenticated ? UserText.vpnServiceButtonTitle : nil,
-                            buttonAction: { model.openVPN() },
-                            enabled: !model.isUserAuthenticated || model.hasAccessToVPN)
-
-                Divider()
-                    .foregroundColor(Color.secondary)
-
-                SectionView(iconName: "PIR-Icon",
-                            title: UserText.personalInformationRemovalServiceTitle,
-                            description: UserText.personalInformationRemovalServiceDescription,
-                            buttonName: model.isUserAuthenticated ? UserText.personalInformationRemovalServiceButtonTitle : nil,
-                            buttonAction: { model.openPersonalInformationRemoval() },
-                            enabled: !model.isUserAuthenticated || model.hasAccessToDBP)
-
-                Divider()
-                    .foregroundColor(Color.secondary)
-
-                SectionView(iconName: "ITR-Icon",
-                            title: UserText.identityTheftRestorationServiceTitle,
-                            description: UserText.identityTheftRestorationServiceDescription,
-                            buttonName: model.isUserAuthenticated ? UserText.identityTheftRestorationServiceButtonTitle : nil,
-                            buttonAction: { model.openIdentityTheftRestoration() },
-                            enabled: !model.isUserAuthenticated || model.hasAccessToITR)
+                servicesView
             }
             .padding(10)
             .roundedBorder()
@@ -175,19 +72,156 @@ public struct PreferencesSubscriptionView: View {
             Spacer()
                 .frame(height: 24)
 
-            PreferencePaneSection {
-                TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle)
-                HStack(alignment: .top, spacing: 6) {
-                    TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
-                    Button(UserText.viewFaqsButton) { model.openFAQ() }
-                }
-            }
+            footerView
         }
         .onAppear(perform: {
             if model.isUserAuthenticated {
                 model.userEventHandler(.activeSubscriptionSettingsClick)
             }
         })
+    }
+
+    @ViewBuilder
+    private var authenticatedHeaderView: some View {
+        UniversalHeaderView {
+            Image(.subscriptionActiveIcon)
+                .padding(4)
+        } content: {
+            TextMenuItemHeader(UserText.preferencesSubscriptionActiveHeader)
+            TextMenuItemCaption(model.subscriptionDetails ?? "")
+        } buttons: {
+            Button(UserText.addToAnotherDeviceButton) {
+                model.userEventHandler(.addToAnotherDeviceClick)
+                showingSheet.toggle()
+            }
+
+            Menu {
+                Button(UserText.changePlanOrBillingButton, action: {
+                    model.userEventHandler(.changePlanOrBillingClick)
+                    Task {
+                        switch await model.changePlanOrBillingAction() {
+                        case .presentSheet(let sheet):
+                            manageSubscriptionSheet = sheet
+                        case .navigateToManageSubscription(let navigationAction):
+                            navigationAction()
+                        }
+                    }
+                })
+                Button(UserText.removeFromThisDeviceButton, action: {
+                    model.userEventHandler(.removeSubscriptionClick)
+                    showingRemoveConfirmationDialog.toggle()
+                })
+            } label: {
+                Text(UserText.manageSubscriptionButton)
+            }
+            .fixedSize()
+        }
+        .onAppear {
+            model.fetchAndUpdateSubscriptionDetails()
+        }
+    }
+
+    @ViewBuilder
+    private var unauthenticatedHeaderView: some View {
+        UniversalHeaderView {
+            Image(.privacyPro)
+                .padding(4)
+                .background(Color("BadgeBackground", bundle: .module))
+                .cornerRadius(4)
+        } content: {
+            TextMenuItemHeader(UserText.preferencesSubscriptionInactiveHeader)
+            TextMenuItemCaption(UserText.preferencesSubscriptionInactiveCaption)
+        } buttons: {
+            Button(UserText.purchaseButton) { model.purchaseAction() }
+                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+            Button(UserText.haveSubscriptionButton) {
+                showingSheet.toggle()
+                model.userEventHandler(.iHaveASubscriptionClick)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var servicesView: some View {
+        SectionView(iconName: "VPN-Icon",
+                    title: UserText.vpnServiceTitle,
+                    description: UserText.vpnServiceDescription,
+                    buttonName: model.isUserAuthenticated ? UserText.vpnServiceButtonTitle : nil,
+                    buttonAction: { model.openVPN() },
+                    enabled: !model.isUserAuthenticated || model.hasAccessToVPN)
+
+        Divider()
+            .foregroundColor(Color.secondary)
+
+        SectionView(iconName: "PIR-Icon",
+                    title: UserText.personalInformationRemovalServiceTitle,
+                    description: UserText.personalInformationRemovalServiceDescription,
+                    buttonName: model.isUserAuthenticated ? UserText.personalInformationRemovalServiceButtonTitle : nil,
+                    buttonAction: { model.openPersonalInformationRemoval() },
+                    enabled: !model.isUserAuthenticated || model.hasAccessToDBP)
+
+        Divider()
+            .foregroundColor(Color.secondary)
+
+        SectionView(iconName: "ITR-Icon",
+                    title: UserText.identityTheftRestorationServiceTitle,
+                    description: UserText.identityTheftRestorationServiceDescription,
+                    buttonName: model.isUserAuthenticated ? UserText.identityTheftRestorationServiceButtonTitle : nil,
+                    buttonAction: { model.openIdentityTheftRestoration() },
+                    enabled: !model.isUserAuthenticated || model.hasAccessToITR)
+    }
+
+    @ViewBuilder
+    private var footerView: some View {
+        PreferencePaneSection {
+            TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle)
+            HStack(alignment: .top, spacing: 6) {
+                TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
+                Button(UserText.viewFaqsButton) { model.openFAQ() }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var removeConfirmationDialog: some View {
+        SubscriptionDialog(imageName: "Privacy-Pro-128",
+                           title: UserText.removeSubscriptionDialogTitle,
+                           description: UserText.removeSubscriptionDialogDescription,
+                           buttons: {
+            Button(UserText.removeSubscriptionDialogCancel) { showingRemoveConfirmationDialog = false }
+            Button(action: {
+                showingRemoveConfirmationDialog = false
+                model.removeFromThisDeviceAction()
+            }, label: {
+                Text(UserText.removeSubscriptionDialogConfirm)
+                    .foregroundColor(.red)
+            })
+        })
+        .frame(width: 320)
+    }
+
+    @ViewBuilder
+    private var manageSubscriptionAppStoreDialog: some View {
+        SubscriptionDialog(imageName: "app-store",
+                           title: UserText.changeSubscriptionDialogTitle,
+                           description: UserText.changeSubscriptionAppleDialogDescription,
+                           buttons: {
+            Button(UserText.changeSubscriptionDialogDone) { manageSubscriptionSheet = nil }
+                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+        })
+        .frame(width: 360)
+    }
+
+    @ViewBuilder
+    private var manageSubscriptionGooglePlayDialog: some View {
+        SubscriptionDialog(imageName: "google-play",
+                           title: UserText.changeSubscriptionDialogTitle,
+                           description: UserText.changeSubscriptionGoogleDialogDescription,
+                           buttons: {
+            Button(UserText.changeSubscriptionDialogDone) { manageSubscriptionSheet = nil }
+                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+        })
+        .frame(width: 360)
     }
 }
 
