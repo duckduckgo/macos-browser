@@ -16050,7 +16050,7 @@
       }
     },
     "email.protection.explanation" : {
-      "comment" : "feature explanation in settings",
+      "comment" : "Email protection feature explanation in settings. The feature blocks email trackers and hides original email address.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {

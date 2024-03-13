@@ -36,7 +36,7 @@ extension Preferences {
                         VStack(alignment: .leading, spacing: 1) {
                             TextMenuItemCaption(UserText.fireproofExplanation)
                             TextButton(UserText.learnMore) {
-                                openNewTab(with: .theFireButton)
+                                model.openNewTab(with: .theFireButton)
                             }
                         }
                     }

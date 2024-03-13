@@ -24,7 +24,7 @@ import SwiftUIExtensions
 import BrowserServicesKit
 
 extension Preferences {
-    struct EmailProtectionView: View {
+    struct EmailProtectionView: View, PreferencesTabOpening {
         var emailManager: EmailManager
         @ObservedObject var protectionStatus: PrivacyProtectionStatus = PrivacyProtectionStatus.status(for: .emailProtection)
 

@@ -30,7 +30,7 @@ struct SearchPreferencesUserDefaultsPersistor: SearchPreferencesPersistor {
     var showAutocompleteSuggestions: Bool
 }
 
-final class SearchPreferences: ObservableObject {
+final class SearchPreferences: ObservableObject, PreferencesTabOpening {
 
     static let shared = SearchPreferences()
 
@@ -46,4 +46,19 @@ final class SearchPreferences: ObservableObject {
     }
 
     private var persistor: SearchPreferencesPersistor
+}
+
+protocol PreferencesTabOpening {
+
+    func openNewTab(with url: URL)
+
+}
+
+extension PreferencesTabOpening {
+
+    @MainActor
+    func openNewTab(with url: URL) {
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    }
+
 }

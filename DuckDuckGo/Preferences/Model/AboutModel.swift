@@ -19,7 +19,7 @@
 import SwiftUI
 import Common
 
-final class AboutModel: ObservableObject {
+final class AboutModel: ObservableObject, PreferencesTabOpening {
     let appVersion = AppVersion()
 
 #if NETWORK_PROTECTION

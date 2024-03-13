@@ -126,7 +126,8 @@ final class DefaultBrowserPreferences: ObservableObject {
     let maxNumberOfExecutions = 60
     var timer: Timer?
 
-    // Monitors for changes in default browser setting over the next minute
+    // Monitors for changes in default browser setting over the next minute.
+    // The reason is there is no API to get a notification for this change.
     private func repeatCheckIfDefault() {
         timer?.invalidate()
         executionCount = 0

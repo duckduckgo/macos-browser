@@ -38,7 +38,7 @@ extension Preferences {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.webTrackingProtectionExplanation)
                         TextButton(UserText.learnMore) {
-                            openNewTab(with: .webTrackingProtection)
+                            model.openNewTab(with: .webTrackingProtection)
                         }
                     }
                 }
@@ -49,20 +49,11 @@ extension Preferences {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.gpcExplanation)
                         TextButton(UserText.learnMore) {
-                            openNewTab(with: .gpcLearnMore)
+                            model.openNewTab(with: .gpcLearnMore)
                         }
                     }.padding(.leading, 19)
                 }
             }
         }
     }
-}
-
-extension View {
-
-    @MainActor
-    func openNewTab(with url: URL) {
-        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-    }
-
 }

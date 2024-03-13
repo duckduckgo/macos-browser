@@ -32,7 +32,7 @@ struct CookiePopupProtectionPreferencesUserDefaultsPersistor: CookiePopupProtect
 
 }
 
-final class CookiePopupProtectionPreferences: ObservableObject {
+final class CookiePopupProtectionPreferences: ObservableObject, PreferencesTabOpening {
 
     static let shared = CookiePopupProtectionPreferences()
 

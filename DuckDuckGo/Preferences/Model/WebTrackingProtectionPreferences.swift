@@ -32,7 +32,7 @@ struct WebTrackingProtectionPreferencesUserDefaultsPersistor: WebTrackingProtect
 
 }
 
-final class WebTrackingProtectionPreferences: ObservableObject {
+final class WebTrackingProtectionPreferences: ObservableObject, PreferencesTabOpening {
 
     static let shared = WebTrackingProtectionPreferences()
 

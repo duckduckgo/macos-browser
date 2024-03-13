@@ -38,7 +38,7 @@ extension Preferences {
                     VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.privateSearchExplanation)
                         TextButton(UserText.learnMore) {
-                            openNewTab(with: .privateSearchLearnMore)
+                            model.openNewTab(with: .privateSearchLearnMore)
                         }
                     }
                 }

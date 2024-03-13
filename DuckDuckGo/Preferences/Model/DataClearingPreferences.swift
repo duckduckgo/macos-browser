@@ -18,7 +18,7 @@
 
 import Foundation
 
-final class DataClearingPreferences: ObservableObject {
+final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
 
     static let shared = DataClearingPreferences()
 
