@@ -80,7 +80,7 @@ extension Preferences {
                                     Text(UserText.homeButtonMode(for: position)).tag(position)
                                 }
                             }
-                            .frame(width: 200)
+                            .fixedSize()
                             .onChange(of: startupModel.homeButtonPosition) { _ in
                                 startupModel.updateHomeButton()
                             }
