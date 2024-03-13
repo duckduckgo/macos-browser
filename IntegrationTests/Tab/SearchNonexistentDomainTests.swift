@@ -19,7 +19,6 @@
 import BrowserServicesKit
 import Carbon
 import Combine
-import Macros
 import Navigation
 import XCTest
 import History
@@ -31,8 +30,8 @@ import History
 final class SearchNonexistentDomainTests: XCTestCase {
 
     struct URLs {
-        let validTLD = #URL("https://testhost.com/")
-        let invalidTLD = #URL("https://testhost.coma/")
+        let validTLD = URL(string: "https://testhost.com/")!
+        let invalidTLD = URL(string: "https://testhost.coma/")!
     }
     let urls = URLs()
 

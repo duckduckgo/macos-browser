@@ -25,7 +25,6 @@ import Configuration
 import CoreData
 import DDGSync
 import History
-import Macros
 import Networking
 import Persistence
 import PixelKit
@@ -358,7 +357,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
             let alert = NSAlert.noAccessToDownloads()
             if alert.runModal() != .cancel {
-                let preferencesLink = #URL("x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")
+                let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")!
                 NSWorkspace.shared.open(preferencesLink)
                 return
             }
