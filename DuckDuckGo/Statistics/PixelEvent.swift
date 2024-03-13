@@ -635,7 +635,7 @@ extension Pixel.Event {
             return "m_mac_netp_ev_geoswitching_no_locations"
 
             // MARK: - Subscription
-        case .privacyProSubscriptionActive: return privacyProPixelPrefix + "privacy-pro_app_subscription_active"
+        case .privacyProSubscriptionActive: return privacyProPixelPrefix + "app_subscription_active"
         case .privacyProOfferScreenImpression: return privacyProPixelPrefix + "offer_screen_impression"
         case .privacyProPurchaseAttempt: return privacyProPixelPrefix + "terms-conditions_subscribe_click"
         case .privacyProPurchaseFailure: return privacyProPixelPrefix + "app_subscription-purchase_failure_other"
