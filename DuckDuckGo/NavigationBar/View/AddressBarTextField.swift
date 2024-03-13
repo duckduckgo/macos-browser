@@ -20,7 +20,7 @@ import AppKit
 import Carbon.HIToolbox
 import Combine
 import Common
-import Suggestions  
+import Suggestions
 
 final class AddressBarTextField: NSTextField {
 
