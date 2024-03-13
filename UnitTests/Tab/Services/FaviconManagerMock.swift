@@ -52,7 +52,7 @@ final class FaviconManagerMock: FaviconManagement {
     func burnExcept(fireproofDomains: DuckDuckGo_Privacy_Browser.FireproofDomains, bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, savedLogins: Set<String>, completion: @escaping @MainActor () -> Void) {
         completion()
     }
-    
+
     // swiftlint:disable:next function_parameter_count
     func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: any DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, exceptExistingHistory history: History.BrowsingHistory, tld: Common.TLD, completion: @escaping @MainActor () -> Void) {
         completion()
