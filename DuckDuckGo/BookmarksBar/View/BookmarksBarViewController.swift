@@ -249,7 +249,7 @@ private extension BookmarksBarViewController {
         case .deleteEntity:
             bookmarkManager.remove(bookmark: bookmark)
         case .addFolder:
-            showDialog(view: BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: nil))
+            addFolder(inParent: nil)
         case .manageBookmarks:
             manageBookmarks()
         }
@@ -266,7 +266,7 @@ private extension BookmarksBarViewController {
         case .deleteEntity:
             bookmarkManager.remove(folder: folder)
         case .addFolder:
-            showDialog(view: BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: folder))
+            addFolder(inParent: folder)
         case .openInNewTab:
             openAllInNewTabs(folder: folder)
         case .openInNewWindow:
@@ -314,12 +314,20 @@ private extension BookmarksBarViewController {
         menu.popUp(positioning: nil, at: CGPoint(x: 0, y: view.frame.minY - 7), in: view)
     }
 
+    func addFolder(inParent parent: BookmarkFolder?) {
+        showDialog(view: BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: parent))
+    }
+
     func showDialog(view: any ModalView) {
         view.show(in: self.view.window)
     }
 
-    func manageBookmarks() {
+    @objc func manageBookmarks() {
         WindowControllersManager.shared.showBookmarksTab()
+    }
+
+    @objc func addFolder(sender: NSMenuItem) {
+        addFolder(inParent: nil)
     }
 
 }
@@ -330,7 +338,12 @@ extension BookmarksBarViewController: NSMenuDelegate {
 
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-        BookmarksBarMenuFactory.addToMenu(menu)
+        BookmarksBarMenuFactory.addToMenuWithManageBookmarksSection(
+            menu,
+            target: self,
+            addFolderSelector: #selector(addFolder(sender:)),
+            manageBookmarksSelector: #selector(manageBookmarks)
+        )
     }
 
 }

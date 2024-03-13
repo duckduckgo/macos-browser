@@ -211,12 +211,24 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     // MARK: NSOutlineView Configuration
 
     private func expandAndRestore(selectedNodes: [BookmarkNode]) {
+        // OutlineView doesn't allow multiple selections so there should be only one selected node at time.
+        let selectedNode = selectedNodes.first
+        // As the data source reloaded we need to refresh the previously selected nodes.
+        // Lets consider the scenario where we add a folder to a subfolder.
+        // When the folder is added we need to "refresh" the node because the previously selected node folder has changed (it has a child folder now).
+        var refreshedSelectedNodes: [BookmarkNode] = []
+
         treeController.visitNodes { node in
             if let objectID = (node.representedObject as? BaseBookmarkEntity)?.id {
                 if dataSource.expandedNodesIDs.contains(objectID) {
                     outlineView.expandItem(node)
                 } else {
                     outlineView.collapseItem(node)
+                }
+
+                // Add the node if it contains previously selected folder
+                if let folder = selectedNode?.representedObject as? BookmarkFolder, folder.id == objectID {
+                    refreshedSelectedNodes.append(node)
                 }
             }
 
@@ -226,7 +238,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
             }
         }
 
-        restoreSelection(to: selectedNodes)
+        restoreSelection(to: refreshedSelectedNodes)
     }
 
     private func restoreSelection(to nodes: [BookmarkNode]) {

@@ -2459,6 +2459,8 @@
 		9FA173EB2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173EA2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift */; };
 		9FA173EC2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173EA2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift */; };
 		9FA173ED2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173EA2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift */; };
+		9FA75A3E2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */; };
+		9FA75A3F2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */; };
 		9FDA6C212B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
 		9FDA6C222B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
 		9FDA6C232B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
@@ -4056,6 +4058,7 @@
 		9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogFolderManagementView.swift; sourceTree = "<group>"; };
 		9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogStackedContentView.swift; sourceTree = "<group>"; };
 		9FA173EA2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogView.swift; sourceTree = "<group>"; };
+		9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuFactoryTests.swift; sourceTree = "<group>"; };
 		9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFavoriteView.swift; sourceTree = "<group>"; };
 		9FEE98642B846870002E44E8 /* AddEditBookmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkView.swift; sourceTree = "<group>"; };
 		9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksDialogViewModel.swift; sourceTree = "<group>"; };
@@ -6750,6 +6753,14 @@
 			path = Dialog;
 			sourceTree = "<group>";
 		};
+		9FA75A3C2BA00DF500DA5FA6 /* Factory */ = {
+			isa = PBXGroup;
+			children = (
+				9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */,
+			);
+			path = Factory;
+			sourceTree = "<group>";
+		};
 		AA0877B626D515EE00B05660 /* UserAgent */ = {
 			isa = PBXGroup;
 			children = (
@@ -7098,6 +7109,7 @@
 			isa = PBXGroup;
 			children = (
 				9F872D9B2B9058B000138637 /* Extensions */,
+				9FA75A3C2BA00DF500DA5FA6 /* Factory */,
 				9F982F102B82264400231028 /* ViewModels */,
 				AA652CAE25DD8228009059CC /* Model */,
 				AA652CAF25DD822C009059CC /* Services */,
@@ -10722,6 +10734,7 @@
 				3706FE4A293F661700E42796 /* BookmarkManagedObjectTests.swift in Sources */,
 				EEC8EB402982CD550065AA39 /* JSAlertViewModelTests.swift in Sources */,
 				3706FE4B293F661700E42796 /* BookmarksHTMLImporterTests.swift in Sources */,
+				9FA75A3F2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */,
 				56D145E929E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */,
 				3706FE4C293F661700E42796 /* CSVParserTests.swift in Sources */,
 				3706FE4D293F661700E42796 /* OnboardingTests.swift in Sources */,
@@ -12595,6 +12608,7 @@
 				B6656E122B29E3BE008798A1 /* DownloadListStoreMock.swift in Sources */,
 				37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */,
 				AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */,
+				9FA75A3E2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */,
 				B69B50462726C5C200758A2B /* AtbAndVariantCleanupTests.swift in Sources */,
 				567DA94529E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift in Sources */,
 				4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */,
