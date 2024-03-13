@@ -543,7 +543,8 @@ release in progress and you're making a follow-up internal release that includes
     ).empty?
 
     # Create the branch and push
-    Action.sh('git', 'fetch', '--tags')
+    # Action.sh('gh', 'api', '--method', 'POST', '/repos/duckduckgo/macos-browser/git/refs', '-f', "ref='refs/heads/#{release_branch}'", -f sha='aa218f56b14c9653891f9e74264a383fa43fefbd'
+    Action.sh('git', 'fetch', '--tags') unless is_ci
     Action.sh('git', 'checkout', '-b', release_branch, source_version)
     Action.sh('git', 'push', '-u', 'origin', release_branch)
   end
