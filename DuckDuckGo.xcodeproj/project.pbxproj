@@ -2620,7 +2620,6 @@
 		B6080BC82B21E78100B418EF /* DataImportErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6080BC42B21E78100B418EF /* DataImportErrorView.swift */; };
 		B6085D062743905F00A9C456 /* CoreDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6085D052743905F00A9C456 /* CoreDataStore.swift */; };
 		B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6085D072743993C00A9C456 /* FireproofDomains.xcdatamodeld */; };
-		B60C5F232B86189800FFA1D2 /* TestsURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */; };
 		B60C6F7729B0E286007BFAA8 /* SearchNonexistentDomainNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F7629B0E286007BFAA8 /* SearchNonexistentDomainNavigationResponder.swift */; };
 		B60C6F7829B0E286007BFAA8 /* SearchNonexistentDomainNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F7629B0E286007BFAA8 /* SearchNonexistentDomainNavigationResponder.swift */; };
 		B60C6F7E29B1B41D007BFAA8 /* TestRunHelperInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F7D29B1B41D007BFAA8 /* TestRunHelperInitializer.m */; };
@@ -3257,13 +3256,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4B2537592A11BE7300610219;
 			remoteInfo = NetworkProtectionSystemExtension;
-		};
-		B696E8182B8619D6008368F0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B6EC37E729B5DA2A001ACE79;
-			remoteInfo = "tests-server";
 		};
 		B6CAC23C2B8F0EC6006CD402 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -8812,7 +8804,6 @@
 			);
 			dependencies = (
 				B6F997BD2B8F35EF00476735 /* PBXTargetDependency */,
-				B696E8192B8619D6008368F0 /* PBXTargetDependency */,
 			);
 			name = "UI Tests";
 			packageProductDependencies = (
@@ -11703,7 +11694,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */,
-				B60C5F232B86189800FFA1D2 /* TestsURLExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12833,11 +12823,6 @@
 			isa = PBXTargetDependency;
 			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
 		};
-		B696E8192B8619D6008368F0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B6EC37E729B5DA2A001ACE79 /* tests-server */;
-			targetProxy = B696E8182B8619D6008368F0 /* PBXContainerItemProxy */;
-		};
 		B69D06142A4C0AC50032D14D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
@@ -13778,8 +13763,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = revision;
-				revision = c14f3ce0fbe4cca247b86333b599668152a4bf6a;
+				kind = exactVersion;
+				version = 122.1.1;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
