@@ -34,7 +34,7 @@ final class NetworkProtectionBouncer {
 #if SUBSCRIPTION
         Task {
             let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-            let result = await accountManager.hasEntitlement(for: .networkProtection)
+            let result = await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
             switch result {
             case .success(true), .failure:
                 return

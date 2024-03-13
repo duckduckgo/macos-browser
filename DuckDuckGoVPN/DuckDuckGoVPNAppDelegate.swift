@@ -355,7 +355,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private func setUpSubscriptionMonitoring() {
 #if SUBSCRIPTION
         let entitlementsCheck = {
-            await AccountManager().hasEntitlement(for: .networkProtection)
+            await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 
         Task {

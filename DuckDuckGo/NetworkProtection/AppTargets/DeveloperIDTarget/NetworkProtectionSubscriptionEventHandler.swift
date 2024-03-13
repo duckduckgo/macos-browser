@@ -49,7 +49,7 @@ final class NetworkProtectionSubscriptionEventHandler {
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
 
         let entitlementsCheck = {
-            await AccountManager().hasEntitlement(for: .networkProtection)
+            await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 
         Task {
