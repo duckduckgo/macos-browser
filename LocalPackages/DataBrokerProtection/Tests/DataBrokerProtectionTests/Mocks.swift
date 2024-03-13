@@ -228,7 +228,6 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
 
 final class EmailServiceMock: EmailServiceProtocol {
 
-    
     var shouldThrow: Bool = false
 
     func getEmail(dataBrokerURL: String?) async throws -> EmailData {
