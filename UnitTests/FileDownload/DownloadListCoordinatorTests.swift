@@ -19,6 +19,7 @@
 import Foundation
 import UniformTypeIdentifiers
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -465,7 +466,7 @@ private extension DownloadListItem {
                                                  added: Date(),
                                                  modified: Date(),
                                                  url: URL(string: "https://duckduckgo.com/testdload")!,
-                                                 websiteURL: URL(string: "https://duckduckgo.com"),
+                                                 websiteURL: URL(string: "https://duckduckgo.com")!,
                                                  progress: nil,
                                                  isBurner: false,
                                                  fileType: .pdf,

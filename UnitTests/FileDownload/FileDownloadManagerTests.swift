@@ -19,6 +19,7 @@
 import Foundation
 import UniformTypeIdentifiers
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FileDownloadManagerTests: XCTestCase {
@@ -31,7 +32,7 @@ final class FileDownloadManagerTests: XCTestCase {
     let fm = FileManager.default
     let testFile = "downloaded file"
 
-    var chooseDestination: (@MainActor (String?, URL?, [UTType], @MainActor (URL?, UTType?) -> Void) -> Void)?
+    var chooseDestination: (@MainActor (String?, [UTType], @MainActor (URL?, UTType?) -> Void) -> Void)?
     var fileIconFlyAnimationOriginalRect: ((WebKitDownloadTask) -> NSRect?)?
 
     let response = URLResponse(url: .duckDuckGo,
@@ -44,6 +45,7 @@ final class FileDownloadManagerTests: XCTestCase {
         defaults.removePersistentDomain(forName: testGroupName)
         preferences = DownloadsPreferences(persistor: DownloadsPreferencesPersistorMock())
         preferences.alwaysRequestDownloadLocation = false
+        preferences.lastUsedCustomDownloadLocation = fm.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
         self.workspace = TestWorkspace()
         self.dm = FileDownloadManager(preferences: preferences)
         let tempDir = fm.temporaryDirectory
@@ -111,12 +113,12 @@ final class FileDownloadManagerTests: XCTestCase {
     func testWhenRequiredByDownloadRequestThenDownloadLocationChooserIsCalled() {
         let downloadsURL = fm.temporaryDirectory
         preferences.selectedDownloadLocation = downloadsURL
+        let lastUsedCustomDownloadLocation = preferences.lastUsedCustomDownloadLocation
 
         let e1 = expectation(description: "chooseDestinationCallback called")
-        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+        self.chooseDestination = { suggestedFilename, fileTypes, callback in
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
-            XCTAssertEqual(directoryURL, downloadsURL)
             XCTAssertEqual(fileTypes, [UTType(filenameExtension: "filename")!, .pdf])
             e1.fulfill()
 
@@ -137,6 +139,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 0.3)
+        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, lastUsedCustomDownloadLocation, "lastUsedCustomDownloadLocation shouldn‘t change")
     }
 
     func testWhenRequiredByPreferencesThenDownloadLocationChooserIsCalled() {
@@ -146,10 +149,9 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let localURL = downloadsURL.appendingPathComponent(testFile)
         let e1 = expectation(description: "chooseDestinationCallback called")
-        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+        self.chooseDestination = { suggestedFilename, fileTypes, callback in
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
-            XCTAssertEqual(directoryURL, downloadsURL)
             XCTAssertEqual(fileTypes, [UTType(filenameExtension: "filename")!, .html])
             e1.fulfill()
 
@@ -171,6 +173,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 0.3)
+        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, downloadsURL, "lastUsedCustomDownloadLocation should be saved")
     }
 
     func testWhenChosenDownloadLocationExistsThenItsOverwritten() {
@@ -180,7 +183,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .prompt)
-        self.chooseDestination = { _, _, _, callback in
+        self.chooseDestination = { _, _, callback in
             callback(localURL, nil)
         }
 
@@ -193,6 +196,7 @@ final class FileDownloadManagerTests: XCTestCase {
         waitForExpectations(timeout: 0.3)
 
         XCTAssertFalse(fm.fileExists(atPath: localURL.path))
+        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, localURL.deletingLastPathComponent(), "lastUsedCustomDownloadLocation should be saved")
     }
 
     func testWhenDownloadingLocalFileThenLocationChooserIsCalled() {
@@ -203,9 +207,8 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let localURL = downloadsURL.appendingPathComponent(testFile)
         let e1 = expectation(description: "chooseDestinationCallback called")
-        self.chooseDestination = { suggestedFilename, directoryURL, fileTypes, callback in
+        self.chooseDestination = { suggestedFilename, fileTypes, callback in
             dispatchPrecondition(condition: .onQueue(.main))
-            XCTAssertEqual(directoryURL, downloadsURL)
             e1.fulfill()
 
             callback(localURL, .html)
@@ -220,6 +223,7 @@ final class FileDownloadManagerTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 0.3)
+        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, downloadsURL, "lastUsedCustomDownloadLocation should be saved")
     }
 
     func testWhenNotRequiredByPreferencesThenDefaultDownloadLocationIsChosen() {
@@ -228,7 +232,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
-        self.chooseDestination = { _, _, _, _ in
+        self.chooseDestination = { _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
 
@@ -247,7 +251,7 @@ final class FileDownloadManagerTests: XCTestCase {
 
         let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
-        self.chooseDestination = { _, _, _, _ in
+        self.chooseDestination = { _, _, _ in
             XCTFail("Unpected chooseDestination call")
         }
 
@@ -285,8 +289,8 @@ final class FileDownloadManagerTests: XCTestCase {
 extension FileDownloadManagerTests: DownloadTaskDelegate {
 
     @MainActor
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
-        self.chooseDestination?(suggestedFilename, directoryURL, fileTypes, callback)
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
+        self.chooseDestination?(suggestedFilename, fileTypes, callback)
     }
 
     @MainActor

@@ -195,6 +195,9 @@ final class FakeStageDurationCalculator: StageDurationCalculator {
     func fireOptOutStart() {
     }
 
+    func setEmailPattern(_ emailPattern: String?) {
+    }
+
     func fireOptOutEmailGenerate() {
     }
 
@@ -219,10 +222,10 @@ final class FakeStageDurationCalculator: StageDurationCalculator {
     func fireOptOutValidate() {
     }
 
-    func fireOptOutSubmitSuccess() {
+    func fireOptOutSubmitSuccess(tries: Int) {
     }
 
-    func fireOptOutFailure() {
+    func fireOptOutFailure(tries: Int) {
     }
 
     func fireScanSuccess(matchesFound: Int) {
@@ -272,23 +275,31 @@ private final class PrivacyConfigurationManagingMock: PrivacyConfigurationManagi
         guard let privacyConfigurationData = try? PrivacyConfigurationData(data: data) else {
             fatalError("Could not retrieve privacy configuration data")
         }
-        let privacyConfig = privacyConfiguration(withData: privacyConfigurationData, internalUserDecider: internalUserDecider)
+        let privacyConfig = privacyConfiguration(withData: privacyConfigurationData,
+                                                 internalUserDecider: internalUserDecider,
+                                                 toggleProtectionsCounter: toggleProtectionsCounter)
         return privacyConfig
     }
 
     var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: InternalUserDeciderStoreMock())
+
+    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: EventMapping<ToggleProtectionsCounterEvent> { _, _, _, _ in
+    })
 
     func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
         .downloaded
     }
 }
 
-func privacyConfiguration(withData data: PrivacyConfigurationData, internalUserDecider: InternalUserDecider) -> PrivacyConfiguration {
+func privacyConfiguration(withData data: PrivacyConfigurationData,
+                          internalUserDecider: InternalUserDecider,
+                          toggleProtectionsCounter: ToggleProtectionsCounter) -> PrivacyConfiguration {
     let domain = MockDomainsProtectionStore()
     return AppPrivacyConfiguration(data: data,
                                    identifier: UUID().uuidString,
                                    localProtection: domain,
-                                   internalUserDecider: internalUserDecider)
+                                   internalUserDecider: internalUserDecider,
+                                   toggleProtectionsCounter: toggleProtectionsCounter)
 }
 
 final class MockDomainsProtectionStore: DomainsProtectionStore {

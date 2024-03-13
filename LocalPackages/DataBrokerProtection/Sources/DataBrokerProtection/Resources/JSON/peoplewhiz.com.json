@@ -1,0 +1,172 @@
+{
+  "name": "PeopleWhiz",
+  "url": "peoplewhiz.com",
+  "version": "0.1.6",
+  "addedDatetime": 1676181600000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "25f11594-f04a-4d46-a7ef-9fb3ed237c2d",
+          "url": "https://www.peoplewhiz.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+        },
+        {
+          "actionType": "extract",
+          "id": "eb93e81d-36d1-4a8a-ad3d-a87ae2018e74",
+          "selector": "[class^='ResultsTable__Record-sc']",
+          "profile": {
+            "name": {
+              "selector": "[class^='ResultsTable__Name-sc']"
+            },
+            "age": {
+              "selector": "[class^='ResultsTable__Age-sc']"
+            },
+            "addressCityState": {
+              "selector": ".MuiGrid-item:nth-child(3) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".MuiGrid-item:nth-child(4) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "ffb90236-10e7-4969-a305-1eb729a1177d",
+          "url": "https://www.peoplewhiz.com/optout/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+        },
+        {
+          "actionType": "click",
+          "id": "4ee5b821-8b26-4a16-928b-5dd20a7292a2",
+          "elements": [
+            {
+              "selector": "button",
+              "type": "button",
+              "parent": {
+                "profileMatch": {
+                  "selector": "[class^='ResultsTable__Record-sc']",
+                  "profile": {
+                    "name": {
+                      "selector": "[class^='ResultsTable__Name-sc']"
+                    },
+                    "age": {
+                      "selector": "[class^='ResultsTable__Age-sc']"
+                    },
+                    "addressCityState": {
+                      "selector": ".MuiGrid-item:nth-child(3) [class^='ResultsTable__AddressAndLocation-sc']",
+                      "findElements": true
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "64f99a6d-f4bb-425e-a430-dded77ed24d0",
+          "selector": "form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "input[name='email']"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "c39d5b51-794a-4c2f-8acc-ed999b5b2245",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[type='submit']"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "9dec9932-00ba-4a7d-85b3-d3d5e5ee7bcc",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[normalize-space()='Upload image of ID']"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "00405f21-3fcf-4114-9d56-233abceff54a",
+          "selector": "form",
+          "elements": [
+            {
+              "type": "$file_id$",
+              "selector": "input[type='file']"
+            }
+          ]
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "4e2b5224-9293-45d0-98fa-2b088079ff83",
+          "selector": "[class^='Confirm__ReCaptchaContainer-sc']"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "006b796c-cf4e-4a7e-a10c-f5c202dfa52e",
+          "selector": "[class^='Confirm__ReCaptchaContainer-sc']"
+        },
+        {
+          "actionType": "click",
+          "id": "003e51ee-6ccb-49eb-b820-e1af2e6fc407",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[type='submit']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "9866e653-d719-4796-8153-4fa89f673d70",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "We have Received Your Request"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "efa0d7c1-2081-4bb5-bff9-5d60eef4e8c8",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "id": "71781ca0-881f-4cc3-b918-0112f952a05e",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your request for optout is confirmed"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

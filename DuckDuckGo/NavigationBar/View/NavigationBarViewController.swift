@@ -38,7 +38,6 @@ final class NavigationBarViewController: NSViewController {
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
         static let homeButtonSeparatorSpacing: CGFloat = 12
-        static let homeButtonSeparatorHeight: CGFloat = 20
     }
 
     @IBOutlet weak var goBackButton: NSButton!
@@ -345,12 +344,12 @@ final class NavigationBarViewController: NSViewController {
 
         if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
             NetworkProtectionWaitlistViewControllerPresenter.show()
-            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
         } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
         } else {
             NetworkProtectionWaitlistViewControllerPresenter.show()
-            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
         }
     }
 #endif
@@ -670,11 +669,11 @@ final class NavigationBarViewController: NSViewController {
                 guard let self else { return }
 
                 let shouldShowPopover = update.kind == .updated
-                    && DownloadsPreferences().shouldOpenPopupOnCompletion
-                    && update.item.destinationURL != nil
-                    && update.item.tempURL == nil
-                    && !update.item.isBurner
-                    && WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window
+                && DownloadsPreferences.shared.shouldOpenPopupOnCompletion
+                && update.item.destinationURL != nil
+                && update.item.tempURL == nil
+                && !update.item.isBurner
+                && WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window
 
                 if shouldShowPopover {
                     self.popovers.showDownloadsPopoverAndAutoHide(usingView: downloadsButton,
@@ -689,14 +688,16 @@ final class NavigationBarViewController: NSViewController {
                 updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
-        downloadListCoordinator.progress
-            .publisher(for: \.fractionCompleted)
+        downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
+            .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
-            .map { [downloadListCoordinator] _ in
-                let progress = downloadListCoordinator.progress
-                return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
+            .map { (total, completed) -> Double? in
+                guard total > 0, completed < total else { return nil }
+                return Double(completed) / Double(total)
             }
-            .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
+            .sink { [weak downloadsProgressView] progress in
+                downloadsProgressView?.setProgress(progress, animated: true)
+            }
             .store(in: &downloadsCancellables)
     }
 
@@ -758,15 +759,6 @@ final class NavigationBarViewController: NSViewController {
                     // Set spacing/size for the separator
                     navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[0])
                     navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[1])
-                    homeButtonSeparator.heightAnchor.constraint(equalToConstant: Constants.homeButtonSeparatorHeight).isActive = true
-                    homeButtonSeparator.translatesAutoresizingMaskIntoConstraints = false
-                    NSLayoutConstraint.activate([NSLayoutConstraint(item: homeButtonSeparator as Any,
-                                                                        attribute: .centerY,
-                                                                        relatedBy: .equal,
-                                                                        toItem: navigationButtons,
-                                                                        attribute: .centerY,
-                                                                        multiplier: 1,
-                                                                        constant: 0)])
                 } else {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: navigationButtons.arrangedSubviews.count)
                     homeButtonSeparator.isHidden = true
@@ -1099,7 +1091,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
-        WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
+        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
     }
 #endif
 

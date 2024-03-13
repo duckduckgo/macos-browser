@@ -230,8 +230,7 @@ extension HomePage.Models {
                 features.append(.dataBrokerProtectionRemoteMessage(message))
                 DailyPixel.fire(
                     pixel: .dataBrokerProtectionRemoteMessageDisplayed(messageID: message.id),
-                    frequency: .dailyOnly,
-                    includeAppVersionParameter: true
+                    frequency: .dailyOnly
                 )
             }
 #endif
@@ -241,8 +240,7 @@ extension HomePage.Models {
                 features.append(.networkProtectionRemoteMessage(message))
                 DailyPixel.fire(
                     pixel: .networkProtectionRemoteMessageDisplayed(messageID: message.id),
-                    frequency: .dailyOnly,
-                    includeAppVersionParameter: true
+                    frequency: .dailyOnly
                 )
             }
 #endif

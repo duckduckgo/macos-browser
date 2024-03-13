@@ -18,9 +18,10 @@
 
 import Combine
 import Common
+import History
 import Navigation
 import XCTest
-import History
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)

@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import XCTest
 import BrowserServicesKit
+import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionViewModelTests: XCTestCase {

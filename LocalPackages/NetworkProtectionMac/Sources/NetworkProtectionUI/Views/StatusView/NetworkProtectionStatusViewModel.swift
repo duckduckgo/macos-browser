@@ -16,12 +16,12 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import Combine
+import LoginItems
 import NetworkExtension
 import NetworkProtection
-import LoginItems
 import ServiceManagement
+import SwiftUI
 
 /// This view can be shown from any location where we want the user to be able to interact with NetP.
 /// This view shows status information about Network Protection, and offers a chance to toggle it ON and OFF.
@@ -159,11 +159,7 @@ extension NetworkProtectionStatusView {
             if #available(macOS 13.0, *) {
                 SMAppService.openSystemSettingsLoginItems()
             } else {
-                guard let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension") else {
-                    assertionFailure("Can't initialize login items URL")
-                    return
-                }
-
+                let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension")!
                 NSWorkspace.shared.open(loginItemsURL)
             }
         }

@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import Combine
 import Navigation
 import WebKit
 import XCTest
-import Combine
-import BrowserServicesKit
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -37,7 +37,7 @@ class HistoryTabExtensionTests: XCTestCase {
 
         let navigationIdentity = NavigationIdentity(nil)
         let responderChain = ResponderChain(responderRefs: [])
-        let urlRequest = URLRequest(url: URL(string: "duckduckgo.com")!)
+        let urlRequest = URLRequest(url: .duckDuckGo)
         let frameInfo = FrameInfo(frame: WKFrameInfo())
         let navigationAction = NavigationAction(request: urlRequest, navigationType: .reload, currentHistoryItemIdentity: nil, redirectHistory: [], isUserInitiated: false, sourceFrame: frameInfo, targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: navigationIdentity, responders: responderChain, state: .started, redirectHistory: [navigationAction], isCurrent: true, isCommitted: false)

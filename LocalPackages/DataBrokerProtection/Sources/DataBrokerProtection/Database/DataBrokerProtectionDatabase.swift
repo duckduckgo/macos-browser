@@ -41,6 +41,8 @@ protocol DataBrokerProtectionRepository {
 
     func add(_ historyEvent: HistoryEvent) throws
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) throws -> HistoryEvent?
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) throws -> [HistoryEvent]
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> [HistoryEvent]
     func hasMatches() throws -> Bool
 
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation?
@@ -298,6 +300,34 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) throws -> [HistoryEvent] {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            guard let scan = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
+                return [HistoryEvent]()
+            }
+
+            return scan.historyEvents
+        } catch {
+            os_log("Database error: fetchHistoryEvents, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+    }
+
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> [HistoryEvent] {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            guard let optOut = try vault.fetchOptOut(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId) else {
+                return [HistoryEvent]()
+            }
+
+            return optOut.historyEvents
+        } catch {
+            os_log("Database error: fetchHistoryEvents, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+    }
+
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: secureVaultErrorReporter)
@@ -411,6 +441,46 @@ extension DataBrokerProtectionDatabase {
                                      profileID: profileID,
                                      brokerIDs: brokerIDs,
                                      vault: vault)
+        }
+
+        // Create
+        if !profileQueriesToCreate.isEmpty {
+            try initializeDatabaseForProfile(
+                profileId: Self.profileId,
+                vault: vault,
+                brokerIDs: brokerIDs,
+                profileQueries: Array(profileQueriesToCreate)
+            )
+        }
+    }
+
+    private func deleteProfileQueries(_ profileQueries: [ProfileQuery],
+                                      profileID: Int64,
+                                      vault: any DataBrokerProtectionSecureVault) throws {
+
+        for profile in profileQueries {
+            try vault.delete(profileQuery: profile, profileId: profileID)
+        }
+    }
+
+    private func updateProfileQueries(_ profileQueries: [ProfileQuery],
+                                      profileID: Int64,
+                                      brokerIDs: [Int64],
+                                      vault: any DataBrokerProtectionSecureVault) throws {
+
+        for profile in profileQueries {
+            let profileQueryID = try vault.update(profile,
+                                                  brokerIDs: brokerIDs,
+                                                  profileId: profileID)
+
+            if !profile.deprecated {
+                for brokerID in brokerIDs where !profile.deprecated {
+                    try updatePreferredRunDate(Date(), brokerId: brokerID, profileQueryId: profileQueryID)
+                }
+            }
+        }
+    }
+}
         }
 
         // Create

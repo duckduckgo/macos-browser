@@ -69,6 +69,11 @@ struct MirrorSite: Codable, Sendable {
     }
 }
 
+public enum DataBrokerHierarchy: Int {
+    case parent = 1
+    case child = 0
+}
+
 struct DataBroker: Codable, Sendable {
     let id: Int64?
     let name: String
@@ -190,5 +195,12 @@ extension DataBroker: Hashable {
 
     static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
         return lhs.name == rhs.name
+    }
+}
+
+extension DataBroker {
+
+    var type: DataBrokerHierarchy {
+        parent == nil ? .parent : .child
     }
 }

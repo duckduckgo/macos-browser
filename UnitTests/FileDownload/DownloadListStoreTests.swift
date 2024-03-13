@@ -18,6 +18,7 @@
 
 import Foundation
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class DownloadListStoreTests: XCTestCase {
@@ -139,7 +140,7 @@ extension DownloadListItem {
                                            added: Date(),
                                            modified: Date(),
                                            url: URL(string: "https://duckduckgo.com/testdload")!,
-                                           websiteURL: URL(string: "https://duckduckgo.com"),
+                                           websiteURL: URL(string: "https://duckduckgo.com")!,
                                            progress: nil,
                                            isBurner: false,
                                            fileType: .pdf,

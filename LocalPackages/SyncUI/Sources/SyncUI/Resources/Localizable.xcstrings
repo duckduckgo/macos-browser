@@ -9,6 +9,12 @@
             "value" : "(%@)"
           }
         },
+        "en-US" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(%@)"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",

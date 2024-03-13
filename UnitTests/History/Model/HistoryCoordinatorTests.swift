@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import XCTest
 import History
+import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -260,7 +261,7 @@ fileprivate extension HistoryCoordinator {
 
     static var aHistoryCoordinator: (HistoryStoringMock, HistoryCoordinator) {
         let historyStoringMock = HistoryStoringMock()
-        historyStoringMock.cleanOldResult = .success(History())
+        historyStoringMock.cleanOldResult = .success(BrowsingHistory())
         historyStoringMock.removeEntriesResult = .success(())
         let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
         historyCoordinator.loadHistory { }

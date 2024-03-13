@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
-import Foundation
-import XCTest
-import WebKit
-import Combine
 import AVFoundation
+import Combine
+import Foundation
+import WebKit
+import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class PermissionModelTests: XCTestCase {

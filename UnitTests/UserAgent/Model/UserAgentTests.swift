@@ -17,12 +17,13 @@
 //
 
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class UserAgentTests: XCTestCase {
 
     func test_default_user_agent_is_safari() {
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "localhost")!))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "http://localhost")!))
         XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "http://example.com")!))
     }
 

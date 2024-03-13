@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import SwiftUI
 import Combine
 import Common
+import Foundation
+import SwiftUI
 
 protocol DefaultBrowserProvider {
     var bundleIdentifier: String { get }

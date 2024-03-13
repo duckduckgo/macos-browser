@@ -32,7 +32,7 @@ final class TabWKUIDelegateTests: XCTestCase {
         try super.setUpWithError()
         testData = try XCTUnwrap("test".data(using: .utf8))
         testDirectory = fileManager.temporaryDirectory
-        originatingURL = try XCTUnwrap(URL(string: "www.duckduckgo.com"))
+        originatingURL = URL(string: "https://www.duckduckgo.com")!
     }
 
     override func tearDownWithError() throws {

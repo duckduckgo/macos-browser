@@ -17,6 +17,7 @@
 //
 
 import Foundation
+
 @testable import DuckDuckGo_Privacy_Browser
 
 // Integration Tests helpers
