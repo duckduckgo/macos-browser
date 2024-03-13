@@ -23,6 +23,7 @@ import Common
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionIPC
 #endif
 
 final class MainViewController: NSViewController {
@@ -62,7 +63,26 @@ final class MainViewController: NSViewController {
         self.isBurner = tabCollectionViewModel.isBurner
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+
+#if NETWORK_PROTECTION
+        let networkProtectionPopoverManager: NetPPopoverManager = {
+#if DEBUG
+            guard case .normal = NSApp.runType else {
+                return NetPPopoverManagerMock()
+            }
+#endif
+            let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
+            let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
+            ipcClient.register()
+
+            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
+        }()
+
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionPopoverManager: networkProtectionPopoverManager, passwordPopoverPresenter: passwordPopoverPresenter)
+#else
         navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, passwordPopoverPresenter: passwordPopoverPresenter)
+#endif
+
         browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
         fireViewController = FireViewController.create(tabCollectionViewModel: tabCollectionViewModel)

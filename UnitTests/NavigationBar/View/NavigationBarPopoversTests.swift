@@ -37,9 +37,7 @@ final class NavigationBarPopoversTests: XCTestCase {
         popoverPresenter = MockPasswordPopoverPresenter()
 
         #if NETWORK_PROTECTION
-            let ipcClient = TunnelControllerIPCClient(machServiceName: "")
-            let networkProtectionPopoverManager = NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
-            sut = NavigationBarPopovers(networkProtectionPopoverManager: NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient), passwordPopoverPresenter: popoverPresenter)
+            sut = NavigationBarPopovers(networkProtectionPopoverManager: NetPPopoverManagerMock(), passwordPopoverPresenter: popoverPresenter)
         #else
             sut = NavigationBarPopovers(passwordPopoverPresenter: popoverPresenter)
         #endif

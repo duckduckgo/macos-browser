@@ -31,14 +31,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtection.ConnectionStatus = .default
-    private let popoverManager: NetworkProtectionNavBarPopoverManager
+    private let popoverManager: NetPPopoverManager
     private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
-
-    // MARK: - IPC
-
-    public var ipcClient: TunnelControllerIPCClient {
-        popoverManager.ipcClient
-    }
 
     // MARK: - Subscriptions
 
@@ -76,20 +70,18 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     // MARK: - Initialization
 
-    init(popoverManager: NetworkProtectionNavBarPopoverManager,
+    init(popoverManager: NetPPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
          statusReporter: NetworkProtectionStatusReporter? = nil,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         self.popoverManager = popoverManager
-
         let ipcClient = popoverManager.ipcClient
-
         self.networkProtectionStatusReporter = statusReporter
             ?? DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.connectionStatusObserver,
-                serverInfoObserver: ipcClient.serverInfoObserver,
-                connectionErrorObserver: ipcClient.connectionErrorObserver,
+                statusObserver: ipcClient.ipcStatusObserver,
+                serverInfoObserver: ipcClient.ipcServerInfoObserver,
+                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
         )

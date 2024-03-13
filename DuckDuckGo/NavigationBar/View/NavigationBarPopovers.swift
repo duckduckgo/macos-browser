@@ -31,6 +31,18 @@ protocol PopoverPresenter {
     func show(_ popover: NSPopover, positionedBelow view: NSView)
 }
 
+#if NETWORK_PROTECTION
+protocol NetPPopoverManager: AnyObject {
+    var ipcClient: NetworkProtectionIPCClient { get }
+    var isShown: Bool { get }
+
+    func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate)
+    func close()
+
+    func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate)
+}
+#endif
+
 extension PopoverPresenter {
     func show(_ popover: NSPopover, positionedBelow view: NSView) {
         view.isHidden = false
@@ -52,9 +64,9 @@ final class NavigationBarPopovers: PopoverPresenter {
     private(set) var downloadsPopover: DownloadsPopover?
 
 #if NETWORK_PROTECTION
-    private let networkProtectionPopoverManager: NetworkProtectionNavBarPopoverManager
+    private let networkProtectionPopoverManager: NetPPopoverManager
 
-    init(networkProtectionPopoverManager: NetworkProtectionNavBarPopoverManager, passwordPopoverPresenter: PasswordPopoverPresenter) {
+    init(networkProtectionPopoverManager: NetPPopoverManager, passwordPopoverPresenter: PasswordPopoverPresenter) {
         self.networkProtectionPopoverManager = networkProtectionPopoverManager
         self.passwordPopoverPresenter = passwordPopoverPresenter
     }
