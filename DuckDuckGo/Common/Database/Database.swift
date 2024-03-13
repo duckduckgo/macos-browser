@@ -41,15 +41,21 @@ final class Database {
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
         func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
+
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
-            _=mainModel.registerValueTransformers(withAllowedPropertyClasses: [
-                NSImage.self,
-                NSString.self,
-                NSURL.self,
-                NSNumber.self,
-                NSError.self,
-                NSData.self
-            ], keyStore: keyStore)
+
+            // Encryption is disabled for UI Tests to make them work in CI
+            if NSApp.runType != .uiTests {
+                _=mainModel.registerValueTransformers(withAllowedPropertyClasses: [
+                    NSImage.self,
+                    NSString.self,
+                    NSURL.self,
+                    NSNumber.self,
+                    NSError.self,
+                    NSData.self
+                ], keyStore: keyStore)
+            }
+
             let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
             return (CoreDataDatabase(name: Constants.databaseName,

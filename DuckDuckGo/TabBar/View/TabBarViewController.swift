@@ -21,6 +21,7 @@ import Combine
 import Common
 import Lottie
 import SwiftUI
+import WebKit
 
 final class TabBarViewController: NSViewController {
 

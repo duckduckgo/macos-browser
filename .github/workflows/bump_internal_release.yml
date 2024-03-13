@@ -2,7 +2,7 @@ name: Bump Internal Release
 
 on:
   schedule:
-    - cron: '0 5 * * 2,3,4,5' # Run at 05:00 UTC on Tuesday through Friday
+    - cron: '0 7 * * 2-5' # Run at 07:00 UTC, Tuesday through Friday
   workflow_dispatch:
     inputs:
       asana-task-url:
@@ -20,7 +20,9 @@ jobs:
 
     name: Validate Input Conditions
 
-    runs-on: ubuntu-latest
+    # This doesn't need Xcode, so could technically run on Ubuntu, but find_asana_release_task.sh
+    # uses BSD-specific `date` syntax, that doesn't work with GNU `date` (available on Linux).
+    runs-on: macos-13
     timeout-minutes: 10
 
     outputs:
@@ -164,7 +166,7 @@ jobs:
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ github.ref_name }}
+          BRANCH: ${{ needs.validate_input_conditions.outputs.release-branch }}
         run: |
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
           ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.task-id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"

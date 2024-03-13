@@ -192,8 +192,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
 #if SPARKLE
-        updateController = UpdateController(internalUserDecider: internalUserDecider)
-        stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+        if NSApp.runType != .uiTests {
+            updateController = UpdateController(internalUserDecider: internalUserDecider)
+            stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+        }
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
