@@ -76,7 +76,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         self.popoverManager = popoverManager
-        let ipcClient = popoverManager.ipcClient
         self.networkProtectionStatusReporter = statusReporter
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.pinningManager = pinningManager
