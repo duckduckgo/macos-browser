@@ -54,8 +54,8 @@ final class PrivacyProtectionStatus: ObservableObject {
 
     // Initializer for observable properties
     init<T: Publisher>(statusPublisher: T,
-                               initialValue: Preferences.StatusIndicator? = nil,
-                               transform: @escaping (T.Output) -> Preferences.StatusIndicator?) where T.Failure == Never {
+                       initialValue: Preferences.StatusIndicator? = nil,
+                       transform: @escaping (T.Output) -> Preferences.StatusIndicator?) where T.Failure == Never {
         self.status = initialValue
 
         statusSubscription = statusPublisher
