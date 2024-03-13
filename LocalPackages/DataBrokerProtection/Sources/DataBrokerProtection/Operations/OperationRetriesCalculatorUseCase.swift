@@ -20,14 +20,14 @@ import Foundation
 
 struct OperationRetriesCalculatorUseCase {
 
-    func calculateForScan(database: DataBrokerProtectionRepository, brokerId: Int64, profileQueryId: Int64) -> Int {
-        let events = database.fetchScanHistoryEvents(brokerId: brokerId, profileQueryId: profileQueryId)
+    func calculateForScan(database: DataBrokerProtectionRepository, brokerId: Int64, profileQueryId: Int64) throws -> Int {
+        let events = try database.fetchScanHistoryEvents(brokerId: brokerId, profileQueryId: profileQueryId)
 
         return events.filter { $0.type == .scanStarted }.count
     }
 
-    func calculateForOptOut(database: DataBrokerProtectionRepository, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) -> Int {
-        let events = database.fetchOptOutHistoryEvents(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+    func calculateForOptOut(database: DataBrokerProtectionRepository, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> Int {
+        let events = try database.fetchOptOutHistoryEvents(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
 
         return events.filter { $0.type == .optOutStarted }.count
     }

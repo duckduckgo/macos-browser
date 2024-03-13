@@ -126,8 +126,17 @@ final class DataBrokerOperationsCollection: Operation {
         return filteredAndSortedOperationsData
     }
 
+    // swiftlint:disable:next function_body_length
     private func runOperation() async {
-        let allBrokerProfileQueryData = database.fetchAllBrokerProfileQueryData()
+        let allBrokerProfileQueryData: [BrokerProfileQueryData]
+
+        do {
+            allBrokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
+        } catch {
+            os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
+            return
+        }
+
         let brokerProfileQueriesData = allBrokerProfileQueryData.filter { $0.dataBroker.id == dataBrokerID }
 
         let filteredAndSortedOperationsData = filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,

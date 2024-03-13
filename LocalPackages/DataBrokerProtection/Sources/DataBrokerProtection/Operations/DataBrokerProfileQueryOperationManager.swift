@@ -320,7 +320,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
 
-            let tries = retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+            let tries = try retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             stageDurationCalculator.fireOptOutValidate()
             stageDurationCalculator.fireOptOutSubmitSuccess(tries: tries)
 
@@ -335,8 +335,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                 startTime: stageDurationCalculator.startTime)
             try database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
         } catch {
-            let tries = retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
-            stageDurationCalculator.fireOptOutFailure(tries: tries)
+            let tries = try? retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+            stageDurationCalculator.fireOptOutFailure(tries: tries ?? -1)
             handleOperationError(
                 origin: .optOut,
                 brokerId: brokerId,
