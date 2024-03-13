@@ -124,8 +124,9 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             guard let broker = try vault.fetchBroker(with: brokerId),
                   let profileQuery = try vault.fetchProfileQuery(with: profileQueryId),
                   let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
-                // TODO perhaps this should error if we query for things that don't exist?
-                return nil
+                let error = DataBrokerProtectionError.dataNotInDatabase
+                os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
+                throw error
             }
 
             let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
