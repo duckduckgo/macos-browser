@@ -29,7 +29,22 @@ import Subscription
 #endif
 
 #if NETWORK_PROTECTION
-final class NetworkProtectionNavBarPopoverManager {
+
+protocol NetworkProtectionIPCClient {
+    var ipcStatusObserver: ConnectionStatusObserver { get }
+    var ipcServerInfoObserver: ConnectionServerInfoObserver { get }
+    var ipcConnectionErrorObserver: ConnectionErrorObserver { get }
+
+    func start()
+    func stop()
+}
+extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
+    public var ipcStatusObserver: any NetworkProtection.ConnectionStatusObserver { connectionStatusObserver }
+    public var ipcServerInfoObserver: any NetworkProtection.ConnectionServerInfoObserver { serverInfoObserver }
+    public var ipcConnectionErrorObserver: any NetworkProtection.ConnectionErrorObserver { connectionErrorObserver }
+}
+
+final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
     let ipcClient: TunnelControllerIPCClient
     let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
@@ -48,9 +63,62 @@ final class NetworkProtectionNavBarPopoverManager {
 #endif
     }
 
+    // swiftlint:disable:next function_body_length
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = networkProtectionPopover ?? {
-            let popover = createNetworkProtectionPopover()
+
+            let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+
+            let statusReporter = DefaultNetworkProtectionStatusReporter(
+                statusObserver: ipcClient.ipcStatusObserver,
+                serverInfoObserver: ipcClient.ipcServerInfoObserver,
+                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
+                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+            )
+
+            let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
+            _ = VPNSettings(defaults: .netP)
+            let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+
+            let popover = NetworkProtectionPopover(controller: controller,
+                                                   onboardingStatusPublisher: onboardingStatusPublisher,
+                                                   statusReporter: statusReporter,
+                                                   appLauncher: appLauncher,
+                                                   menuItems: {
+                if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
+                    return [
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
+                                await appLauncher.launchApp(withCommand: .showSettings)
+                            }),
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                                await appLauncher.launchApp(withCommand: .showFAQ)
+                            }),
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            action: {
+                                await appLauncher.launchApp(withCommand: .shareFeedback)
+                            })
+                    ]
+                } else {
+                    return [
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                                await appLauncher.launchApp(withCommand: .showFAQ)
+                            }),
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            action: {
+                                await appLauncher.launchApp(withCommand: .shareFeedback)
+                            })
+                    ]
+                }
+            },
+                                                   agentLoginItem: LoginItem.vpnMenu,
+                                                   isMenuBarStatusView: false
+            )
             popover.delegate = delegate
 
             networkProtectionPopover = popover

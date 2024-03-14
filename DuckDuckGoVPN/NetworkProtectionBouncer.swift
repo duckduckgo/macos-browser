@@ -25,11 +25,12 @@ import AppKit
 #if SUBSCRIPTION
 import Subscription
 #endif
-/// Class that implements the necessary logic to ensure Network Protection is enabled, or prevent the app from running otherwise.
+
+/// Class that implements the necessary logic to ensure the VPN is enabled, or prevent the app from running otherwise.
 ///
 final class NetworkProtectionBouncer {
 
-    /// Simply verifies that the Network Protection feature is enabled and if not, takes care of killing the
+    /// Simply verifies that the VPN feature is enabled and if not, takes care of killing the
     /// current app.
     ///
     func requireAuthenticationOrKillApp() {
@@ -41,7 +42,7 @@ final class NetworkProtectionBouncer {
             case .success(true), .failure:
                 return
             case .success(false):
-                os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized. Missing entitlement.")
+                os_log(.error, log: .networkProtection, "🔴 Stopping: VPN not authorized. Missing entitlement.")
 
                 // EXIT_SUCCESS ensures the login item won't relaunch
                 // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
@@ -51,10 +52,12 @@ final class NetworkProtectionBouncer {
             }
         }
 #else
-        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil, isSubscriptionEnabled: false)
-
+        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
+                                                                errorEvents: nil,
+                                                                isSubscriptionEnabled: false,
+                                                                accessTokenProvider: { nil })
         guard keychainStore.isFeatureActivated else {
-            os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized. Missing token.")
+            os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing token.")
 
             // EXIT_SUCCESS ensures the login item won't relaunch
             // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()

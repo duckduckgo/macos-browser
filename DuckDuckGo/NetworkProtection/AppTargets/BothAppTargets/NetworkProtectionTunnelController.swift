@@ -389,7 +389,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - Connection Status Querying
 
-    /// Queries Network Protection to know if its VPN is connected.
+    /// Queries the VPN to know if it's connected.
     ///
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
     ///
@@ -480,7 +480,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
     }
 
-    /// Starts the VPN connection used for Network Protection
+    /// Starts the VPN connection
     ///
     func start() async {
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
@@ -585,7 +585,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
     }
 
-    /// Stops the VPN connection used for Network Protection
+    /// Stops the VPN connection
     ///
     @MainActor
     func stop() async {

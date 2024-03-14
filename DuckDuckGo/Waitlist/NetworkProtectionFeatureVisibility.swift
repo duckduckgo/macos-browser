@@ -59,18 +59,18 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         self.defaults = defaults
     }
 
-    /// Calculates whether Network Protection is visible.
+    /// Calculates whether the VPN is visible.
     /// The following criteria are used:
     ///
     /// 1. If the user has a valid auth token, the feature is visible
     /// 2. If no auth token is found, the feature is visible if the waitlist feature flag is enabled
     ///
-    /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
+    /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding the VPN from the user.
     func isNetworkProtectionVisible() -> Bool {
         return isEasterEggUser || waitlistIsOngoing
     }
 
-    /// Returns whether Network Protection should be uninstalled automatically.
+    /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
 #if SUBSCRIPTION
