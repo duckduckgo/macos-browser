@@ -47,9 +47,19 @@ final class NetworkProtectionAppEvents {
     // MARK: - Feature Visibility
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
+    private let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+    private let featureDisabler: NetworkProtectionFeatureDisabling
+    private let defaults: UserDefaults
 
-    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()) {
+    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         subscriptionFeatureAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
+         featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         defaults: UserDefaults = .netP) {
+
+        self.defaults = defaults
+        self.featureDisabler = featureDisabler
         self.featureVisibility = featureVisibility
+        self.subscriptionFeatureAvailability = subscriptionFeatureAvailability
     }
 
     /// Call this method when the app finishes launching, to run the startup logic for NetP.
@@ -58,8 +68,9 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            if featureVisibility.shouldUninstallAutomatically() {
-                featureVisibility.disableForAllUsers()
+            let disabled = await featureVisibility.disableIfUserHasNoAccess()
+
+            guard !disabled else {
                 return
             }
 

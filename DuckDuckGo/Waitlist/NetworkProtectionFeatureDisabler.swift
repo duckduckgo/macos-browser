@@ -29,6 +29,7 @@ import SystemExtensions
 protocol NetworkProtectionFeatureDisabling {
     /// - Returns: `true` if the uninstallation was completed.  `false` if it was cancelled by the user or an error.
     ///
+    @discardableResult
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool
 }
 
@@ -124,6 +125,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     private func resetUserDefaults() {
         settings.resetToDefaults()
+        userDefaults.resetVPNLegacyUserAccessDisabledOnce()
     }
 
     private func postVPNUninstalledNotification() {

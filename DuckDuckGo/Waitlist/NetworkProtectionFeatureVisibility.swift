@@ -30,14 +30,17 @@ protocol NetworkProtectionFeatureVisibility {
     func shouldUninstallAutomatically() -> Bool
     func disableForAllUsers()
     func disableForWaitlistUsers()
+    func disableIfUserHasNoAccess() async -> Bool
 }
 
 struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
+    private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let featureDisabler: NetworkProtectionFeatureDisabling
     private let featureOverrides: WaitlistBetaOverriding
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let networkProtectionWaitlist = NetworkProtectionWaitlist()
     private let privacyConfigurationManager: PrivacyConfigurationManaging
+    private let subscriptionAvailability: SubscriptionFeatureAvailability
     private let defaults: UserDefaults
 
     var waitlistIsOngoing: Bool {
@@ -48,6 +51,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides(),
          featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection) {
 
@@ -55,6 +59,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.featureDisabler = featureDisabler
         self.featureOverrides = featureOverrides
+        self.subscriptionAvailability = subscriptionAvailability
         self.defaults = defaults
     }
 
@@ -154,6 +159,51 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         Task {
             await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
         }
+    }
+
+    /// A method meant to be called safely from different places to disable the VPN if the user isn't meant to have access to it.
+    ///
+    func disableIfUserHasNoAccess() async -> Bool {
+        if shouldUninstallAutomatically() {
+            disableForAllUsers()
+            return true
+        }
+
+        return await disableVPNForLegacyUsersIfSubscriptionAvailable()
+    }
+
+    // MARK: - Subscription Start Support
+
+    /// To query whether we're a legacy (waitlist or easter egg) user.
+    ///
+    private func isPreSubscriptionUser() -> Bool {
+        guard let token = try? NetworkProtectionKeychainTokenStore().fetchToken() else {
+            return false
+        }
+
+        return !token.hasPrefix(Self.subscriptionAuthTokenPrefix)
+    }
+
+    /// Checks whether the VPN needs to be disabled.
+    ///
+    private var shouldDisableVPN: Bool {
+        !defaults.vpnLegacyUserAccessDisabledOnce
+        && isPreSubscriptionUser()
+        && subscriptionAvailability.isFeatureAvailable()
+    }
+
+    /// Disables the VPN for legacy users, if necessary.
+    ///
+    /// This method does not seek to remove tokens or uninstall anything.
+    ///
+    private func disableVPNForLegacyUsersIfSubscriptionAvailable() async -> Bool {
+        guard !defaults.vpnLegacyUserAccessDisabledOnce else {
+            return false
+        }
+
+        //defaults.vpnLegacyUserAccessDisabledOnce = true
+        await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
+        return true
     }
 }
 

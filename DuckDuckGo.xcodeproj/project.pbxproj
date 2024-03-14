@@ -2195,6 +2195,9 @@
 		7B624F172BA25C1F00A6C544 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7B624F162BA25C1F00A6C544 /* NetworkProtectionUI */; };
 		7B7DFB202B7E736B009EA1A3 /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		7B7DFB222B7E7473009EA1A3 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 7B7DFB212B7E7473009EA1A3 /* Networking */; };
+		7B7FCD0F2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */; };
+		7B7FCD102BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */; };
+		7B7FCD112BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */; };
 		7B8C083C2AE1268E00F4C67F /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B8C083B2AE1268E00F4C67F /* PixelKit */; };
 		7B8DB31A2B504D7500EC16DA /* VPNAppEventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */; };
 		7B934C412A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
@@ -3849,6 +3852,7 @@
 		7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgentAppStore.xcconfig; sourceTree = "<group>"; };
 		7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgent.xcconfig; sourceTree = "<group>"; };
 		7B76E6852AD5D77600186A84 /* XPCHelper */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = XPCHelper; sourceTree = "<group>"; };
+		7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+vpnLegacyUser.swift"; sourceTree = "<group>"; };
 		7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNAppEventsHandler.swift; sourceTree = "<group>"; };
 		7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionShared.swift"; sourceTree = "<group>"; };
@@ -5851,6 +5855,7 @@
 			children = (
 				7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */,
 				4B6785432AA8DE1F008A5004 /* NetworkProtectionFeatureDisabler.swift */,
+				7B7FCD0E2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift */,
 				31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */,
 				31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */,
 				4B9DB0072A983B23000927DB /* Waitlist.swift */,
@@ -10047,6 +10052,7 @@
 				B603971B29BA084C00902A34 /* JSAlertController.swift in Sources */,
 				3706FB6A293F65D500E42796 /* AddressBarButton.swift in Sources */,
 				4B41EDA42B1543B9001EEDF4 /* VPNPreferencesModel.swift in Sources */,
+				7B7FCD102BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */,
 				3706FB6C293F65D500E42796 /* FaviconStore.swift in Sources */,
 				3706FB6D293F65D500E42796 /* SuggestionListCharacteristics.swift in Sources */,
 				377D801F2AB48191002AF251 /* FavoritesDisplayModeSyncHandler.swift in Sources */,
@@ -11654,6 +11660,7 @@
 				4B957BCB2AC7AE700062CA31 /* PreferencesAppearanceView.swift in Sources */,
 				4B957BCC2AC7AE700062CA31 /* NSMenuItemExtension.swift in Sources */,
 				4B957BCD2AC7AE700062CA31 /* ContiguousBytesExtension.swift in Sources */,
+				7B7FCD112BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */,
 				4B957BCE2AC7AE700062CA31 /* AdjacentItemEnumerator.swift in Sources */,
 				4B957BCF2AC7AE700062CA31 /* BookmarkDatabase.swift in Sources */,
 				4B957BD02AC7AE700062CA31 /* ChromiumKeychainPrompt.swift in Sources */,
@@ -12442,6 +12449,7 @@
 				B6A22B622B1E29D000ECD2BA /* DataImportSummaryViewModel.swift in Sources */,
 				37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */,
 				1EA7B8D82B7E1283000330A4 /* SubscriptionFeatureAvailability.swift in Sources */,
+				7B7FCD0F2BA33B2700C04FBE /* UserDefaults+vpnLegacyUser.swift in Sources */,
 				987799F62999996B005D8EB6 /* BookmarkDatabase.swift in Sources */,
 				4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */,
 				B6553692268440D700085A79 /* WKProcessPool+GeolocationProvider.swift in Sources */,
