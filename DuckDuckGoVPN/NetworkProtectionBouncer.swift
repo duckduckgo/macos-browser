@@ -30,7 +30,10 @@ final class NetworkProtectionBouncer {
     /// current app.
     ///
     func requireAuthTokenOrKillApp() {
-        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil, isSubscriptionEnabled: false)
+        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
+                                                                errorEvents: nil,
+                                                                isSubscriptionEnabled: false,
+                                                                accessTokenProvider: { nil })
 
         guard keychainStore.isFeatureActivated else {
             os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized.")
