@@ -22,6 +22,10 @@ import Foundation
 import NetworkProtection
 import Common
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 extension NetworkProtectionDeviceManager {
 
     static func create() -> NetworkProtectionDeviceManager {
@@ -58,6 +62,27 @@ extension NetworkProtectionKeychainKeyStore {
     convenience init() {
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents)
+    }
+}
+
+extension NetworkProtectionLocationListCompositeRepository {
+    convenience init() {
+        let settings = VPNSettings(defaults: .netP)
+#if SUBSCRIPTION
+        self.init(
+            environment: settings.selectedEnvironment,
+            fetchToken: { AccountManager().accessToken },
+            errorEvents: .networkProtectionAppDebugEvents,
+            isSubscriptionEnabled: true
+        )
+#else
+        self.init(
+            environment: settings.selectedEnvironment,
+            tokenStore: NetworkProtectionKeychainTokenStore(),
+            errorEvents: .networkProtectionAppDebugEvents,
+            isSubscriptionEnabled: false
+        )
+#endif
     }
 }
 
