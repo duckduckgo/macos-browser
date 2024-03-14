@@ -276,10 +276,10 @@ extension PrivacyDashboardViewController {
 
         var errors: [Error]?
         var statusCodes: [Int]?
-        if let error = tabViewModel?.tab.lastWebError {
+        if let error = currentTab.lastWebError {
             errors = [error]
         }
-        if let httpStatusCode = tabViewModel?.tab.lastHttpStatusCode {
+        if let httpStatusCode = currentTab.lastHttpStatusCode {
             statusCodes = [httpStatusCode]
         }
 
@@ -298,7 +298,11 @@ extension PrivacyDashboardViewController {
                                               protectionsState: protectionsState,
                                               reportFlow: source,
                                               errors: errors,
-                                              httpStatusCodes: statusCodes)
+                                              httpStatusCodes: statusCodes,
+                                              openerContext: tabViewModel?.tab.inferredOpenerContext,
+                                              vpnOn: tabViewModel?.tab.tunnelController?.isConnected ?? false,
+                                              jsPerformance: nil,
+                                              userRefreshCount: tabViewModel?.tab.refreshCountSinceLoad ?? 0)
         return websiteBreakage
     }
 }

@@ -25,6 +25,7 @@ import Navigation
 import UserScript
 import WebKit
 import History
+import PrivacyDashboard
 
 #if SUBSCRIPTION
 import Subscription
@@ -303,7 +304,7 @@ protocol NewWindowPolicyDecisionMaker {
     let pinnedTabsManager: PinnedTabsManager
 
 #if NETWORK_PROTECTION
-    private var tunnelController: NetworkProtectionIPCTunnelController?
+    private(set) var tunnelController: NetworkProtectionIPCTunnelController?
 #endif
 
     private let webViewConfiguration: WKWebViewConfiguration
@@ -738,6 +739,9 @@ protocol NewWindowPolicyDecisionMaker {
     @Published private(set) var lastWebError: Error?
     @Published private(set) var lastHttpStatusCode: Int?
 
+    @Published private(set) var inferredOpenerContext: WebsiteBreakage.OpenerContext?
+    @Published private(set) var refreshCountSinceLoad: Int = 0
+
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var loadingProgress: Double = 0.0
 
@@ -986,6 +990,8 @@ protocol NewWindowPolicyDecisionMaker {
             webView.load(URLRequest(url: redirectUrl))
             return nil
         }
+
+        refreshCountSinceLoad += 1
 
         self.content = content.forceReload()
         if webView.url == nil, content.isUrl {
@@ -1323,6 +1329,16 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         // allow local file navigations
         if navigationAction.url.isFileURL { return .allow }
 
+        switch navigationAction.navigationType {
+        case .linkActivated, .formSubmitted:
+            refreshCountSinceLoad = 0
+            inferredOpenerContext = .navigation
+        case .reload, .other:
+            break
+        default:
+            refreshCountSinceLoad = 0
+        }
+
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if let mainFrame = navigationAction.mainFrameTarget,
            let credential = navigationAction.url.basicAuthCredential {
@@ -1377,6 +1393,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             error = nil
         }
 
+        if inferredOpenerContext != .external {
+            inferredOpenerContext = .external
+        }
+
         invalidateInteractionStateData()
     }
 
@@ -1385,6 +1405,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+
+        Task { @MainActor in
+            if await ReferrerInfo.isSERPReferred(from: webView) {
+                inferredOpenerContext = .serp
+            }
+        }
 
 #if NETWORK_PROTECTION
         if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {
