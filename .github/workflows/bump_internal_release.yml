@@ -62,16 +62,11 @@ jobs:
           # if [[ "${{ github.event_name }}" != "schedule" ]]; then
           #   echo "skip-release=false" >> $GITHUB_OUTPUT
           # else
-            git checkout "${release_branch}"
             latest_tag="$(git describe --tags --abbrev=0)"
-            echo "git diff --name-only \"$latest_tag\""
-            git diff --name-only "$latest_tag"
-            echo "diff computed"
-            changed_files="$(git diff --name-only "$latest_tag" | grep -v -E '.github|scripts')"
-            echo "changed_files=${changed_files}"
-
-            if [[ ${#changed_files} == 0 ]]; then
-              echo "::warning::No changes to the release branch (or only scripts and workflows). Skipping automatic release."
+            changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}")"
+ 
+            if grep -v -E '.github|scripts' <<< "$changed_files"; then
+              echo "::warning::No changes to the release branch (or only changes to scripts and workflows). Skipping automatic release."
               echo "skip-release=true" >> $GITHUB_OUTPUT
             else
               echo "skip-release=false" >> $GITHUB_OUTPUT
