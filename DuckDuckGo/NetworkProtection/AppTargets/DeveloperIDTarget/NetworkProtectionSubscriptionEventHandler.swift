@@ -78,15 +78,6 @@ final class NetworkProtectionSubscriptionEventHandler {
             return
         }
         userDefaults.networkProtectionEntitlementsValid = true
-
-        Task {
-            do {
-                try NetworkProtectionKeychainTokenStore().store(NetworkProtectionKeychainTokenStore.makeToken(from: token))
-                print("[NetP Subscription] Stored derived NetP auth token")
-            } catch {
-                print("[NetP Subscription] Failed to store derived NetP auth token: \(error)")
-            }
-        }
     }
 
     @objc private func handleAccountDidSignOut() {

@@ -38,6 +38,7 @@ protocol NetworkProtectionIPCClient {
     func start()
     func stop()
 }
+
 extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
     public var ipcStatusObserver: any NetworkProtection.ConnectionStatusObserver { connectionStatusObserver }
     public var ipcServerInfoObserver: any NetworkProtection.ConnectionServerInfoObserver { serverInfoObserver }
@@ -46,7 +47,7 @@ extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
 
 final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     private var networkProtectionPopover: NetworkProtectionPopover?
-    let ipcClient: TunnelControllerIPCClient
+    let ipcClient: NetworkProtectionIPCClient
     let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
 
     init(ipcClient: TunnelControllerIPCClient,
@@ -117,8 +118,13 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 }
             },
                                                    agentLoginItem: LoginItem.vpnMenu,
-                                                   isMenuBarStatusView: false
-            )
+                                                   isMenuBarStatusView: false,
+                                                   userDefaults: .netP,
+                                                   uninstallHandler: { [weak self] in
+                Task { [weak self] in
+                    await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
+                }
+            })
             popover.delegate = delegate
 
             networkProtectionPopover = popover
@@ -126,58 +132,6 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         }()
 
         show(popover, positionedBelow: view)
-    }
-
-    private func createNetworkProtectionPopover() -> NetworkProtectionPopover {
-        let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-
-        let statusReporter = DefaultNetworkProtectionStatusReporter(
-            statusObserver: ipcClient.connectionStatusObserver,
-            serverInfoObserver: ipcClient.serverInfoObserver,
-            connectionErrorObserver: ipcClient.connectionErrorObserver,
-            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-        )
-
-        let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
-        _ = VPNSettings(defaults: .netP)
-        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-
-        return NetworkProtectionPopover(controller: controller,
-                                               onboardingStatusPublisher: onboardingStatusPublisher,
-                                               statusReporter: statusReporter,
-                                               appLauncher: appLauncher,
-                                               menuItems: {
-            if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
-                return [
-                    NetworkProtectionStatusView.Model.MenuItem(
-                        name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
-                            await appLauncher.launchApp(withCommand: .showSettings)
-                        }),
-                    NetworkProtectionStatusView.Model.MenuItem(
-                        name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                        action: {
-                            await appLauncher.launchApp(withCommand: .shareFeedback)
-                        })
-                ]
-            } else {
-                return [
-                    NetworkProtectionStatusView.Model.MenuItem(
-                        name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                        action: {
-                            await appLauncher.launchApp(withCommand: .shareFeedback)
-                        })
-                ]
-            }
-        },
-                                               agentLoginItem: LoginItem.vpnMenu,
-                                               isMenuBarStatusView: false,
-                                               userDefaults: .netP,
-                                               uninstallHandler: { [weak self] in
-            Task { [weak self] in
-                await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
-            }
-        })
     }
 
     private func show(_ popover: NSPopover, positionedBelow view: NSView) {

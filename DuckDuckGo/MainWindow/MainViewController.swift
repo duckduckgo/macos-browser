@@ -75,7 +75,7 @@ final class MainViewController: NSViewController {
             let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
             ipcClient.register()
 
-            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
+            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient, networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler())
         }()
         let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
             var connectivityIssuesObserver: ConnectivityIssueObserver!
