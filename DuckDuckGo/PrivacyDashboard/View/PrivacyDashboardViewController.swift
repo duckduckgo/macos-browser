@@ -346,10 +346,10 @@ extension PrivacyDashboardViewController {
                                                reportFlow: source,
                                                errors: errors,
                                                httpStatusCodes: statusCodes,
-                                               openerContext: tabViewModel?.tab.inferredOpenerContext,
-                                               vpnOn: tabViewModel?.tab.tunnelController?.isConnected ?? false,
+                                               openerContext: currentTab.inferredOpenerContext,
+                                               vpnOn: currentTab.tunnelController?.isConnected ?? false,
                                                jsPerformance: nil,
-                                               userRefreshCount: tabViewModel?.tab.refreshCountSinceLoad ?? 0,
+                                               userRefreshCount: currentTab.refreshCountSinceLoad,
                                                didOpenReportInfo: didOpenReportInfo,
                                                toggleReportCounter: toggleReportCounter)
         return websiteBreakage
