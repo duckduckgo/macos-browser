@@ -155,7 +155,7 @@ extension ProductWaitlistRequest {
     }
 }
 
-// MARK: - Network Protection Waitlist
+// MARK: - VPN Waitlist
 
 struct NetworkProtectionWaitlist: Waitlist {
 

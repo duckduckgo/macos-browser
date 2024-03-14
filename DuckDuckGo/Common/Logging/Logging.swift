@@ -41,7 +41,7 @@ extension OSLog {
         case duckPlayer = "Duck Player"
         case tabSnapshots = "Tab Snapshots"
         case sync = "Sync"
-        case networkProtection = "Network Protection"
+        case networkProtection = "VPN"
         case dbp = "dbp"
     }
 

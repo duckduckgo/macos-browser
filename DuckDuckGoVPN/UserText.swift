@@ -22,6 +22,7 @@ final class UserText {
     // MARK: - Status Menu
 
     static let networkProtectionStatusMenuVPNSettings = NSLocalizedString("network.protection.status.menu.vpn.settings", value: "VPN Settings…", comment: "The status menu 'VPN Settings' menu item")
+    static let networkProtectionStatusMenuFAQ = NSLocalizedString("network.protection.status.menu.faq", value: "Frequently Asked Questions…", comment: "The status menu 'FAQ' menu item")
     static let networkProtectionStatusMenuOpenDuckDuckGo = NSLocalizedString("network.protection.status.menu.vpn.open-duckduckgo", value: "Open DuckDuckGo…", comment: "The status menu 'Open DuckDuckGo' menu item")
     static let networkProtectionStatusMenuShareFeedback = NSLocalizedString("network.protection.status.menu.share.feedback", value: "Send VPN Feedback…", comment: "The status menu 'Send VPN Feedback' menu item")
 }
