@@ -25,10 +25,10 @@ import NetworkProtectionIPC
 final class NetworkProtectionIPCTunnelController: TunnelController {
 
     private let loginItemsManager: LoginItemsManager
-    private let ipcClient: TunnelControllerIPCClient
+    private let ipcClient: NetworkProtectionIPCClient
 
     init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
-         ipcClient: TunnelControllerIPCClient) {
+         ipcClient: NetworkProtectionIPCClient) {
 
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
@@ -54,7 +54,7 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
     ///
     var isConnected: Bool {
         get {
-            if case .connected = ipcClient.connectionStatusObserver.recentValue {
+            if case .connected = ipcClient.ipcStatusObserver.recentValue {
                 return true
             }
 
