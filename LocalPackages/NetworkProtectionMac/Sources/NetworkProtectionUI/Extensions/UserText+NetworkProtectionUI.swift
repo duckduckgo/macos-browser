@@ -70,7 +70,7 @@ final class UserText {
 
     // MARK: Subscription Expired
 
-    static let networkProtectionSubscriptionExpiredTitle = NSLocalizedString("network.protection.subscription.expired.title", value: "VPN disconnected due to expired subscription", comment: "Title for the prompt that tells the user their subscription expired.")
+    static let networkProtectionSubscriptionExpiredTitle = NSLocalizedString("network.protection.subscription.expired.title", value: "VPN disconnected", comment: "Title for the prompt that tells the user their subscription expired.")
     static let networkProtectionSubscriptionExpiredSubtitle = NSLocalizedString("network.protection.subscription.expired.subtitle", value: "Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.", comment: "Subtitle for the prompt that tells the user their subscription expired.")
     static let networkProtectionSubscriptionExpiredResubscribeButton = NSLocalizedString("network.protection.subscription.expired.resubscribe.button", value: "Subscribe to Privacy Pro", comment: "Button for the prompt that takes the user to the page to resubscribe.")
     static let networkProtectionSubscriptionExpiredUninstallButton = NSLocalizedString("network.protection.subscription.expired.uninstall.button", value: "Uninstall DuckDuckGo VPN", comment: "Button for the prompt that uninstalls the VPN.")
