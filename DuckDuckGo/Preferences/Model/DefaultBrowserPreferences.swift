@@ -19,7 +19,6 @@
 import Combine
 import Common
 import Foundation
-import Macros
 import SwiftUI
 
 protocol DefaultBrowserProvider {
@@ -38,7 +37,7 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
     let bundleIdentifier: String
 
     var isDefault: Bool {
-        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: #URL("http://")),
+        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
               let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
         else {
             return false

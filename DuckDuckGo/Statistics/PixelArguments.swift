@@ -24,8 +24,13 @@ extension Pixel.Event {
     enum Repetition: String, CustomStringConvertible {
         var description: String { rawValue }
 
+        /// fires once ever
         case initial = "initial"
+
+        /// fires at most once per day
         case dailyFirst = "first-in-a-day"
+
+        /// fires every time
         case repetitive = "repetitive"
 
         init(key: String, store: PixelDataStore = LocalPixelDataStore.shared, now: Date = Date(), update: Bool = true) {

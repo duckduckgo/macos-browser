@@ -19,7 +19,6 @@
 import AVFoundation
 import Combine
 import Foundation
-import Macros
 import WebKit
 import XCTest
 
@@ -715,7 +714,7 @@ final class PermissionModelTests: XCTestCase {
     }
 
     func testWhenDeniedPermissionIsStoredThenActivePermissionIsRevoked() {
-        webView.urlValue = #URL("http://www.duckduckgo.com")
+        webView.urlValue = URL(string: "http://www.duckduckgo.com")!
         if #available(macOS 12, *) {
             webView.cameraCaptureState = .active
             webView.microphoneCaptureState = .active
@@ -777,7 +776,7 @@ final class PermissionModelTests: XCTestCase {
     }
 
     func testWhenGrantedPermissionIsRemovedThenActivePermissionStaysActive() {
-        webView.urlValue = #URL("http://www.duckduckgo.com")
+        webView.urlValue = URL(string: "http://www.duckduckgo.com")!
         if #available(macOS 12, *) {
             self.webView.cameraCaptureState = .active
             self.webView.microphoneCaptureState = .active

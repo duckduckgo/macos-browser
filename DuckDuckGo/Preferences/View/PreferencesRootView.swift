@@ -128,6 +128,7 @@ enum Preferences {
         }
 
 #if SUBSCRIPTION
+        // swiftlint:disable:next cyclomatic_complexity
         private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
                 DispatchQueue.main.async {
@@ -135,29 +136,50 @@ enum Preferences {
                 }
             }
 
-            let openVPN: () -> Void = {
-                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
-            }
-
-            let openDBP: () -> Void = {
+            let handleUIEvent: (PreferencesSubscriptionModel.UserEvent) -> Void = { event in
                 DispatchQueue.main.async {
-                    WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+                    switch event {
+                    case .openVPN:
+                        Pixel.fire(.privacyProVPNSettings)
+                        NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
+                    case .openDB:
+                        Pixel.fire(.privacyProPersonalInformationRemovalSettings)
+                        WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+                    case .openITR:
+                        Pixel.fire(.privacyProIdentityRestorationSettings)
+                        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+                    case .iHaveASubscriptionClick:
+                        Pixel.fire(.privacyProRestorePurchaseClick)
+                    case .activateAddEmailClick:
+                        DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                    case .postSubscriptionAddEmailClick:
+                        Pixel.fire(.privacyProWelcomeAddDevice, limitTo: .initial)
+                    case .restorePurchaseStoreClick:
+                        DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
+                    case .addToAnotherDeviceClick:
+                        Pixel.fire(.privacyProSettingsAddDevice)
+                    case .addDeviceEnterEmail:
+                        Pixel.fire(.privacyProAddDeviceEnterEmail)
+                    case .activeSubscriptionSettingsClick:
+                        Pixel.fire(.privacyProSubscriptionSettings)
+                    case .changePlanOrBillingClick:
+                        Pixel.fire(.privacyProSubscriptionManagementPlanBilling)
+                    case .removeSubscriptionClick:
+                        Pixel.fire(.privacyProSubscriptionManagementRemoval)
+                    }
                 }
             }
 
-            let openITR: () -> Void = {
-                DispatchQueue.main.async {
-                    WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
+                if #available(macOS 12.0, *) {
+                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow { _ in }
                 }
-            }
-
-            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
-                                                                      openURLHandler: openURL)
+            },
+                                                                      openURLHandler: openURL,
+                                                                      uiActionHandler: handleUIEvent)
 
             return PreferencesSubscriptionModel(openURLHandler: openURL,
-                                                openVPNHandler: openVPN,
-                                                openDBPHandler: openDBP,
-                                                openITRHandler: openITR,
+                                                userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
                                                 subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }

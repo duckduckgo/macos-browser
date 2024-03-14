@@ -17,11 +17,10 @@
 //
 
 import Foundation
-import Macros
 
 final class CrashReportSender {
 
-    static let reportServiceUrl = #URL("https://duckduckgo.com/crash.js")
+    static let reportServiceUrl = URL(string: "https://duckduckgo.com/crash.js")!
 
     private let session = URLSession(configuration: .ephemeral)
 

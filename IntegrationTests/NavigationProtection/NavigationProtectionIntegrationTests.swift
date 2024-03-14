@@ -18,7 +18,6 @@
 
 import Combine
 import Common
-import Macros
 import Navigation
 import os.log
 import XCTest
@@ -68,7 +67,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = #URL("https://privacy-test-pages.site/privacy-protections/amp/")
+        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/amp/")!
         _=try await tab.setUrl(url, source: .link)?.result.get()
 
         let itemsCount = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li').length") as? Int ?? 0
@@ -151,7 +150,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = #URL("https://privacy-test-pages.site/privacy-protections/referrer-trimming/")
+        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/referrer-trimming/")!
         _=try await tab.setUrl(url, source: .link)?.result.get()
 
         // run test
@@ -204,7 +203,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: tab)!
         let tabViewModel = (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
 
-        let url = #URL("https://privacy-test-pages.site/privacy-protections/gpc/")
+        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/gpc/")!
         // disable GPC redirects
         WebTrackingProtectionPreferences.shared.isGPCEnabled = false
         _=try await tab.setUrl(url, source: .link)?.result.get()

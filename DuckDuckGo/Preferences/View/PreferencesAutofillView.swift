@@ -149,7 +149,8 @@ extension Preferences {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text(UserText.autofillLockWhenIdle)
-                                    .fixedSize(horizontal: true, vertical: false)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .multilineTextAlignment(.leading)
                                 NSPopUpButtonView(selection: autoLockThresholdBinding) {
                                     let button = NSPopUpButton()
                                     button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
