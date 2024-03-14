@@ -53,6 +53,11 @@ enum UserText {
         return String(format: localized, period, formattedDate)
     }
 
+    static func preferencesSubscriptionExpiredCaption(formattedDate: String) -> String {
+        let localized = NSLocalizedString("subscription.preferences.subscription.expired.caption", value: "Your Privacy Pro subscription expired on %@.", comment: "Caption for the subscription preferences pane when the subscription has expired. The parameter is date of expiry.")
+        return String(format: localized, formattedDate)
+    }
+
     static let monthlySubscriptionBillingPeriod = NSLocalizedString("subscription.billing.period.monthly", value: "Monthly", comment: "Type of subscription billing period that lasts a month")
     static let yearlySubscriptionBillingPeriod = NSLocalizedString("subscription.billing.period.yearly", value: "Yearly", comment: "Type of subscription billing period that lasts a year")
 
@@ -73,6 +78,11 @@ enum UserText {
     static let preferencesSubscriptionPendingCaption = NSLocalizedString("subscription.preferences.subscription.pending.caption", value: "This is taking longer than usual, please check back later.", comment: "Caption for the subscription preferences pane when the subscription activation is pending")
 
     static let restorePurchaseButton = NSLocalizedString("subscription.preferences.restore.purchase.button", value: "Restore Purchase", comment: "Button to restore past purchases")
+
+    // MARK: Preferences when subscription is expired
+    static let preferencesSubscriptionExpiredCaption = NSLocalizedString("subscription.preferences.subscription.expired.caption", value: "Subscribe again to continue using Privacy Pro.", comment: "Caption for the subscription preferences pane when the subscription activation is pending")
+
+    static let manageDevicesButton = NSLocalizedString("subscription.preferences.manage.devices.button", value: "Manage Devices", comment: "Button to manage devices")
 
     // MARK: - Change plan or billing dialogs
     static let changeSubscriptionDialogTitle = NSLocalizedString("subscription.dialog.change.title", value: "Change Plan or Billing", comment: "Change plan or billing dialog title")

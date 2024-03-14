@@ -64,41 +64,9 @@ public struct PreferencesSubscriptionView: View {
                     pendingActivationHeaderView
                 case .subscriptionActive:
                     authenticatedHeaderView
+                case .subscriptionExpired:
+                    expiredHeaderView
                 }
-
-                // DEBUG buttons
-                HStack {
-                    Button("auth", action: {
-                        model.isUserAuthenticated.toggle()
-                    })
-                    Button("vpn", action: {
-                        model.hasAccessToVPN.toggle()
-                    })
-                    Button("dbp", action: {
-                        model.hasAccessToDBP.toggle()
-                    })
-                    Button("itr", action: {
-                        model.hasAccessToITR.toggle()
-                    })
-                }
-                HStack {
-                    Button("autoRenewable", action: {
-                        model.updateDescription(for: Date(), status: .autoRenewable, period: .monthly)
-                    })
-                    Button("notAutoRenewable", action: {
-                        model.updateDescription(for: Date(), status: .notAutoRenewable, period: .yearly)
-                    })
-                    Button("gracePeriod", action: {
-                        model.updateDescription(for: Date(), status: .gracePeriod, period: .monthly)
-                    })
-                    Button("inactive", action: {
-                        model.updateDescription(for: Date(), status: .inactive, period: .unknown)
-                    })
-                    Button("expired", action: {
-                        model.updateDescription(for: Date(), status: .expired, period: .unknown)
-                    })
-                }
-                // DEBUG buttons
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -201,6 +169,29 @@ public struct PreferencesSubscriptionView: View {
         } buttons: {
             Button(UserText.restorePurchaseButton) { model.refreshSubscriptionPendingState() }
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
+        }
+    }
+    
+    @ViewBuilder
+    private var expiredHeaderView: some View {
+        UniversalHeaderView {
+            Image(.subscriptionExpiredIcon)
+                .padding(4)
+        } content: {
+            TextMenuItemHeader(model.subscriptionDetails ?? UserText.preferencesSubscriptionInactiveHeader)
+            TextMenuItemCaption(UserText.preferencesSubscriptionExpiredCaption)
+        } buttons: {
+            Button(UserText.viewPlansButtonTitle) { model.purchaseAction() }
+                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+            Menu {
+                Button(UserText.removeFromThisDeviceButton, action: {
+                    model.userEventHandler(.removeSubscriptionClick)
+                    showingRemoveConfirmationDialog.toggle()
+                })
+            } label: {
+                Text(UserText.manageDevicesButton)
+            }
+            .fixedSize()
         }
     }
 

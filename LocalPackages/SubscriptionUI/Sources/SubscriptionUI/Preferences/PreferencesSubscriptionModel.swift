@@ -25,6 +25,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
     @Published var subscriptionDetails: String?
+    @Published var subscriptionStatus: Subscription.Status?
 
     @Published var hasAccessToVPN: Bool = false
     @Published var hasAccessToDBP: Bool = false
@@ -61,25 +62,25 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     lazy var statePublisher: AnyPublisher<PreferencesSubscriptionState, Never> = {
+        let isSubscriptionActivePublisher = $subscriptionStatus.map {
+            $0 != .expired && $0 != .inactive
+        }.eraseToAnyPublisher()
+
         let hasAnyEntitlementPublisher = Publishers.CombineLatest3($hasAccessToVPN, $hasAccessToDBP, $hasAccessToITR).map {
-            print("---= 1. \($0), \($1), \($2)")
             return $0 || $1 || $2
         }.eraseToAnyPublisher()
 
-        return Publishers.CombineLatest($isUserAuthenticated, hasAnyEntitlementPublisher)
-            .map { isUserAuthenticated, hasAnyEntitlement in
-                print("---= 2. \(isUserAuthenticated) \(hasAnyEntitlement)")
-                switch (isUserAuthenticated, hasAnyEntitlement) {
-                case (false, _): return PreferencesSubscriptionState.noSubscription
-                case (true, false): return PreferencesSubscriptionState.subscriptionPendingActivation
-                case (true, true): return PreferencesSubscriptionState.subscriptionActive
+        return Publishers.CombineLatest3($isUserAuthenticated, isSubscriptionActivePublisher, hasAnyEntitlementPublisher)
+            .map { isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement in
+                switch (isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement) {
+                case (false, _, _): return PreferencesSubscriptionState.noSubscription
+                case (true, false, _): return PreferencesSubscriptionState.subscriptionExpired
+                case (true, true, false): return PreferencesSubscriptionState.subscriptionPendingActivation
+                case (true, true, true): return PreferencesSubscriptionState.subscriptionActive
                 }
             }
             .removeDuplicates()
-            .map {
-                print("---= 3. \($0.rawValue)")
-                return $0
-            }.eraseToAnyPublisher()
+            .eraseToAnyPublisher()
     }()
 
     public init(openURLHandler: @escaping (URL) -> Void,
@@ -99,6 +100,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
                 if case .success(let subscription) = subscriptionResult {
                     self.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
+                    self.subscriptionPlatform = subscription.platform
+                    self.subscriptionStatus = subscription.status
                 }
             }
         }
@@ -255,6 +258,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             if case .success(let subscription) = subscriptionResult {
                 self?.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
                 self?.subscriptionPlatform = subscription.platform
+                self?.subscriptionStatus = subscription.status
 
                 if subscription.expiresOrRenewsAt.timeIntervalSinceNow < 0 || !subscription.isActive {
                     self?.hasAccessToVPN = false
@@ -311,6 +315,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         switch status {
         case .autoRenewable:
             self.subscriptionDetails = UserText.preferencesSubscriptionActiveRenewCaption(period: billingPeriod, formattedDate: formattedDate)
+        case .expired, .inactive:
+            self.subscriptionDetails = UserText.preferencesSubscriptionExpiredCaption(formattedDate: formattedDate)
         default:
             self.subscriptionDetails = UserText.preferencesSubscriptionActiveExpireCaption(period: billingPeriod, formattedDate: formattedDate)
         }
@@ -334,5 +340,5 @@ enum ManageSubscriptionSheet: Identifiable {
 }
 
 enum PreferencesSubscriptionState: String {
-    case noSubscription, subscriptionPendingActivation ,subscriptionActive //, subscriptionExpired
+    case noSubscription, subscriptionPendingActivation ,subscriptionActive, subscriptionExpired
 }
