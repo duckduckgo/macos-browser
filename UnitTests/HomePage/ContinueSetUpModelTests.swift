@@ -189,6 +189,19 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
     }
 
+    @MainActor func testWhenInstallDateIsLessThanADayAgoThenRandomGeneratorIsRequestARandomNumberInTheCorrectRange() {
+        XCTAssertEqual(randomNumberGenerator.capturedRange, 0..<100)
+    }
+
+    @MainActor func WhenInstallDateIsMoreThan14daysAgoDay14ThenRandomGeneratorIsRequestARandomNumberInTheCorrectRange() {
+        let twoWeeksAgo = Calendar.current.date(byAdding: .day, value: -16, to: Date())!
+        userDefaults.set(twoWeeksAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
+        vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults)
+        
+        XCTAssertEqual(randomNumberGenerator.capturedRange, 0..<100)
+    }
+
     @MainActor func testWhenInstallDateIsLessThanADayAgoButUserNotIn10PercentNoSurveyCardIsShown() {
         let aDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
         userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
@@ -662,9 +675,11 @@ extension HomePage.Models.ContinueSetUpModel {
     }
 }
 
-struct MockRandomNumberGenerator: RandomNumberGenerating {
+class MockRandomNumberGenerator: RandomNumberGenerating {
     var numberToReturn = 0
+    var capturedRange: Range<Int>? = nil
     func random(in range: Range<Int>) -> Int {
+        capturedRange = range
         return numberToReturn
     }
 }
