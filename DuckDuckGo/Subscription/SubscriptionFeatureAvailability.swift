@@ -36,8 +36,8 @@ struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
 #if SUBSCRIPTION_OVERRIDE_ENABLED
         return true
 #elseif SUBSCRIPTION
-        print("isUserAuthenticated: [\(AccountManager().isUserAuthenticated)] | isSubscriptionInternalTestingEnabled: [\(isSubscriptionInternalTestingEnabled)] isInternalUser: [\(isInternalUser)] | isVPNActivated: [\(isVPNActivated)] | isDBPActivated: [\(isDBPActivated)]")
-        return AccountManager().isUserAuthenticated || (isSubscriptionInternalTestingEnabled && isInternalUser && !isVPNActivated && !isDBPActivated)
+        print("isUserAuthenticated: [\(AccountManager().isUserAuthenticated)] | isSubscriptionInternalTestingEnabled: [\(isSubscriptionInternalTestingEnabled)] isInternalUser: [\(isInternalUser)] | isDBPActivated: [\(isDBPActivated)]")
+        return AccountManager().isUserAuthenticated || (isSubscriptionInternalTestingEnabled && isInternalUser && !isDBPActivated)
 #else
         return false
 #endif
@@ -49,14 +49,6 @@ struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
 
     private var isInternalUser: Bool {
         NSApp.delegateTyped.internalUserDecider.isInternalUser
-    }
-
-    private var isVPNActivated: Bool {
-#if NETWORK_PROTECTION
-        return NetworkProtectionKeychainTokenStore().isFeatureActivated
-#else
-        return false
-#endif
     }
 
     private var isDBPActivated: Bool {
