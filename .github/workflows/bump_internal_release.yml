@@ -65,12 +65,18 @@ jobs:
             latest_tag="$(git describe --tags --abbrev=0)"
             changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}")"
  
-            if grep -v -E '.github|scripts' <<< "$changed_files"; then
-              echo "::warning::No changes to the release branch (or only changes to scripts and workflows). Skipping automatic release."
-              echo "skip-release=true" >> $GITHUB_OUTPUT
-            else
-              echo "skip-release=false" >> $GITHUB_OUTPUT
-            fi
+            case grep -v -E '.github|scripts' <<< "$changed_files" in
+              0)
+                echo "::warning::No changes to the release branch (or only changes to scripts and workflows). Skipping automatic release."
+                echo "skip-release=true" >> $GITHUB_OUTPUT
+                ;;
+              1)
+                echo "skip-release=false" >> $GITHUB_OUTPUT
+                ;;
+              *)
+                exit
+                ;;
+            esac
           # fi
 
       - name: Extract Asana Task ID
