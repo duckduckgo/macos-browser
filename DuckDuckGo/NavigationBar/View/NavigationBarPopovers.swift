@@ -289,7 +289,7 @@ final class NavigationBarPopovers: PopoverPresenter {
         show(popover, positionedBelow: view)
     }
 
-    private func show(_ popover: NSPopover, positionedBelow view: NSView) {
+    func show(_ popover: NSPopover, positionedBelow view: NSView) {
         view.isHidden = false
 
         popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
