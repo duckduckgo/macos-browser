@@ -340,7 +340,7 @@ extension URL {
     }
 
     static var cookieConsentPopUpManagement: URL {
-        return URL(string:"https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-pop-up-management")!
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-pop-up-management")!
     }
 
     static var gpcLearnMore: URL {
@@ -370,7 +370,7 @@ extension URL {
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
     static var duckDuckGoEmailLogin = URL(string: "https://duckduckgo.com/email")!
 
-    static var duckDuckGoEmailInfo = URL(string:"https://duckduckgo.com/duckduckgo-help-pages/email-protection/what-is-duckduckgo-email-protection/")!
+    static var duckDuckGoEmailInfo = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/email-protection/what-is-duckduckgo-email-protection/")!
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
     var isDuckDuckGo: Bool {
