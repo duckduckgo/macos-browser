@@ -259,17 +259,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
                 self?.subscriptionPlatform = subscription.platform
                 self?.subscriptionStatus = subscription.status
-
-                if subscription.expiresOrRenewsAt.timeIntervalSinceNow < 0 || !subscription.isActive {
-                    self?.hasAccessToVPN = false
-                    self?.hasAccessToDBP = false
-                    self?.hasAccessToITR = false
-
-                    if !subscription.isActive {
-                        self?.accountManager.signOut()
-                        return
-                    }
-                }
             } else {
                 self?.accountManager.signOut()
             }
