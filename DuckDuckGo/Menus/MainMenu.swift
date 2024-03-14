@@ -610,7 +610,7 @@ import SubscriptionUI
 
 #if NETWORK_PROTECTION
             if case .normal = NSApp.runType {
-                NSMenuItem(title: "Network Protection")
+                NSMenuItem(title: "VPN")
                     .submenu(NetworkProtectionDebugMenu())
             }
 #endif

@@ -1,5 +1,5 @@
 //
-//  NavigationBarIconProvider.swift
+//  MockAppLauncher.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,24 +16,15 @@
 //  limitations under the License.
 //
 
-import AppKit
 import Foundation
+import NetworkProtectionUI
 
-/// VPN icon shown in the navigation bar.
-///
-public final class NavigationBarIconProvider: IconProvider {
-
-    public init() {}
-
-    public var onIcon: NetworkProtectionAsset {
-        .appVPNOnIcon
+public final class MockAppLauncher: AppLaunching {
+    public init() {
     }
 
-    public var offIcon: NetworkProtectionAsset {
-        .appVPNOffIcon
-    }
-
-    public var issueIcon: NetworkProtectionAsset {
-        .appVPNIssueIcon
+    public var spyLaunchAppCommand: AppLaunchCommand?
+    public func launchApp(withCommand command: AppLaunchCommand) async {
+        spyLaunchAppCommand = command
     }
 }

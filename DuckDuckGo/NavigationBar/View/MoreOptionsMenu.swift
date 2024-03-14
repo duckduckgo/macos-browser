@@ -164,15 +164,11 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        #if SUBSCRIPTION
-        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
-        #else
         if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         } else {
             actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
         }
-        #endif
     }
 #endif // DBP
 
@@ -348,7 +344,7 @@ final class MoreOptionsMenu: NSMenu {
 
             let networkProtectionItem: NSMenuItem
 
-            // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
+            // If the user can see the VPN option but they haven't joined the waitlist or don't have an auth token, show the "New"
             // badge to bring it to their attention.
             if !isWaitlistUser && !hasAuthToken {
                 networkProtectionItem = makeNetworkProtectionItem(showNewLabel: true)

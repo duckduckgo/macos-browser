@@ -21,7 +21,7 @@ import Foundation
 import AppKit
 
 #if NETWORK_PROTECTION
-import NetworkProtection
+import NetworkProtectionUI
 #endif
 
 #if DBP

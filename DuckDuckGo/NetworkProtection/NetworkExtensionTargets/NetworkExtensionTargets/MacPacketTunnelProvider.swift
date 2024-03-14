@@ -37,8 +37,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private var cancellables = Set<AnyCancellable>()
 
-    private let appLauncher: AppLaunching?
-
     // MARK: - Error Reporting
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
@@ -270,8 +268,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - Initialization
 
     @objc public init() {
-        self.appLauncher = AppLauncher(appBundleURL: .mainAppBundleURL)
-
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard
 #else

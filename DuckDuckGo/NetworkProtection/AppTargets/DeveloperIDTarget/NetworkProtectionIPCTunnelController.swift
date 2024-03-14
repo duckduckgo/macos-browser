@@ -48,7 +48,7 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
         ipcClient.stop()
     }
 
-    /// Queries Network Protection to know if its VPN is connected.
+    /// Queries VPN to know if it's connected.
     ///
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
     ///

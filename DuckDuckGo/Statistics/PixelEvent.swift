@@ -164,7 +164,7 @@ extension Pixel {
         // VPN
         case vpnBreakageReport(category: String, description: String, metadata: String)
 
-        // Network Protection
+        // VPN
         case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
         case networkProtectionWaitlistEntryPointToolbarButtonDisplayed

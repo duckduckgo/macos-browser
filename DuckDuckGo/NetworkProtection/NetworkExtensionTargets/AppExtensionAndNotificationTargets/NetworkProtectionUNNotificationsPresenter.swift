@@ -19,6 +19,7 @@
 import Foundation
 import UserNotifications
 import NetworkProtection
+import NetworkProtectionUI
 
 extension UNNotificationAction {
 
