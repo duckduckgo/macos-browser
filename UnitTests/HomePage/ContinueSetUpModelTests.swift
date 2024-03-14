@@ -253,7 +253,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         userDefaults.set(nil, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
         userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
 
-        var randomGenerator = MockRandomNumberGenerator()
+        let randomGenerator = MockRandomNumberGenerator()
         randomGenerator.numberToReturn = 10
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, randomNumberGenerator: randomGenerator)
         vm.shouldShowAllFeatures = true
@@ -677,7 +677,7 @@ extension HomePage.Models.ContinueSetUpModel {
 
 class MockRandomNumberGenerator: RandomNumberGenerating {
     var numberToReturn = 0
-    var capturedRange: Range<Int>? = nil
+    var capturedRange: Range<Int>?
     func random(in range: Range<Int>) -> Int {
         capturedRange = range
         return numberToReturn
