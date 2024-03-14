@@ -47,6 +47,7 @@ final class NetworkProtectionNavBarPopoverManager {
         popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
     }
 
+    // swiftlint:disable:next function_body_length
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
 
         let popover = networkProtectionPopover ?? {
