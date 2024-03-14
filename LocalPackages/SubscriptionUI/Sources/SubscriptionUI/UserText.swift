@@ -59,6 +59,12 @@ enum UserText {
     static let purchaseButton = NSLocalizedString("subscription.preferences.purchase.button", value: "Get Privacy Pro", comment: "Button to open a page where user can learn more and purchase the subscription")
     static let haveSubscriptionButton = NSLocalizedString("subscription.preferences.i.have.a.subscription.button", value: "I Have a Subscription", comment: "Button enabling user to activate a subscription user bought earlier or on another device")
 
+    // MARK: Preferences when subscription activation is pending
+    static let preferencesSubscriptionPendingHeader = NSLocalizedString("subscription.preferences.subscription.pending.header", value: "Your Subscription is Being Activated", comment: "Header for the subscription preferences pane when the subscription activation is pending")
+    static let preferencesSubscriptionPendingCaption = NSLocalizedString("subscription.preferences.subscription.pending.caption", value: "This is taking longer than usual, please check back later.", comment: "Caption for the subscription preferences pane when the subscription activation is pending")
+
+    static let restorePurchaseButton = NSLocalizedString("subscription.preferences.restore.purchase.button", value: "Restore Purchase", comment: "Button to restore past purchases")
+
     // MARK: - Change plan or billing dialogs
     static let changeSubscriptionDialogTitle = NSLocalizedString("subscription.dialog.change.title", value: "Change Plan or Billing", comment: "Change plan or billing dialog title")
     static let changeSubscriptionGoogleDialogDescription = NSLocalizedString("subscription.dialog.change.google.description", value: "Your subscription was purchased through the Google Play Store. To change your plan or billing settings, please open Google Play Store subscription settings on a device signed in to the same Google Account used to purchase your subscription.", comment: "Change plan or billing dialog subtitle description for subscription purchased via Google")

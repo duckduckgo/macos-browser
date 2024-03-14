@@ -21,6 +21,9 @@ import SwiftUI
 import SwiftUIExtensions
 
 public struct PreferencesSubscriptionView: View {
+
+    @State private var state: PreferencesSubscriptionState = .noSubscription
+
     @ObservedObject var model: PreferencesSubscriptionModel
     @State private var showingSheet = false
     @State private var showingRemoveConfirmationDialog = false
@@ -54,17 +57,41 @@ public struct PreferencesSubscriptionView: View {
                 .frame(height: 20)
 
             VStack {
-                if model.isUserAuthenticated {
-                    authenticatedHeaderView
-                } else {
+                switch state {
+                case .noSubscription:
                     unauthenticatedHeaderView
+                case .subscriptionPendingActivation:
+                    pendingActivationHeaderView
+                case .subscriptionActive:
+                    authenticatedHeaderView
                 }
+
+                // DEBUG buttons
+//                HStack {
+//                    Button("auth", action: {
+//                        model.isUserAuthenticated.toggle()
+//                    })
+//                    Button("vpn", action: {
+//                        model.hasAccessToVPN.toggle()
+//                    })
+//                    Button("dbp", action: {
+//                        model.hasAccessToDBP.toggle()
+//                    })
+//                    Button("itr", action: {
+//                        model.hasAccessToITR.toggle()
+//                    })
+//                }
+                // DEBUG buttons
 
                 Divider()
                     .foregroundColor(Color.secondary)
                     .padding(.horizontal, -10)
 
-                servicesView
+                if state == .subscriptionActive {
+                    servicesRowsForActiveSubscriptionView
+                } else {
+                    servicesRowsForNoSubscriptionView
+                }
             }
             .padding(10)
             .roundedBorder()
@@ -79,6 +106,11 @@ public struct PreferencesSubscriptionView: View {
                 model.userEventHandler(.activeSubscriptionSettingsClick)
             }
         })
+        .onReceive(model.statePublisher, perform: updateState(state:))
+    }
+
+    private func updateState(state: PreferencesSubscriptionState) {
+        self.state = state
     }
 
     @ViewBuilder
@@ -142,13 +174,48 @@ public struct PreferencesSubscriptionView: View {
     }
 
     @ViewBuilder
-    private var servicesView: some View {
+    private var pendingActivationHeaderView: some View {
+        UniversalHeaderView {
+            Image(.subscriptionPendingIcon)
+                .padding(4)
+        } content: {
+            TextMenuItemHeader(UserText.preferencesSubscriptionPendingHeader)
+            TextMenuItemCaption(UserText.preferencesSubscriptionPendingCaption)
+        } buttons: {
+            Button(UserText.restorePurchaseButton) { model.refreshSubscriptionPendingState() }
+                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+        }
+    }
+
+    @ViewBuilder
+    private var servicesRowsForNoSubscriptionView: some View {
+        SectionView(iconName: "VPN-Icon",
+                    title: UserText.vpnServiceTitle,
+                    description: UserText.vpnServiceDescription)
+
+        Divider()
+            .foregroundColor(Color.secondary)
+
+        SectionView(iconName: "PIR-Icon",
+                    title: UserText.personalInformationRemovalServiceTitle,
+                    description: UserText.personalInformationRemovalServiceDescription)
+
+        Divider()
+            .foregroundColor(Color.secondary)
+
+        SectionView(iconName: "ITR-Icon",
+                    title: UserText.identityTheftRestorationServiceTitle,
+                    description: UserText.identityTheftRestorationServiceDescription)
+    }
+
+    @ViewBuilder
+    private var servicesRowsForActiveSubscriptionView: some View {
         SectionView(iconName: "VPN-Icon",
                     title: UserText.vpnServiceTitle,
                     description: UserText.vpnServiceDescription,
-                    buttonName: model.isUserAuthenticated ? UserText.vpnServiceButtonTitle : nil,
+                    buttonName: UserText.vpnServiceButtonTitle,
                     buttonAction: { model.openVPN() },
-                    enabled: !model.isUserAuthenticated || model.hasAccessToVPN)
+                    enabled: model.hasAccessToVPN)
 
         Divider()
             .foregroundColor(Color.secondary)
@@ -156,9 +223,9 @@ public struct PreferencesSubscriptionView: View {
         SectionView(iconName: "PIR-Icon",
                     title: UserText.personalInformationRemovalServiceTitle,
                     description: UserText.personalInformationRemovalServiceDescription,
-                    buttonName: model.isUserAuthenticated ? UserText.personalInformationRemovalServiceButtonTitle : nil,
+                    buttonName: UserText.personalInformationRemovalServiceButtonTitle,
                     buttonAction: { model.openPersonalInformationRemoval() },
-                    enabled: !model.isUserAuthenticated || model.hasAccessToDBP)
+                    enabled: model.hasAccessToDBP)
 
         Divider()
             .foregroundColor(Color.secondary)
@@ -166,9 +233,9 @@ public struct PreferencesSubscriptionView: View {
         SectionView(iconName: "ITR-Icon",
                     title: UserText.identityTheftRestorationServiceTitle,
                     description: UserText.identityTheftRestorationServiceDescription,
-                    buttonName: model.isUserAuthenticated ? UserText.identityTheftRestorationServiceButtonTitle : nil,
+                    buttonName: UserText.identityTheftRestorationServiceButtonTitle,
                     buttonAction: { model.openIdentityTheftRestoration() },
-                    enabled: !model.isUserAuthenticated || model.hasAccessToITR)
+                    enabled: model.hasAccessToITR)
     }
 
     @ViewBuilder

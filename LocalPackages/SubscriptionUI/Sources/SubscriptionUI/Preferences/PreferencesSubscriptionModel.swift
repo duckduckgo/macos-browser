@@ -18,6 +18,7 @@
 
 import AppKit
 import Subscription
+import Combine
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
@@ -28,7 +29,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var hasAccessToDBP: Bool = false
     @Published var hasAccessToITR: Bool = false
 
-    private var subscriptionPlatform: Subscription.Platform?
+    private var subscriptionPlatform: String? //Subscription.Platform?
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
@@ -57,6 +58,28 @@ public final class PreferencesSubscriptionModel: ObservableObject {
              changePlanOrBillingClick,
              removeSubscriptionClick
     }
+
+    lazy var statePublisher: AnyPublisher<PreferencesSubscriptionState, Never> = {
+        let hasAnyEntitlementPublisher = Publishers.CombineLatest3($hasAccessToVPN, $hasAccessToDBP, $hasAccessToITR).map {
+            print("---= 1. \($0), \($1), \($2)")
+            return $0 || $1 || $2
+        }.eraseToAnyPublisher()
+
+        return Publishers.CombineLatest($isUserAuthenticated, hasAnyEntitlementPublisher)
+            .map { isUserAuthenticated, hasAnyEntitlement in
+                print("---= 2. \(isUserAuthenticated) \(hasAnyEntitlement)")
+                switch (isUserAuthenticated, hasAnyEntitlement) {
+                case (false, _): return PreferencesSubscriptionState.noSubscription
+                case (true, false): return PreferencesSubscriptionState.subscriptionPendingActivation
+                case (true, true): return PreferencesSubscriptionState.subscriptionActive
+                }
+            }
+            .removeDuplicates()
+            .map {
+                print("---= 3. \($0.rawValue)")
+                return $0
+            }.eraseToAnyPublisher()
+    }()
 
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
@@ -123,8 +146,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func changePlanOrBillingAction() async -> ChangePlanOrBillingAction {
+
         switch subscriptionPlatform {
-        case .apple:
+        case "apple":
             if await confirmIfSignedInToSameAccount() {
                 return .navigateToManageSubscription { [weak self] in
                     self?.changePlanOrBilling(for: .appStore)
@@ -132,9 +156,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             } else {
                 return .presentSheet(.apple)
             }
-        case .google:
+        case "google":
             return .presentSheet(.google)
-        case .stripe:
+        case "stripe":
             return .navigateToManageSubscription { [weak self] in
                 self?.changePlanOrBilling(for: .stripe)
             }
@@ -199,6 +223,20 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         openURLHandler(.subscriptionFAQ)
     }
 
+    @MainActor
+    func refreshSubscriptionPendingState() {
+        if SubscriptionPurchaseEnvironment.current == .appStore {
+            if #available(macOS 12.0, *) {
+                Task {
+                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: subscriptionAppGroup)
+                    fetchAndUpdateSubscriptionDetails()
+                }
+            }
+        } else {
+            fetchAndUpdateSubscriptionDetails()
+        }
+    }
+
     // swiftlint:disable cyclomatic_complexity
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
@@ -215,7 +253,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             if case .success(let subscription) = subscriptionResult {
                 self?.updateDescription(for: subscription.expiresOrRenewsAt)
-                self?.subscriptionPlatform = subscription.platform
+                self?.subscriptionPlatform = subscription.platform.rawValue
 
                 if subscription.expiresOrRenewsAt.timeIntervalSinceNow < 0 || !subscription.isActive {
                     self?.hasAccessToVPN = false
@@ -276,4 +314,8 @@ enum ManageSubscriptionSheet: Identifiable {
     var id: Self {
         return self
     }
+}
+
+enum PreferencesSubscriptionState: String {
+    case noSubscription, subscriptionPendingActivation ,subscriptionActive //, subscriptionExpired
 }
