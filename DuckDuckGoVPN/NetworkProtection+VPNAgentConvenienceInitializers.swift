@@ -29,7 +29,7 @@ extension NetworkProtectionKeychainTokenStore {
         let accessTokenProvider: () -> String? = { AccountManager().accessToken }
         let isSubscriptionEnabled = true
 #else
-        let accessTokenProvider: () -> String? = { }
+        let accessTokenProvider: () -> String? = { return nil }
         let isSubscriptionEnabled = false
 #endif
         self.init(keychainType: .default,

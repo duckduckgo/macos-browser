@@ -55,7 +55,7 @@ extension NetworkProtectionKeychainTokenStore {
 #if SUBSCRIPTION
         let accessTokenProvider: () -> String? = { AccountManager().accessToken }
 #else
-        let accessTokenProvider: () -> String? = { }
+        let accessTokenProvider: () -> String? = { return nil }
 #endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
