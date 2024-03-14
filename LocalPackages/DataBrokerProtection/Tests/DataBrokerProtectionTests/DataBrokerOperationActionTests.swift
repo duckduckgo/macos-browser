@@ -338,6 +338,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -357,6 +358,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -376,6 +378,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -395,6 +398,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
