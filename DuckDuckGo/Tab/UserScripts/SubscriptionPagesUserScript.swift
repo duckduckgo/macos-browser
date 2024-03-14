@@ -305,8 +305,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 case .accountCreationFailed:
                     report(subscriptionActivationError: .accountCreationFailed)
                 }
-
-                return nil
+                await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
             }
         }
 
