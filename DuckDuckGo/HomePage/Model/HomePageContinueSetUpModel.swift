@@ -51,10 +51,10 @@ extension HomePage.Models {
             }
             return false
         }
-        var isDay7SurveyEnabled: Bool {
+        var isDay14SurveyEnabled: Bool {
             let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
-            if let day7SurveyString =  newTabContinueSetUpSettings["surveyCardDay7"] as? String {
-                if day7SurveyString == "enabled" {
+            if let day14SurveyString =  newTabContinueSetUpSettings["surveyCardDay14"] as? String {
+                if day14SurveyString == "enabled" {
                     return true
                 }
             }
@@ -64,8 +64,8 @@ extension HomePage.Models {
             let duckPlayerSettings = privacyConfigurationManager.privacyConfig.settings(for: .duckPlayer)
             return duckPlayerSettings["tryDuckPlayerLink"] as? String ?? "https://www.youtube.com/watch?v=yKWIA-Pys4c"
         }
-        var day0SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/230701?list=1"
-        var day7SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/230702?list=1"
+        var day0SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/240300?list=1"
+        var day14SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/240300?list=2"
 
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dataImportProvider: DataImportStatusProviding
@@ -73,6 +73,7 @@ extension HomePage.Models {
         private let emailManager: EmailManager
         private let privacyPreferences: PrivacySecurityPreferences
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
+        private let randomNumberGenerator: RandomNumberGenerating
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
@@ -102,11 +103,17 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .shouldShowDBPWaitlistInvitedCardUI, defaultValue: false)
         private var shouldShowDBPWaitlistInvitedCardUI: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowSurveyDay7, defaultValue: true)
-        private var shouldShowSurveyDay7: Bool
+        @UserDefaultsWrapper(key: .homePageShowSurveyDay14, defaultValue: true)
+        private var shouldShowSurveyDay14: Bool
 
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
+
+        @UserDefaultsWrapper(key: .homePageShowSurveyDay0in10Percent, defaultValue: nil)
+        private var isPartOfSurveyDay0On10Percent: Bool?
+
+        @UserDefaultsWrapper(key: .homePageShowSurveyDay14in10Percent, defaultValue: nil)
+        private var isPartOfSurveyDay14On10Percent: Bool?
 
         @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
         private var firstLaunchDate: Date
@@ -138,7 +145,8 @@ extension HomePage.Models {
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              homePageRemoteMessaging: HomePageRemoteMessaging,
-             privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
+             privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+             randomNumberGenerator: RandomNumberGenerating = RandomNumberGenerator()) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -147,6 +155,7 @@ extension HomePage.Models {
             self.duckPlayerPreferences = duckPlayerPreferences
             self.homePageRemoteMessaging = homePageRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager
+            self.randomNumberGenerator = randomNumberGenerator
 
             refreshFeaturesMatrix()
 
@@ -175,8 +184,8 @@ extension HomePage.Models {
                 tabCollectionViewModel.append(tab: tab)
             case .surveyDay0:
                 visitSurvey(day: .day0)
-            case .surveyDay7:
-                visitSurvey(day: .day7)
+            case .surveyDay14:
+                visitSurvey(day: .day14)
             case .networkProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -200,8 +209,8 @@ extension HomePage.Models {
                 shouldShowEmailProtectionSetting = false
             case .surveyDay0:
                 shouldShowSurveyDay0 = false
-            case .surveyDay7:
-                shouldShowSurveyDay7 = false
+            case .surveyDay14:
+                shouldShowSurveyDay14 = false
             case .networkProtectionRemoteMessage(let message):
 #if NETWORK_PROTECTION
                 homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: message)
@@ -268,9 +277,10 @@ extension HomePage.Models {
                 case .surveyDay0:
                     if shouldSurveyDay0BeVisible {
                         features.append(feature)
+                        userInteractedWithSurveyDay0 = true
                     }
-                case .surveyDay7:
-                    if shouldSurveyDay7BeVisible {
+                case .surveyDay14:
+                    if shouldSurveyDay14BeVisible {
                         features.append(feature)
                     }
                 case .networkProtectionRemoteMessage, .dataBrokerProtectionRemoteMessage, .dataBrokerProtectionWaitlistInvited:
@@ -355,22 +365,39 @@ extension HomePage.Models {
             let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
             return isDay0SurveyEnabled &&
             shouldShowSurveyDay0 &&
-            !userInteractedWithSurveyDay0 &&
-            firstLaunchDate > oneDayAgo
+            firstLaunchDate >= oneDayAgo &&
+            Bundle.main.preferredLocalizations.first == "en" &&
+            isPartOfSurveyDay0On10Percent ?? calculateIfIn10percent(day: .day0)
         }
 
-        private var shouldSurveyDay7BeVisible: Bool {
-            let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
-            return isDay7SurveyEnabled &&
+        private var shouldSurveyDay14BeVisible: Bool {
+            let fourteenDaysAgo = Calendar.current.date(byAdding: .weekday, value: -14, to: Date())!
+            let fifteenDaysAgo = Calendar.current.date(byAdding: .weekday, value: -15, to: Date())!
+            return isDay14SurveyEnabled &&
             shouldShowSurveyDay0 &&
-            shouldShowSurveyDay7 &&
+            shouldShowSurveyDay14 &&
             !userInteractedWithSurveyDay0 &&
-            firstLaunchDate <= oneWeekAgo
+            firstLaunchDate >= fifteenDaysAgo &&
+            firstLaunchDate <= fourteenDaysAgo &&
+            Bundle.main.preferredLocalizations.first == "en" &&
+            isPartOfSurveyDay14On10Percent ?? calculateIfIn10percent(day: .day14)
+        }
+
+        private func calculateIfIn10percent(day: SurveyDay) -> Bool {
+            let randomNumber0To99 = randomNumberGenerator.random(in: 0..<100)
+            let isInSurvey10Percent = randomNumber0To99 < 10
+            switch day {
+            case .day0:
+                isPartOfSurveyDay0On10Percent = isInSurvey10Percent
+            case .day14:
+                isPartOfSurveyDay14On10Percent = isInSurvey10Percent
+            }
+            return isInSurvey10Percent
         }
 
         private enum SurveyDay {
             case day0
-            case day7
+            case day14
         }
 
         @MainActor private func visitSurvey(day: SurveyDay) {
@@ -378,11 +405,8 @@ extension HomePage.Models {
             switch day {
             case .day0:
                 surveyURLString = day0SurveyURL
-            case .day7:
-                surveyURLString = day7SurveyURL
-            }
-            if let atb = statisticsStore.atb {
-                surveyURLString += "&atb=\(atb)"
+            case .day14:
+                surveyURLString = day14SurveyURL
             }
 
             if let url = URL(string: surveyURLString) {
@@ -390,9 +414,9 @@ extension HomePage.Models {
                 tabCollectionViewModel.append(tab: tab)
                 switch day {
                 case .day0:
-                    userInteractedWithSurveyDay0 = true
-                case .day7:
-                    shouldShowSurveyDay7 = false
+                    shouldShowSurveyDay0 = false
+                case .day14:
+                    shouldShowSurveyDay14 = false
                 }
             }
         }
@@ -457,7 +481,7 @@ extension HomePage.Models {
         // We ignore the `networkProtectionRemoteMessage` case here to avoid it getting accidentally included - it has special handling and will get
         // included elsewhere.
         static var allCases: [HomePage.Models.FeatureType] {
-            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .surveyDay0, .surveyDay7]
+            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .surveyDay0, .surveyDay14]
         }
 
         case duckplayer
@@ -465,7 +489,7 @@ extension HomePage.Models {
         case defaultBrowser
         case importBookmarksAndPasswords
         case surveyDay0
-        case surveyDay7
+        case surveyDay14
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
         case dataBrokerProtectionRemoteMessage(DataBrokerProtectionRemoteMessage)
         case dataBrokerProtectionWaitlistInvited
@@ -482,8 +506,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionCardTitle
             case .surveyDay0:
                 return UserText.newTabSetUpSurveyDay0CardTitle
-            case .surveyDay7:
-                return UserText.newTabSetUpSurveyDay7CardTitle
+            case .surveyDay14:
+                return UserText.newTabSetUpSurveyDay14CardTitle
             case .networkProtectionRemoteMessage(let message):
                 return message.cardTitle
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -505,8 +529,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionSummary
             case .surveyDay0:
                 return UserText.newTabSetUpSurveyDay0Summary
-            case .surveyDay7:
-                return UserText.newTabSetUpSurveyDay7Summary
+            case .surveyDay14:
+                return UserText.newTabSetUpSurveyDay14Summary
             case .networkProtectionRemoteMessage(let message):
                 return message.cardDescription
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -528,8 +552,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionAction
             case .surveyDay0:
                 return UserText.newTabSetUpSurveyDay0Action
-            case .surveyDay7:
-                return UserText.newTabSetUpSurveyDay7Action
+            case .surveyDay14:
+                return UserText.newTabSetUpSurveyDay14Action
             case .networkProtectionRemoteMessage(let message):
                 return message.action.actionTitle
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -552,9 +576,9 @@ extension HomePage.Models {
             case .emailProtection:
                 return .inbox128.resized(to: iconSize)!
             case .surveyDay0:
-                return .survey128.resized(to: iconSize)!
-            case .surveyDay7:
-                return .survey128.resized(to: iconSize)!
+                return .qandA128.resized(to: iconSize)!
+            case .surveyDay14:
+                return .qandA128.resized(to: iconSize)!
             case .networkProtectionRemoteMessage:
                 return .vpnEnded.resized(to: iconSize)!
             case .dataBrokerProtectionRemoteMessage:
@@ -616,4 +640,14 @@ struct HomePageRemoteMessaging {
     let dataBrokerProtectionUserDefaults: UserDefaults
 #endif
 
+}
+
+public protocol RandomNumberGenerating {
+    func random(in range: Range<Int>) -> Int
+}
+
+struct RandomNumberGenerator: RandomNumberGenerating {
+    func random(in range: Range<Int>) -> Int {
+        return Int.random(in: range)
+    }
 }
