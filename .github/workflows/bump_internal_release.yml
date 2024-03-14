@@ -32,13 +32,13 @@ jobs:
 
     steps:
 
-      - name: Assert release branch
-        run: |
-          case "${{ github.ref_name }}" in
-            release/*) ;;
-            main) ;;
-            *) echo "👎 Not a release or main branch"; exit 1 ;;
-          esac
+      # - name: Assert release branch
+      #   run: |
+      #     case "${{ github.ref_name }}" in
+      #       release/*) ;;
+      #       main) ;;
+      #       *) echo "👎 Not a release or main branch"; exit 1 ;;
+      #     esac
 
       - name: Check out the code
         uses: actions/checkout@v4
@@ -59,11 +59,13 @@ jobs:
         env:
           release_branch: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
         run: |
-          if [[ "${{ github.event_name }}" != "schedule" ]]; then
-            echo "skip-release=false" >> $GITHUB_OUTPUT
-          else
+          # if [[ "${{ github.event_name }}" != "schedule" ]]; then
+          #   echo "skip-release=false" >> $GITHUB_OUTPUT
+          # else
             latest_tag="$(git describe --tags --abbrev=0)"
+            echo "latest_tag=${latest_tag}"
             changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}" | grep -v -E '.github|scripts')"
+            echo "changed_files=${changed_files}"
 
             if [[ ${#changed_files} == 0 ]]; then
               echo "::warning::No changes to the release branch (or only scripts and workflows). Skipping automatic release."
@@ -71,7 +73,7 @@ jobs:
             else
               echo "skip-release=false" >> $GITHUB_OUTPUT
             fi
-          fi
+          # fi
 
       - name: Extract Asana Task ID
         id: task-id
@@ -87,6 +89,7 @@ jobs:
           RELEASE_BRANCH: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
           TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.task-id }}
         run: |
+          exit 1
           if [[ "${RELEASE_BRANCH}" == "main" ]]; then
             echo "::error::Workflow run from main branch and release branch wasn't found. Please re-run the workflow and specify a release branch."
             exit 1
