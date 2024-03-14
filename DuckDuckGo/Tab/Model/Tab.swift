@@ -780,7 +780,7 @@ protocol NewWindowPolicyDecisionMaker {
     @Published private(set) var lastWebError: Error?
     @Published private(set) var lastHttpStatusCode: Int?
 
-    @Published private(set) var inferredOpenerContext: WebsiteBreakage.OpenerContext?
+    @Published private(set) var inferredOpenerContext: BrokenSiteReport.OpenerContext?
     @Published private(set) var refreshCountSinceLoad: Int = 0
 
     @Published private(set) var isLoading: Bool = false
