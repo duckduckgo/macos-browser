@@ -62,6 +62,7 @@ jobs:
           # if [[ "${{ github.event_name }}" != "schedule" ]]; then
           #   echo "skip-release=false" >> $GITHUB_OUTPUT
           # else
+            git checkout "${release_branch}"
             latest_tag="$(git describe --tags --abbrev=0)"
             echo "git diff --name-only \"$latest_tag\"..\"${release_branch}\""
             changed_files="$(git diff --name-only "$latest_tag".."${release_branch}" | grep -v -E '.github|scripts')"
