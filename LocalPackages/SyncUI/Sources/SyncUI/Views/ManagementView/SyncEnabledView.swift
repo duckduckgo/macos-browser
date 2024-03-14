@@ -32,6 +32,12 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             if model.isSyncCredentialsPaused {
                 syncPaused(for: .credentials)
             }
+            if !model.invalidBookmarksTitles.isEmpty {
+                syncHasInvalidItems(for: .bookmarks)
+            }
+            if !model.invalidCredentialsTitles.isEmpty {
+                syncHasInvalidItems(for: .credentials)
+            }
         }
 
         // Sync Enabled
@@ -98,6 +104,42 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             }
         }
         SyncWarningMessage(title: UserText.syncLimitExceededTitle, message: description, buttonTitle: actionTitle) {
+            switch itemType {
+            case .bookmarks:
+                model.manageBookmarks()
+            case .credentials:
+                model.manageLogins()
+            }
+        }
+    }
+
+    @ViewBuilder
+    func syncHasInvalidItems(for itemType: LimitedItemType) -> some View {
+        var title: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.invalidBookmarksPresentTitle
+            case .credentials:
+                return UserText.invalidCredentialsPresentTitle
+            }
+        }
+        var description: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.invalidBookmarksPresentDescription(model.invalidBookmarksTitles)
+            case .credentials:
+                return UserText.invalidCredentialsPresentDescription(model.invalidCredentialsTitles)
+            }
+        }
+        var actionTitle: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.bookmarksLimitExceededAction
+            case .credentials:
+                return UserText.credentialsLimitExceededAction
+            }
+        }
+        SyncWarningMessage(title: title, message: description, buttonTitle: actionTitle) {
             switch itemType {
             case .bookmarks:
                 model.manageBookmarks()

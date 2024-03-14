@@ -39,6 +39,8 @@ extension SyncDevice {
 }
 
 final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
+    @Published var invalidBookmarksTitles: [String] = []
+    @Published var invalidCredentialsTitles: [String] = []
 
     struct Consts {
         static let syncPausedStateChanged = Notification.Name("com.duckduckgo.app.SyncPausedStateChanged")
@@ -117,12 +119,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     init(
         syncService: DDGSyncing,
         syncBookmarksAdapter: SyncBookmarksAdapter,
+        syncCredentialsAdapter: SyncCredentialsAdapter,
         appearancePreferences: AppearancePreferences = .shared,
         managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
+        self.syncCredentialsAdapter = syncCredentialsAdapter
         self.appearancePreferences = appearancePreferences
         self.syncFeatureFlags = syncService.featureFlags
         self.userAuthenticator = userAuthenticator
@@ -138,6 +142,17 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         updateSyncFeatureFlags(self.syncFeatureFlags)
         setUpObservables()
         setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
+
+        updateInvalidObjects()
+    }
+
+    private func updateInvalidObjects() {
+        invalidBookmarksTitles = syncBookmarksAdapter.provider?
+            .fetchTitlesForObjectsThatFailedValidation()
+            .map { $0.truncated(length: 15) } ?? []
+
+        let invalidCredentialsObjects: [String] = (try? syncCredentialsAdapter.provider?.fetchTitlesForObjectsThatFailedValidation()) ?? []
+        invalidCredentialsTitles = invalidCredentialsObjects.map({ $0.truncated(length: 15) })
     }
 
     private func setUpObservables() {
@@ -154,6 +169,16 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.updateState()
+            }
+            .store(in: &cancellables)
+
+        syncService.isSyncInProgressPublisher
+            .removeDuplicates()
+            .filter { !$0 }
+            .asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.updateInvalidObjects()
             }
             .store(in: &cancellables)
 
@@ -351,6 +376,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private let syncService: DDGSyncing
     private let syncBookmarksAdapter: SyncBookmarksAdapter
+    private let syncCredentialsAdapter: SyncCredentialsAdapter
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
