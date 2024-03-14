@@ -84,6 +84,19 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         DataBrokerProtectionWaitlist().waitlistStorage.isWaitlistUser
     }
 
+    // TODO: WIP function
+    func shouldDisplayThankYouMessage() -> Bool {
+        let userWasInvitedToWaitlist = DataBrokerProtectionWaitlist().waitlistStorage.isInvited
+        let waitlistHasEnded = !isWaitlistEnabled && !isWaitlistBetaActive
+        let isSubscriptionEnabled = DefaultSubscriptionFeatureAvailability().isFeatureAvailable()
+        // let wasThankYouMessageAlreadyShown = false
+
+        let shouldDisplayThankYouMessage = userWasInvitedToWaitlist && waitlistHasEnded && isSubscriptionEnabled
+
+        os_log("Should Display DBP Thank You Message [%@]", log: .dataBrokerProtection, shouldDisplayThankYouMessage ? "YES": "NO")
+        return shouldDisplayThankYouMessage
+    }
+
     func disableAndDeleteForAllUsers() {
         featureDisabler.disableAndDelete()
 
