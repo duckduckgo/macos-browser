@@ -344,7 +344,7 @@ final class MoreOptionsMenu: NSMenu {
 #if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
             let networkProtectionItem: NSMenuItem
-            
+
             let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
             let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
 
