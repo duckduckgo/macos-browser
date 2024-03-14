@@ -170,6 +170,9 @@ public struct PreferencesSubscriptionView: View {
             Button(UserText.restorePurchaseButton) { model.refreshSubscriptionPendingState() }
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
+        .onAppear {
+            model.fetchAndUpdateSubscriptionDetails()
+        }
     }
 
     @ViewBuilder

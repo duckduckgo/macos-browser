@@ -252,7 +252,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             guard let token = self?.accountManager.accessToken else { return }
 
-            let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
+            let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
 
             if case .success(let subscription) = subscriptionResult {
                 self?.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
