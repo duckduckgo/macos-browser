@@ -53,13 +53,15 @@ extension NetworkProtectionCodeRedemptionCoordinator {
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
 #if SUBSCRIPTION
+        let isSubscriptionEnabled = true
         let accessTokenProvider: () -> String? = { AccountManager().accessToken }
 #else
+        let isSubscriptionEnabled = false
         let accessTokenProvider: () -> String? = { return nil }
 #endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable(),
+                  isSubscriptionEnabled: isSubscriptionEnabled,
                   accessTokenProvider: accessTokenProvider)
     }
 }
