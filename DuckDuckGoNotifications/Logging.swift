@@ -39,11 +39,11 @@ struct Logging {
     static let subsystem = Bundle.main.bundleIdentifier ?? "DuckDuckGo"
 
     fileprivate static let networkProtectionLoginItemLoggingEnabled = false
-    fileprivate static let networkProtectionLoginItemLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Login Item")
+    fileprivate static let networkProtectionLoginItemLog: OSLog = OSLog(subsystem: subsystem, category: "VPN: Login Item")
 
     fileprivate static let networkProtectionIPCLoginItemLoggingEnabled = false
-    fileprivate static let networkProtectionIPCLoginItemLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: IPC (Login Item)")
+    fileprivate static let networkProtectionIPCLoginItemLog: OSLog = OSLog(subsystem: subsystem, category: "VPN: IPC (Login Item)")
 
     fileprivate static let networkProtectionMemoryLoggingEnabled = false
-    fileprivate static let networkProtectionMemoryLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Memory")
+    fileprivate static let networkProtectionMemoryLog: OSLog = OSLog(subsystem: subsystem, category: "VPN: Memory")
 }

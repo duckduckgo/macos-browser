@@ -184,12 +184,10 @@ final class EncryptedHistoryStore: HistoryStoring {
                 let historyEntryManagedObject: HistoryEntryManagedObject
                 if let fetchedObject = fetchedObjects.first {
                     // Update existing
-                    print("*** updating existing history entry", entry.url, entry.title ?? "no title")
                     fetchedObject.update(with: entry)
                     historyEntryManagedObject = fetchedObject
                 } else {
                     // Add new
-                    print("*** creating new history entry", entry.url, entry.title ?? "no title")
                     let insertedObject = NSEntityDescription.insertNewObject(forEntityName: HistoryEntryManagedObject.className(), into: self.context)
                     guard let historyEntryMO = insertedObject as? HistoryEntryManagedObject else {
                         promise(.failure(HistoryStoreError.savingFailed))

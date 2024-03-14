@@ -23,7 +23,7 @@ import SwiftUI
 import NetworkProtection
 import LoginItems
 
-/// Abstraction of the the Network Protection status bar menu with a simple interface.
+/// Abstraction of the the VPN status bar menu with a simple interface.
 ///
 @objc
 public final class StatusBarMenu: NSObject {

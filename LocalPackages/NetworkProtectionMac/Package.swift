@@ -31,11 +31,12 @@ let package = Package(
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "122.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "122.2.1"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../LoginItems"),
         .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "2.0.0"),
+        .package(path: "../PixelKit"),
     ],
     targets: [
         // MARK: - NetworkProtectionIPC
@@ -58,6 +59,7 @@ let package = Package(
             name: "NetworkProtectionProxy",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
+                .product(name: "PixelKit", package: "PixelKit"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))

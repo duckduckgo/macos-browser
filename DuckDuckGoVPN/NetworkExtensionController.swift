@@ -24,7 +24,7 @@ import SystemExtensionManager
 import SystemExtensions
 #endif
 
-/// Network Protection's network extension session object.
+/// The VPN's network extension session object.
 ///
 /// Through this class the app that owns the VPN can interact with the network extension.
 ///
