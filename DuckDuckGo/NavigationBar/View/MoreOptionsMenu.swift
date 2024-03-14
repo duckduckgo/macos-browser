@@ -164,15 +164,11 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        #if SUBSCRIPTION
-        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
-        #else
         if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         } else {
             actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
         }
-        #endif
     }
 #endif // DBP
 
@@ -255,6 +251,7 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
+        Pixel.fire(.privacyProOfferScreenImpression)
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
 
@@ -343,6 +340,7 @@ final class MoreOptionsMenu: NSMenu {
 #if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
             let networkProtectionItem: NSMenuItem
+
             networkProtectionItem = makeNetworkProtectionItem()
 
             items.append(networkProtectionItem)

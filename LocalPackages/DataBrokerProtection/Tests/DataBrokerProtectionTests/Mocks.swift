@@ -21,7 +21,6 @@ import Combine
 import Common
 import Foundation
 import GRDB
-import Macros
 import SecureStorage
 
 @testable import DataBrokerProtection
@@ -243,7 +242,7 @@ final class EmailServiceMock: EmailServiceProtocol {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return #URL("https://www.duckduckgo.com")
+        return URL(string: "https://www.duckduckgo.com")!
     }
 
     func reset() {

@@ -19,7 +19,6 @@
 import class Persistence.CoreDataDatabase
 import Combine
 import History
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -78,7 +77,7 @@ final class HistoryStoreTests: XCTestCase {
     func testWhenCleanOldIsCalled_ThenOlderEntriesThanDateAreCleaned() {
         let toBeKeptIdentifier = UUID()
         let newHistoryEntry = HistoryEntry(identifier: toBeKeptIdentifier,
-                                           url: #URL("http://wikipedia.org"),
+                                           url: URL(string: "http://wikipedia.org")!,
                                            title: nil,
                                            numberOfVisits: 1,
                                            lastVisit: Date(),

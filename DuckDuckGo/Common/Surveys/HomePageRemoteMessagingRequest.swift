@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import Macros
 import Networking
 
 protocol HomePageRemoteMessagingRequest {
@@ -34,8 +33,8 @@ final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingReques
 
         var url: URL {
             switch self {
-            case .debug: return #URL("https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2-debug.json")
-            case .production: return #URL("https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2.json")
+            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2-debug.json")!
+            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2.json")!
             }
         }
     }
@@ -46,8 +45,8 @@ final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingReques
 
         var url: URL {
             switch self {
-            case .debug: return #URL("https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages-debug.json")
-            case .production: return #URL("https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages.json")
+            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages-debug.json")!
+            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages.json")!
             }
         }
     }
