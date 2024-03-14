@@ -47,6 +47,7 @@ final class NetworkProtectionNavBarPopoverManager {
         popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
     }
 
+    // swiftlint:disable:next function_body_length
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
 
         let popover = networkProtectionPopover ?? {
@@ -77,6 +78,10 @@ final class NetworkProtectionNavBarPopoverManager {
                                 await appLauncher.launchApp(withCommand: .showSettings)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                                await appLauncher.launchApp(withCommand: .showFAQ)
+                            }),
+                        NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {
                                 await appLauncher.launchApp(withCommand: .shareFeedback)
@@ -84,6 +89,10 @@ final class NetworkProtectionNavBarPopoverManager {
                     ]
                 } else {
                     return [
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                                await appLauncher.launchApp(withCommand: .showFAQ)
+                            }),
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {

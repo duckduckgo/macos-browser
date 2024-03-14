@@ -146,13 +146,13 @@ public struct UserDefaultsWrapper<T> {
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
         case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
 
-        // Network Protection
+        // VPN
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
         case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
-        // Network Protection: Shared Defaults
+        // VPN: Shared Defaults
         // ---
         // Please note that shared defaults MUST have a name that matches exactly their value,
         // or else KVO will just not work as of 2023-08-07

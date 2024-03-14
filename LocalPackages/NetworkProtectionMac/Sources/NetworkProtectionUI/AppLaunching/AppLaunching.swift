@@ -1,7 +1,7 @@
 //
-//  NavigationBarIconProvider.swift
+//  AppLaunching.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,24 +16,24 @@
 //  limitations under the License.
 //
 
-import AppKit
+// SPDX-License-Identifier: MIT
+// Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
+
 import Foundation
 
-/// VPN icon shown in the navigation bar.
-///
-public final class NavigationBarIconProvider: IconProvider {
+public enum AppLaunchCommand: Codable {
+    case justOpen
+    case shareFeedback
+    case showFAQ
+    case showStatus
+    case showSettings
+    case showVPNLocations
+    case startVPN
+    case stopVPN
+    case enableOnDemand
+    case moveAppToApplications
+}
 
-    public init() {}
-
-    public var onIcon: NetworkProtectionAsset {
-        .appVPNOnIcon
-    }
-
-    public var offIcon: NetworkProtectionAsset {
-        .appVPNOffIcon
-    }
-
-    public var issueIcon: NetworkProtectionAsset {
-        .appVPNIssueIcon
-    }
+public protocol AppLaunching {
+    func launchApp(withCommand command: AppLaunchCommand) async
 }

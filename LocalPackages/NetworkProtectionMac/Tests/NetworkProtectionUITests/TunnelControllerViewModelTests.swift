@@ -182,7 +182,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         XCTAssertFalse(model.showServerDetails)
     }
 
-    /// We expect that setting the model's `isRunning` to `true`, will start network protection.
+    /// We expect that setting the model's `isRunning` to `true`, will start the VPN.
     ///
     @MainActor
     func testStartsNetworkProtection() async throws {
@@ -193,7 +193,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
             appLauncher: MockAppLauncher())
-        let networkProtectionWasStarted = expectation(description: "The model started network protection when appropriate")
+        let networkProtectionWasStarted = expectation(description: "The model started the VPN when appropriate")
 
         controller.startCallback = {
             networkProtectionWasStarted.fulfill()
@@ -206,7 +206,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         await fulfillment(of: [networkProtectionWasStarted], timeout: 0.1)
     }
 
-    /// We expect that setting the model's `isRunning` to `false`, will stop network protection.
+    /// We expect that setting the model's `isRunning` to `false`, will stop the VPN.
     ///
     @MainActor
     func testStopsNetworkProtection() async throws {
@@ -225,7 +225,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             appLauncher: MockAppLauncher())
 
-        let networkProtectionWasStopped = expectation(description: "The model stopped network protection when appropriate")
+        let networkProtectionWasStopped = expectation(description: "The model stopped the VPN when appropriate")
 
         controller.stopCallback = {
             networkProtectionWasStopped.fulfill()
