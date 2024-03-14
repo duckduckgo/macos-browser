@@ -171,7 +171,7 @@ public struct PreferencesSubscriptionView: View {
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
     }
-    
+
     @ViewBuilder
     private var expiredHeaderView: some View {
         UniversalHeaderView {

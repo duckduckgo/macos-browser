@@ -241,7 +241,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
         guard fetchSubscriptionDetailsTask == nil else { return }
@@ -287,7 +286,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             }
         }
     }
-    // swiftlint:enable cyclomatic_complexity
 
     func updateDescription(for date: Date, status: Subscription.Status, period: Subscription.BillingPeriod) {
 
@@ -329,5 +327,5 @@ enum ManageSubscriptionSheet: Identifiable {
 }
 
 enum PreferencesSubscriptionState: String {
-    case noSubscription, subscriptionPendingActivation ,subscriptionActive, subscriptionExpired
+    case noSubscription, subscriptionPendingActivation, subscriptionActive, subscriptionExpired
 }
