@@ -2177,6 +2177,8 @@
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
+		7B25856C2BA2F2D000D49F79 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
+		7B25856E2BA2F2ED00D49F79 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7B25856D2BA2F2ED00D49F79 /* NetworkProtectionUI */; };
 		7B2DDCF82A93A8BB0039D884 /* NetworkProtectionAppEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */; };
 		7B2DDCFA2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		7B2DDCFB2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
@@ -4629,6 +4631,7 @@
 				EE7295E72A545BBB008C0991 /* NetworkProtection in Frameworks */,
 				4B4D60982A0B2A5C00BCD287 /* PixelKit in Frameworks */,
 				4B4D60AF2A0C837F00BCD287 /* Networking in Frameworks */,
+				7B25856E2BA2F2ED00D49F79 /* NetworkProtectionUI in Frameworks */,
 				4B4D603F2A0B290200BCD287 /* NetworkExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8657,6 +8660,7 @@
 				4B4D60AE2A0C837F00BCD287 /* Networking */,
 				EE7295E62A545BBB008C0991 /* NetworkProtection */,
 				37269EFE2B332FBB005E8E46 /* Common */,
+				7B25856D2BA2F2ED00D49F79 /* NetworkProtectionUI */,
 			);
 			productName = NetworkProtectionAppExtension;
 			productReference = 4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */;
@@ -10871,6 +10875,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B41EDA02B15437A001EEDF4 /* NetworkProtectionNotificationsPresenterFactory.swift in Sources */,
+				7B25856C2BA2F2D000D49F79 /* AppLauncher.swift in Sources */,
 				4B4D609F2A0B2C7300BCD287 /* Logging.swift in Sources */,
 				7B7DFB202B7E736B009EA1A3 /* MacPacketTunnelProvider.swift in Sources */,
 				4B4D60A12A0B2D6100BCD287 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
@@ -14125,6 +14130,10 @@
 		7B1459562B7D43E500047F2C /* NetworkProtectionProxy */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtectionProxy;
+		};
+		7B25856D2BA2F2ED00D49F79 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
 		};
 		7B31FD8B2AD125620086AA24 /* NetworkProtectionIPC */ = {
 			isa = XCSwiftPackageProductDependency;
