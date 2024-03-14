@@ -36,7 +36,7 @@ extension NetworkProtectionDeviceManager {
                                               tokenStore: tokenStore,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents,
-                                              isSubscriptionEnabled: false)
+                                              isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable())
     }
 }
 
@@ -46,7 +46,7 @@ extension NetworkProtectionCodeRedemptionCoordinator {
         self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false)
+                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable())
     }
 }
 
@@ -68,6 +68,18 @@ extension NetworkProtectionKeychainKeyStore {
     convenience init() {
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents)
+    }
+}
+
+extension NetworkProtectionLocationListCompositeRepository {
+    convenience init() {
+        let settings = VPNSettings(defaults: .netP)
+        self.init(
+            environment: settings.selectedEnvironment,
+            tokenStore: NetworkProtectionKeychainTokenStore(),
+            errorEvents: .networkProtectionAppDebugEvents,
+            isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable()
+        )
     }
 }
 
