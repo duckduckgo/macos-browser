@@ -342,11 +342,13 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
+        let networkProtectionItem: NSMenuItem
+
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+            networkProtectionItem = makeNetworkProtectionItem(showNewLabel: false)
+        } else if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
             let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
             let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
-
-            let networkProtectionItem: NSMenuItem
 
             // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
             // badge to bring it to their attention.
@@ -356,8 +358,7 @@ final class MoreOptionsMenu: NSMenu {
                 networkProtectionItem = makeNetworkProtectionItem(showNewLabel: false)
             }
 
-            items.append(networkProtectionItem)
-
+        items.append(networkProtectionItem)
 #if SUBSCRIPTION
             if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated {
                 Task {
