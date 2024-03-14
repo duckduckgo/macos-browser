@@ -575,11 +575,14 @@ import SubscriptionUI
                 NSMenuItem(title: "Reset Pinned Tabs", action: #selector(MainViewController.resetPinnedTabs))
                 NSMenuItem(title: "Reset YouTube Overlay Interactions", action: #selector(MainViewController.resetDuckPlayerOverlayInteractions))
                 NSMenuItem(title: "Reset MakeDuckDuckYours user settings", action: #selector(MainViewController.resetMakeDuckDuckGoYoursUserSettings))
+                NSMenuItem(title: "Survey 10% on", action: #selector(MainViewController.in10PercentSurveyOn))
+                NSMenuItem(title: "Survey 10% off", action: #selector(MainViewController.in10PercentSurveyOff))
                 NSMenuItem(title: "Change Activation Date") {
                     NSMenuItem(title: "Today", action: #selector(MainViewController.changeInstallDateToToday), keyEquivalent: "N")
-                    NSMenuItem(title: "Less Than a 21 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan21DaysAgo))
-                    NSMenuItem(title: "More Than 21 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan21DaysAgoButLessThan27))
-                    NSMenuItem(title: "More Than 27 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan27DaysAgo))
+                    NSMenuItem(title: "Less Than a 1 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan1DayAgo(_:)))
+                    NSMenuItem(title: "More Than 1 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan1DayAgoButLessThan14(_:)))
+                    NSMenuItem(title: "More Than 14 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan14DaysAgoButLessThan15(_:)))
+                    NSMenuItem(title: "More Than 15 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan15DaysAgo(_:)))
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Daily Pixels", action: #selector(MainViewController.resetDailyPixels))
@@ -609,8 +612,10 @@ import SubscriptionUI
 #endif
 
 #if NETWORK_PROTECTION
-            NSMenuItem(title: "Network Protection")
-                .submenu(NetworkProtectionDebugMenu())
+            if case .normal = NSApp.runType {
+                NSMenuItem(title: "VPN")
+                    .submenu(NetworkProtectionDebugMenu())
+            }
 #endif
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
