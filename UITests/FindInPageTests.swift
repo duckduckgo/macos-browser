@@ -25,22 +25,24 @@ class FindInPageTests: XCTestCase {
     let loremIpsumWebView = XCUIApplication().windows.webViews["Lorem Ipsum"]
     let findInPageCloseButton = XCUIApplication().windows.buttons["FindInPageController.closeButton"]
 
+    override class func setUp() {
+        saveLocalHTML()
+    }
+
+    override class func tearDown() {
+        removeLocalHTML()
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
-        saveLocalHTML()
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
         app.typeKey("n", modifierFlags: .command)
-        
-    }
-
-    override func tearDownWithError() throws {
-        removeLocalHTML()
     }
 
     func test_findInPage_canBeOpenedWithKeyCommand() throws {
         XCTAssertTrue(searchOrEnterAddressTextField.waitForExistence(timeout: timeout), "Address bar text field does not exist when it is expected to exist")
-        searchOrEnterAddressTextField.typeText("\(loremIpsumFileURL().absoluteString)\r")
+        searchOrEnterAddressTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
         XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local lorem ipsum web page didn't load with the expected title in a reasonable timeframe.")
 
         app.typeKey("f", modifierFlags: .command)
@@ -50,7 +52,7 @@ class FindInPageTests: XCTestCase {
 
     func test_findInPage_canBeOpenedWithMenuBarItem() throws {
         XCTAssertTrue(searchOrEnterAddressTextField.waitForExistence(timeout: timeout), "Address bar text field does not exist when it is expected to exist")
-        searchOrEnterAddressTextField.typeText("\(loremIpsumFileURL().absoluteString)\r")
+        searchOrEnterAddressTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
         XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local lorem ipsum web page didn't load with the expected title in a reasonable timeframe.")
         let findInPageMenuBarItem = app.menuItems["MainMenu.findInPage"]
         XCTAssertTrue(findInPageMenuBarItem.waitForExistence(timeout: timeout), "Couldn't find Find in Page menu bar item in a reasonable timeframe.")
@@ -62,7 +64,7 @@ class FindInPageTests: XCTestCase {
 
     func test_findInPage_canBeOpenedWithMoreOptionsMenuItem() throws {
         XCTAssertTrue(searchOrEnterAddressTextField.waitForExistence(timeout: timeout), "Address bar text field does not exist when it is expected to exist")
-        searchOrEnterAddressTextField.typeText("\(loremIpsumFileURL().absoluteString)\r")
+        searchOrEnterAddressTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
         XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local lorem ipsum web page didn't load with the expected title in a reasonable timeframe.")
         let optionsButton = XCUIApplication().windows.buttons["NavigationBarViewController.optionsButton"]
         XCTAssertTrue(optionsButton.waitForExistence(timeout: timeout), "Couldn't find options item in a reasonable timeframe.")
@@ -77,7 +79,7 @@ class FindInPageTests: XCTestCase {
 
     func test_findInPage_canBeClosedWithEscape() throws {
         XCTAssertTrue(searchOrEnterAddressTextField.waitForExistence(timeout: timeout), "Address bar text field does not exist when it is expected to exist")
-        searchOrEnterAddressTextField.typeText("\(loremIpsumFileURL().absoluteString)\r")
+        searchOrEnterAddressTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
         XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local lorem ipsum web page didn't load with the expected title in a reasonable timeframe.")
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(findInPageCloseButton.waitForExistence(timeout: timeout), "After invoking find in page with command-f, the elements of the find in page interface should exist.")
@@ -89,7 +91,7 @@ class FindInPageTests: XCTestCase {
 
     func test_findInPage_canBeClosedWithShiftCommandF() throws {
         XCTAssertTrue(searchOrEnterAddressTextField.waitForExistence(timeout: timeout), "Address bar text field does not exist when it is expected to exist")
-        searchOrEnterAddressTextField.typeText("\(loremIpsumFileURL().absoluteString)\r")
+        searchOrEnterAddressTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
         XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local lorem ipsum web page didn't load with the expected title in a reasonable timeframe.")
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(findInPageCloseButton.waitForExistence(timeout: timeout), "After invoking find in page with command-f, the elements of the find in page interface should exist.")
@@ -101,7 +103,7 @@ class FindInPageTests: XCTestCase {
 
     func test_findInPage_canBeClosedWithHideFindMenuItem() throws {
         XCTAssertTrue(searchOrEnterAddressTextField.waitForExistence(timeout: timeout), "Address bar text field does not exist when it is expected to exist")
-        searchOrEnterAddressTextField.typeText("\(loremIpsumFileURL().absoluteString)\r")
+        searchOrEnterAddressTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
         XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local lorem ipsum web page didn't load with the expected title in a reasonable timeframe.")
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(findInPageCloseButton.waitForExistence(timeout: timeout), "After invoking find in page with command-f, the elements of the find in page interface should exist.")
@@ -115,7 +117,7 @@ class FindInPageTests: XCTestCase {
 
     func test_findInPage_showsCorrectNumberOfOccurences() throws {
         XCTAssertTrue(searchOrEnterAddressTextField.waitForExistence(timeout: timeout), "Address bar text field does not exist when it is expected to exist")
-        searchOrEnterAddressTextField.typeText("\(loremIpsumFileURL().absoluteString)\r")
+        searchOrEnterAddressTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
         XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local lorem ipsum web page didn't load with the expected title in a reasonable timeframe.")
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(findInPageCloseButton.waitForExistence(timeout: timeout), "After invoking find in page with command-f, the elements of the find in page interface should exist.")
@@ -131,14 +133,14 @@ class FindInPageTests: XCTestCase {
 }
 
 extension FindInPageTests {
-    func loremIpsumFileURL() -> URL {
+    class func loremIpsumFileURL() -> URL {
         let loremIpsumFileName = "lorem_ipsum.html"
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let loremIpsumHTMLFileURL = documentsDirectory.appendingPathComponent(loremIpsumFileName)
         return loremIpsumHTMLFileURL
     }
 
-    func saveLocalHTML() {
+    class func saveLocalHTML() {
         let loremIpsumHTML = """
         <html><head><title>Lorem Ipsum</title></head><body><table><tr><td><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac sem nisi. Cras fermentum mi vitae turpis efficitur malesuada. Donec eget maximus ligula, et tincidunt sapien. Suspendisse posuere diam maximus, dignissim ex at, fringilla elit. Maecenas enim tellus, ornare non pretium a, sodales nec lectus. Vestibulum quis augue orci. Donec eget mi sed magna consequat auctor a a nulla. Etiam condimentum, neque at congue semper, arcu sem commodo tellus, venenatis finibus ex magna vitae erat. Nunc non enim sit amet mi posuere egestas. Donec nibh nisl, pretium sit amet aliquet, porta id nibh. Pellentesque ullamcorper mauris quam, semper hendrerit mi dictum non. Nullam pulvinar, nulla a maximus egestas, velit mi volutpat neque, vitae placerat eros sapien vitae tellus. Pellentesque malesuada accumsan dolor, ut feugiat enim. Curabitur nunc quam, maximus venenatis augue vel, accumsan eros.</p>
 
@@ -155,7 +157,7 @@ extension FindInPageTests {
         }
     }
 
-    func removeLocalHTML() {
+    class func removeLocalHTML() {
         do {
             try FileManager.default.removeItem(at: loremIpsumFileURL())
         } catch {
