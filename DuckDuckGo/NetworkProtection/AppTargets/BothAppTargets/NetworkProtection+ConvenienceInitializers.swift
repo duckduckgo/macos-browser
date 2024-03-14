@@ -22,6 +22,10 @@ import Foundation
 import NetworkProtection
 import Common
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 extension NetworkProtectionDeviceManager {
 
     static func create() -> NetworkProtectionDeviceManager {
@@ -48,10 +52,15 @@ extension NetworkProtectionCodeRedemptionCoordinator {
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
+#if SUBSCRIPTION
+        let accessTokenProvider: () -> String? = { AccountManager().accessToken }
+#else
+        let accessTokenProvider: () -> String? = { }
+#endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false,
-                  accessTokenProvider: { nil })
+                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable(),
+                  accessTokenProvider: accessTokenProvider)
     }
 }
 
