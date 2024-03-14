@@ -66,10 +66,10 @@ jobs:
             changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}")"
 
             if grep -q -v -e '.github' -e 'scripts' <<< "$changed_files"; then
+              echo "skip-release=false" >> $GITHUB_OUTPUT
+            else
               echo "::warning::No changes to the release branch (or only changes to scripts and workflows). Skipping automatic release."
               echo "skip-release=true" >> $GITHUB_OUTPUT
-            else
-              echo "skip-release=false" >> $GITHUB_OUTPUT
             fi
           fi
 
