@@ -109,6 +109,10 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         // US internal users should have it available by default
         guard !isInternalUser else { return true }
 
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+            return true
+        }
+
         if isWaitlistUser {
             return isWaitlistBetaActive
         } else {
