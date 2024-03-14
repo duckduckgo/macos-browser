@@ -18,5 +18,7 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>DBP_APP_GROUP</key>
+	<string>$(DBP_APP_GROUP)</string>
 </dict>
 </plist>

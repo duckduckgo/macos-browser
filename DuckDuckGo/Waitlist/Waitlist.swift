@@ -155,7 +155,7 @@ extension ProductWaitlistRequest {
     }
 }
 
-// MARK: - Network Protection Waitlist
+// MARK: - VPN Waitlist
 
 struct NetworkProtectionWaitlist: Waitlist {
 
@@ -210,7 +210,12 @@ struct NetworkProtectionWaitlist: Waitlist {
             if let error {
                 // Check for users who have waitlist state but have no auth token, for example if the redeem call fails.
                 let networkProtectionKeyStore = NetworkProtectionKeychainTokenStore()
-                if let inviteCode = waitlistStorage.getWaitlistInviteCode(), !networkProtectionKeyStore.isFeatureActivated {
+                let configManager = ContentBlocking.shared.privacyConfigurationManager
+                let waitlistBetaActive = configManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive)
+
+                if let inviteCode = waitlistStorage.getWaitlistInviteCode(),
+                   !networkProtectionKeyStore.isFeatureActivated,
+                   waitlistBetaActive {
                     Task { @MainActor in
                         do {
                             try await networkProtectionCodeRedemption.redeem(inviteCode)
@@ -229,7 +234,7 @@ struct NetworkProtectionWaitlist: Waitlist {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
                         sendInviteCodeAvailableNotification {
-                            DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                            DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
                         }
                         completion(nil)
                     } catch {

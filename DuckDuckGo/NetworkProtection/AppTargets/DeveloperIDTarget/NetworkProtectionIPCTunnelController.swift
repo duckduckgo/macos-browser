@@ -25,10 +25,10 @@ import NetworkProtectionIPC
 final class NetworkProtectionIPCTunnelController: TunnelController {
 
     private let loginItemsManager: LoginItemsManager
-    private let ipcClient: TunnelControllerIPCClient
+    private let ipcClient: NetworkProtectionIPCClient
 
     init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
-         ipcClient: TunnelControllerIPCClient) {
+         ipcClient: NetworkProtectionIPCClient) {
 
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
@@ -48,13 +48,13 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
         ipcClient.stop()
     }
 
-    /// Queries Network Protection to know if its VPN is connected.
+    /// Queries VPN to know if it's connected.
     ///
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
     ///
     var isConnected: Bool {
         get {
-            if case .connected = ipcClient.connectionStatusObserver.recentValue {
+            if case .connected = ipcClient.ipcStatusObserver.recentValue {
                 return true
             }
 

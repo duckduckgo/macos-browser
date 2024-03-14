@@ -25,7 +25,6 @@ import Configuration
 import CoreData
 import DDGSync
 import History
-import Macros
 import Networking
 import Persistence
 import PixelKit
@@ -192,8 +191,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
 #if SPARKLE
-        updateController = UpdateController(internalUserDecider: internalUserDecider)
-        stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+        if NSApp.runType != .uiTests {
+            updateController = UpdateController(internalUserDecider: internalUserDecider)
+            stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+        }
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
@@ -238,6 +239,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         startupSync()
 
+#if SUBSCRIPTION
+        let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
+
+        let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
+                                                     defaultValue: defaultEnvironment).wrappedValue
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
+
+    #if APPSTORE || !STRIPE
+        SubscriptionPurchaseEnvironment.current = .appStore
+    #else
+        SubscriptionPurchaseEnvironment.current = .stripe
+    #endif
+
+        Task {
+            let accountManager = AccountManager()
+            do {
+                try accountManager.migrateAccessTokenToNewStore()
+            } catch {
+                if let error = error as? AccountManager.MigrationError {
+                    switch error {
+                    case AccountManager.MigrationError.migrationFailed:
+                        os_log(.default, log: .subscription, "Access token migration failed")
+                    case AccountManager.MigrationError.noMigrationNeeded:
+                        os_log(.default, log: .subscription, "No access token migration needed")
+                    }
+                }
+            }
+            await accountManager.checkSubscriptionState()
+        }
+#endif
+
         if [.normal, .uiTests].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
         }
@@ -280,33 +312,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if SUBSCRIPTION
-        Task {
-            let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
 
-            let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
-                                                         defaultValue: defaultEnvironment).wrappedValue
-            SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
-
-    #if STRIPE
-            SubscriptionPurchaseEnvironment.current = .stripe
-    #else
-            SubscriptionPurchaseEnvironment.current = .appStore
-    #endif
-            let accountManager = AccountManager()
-            do {
-                try accountManager.migrateAccessTokenToNewStore()
-            } catch {
-                if let error = error as? AccountManager.MigrationError {
-                    switch error {
-                    case AccountManager.MigrationError.migrationFailed:
-                        os_log(.default, log: .subscription, "Access token migration failed")
-                    case AccountManager.MigrationError.noMigrationNeeded:
-                        os_log(.default, log: .subscription, "No access token migration needed")
-                    }
-                }
-            }
-            await accountManager.checkSubscriptionState()
-        }
 #endif
     }
 
@@ -327,6 +333,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidBecomeActive()
 #endif
+
+        AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
+
+        updateSubscriptionStatus()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -350,7 +360,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
             let alert = NSAlert.noAccessToDownloads()
             if alert.runModal() != .cancel {
-                let preferencesLink = #URL("x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")
+                let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")!
                 NSWorkspace.shared.open(preferencesLink)
                 return
             }
@@ -561,6 +571,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 }
 
+func updateSubscriptionStatus() {
+#if SUBSCRIPTION
+    Task {
+        guard let token = AccountManager().accessToken else {
+            return
+        }
+        let result = await SubscriptionService.getSubscription(accessToken: token)
+
+        switch result {
+        case .success(let success):
+            if success.isActive {
+                DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
+            }
+        case .failure: break
+        }
+    }
+#endif
+}
+
 #if NETWORK_PROTECTION || DBP
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
@@ -579,7 +608,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 #if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
                     NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }

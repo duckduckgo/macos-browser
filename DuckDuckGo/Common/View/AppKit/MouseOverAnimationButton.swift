@@ -135,9 +135,10 @@ final class MouseOverAnimationButton: AddressBarButton {
         }
 
         set {
-            if isAnimationViewVisible {
+            if imageCache !== newValue {
                 imageCache = newValue
-            } else {
+            }
+            if !isAnimationViewVisible {
                 super.image = newValue
             }
         }
@@ -146,7 +147,6 @@ final class MouseOverAnimationButton: AddressBarButton {
     var imageCache: NSImage?
 
     private func hideImage() {
-        imageCache = image
         super.image = nil
     }
 

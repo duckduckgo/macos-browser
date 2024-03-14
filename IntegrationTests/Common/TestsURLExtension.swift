@@ -17,14 +17,13 @@
 //
 
 import Foundation
-import Macros
 
 @testable import DuckDuckGo_Privacy_Browser
 
 // Integration Tests helpers
 extension URL {
 
-    static let testsServer = #URL("http://localhost:8085/")
+    static let testsServer = URL(string: "http://localhost:8085/")!
 
     /// used for Tests Server mock HTTP requests creation (see tests-server/main.swift)
     /**

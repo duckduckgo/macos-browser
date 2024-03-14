@@ -31,14 +31,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtection.ConnectionStatus = .default
-    private let popoverManager: NetworkProtectionNavBarPopoverManager
+    private let popoverManager: NetPPopoverManager
     private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
-
-    // MARK: - IPC
-
-    public var ipcClient: TunnelControllerIPCClient {
-        popoverManager.ipcClient
-    }
 
     // MARK: - Subscriptions
 
@@ -76,23 +70,13 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     // MARK: - Initialization
 
-    init(popoverManager: NetworkProtectionNavBarPopoverManager,
+    init(popoverManager: NetPPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
-         statusReporter: NetworkProtectionStatusReporter? = nil,
+         statusReporter: NetworkProtectionStatusReporter,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         self.popoverManager = popoverManager
-
-        let ipcClient = popoverManager.ipcClient
-
         self.networkProtectionStatusReporter = statusReporter
-            ?? DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.connectionStatusObserver,
-                serverInfoObserver: ipcClient.serverInfoObserver,
-                connectionErrorObserver: ipcClient.connectionErrorObserver,
-                connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
-                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-        )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.pinningManager = pinningManager
         self.shortcutTitle = pinningManager.shortcutTitle(for: .networkProtection)
@@ -125,6 +109,9 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     /// This will be removed once the waitlist beta has ended.
     private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
         let icon = icon ?? iconPublisher.icon
+#if DEBUG
+        guard [.normal, .integrationTests].contains(NSApp.runType) else { return NSImage() }
+#endif
 
         let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
         let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
@@ -239,7 +226,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         pinningManager.togglePinning(for: .networkProtection)
     }
 
-    /// We want to pin Network Protection to the navigation bar the first time it's enabled, and only
+    /// We want to pin the VPN to the navigation bar the first time it's enabled, and only
     /// if the user hasn't toggled it manually before.
     /// 
     private func pinNetworkProtectionToNavBarIfNeverPinnedBefore() {

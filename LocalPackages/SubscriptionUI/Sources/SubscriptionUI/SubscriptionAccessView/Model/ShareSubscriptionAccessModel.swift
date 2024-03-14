@@ -42,6 +42,12 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public func handleEmailAction() {
         let url: URL = hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription
 
+        if hasEmail {
+            actionHandlers.uiActionHandler(.postSubscriptionAddEmailClick)
+        } else {
+            actionHandlers.uiActionHandler(.addDeviceEnterEmail)
+        }
+
         Task {
             if SubscriptionPurchaseEnvironment.current == .appStore {
                 if #available(macOS 12.0, iOS 15.0, *) {

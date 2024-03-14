@@ -32,24 +32,31 @@ final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
 }
 
 final class UserAuthenticatorMock: UserAuthenticating {
+    var didCallAuthenticate = false
     var _authenticateUser: (DeviceAuthenticator.AuthenticationReason) -> DeviceAuthenticationResult = { _ in return .success }
 
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
+        didCallAuthenticate = true
         let authenticationResult = _authenticateUser(reason)
         result(authenticationResult)
     }
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
-        _authenticateUser(reason)
+        didCallAuthenticate = true
+        return _authenticateUser(reason)
     }
 }
 
-@MainActor
 final class AutofillPreferencesModelTests: XCTestCase {
 
+    func neverPromptWebsitesManager() throws -> AutofillNeverPromptWebsitesManager {
+        try AutofillNeverPromptWebsitesManager(secureVault: MockSecureVaultFactory.makeVault(errorReporter: nil))
+    }
+
+    @MainActor
     func testThatPreferencesArePersisted() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = try AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, neverPromptWebsitesManager: neverPromptWebsitesManager())
 
         model.askToSaveUsernamesAndPasswords.toggle()
         XCTAssertEqual(persistor.askToSaveUsernamesAndPasswords, model.askToSaveUsernamesAndPasswords)
@@ -61,10 +68,11 @@ final class AutofillPreferencesModelTests: XCTestCase {
         XCTAssertEqual(persistor.askToSavePaymentMethods, model.askToSavePaymentMethods)
     }
 
+    @MainActor
     func testWhenUserIsAuthenticatedThenAutoLockCanBeDisabled() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = try AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, neverPromptWebsitesManager: neverPromptWebsitesManager())
 
         userAuthenticator._authenticateUser = { _ in return .success}
 
@@ -73,10 +81,11 @@ final class AutofillPreferencesModelTests: XCTestCase {
         XCTAssertEqual(persistor.isAutoLockEnabled, model.isAutoLockEnabled)
     }
 
+    @MainActor
     func testWhenUserIsNotAuthenticatedThenAutoLockCannotBeDisabled() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = try AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, neverPromptWebsitesManager: neverPromptWebsitesManager())
 
         userAuthenticator._authenticateUser = { _ in return .failure}
 
@@ -85,10 +94,11 @@ final class AutofillPreferencesModelTests: XCTestCase {
         XCTAssertEqual(persistor.isAutoLockEnabled, model.isAutoLockEnabled)
     }
 
+    @MainActor
     func testWhenUserIsAuthenticatedThenAutoLockThresholdCanBeChanged() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = try AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, neverPromptWebsitesManager: neverPromptWebsitesManager())
 
         userAuthenticator._authenticateUser = { _ in return .success}
 
@@ -98,10 +108,11 @@ final class AutofillPreferencesModelTests: XCTestCase {
         XCTAssertEqual(persistor.autoLockThreshold, model.autoLockThreshold)
     }
 
+    @MainActor
     func testWhenUserIsNotAuthenticatedThenAutoLockThresholdCannotBeChanged() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = try AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, neverPromptWebsitesManager: neverPromptWebsitesManager())
 
         userAuthenticator._authenticateUser = { _ in return .failure}
 

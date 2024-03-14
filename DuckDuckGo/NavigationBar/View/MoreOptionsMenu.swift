@@ -164,15 +164,11 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        #if SUBSCRIPTION
-        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
-        #else
         if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         } else {
             actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
         }
-        #endif
     }
 #endif // DBP
 
@@ -255,6 +251,7 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
+        Pixel.fire(.privacyProOfferScreenImpression)
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
 
@@ -336,6 +333,7 @@ final class MoreOptionsMenu: NSMenu {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private func makeActiveSubscriptionItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = []
 
@@ -344,13 +342,34 @@ final class MoreOptionsMenu: NSMenu {
             let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
             let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
 
-            // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
+            let networkProtectionItem: NSMenuItem
+
+            // If the user can see the VPN option but they haven't joined the waitlist or don't have an auth token, show the "New"
             // badge to bring it to their attention.
             if !isWaitlistUser && !hasAuthToken {
-                items.append(makeNetworkProtectionItem(showNewLabel: true))
+                networkProtectionItem = makeNetworkProtectionItem(showNewLabel: true)
             } else {
-                items.append(makeNetworkProtectionItem(showNewLabel: false))
+                networkProtectionItem = makeNetworkProtectionItem(showNewLabel: false)
             }
+
+            items.append(networkProtectionItem)
+
+#if SUBSCRIPTION
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated {
+                Task {
+                    let isMenuItemEnabled: Bool
+
+                    switch await AccountManager().hasEntitlement(for: .networkProtection) {
+                    case let .success(result):
+                        isMenuItemEnabled = result
+                    case .failure:
+                        isMenuItemEnabled = false
+                    }
+
+                    networkProtectionItem.isEnabled = isMenuItemEnabled
+                }
+            }
+#endif
 
             DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else {
@@ -367,6 +386,23 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.dbpIcon)
             items.append(dataBrokerProtectionItem)
 
+#if SUBSCRIPTION
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
+                Task {
+                    let isMenuItemEnabled: Bool
+
+                    switch await AccountManager().hasEntitlement(for: .dataBrokerProtection) {
+                    case let .success(result):
+                        isMenuItemEnabled = result
+                    case .failure:
+                        isMenuItemEnabled = false
+                    }
+
+                    dataBrokerProtectionItem.isEnabled = isMenuItemEnabled
+                }
+            }
+#endif
+
             DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
 
         } else {
@@ -382,6 +418,21 @@ final class MoreOptionsMenu: NSMenu {
                 .targetting(self)
                 .withImage(.itrIcon)
             items.append(identityTheftRestorationItem)
+
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
+                Task {
+                    let isMenuItemEnabled: Bool
+
+                    switch await AccountManager().hasEntitlement(for: .identityTheftRestoration) {
+                    case let .success(result):
+                        isMenuItemEnabled = result
+                    case .failure:
+                        isMenuItemEnabled = false
+                    }
+
+                    identityTheftRestorationItem.isEnabled = isMenuItemEnabled
+                }
+            }
         }
 #endif
 

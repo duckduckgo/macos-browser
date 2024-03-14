@@ -25,7 +25,7 @@ import NetworkProtection
 import NetworkProtectionProxy
 import SwiftUI
 
-/// Controller for the Network Protection debug menu.
+/// Controller for the VPN debug menu.
 ///
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
@@ -70,7 +70,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         registrationKeyValidityMenu = NSMenu { [registrationKeyValidityAutomaticItem] in
             registrationKeyValidityAutomaticItem
         }
-        super.init(title: "Network Protection")
+        super.init(title: "VPN")
 
         buildItems {
             NSMenuItem(title: "Reset") {
@@ -227,7 +227,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         settings.resetToDefaults()
     }
 
-    /// Removes the system extension and agents for Network Protection.
+    /// Removes the system extension and agents for DuckDuckGo VPN.
     ///
     @objc func removeSystemExtensionAndAgents(_ sender: Any?) {
         Task { @MainActor in
@@ -588,7 +588,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         alert.addButton(withTitle: "Use Invite Code")
         alert.addButton(withTitle: "Cancel")
         alert.messageText = "Enter Invite Code"
-        alert.informativeText = "Please grab a Network Protection invite code from Asana and enter it here."
+        alert.informativeText = "Please grab a VPN invite code from Asana and enter it here."
 
         let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
         alert.accessoryView = textField

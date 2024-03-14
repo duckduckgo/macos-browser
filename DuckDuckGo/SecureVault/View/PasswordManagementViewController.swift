@@ -49,7 +49,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet weak var lockMenuItem: NSMenuItem!
     @IBOutlet weak var importPasswordMenuItem: NSMenuItem!
     @IBOutlet weak var settingsMenuItem: NSMenuItem!
-
+    @IBOutlet weak var deleteAllPasswordsMenuItem: NSMenuItem!
     @IBOutlet weak var unlockYourAutofillLabel: FlatButton!
     @IBOutlet weak var autofillTitleLabel: NSTextField!
     @IBOutlet weak var unlockYourAutofillInfo: NSButtonCell!
@@ -199,11 +199,12 @@ final class PasswordManagementViewController: NSViewController {
     private func setupStrings() {
         importPasswordMenuItem.title = UserText.importPasswords
         exportLoginItem.title = UserText.exportLogins
+        deleteAllPasswordsMenuItem.title = UserText.deleteAllPasswords
         settingsMenuItem.title = UserText.settingsSuspended
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
         autofillTitleLabel.stringValue = UserText.autofill
-        emptyStateTitle.stringValue = UserText.passwordManagerEmptyStateTitle
-        emptyStateMessage.stringValue = UserText.passwordManagerEmptyStateMessage
+        emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
+        emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
         emptyStateButton.title = UserText.importData
     }
 
@@ -267,13 +268,12 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func promptForAuthenticationIfNecessary() {
-        let authenticator = DeviceAuthenticator.shared
-#if DEBUG
-        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+        guard NSApp.runType != .uiTests else {
             toggleLockScreen(hidden: true)
             return
         }
-#endif
+
+        let authenticator = DeviceAuthenticator.shared
         toggleLockScreen(hidden: !authenticator.requiresAuthentication)
 
         authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
@@ -313,6 +313,18 @@ final class PasswordManagementViewController: NSViewController {
         DataImportView().show()
     }
 
+    @IBAction func onDeleteAllPasswordsClicked(_ sender: Any) {
+        let builder = AutofillDeleteAllPasswordsBuilder()
+        guard let autofillDeleteAllPasswordsExecutor = builder.buildExecutor() else { return }
+        let presenter = builder.buildPresenter()
+
+        presenter.show(actionExecutor: autofillDeleteAllPasswordsExecutor) {
+            self.refreshData {
+                self.select(category: .logins)
+            }
+        }
+    }
+
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
         promptForAuthenticationIfNecessary()
     }
@@ -335,7 +347,7 @@ final class PasswordManagementViewController: NSViewController {
             self?.searchField.stringValue = text
             self?.updateFilter()
 
-            if clearWhenNoMatches && self?.listModel?.displayedItems.isEmpty == true {
+            if clearWhenNoMatches && self?.listModel?.displayedSections.isEmpty == true {
                 self?.searchField.stringValue = ""
                 self?.updateFilter()
             } else if self?.isDirty == false {
@@ -697,9 +709,11 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    private func refreshData() {
+    private func refreshData(completion: (() -> Void)? = nil) {
         self.itemModel?.clearSecureVaultModel()
-        self.refetchWithText(self.searchField.stringValue)
+        self.refetchWithText(self.searchField.stringValue) {
+            completion?()
+        }
         self.postChange()
     }
 
@@ -971,8 +985,8 @@ final class PasswordManagementViewController: NSViewController {
 
     private func showEmptyState(category: SecureVaultSorting.Category) {
         switch category {
-        case .allItems: showDefaultEmptyState()
-        case .logins: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateLoginsTitle)
+        case .allItems: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateDefaultTitle, message: UserText.pmEmptyStateDefaultDescription, hideMessage: false, hideButton: false)
+        case .logins: showEmptyState(image: .loginsEmpty, title: UserText.pmEmptyStateLoginsTitle, hideMessage: false, hideButton: false)
         case .identities: showEmptyState(image: .identitiesEmpty, title: UserText.pmEmptyStateIdentitiesTitle)
         case .cards: showEmptyState(image: .creditCardsEmpty, title: UserText.pmEmptyStateCardsTitle)
         }
@@ -982,24 +996,15 @@ final class PasswordManagementViewController: NSViewController {
         emptyState.isHidden = true
     }
 
-    private func showDefaultEmptyState() {
+    private func showEmptyState(image: NSImage, title: String, message: String? = nil, hideMessage: Bool = true, hideButton: Bool = true) {
         emptyState.isHidden = false
-        emptyStateMessage.isHidden = false
-        emptyStateButton.isHidden = false
-
-        emptyStateImageView.image = .loginsEmpty
-
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultTitle, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.pmEmptyStateDefaultDescription, lineHeight: 1.05, kern: -0.08)
-    }
-
-    private func showEmptyState(image: NSImage, title: String) {
-        emptyState.isHidden = false
-
         emptyStateImageView.image = image
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.isHidden = true
-        emptyStateButton.isHidden = true
+        if let message {
+            emptyStateMessage.attributedStringValue = NSAttributedString.make(message, lineHeight: 1.05, kern: -0.08)
+        }
+        emptyStateMessage.isHidden = hideMessage
+        emptyStateButton.isHidden = hideButton
     }
 
     private func requestSync() {
@@ -1053,4 +1058,23 @@ extension PasswordManagementViewController: NSTextViewDelegate {
         return NSRange(location: 0, length: 0)
     }
 
+}
+
+extension PasswordManagementViewController: NSMenuItemValidation {
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        switch menuItem.action {
+        case #selector(PasswordManagementViewController.onDeleteAllPasswordsClicked(_:)):
+            return haveDuckDuckGoPasswords
+        default:
+            guard let appDelegate = NSApplication.shared.delegate as? AppDelegate else { return false }
+            return appDelegate.validateMenuItem(menuItem)
+        }
+    }
+
+    private var haveDuckDuckGoPasswords: Bool {
+        guard let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared) else { return false }
+        let accounts = (try? vault.accounts()) ?? []
+        return !accounts.isEmpty
+    }
 }
