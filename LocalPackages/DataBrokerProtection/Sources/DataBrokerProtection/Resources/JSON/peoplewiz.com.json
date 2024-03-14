@@ -1,7 +1,7 @@
 {
   "name": "PeopleWiz",
   "url": "peoplewiz.com",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "parent": "peoplewhiz.com",
   "addedDatetime": 1709445600000,
   "steps": [
@@ -11,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "3b6a62aa-b056-4f82-aebf-6574e3e3fa21",
-          "url": "https://www.peoplewhized.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+          "id": "723b8b9e-6f6d-4180-aaab-639682113875",
+          "url": "https://www.peoplewiz.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
         },
         {
           "actionType": "extract",
-          "id": "bcd05ea5-27e7-4f29-8b02-8eba71869d1b",
+          "id": "36ba376d-03c1-4ecc-92ed-2fe12bd79d6f",
           "selector": "[class^='ResultsTable__Record-sc']",
           "profile": {
             "name": {

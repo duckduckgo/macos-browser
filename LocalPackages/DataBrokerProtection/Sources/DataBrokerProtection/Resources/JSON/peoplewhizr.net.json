@@ -3,7 +3,7 @@
   "url": "peoplewhizr.net",
   "version": "0.1.6",
   "parent": "peoplewhiz.com",
-  "addedDatetime": 1709424000000,
+  "addedDatetime": 1709445600000,
   "steps": [
     {
       "stepType": "scan",
@@ -11,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "d849d242-e0a4-473c-8382-7c6ae4bc0be1",
-          "url": "https://www.peoplewhized.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+          "id": "8cbdebad-158e-43ee-90f1-4f555feeef03",
+          "url": "https://www.peoplewhizr.net/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
         },
         {
           "actionType": "extract",
-          "id": "add53c44-cada-4b66-8219-1d8740a87bd9",
+          "id": "2955fb45-374e-42f2-a72a-f7a2ffe4ebe5",
           "selector": "[class^='ResultsTable__Record-sc']",
           "profile": {
             "name": {
