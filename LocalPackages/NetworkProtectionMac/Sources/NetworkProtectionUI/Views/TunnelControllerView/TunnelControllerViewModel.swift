@@ -95,7 +95,7 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         connectionStatus = statusReporter.statusObserver.recentValue
         internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
-        internalServerLocation = statusReporter.serverInfoObserver.recentValue.serverLocation
+        internalServerLocation = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation
 
         // Particularly useful when unit testing with an initial status of our choosing.
         refreshInternalIsRunning()
@@ -146,7 +146,7 @@ public final class TunnelControllerViewModel: ObservableObject {
 
             Task { @MainActor in
                 self.internalServerAddress = serverInfo.serverAddress
-                self.internalServerLocation = serverInfo.serverLocation
+                self.internalServerLocation = serverInfo.serverLocation?.serverLocation
             }
         }
             .store(in: &cancellables)

@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "4e05a46f0a9ce56f6d6379b79a92dc7a0182e027",
-        "version" : "122.2.0"
+        "branch" : "sam/vpn-ui-improvements",
+        "revision" : "1814bc7ec4d3c2be5bf77bce850818a625276893"
       }
     },
     {
