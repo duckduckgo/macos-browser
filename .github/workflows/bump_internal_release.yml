@@ -63,7 +63,7 @@ jobs:
           #   echo "skip-release=false" >> $GITHUB_OUTPUT
           # else
             latest_tag="$(git describe --tags --abbrev=0)"
-            git diff --name-only "$latest_tag".."origin/${release_branch}"
+            echo "git diff --name-only \"$latest_tag\"..\"origin/${release_branch}\""
             changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}" | grep -v -E '.github|scripts')"
             echo "changed_files=${changed_files}"
 
