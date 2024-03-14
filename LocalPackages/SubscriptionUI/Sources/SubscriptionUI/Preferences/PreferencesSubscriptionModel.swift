@@ -18,7 +18,8 @@
 
 import AppKit
 import Subscription
-import Combine
+import struct Combine.AnyPublisher
+import enum Combine.Publishers
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
@@ -29,7 +30,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var hasAccessToDBP: Bool = false
     @Published var hasAccessToITR: Bool = false
 
-    private var subscriptionPlatform: String? //Subscription.Platform?
+    private var subscriptionPlatform: Subscription.Platform?
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
@@ -97,7 +98,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             Task {
                 let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
                 if case .success(let subscription) = subscriptionResult {
-                    self.updateDescription(for: subscription.expiresOrRenewsAt)
+                    self.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
                 }
             }
         }
@@ -148,7 +149,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     func changePlanOrBillingAction() async -> ChangePlanOrBillingAction {
 
         switch subscriptionPlatform {
-        case "apple":
+        case .apple:
             if await confirmIfSignedInToSameAccount() {
                 return .navigateToManageSubscription { [weak self] in
                     self?.changePlanOrBilling(for: .appStore)
@@ -156,9 +157,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             } else {
                 return .presentSheet(.apple)
             }
-        case "google":
+        case .google:
             return .presentSheet(.google)
-        case "stripe":
+        case .stripe:
             return .navigateToManageSubscription { [weak self] in
                 self?.changePlanOrBilling(for: .stripe)
             }
@@ -252,8 +253,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
 
             if case .success(let subscription) = subscriptionResult {
-                self?.updateDescription(for: subscription.expiresOrRenewsAt)
-                self?.subscriptionPlatform = subscription.platform.rawValue
+                self?.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
+                self?.subscriptionPlatform = subscription.platform
 
                 if subscription.expiresOrRenewsAt.timeIntervalSinceNow < 0 || !subscription.isActive {
                     self?.hasAccessToVPN = false
@@ -295,14 +296,30 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
     // swiftlint:enable cyclomatic_complexity
 
-    private func updateDescription(for date: Date) {
-        self.subscriptionDetails = UserText.preferencesSubscriptionActiveCaption(formattedDate: dateFormatter.string(from: date))
+    func updateDescription(for date: Date, status: Subscription.Status, period: Subscription.BillingPeriod) {
+
+        let formattedDate = dateFormatter.string(from: date)
+
+        let billingPeriod: String
+
+        switch period {
+        case .monthly: billingPeriod = UserText.monthlySubscriptionBillingPeriod.lowercased()
+        case .yearly: billingPeriod = UserText.yearlySubscriptionBillingPeriod.lowercased()
+        case .unknown: billingPeriod = ""
+        }
+
+        switch status {
+        case .autoRenewable:
+            self.subscriptionDetails = UserText.preferencesSubscriptionActiveRenewCaption(period: billingPeriod, formattedDate: formattedDate)
+        default:
+            self.subscriptionDetails = UserText.preferencesSubscriptionActiveExpireCaption(period: billingPeriod, formattedDate: formattedDate)
+        }
     }
 
     private var dateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .short
+        dateFormatter.timeStyle = .none
 
         return dateFormatter
     }()

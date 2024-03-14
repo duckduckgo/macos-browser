@@ -67,20 +67,37 @@ public struct PreferencesSubscriptionView: View {
                 }
 
                 // DEBUG buttons
-//                HStack {
-//                    Button("auth", action: {
-//                        model.isUserAuthenticated.toggle()
-//                    })
-//                    Button("vpn", action: {
-//                        model.hasAccessToVPN.toggle()
-//                    })
-//                    Button("dbp", action: {
-//                        model.hasAccessToDBP.toggle()
-//                    })
-//                    Button("itr", action: {
-//                        model.hasAccessToITR.toggle()
-//                    })
-//                }
+                HStack {
+                    Button("auth", action: {
+                        model.isUserAuthenticated.toggle()
+                    })
+                    Button("vpn", action: {
+                        model.hasAccessToVPN.toggle()
+                    })
+                    Button("dbp", action: {
+                        model.hasAccessToDBP.toggle()
+                    })
+                    Button("itr", action: {
+                        model.hasAccessToITR.toggle()
+                    })
+                }
+                HStack {
+                    Button("autoRenewable", action: {
+                        model.updateDescription(for: Date(), status: .autoRenewable, period: .monthly)
+                    })
+                    Button("notAutoRenewable", action: {
+                        model.updateDescription(for: Date(), status: .notAutoRenewable, period: .yearly)
+                    })
+                    Button("gracePeriod", action: {
+                        model.updateDescription(for: Date(), status: .gracePeriod, period: .monthly)
+                    })
+                    Button("inactive", action: {
+                        model.updateDescription(for: Date(), status: .inactive, period: .unknown)
+                    })
+                    Button("expired", action: {
+                        model.updateDescription(for: Date(), status: .expired, period: .unknown)
+                    })
+                }
                 // DEBUG buttons
 
                 Divider()

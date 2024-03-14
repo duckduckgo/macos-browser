@@ -42,10 +42,19 @@ enum UserText {
 
     // MARK: Preferences when subscription is active
     static let preferencesSubscriptionActiveHeader = NSLocalizedString("subscription.preferences.subscription.active.header", value: "Privacy Pro is active on this device", comment: "Header for the subscription preferences pane when the subscription is active")
-    static func preferencesSubscriptionActiveCaption(formattedDate: String) -> String {
-        let localized = NSLocalizedString("subscription.preferences.subscription.active.caption", value: "Your monthly Privacy Pro subscription renews on %@", comment: "Caption for the subscription preferences pane when the subscription is active")
-        return String(format: localized, formattedDate)
+
+    static func preferencesSubscriptionActiveRenewCaption(period: String, formattedDate: String) -> String {
+        let localized = NSLocalizedString("subscription.preferences.subscription.active.renew.caption", value: "Your %@ Privacy Pro subscription renews on %@.", comment: "Caption for the subscription preferences pane when the subscription is active and will renew. First parameter is renewal period (monthly/yearly). Second parameter is date.")
+        return String(format: localized, period, formattedDate)
     }
+
+    static func preferencesSubscriptionActiveExpireCaption(period: String, formattedDate: String) -> String {
+        let localized = NSLocalizedString("subscription.preferences.subscription.active.expire.caption", value: "Your %@ Privacy Pro subscription expires on %@.", comment: "Caption for the subscription preferences pane when the subscription is active but will expire. First parameter is renewal period (monthly/yearly). Second parameter is date.")
+        return String(format: localized, period, formattedDate)
+    }
+
+    static let monthlySubscriptionBillingPeriod = NSLocalizedString("subscription.billing.period.monthly", value: "Monthly", comment: "Type of subscription billing period that lasts a month")
+    static let yearlySubscriptionBillingPeriod = NSLocalizedString("subscription.billing.period.yearly", value: "Yearly", comment: "Type of subscription billing period that lasts a year")
 
     static let addToAnotherDeviceButton = NSLocalizedString("subscription.preferences.add.to.another.device.button", value: "Add to Another Device…", comment: "Button to add subscription to another device")
     static let manageSubscriptionButton = NSLocalizedString("subscription.preferences.manage.subscription.button", value: "Manage Subscription", comment: "Button to manage subscription")
