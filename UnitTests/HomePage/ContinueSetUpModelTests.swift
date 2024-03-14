@@ -206,7 +206,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         let aDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
         userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
         var randomGenerator = MockRandomNumberGenerator()
-        randomGenerator.numberToReturn = 11
+        randomGenerator.numberToReturn = 10
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, randomNumberGenerator: randomGenerator)
         vm.shouldShowAllFeatures = true
 
@@ -254,7 +254,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
 
         var randomGenerator = MockRandomNumberGenerator()
-        randomGenerator.numberToReturn = 11
+        randomGenerator.numberToReturn = 10
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, randomNumberGenerator: randomGenerator)
         vm.shouldShowAllFeatures = true
 
