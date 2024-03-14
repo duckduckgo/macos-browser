@@ -25,16 +25,11 @@ import Common
 
 extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStorage {
     public func store(accessToken: String) throws {
-        let tokenToStore = Self.makeToken(from: accessToken)
-        try store(tokenToStore)
+        try store(accessToken)
     }
 
     public func getAccessToken() throws -> String? {
         guard var token = try fetchToken() else { return nil }
-        if token.hasPrefix("ddg:") {
-            token = token.replacingOccurrences(of: "ddg:", with: "")
-        }
-        os_log("🔵 Wrapper successfully fetched token %{token}@", log: .networkProtection, type: .info, token)
         return token
     }
 
