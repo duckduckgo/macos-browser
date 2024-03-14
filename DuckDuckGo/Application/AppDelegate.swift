@@ -663,7 +663,7 @@ final class WaitlistBetaThankYouDialogViewModel: ObservableObject {
 
 final class WaitlistBetaThankYouDialogViewController: NSViewController {
 
-    private let defaultSize = CGSize(width: 420, height: 460)
+    private let defaultSize = CGSize(width: 450, height: 470)
     private let viewModel: WaitlistBetaThankYouDialogViewModel
 
     private var heightConstraint: NSLayoutConstraint?
@@ -686,7 +686,7 @@ final class WaitlistBetaThankYouDialogViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let feedbackFormView = WaitlistBetaThankYouView(copy: .vpn)
+        let feedbackFormView = WaitlistBetaThankYouView(copy: .personalInformationRemoval)
         let hostingView = NSHostingView(rootView: feedbackFormView.environmentObject(self.viewModel))
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(hostingView)
@@ -707,13 +707,40 @@ final class WaitlistBetaThankYouDialogViewController: NSViewController {
 }
 
 struct WaitlistBetaThankYouCopy {
-    static let vpn = WaitlistBetaThankYouCopy(
-        title: "DuckDuckGo VPN early access is over",
-        subtitle: "Thank you for being a tester!"
+    static let personalInformationRemoval = WaitlistBetaThankYouCopy(
+        title: "Personal Information Removal early access is over",
+        subtitle: "Thank you for being a tester!",
+        body1: "To continue using Personal Information Removal, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code THANKYOU",
+        body2: "Offer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. testers when you download from duckduckgo.com/app"
     )
 
     let title: String
     let subtitle: String
+    let body1: String
+    let body2: String
+
+    @available(macOS 12.0, *)
+    func boldedBold1() -> AttributedString {
+        return bolded(text: body1, boldedStrings: ["THANKYOU"])
+    }
+
+    @available(macOS 12.0, *)
+    func boldedBold2() -> AttributedString {
+        return bolded(text: body2, boldedStrings: ["duckduckgo.com/app"])
+    }
+
+    @available(macOS 12.0, *)
+    private func bolded(text: String, boldedStrings: [String]) -> AttributedString {
+        var attributedString = AttributedString(text)
+
+        for boldedString in boldedStrings {
+            if let range = attributedString.range(of: boldedString) {
+                attributedString[range].font = .system(size: 14, weight: .semibold)
+            }
+        }
+
+        return attributedString
+    }
 }
 
 struct WaitlistBetaThankYouView: View {
@@ -726,7 +753,7 @@ struct WaitlistBetaThankYouView: View {
         VStack(spacing: 0) {
             VStack {
                 Text(copy.title)
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 18, weight: .semibold))
                     .padding([.top, .bottom], 24)
             }
             .frame(maxWidth: .infinity)
@@ -739,17 +766,33 @@ struct WaitlistBetaThankYouView: View {
                 .frame(width: 96, height: 96)
                 .padding([.top, .bottom], 24)
 
-            Text("Thank you for being a tester!")
+            Text(copy.subtitle)
                 .font(.system(size: 17, weight: .semibold))
                 .padding([.leading, .trailing, .bottom], 14)
 
-            Text("To continue using Personal Information Removal, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code THANKYOU")
-                .font(.system(size: 14))
-                .padding([.leading, .trailing, .bottom], 14)
+            if #available(macOS 12.0, *) {
+                Text(copy.boldedBold1())
+                    .font(.system(size: 14))
+                    .padding([.leading, .trailing, .bottom], 14)
+                    .lineSpacing(2)
+            } else {
+                Text(copy.body1)
+                    .font(.system(size: 14))
+                    .padding([.leading, .trailing, .bottom], 14)
+                    .lineSpacing(2)
+            }
 
-            Text("Offer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. testers when you download from duckduckgo.com/app")
-                .font(.system(size: 14))
-                .padding([.leading, .trailing], 14)
+            if #available(macOS 12.0, *) {
+                Text(copy.boldedBold2())
+                    .font(.system(size: 14))
+                    .padding([.leading, .trailing, .bottom], 14)
+                    .lineSpacing(2)
+            } else {
+                Text(copy.body2)
+                    .font(.system(size: 14))
+                    .padding([.leading, .trailing, .bottom], 14)
+                    .lineSpacing(2)
+            }
 
             Spacer()
 
