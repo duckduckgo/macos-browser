@@ -57,11 +57,16 @@ final class FindInPageViewController: NSViewController {
         updateFieldStates()
 
         closeButton.toolTip = UserText.findInPageCloseTooltip
-        closeButton.setAccessibilityIdentifier("FindInPageController.closeButton")
         nextButton.toolTip = UserText.findInPageNextTooltip
-        nextButton.setAccessibilityIdentifier("FindInPageController.nextButton")
         previousButton.toolTip = UserText.findInPagePreviousTooltip
+        
+        nextButton.setAccessibilityIdentifier("FindInPageController.nextButton")
+        closeButton.setAccessibilityIdentifier("FindInPageController.closeButton")
         previousButton.setAccessibilityIdentifier("FindInPageController.previousButton")
+        textField.setAccessibilityIdentifier("FindInPageController.textField")
+        textField.setAccessibilityRole(.textField)
+        statusField.setAccessibilityIdentifier("FindInPageController.statusField")
+        statusField.setAccessibilityRole(.textField)
     }
 
     @IBAction func findInPageNext(_ sender: Any?) {
