@@ -64,8 +64,9 @@ jobs:
           # else
             git checkout "${release_branch}"
             latest_tag="$(git describe --tags --abbrev=0)"
-            latest_tag="1.78.0"
             echo "git diff --name-only \"$latest_tag\"..\"${release_branch}\""
+            git diff --name-only \"$latest_tag\"..\"${release_branch}\"
+            echo "diff computed"
             changed_files="$(git diff --name-only "$latest_tag".."${release_branch}" | grep -v -E '.github|scripts')"
             echo "changed_files=${changed_files}"
 
