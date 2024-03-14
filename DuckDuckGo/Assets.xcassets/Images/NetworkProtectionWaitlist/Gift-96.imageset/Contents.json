@@ -1,12 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "Gift-96.pdf",
+      "filename" : "Gift-New-96x96.pdf",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
+  },
+  "properties" : {
+    "preserves-vector-representation" : true
   }
 }

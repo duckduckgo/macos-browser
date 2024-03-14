@@ -31,6 +31,7 @@ import PixelKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
+import SwiftUI
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -293,6 +294,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         subscribeToDataImportCompleteNotification()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
+
+        let thankYouModalView = WaitlistBetaThankYouDialogViewController()
+        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
+        if let thankYouWindow = thankYouWindowController.window {
+            WindowsManager.windows.first?.beginSheet(thankYouWindow)
+        }
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
         networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
@@ -627,3 +634,152 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 }
 
 #endif
+
+// MARK: New Modal
+
+protocol WaitlistBetaThankYouDialogViewModelDelegate: AnyObject {
+    func waitlistBetaThankYouViewModelDismissedView(_ viewModel: WaitlistBetaThankYouDialogViewModel)
+}
+
+final class WaitlistBetaThankYouDialogViewModel: ObservableObject {
+
+    enum ViewAction {
+        case close
+    }
+
+    weak var delegate: WaitlistBetaThankYouDialogViewModelDelegate?
+
+    init() {}
+
+    @MainActor
+    func process(action: ViewAction) async {
+        switch action {
+        case .close:
+            delegate?.waitlistBetaThankYouViewModelDismissedView(self)
+        }
+    }
+
+}
+
+final class WaitlistBetaThankYouDialogViewController: NSViewController {
+
+    private let defaultSize = CGSize(width: 420, height: 460)
+    private let viewModel: WaitlistBetaThankYouDialogViewModel
+
+    private var heightConstraint: NSLayoutConstraint?
+    private var cancellables = Set<AnyCancellable>()
+
+    init() {
+        self.viewModel = WaitlistBetaThankYouDialogViewModel()
+        super.init(nibName: nil, bundle: nil)
+        self.viewModel.delegate = self
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func loadView() {
+        view = NSView(frame: NSRect(origin: CGPoint.zero, size: defaultSize))
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let feedbackFormView = WaitlistBetaThankYouView(copy: .vpn)
+        let hostingView = NSHostingView(rootView: feedbackFormView.environmentObject(self.viewModel))
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(hostingView)
+
+        let heightConstraint = hostingView.heightAnchor.constraint(equalToConstant: defaultSize.height)
+        self.heightConstraint = heightConstraint
+
+        NSLayoutConstraint.activate([
+            heightConstraint,
+            hostingView.widthAnchor.constraint(equalToConstant: defaultSize.width),
+            hostingView.topAnchor.constraint(equalTo: view.topAnchor),
+            hostingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            hostingView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            hostingView.rightAnchor.constraint(equalTo: view.rightAnchor)
+        ])
+    }
+
+}
+
+struct WaitlistBetaThankYouCopy {
+    static let vpn = WaitlistBetaThankYouCopy(
+        title: "DuckDuckGo VPN early access is over",
+        subtitle: "Thank you for being a tester!"
+    )
+
+    let title: String
+    let subtitle: String
+}
+
+struct WaitlistBetaThankYouView: View {
+
+    @EnvironmentObject var viewModel: WaitlistBetaThankYouDialogViewModel
+
+    let copy: WaitlistBetaThankYouCopy
+
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack {
+                Text(copy.title)
+                    .font(.system(size: 22, weight: .semibold))
+                    .padding([.top, .bottom], 24)
+            }
+            .frame(maxWidth: .infinity)
+            .background(Color.backgroundSecondary)
+
+            Divider()
+
+            Image("Gift-96")
+                .resizable()
+                .frame(width: 96, height: 96)
+                .padding([.top, .bottom], 24)
+
+            Text("Thank you for being a tester!")
+                .font(.system(size: 17, weight: .semibold))
+                .padding([.leading, .trailing, .bottom], 14)
+
+            Text("To continue using Personal Information Removal, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code THANKYOU")
+                .font(.system(size: 14))
+                .padding([.leading, .trailing, .bottom], 14)
+
+            Text("Offer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. testers when you download from duckduckgo.com/app")
+                .font(.system(size: 14))
+                .padding([.leading, .trailing], 14)
+
+            Spacer()
+
+            button(text: "Close", action: .close)
+                .padding(16)
+        }
+        .multilineTextAlignment(.center)
+    }
+
+    @ViewBuilder
+    func button(text: String, action: WaitlistBetaThankYouDialogViewModel.ViewAction) -> some View {
+        Button(action: {
+            Task {
+                await viewModel.process(action: action)
+            }
+        }, label: {
+            Text(text)
+                .frame(maxWidth: .infinity)
+        })
+        .controlSize(.large)
+        .keyboardShortcut(.defaultAction)
+        .frame(maxWidth: .infinity)
+    }
+
+}
+
+extension WaitlistBetaThankYouDialogViewController: WaitlistBetaThankYouDialogViewModelDelegate {
+
+    func waitlistBetaThankYouViewModelDismissedView(_ viewModel: WaitlistBetaThankYouDialogViewModel) {
+        dismiss()
+    }
+
+}
