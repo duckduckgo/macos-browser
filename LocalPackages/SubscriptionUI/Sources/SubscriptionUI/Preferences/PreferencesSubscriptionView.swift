@@ -196,6 +196,9 @@ public struct PreferencesSubscriptionView: View {
             }
             .fixedSize()
         }
+        .onAppear {
+            model.fetchAndUpdateSubscriptionDetails()
+        }
     }
 
     @ViewBuilder

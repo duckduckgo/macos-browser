@@ -97,11 +97,32 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         if let token = accountManager.accessToken {
             Task {
-                let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
+                let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .returnCacheDataElseLoad)
                 if case .success(let subscription) = subscriptionResult {
                     self.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
                     self.subscriptionPlatform = subscription.platform
                     self.subscriptionStatus = subscription.status
+                }
+
+                switch await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .returnCacheDataElseLoad) {
+                case let .success(result):
+                    self.hasAccessToVPN = result
+                case .failure:
+                    self.hasAccessToVPN = false
+                }
+
+                switch await self.accountManager.hasEntitlement(for: .dataBrokerProtection, cachePolicy: .returnCacheDataElseLoad) {
+                case let .success(result):
+                    self.hasAccessToDBP = result
+                case .failure:
+                    self.hasAccessToDBP = false
+                }
+
+                switch await self.accountManager.hasEntitlement(for: .identityTheftRestoration, cachePolicy: .returnCacheDataElseLoad) {
+                case let .success(result):
+                    self.hasAccessToITR = result
+                case .failure:
+                    self.hasAccessToITR = false
                 }
             }
         }
