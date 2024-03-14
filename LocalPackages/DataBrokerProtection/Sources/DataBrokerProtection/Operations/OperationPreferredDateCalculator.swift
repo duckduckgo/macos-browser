@@ -41,7 +41,6 @@ struct OperationPreferredDateCalculator {
         }
 
         switch lastEvent.type {
-
         case .optOutConfirmed:
             if isDeprecated {
                 return nil
@@ -52,7 +51,7 @@ struct OperationPreferredDateCalculator {
             return Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         case .error:
             return Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
-        case .optOutStarted, .scanStarted:
+        case .optOutStarted, .scanStarted, .reAppearence:
             return currentPreferredRunDate
         case .optOutRequested:
             return Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)
@@ -80,7 +79,7 @@ struct OperationPreferredDateCalculator {
             }
         case .error:
             return date.now.addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
-        case .optOutStarted, .scanStarted, .noMatchFound:
+        case .optOutStarted, .scanStarted, .noMatchFound, .reAppearence:
             return currentPreferredRunDate
         case .optOutConfirmed, .optOutRequested:
             return nil

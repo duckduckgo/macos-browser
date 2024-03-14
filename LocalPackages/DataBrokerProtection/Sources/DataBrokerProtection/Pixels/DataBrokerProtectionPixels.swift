@@ -54,6 +54,10 @@ public enum DataBrokerProtectionPixels {
         static let pattern = "pattern"
         static let isParent = "is_parent"
         static let actionIDKey = "action_id"
+        static let hadNewMatch = "had_new_match"
+        static let hadReAppereance = "had_re-appearance"
+        static let scanCoverage = "scan_coverage"
+        static let removals = "removals"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -117,6 +121,12 @@ public enum DataBrokerProtectionPixels {
     case dailyActiveUser
     case weeklyActiveUser
     case monthlyActiveUser
+
+    // KPIs - events
+    case weeklyReportScanning(hadNewMatch: Bool, hadReAppereance: Bool, scanCoverage: Int)
+    case weeklyReportRemovals(removals: Int)
+    case scanningEventNewMatch
+    case scanningEventReAppearance
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -190,6 +200,11 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .dailyActiveUser: return "m_mac_dbp_engagement_dau"
         case .weeklyActiveUser: return "m_mac_dbp_engagement_wau"
         case .monthlyActiveUser: return "m_mac_dbp_engagement_mau"
+
+        case .weeklyReportScanning: return "m_mac_dbp_event_weekly-report_scanning"
+        case .weeklyReportRemovals: return "m_mac_dbp_event_weekly-report_removals"
+        case .scanningEventNewMatch: return "m_mac_dbp_event_scanning-events_new-match"
+        case .scanningEventReAppearance: return "m_mac_dbp_event_scanning-events_re-appearance"
         }
     }
 
@@ -251,6 +266,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             }
 
             return params
+        case .weeklyReportScanning(let hadNewMatch, let hadReAppereance, let scanCoverage):
+            return [Consts.hadNewMatch: hadNewMatch.description, Consts.hadReAppereance: hadReAppereance.description, Consts.scanCoverage: scanCoverage.description]
+        case .weeklyReportRemovals(let removals):
+            return [Consts.removals: String(removals)]
         case .backgroundAgentStarted,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
@@ -266,7 +285,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                 .dailyActiveUser,
                 .weeklyActiveUser,
-                .monthlyActiveUser:
+                .monthlyActiveUser,
+                .scanningEventNewMatch,
+                .scanningEventReAppearance:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -341,7 +362,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                     .dailyActiveUser,
                     .weeklyActiveUser,
-                    .monthlyActiveUser:
+                    .monthlyActiveUser,
+                    .weeklyReportScanning,
+                    .weeklyReportRemovals,
+                    .scanningEventNewMatch,
+                    .scanningEventReAppearance:
 
                 PixelKit.fire(event)
             }
