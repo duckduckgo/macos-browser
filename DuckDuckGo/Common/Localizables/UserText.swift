@@ -1008,7 +1008,6 @@ struct UserText {
 
     // "data-broker-protection.optionsMenu" - Menu item data broker protection feature
     static let dataBrokerProtectionOptionsMenuItem = "Personal Information Removal"
-    static let dataBrokerProtectionScanOptionsMenuItem = "Personal Information Removal Scan"
     // "tab.dbp.title" - Tab data broker protection title
     static let tabDataBrokerProtectionTitle = "Personal Information Removal"
 
