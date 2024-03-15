@@ -155,6 +155,7 @@ public struct PreferencesSubscriptionView: View {
                 showingSheet.toggle()
                 model.userEventHandler(.iHaveASubscriptionClick)
             }
+            .buttonStyle(DismissActionButtonStyle())
         }
     }
 

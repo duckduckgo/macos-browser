@@ -23,7 +23,7 @@ extension UserText {
     // "network.protection.tunnel.name" - The name of the NetP VPN that will be visible in the system to the user
     static let networkProtectionTunnelName = "DuckDuckGo Network Protection"
     // "network.protection" - Menu item for opening Network Protection
-    static let networkProtection = "Network Protection"
+    static let networkProtection = "VPN"
 
     // MARK: - Navigation Bar
     // "network.protection.status.button.tooltip" - The tooltip for NetP's nav bar button

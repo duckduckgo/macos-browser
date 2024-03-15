@@ -332,7 +332,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private var dateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
+        dateFormatter.dateStyle = .long
         dateFormatter.timeStyle = .none
 
         return dateFormatter

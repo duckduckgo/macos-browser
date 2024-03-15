@@ -343,21 +343,22 @@ final class MoreOptionsMenu: NSMenu {
 
 #if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
+            let networkProtectionItem: NSMenuItem
+
             let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
             let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
 
-            let networkProtectionItem: NSMenuItem
-
             // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
             // badge to bring it to their attention.
-            if !isWaitlistUser && !hasAuthToken {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+                networkProtectionItem = makeNetworkProtectionItem(showNewLabel: false)
+            } else if !isWaitlistUser && !hasAuthToken {
                 networkProtectionItem = makeNetworkProtectionItem(showNewLabel: true)
             } else {
                 networkProtectionItem = makeNetworkProtectionItem(showNewLabel: false)
             }
 
             items.append(networkProtectionItem)
-
 #if SUBSCRIPTION
             if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated {
                 Task {
@@ -445,19 +446,13 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionScanOptionsMenuItem,
-                                                  action: #selector(openSubscriptionPurchasePage(_:)),
-                                                  keyEquivalent: "")
-            .targetting(self)
-            .withImage(.dbpIcon)
-
         let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
             .withImage(.subscriptionIcon)
 
-        return [dataBrokerProtectionItem, privacyProItem]
+        return [privacyProItem]
     }
 #endif
 
