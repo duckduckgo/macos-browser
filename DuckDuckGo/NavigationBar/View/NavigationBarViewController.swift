@@ -327,7 +327,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         #if SUBSCRIPTION
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
             let accountManager = AccountManager()
             let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
 

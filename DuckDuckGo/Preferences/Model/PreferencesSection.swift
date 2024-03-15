@@ -33,11 +33,11 @@ struct PreferencesSection: Hashable, Identifiable {
 
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
 
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
 #if SUBSCRIPTION
+            if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
                 panes = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
-#endif
             }
+#endif
 
             if includingSync {
                 if let generalIndex = panes.firstIndex(of: .general) {
