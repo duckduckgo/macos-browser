@@ -79,11 +79,11 @@ public final class DebugEvent: PixelKitEvent {
             let nsError = error as NSError
 
             params[PixelKit.Parameters.errorCode] = "\(nsError.code)"
-            params[PixelKit.Parameters.errorDesc] = nsError.domain
+            params[PixelKit.Parameters.errorDomain] = nsError.domain
 
             if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
                 params[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-                params[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
+                params[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
             }
 
             if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {

@@ -50,7 +50,8 @@ extension NetworkProtectionKeychainTokenStore {
     convenience init() {
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false)
+                  isSubscriptionEnabled: false,
+                  accessTokenProvider: { nil })
     }
 }
 
