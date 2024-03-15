@@ -131,6 +131,102 @@ class FindInPageTests: XCTestCase {
 		XCTAssertEqual(statusFieldTextContent, "1 of 4") // Note: this is not a localized test element, and it should have a localization strategy.
 	}
 
+	func test_findInPage_findNextGoesToNextOccurrence() throws {
+		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
+		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe.")
+		app.typeKey("f", modifierFlags: .command)
+		XCTAssertTrue(findInPageCloseButton.waitForExistence(timeout: timeout), "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist.")
+
+		app.typeText("maximus\r")
+		let statusField = app.textFields["FindInPageController.statusField"]
+		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
+		XCTAssertNotNil(statusField.value as? String, "There was no string content in the \"Find in Page\" status field when it was expected.")
+		let statusFieldTextContent = statusField.value as! String
+
+		XCTAssertEqual(statusFieldTextContent, "1 of 4") // Note: this is not a localized test element, and it should have a localization strategy.
+
+		let findInPageScreenshot = loremIpsumWebView.screenshot()
+
+		let findNextMenuBarItem = app.menuItems["MainMenu.findNext"]
+		XCTAssertTrue(findNextMenuBarItem.waitForExistence(timeout: timeout), "Couldn't find \"Find Next\" main menu bar item in a reasonable timeframe.")
+
+		findNextMenuBarItem.click()
+		let updatedStatusField = app.textFields["FindInPageController.statusField"]
+		let updatedStatusFieldTextContent = updatedStatusField.value as! String
+		XCTAssertTrue(updatedStatusField.waitForExistence(timeout: timeout), "Couldn't find the updated \"Find in Page\" statusField in a reasonable timeframe.")
+		XCTAssertEqual(updatedStatusFieldTextContent, "2 of 4") // Note: this is not a localized test element, and it should have a localization strategy.
+		let findNextScreenshot = loremIpsumWebView.screenshot()
+
+		XCTAssertNotEqual(findInPageScreenshot.pngRepresentation, findNextScreenshot.pngRepresentation) // A screenshot of the find results and the find next results should be different
+		let count = findNextScreenshot.image.numberOfMatchingPixels(of: .findHighlightColor)
+		let expectedNumberOfMatchingPixels = 150
+		XCTAssertGreaterThan(count, expectedNumberOfMatchingPixels, "Although the highlight color was detected, there are expected to be more than \(expectedNumberOfMatchingPixels) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match, and the page text and background is black, and this test only found \(count) matching pixels.")
+	}
+
+	func test_findInPage_findNextNextArrowGoesToNextOccurrence() throws {
+		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
+		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe.")
+		app.typeKey("f", modifierFlags: .command)
+		XCTAssertTrue(findInPageCloseButton.waitForExistence(timeout: timeout), "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist.")
+
+		app.typeText("maximus\r")
+		let statusField = app.textFields["FindInPageController.statusField"]
+		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
+		XCTAssertNotNil(statusField.value as? String, "There was no string content in the \"Find in Page\" status field when it was expected.")
+		let statusFieldTextContent = statusField.value as! String
+
+		XCTAssertEqual(statusFieldTextContent, "1 of 4") // Note: this is not a localized test element, and it should have a localization strategy.
+
+		let findInPageScreenshot = loremIpsumWebView.screenshot()
+
+		let findInPageNextButton = XCUIApplication().windows.buttons["FindInPageController.nextButton"]
+		XCTAssertTrue(findInPageNextButton.waitForExistence(timeout: timeout), "Couldn't find \"Find Next\" main menu bar item in a reasonable timeframe.")
+
+		findInPageNextButton.click()
+		let updatedStatusField = app.textFields["FindInPageController.statusField"]
+		let updatedStatusFieldTextContent = updatedStatusField.value as! String
+		XCTAssertTrue(updatedStatusField.waitForExistence(timeout: timeout), "Couldn't find the updated \"Find in Page\" statusField in a reasonable timeframe.")
+		XCTAssertEqual(updatedStatusFieldTextContent, "2 of 4") // Note: this is not a localized test element, and it should have a localization strategy.
+		let findNextScreenshot = loremIpsumWebView.screenshot()
+
+		XCTAssertNotEqual(findInPageScreenshot.pngRepresentation, findNextScreenshot.pngRepresentation) // A screenshot of the find results and the find next results should be different
+		let count = findNextScreenshot.image.numberOfMatchingPixels(of: .findHighlightColor)
+		let expectedNumberOfMatchingPixels = 150
+		XCTAssertGreaterThan(count, expectedNumberOfMatchingPixels, "Although the highlight color was detected, there are expected to be more than \(expectedNumberOfMatchingPixels) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match, and the page text and background is black, and this test only found \(count) matching pixels.")
+	}
+
+	func test_findInPage_commandGGoesToNextOccurrence() throws {
+		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
+		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		XCTAssertTrue(loremIpsumWebView.waitForExistence(timeout: timeout), "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe.")
+		app.typeKey("f", modifierFlags: .command)
+		XCTAssertTrue(findInPageCloseButton.waitForExistence(timeout: timeout), "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist.")
+
+		app.typeText("maximus\r")
+		let statusField = app.textFields["FindInPageController.statusField"]
+		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
+		XCTAssertNotNil(statusField.value as? String, "There was no string content in the \"Find in Page\" status field when it was expected.")
+		let statusFieldTextContent = statusField.value as! String
+
+		XCTAssertEqual(statusFieldTextContent, "1 of 4") // Note: this is not a localized test element, and it should have a localization strategy.
+
+		let findInPageScreenshot = loremIpsumWebView.screenshot()
+
+		app.typeKey("g", modifierFlags: [.command])
+		let updatedStatusField = app.textFields["FindInPageController.statusField"]
+		let updatedStatusFieldTextContent = updatedStatusField.value as! String
+		XCTAssertTrue(updatedStatusField.waitForExistence(timeout: timeout), "Couldn't find the updated \"Find in Page\" statusField in a reasonable timeframe.")
+		XCTAssertEqual(updatedStatusFieldTextContent, "2 of 4") // Note: this is not a localized test element, and it should have a localization strategy.
+		let findNextScreenshot = loremIpsumWebView.screenshot()
+
+		XCTAssertNotEqual(findInPageScreenshot.pngRepresentation, findNextScreenshot.pngRepresentation) // A screenshot of the find results and the find next results should be different
+		let count = findNextScreenshot.image.numberOfMatchingPixels(of: .findHighlightColor)
+		let expectedNumberOfMatchingPixels = 150
+		XCTAssertGreaterThan(count, expectedNumberOfMatchingPixels, "Although the highlight color was detected, there are expected to be more than \(expectedNumberOfMatchingPixels) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match, and the page text and background is black, and this test only found \(count) matching pixels.")
+	}
+
 	func test_findInPage_showsFocusAndOccurrenceHighlighting() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
 		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
@@ -144,25 +240,10 @@ class FindInPageTests: XCTestCase {
 		let statusFieldTextContent = statusField.value as! String
 		XCTAssertEqual(statusFieldTextContent, "1 of 4", "Test cannot continue because there was an unexpected number of matches for a \"Find in Page\" operation.") // Note: this is not a localized test element, and it should have a localization strategy.
 
-		let webViewWithSelectedWordsScreenshot = loremIpsumWebView.screenshot().image.withNoAlphaChannel() // Screenshot of Find in Page state
-		XCTAssertNotNil(webViewWithSelectedWordsScreenshot, "It wasn't possible to remove the alpha channel of the screenshot image when it was expected.")
-		let pixelData = webViewWithSelectedWordsScreenshot!.pixels().pixelArray // Pixels of the screenshot we will check for the highlight color
-		let colorSpace = webViewWithSelectedWordsScreenshot!.pixels().colorSpace // We have to check in the same colorspace of the screenshot
-		let findHighlightColor: NSColor = .findHighlightColor // This is the color the user should see on a selected find hit
-		XCTAssertNotNil(findHighlightColor.usingColorSpace(colorSpace), "It wasn't possible to get the local colorspace for the UI Tests when this is expected.")
-		let findHighlightColorWithColorSpace = findHighlightColor.usingColorSpace(colorSpace)! // And this is the same color converted to the screenshot's colorspace, so we can compare
-		let findHighlightRed = UInt8(findHighlightColorWithColorSpace.redComponent * 255.999999) // .findHighlightColor color components in 0-255 values in this colorspace
-		let findHighlightGreen = UInt8(findHighlightColorWithColorSpace.greenComponent * 255.999999)
-		let findHighlightBlue = UInt8(findHighlightColorWithColorSpace.blueComponent * 255.999999)
-		let pixelSet = Set(pixelData) // A set of the pixels
-		var matchingPixels: [Pixel: Int] = [:]
-		if pixelSet.contains(Pixel(red: findHighlightRed, green: findHighlightGreen, blue: findHighlightBlue, alpha: 255)) { // If there is a match
-			pixelData.forEach { matchingPixels[$0, default: 0] += 1 } // See if it is a number of matches we believe is a highlighted area of the screenshot
-		} else {
-			XCTFail("The \"Find in Page\" selected highlight color was not detected in the page where hits are expected. If this is happening in a test where you can see the highlight on the screenshot, it is possible that the color tolerances have to be loosened for the color equality test..")
-		}
+		let webViewWithSelectedWordsScreenshot = loremIpsumWebView.screenshot()
+		let count = webViewWithSelectedWordsScreenshot.image.numberOfMatchingPixels(of: .findHighlightColor)
 		let expectedNumberOfMatchingPixels = 150
-		XCTAssertGreaterThan(matchingPixels.count, expectedNumberOfMatchingPixels, "Although the highlight color was detected, there are expected to be more than \(expectedNumberOfMatchingPixels) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match, and the page text and background is black, and this test only found \(matchingPixels.count) matching pixels.")
+		XCTAssertGreaterThan(count, expectedNumberOfMatchingPixels, "Although the highlight color was detected, there are expected to be more than \(expectedNumberOfMatchingPixels) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match, and the page text and background is black, and this test only found \(count) matching pixels.")
 	}
 }
 
@@ -208,6 +289,27 @@ extension FindInPageTests {
 }
 
 extension NSImage {
+
+	func numberOfMatchingPixels(of colorToMatch: NSColor) -> Int {
+		let imageNoAlpha =	self.withNoAlphaChannel() // We remove the alpha, since this is for screenshot comparisons
+		XCTAssertNotNil(imageNoAlpha, "It wasn't possible to remove the alpha channel of the image when it was expected.")
+		let pixelData = imageNoAlpha!.pixels().pixelArray // Pixels of the image we will check for the requested color
+		let colorSpace = imageNoAlpha!.pixels().colorSpace // We have to check in the same colorspace of the image
+		XCTAssertNotNil(colorToMatch.usingColorSpace(colorSpace), "It wasn't possible to get the local colorspace for the UI Tests when this is expected.")
+		let colorToMatchWithColorSpace = colorToMatch.usingColorSpace(colorSpace)! // And this is the same color converted to the image's colorspace, so we can compare
+		let colorToMatchRed = UInt8(colorToMatchWithColorSpace.redComponent * 255.999999) // color components in 0-255 values in this colorspace
+		let colorToMatchGreen = UInt8(colorToMatchWithColorSpace.greenComponent * 255.999999)
+		let colorToMatchBlue = UInt8(colorToMatchWithColorSpace.blueComponent * 255.999999)
+		let pixelSet = Set(pixelData) // A set of the pixels so we do our first check for existence of the color without enumerating a very large array
+		var matchingPixels: [Pixel: Int] = [:]
+		if pixelSet.contains(Pixel(red: colorToMatchRed, green: colorToMatchGreen, blue: colorToMatchBlue, alpha: 255)) { // If there is a match in the set
+			pixelData.forEach { matchingPixels[$0, default: 0] += 1 } // Get all the matches in the array
+		} else {
+			return 0
+		}
+		return matchingPixels.count
+	}
+
 	func pixels() -> (pixelArray: [Pixel], colorSpace: NSColorSpace) {
 		let cgImage = cgImage(forProposedRect: nil, context: nil, hints: nil)
 		let bitmap = NSBitmapImageRep(cgImage: cgImage!)
