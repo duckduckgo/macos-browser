@@ -47,11 +47,11 @@ struct OperationPreferredDateCalculator {
             } else {
                 return Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
             }
-        case .noMatchFound, .matchesFound:
+        case .noMatchFound, .matchesFound, .reAppearence:
             return Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         case .error:
             return Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
-        case .optOutStarted, .scanStarted, .reAppearence:
+        case .optOutStarted, .scanStarted:
             return currentPreferredRunDate
         case .optOutRequested:
             return Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)
@@ -69,7 +69,7 @@ struct OperationPreferredDateCalculator {
         }
 
         switch lastEvent.type {
-        case .matchesFound:
+        case .matchesFound, .reAppearence:
             if let extractedProfileID = extractedProfileID, shouldScheduleNewOptOut(events: historyEvents,
                                                                                     extractedProfileId: extractedProfileID,
                                                                                     schedulingConfig: schedulingConfig) {
@@ -79,7 +79,7 @@ struct OperationPreferredDateCalculator {
             }
         case .error:
             return date.now.addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
-        case .optOutStarted, .scanStarted, .noMatchFound, .reAppearence:
+        case .optOutStarted, .scanStarted, .noMatchFound:
             return currentPreferredRunDate
         case .optOutConfirmed, .optOutRequested:
             return nil
