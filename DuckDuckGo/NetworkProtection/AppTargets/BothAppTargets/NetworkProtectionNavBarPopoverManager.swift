@@ -124,7 +124,9 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 Task { [weak self] in
                     await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
                 }
-            })
+            },
+                                                   featureActivation: NetworkProtectionKeychainTokenStore()
+            )
             popover.delegate = delegate
 
             networkProtectionPopover = popover

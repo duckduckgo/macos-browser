@@ -98,6 +98,8 @@ extension NetworkProtectionStatusView {
 
         private let uninstallHandler: () async -> Void
 
+        private let featureActivation: NetworkProtectionFeatureActivation
+
         private var cancellables = Set<AnyCancellable>()
 
         // MARK: - Dispatch Queues
@@ -119,7 +121,8 @@ extension NetworkProtectionStatusView {
                     isMenuBarStatusView: Bool,
                     runLoopMode: RunLoop.Mode? = nil,
                     userDefaults: UserDefaults,
-                    uninstallHandler: @escaping () async -> Void) {
+                    uninstallHandler: @escaping () async -> Void,
+                    featureActivation: NetworkProtectionFeatureActivation) {
 
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -131,6 +134,7 @@ extension NetworkProtectionStatusView {
             self.runLoopMode = runLoopMode
             self.appLauncher = appLauncher
             self.uninstallHandler = uninstallHandler
+            self.featureActivation = featureActivation
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
@@ -161,7 +165,9 @@ extension NetworkProtectionStatusView {
             userDefaults
                 .publisher(for: \.networkProtectionEntitlementsValid)
                 .receive(on: DispatchQueue.main)
-                .map { !$0 }
+                .map { entitlementsValid in
+                    return !(entitlementsValid || featureActivation.isFeatureActivated)
+                }
                 .assign(to: \.shouldShowSubscriptionExpired, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }
