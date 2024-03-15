@@ -35,9 +35,9 @@ struct DataBrokerRunCustomJSONView: View {
                     HStack {
                         TextField("First name", text: $viewModel.names[index].first)
                             .padding()
-                        TextField("Last name", text: $viewModel.names[index].last)
-                            .padding()
                         TextField("Middle", text: $viewModel.names[index].middle)
+                            .padding()
+                        TextField("Last name", text: $viewModel.names[index].last)
                             .padding()
                     }
                 }
@@ -52,7 +52,12 @@ struct DataBrokerRunCustomJSONView: View {
                     HStack {
                         TextField("City", text: $viewModel.addresses[index].city)
                             .padding()
-                        TextField("State", text: $viewModel.addresses[index].state)
+                        TextField("State (two characters format)", text: $viewModel.addresses[index].state)
+                            .onChange(of: viewModel.addresses[index].state) { newValue in
+                                if newValue.count > 2 {
+                                    viewModel.addresses[index].state = String(newValue.prefix(2))
+                                }
+                            }
                             .padding()
                     }
                 }
