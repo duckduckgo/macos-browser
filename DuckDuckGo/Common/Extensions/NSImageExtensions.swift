@@ -59,6 +59,19 @@ extension NSImage {
         return image
     }
 
+    func cropped(to rect: CGRect) -> NSImage {
+        let image = NSImage(size: rect.size)
+        image.lockFocus()
+
+        let targetRect = rect
+        let currentRect = NSRect(x: 0, y: 0, width: self.size.width, height: self.size.height)
+        
+        self.draw(in: targetRect, from: rect, operation: .copy, fraction: 1.0)
+
+        image.unlockFocus()
+        return image
+    }
+
     func ciImage(with size: NSSize?) -> CIImage {
         var rect = NSRect(origin: .zero, size: size ?? self.size)
         return CIImage(cgImage: self.cgImage(forProposedRect: &rect, context: nil, hints: nil)!)
