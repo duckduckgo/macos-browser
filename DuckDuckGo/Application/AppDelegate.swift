@@ -81,6 +81,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
+#if SUBSCRIPTION
+    let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+#endif
+
 #if NETWORK_PROTECTION && SUBSCRIPTION
     private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
 #endif
@@ -182,6 +186,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
 
+#if SUBSCRIPTION
+    #if APPSTORE || !STRIPE
+        SubscriptionPurchaseEnvironment.current = .appStore
+    #else
+        SubscriptionPurchaseEnvironment.current = .stripe
+    #endif
+        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+                                                                                 purchasePlatform: SubscriptionPurchaseEnvironment.current)
+#endif
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -245,12 +258,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
                                                      defaultValue: defaultEnvironment).wrappedValue
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
-
-    #if APPSTORE || !STRIPE
-        SubscriptionPurchaseEnvironment.current = .appStore
-    #else
-        SubscriptionPurchaseEnvironment.current = .stripe
-    #endif
 
         Task {
             let accountManager = AccountManager()
