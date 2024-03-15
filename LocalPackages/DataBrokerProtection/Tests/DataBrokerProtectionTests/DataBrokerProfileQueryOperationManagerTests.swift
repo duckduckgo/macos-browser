@@ -1041,7 +1041,7 @@ extension DataBroker {
     }
 
     static func mockWithURL(_ url: String) -> DataBroker {
-        .init(name: "Test", 
+        .init(name: "Test",
               url: url,
               steps: [Step](),
               version: "1.0",
