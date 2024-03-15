@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1710170291349,
+    "version": 1710501855617,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -265,6 +265,18 @@
                     "domain": "meneame.net"
                 },
                 {
+                    "domain": "espn.com"
+                },
+                {
+                    "domain": "usaa.com"
+                },
+                {
+                    "domain": "publico.es"
+                },
+                {
+                    "domain": "cnbc.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -287,7 +299,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "8458a9cc012a9613e1497204003be946"
+            "hash": "ec25d3a0b633fbc4f208f35999f4ab0e"
         },
         "autofill": {
             "exceptions": [
@@ -968,8 +980,11 @@
         },
         "clientBrandHint": {
             "exceptions": [],
+            "settings": {
+                "domains": []
+            },
             "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "hash": "d35dd75140cdfe166762013e59eb076d"
         },
         "contentBlocking": {
             "state": "enabled",
@@ -3905,6 +3920,23 @@
                         ]
                     },
                     {
+                        "domain": "uzone.id",
+                        "rules": [
+                            {
+                                "selector": "[class^='box-ads']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[class^='section-ads']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".parallax-container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "washingtontimes.com",
                         "rules": [
                             {
@@ -3984,7 +4016,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "3dc2d5b9a38827f46503a3b5882c7e33"
+            "hash": "3098b766cd343378237605f207f4fd17"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4878,6 +4910,16 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "2mdn.net": {
+                        "rules": [
+                            {
+                                "rule": "2mdn.net",
+                                "domains": [
+                                    "crunchyroll.com"
+                                ]
+                            }
+                        ]
+                    },
                     "3lift.com": {
                         "rules": [
                             {
@@ -6013,21 +6055,10 @@
                     "fwmrm.net": {
                         "rules": [
                             {
-                                "rule": "2a7e9.v.fwmrm.net/ad/g/1",
+                                "rule": "v.fwmrm.net/ad",
                                 "domains": [
+                                    "6play.fr",
                                     "channel4.com"
-                                ]
-                            },
-                            {
-                                "rule": "2a7e9.v.fwmrm.net/ad/l/1",
-                                "domains": [
-                                    "channel4.com"
-                                ]
-                            },
-                            {
-                                "rule": "7cbf2.v.fwmrm.net/ad/g/1",
-                                "domains": [
-                                    "6play.fr"
                                 ]
                             }
                         ]
@@ -6197,6 +6228,7 @@
                                 "domains": [
                                     "arkadium.com",
                                     "bloomberg.com",
+                                    "crunchyroll.com",
                                     "gamak.tv",
                                     "games.washingtonpost.com",
                                     "metro.co.uk",
@@ -7946,7 +7978,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "4325ed151d126936fbeb9a608d77da86"
+            "hash": "1bbefc586e08d2c42b5db17ed95cc8e5"
         },
         "trackingCookies1p": {
             "settings": {
