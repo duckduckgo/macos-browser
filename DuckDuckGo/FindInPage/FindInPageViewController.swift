@@ -59,7 +59,7 @@ final class FindInPageViewController: NSViewController {
         closeButton.toolTip = UserText.findInPageCloseTooltip
         nextButton.toolTip = UserText.findInPageNextTooltip
         previousButton.toolTip = UserText.findInPagePreviousTooltip
-        
+
         nextButton.setAccessibilityIdentifier("FindInPageController.nextButton")
         closeButton.setAccessibilityIdentifier("FindInPageController.closeButton")
         previousButton.setAccessibilityIdentifier("FindInPageController.previousButton")
