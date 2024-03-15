@@ -214,6 +214,14 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasExecuteJavascriptCalled = true
     }
 
+    func takeSnaphost(path: String, fileName: String) async throws {
+
+    }
+
+    func saveHTML(path: String, fileName: String) async throws {
+
+    }
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil

@@ -170,7 +170,12 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
             switch dataBrokerProtectionError {
             case .httpError(let httpCode):
                 if httpCode < 500 {
-                    errorCategory = .clientError(httpCode: httpCode)
+                    if httpCode == 404 {
+                        fireScanFailed()
+                        return
+                    } else {
+                        errorCategory = .clientError(httpCode: httpCode)
+                    }
                 } else {
                     errorCategory = .serverError(httpCode: httpCode)
                 }

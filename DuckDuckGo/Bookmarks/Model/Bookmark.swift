@@ -23,25 +23,32 @@ internal class BaseBookmarkEntity: Identifiable {
 
     static func singleEntity(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@ AND %K == NO", #keyPath(BookmarkEntity.uuid), uuid, #keyPath(BookmarkEntity.isPendingDeletion))
+        request.predicate = NSPredicate(format: "%K == %@ AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.uuid), uuid,
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
     static func favorite(with uuid: String, favoritesFolder: BookmarkEntity) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@ AND %K CONTAINS %@ AND %K == NO AND %K == NO",
+        request.predicate = NSPredicate(format: "%K == %@ AND %K CONTAINS %@ AND %K == NO AND %K == NO AND (%K == NO OR %K == nil)",
                                         #keyPath(BookmarkEntity.uuid),
                                         uuid as CVarArg,
                                         #keyPath(BookmarkEntity.favoriteFolders),
                                         favoritesFolder,
                                         #keyPath(BookmarkEntity.isFolder),
-                                        #keyPath(BookmarkEntity.isPendingDeletion))
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
     static func entities(with identifiers: [String]) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K IN %@ AND %K == NO", #keyPath(BookmarkEntity.uuid), identifiers, #keyPath(BookmarkEntity.isPendingDeletion))
+        request.predicate = NSPredicate(format: "%K IN %@ AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.uuid), identifiers,
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
@@ -98,7 +105,10 @@ final class BookmarkFolder: BaseBookmarkEntity {
 
     static func bookmarkFoldersFetchRequest() -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == YES AND %K == NO", #keyPath(BookmarkEntity.isFolder), #keyPath(BookmarkEntity.isPendingDeletion))
+        request.predicate = NSPredicate(format: "%K == YES AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.isFolder),
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
@@ -135,7 +145,10 @@ final class Bookmark: BaseBookmarkEntity {
 
     static func bookmarksFetchRequest() -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == NO AND %K == NO", #keyPath(BookmarkEntity.isFolder), #keyPath(BookmarkEntity.isPendingDeletion))
+        request.predicate = NSPredicate(format: "%K == NO AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.isFolder),
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
