@@ -164,15 +164,11 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        #if SUBSCRIPTION
-        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
-        #else
         if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         } else {
             actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
         }
-        #endif
     }
 #endif // DBP
 
@@ -345,18 +341,7 @@ final class MoreOptionsMenu: NSMenu {
         if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
             let networkProtectionItem: NSMenuItem
 
-            let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
-            let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
-
-            // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
-            // badge to bring it to their attention.
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
-                networkProtectionItem = makeNetworkProtectionItem(showNewLabel: false)
-            } else if !isWaitlistUser && !hasAuthToken {
-                networkProtectionItem = makeNetworkProtectionItem(showNewLabel: true)
-            } else {
-                networkProtectionItem = makeNetworkProtectionItem(showNewLabel: false)
-            }
+            networkProtectionItem = makeNetworkProtectionItem()
 
             items.append(networkProtectionItem)
 #if SUBSCRIPTION
@@ -489,25 +474,12 @@ final class MoreOptionsMenu: NSMenu {
     }
 
 #if NETWORK_PROTECTION
-    private func makeNetworkProtectionItem(showNewLabel: Bool) -> NSMenuItem {
+    private func makeNetworkProtectionItem() -> NSMenuItem {
         let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(.image(for: .vpnIcon))
 
-        if showNewLabel {
-            let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
-            attributedText.append(NSAttributedString(string: "  "))
-
-            let imageAttachment = NSTextAttachment()
-            imageAttachment.image = .newLabel
-            imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
-
-            attributedText.append(NSAttributedString(attachment: imageAttachment))
-
-            networkProtectionItem.attributedTitle = attributedText
-        } else {
-            networkProtectionItem.title = UserText.networkProtection
-        }
+        networkProtectionItem.title = UserText.networkProtection
 
         return networkProtectionItem
     }

@@ -2,7 +2,7 @@ name: Bump Internal Release
 
 on:
   schedule:
-    - cron: '0 7 * * 2-5' # Run at 07:00 UTC, Tuesday through Friday
+    - cron: '0 5 * * 2-5' # Run at 05:00 UTC, Tuesday through Friday
   workflow_dispatch:
     inputs:
       asana-task-url:
@@ -63,13 +63,21 @@ jobs:
             echo "skip-release=false" >> $GITHUB_OUTPUT
           else
             latest_tag="$(git describe --tags --abbrev=0)"
-            changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}" | grep -v -E '.github|scripts')"
+            latest_tag_sha="$(git rev-parse "$latest_tag")"
+            release_branch_sha="$(git rev-parse "origin/${release_branch}")"
 
-            if [[ ${#changed_files} == 0 ]]; then
-              echo "::warning::No changes to the release branch (or only scripts and workflows). Skipping automatic release."
+            if [[ "${latest_tag_sha}" == "${release_branch_sha}" ]]; then
+              echo "::warning::Release branch's HEAD is already tagged. Skipping automatic release."
               echo "skip-release=true" >> $GITHUB_OUTPUT
             else
-              echo "skip-release=false" >> $GITHUB_OUTPUT
+              changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}")"
+              if grep -q -v -e '.github' -e 'scripts' <<< "$changed_files"; then
+                echo "::warning::New code changes found in the release branch since the last release. Will bump internal release now."
+                echo "skip-release=false" >> $GITHUB_OUTPUT
+              else
+                echo "::warning::No changes to the release branch (or only changes to scripts and workflows). Skipping automatic release."
+                echo "skip-release=true" >> $GITHUB_OUTPUT
+              fi
             fi
           fi
 
