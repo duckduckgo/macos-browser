@@ -20,7 +20,7 @@ import AppKit
 import Common
 import Foundation
 
-final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate {
+final class BookmarkOutlineViewDataSource: NSObject {
 
     enum ContentMode {
         case bookmarksAndFolders
@@ -67,9 +67,57 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         treeController.rebuild()
     }
 
-    // MARK: - Private
+    func validateDrop(for draggedFolders: Set<PasteboardFolder>, destination: BookmarkNode) -> NSDragOperation {
+        if destination.isRoot {
+            return .move
+        }
 
-    private func id(from notification: Notification) -> String? {
+        if let pseudoFolder = destination.representedObject as? PseudoFolder, pseudoFolder == .bookmarks {
+            return .move
+        }
+
+        guard let destinationFolder = destination.representedObject as? BookmarkFolder else {
+            return .none
+        }
+
+        // Folders cannot be dragged onto themselves:
+
+        let containsDestination = draggedFolders.contains { draggedFolder in
+            return draggedFolder.id == destinationFolder.id
+        }
+
+        if containsDestination {
+            return .none
+        }
+
+        // Folders cannot be dragged onto any of their descendants:
+
+        let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
+            let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name, parentFolderUUID: draggedFolder.parentFolderUUID, children: draggedFolder.children)
+
+            guard let draggedNode = treeController.node(representing: folder) else {
+                return false
+            }
+
+            let descendant = draggedNode.descendantNodeRepresenting(object: destination.representedObject)
+
+            return descendant != nil
+        }
+
+        if containsDescendantOfDestination {
+            return .none
+        }
+
+        return .move
+    }
+
+}
+
+// MARK: - Private
+
+private extension BookmarkOutlineViewDataSource {
+
+    func id(from notification: Notification) -> String? {
         let node = notification.userInfo?["NSObject"] as? BookmarkNode
 
         if let bookmark = node?.representedObject as? BaseBookmarkEntity {
@@ -83,7 +131,19 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return nil
     }
 
-    // MARK: - NSOutlineViewDataSource
+    func validateDrop(for draggedBookmarks: Set<PasteboardBookmark>, destination: BookmarkNode) -> NSDragOperation {
+        guard destination.representedObject is BookmarkFolder || destination.representedObject is PseudoFolder || destination.isRoot else {
+            return .none
+        }
+
+        return .move
+    }
+
+}
+
+// MARK: - NSOutlineViewDataSource
+
+extension BookmarkOutlineViewDataSource: NSOutlineViewDataSource {
 
     func nodeForItem(_ item: Any?) -> BookmarkNode {
         guard let item = item as? BookmarkNode else {
@@ -166,23 +226,20 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return entity.pasteboardWriter
     }
 
-    func outlineView(_ outlineView: NSOutlineView,
-                     validateDrop info: NSDraggingInfo,
-                     proposedItem item: Any?,
-                     proposedChildIndex index: Int) -> NSDragOperation {
+    func outlineView(
+        _ outlineView: NSOutlineView,
+        validateDrop info: NSDraggingInfo,
+        proposedItem item: Any?,
+        proposedChildIndex index: Int
+    ) -> NSDragOperation {
         let destinationNode = nodeForItem(item)
+        let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
 
-        if contentMode == .foldersOnly {
-            // when in folders sidebar mode only allow moving a folder to another folder (or root)
-            if destinationNode.representedObject is BookmarkFolder
-                || (destinationNode.representedObject as? PseudoFolder == .bookmarks) {
-                return .move
-            }
-            return .none
+        if contentMode == .foldersOnly, let folders {
+            return validateDrop(for: folders, destination: destinationNode)
         }
 
         let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard)
-        let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
 
         if let bookmarks = bookmarks, let folders = folders {
             let canMoveBookmarks = validateDrop(for: bookmarks, destination: destinationNode) == .move
@@ -205,58 +262,6 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
 
         return .none
-    }
-
-    func validateDrop(for draggedBookmarks: Set<PasteboardBookmark>, destination: BookmarkNode) -> NSDragOperation {
-        guard destination.representedObject is BookmarkFolder || destination.representedObject is PseudoFolder || destination.isRoot else {
-            return .none
-        }
-
-        return .move
-    }
-
-    func validateDrop(for draggedFolders: Set<PasteboardFolder>, destination: BookmarkNode) -> NSDragOperation {
-        if destination.isRoot {
-            return .move
-        }
-
-        if let pseudoFolder = destination.representedObject as? PseudoFolder, pseudoFolder == .bookmarks {
-            return .move
-        }
-
-        guard let destinationFolder = destination.representedObject as? BookmarkFolder else {
-            return .none
-        }
-
-        // Folders cannot be dragged onto themselves:
-
-        let containsDestination = draggedFolders.contains { draggedFolder in
-            return draggedFolder.id == destinationFolder.id
-        }
-
-        if containsDestination {
-            return .none
-        }
-
-        // Folders cannot be dragged onto any of their descendants:
-
-        let containsDescendantOfDestination = draggedFolders.contains { draggedFolder in
-            let folder = BookmarkFolder(id: draggedFolder.id, title: draggedFolder.name, parentFolderUUID: draggedFolder.parentFolderUUID, children: draggedFolder.children)
-
-            guard let draggedNode = treeController.node(representing: folder) else {
-                return false
-            }
-
-            let descendant = draggedNode.descendantNodeRepresenting(object: destination.representedObject)
-
-            return descendant != nil
-        }
-
-        if containsDescendantOfDestination {
-            return .none
-        }
-
-        return .move
     }
 
     func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
@@ -326,7 +331,11 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return view
     }
 
-    // MARK: - NSTableViewDelegate
+}
+
+// MARK: - NSOutlineViewDelegate
+
+extension BookmarkOutlineViewDataSource: NSOutlineViewDelegate {
 
     func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
         if let node = item as? BookmarkNode, node.representedObject is SpacerNode {

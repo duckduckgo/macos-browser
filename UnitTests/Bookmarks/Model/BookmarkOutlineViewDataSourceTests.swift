@@ -77,6 +77,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
     }
 
     func testWhenValidatingBookmarkDrop_AndDestinationIsFolder_ThenMoveDragOperationIsReturned() {
+        // GIVEN
         let mockDestinationFolder = BookmarkFolder.mock
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -90,13 +91,18 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController)
 
-        let pasteboardBookmark = PasteboardBookmark(id: UUID().uuidString, url: "https://example.com", title: "Pasteboard Bookmark")
-        let result = dataSource.validateDrop(for: [pasteboardBookmark], destination: mockDestinationNode)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Pasteboard Bookmark", isFavorite: false)
+        let draggingInfoMock = DraggingInfoMock.with(bookmarkEntity: bookmark)
 
+        // WHEN
+        let result = dataSource.outlineView(BookmarksOutlineView(), validateDrop: draggingInfoMock, proposedItem: mockDestinationNode, proposedChildIndex: -1)
+
+        // THEN
         XCTAssertEqual(result, .move)
     }
 
     func testWhenValidatingFolderDrop_AndDestinationIsFolder_ThenMoveDragOperationIsReturned() {
+        // GIVEN
         let mockDestinationFolder = BookmarkFolder.mock
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
@@ -110,9 +116,13 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController)
 
-        let pasteboardFolder = PasteboardFolder(folder: .init(id: UUID().uuidString, title: "Pasteboard Folder"))
-        let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
+        let folder = BookmarkFolder(id: UUID().uuidString, title: "Pasteboard Folder")
+        let draggingInfoMock = DraggingInfoMock.with(bookmarkEntity: folder)
 
+        // WHEN
+        let result = dataSource.outlineView(BookmarksOutlineView(), validateDrop: draggingInfoMock, proposedItem: mockDestinationNode, proposedChildIndex: -1)
+
+        // THEN
         XCTAssertEqual(result, .move)
     }
 
@@ -130,9 +140,12 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController)
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
 
-        let pasteboardFolder = PasteboardFolder(folder: mockDestinationFolder)
-        let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
+        let draggingInfoMock = DraggingInfoMock.with(bookmarkEntity: mockDestinationFolder)
 
+        // WHEN
+        let result = dataSource.outlineView(BookmarksOutlineView(), validateDrop: draggingInfoMock, proposedItem: mockDestinationNode, proposedChildIndex: -1)
+
+        // THEN
         XCTAssertEqual(result, .none)
     }
 
