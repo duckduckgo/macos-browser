@@ -166,6 +166,38 @@ extension Pixel.Event {
              .dataBrokerEnableLoginItemDaily,
              .dataBrokerDisableLoginItemDaily,
              .dataBrokerResetLoginItemDaily,
+             .privacyProSubscriptionActive,
+             .privacyProOfferScreenImpression,
+             .privacyProPurchaseAttempt,
+             .privacyProPurchaseFailure,
+             .privacyProPurchaseFailureStoreError,
+             .privacyProPurchaseFailureBackendError,
+             .privacyProPurchaseFailureAccountNotCreated,
+             .privacyProPurchaseSuccess,
+             .privacyProRestorePurchaseOfferPageEntry,
+             .privacyProRestorePurchaseSettingsMenuEntry,
+             .privacyProRestorePurchaseEmailStart,
+             .privacyProRestorePurchaseStoreStart,
+             .privacyProRestorePurchaseEmailSuccess,
+             .privacyProRestorePurchaseStoreSuccess,
+             .privacyProRestorePurchaseStoreFailureNotFound,
+             .privacyProRestorePurchaseStoreFailureOther,
+             .privacyProRestoreAfterPurchaseAttempt,
+             .privacyProSubscriptionActivated,
+             .privacyProWelcomeAddDevice,
+             .privacyProSettingsAddDevice,
+             .privacyProAddDeviceEnterEmail,
+             .privacyProWelcomeVPN,
+             .privacyProWelcomePersonalInformationRemoval,
+             .privacyProWelcomeIdentityRestoration,
+             .privacyProSubscriptionSettings,
+             .privacyProVPNSettings,
+             .privacyProPersonalInformationRemovalSettings,
+             .privacyProIdentityRestorationSettings,
+             .privacyProSubscriptionManagementEmail,
+             .privacyProSubscriptionManagementPlanBilling,
+             .privacyProSubscriptionManagementRemoval,
+             .privacyProRestorePurchaseClick,
              .protectionToggledOffBreakageReport,
              .toggleProtectionsDailyCount,
              .toggleReportDoNotSend,
@@ -313,11 +345,11 @@ extension Error {
         let nsError = self as NSError
 
         params[PixelKit.Parameters.errorCode] = "\(nsError.code)"
-        params[PixelKit.Parameters.errorDesc] = nsError.domain
+        params[PixelKit.Parameters.errorDomain] = nsError.domain
 
         if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
             params[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            params[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
+            params[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
         }
 
         if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {

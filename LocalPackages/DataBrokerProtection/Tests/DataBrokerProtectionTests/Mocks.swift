@@ -21,7 +21,6 @@ import Combine
 import Common
 import Foundation
 import GRDB
-import Macros
 import SecureStorage
 
 @testable import DataBrokerProtection
@@ -243,7 +242,7 @@ final class EmailServiceMock: EmailServiceProtocol {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return #URL("https://www.duckduckgo.com")
+        return URL(string: "https://www.duckduckgo.com")!
     }
 
     func reset() {
@@ -825,5 +824,76 @@ final class MockAppVersion: AppVersionNumberProvider {
 
     init(versionNumber: String) {
         self.versionNumber = versionNumber
+    }
+}
+
+final class MockStageDurationCalculator: StageDurationCalculator {
+    var stage: Stage?
+
+    func durationSinceLastStage() -> Double {
+        return 0.0
+    }
+
+    func durationSinceStartTime() -> Double {
+        return 0.0
+    }
+
+    func fireOptOutStart() {
+    }
+
+    func fireOptOutEmailGenerate() {
+    }
+
+    func fireOptOutCaptchaParse() {
+    }
+
+    func fireOptOutCaptchaSend() {
+    }
+
+    func fireOptOutCaptchaSolve() {
+    }
+
+    func fireOptOutSubmit() {
+    }
+
+    func fireOptOutEmailReceive() {
+    }
+
+    func fireOptOutEmailConfirm() {
+    }
+
+    func fireOptOutValidate() {
+    }
+
+    func fireOptOutSubmitSuccess(tries: Int) {
+    }
+
+    func fireOptOutFillForm() {
+    }
+
+    func fireOptOutFailure(tries: Int) {
+    }
+
+    func fireScanSuccess(matchesFound: Int) {
+    }
+
+    func fireScanFailed() {
+    }
+
+    func fireScanError(error: any Error) {
+    }
+
+    func setStage(_ stage: DataBrokerProtection.Stage) {
+        self.stage = stage
+    }
+
+    func setEmailPattern(_ emailPattern: String?) {
+    }
+
+    func setLastActionId(_ actionID: String) {
+    }
+
+    func clear() {
+        self.stage = nil
     }
 }

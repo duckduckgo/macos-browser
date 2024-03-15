@@ -213,25 +213,20 @@ struct RedeemResponse: Codable {
 }
 
 public struct AuthenticationService: DataBrokerProtectionAuthenticationService {
-    private struct Constants {
-#if DEBUG
-        static let redeemURL = "https://dbp-staging.duckduckgo.com/dbp/redeem?"
-#else
-        static let redeemURL = "https://dbp.duckduckgo.com/dbp/redeem?"
-#endif
-    }
-
     private let urlSession: URLSession
+    private let settings: DataBrokerProtectionSettings
 
-    public init(urlSession: URLSession = URLSession.shared) {
+    public init(urlSession: URLSession = URLSession.shared, settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
         self.urlSession = urlSession
+        self.settings = settings
     }
 
     public func redeem(inviteCode: String) async throws -> String {
-        guard let url = URL(string: Constants.redeemURL + "code=\(inviteCode)") else {
+        let redeemURL = settings.selectedEnvironment.endpointURL.appendingPathComponent("dbp/redeem")
+
+        guard let url = URL(string: "\(redeemURL.absoluteString)?code=\(inviteCode)") else {
             throw AuthenticationError.cantGenerateURL
         }
-
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let (data, _) = try await urlSession.data(for: request)

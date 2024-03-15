@@ -44,26 +44,30 @@ protocol EmailServiceProtocol {
 
 struct EmailService: EmailServiceProtocol {
     private struct Constants {
-        static let baseUrl = "https://dbp.duckduckgo.com/dbp/em/v0"
+        static let endpointSubPath = "/dbp/em/v0"
     }
 
     public let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let settings: DataBrokerProtectionSettings
 
     init(urlSession: URLSession = URLSession.shared,
-         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase()) {
+         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
+         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
+        self.settings = settings
     }
 
     func getEmail(dataBrokerURL: String? = nil) async throws -> EmailData {
-        var urlString = Constants.baseUrl + "/generate"
+        var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
+        urlComponents?.path = "\(Constants.endpointSubPath)/generate"
 
         if let dataBrokerValue = dataBrokerURL {
-            urlString += "?dataBroker=\(dataBrokerValue)"
+            urlComponents?.queryItems = [URLQueryItem(name: "dataBroker", value: dataBrokerValue)]
         }
 
-        guard let url = URL(string: urlString) else {
+        guard let url = urlComponents?.url else {
             throw EmailError.cantGenerateURL
         }
 
@@ -119,11 +123,16 @@ struct EmailService: EmailServiceProtocol {
     }
 
     private func extractEmailLink(email: String) async throws -> EmailResponse {
-        guard let url = URL(string: Constants.baseUrl + "/links?e=\(email)") else {
+        var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
+        urlComponents?.path = "\(Constants.endpointSubPath)/links"
+        urlComponents?.queryItems = [URLQueryItem(name: "e", value: email)]
+
+        guard let url = urlComponents?.url else {
             throw EmailError.cantGenerateURL
         }
 
         var request = URLRequest(url: url)
+
         let authHeader = try await redeemUseCase.getAuthHeader()
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
 

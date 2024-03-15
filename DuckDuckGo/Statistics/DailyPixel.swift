@@ -43,7 +43,7 @@ final class DailyPixel {
 
     static func fire(pixel: Pixel.Event,
                      frequency: PixelFrequency,
-                     includeAppVersionParameter includeAppVersion: Bool,
+                     includeAppVersionParameter includeAppVersion: Bool = true,
                      withAdditionalParameters params: [String: String] = [:],
                      onComplete: @escaping (Swift.Error?) -> Void = { _ in }) {
         switch frequency {

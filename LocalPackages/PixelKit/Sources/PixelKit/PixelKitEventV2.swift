@@ -30,8 +30,7 @@ extension PixelKitEventErrorDetails {
 
         return [
             PixelKit.Parameters.underlyingErrorCode: "\(nsError.code)",
-            PixelKit.Parameters.underlyingErrorDomain: nsError.domain,
-            PixelKit.Parameters.underlyingErrorDesc: nsError.localizedDescription
+            PixelKit.Parameters.underlyingErrorDomain: nsError.domain
         ]
     }
 }
