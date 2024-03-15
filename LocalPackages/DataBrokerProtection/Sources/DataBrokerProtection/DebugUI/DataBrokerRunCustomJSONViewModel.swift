@@ -219,6 +219,9 @@ final class FakeStageDurationCalculator: StageDurationCalculator {
     func fireOptOutEmailConfirm() {
     }
 
+    func fireOptOutFillForm() {
+    }
+
     func fireOptOutValidate() {
     }
 
@@ -238,6 +241,9 @@ final class FakeStageDurationCalculator: StageDurationCalculator {
     }
 
     func setStage(_ stage: Stage) {
+    }
+
+    func setLastActionId(_ actionID: String) {
     }
 }
 

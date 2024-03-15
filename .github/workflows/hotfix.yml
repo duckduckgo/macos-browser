@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
 
       - name: Prepare fastlane
         run: bundle install
@@ -39,7 +40,8 @@ jobs:
           APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
-          GH_TOKEN: ${{ github.token }}
+          # Elevated permissions token is needed here to use GH git/refs API (used by fastlane)
+          GH_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
         run: |
           git config --global user.name "Dax the Duck"
           git config --global user.email "dax@duckduckgo.com"

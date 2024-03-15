@@ -19,7 +19,6 @@
 import Combine
 import Common
 import History
-import Macros
 import Navigation
 import XCTest
 
@@ -205,7 +204,7 @@ class HistoryIntegrationTests: XCTestCase {
         let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = #URL("http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")
+        let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")!
 
         // navigate to a regular page, tracker count should be reset to 0
         let trackerPromise = tab.privacyInfoPublisher.compactMap { $0?.$trackerInfo }
@@ -233,7 +232,7 @@ class HistoryIntegrationTests: XCTestCase {
         let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = #URL("http://privacy-test-pages.site/tracker-reporting/1major-with-surrogate.html")
+        let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-with-surrogate.html")!
 
         // navigate to a regular page, tracker count should be reset to 0
         let trackerPromise = tab.privacyInfoPublisher.compactMap { $0?.$trackerInfo }

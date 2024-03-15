@@ -43,9 +43,11 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
 
     public func handleEmailAction() {
         actionHandlers.openURLHandler(activateViaEmailURL)
+        actionHandlers.uiActionHandler(.activateAddEmailClick)
     }
 
     public func handleRestorePurchaseAction() {
         actionHandlers.restorePurchases()
+        actionHandlers.uiActionHandler(.restorePurchaseStoreClick)
     }
 }

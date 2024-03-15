@@ -38,16 +38,14 @@ public extension XCTestCase {
     ///
     private static var errorPixelParameters = [
         PixelKit.Parameters.errorCode,
-        PixelKit.Parameters.errorDomain,
-        PixelKit.Parameters.errorDesc
+        PixelKit.Parameters.errorDomain
     ]
 
     /// List of underlying error pixel parameters
     ///
     private static var underlyingErrorPixelParameters = [
         PixelKit.Parameters.underlyingErrorCode,
-        PixelKit.Parameters.underlyingErrorDomain,
-        PixelKit.Parameters.underlyingErrorDesc
+        PixelKit.Parameters.underlyingErrorDomain
     ]
 
     /// Filter out the standard parameters.
@@ -75,13 +73,11 @@ public extension XCTestCase {
             let nsError = error as NSError
             expectedParameters[PixelKit.Parameters.errorCode] = "\(nsError.code)"
             expectedParameters[PixelKit.Parameters.errorDomain] = nsError.domain
-            expectedParameters[PixelKit.Parameters.errorDesc] = nsError.localizedDescription
 
             if let underlyingError = (error as? PixelKitEventErrorDetails)?.underlyingError {
                 let underlyingNSError = underlyingError as NSError
                 expectedParameters[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingNSError.code)"
                 expectedParameters[PixelKit.Parameters.underlyingErrorDomain] = underlyingNSError.domain
-                expectedParameters[PixelKit.Parameters.underlyingErrorDesc] = underlyingNSError.localizedDescription
             }
         }
 
@@ -129,14 +125,12 @@ public extension XCTestCase {
                 let nsError = error as NSError
                 XCTAssertEqual(firedParameters[PixelKit.Parameters.errorCode], String(nsError.code), file: file, line: line)
                 XCTAssertEqual(firedParameters[PixelKit.Parameters.errorDomain], nsError.domain, file: file, line: line)
-                XCTAssertEqual(firedParameters[PixelKit.Parameters.errorDesc], nsError.localizedDescription, file: file, line: line)
             }
 
             if let underlyingError = expectations.underlyingError {
                 let nsError = underlyingError as NSError
                 XCTAssertEqual(firedParameters[PixelKit.Parameters.underlyingErrorCode], String(nsError.code), file: file, line: line)
                 XCTAssertEqual(firedParameters[PixelKit.Parameters.underlyingErrorDomain], nsError.domain, file: file, line: line)
-                XCTAssertEqual(firedParameters[PixelKit.Parameters.underlyingErrorDesc], nsError.localizedDescription, file: file, line: line)
             }
 
             completion(true, nil)

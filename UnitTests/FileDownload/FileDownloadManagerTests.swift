@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import Macros
 import UniformTypeIdentifiers
 import XCTest
 
@@ -129,7 +128,7 @@ final class FileDownloadManagerTests: XCTestCase {
         let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .prompt)
 
-        let url = #URL("https://duckduckgo.com/somefile.html")
+        let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.pdf.preferredMIMEType, expectedContentLength: 1, textEncodingName: "utf-8")
         let e2 = expectation(description: "WKDownload callback called")
         download.delegate?.download(download.asWKDownload(),
@@ -162,7 +161,7 @@ final class FileDownloadManagerTests: XCTestCase {
         let download = WKDownloadMock(url: .duckDuckGo)
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
 
-        let url = #URL("https://duckduckgo.com/somefile.html")
+        let url = URL(string: "https://duckduckgo.com/somefile.html")!
         let response = URLResponse(url: url, mimeType: UTType.html.preferredMIMEType, expectedContentLength: 1, textEncodingName: "utf-8")
         let e2 = expectation(description: "WKDownload callback called")
         download.delegate?.download(download.asWKDownload(),

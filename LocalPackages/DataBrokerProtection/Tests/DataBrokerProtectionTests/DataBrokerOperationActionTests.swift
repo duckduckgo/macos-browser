@@ -19,7 +19,6 @@
 import BrowserServicesKit
 import Combine
 import Foundation
-import Macros
 import XCTest
 
 @testable import DataBrokerProtection
@@ -45,6 +44,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -67,6 +67,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -96,6 +97,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -123,6 +125,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -143,6 +146,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -168,6 +172,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -185,6 +190,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -203,6 +209,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
@@ -223,6 +230,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
+            emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
@@ -250,6 +258,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
@@ -270,6 +279,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
@@ -292,6 +302,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
@@ -308,13 +319,94 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
 
-        await sut.loadURL(url: #URL("https://www.duckduckgo.com"))
+        await sut.loadURL(url: URL(string: "https://www.duckduckgo.com")!)
 
         XCTAssertEqual(webViewHandler.wasLoadCalledWithURL?.absoluteString, "https://www.duckduckgo.com")
+    }
+
+    func testWhenGetCaptchaActionRuns_thenStageIsSetToCaptchaParse() async {
+        let mockStageCalculator = MockStageDurationCalculator()
+        let captchaAction = GetCaptchaInfoAction(id: "1", actionType: .getCaptchaInfo, selector: "captcha", dataSource: nil)
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
+            captchaService: captchaService,
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
+        )
+
+        sut.stageCalculator = mockStageCalculator
+
+        await sut.runNextAction(captchaAction)
+
+        XCTAssertEqual(mockStageCalculator.stage, .captchaParse)
+    }
+
+    func testWhenClickActionRuns_thenStageIsSetToSubmit() async {
+        let mockStageCalculator = MockStageDurationCalculator()
+        let clickAction = ClickAction(id: "1", actionType: .click, elements: [PageElement](), dataSource: nil)
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
+            captchaService: captchaService,
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
+        )
+
+        sut.stageCalculator = mockStageCalculator
+
+        await sut.runNextAction(clickAction)
+
+        XCTAssertEqual(mockStageCalculator.stage, .fillForm)
+    }
+
+    func testWhenExpectationActionRuns_thenStageIsSetToSubmit() async {
+        let mockStageCalculator = MockStageDurationCalculator()
+        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil)
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
+            captchaService: captchaService,
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
+        )
+
+        sut.stageCalculator = mockStageCalculator
+
+        await sut.runNextAction(expectationAction)
+
+        XCTAssertEqual(mockStageCalculator.stage, .submit)
+    }
+
+    func testWhenFillFormActionRuns_thenStageIsSetToFillForm() async {
+        let mockStageCalculator = MockStageDurationCalculator()
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "", elements: [PageElement](), dataSource: nil)
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
+            captchaService: captchaService,
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
+        )
+
+        sut.stageCalculator = mockStageCalculator
+
+        await sut.runNextAction(fillFormAction)
+
+        XCTAssertEqual(mockStageCalculator.stage, .fillForm)
     }
 }

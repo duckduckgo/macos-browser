@@ -25,7 +25,7 @@ import NetworkProtectionUI
 import NetworkProtectionIPC
 import NetworkExtension
 
-/// Implements the sequence of steps that Network Protection needs to execute when the App starts up.
+/// Implements the sequence of steps that the VPN needs to execute when the App starts up.
 ///
 final class NetworkProtectionAppEvents {
 
@@ -94,7 +94,7 @@ final class NetworkProtectionAppEvents {
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
 
-    /// Fetches a new list of Network Protection servers, and updates the existing set.
+    /// Fetches a new list of VPN servers, and updates the existing set.
     ///
     private func refreshNetworkProtectionServers() {
         Task {
@@ -102,11 +102,11 @@ final class NetworkProtectionAppEvents {
             do {
                 serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList().count
             } catch {
-                os_log("Failed to update Network Protection servers", log: .networkProtection, type: .error)
+                os_log("Failed to update DuckDuckGo VPN servers", log: .networkProtection, type: .error)
                 return
             }
 
-            os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
+            os_log("Successfully updated DuckDuckGo VPN servers; total server count = %{public}d", log: .networkProtection, serverCount)
         }
     }
 }

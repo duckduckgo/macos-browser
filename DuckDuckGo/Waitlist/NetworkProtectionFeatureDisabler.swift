@@ -57,7 +57,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         self.ipcClient = ipcClient
     }
 
-    /// This method disables Network Protection and clear all of its state.
+    /// This method disables the VPN and clear all of its state.
     ///
     /// - Parameters:
     ///     - keepAuthToken: If `true`, the auth token will not be removed.
