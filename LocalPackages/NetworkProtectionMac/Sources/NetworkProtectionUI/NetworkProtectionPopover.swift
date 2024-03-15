@@ -58,8 +58,7 @@ public final class NetworkProtectionPopover: NSPopover {
                          agentLoginItem: LoginItem?,
                          isMenuBarStatusView: Bool,
                          userDefaults: UserDefaults,
-                         uninstallHandler: @escaping () async -> Void,
-                         featureActivation: NetworkProtectionFeatureActivation) {
+                         uninstallHandler: @escaping () async -> Void) {
 
         self.statusReporter = statusReporter
         self.model = NetworkProtectionStatusView.Model(controller: controller,
@@ -71,8 +70,7 @@ public final class NetworkProtectionPopover: NSPopover {
                                                        agentLoginItem: agentLoginItem,
                                                        isMenuBarStatusView: isMenuBarStatusView,
                                                        userDefaults: userDefaults,
-                                                       uninstallHandler: uninstallHandler,
-                                                       featureActivation: featureActivation)
+                                                       uninstallHandler: uninstallHandler)
 
         super.init()
 

@@ -264,8 +264,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     guard let self else { return }
                     await self.vpnUninstaller.uninstall(includingSystemExtension: true)
                 }
-            },
-            featureActivation: NetworkProtectionKeychainTokenStore()
+            }
         )
     }
 
