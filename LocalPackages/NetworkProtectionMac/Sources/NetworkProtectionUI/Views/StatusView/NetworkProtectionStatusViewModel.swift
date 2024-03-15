@@ -161,7 +161,9 @@ extension NetworkProtectionStatusView {
             userDefaults
                 .publisher(for: \.networkProtectionEntitlementsValid)
                 .receive(on: DispatchQueue.main)
-                .map { !$0 }
+                .map { entitlementsAreValid in
+                    !(entitlementsAreValid || userDefaults.networkProtectionVPNEnabledViaWaitlist)
+                }
                 .assign(to: \.shouldShowSubscriptionExpired, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }
