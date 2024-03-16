@@ -29,7 +29,6 @@ protocol ScriptSourceProviding {
     var privacyConfigurationManager: PrivacyConfigurationManaging { get }
     var autofillSourceProvider: AutofillUserScriptSourceProvider? { get }
     var sessionKey: String? { get }
-    var clickToLoadSource: String { get }
     func buildAutofillSource() -> AutofillUserScriptSourceProvider
 
 }
@@ -46,7 +45,6 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     private(set) var surrogatesConfig: SurrogatesUserScriptConfig?
     private(set) var autofillSourceProvider: AutofillUserScriptSourceProvider?
     private(set) var sessionKey: String?
-    private(set) var clickToLoadSource: String = ""
 
     let configStorage: ConfigurationStoring
     let privacyConfigurationManager: PrivacyConfigurationManaging
@@ -72,7 +70,6 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         self.contentBlockerRulesConfig = buildContentBlockerRulesConfig()
         self.surrogatesConfig = buildSurrogatesConfig()
         self.sessionKey = generateSessionKey()
-        self.clickToLoadSource = buildClickToLoadSource()
         self.autofillSourceProvider = buildAutofillSource()
     }
 
@@ -153,10 +150,6 @@ struct ScriptSourceProvider: ScriptSourceProviding {
 
         let font = "data:application/octet-stream;base64," + base64String
         return font
-    }
-
-    private func buildClickToLoadSource() -> String {
-        return ""
     }
 
 }
