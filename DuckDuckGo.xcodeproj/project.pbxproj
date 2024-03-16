@@ -1203,6 +1203,9 @@
 		4B4D60E22A0C883A00BCD287 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60E12A0C883A00BCD287 /* AppMain.swift */; };
 		4B4D60E32A0C883A00BCD287 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60E12A0C883A00BCD287 /* AppMain.swift */; };
 		4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */; };
+		4B520F632BA5573A006405C7 /* WaitlistThankYouView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B520F622BA5573A006405C7 /* WaitlistThankYouView.swift */; };
+		4B520F642BA5573A006405C7 /* WaitlistThankYouView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B520F622BA5573A006405C7 /* WaitlistThankYouView.swift */; };
+		4B520F652BA5573A006405C7 /* WaitlistThankYouView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B520F622BA5573A006405C7 /* WaitlistThankYouView.swift */; };
 		4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023926B35F3600489384 /* ChromiumLoginReader.swift */; };
 		4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */; };
 		4B59024826B3673600489384 /* ThirdPartyBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024726B3673600489384 /* ThirdPartyBrowser.swift */; };
@@ -3625,6 +3628,7 @@
 		4B4D60D22A0C84F700BCD287 /* UserText+NetworkProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserText+NetworkProtection.swift"; sourceTree = "<group>"; };
 		4B4D60E12A0C883A00BCD287 /* AppMain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppMain.swift; sourceTree = "<group>"; };
 		4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
+		4B520F622BA5573A006405C7 /* WaitlistThankYouView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistThankYouView.swift; sourceTree = "<group>"; };
 		4B59023926B35F3600489384 /* ChromiumLoginReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReader.swift; sourceTree = "<group>"; };
 		4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromiumDataImporter.swift; sourceTree = "<group>"; };
 		4B59024726B3673600489384 /* ThirdPartyBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowser.swift; sourceTree = "<group>"; };
@@ -5898,6 +5902,7 @@
 				4B9DB0192A983B24000927DB /* WaitlistModalViewController.swift */,
 				3168506C2AF3AD1C009A2828 /* WaitlistViewControllerPresenter.swift */,
 				4B9DB01A2A983B24000927DB /* WaitlistRootView.swift */,
+				4B520F622BA5573A006405C7 /* WaitlistThankYouView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -9766,6 +9771,7 @@
 				3706FA7B293F65D500E42796 /* FaviconUserScript.swift in Sources */,
 				3706FA7E293F65D500E42796 /* LottieAnimationCache.swift in Sources */,
 				3706FA7F293F65D500E42796 /* TabIndex.swift in Sources */,
+				4B520F642BA5573A006405C7 /* WaitlistThankYouView.swift in Sources */,
 				3706FA80293F65D500E42796 /* TabLazyLoaderDataSource.swift in Sources */,
 				3706FA81293F65D500E42796 /* LoginImport.swift in Sources */,
 				C13909FC2B861039001626ED /* AutofillActionPresenter.swift in Sources */,
@@ -11316,6 +11322,7 @@
 				4B957A9D2AC7AE700062CA31 /* NetworkProtectionSimulateFailureMenu.swift in Sources */,
 				4B957A9E2AC7AE700062CA31 /* PrivacyDashboardPermissionHandler.swift in Sources */,
 				4B957A9F2AC7AE700062CA31 /* TabCollectionViewModel.swift in Sources */,
+				4B520F652BA5573A006405C7 /* WaitlistThankYouView.swift in Sources */,
 				4B957AA02AC7AE700062CA31 /* BookmarkManager.swift in Sources */,
 				4B957AA12AC7AE700062CA31 /* AboutModel.swift in Sources */,
 				4B957AA22AC7AE700062CA31 /* PasswordManagementCreditCardItemView.swift in Sources */,
@@ -12104,6 +12111,7 @@
 				7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */,
 				1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
+				4B520F632BA5573A006405C7 /* WaitlistThankYouView.swift in Sources */,
 				4BF0E5052AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */,
 				37CD54CD27F2FDD100F1F7B9 /* AboutModel.swift in Sources */,
