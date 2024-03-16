@@ -31,7 +31,6 @@ import PixelKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
-import SwiftUI
 
 #if NETWORK_PROTECTION
 import NetworkProtection
