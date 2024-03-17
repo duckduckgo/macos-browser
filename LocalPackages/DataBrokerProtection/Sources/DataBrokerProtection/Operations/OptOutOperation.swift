@@ -99,7 +99,7 @@ final class OptOutOperation: DataBrokerOperation {
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) async {
+    func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async {
         // No - op
     }
 

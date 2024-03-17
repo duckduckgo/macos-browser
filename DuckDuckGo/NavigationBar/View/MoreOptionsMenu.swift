@@ -348,7 +348,6 @@ final class MoreOptionsMenu: NSMenu {
             networkProtectionItem = makeNetworkProtectionItem()
 
             items.append(networkProtectionItem)
-
 #if SUBSCRIPTION
             if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionAccountManager.isUserAuthenticated {
                 Task {
@@ -436,19 +435,13 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionScanOptionsMenuItem,
-                                                  action: #selector(openSubscriptionPurchasePage(_:)),
-                                                  keyEquivalent: "")
-            .targetting(self)
-            .withImage(.dbpIcon)
-
         let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
             .withImage(.subscriptionIcon)
 
-        return [dataBrokerProtectionItem, privacyProItem]
+        return [privacyProItem]
     }
 #endif
 

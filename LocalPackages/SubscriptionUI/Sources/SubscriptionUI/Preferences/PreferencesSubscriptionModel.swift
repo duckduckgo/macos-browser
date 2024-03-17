@@ -18,11 +18,14 @@
 
 import AppKit
 import Subscription
+import struct Combine.AnyPublisher
+import enum Combine.Publishers
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
     @Published var subscriptionDetails: String?
+    @Published var subscriptionStatus: Subscription.Status?
 
     @Published var hasAccessToVPN: Bool = false
     @Published var hasAccessToDBP: Bool = false
@@ -61,6 +64,28 @@ public final class PreferencesSubscriptionModel: ObservableObject {
              removeSubscriptionClick
     }
 
+    lazy var statePublisher: AnyPublisher<PreferencesSubscriptionState, Never> = {
+        let isSubscriptionActivePublisher = $subscriptionStatus.map {
+            $0 != .expired && $0 != .inactive
+        }.eraseToAnyPublisher()
+
+        let hasAnyEntitlementPublisher = Publishers.CombineLatest3($hasAccessToVPN, $hasAccessToDBP, $hasAccessToITR).map {
+            return $0 || $1 || $2
+        }.eraseToAnyPublisher()
+
+        return Publishers.CombineLatest3($isUserAuthenticated, isSubscriptionActivePublisher, hasAnyEntitlementPublisher)
+            .map { isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement in
+                switch (isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement) {
+                case (false, _, _): return PreferencesSubscriptionState.noSubscription
+                case (true, false, _): return PreferencesSubscriptionState.subscriptionExpired
+                case (true, true, false): return PreferencesSubscriptionState.subscriptionPendingActivation
+                case (true, true, true): return PreferencesSubscriptionState.subscriptionActive
+                }
+            }
+            .removeDuplicates()
+            .eraseToAnyPublisher()
+    }()
+
     public init(subscriptionManager: SubscriptionManaging,
                 accountManager: AccountManaging,
                 openURLHandler: @escaping (URL) -> Void,
@@ -76,9 +101,32 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         if let token = accountManager.accessToken {
             Task {
-                let subscriptionResult = await subscriptionService.getSubscription(accessToken: token)
+                let subscriptionResult = await subscriptionService.getSubscription(accessToken: token, cachePolicy: .returnCacheDataElseLoad)
                 if case .success(let subscription) = subscriptionResult {
-                    self.updateDescription(for: subscription.expiresOrRenewsAt)
+                    self.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
+                    self.subscriptionPlatform = subscription.platform
+                    self.subscriptionStatus = subscription.status
+                }
+
+                switch await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .returnCacheDataElseLoad) {
+                case let .success(result):
+                    self.hasAccessToVPN = result
+                case .failure:
+                    self.hasAccessToVPN = false
+                }
+
+                switch await self.accountManager.hasEntitlement(for: .dataBrokerProtection, cachePolicy: .returnCacheDataElseLoad) {
+                case let .success(result):
+                    self.hasAccessToDBP = result
+                case .failure:
+                    self.hasAccessToDBP = false
+                }
+
+                switch await self.accountManager.hasEntitlement(for: .identityTheftRestoration, cachePolicy: .returnCacheDataElseLoad) {
+                case let .success(result):
+                    self.hasAccessToITR = result
+                case .failure:
+                    self.hasAccessToITR = false
                 }
             }
         }
@@ -140,6 +188,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func changePlanOrBillingAction() async -> ChangePlanOrBillingAction {
+
         switch subscriptionPlatform {
         case .apple:
             if await confirmIfSignedInToSameAccount() {
@@ -216,7 +265,20 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         openURLHandler(.subscriptionFAQ)
     }
 
-    // swiftlint:disable cyclomatic_complexity
+    @MainActor
+    func refreshSubscriptionPendingState() {
+        if SubscriptionPurchaseEnvironment.current == .appStore {
+            if #available(macOS 12.0, *) {
+                Task {
+                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: subscriptionAppGroup)
+                    fetchAndUpdateSubscriptionDetails()
+                }
+            }
+        } else {
+            fetchAndUpdateSubscriptionDetails()
+        }
+    }
+
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
         guard fetchSubscriptionDetailsTask == nil else { return }
@@ -228,22 +290,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             guard let token = self?.accountManager.accessToken else { return }
 
-            let subscriptionResult = await self?.subscriptionService.getSubscription(accessToken: token)
+            let subscriptionResult = await self?.subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
 
             if case .success(let subscription) = subscriptionResult {
-                self?.updateDescription(for: subscription.expiresOrRenewsAt)
+                self?.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
                 self?.subscriptionPlatform = subscription.platform
-
-                if subscription.expiresOrRenewsAt.timeIntervalSinceNow < 0 || !subscription.isActive {
-                    self?.hasAccessToVPN = false
-                    self?.hasAccessToDBP = false
-                    self?.hasAccessToITR = false
-
-                    if !subscription.isActive {
-                        self?.accountManager.signOut()
-                        return
-                    }
-                }
+                self?.subscriptionStatus = subscription.status
             } else {
                 self?.accountManager.signOut()
             }
@@ -272,16 +324,33 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             }
         }
     }
-    // swiftlint:enable cyclomatic_complexity
 
-    private func updateDescription(for date: Date) {
-        self.subscriptionDetails = UserText.preferencesSubscriptionActiveCaption(formattedDate: dateFormatter.string(from: date))
+    func updateDescription(for date: Date, status: Subscription.Status, period: Subscription.BillingPeriod) {
+
+        let formattedDate = dateFormatter.string(from: date)
+
+        let billingPeriod: String
+
+        switch period {
+        case .monthly: billingPeriod = UserText.monthlySubscriptionBillingPeriod.lowercased()
+        case .yearly: billingPeriod = UserText.yearlySubscriptionBillingPeriod.lowercased()
+        case .unknown: billingPeriod = ""
+        }
+
+        switch status {
+        case .autoRenewable:
+            self.subscriptionDetails = UserText.preferencesSubscriptionActiveRenewCaption(period: billingPeriod, formattedDate: formattedDate)
+        case .expired, .inactive:
+            self.subscriptionDetails = UserText.preferencesSubscriptionExpiredCaption(formattedDate: formattedDate)
+        default:
+            self.subscriptionDetails = UserText.preferencesSubscriptionActiveExpireCaption(period: billingPeriod, formattedDate: formattedDate)
+        }
     }
 
     private var dateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .short
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .none
 
         return dateFormatter
     }()
@@ -293,4 +362,8 @@ enum ManageSubscriptionSheet: Identifiable {
     var id: Self {
         return self
     }
+}
+
+enum PreferencesSubscriptionState: String {
+    case noSubscription, subscriptionPendingActivation, subscriptionActive, subscriptionExpired
 }

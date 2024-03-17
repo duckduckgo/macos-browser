@@ -17,12 +17,13 @@
 //
 
 import Foundation
+import Subscription
 
 public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, PurchaseRestoringSubscriptionAccessModel {
     private var actionHandlers: SubscriptionAccessActionHandlers
 
     public var title = UserText.activateModalTitle
-    public var description = UserText.activateModalDescription
+    public var description = UserText.activateModalDescription(platform: SubscriptionPurchaseEnvironment.current)
 
     public var email: String?
     public var emailLabel: String { UserText.email }
@@ -31,8 +32,8 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
 
     public private(set) var shouldShowRestorePurchase: Bool
     public var restorePurchaseDescription = UserText.restorePurchaseDescription
-    public var restorePurchaseButtonTitle = UserText.restorePurchasesButton
-    
+    public var restorePurchaseButtonTitle = UserText.restorePurchaseButton
+
     private var activateViaEmailURL: URL
 
     public init(actionHandlers: SubscriptionAccessActionHandlers, shouldShowRestorePurchase: Bool, activateViaEmailURL: URL) {

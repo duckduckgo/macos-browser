@@ -315,8 +315,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 case .accountCreationFailed:
                     report(subscriptionActivationError: .accountCreationFailed)
                 }
-
-                return nil
+                await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "canceled"))
             }
         }
 
@@ -539,12 +538,7 @@ extension MainWindowController {
     func showSomethingWentWrongAlert() {
         guard let window else { return }
 
-        switch NSApp.delegateTyped.subscriptionManager.configuration.currentPurchasePlatform {
-        case .appStore:
-            window.show(.somethingWentWrongAlert())
-        case .stripe:
-            window.show(.somethingWentWrongStripeAlert())
-        }
+        window.show(.somethingWentWrongAlert())
     }
 
     @MainActor
