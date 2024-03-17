@@ -223,7 +223,7 @@ final class BookmarkTableCellView: NSTableCellView {
         self.entity = folder
 
         faviconImageView.image = .folder
-        accessoryImageView.image = .chevronNext16
+        accessoryImageView.image = .chevronMediumRight16
         primaryTitleLabelValue = folder.title
         tertiaryTitleLabelValue = nil
     }
