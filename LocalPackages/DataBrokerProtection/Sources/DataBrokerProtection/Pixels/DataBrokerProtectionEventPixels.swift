@@ -35,7 +35,7 @@ final class DataBrokerProtectionEventPixelsUserDefaults: DataBrokerProtectionEve
 
     private let userDefaults: UserDefaults
 
-    init(userDefaults: UserDefaults = .dbp) {
+    init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
 
