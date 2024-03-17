@@ -27,7 +27,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     private let authRepository: AuthenticationRepository
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
-    init(accountManager: AccountManaging = AccountManager(),
+    init(accountManager: AccountManaging,
          authRepository: AuthenticationRepository = KeychainAuthenticationData(),
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
         self.accountManager = accountManager

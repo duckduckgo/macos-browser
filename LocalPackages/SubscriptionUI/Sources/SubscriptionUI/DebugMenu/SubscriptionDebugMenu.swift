@@ -22,6 +22,9 @@ import Subscription
 public final class SubscriptionDebugMenu: NSMenuItem {
 
     private var subscriptionManager: SubscriptionManaging
+    private lazy var authService = subscriptionManager.serviceProvider.makeAuthService()
+    private lazy var subscriptionService = subscriptionManager.serviceProvider.makeSubscriptionService()
+
     var persistSubscriptionServiceEnvironment: (SubscriptionServiceEnvironment) -> Void
 
     var isInternalTestingEnabled: () -> Bool
@@ -31,7 +34,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private var serviceEnvironmentItem: NSMenuItem?
 
     var currentViewController: () -> NSViewController?
-    private let accountManager: AccountManager
+    private let accountManager: AccountManaging
     private let subscriptionAppGroup: String
 
     private var _purchaseManager: Any?
@@ -59,7 +62,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
-        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
+        self.accountManager = subscriptionManager.accountManager
         self.subscriptionAppGroup = subscriptionAppGroup
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
@@ -184,7 +187,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func validateToken() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await AuthService.validateToken(accessToken: token) {
+            switch await authService.validateToken(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Validate token", message: "\(response)")
             case .failure(let error):
@@ -215,7 +218,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func getSubscriptionDetails() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await SubscriptionService.getSubscription(accessToken: token) {
+            switch await subscriptionService.getSubscription(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")
             case .failure(let error):
@@ -234,7 +237,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            currentViewController()?.presentAsSheet(DebugPurchaseViewController(subscriptionAppGroup: subscriptionAppGroup))
+            currentViewController()?.presentAsSheet(DebugPurchaseViewController(subscriptionManager: subscriptionManager))
         }
     }
 
@@ -291,7 +294,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
-                await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: subscriptionAppGroup)
+                await subscriptionManager.flowProvider.appStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: subscriptionAppGroup)
             }
         }
     }

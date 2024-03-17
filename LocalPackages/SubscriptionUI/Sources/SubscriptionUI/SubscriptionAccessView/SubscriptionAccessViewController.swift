@@ -67,7 +67,8 @@ public final class SubscriptionAccessViewController: NSViewController {
                                                 subscriptionAppGroup: subscriptionAppGroup,
                                                 refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
                                                 addEmailURL: addEmailURL,
-                                                manageEmailURL: manageEmailURL)
+                                                manageEmailURL: manageEmailURL,
+                                                flowProvider: subscriptionManager.flowProvider)
         } else {
             let shouldShowRestore = subscriptionManager.configuration.currentPurchasePlatform == .appStore
             let activateURL = subscriptionManager.urlProvider.url(for: .activateWithEmail)

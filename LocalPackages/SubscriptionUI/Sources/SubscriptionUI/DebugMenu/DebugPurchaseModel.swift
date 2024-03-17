@@ -23,17 +23,12 @@ import Subscription
 @available(macOS 12.0, *)
 public final class DebugPurchaseModel: ObservableObject {
 
-    var purchaseManager: PurchaseManager
-    var accountManager: AccountManager
-    private let subscriptionAppGroup: String
+    private var subscriptionManager: SubscriptionManaging
 
-    @Published var subscriptions: [SubscriptionRowModel]
+    @Published var subscriptions: [SubscriptionRowModel] = []
 
-    init(manager: PurchaseManager, subscriptions: [SubscriptionRowModel] = [], subscriptionAppGroup: String) {
-        self.purchaseManager = manager
-        self.subscriptions = subscriptions
-        self.subscriptionAppGroup = subscriptionAppGroup
-        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
+    init(subscriptionManager: SubscriptionManaging) {
+        self.subscriptionManager = subscriptionManager
     }
 
     @MainActor
@@ -41,7 +36,7 @@ public final class DebugPurchaseModel: ObservableObject {
         print("Attempting purchase: \(product.displayName)")
 
         Task {
-            await AppStorePurchaseFlow.purchaseSubscription(with: product.id, emailAccessToken: nil, subscriptionAppGroup: subscriptionAppGroup)
+            await subscriptionManager.flowProvider.appStorePurchaseFlow.purchaseSubscription(with: product.id, emailAccessToken: nil, subscriptionAppGroup: subscriptionManager.configuration.subscriptionAppGroup)
         }
     }
 }

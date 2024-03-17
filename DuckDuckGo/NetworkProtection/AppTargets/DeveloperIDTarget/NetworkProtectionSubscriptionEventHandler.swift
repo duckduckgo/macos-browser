@@ -29,7 +29,7 @@ final class NetworkProtectionSubscriptionEventHandler {
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
 
-    init(accountManager: AccountManaging = AccountManager(),
+    init(accountManager: AccountManaging,
          networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming = NetworkProtectionCodeRedemptionCoordinator(),
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler()) {

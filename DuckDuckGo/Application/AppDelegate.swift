@@ -82,11 +82,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     var privacyDashboardWindow: NSWindow?
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
-    private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+    private lazy var networkProtectionSubscriptionEventHandler = { NetworkProtectionSubscriptionEventHandler(accountManager: subscriptionManager.accountManager) }()
 #endif
 
 #if DBP && SUBSCRIPTION
-    private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
+    private lazy var dataBrokerProtectionSubscriptionEventHandler = { DataBrokerProtectionSubscriptionEventHandler(accountManager: subscriptionManager.accountManager) }()
 #endif
 
 #if SUBSCRIPTION
@@ -97,30 +97,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                      defaultValue: SubscriptionServiceEnvironment.default).wrappedValue
         let configuration: SubscriptionConfiguration
 #if APPSTORE || !STRIPE
-        configuration = DefaultSubscriptionConfiguration(purchasePlatform: .appStore, serviceEnvironment: currentEnvironment)
+        configuration = DefaultSubscriptionConfiguration(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs),
+                                                         purchasePlatform: .appStore,
+                                                         serviceEnvironment: currentEnvironment)
 #else
-        configuration = DefaultSubscriptionConfiguration(purchasePlatform: .stripe, serviceEnvironment: currentEnvironment)
+        configuration = DefaultSubscriptionConfiguration(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs),
+                                                         purchasePlatform: .stripe,
+                                                         serviceEnvironment: currentEnvironment)
 #endif
 
-        // AccountManager
-        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+//        do {
+//            // perform token migration if needed (to be removed before release)
+//            try subscriptionManager.accountManager.migrateAccessTokenToNewStore()
+//        } catch {
+//            if let error = error as? AccountManager.MigrationError {
+//                switch error {
+//                case AccountManager.MigrationError.migrationFailed:
+//                    os_log(.default, log: .subscription, "Access token migration failed")
+//                case AccountManager.MigrationError.noMigrationNeeded:
+//                    os_log(.default, log: .subscription, "No access token migration needed")
+//                }
+//            }
+//        }
 
-        do {
-            // perform token migration if needed (to be removed before release)
-            try accountManager.migrateAccessTokenToNewStore()
-        } catch {
-            if let error = error as? AccountManager.MigrationError {
-                switch error {
-                case AccountManager.MigrationError.migrationFailed:
-                    os_log(.default, log: .subscription, "Access token migration failed")
-                case AccountManager.MigrationError.noMigrationNeeded:
-                    os_log(.default, log: .subscription, "No access token migration needed")
-                }
-            }
-        }
-
-        return SubscriptionManager(configuration: configuration,
-                                   accountManager: accountManager)
+        return SubscriptionManager(configuration: configuration)
     }()
 #endif
 
@@ -579,25 +579,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         }
     }
 
-}
-
-func updateSubscriptionStatus() {
-#if SUBSCRIPTION
-    Task {
-        guard let token = AccountManager().accessToken else {
-            return
-        }
-        let result = await SubscriptionService.getSubscription(accessToken: token)
-
-        switch result {
-        case .success(let success):
-            if success.isActive {
-                DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
+    func updateSubscriptionStatus() {
+    #if SUBSCRIPTION
+        Task {
+            guard let token = subscriptionManager.accountManager.accessToken else {
+                return
             }
-        case .failure: break
+
+            let subscriptionService = subscriptionManager.serviceProvider.makeSubscriptionService()
+            let result = await subscriptionService.getSubscription(accessToken: token)
+
+            switch result {
+            case .success(let success):
+                if success.isActive {
+                    DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
+                }
+            case .failure: break
+            }
         }
+    #endif
     }
-#endif
 }
 
 #if NETWORK_PROTECTION || DBP

@@ -82,6 +82,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     private var subscriptionManager = NSApp.delegateTyped.subscriptionManager
     private var accountManager = NSApp.delegateTyped.subscriptionManager.accountManager
 
+    private var stripePurchaseFlow: StripePurchaseFlow { subscriptionManager.flowProvider.stripePurchaseFlow }
+
+    @available(macOS 12.0, *)
+    private var appStorePurchaseFlow: AppStorePurchaseFlow { subscriptionManager.flowProvider.appStorePurchaseFlow }
+
+    @available(macOS 12.0, *)
+    private var appStoreRestoreFlow: AppStoreRestoreFlow { subscriptionManager.flowProvider.appStoreRestoreFlow }
+
     var broker: UserScriptMessageBroker?
 
     var featureName = "useSubscription"
@@ -165,7 +173,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         if subscriptionManager.configuration.currentPurchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
-                switch await AppStorePurchaseFlow.subscriptionOptions() {
+                switch await appStorePurchaseFlow.subscriptionOptions() {
                 case .success(let subscriptionOptions):
                     return subscriptionOptions
                 case .failure:
@@ -173,7 +181,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 }
             }
         } else if subscriptionManager.configuration.currentPurchasePlatform == .stripe {
-            switch await StripePurchaseFlow.subscriptionOptions() {
+            switch await stripePurchaseFlow.subscriptionOptions() {
             case .success(let subscriptionOptions):
                 return subscriptionOptions
             case .failure:
@@ -231,7 +239,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 let purchaseTransactionJWS: String
 
                 os_log(.info, log: .subscription, "[Purchase] Purchasing")
-                switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+                switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
                 case .success(let transactionJWS):
                     purchaseTransactionJWS = transactionJWS
                 case .failure(let error):
@@ -263,7 +271,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
-                switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+                switch await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
                 case .success(let purchaseUpdate):
                     os_log(.info, log: .subscription, "[Purchase] Purchase complete")
                     DailyPixel.fire(pixel: .privacyProPurchaseSuccess, frequency: .dailyAndCount)
@@ -293,7 +301,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         } else if subscriptionManager.configuration.currentPurchasePlatform == .stripe {
             let emailAccessToken = try? EmailManager().getToken()
 
-            let result = await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            let result = await stripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
             switch result {
             case .success(let success):
@@ -486,7 +494,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let progressViewController = await ProgressViewController(title: UserText.completingPurchaseTitle)
 
         await mainViewController?.presentAsSheet(progressViewController)
-        await StripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        await stripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         await mainViewController?.dismiss(progressViewController)
 
         return [String: String]() // cannot be nil
@@ -519,7 +527,8 @@ extension SubscriptionPagesUseSubscriptionFeature {
             defer { mainViewController?.dismiss(progressViewController) }
             mainViewController?.presentAsSheet(progressViewController)
             guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
-            onResultHandler(await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)))
+            let appStoreRestoreFlow = NSApp.delegateTyped.subscriptionManager.flowProvider.appStoreRestoreFlow
+            onResultHandler(await appStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)))
         }
     }
 }
@@ -565,7 +574,8 @@ extension MainWindowController {
         window.show(.subscriptionFoundAlert(), firstButtonAction: {
             if #available(macOS 12.0, *) {
                 Task {
-                    let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                    let appStoreRestoreFlow = NSApp.delegateTyped.subscriptionManager.flowProvider.appStoreRestoreFlow
+                    let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
                     switch result {
                     case .success:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)

@@ -142,7 +142,7 @@ protocol NewWindowPolicyDecisionMaker {
 #if SUBSCRIPTION
             if let url {
                 if url.isChild(of: URL.subscriptionBaseURL) {
-                    // TODO:
+                    // TODO: Subs. logic for converting subscription URL to environment if it lacks one
                     if SubscriptionPurchaseEnvironment.currentServiceEnvironment == .staging, url.getParameter(named: "environment") == nil {
                         return .subscription(url.appendingParameter(name: "environment", value: "staging"))
                     }

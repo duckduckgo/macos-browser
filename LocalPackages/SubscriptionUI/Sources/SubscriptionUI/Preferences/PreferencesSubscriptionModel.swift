@@ -44,6 +44,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
+    private lazy var authService = subscriptionManager.serviceProvider.makeAuthService()
+    private lazy var subscriptionService = subscriptionManager.serviceProvider.makeSubscriptionService()
+
     public enum UserEvent {
         case openVPN,
              openDB,
@@ -76,7 +79,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         if let token = accountManager.accessToken {
             Task {
-                let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
+                let subscriptionResult = await subscriptionService.getSubscription(accessToken: token)
                 if case .success(let subscription) = subscriptionResult {
                     self.updateDescription(for: subscription.expiresOrRenewsAt)
                 }
@@ -112,7 +115,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                                                 subscriptionAppGroup: subscriptionAppGroup,
                                                 refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
                                                 addEmailURL: addEmailURL,
-                                                manageEmailURL: manageEmailURL)
+                                                manageEmailURL: manageEmailURL,
+                                                flowProvider: subscriptionManager.flowProvider)
 
         } else {
             let shouldShowRestore = subscriptionManager.configuration.currentPurchasePlatform == .appStore
@@ -168,7 +172,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         case .stripe:
             Task {
                 guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
-                      case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                      case let .success(response) = await subscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
                 openURLHandler(customerPortalURL)
@@ -180,7 +184,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         if #available(macOS 12.0, *) {
             guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return false }
 
-            switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
+            switch await authService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
                 return response.externalID == accountManager.externalID
             case .failure:
@@ -228,7 +232,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             guard let token = self?.accountManager.accessToken else { return }
 
-            let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token)
+            let subscriptionResult = await self?.subscriptionService.getSubscription(accessToken: token)
 
             if case .success(let subscription) = subscriptionResult {
                 self?.updateDescription(for: subscription.expiresOrRenewsAt)
