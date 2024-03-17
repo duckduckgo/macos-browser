@@ -35,7 +35,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     var currentViewController: () -> NSViewController?
     private let accountManager: AccountManaging
-    private let subscriptionAppGroup: String
 
     private var _purchaseManager: Any?
     @available(macOS 12.0, *)
@@ -55,15 +54,13 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 persistSubscriptionServiceEnvironment: @escaping (SubscriptionServiceEnvironment) -> Void,
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
-                currentViewController: @escaping () -> NSViewController?,
-                subscriptionAppGroup: String) {
+                currentViewController: @escaping () -> NSViewController?) {
         self.subscriptionManager = subscriptionManager
         self.persistSubscriptionServiceEnvironment = persistSubscriptionServiceEnvironment
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
         self.accountManager = subscriptionManager.accountManager
-        self.subscriptionAppGroup = subscriptionAppGroup
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
     }
@@ -294,7 +291,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
-                await subscriptionManager.flowProvider.appStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: subscriptionAppGroup)
+                await subscriptionManager.flowProvider.appStoreRestoreFlow.restoreAccountFromPastPurchase()
             }
         }
     }

@@ -239,7 +239,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 let purchaseTransactionJWS: String
 
                 os_log(.info, log: .subscription, "[Purchase] Purchasing")
-                switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+                switch await appStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
                 case .success(let transactionJWS):
                     purchaseTransactionJWS = transactionJWS
                 case .failure(let error):
@@ -271,7 +271,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
-                switch await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+                switch await appStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS) {
                 case .success(let purchaseUpdate):
                     os_log(.info, log: .subscription, "[Purchase] Purchase complete")
                     DailyPixel.fire(pixel: .privacyProPurchaseSuccess, frequency: .dailyAndCount)
@@ -301,7 +301,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         } else if subscriptionManager.configuration.currentPurchasePlatform == .stripe {
             let emailAccessToken = try? EmailManager().getToken()
 
-            let result = await stripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            let result = await stripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken)
 
             switch result {
             case .success(let success):
@@ -442,7 +442,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     }
                 })
 
-            let vc = SubscriptionAccessViewController(subscriptionManager: subscriptionManager, accountManager: accountManager, actionHandlers: actionHandlers, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            let vc = SubscriptionAccessViewController(subscriptionManager: subscriptionManager, accountManager: accountManager, actionHandlers: actionHandlers)
             WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
         }
 
@@ -494,7 +494,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let progressViewController = await ProgressViewController(title: UserText.completingPurchaseTitle)
 
         await mainViewController?.presentAsSheet(progressViewController)
-        await stripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        await stripePurchaseFlow.completeSubscriptionPurchase()
         await mainViewController?.dismiss(progressViewController)
 
         return [String: String]() // cannot be nil
@@ -528,7 +528,7 @@ extension SubscriptionPagesUseSubscriptionFeature {
             mainViewController?.presentAsSheet(progressViewController)
             guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
             let appStoreRestoreFlow = NSApp.delegateTyped.subscriptionManager.flowProvider.appStoreRestoreFlow
-            onResultHandler(await appStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)))
+            onResultHandler(await appStoreRestoreFlow.restoreAccountFromPastPurchase())
         }
     }
 }
@@ -575,7 +575,7 @@ extension MainWindowController {
             if #available(macOS 12.0, *) {
                 Task {
                     let appStoreRestoreFlow = NSApp.delegateTyped.subscriptionManager.flowProvider.appStoreRestoreFlow
-                    let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                    let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     switch result {
                     case .success:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)

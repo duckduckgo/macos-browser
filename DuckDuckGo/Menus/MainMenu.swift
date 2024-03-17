@@ -630,7 +630,7 @@ import SubscriptionUI
                                   updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
                                   currentViewController: {
                 WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            }, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            })
 #endif
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())

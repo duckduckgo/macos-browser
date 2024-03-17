@@ -25,17 +25,15 @@ public final class SubscriptionAccessViewController: NSViewController {
     private var subscriptionManager: SubscriptionManaging
     private let accountManager: AccountManaging
     private var actionHandlers: SubscriptionAccessActionHandlers
-    private let subscriptionAppGroup: String
 
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(subscriptionManager: SubscriptionManaging, accountManager: AccountManaging, actionHandlers: SubscriptionAccessActionHandlers, subscriptionAppGroup: String) {
+    public init(subscriptionManager: SubscriptionManaging, accountManager: AccountManaging, actionHandlers: SubscriptionAccessActionHandlers) {
         self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
         self.actionHandlers = actionHandlers
-        self.subscriptionAppGroup = subscriptionAppGroup
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -64,7 +62,6 @@ public final class SubscriptionAccessViewController: NSViewController {
             let manageEmailURL = subscriptionManager.urlProvider.url(for: .manageEmail)
             return ShareSubscriptionAccessModel(actionHandlers: actionHandlers,
                                                 email: accountManager.email,
-                                                subscriptionAppGroup: subscriptionAppGroup,
                                                 refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
                                                 addEmailURL: addEmailURL,
                                                 manageEmailURL: manageEmailURL,

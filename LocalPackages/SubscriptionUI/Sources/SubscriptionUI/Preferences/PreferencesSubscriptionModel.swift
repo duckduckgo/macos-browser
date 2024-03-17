@@ -37,7 +37,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private let openURLHandler: (URL) -> Void
     public let userEventHandler: (UserEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
-    private let subscriptionAppGroup: String
 
     private var fetchSubscriptionDetailsTask: Task<(), Never>?
 
@@ -66,14 +65,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 accountManager: AccountManaging,
                 openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
-                sheetActionHandler: SubscriptionAccessActionHandlers,
-                subscriptionAppGroup: String) {
+                sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.subscriptionManager = subscriptionManager
         self.accountManager = accountManager
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
-        self.subscriptionAppGroup = subscriptionAppGroup
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
@@ -112,7 +109,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             let manageEmailURL = subscriptionManager.urlProvider.url(for: .manageEmail)
             return ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler,
                                                 email: accountManager.email,
-                                                subscriptionAppGroup: subscriptionAppGroup,
                                                 refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
                                                 addEmailURL: addEmailURL,
                                                 manageEmailURL: manageEmailURL,

@@ -165,8 +165,7 @@ enum Preferences {
                                                 accountManager: NSApp.delegateTyped.subscriptionManager.accountManager,
                                                 openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
-                                                sheetActionHandler: sheetActionHandler,
-                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                                                sheetActionHandler: sheetActionHandler)
         }
 #endif
     }
