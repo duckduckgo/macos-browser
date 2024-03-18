@@ -35,6 +35,8 @@ struct DataBrokerProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
         let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
 
+        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
+
         guard featureVisibility.isFeatureVisible() else {
             featureVisibility.disableAndDeleteForWaitlistUsers()
             return
@@ -57,6 +59,8 @@ struct DataBrokerProtectionAppEvents {
 
     func applicationDidBecomeActive() {
         let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
+
+        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
         guard featureVisibility.isFeatureVisible() else {
             featureVisibility.disableAndDeleteForWaitlistUsers()

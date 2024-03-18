@@ -147,6 +147,8 @@ public struct UserDefaultsWrapper<T> {
 
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
         case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
+        case dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
+
 
         // VPN
 

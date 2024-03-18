@@ -33,16 +33,23 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let userDefaults: UserDefaults
+
+    @UserDefaultsWrapper(key: .dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro, defaultValue: false)
+    var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool
+
 
     /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
     static var bypassWaitlist = false
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler(),
-         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
+         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
+         userDefaults: UserDefaults = .standard) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
+        self.userDefaults = userDefaults
     }
 
     var waitlistIsOngoing: Bool {
@@ -97,6 +104,24 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
 
         os_log("Disabling and removing DBP for waitlist users", log: .dataBrokerProtection)
         featureDisabler.disableAndDelete()
+    }
+
+    /// Returns true if a cleanup was performed, false otherwise
+    func cleanUpDBPForPrivacyProIfNecessary() -> Bool {
+        let isPrivacyProFeatureFlagEnabled = NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
+
+        // Early return to avoid unnecessary storage calls
+        guard isPrivacyProFeatureFlagEnabled else { return false }
+
+        let wasWaitlistUser = DataBrokerProtectionWaitlist().waitlistStorage.getWaitlistInviteCode() != nil
+
+        if isPrivacyProFeatureFlagEnabled && wasWaitlistUser && !dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro {
+            disableAndDeleteForWaitlistUsers()
+            dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = true
+            return true
+        } else {
+            return false
+        }
     }
 
     /// If we want to prevent new users from joining the waitlist while still allowing waitlist users to continue using it,
