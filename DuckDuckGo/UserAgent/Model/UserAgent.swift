@@ -72,6 +72,8 @@ extension UserAgent {
         // use safari when serving up PDFs from duckduckgo directly
         regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
 
+        regex("https://duckduckgo\\.com/email/.*"): UserAgent.safari,
+
         // use default WKWebView user agent for duckduckgo domain to remove CTA
         regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
     ]
