@@ -13754,8 +13754,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "sam/update-wireguard-framework-to-1.1.3";
-				kind = branch;
+				kind = exactVersion;
+				version = 125.0.2;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
