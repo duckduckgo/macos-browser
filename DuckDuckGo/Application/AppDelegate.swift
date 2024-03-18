@@ -82,11 +82,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     var privacyDashboardWindow: NSWindow?
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
-    private lazy var networkProtectionSubscriptionEventHandler = { NetworkProtectionSubscriptionEventHandler(accountManager: subscriptionManager.accountManager) }()
+    private lazy var networkProtectionSubscriptionEventHandler = { NetworkProtectionSubscriptionEventHandler(tokenStorage: subscriptionManager.tokenStorage) }()
 #endif
 
 #if DBP && SUBSCRIPTION
-    private lazy var dataBrokerProtectionSubscriptionEventHandler = { DataBrokerProtectionSubscriptionEventHandler(accountManager: subscriptionManager.accountManager) }()
+    private lazy var dataBrokerProtectionSubscriptionEventHandler = { DataBrokerProtectionSubscriptionEventHandler(tokenStorage: subscriptionManager.tokenStorage) }()
 #endif
 
 #if SUBSCRIPTION
@@ -568,7 +568,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     func updateSubscriptionStatus() {
     #if SUBSCRIPTION
         Task {
-            guard let token = subscriptionManager.accountManager.accessToken else {
+            guard let token = subscriptionManager.tokenStorage.accessToken else {
                 return
             }
 

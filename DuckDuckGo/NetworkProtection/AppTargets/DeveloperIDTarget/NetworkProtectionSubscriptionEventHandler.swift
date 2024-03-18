@@ -24,16 +24,16 @@ import NetworkProtection
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let accountManager: AccountManaging
+    private let tokenStorage: SubscriptionTokenStorage
     private let networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
 
-    init(accountManager: AccountManaging,
+    init(tokenStorage: SubscriptionTokenStorage,
          networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming = NetworkProtectionCodeRedemptionCoordinator(),
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler()) {
-        self.accountManager = accountManager
+        self.tokenStorage = tokenStorage
         self.networkProtectionRedemptionCoordinator = networkProtectionRedemptionCoordinator
         self.networkProtectionTokenStorage = networkProtectionTokenStorage
         self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
@@ -45,7 +45,7 @@ final class NetworkProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignIn() {
-        guard let token = accountManager.accessToken else {
+        guard let token = tokenStorage.accessToken else {
             assertionFailure("[NetP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }

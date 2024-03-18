@@ -99,7 +99,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
-        if let token = accountManager.accessToken {
+        if let token = subscriptionManager.tokenStorage.accessToken {
             Task {
                 let subscriptionResult = await subscriptionService.getSubscription(accessToken: token, cachePolicy: .returnCacheDataElseLoad)
                 if case .success(let subscription) = subscriptionResult {
@@ -218,7 +218,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
         case .stripe:
             Task {
-                guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
+                guard let accessToken = subscriptionManager.tokenStorage.accessToken, let externalID = accountManager.externalID,
                       case let .success(response) = await subscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
@@ -290,7 +290,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.fetchSubscriptionDetailsTask = nil
             }
 
-            guard let token = self?.accountManager.accessToken else { return }
+            guard let token = self?.subscriptionManager.tokenStorage.accessToken else { return }
 
             let subscriptionResult = await self?.subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
 

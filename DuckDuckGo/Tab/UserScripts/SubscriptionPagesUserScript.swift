@@ -80,6 +80,7 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     private var subscriptionManager = NSApp.delegateTyped.subscriptionManager
+    private var tokenStorage: SubscriptionTokenStorage { subscriptionManager.tokenStorage }
     private var accountManager = NSApp.delegateTyped.subscriptionManager.accountManager
 
     private var stripePurchaseFlow: StripePurchaseFlow { subscriptionManager.flowProvider.stripePurchaseFlow }
@@ -131,7 +132,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let authToken = accountManager.authToken, accountManager.accessToken != nil {
+        if let authToken = tokenStorage.authToken, tokenStorage.accessToken != nil {
             return Subscription(token: authToken)
         } else {
             return Subscription(token: "")
@@ -150,7 +151,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let authToken = subscriptionValues.token
         if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(authToken),
            case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
-            accountManager.storeAuthToken(token: authToken)
+            tokenStorage.authToken = authToken
+            tokenStorage.accessToken = accessToken
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
         }
 
@@ -158,7 +160,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let accessToken = accountManager.accessToken,
+        if let accessToken = tokenStorage.accessToken,
            case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
         }
