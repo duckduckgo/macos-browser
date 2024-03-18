@@ -106,20 +106,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                          serviceEnvironment: currentEnvironment)
 #endif
 
-//        do {
-//            // perform token migration if needed (to be removed before release)
-//            try subscriptionManager.accountManager.migrateAccessTokenToNewStore()
-//        } catch {
-//            if let error = error as? AccountManager.MigrationError {
-//                switch error {
-//                case AccountManager.MigrationError.migrationFailed:
-//                    os_log(.default, log: .subscription, "Access token migration failed")
-//                case AccountManager.MigrationError.noMigrationNeeded:
-//                    os_log(.default, log: .subscription, "No access token migration needed")
-//                }
-//            }
-//        }
-
         return SubscriptionManager(configuration: configuration)
     }()
 #endif
