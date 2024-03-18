@@ -27,6 +27,7 @@ protocol DataBrokerProtectionFeatureVisibility {
     func isFeatureVisible() -> Bool
     func disableAndDeleteForAllUsers()
     func disableAndDeleteForWaitlistUsers()
+    func isPrivacyProEnabled() -> Bool
 }
 
 struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeatureVisibility {
@@ -90,6 +91,15 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         DataBrokerProtectionWaitlist().waitlistStorage.isWaitlistUser
     }
 
+    func isPrivacyProEnabled() -> Bool {
+#if SUBSCRIPTION
+        return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
+#else
+        return false
+#endif
+
+    }
+
     func disableAndDeleteForAllUsers() {
         featureDisabler.disableAndDelete()
 
@@ -107,15 +117,9 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
 
     /// Returns true if a cleanup was performed, false otherwise
     func cleanUpDBPForPrivacyProIfNecessary() -> Bool {
-#if SUBSCRIPTION
-        let isPrivacyProFeatureFlagEnabled = NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
-#else
-        let isPrivacyProFeatureFlagEnabled = false
-#endif
-
         let wasWaitlistUser = DataBrokerProtectionWaitlist().waitlistStorage.getWaitlistInviteCode() != nil
 
-        if isPrivacyProFeatureFlagEnabled && wasWaitlistUser && !dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro {
+        if isPrivacyProEnabled() && wasWaitlistUser && !dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro {
             disableAndDeleteForWaitlistUsers()
             dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = true
             return true

@@ -37,7 +37,7 @@ struct DataBrokerProtectionAppEvents {
 
         guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
-        guard featureVisibility.isFeatureVisible() else {
+        guard featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() else {
             featureVisibility.disableAndDeleteForWaitlistUsers()
             return
         }
@@ -62,7 +62,7 @@ struct DataBrokerProtectionAppEvents {
 
         guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
-        guard featureVisibility.isFeatureVisible() else {
+        guard featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() else {
             featureVisibility.disableAndDeleteForWaitlistUsers()
             return
         }
