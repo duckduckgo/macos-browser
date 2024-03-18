@@ -44,7 +44,9 @@ public struct SystemExtensionManager {
         self.workspace = workspace
     }
 
-    public func activate(waitingForUserApproval: @escaping () -> Void) async throws {
+    /// - Returns: The system extension version.
+    /// 
+    public func activate(waitingForUserApproval: @escaping () -> Void) async throws -> String {
         /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
         ///     Background: For a lot of users, the system won't show the system-extension-blocked alert if there's a previous request
         ///         to activate the extension.  You can see active requests in your console using command `systemextensionsctl list`.
@@ -69,8 +71,7 @@ public struct SystemExtensionManager {
 
         try await activationRequest.submit()
 
-        // TODO: do something with this
-        print(activationRequest.version)
+        return activationRequest.version ?? "unknown"
     }
 
     public func deactivate() async throws {
@@ -117,7 +118,7 @@ final class SystemExtensionRequest: NSObject {
     private let request: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
     private let waitingForUserApproval: (() -> Void)?
-    private(set) var version: String? = nil
+    private(set) var version: String?
 
     private var continuation: CheckedContinuation<Void, Error>?
 
@@ -150,6 +151,10 @@ final class SystemExtensionRequest: NSObject {
         }
     }
 
+    private func updateVersion(to version: String) {
+        self.version = version
+    }
+
     private func updateVersionNumberIfMissing() {
         guard version == nil,
               let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
@@ -168,7 +173,7 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
 
     func request(_ request: OSSystemExtensionRequest, actionForReplacingExtension existing: OSSystemExtensionProperties, withExtension ext: OSSystemExtensionProperties) -> OSSystemExtensionRequest.ReplacementAction {
 
-        version = ext.bundleShortVersion + "." + ext.bundleVersion
+        updateVersion(to: ext.bundleShortVersion + "." + ext.bundleVersion)
         return .replace
     }
 
