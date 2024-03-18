@@ -9,15 +9,12 @@
             "value" : "(%@)"
           }
         },
-<<<<<<< HEAD
-=======
         "en-US" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "(%@)"
           }
         },
->>>>>>> main
         "es" : {
           "stringUnit" : {
             "state" : "translated",
