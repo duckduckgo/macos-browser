@@ -43,7 +43,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_canBeOpenedWithKeyCommand() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -59,7 +59,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_canBeOpenedWithMenuBarItem() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -80,7 +80,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_canBeOpenedWithMoreOptionsMenuItem() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -104,7 +104,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_canBeClosedWithEscape() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -125,7 +125,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_canBeClosedWithShiftCommandF() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -146,7 +146,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_canBeClosedWithHideFindMenuItem() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -172,7 +172,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_showsCorrectNumberOfOccurrences() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -193,7 +193,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_showsFocusAndOccurrenceHighlighting() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -222,7 +222,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_findNextGoesToNextOccurrence() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -275,7 +275,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_findNextNextArrowGoesToNextOccurrence() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -327,7 +327,7 @@ class FindInPageTests: XCTestCase {
 
 	func test_findInPage_commandGGoesToNextOccurrence() throws {
 		XCTAssertTrue(addressBarTextField.waitForExistence(timeout: timeout), "The Address Bar text field does not exist when it is expected.")
-		addressBarTextField.typeText("\(FindInPageTests.loremIpsumFileURL().absoluteString)\r")
+		addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
 		XCTAssertTrue(
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
@@ -377,7 +377,7 @@ class FindInPageTests: XCTestCase {
 /// Helpers for the Find in Page tests
 extension FindInPageTests {
 	/// A shared URL to reference the local HTML file
-	class func loremIpsumFileURL() -> URL {
+	class var loremIpsumFileURL: URL {
 		let loremIpsumFileName = "lorem_ipsum.html"
 		XCTAssertNotNil(
 			FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
@@ -401,7 +401,7 @@ extension FindInPageTests {
 		let loremIpsumData = Data(loremIpsumHTML.utf8)
 
 		do {
-			try loremIpsumData.write(to: loremIpsumFileURL(), options: [])
+			try loremIpsumData.write(to: loremIpsumFileURL, options: [])
 		} catch {
 			XCTFail("It wasn't possible to write out the required local HTML file for the tests: \(error.localizedDescription)")
 		}
@@ -410,7 +410,7 @@ extension FindInPageTests {
 	/// Remove it when done
 	class func removeLocalHTML() {
 		do {
-			try FileManager.default.removeItem(at: loremIpsumFileURL())
+			try FileManager.default.removeItem(at: loremIpsumFileURL)
 		} catch {
 			XCTFail("It wasn't possible to remove the required local HTML file for the tests: \(error.localizedDescription)")
 		}
