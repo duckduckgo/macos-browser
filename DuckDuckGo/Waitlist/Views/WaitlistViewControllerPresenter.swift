@@ -81,9 +81,11 @@ struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerP
 struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
 
     static func shouldPresentWaitlist() -> Bool {
+#if SUBSCRIPTION
         if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
             return false
         }
+#endif
         let waitlist = DataBrokerProtectionWaitlist()
 
         let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)

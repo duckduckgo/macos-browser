@@ -367,8 +367,14 @@ final class MoreOptionsMenu: NSMenu {
         }
 #endif // NETWORK_PROTECTION
 
+#if SUBSCRIPTION
+        let isSubscriptionEnabled = NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
+#else
+        let isSubscriptionEnabled = false
+#endif
+
 #if DBP
-        if DefaultDataBrokerProtectionFeatureVisibility().isFeatureVisible() || NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
+        if DefaultDataBrokerProtectionFeatureVisibility().isFeatureVisible() || isSubscriptionEnabled {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")
