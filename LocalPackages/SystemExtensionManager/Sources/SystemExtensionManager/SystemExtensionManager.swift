@@ -62,11 +62,15 @@ public struct SystemExtensionManager {
             openSystemSettingsSecurity()
         }
 
-        return try await SystemExtensionRequest.activationRequest(
+        let activationRequest = SystemExtensionRequest.activationRequest(
             forExtensionWithIdentifier: extensionBundleID,
             manager: manager,
             waitingForUserApproval: waitingForUserApproval)
-        .submit()
+
+        try await activationRequest.submit()
+
+        // TODO: do something with this
+        print(activationRequest.version)
     }
 
     public func deactivate() async throws {
@@ -113,6 +117,7 @@ final class SystemExtensionRequest: NSObject {
     private let request: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
     private let waitingForUserApproval: (() -> Void)?
+    private(set) var version: String? = nil
 
     private var continuation: CheckedContinuation<Void, Error>?
 
@@ -144,12 +149,26 @@ final class SystemExtensionRequest: NSObject {
             manager.submitRequest(request)
         }
     }
+
+    private func updateVersionNumberIfMissing() {
+        guard version == nil,
+              let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
+            return
+        }
+
+        var extensionVersion = versionString
+
+        if let buildString = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String {
+            extensionVersion = extensionVersion + "." + buildString
+        }
+    }
 }
 
 extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
 
     func request(_ request: OSSystemExtensionRequest, actionForReplacingExtension existing: OSSystemExtensionProperties, withExtension ext: OSSystemExtensionProperties) -> OSSystemExtensionRequest.ReplacementAction {
 
+        version = ext.bundleShortVersion + "." + ext.bundleVersion
         return .replace
     }
 
@@ -160,6 +179,7 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
     func request(_ request: OSSystemExtensionRequest, didFinishWithResult result: OSSystemExtensionRequest.Result) {
         switch result {
         case .completed:
+            updateVersionNumberIfMissing()
             continuation?.resume()
         case .willCompleteAfterReboot:
             continuation?.resume(throwing: SystemExtensionRequestError.willActivateAfterReboot)
