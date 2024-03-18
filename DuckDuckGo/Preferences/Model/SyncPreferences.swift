@@ -148,13 +148,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private func updateInvalidObjects() {
         invalidBookmarksTitles = syncBookmarksAdapter.provider?
-            .fetchTitlesForObjectsThatFailedValidation()
+            .fetchDescriptionsForObjectsThatFailedValidation()
             .map { $0.truncated(length: 15) } ?? []
 
-        let invalidCredentialsObjects: [String] = (try? syncCredentialsAdapter.provider?.fetchTitlesForObjectsThatFailedValidation()) ?? []
+        let invalidCredentialsObjects: [String] = (try? syncCredentialsAdapter.provider?.fetchDescriptionsForObjectsThatFailedValidation()) ?? []
         invalidCredentialsTitles = invalidCredentialsObjects.map({ $0.truncated(length: 15) })
     }
 
+    // swiftlint:disable:next function_body_length
     private func setUpObservables() {
         syncService.featureFlagsPublisher
             .dropFirst()
