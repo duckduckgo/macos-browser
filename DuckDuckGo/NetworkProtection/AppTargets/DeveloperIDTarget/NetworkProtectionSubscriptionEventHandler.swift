@@ -47,7 +47,7 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private func setUpEntitlementMonitoring() {
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
-
+        guard AccountManager().isUserAuthenticated else { return }
         let entitlementsCheck = {
             await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
