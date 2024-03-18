@@ -126,9 +126,14 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         var description: String {
             switch itemType {
             case .bookmarks:
-                return UserText.invalidBookmarksPresentDescription(model.invalidBookmarksTitles)
+                assert(!model.invalidBookmarksTitles.isEmpty)
+                let firstInvalidBookmarkTitle = model.invalidBookmarksTitles.first ?? ""
+                return UserText.invalidBookmarksPresentDescription(firstInvalidBookmarkTitle, numberOfOtherInvalidItems: model.invalidBookmarksTitles.count - 1)
+
             case .credentials:
-                return UserText.invalidCredentialsPresentDescription(model.invalidCredentialsTitles)
+                assert(!model.invalidCredentialsTitles.isEmpty)
+                let firstInvalidCredentialTitle = model.invalidCredentialsTitles.first ?? ""
+                return UserText.invalidCredentialsPresentDescription(firstInvalidCredentialTitle, numberOfOtherInvalidItems: model.invalidCredentialsTitles.count - 1)
             }
         }
         var actionTitle: String {

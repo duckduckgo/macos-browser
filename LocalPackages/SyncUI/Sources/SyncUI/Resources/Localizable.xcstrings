@@ -4746,7 +4746,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your bookmarks for %1$@ and other sites (%2$@) can't sync because some of their fields exceed the character limit."
+            "value" : "Your bookmarks for %1$@ and other sites (%2$d) can't sync because some of their fields exceed the character limit."
           }
         }
       }
@@ -4782,7 +4782,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your passwords for %1$@ and other sites (%2$@) can't sync because some of their fields exceed the character limit."
+            "value" : "Your passwords for %1$@ and other sites (%2$d) can't sync because some of their fields exceed the character limit."
           }
         }
       }

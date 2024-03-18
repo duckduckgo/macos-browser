@@ -39,8 +39,6 @@ extension SyncDevice {
 }
 
 final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
-    @Published var invalidBookmarksTitles: [String] = []
-    @Published var invalidCredentialsTitles: [String] = []
 
     struct Consts {
         static let syncPausedStateChanged = Notification.Name("com.duckduckgo.app.SyncPausedStateChanged")
@@ -87,6 +85,9 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var isSyncBookmarksPaused: Bool
 
     @Published var isSyncCredentialsPaused: Bool
+
+    @Published var invalidBookmarksTitles: [String] = []
+    @Published var invalidCredentialsTitles: [String] = []
 
     private var shouldRequestSyncOnFavoritesOptionChange: Bool = true
     private var isScreenLocked: Bool = false
