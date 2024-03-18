@@ -274,59 +274,61 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         setupMenuVisibility()
 
-        bouncer.requireAuthenticationOrKillApp()
+        Task { @MainActor in
+            await bouncer.requireAuthenticationOrKillApp()
 
-        // Initialize lazy properties
-        _ = tunnelControllerIPCService
-        _ = vpnProxyLauncher
+            // Initialize lazy properties
+            _ = tunnelControllerIPCService
+            _ = vpnProxyLauncher
 
-        let dryRun: Bool
+            let dryRun: Bool
 
 #if DEBUG
-        dryRun = true
+            dryRun = true
 #else
-        dryRun = false
+            dryRun = false
 #endif
 
-        let pixelSource: String
+            let pixelSource: String
 
 #if NETP_SYSTEM_EXTENSION
-        pixelSource = "vpnAgent"
+            pixelSource = "vpnAgent"
 #else
-        pixelSource = "vpnAgentAppStore"
+            pixelSource = "vpnAgentAppStore"
 #endif
 
-        PixelKit.setUp(dryRun: dryRun,
-                       appVersion: AppVersion.shared.versionNumber,
-                       source: pixelSource,
-                       defaultHeaders: [:],
-                       log: .networkProtectionPixel,
-                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
+            PixelKit.setUp(dryRun: dryRun,
+                           appVersion: AppVersion.shared.versionNumber,
+                           source: pixelSource,
+                           defaultHeaders: [:],
+                           log: .networkProtectionPixel,
+                           defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
-            let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
-            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
-            let request = APIRequest(configuration: configuration)
+                let url = URL.pixelUrl(forPixelNamed: pixelName)
+                let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
+                let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+                let request = APIRequest(configuration: configuration)
 
-            request.fetch { _, error in
-                onComplete(error == nil, error)
+                request.fetch { _, error in
+                    onComplete(error == nil, error)
+                }
             }
-        }
 
-        vpnAppEventsHandler.appDidFinishLaunching()
+            vpnAppEventsHandler.appDidFinishLaunching()
 
-        let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
-        let launchedOnStartup = launchInformation.wasLaunchedByStartup
-        launchInformation.update()
+            let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
+            let launchedOnStartup = launchInformation.wasLaunchedByStartup
+            launchInformation.update()
 
-        setUpSubscriptionMonitoring()
+            setUpSubscriptionMonitoring()
 
-        if launchedOnStartup {
-            Task {
-                let isConnected = await tunnelController.isConnected
+            if launchedOnStartup {
+                Task {
+                    let isConnected = await tunnelController.isConnected
 
-                if !isConnected && tunnelSettings.connectOnLogin {
-                    await tunnelController.start()
+                    if !isConnected && tunnelSettings.connectOnLogin {
+                        await tunnelController.start()
+                    }
                 }
             }
         }

@@ -33,23 +33,21 @@ final class NetworkProtectionBouncer {
     /// Simply verifies that the VPN feature is enabled and if not, takes care of killing the
     /// current app.
     ///
-    func requireAuthenticationOrKillApp() {
+    func requireAuthenticationOrKillApp() async {
 #if SUBSCRIPTION
-        Task {
-            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-            let result = await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
-            switch result {
-            case .success(true), .failure:
-                return
-            case .success(false):
-                os_log(.error, log: .networkProtection, "🔴 Stopping: VPN not authorized. Missing entitlement.")
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        let result = await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        switch result {
+        case .success(true), .failure:
+            return
+        case .success(false):
+            os_log(.error, log: .networkProtection, "🔴 Stopping: VPN not authorized. Missing entitlement.")
 
-                // EXIT_SUCCESS ensures the login item won't relaunch
-                // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
-                // See where it mentions:
-                //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
-                exit(EXIT_SUCCESS)
-            }
+            // EXIT_SUCCESS ensures the login item won't relaunch
+            // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
+            // See where it mentions:
+            //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
+            exit(EXIT_SUCCESS)
         }
 #else
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
