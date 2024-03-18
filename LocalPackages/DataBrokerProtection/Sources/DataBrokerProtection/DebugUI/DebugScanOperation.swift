@@ -1,5 +1,5 @@
 //
-//  ScanOperation.swift
+//  DebugScanOperation.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,8 +22,28 @@ import BrowserServicesKit
 import UserScript
 import Common
 
-final class ScanOperation: DataBrokerOperation {
-    typealias ReturnValue = [ExtractedProfile]
+struct DebugScanReturnValue {
+    let brokerURL: String
+    let extractedProfiles: [ExtractedProfile]
+    let error: Error?
+    let brokerProfileQueryData: BrokerProfileQueryData
+    let meta: [String: Any]?
+
+    init(brokerURL: String,
+         extractedProfiles: [ExtractedProfile] = [ExtractedProfile](),
+         error: Error? = nil,
+         brokerProfileQueryData: BrokerProfileQueryData,
+         meta: [String: Any]? = nil) {
+        self.brokerURL = brokerURL
+        self.extractedProfiles = extractedProfiles
+        self.error = error
+        self.brokerProfileQueryData = brokerProfileQueryData
+        self.meta = meta
+    }
+}
+
+final class DebugScanOperation: DataBrokerOperation {
+    typealias ReturnValue = DebugScanReturnValue
     typealias InputValue = Void
 
     let privacyConfig: PrivacyConfigurationManaging
@@ -33,12 +53,16 @@ final class ScanOperation: DataBrokerOperation {
     let captchaService: CaptchaServiceProtocol
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
-    var continuation: CheckedContinuation<[ExtractedProfile], Error>?
+    var continuation: CheckedContinuation<DebugScanReturnValue, Error>?
     var extractedProfile: ExtractedProfile?
     var stageCalculator: StageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
+    var scanURL: String?
+
+    private let fileManager = FileManager.default
+    private let debugScanContentPath: String?
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
@@ -55,15 +79,19 @@ final class ScanOperation: DataBrokerOperation {
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
         self.shouldRunNextStep = shouldRunNextStep
+        if let desktopPath = fileManager.urls(for: .desktopDirectory, in: .userDomainMask).first?.relativePath {
+            self.debugScanContentPath = desktopPath + "/PIR-Debug"
+        } else {
+            self.debugScanContentPath = nil
+        }
     }
 
     func run(inputValue: Void,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
              stageCalculator: StageDurationCalculator, // We do not need it for scans - for now.
-             showWebView: Bool) async throws -> [ExtractedProfile] {
+             showWebView: Bool) async throws -> DebugScanReturnValue {
         try await withCheckedThrowingContinuation { continuation in
-            self.stageCalculator = stageCalculator
             self.continuation = continuation
             Task {
                 await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker, showWebView: showWebView)
@@ -87,8 +115,42 @@ final class ScanOperation: DataBrokerOperation {
         }
     }
 
+    func runNextAction(_ action: Action) async {
+        if action as? ExtractAction != nil {
+            do {
+                if let path = self.debugScanContentPath {
+                    let fileName = "\(query.profileQuery.id ?? 0)_\(query.dataBroker.name)"
+                    try await webViewHandler?.takeSnaphost(path: path + "/screenshots/", fileName: "\(fileName).png")
+                    try await webViewHandler?.saveHTML(path: path + "/html/", fileName: "\(fileName).html")
+                }
+            } catch {
+                print("Error: \(error)")
+            }
+        }
+
+        await webViewHandler?.execute(action: action, data: .userData(query.profileQuery, self.extractedProfile))
+    }
+
     func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async {
-        complete(profiles)
+        if let scanURL = self.scanURL {
+            let debugScanReturnValue = DebugScanReturnValue(
+                brokerURL: scanURL,
+                extractedProfiles: profiles,
+                brokerProfileQueryData: query,
+                meta: meta
+            )
+            complete(debugScanReturnValue)
+        }
+
+        await executeNextStep()
+    }
+
+    func completeWith(error: Error) async {
+        if let scanURL = self.scanURL {
+            let debugScanReturnValue = DebugScanReturnValue(brokerURL: scanURL, error: error, brokerProfileQueryData: query)
+            complete(debugScanReturnValue)
+        }
+
         await executeNextStep()
     }
 
@@ -104,6 +166,16 @@ final class ScanOperation: DataBrokerOperation {
         } else {
             os_log("Releasing the web view", log: .action)
             await webViewHandler?.finish() // If we executed all steps we release the web view
+        }
+    }
+
+    func loadURL(url: URL) async {
+        do {
+            self.scanURL = url.absoluteString
+            try await webViewHandler?.load(url: url)
+            await executeNextStep()
+        } catch {
+            await completeWith(error: error)
         }
     }
 }
