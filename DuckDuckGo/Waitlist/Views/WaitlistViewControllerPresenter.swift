@@ -18,7 +18,6 @@
 
 import Foundation
 import UserNotifications
-import Subscription
 
 #if NETWORK_PROTECTION || DBP
 
