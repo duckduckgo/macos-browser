@@ -341,6 +341,7 @@ class FindInPageTests: XCTestCase {
 		let statusField = app.textFields["FindInPageController.statusField"]
 		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
 		let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
+
 		// Note: the following is not a localized test element, but it should have a localization strategy.
 		XCTAssertEqual(statusFieldTextContent, "1 of 4", "Unexpected status field text content after a \"Find in Page\" operation.")
 		let findInPageScreenshot = loremIpsumWebView.screenshot()
