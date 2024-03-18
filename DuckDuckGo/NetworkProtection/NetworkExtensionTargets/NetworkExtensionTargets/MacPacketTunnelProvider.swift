@@ -295,7 +295,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             accessTokenStorage: tokenStore,
             entitlementsCache: UserDefaultsCache<[Entitlement]>(key: UserDefaultsCacheKey.subscriptionEntitlements)
         )
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = .staging
         let entitlementsCheck = {
             await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
