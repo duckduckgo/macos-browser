@@ -260,10 +260,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             isMenuBarStatusView: true,
             userDefaults: .netP,
             uninstallHandler: { [weak self] in
-                Task { [weak self] in
-                    guard let self else { return }
-                    await self.vpnUninstaller.uninstall(includingSystemExtension: true)
-                }
+                guard let self else { return }
+                await self.vpnUninstaller.uninstall(includingSystemExtension: true)
             }
         )
     }

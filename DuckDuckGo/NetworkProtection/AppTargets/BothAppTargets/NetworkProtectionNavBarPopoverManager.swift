@@ -121,9 +121,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                                    isMenuBarStatusView: false,
                                                    userDefaults: .netP,
                                                    uninstallHandler: { [weak self] in
-                Task { [weak self] in
-                    await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
-                }
+                _ = await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
             })
             popover.delegate = delegate
 
