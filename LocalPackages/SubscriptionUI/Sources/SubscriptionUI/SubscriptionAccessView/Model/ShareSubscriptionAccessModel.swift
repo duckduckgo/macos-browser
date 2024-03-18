@@ -21,7 +21,7 @@ import Subscription
 
 public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var title = UserText.shareModalTitle
-    public var description = UserText.shareModalDescription
+    public var description = UserText.shareModalDescription(platform: SubscriptionPurchaseEnvironment.current)
 
     private let subscriptionAppGroup: String
     private var actionHandlers: SubscriptionAccessActionHandlers
