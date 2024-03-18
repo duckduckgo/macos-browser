@@ -84,7 +84,7 @@ final class PreferencesSidebarModel: ObservableObject {
     ) {
         let loadSections = {
 #if SUBSCRIPTION
-            let includingVPN = userDefaults.networkProtectionEntitlementsValid && DefaultNetworkProtectionVisibility().isOnboarded
+            let includingVPN = !userDefaults.networkProtectionEntitlementsExpired && DefaultNetworkProtectionVisibility().isOnboarded
 #elseif NETWORK_PROTECTION
             let includingVPN = DefaultNetworkProtectionVisibility().isOnboarded
 #else
@@ -121,11 +121,11 @@ final class PreferencesSidebarModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-        UserDefaults.netP.publisher(for: \.networkProtectionEntitlementsValid)
+        UserDefaults.netP.publisher(for: \.networkProtectionEntitlementsExpired)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] entitlementsValid in
+            .sink { [weak self] entitlementsExpired in
                 guard let self else { return }
-                if !entitlementsValid && self.selectedPane == .vpn {
+                if !entitlementsExpired && self.selectedPane == .vpn {
                     self.selectedPane = .general
                 }
                 self.refreshSections()

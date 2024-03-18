@@ -20,25 +20,25 @@ import Foundation
 
 public extension UserDefaults {
     private enum Key {
-        static var networkProtectionEntitlementsValid = "networkProtectionEntitlementsValid"
+        static var networkProtectionEntitlementsExpired = "networkProtectionEntitlementsExpired"
     }
 
     // Convenience declaration
-    private var networkProtectionEntitlementsValidRawValueKey: String {
-        Key.networkProtectionEntitlementsValid
+    private var networkProtectionEntitlementsExpiredRawValueKey: String {
+        Key.networkProtectionEntitlementsExpired
     }
 
     /// For KVO to work across processes (Menu App + Main App) we need to declare this dynamic var in a `UserDefaults`
     /// extension, and the key for this property must match its name exactly.
     ///
     @objc
-    dynamic var networkProtectionEntitlementsValid: Bool {
+    dynamic var networkProtectionEntitlementsExpired: Bool {
         get {
-            value(forKey: networkProtectionEntitlementsValidRawValueKey) as? Bool ?? false
+            value(forKey: networkProtectionEntitlementsExpiredRawValueKey) as? Bool ?? false
         }
 
         set {
-            set(newValue, forKey: networkProtectionEntitlementsValidRawValueKey)
+            set(newValue, forKey: networkProtectionEntitlementsExpiredRawValueKey)
         }
     }
 }

@@ -365,9 +365,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { [weak self] result in
                 switch result {
                 case .validEntitlement:
-                    UserDefaults.netP.networkProtectionEntitlementsValid = true
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = false
                 case .invalidEntitlement:
-                    UserDefaults.netP.networkProtectionEntitlementsValid = false
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = true
                     guard let self else { return }
                     Task {
                         let isConnected = await self.tunnelController.isConnected

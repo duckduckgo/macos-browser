@@ -56,9 +56,9 @@ final class NetworkProtectionSubscriptionEventHandler {
             await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { result in
                 switch result {
                 case .validEntitlement:
-                    UserDefaults.netP.networkProtectionEntitlementsValid = true
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = false
                 case .invalidEntitlement:
-                    UserDefaults.netP.networkProtectionEntitlementsValid = false
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = true
                 case .error:
                     break
                 }
@@ -77,12 +77,13 @@ final class NetworkProtectionSubscriptionEventHandler {
             assertionFailure("[NetP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }
-        userDefaults.networkProtectionEntitlementsValid = true
+        userDefaults.networkProtectionEntitlementsExpired = false
+        setUpEntitlementMonitoring()
     }
 
     @objc private func handleAccountDidSignOut() {
         print("[NetP Subscription] Deleted NetP auth token after signing out from Privacy Pro")
-        userDefaults.networkProtectionEntitlementsValid = false
+        userDefaults.networkProtectionEntitlementsExpired = true
 
         Task {
             await networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
