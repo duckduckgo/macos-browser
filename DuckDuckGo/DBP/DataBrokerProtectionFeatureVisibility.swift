@@ -38,7 +38,6 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     @UserDefaultsWrapper(key: .dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro, defaultValue: false)
     var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool
 
-
     /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
     static var bypassWaitlist = false
 

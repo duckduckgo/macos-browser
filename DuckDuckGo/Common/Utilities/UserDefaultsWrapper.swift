@@ -149,7 +149,6 @@ public struct UserDefaultsWrapper<T> {
         case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
         case dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
 
-
         // VPN
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
