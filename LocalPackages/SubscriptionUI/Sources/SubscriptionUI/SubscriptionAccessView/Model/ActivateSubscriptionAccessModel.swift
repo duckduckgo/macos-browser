@@ -17,46 +17,35 @@
 //
 
 import Foundation
+import Subscription
 
-public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
-    public var actionHandlers: SubscriptionAccessActionHandlers
+public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, PurchaseRestoringSubscriptionAccessModel {
+    private var actionHandlers: SubscriptionAccessActionHandlers
+
     public var title = UserText.activateModalTitle
-    public var description = UserText.activateModalDescription
+    public var description = UserText.activateModalDescription(platform: SubscriptionPurchaseEnvironment.current)
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers) {
+    public var email: String?
+    public var emailLabel: String { UserText.email }
+    public var emailDescription = UserText.activateModalEmailDescription
+    public var emailButtonTitle = UserText.enterEmailButton
+
+    public private(set) var shouldShowRestorePurchase: Bool
+    public var restorePurchaseDescription = UserText.restorePurchaseDescription
+    public var restorePurchaseButtonTitle = UserText.restorePurchaseButton
+
+    public init(actionHandlers: SubscriptionAccessActionHandlers, shouldShowRestorePurchase: Bool) {
         self.actionHandlers = actionHandlers
+        self.shouldShowRestorePurchase = shouldShowRestorePurchase
     }
 
-    public func description(for channel: AccessChannel) -> String {
-        switch channel {
-        case .appleID:
-            return UserText.activateModalAppleIDDescription
-        case .email:
-            return UserText.activateModalEmailDescription
-        case .sync:
-            return UserText.activateModalSyncDescription
-        }
+    public func handleEmailAction() {
+        actionHandlers.openURLHandler(.activateSubscriptionViaEmail)
+        actionHandlers.uiActionHandler(.activateAddEmailClick)
     }
 
-    public func buttonTitle(for channel: AccessChannel) -> String? {
-        switch channel {
-        case .appleID:
-            return UserText.restorePurchasesButton
-        case .email:
-            return UserText.enterEmailButton
-        case .sync:
-            return UserText.goToSyncSettingsButton
-        }
-    }
-
-    public func handleAction(for channel: AccessChannel) {
-        switch channel {
-        case .appleID:
-            actionHandlers.restorePurchases()
-        case .email:
-            actionHandlers.openURLHandler(.activateSubscriptionViaEmail)
-        case .sync:
-            actionHandlers.goToSyncPreferences()
-        }
+    public func handleRestorePurchaseAction() {
+        actionHandlers.restorePurchases()
+        actionHandlers.uiActionHandler(.restorePurchaseStoreClick)
     }
 }

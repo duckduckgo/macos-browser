@@ -16,9 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import AppKit
+import Combine
+import Foundation
 
 protocol ConnectBitwardenViewModelDelegate: AnyObject {
 
@@ -142,11 +142,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
             } else if viewState == .disclaimer {
                 viewState = .lookingForBitwarden
             } else if viewState == .accessToContainersNotApproved {
-                guard let link = URL.fullDiskAccess else {
-                    assertionFailure("Can't initialize link to Settings")
-                    return
-                }
-                NSWorkspace.shared.open(link)
+                NSWorkspace.shared.open(.fullDiskAccess)
             }
 
         case .cancel:

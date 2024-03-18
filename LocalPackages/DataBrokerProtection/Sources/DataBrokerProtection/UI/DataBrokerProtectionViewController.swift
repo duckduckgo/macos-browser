@@ -64,7 +64,6 @@ final public class DataBrokerProtectionViewController: NSViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        addLoadingIndicator()
         reloadObserver = NotificationCenter.default.addObserver(forName: DataBrokerProtectionNotifications.shouldReloadUI,
                                                                 object: nil,
                                                                 queue: .main) { [weak self] _ in
@@ -80,13 +79,14 @@ final public class DataBrokerProtectionViewController: NSViewController {
         webView?.navigationDelegate = self
         view = webView!
 
+        addLoadingIndicator()
+
         if let url = URL(string: webUISettings.selectedURL) {
             webView?.load(url)
         } else {
             removeLoadingIndicator()
             assertionFailure("Selected URL is not valid \(webUISettings.selectedURL)")
         }
-
     }
 
     private func addLoadingIndicator() {

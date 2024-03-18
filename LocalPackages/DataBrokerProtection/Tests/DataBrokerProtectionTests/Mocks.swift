@@ -16,12 +16,13 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import BrowserServicesKit
+import Combine
 import Common
-import SecureStorage
+import Foundation
 import GRDB
+import SecureStorage
+
 @testable import DataBrokerProtection
 
 extension BrokerProfileQueryData {
@@ -65,6 +66,8 @@ final class InternalUserDeciderStoreMock: InternalUserStoring {
 }
 
 final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
+    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: nil)
+
     var currentConfig: Data = Data()
 
     var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
@@ -176,8 +179,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasLoadCalledWithURL: URL?
     var wasWaitForWebViewLoadCalled = false
     var wasFinishCalled = false
-    var wasExecuteCalledForExtractedProfile = false
-    var wasExecuteCalledForProfileData = false
+    var wasExecuteCalledForUserData = false
     var wasExecuteCalledForSolveCaptcha = false
     var wasExecuteJavascriptCalled = false
 
@@ -199,18 +201,12 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
 
     func execute(action: DataBrokerProtection.Action, data: DataBrokerProtection.CCFRequestData) async {
         switch data {
-        case .profile:
-            wasExecuteCalledForExtractedProfile = false
-            wasExecuteCalledForSolveCaptcha = false
-            wasExecuteCalledForProfileData = true
         case .solveCaptcha:
-            wasExecuteCalledForExtractedProfile = false
             wasExecuteCalledForSolveCaptcha = true
-            wasExecuteCalledForProfileData = false
-        case.extractedProfile:
-            wasExecuteCalledForExtractedProfile = true
+            wasExecuteCalledForUserData = false
+        case .userData:
+            wasExecuteCalledForUserData = true
             wasExecuteCalledForSolveCaptcha = false
-            wasExecuteCalledForProfileData = false
         }
     }
 
@@ -218,15 +214,22 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasExecuteJavascriptCalled = true
     }
 
+    func takeSnaphost(path: String, fileName: String) async throws {
+
+    }
+
+    func saveHTML(path: String, fileName: String) async throws {
+
+    }
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil
         wasWaitForWebViewLoadCalled = false
         wasFinishCalled = false
-        wasExecuteCalledForExtractedProfile = false
         wasExecuteCalledForSolveCaptcha = false
-        wasExecuteCalledForProfileData = false
         wasExecuteJavascriptCalled = false
+        wasExecuteCalledForUserData = false
     }
 }
 
@@ -234,12 +237,12 @@ final class EmailServiceMock: EmailServiceProtocol {
 
     var shouldThrow: Bool = false
 
-    func getEmail(dataBrokerURL: String?) async throws -> String {
+    func getEmail(dataBrokerURL: String?) async throws -> EmailData {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return "test@duck.com"
+        return EmailData(pattern: nil, emailAddress: "test@duck.com")
     }
 
     func getConfirmationLink(from email: String, numberOfRetries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
@@ -663,6 +666,8 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
     var brokerProfileQueryDataToReturn = [BrokerProfileQueryData]()
     var profile: DataBrokerProtectionProfile?
+    var attemptInformation: AttemptInformation?
+    var historyEvents = [HistoryEvent]()
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -764,6 +769,14 @@ final class MockDatabase: DataBrokerProtectionRepository {
         return lastHistoryEventToReturn
     }
 
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) -> [HistoryEvent] {
+        return [HistoryEvent]()
+    }
+
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) -> [HistoryEvent] {
+        return historyEvents
+    }
+
     func hasMatches() -> Bool {
         false
     }
@@ -773,7 +786,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     }
 
     func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
-        return nil
+        return attemptInformation
     }
 
     func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
@@ -808,6 +821,8 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
         brokerProfileQueryDataToReturn.removeAll()
         profile = nil
+        attemptInformation = nil
+        historyEvents.removeAll()
     }
 }
 
@@ -817,5 +832,76 @@ final class MockAppVersion: AppVersionNumberProvider {
 
     init(versionNumber: String) {
         self.versionNumber = versionNumber
+    }
+}
+
+final class MockStageDurationCalculator: StageDurationCalculator {
+    var stage: Stage?
+
+    func durationSinceLastStage() -> Double {
+        return 0.0
+    }
+
+    func durationSinceStartTime() -> Double {
+        return 0.0
+    }
+
+    func fireOptOutStart() {
+    }
+
+    func fireOptOutEmailGenerate() {
+    }
+
+    func fireOptOutCaptchaParse() {
+    }
+
+    func fireOptOutCaptchaSend() {
+    }
+
+    func fireOptOutCaptchaSolve() {
+    }
+
+    func fireOptOutSubmit() {
+    }
+
+    func fireOptOutEmailReceive() {
+    }
+
+    func fireOptOutEmailConfirm() {
+    }
+
+    func fireOptOutValidate() {
+    }
+
+    func fireOptOutSubmitSuccess(tries: Int) {
+    }
+
+    func fireOptOutFillForm() {
+    }
+
+    func fireOptOutFailure(tries: Int) {
+    }
+
+    func fireScanSuccess(matchesFound: Int) {
+    }
+
+    func fireScanFailed() {
+    }
+
+    func fireScanError(error: any Error) {
+    }
+
+    func setStage(_ stage: DataBrokerProtection.Stage) {
+        self.stage = stage
+    }
+
+    func setEmailPattern(_ emailPattern: String?) {
+    }
+
+    func setLastActionId(_ actionID: String) {
+    }
+
+    func clear() {
+        self.stage = nil
     }
 }

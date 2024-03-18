@@ -75,13 +75,13 @@ final class VPNLocationViewModel: ObservableObject {
     }
 
     func onNearestItemSelection() async {
-        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount)
         selectedLocation = .nearest
         await reloadList()
     }
 
     func onCountryItemSelection(id: String, cityId: String? = nil) async {
-        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount)
         let location = NetworkProtectionSelectedLocation(country: id, city: cityId)
         selectedLocation = .location(location)
         await reloadList()
@@ -95,7 +95,7 @@ final class VPNLocationViewModel: ObservableObject {
     private func reloadList() async {
         guard let locations = try? await locationListRepository.fetchLocationList().sortedByName() else { return }
         if locations.isEmpty {
-            DailyPixel.fire(pixel: .networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount)
         }
         let isNearestSelected = selectedLocation == .nearest
         self.isNearestSelected = isNearestSelected
@@ -191,7 +191,8 @@ extension NetworkProtectionLocationListCompositeRepository {
         self.init(
             environment: settings.selectedEnvironment,
             tokenStore: NetworkProtectionKeychainTokenStore(),
-            errorEvents: .networkProtectionAppDebugEvents
+            errorEvents: .networkProtectionAppDebugEvents,
+            isSubscriptionEnabled: false
         )
     }
 }

@@ -13,8 +13,12 @@ inputs:
     description: "Task name"
     required: false
     type: string
-  contents:
-    description: "Task contents"
+  notes:
+    description: "Task notes"
+    required: false
+    type: string
+  html-notes:
+    description: "Task HTML notes"
     required: false
     type: string
   template-name:
@@ -26,7 +30,7 @@ inputs:
 outputs:
   assignee-id:
     description: "Assignee ID"
-    value: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+    value: ${{ steps.set-assignee-id.outputs.assignee-id }}
   new-task-id:
     description: "New task ID"
     value: ${{ steps.create-task.outputs.new-task-id }}
@@ -39,12 +43,28 @@ runs:
         access-token: ${{ inputs.access-token }}
         task-url: ${{ inputs.release-task-url }}
 
+    - id: get-asana-user-id
+      if: github.event_name != 'schedule'
+      uses: duckduckgo/apple-infra/actions/asana-get-user-id-for-github-handle@main
+      with:
+        access-token: ${{ inputs.access-token }}
+        github-handle: ${{ github.actor }}
+
+    - id: set-assignee-id
+      shell: bash
+      env:
+        USER_ID: ${{ steps.get-asana-user-id.outputs.user-id || steps.get-automation-subtask.outputs.assignee-id }}
+      run: |
+        echo "assignee-id=${USER_ID}" >> $GITHUB_OUTPUT
+
     - id: process-template-payload
       if: ${{ inputs.template-name }}
       shell: bash
       env:
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
+        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         TEMPLATE_PATH: ${{ github.action_path }}/templates/${{ inputs.template-name }}.yml
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         if [ ! -f $TEMPLATE_PATH ]; then
           echo "::error::Template file not found at $TEMPLATE_PATH"
@@ -55,25 +75,39 @@ runs:
         payload="$(envsubst < $TEMPLATE_PATH | yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g' | jq -c)"
         echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
 
-    - id: process-contents-payload
-      if: ${{ inputs.contents }}
+    - id: process-notes-payload
+      if: ${{ inputs.notes }}
       shell: bash
       env:
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
-        CONTENTS: ${{ inputs.contents }}
+        ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
+        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        NOTES: ${{ inputs.notes }}
         TASK_NAME: ${{ inputs.task-name }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
-        payload="{ \"data\": { \"name\": \"${TASK_NAME}\", \"notes\": \"${CONTENTS}\n\nWorkflow URL: ${WORKFLOW_URL}\", \"assignee\": \"${ASSIGNEE_ID}\" } }"
+        payload="{ \"data\": { \"name\": \"${TASK_NAME}\", \"notes\": \"${NOTES}\n\n🔗 Workflow URL: ${WORKFLOW_URL}\", \"assignee\": \"${ASSIGNEE_ID}\" } }"
+        echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
+
+    - id: process-html-notes-payload
+      if: ${{ inputs.html-notes }}
+      shell: bash
+      env:
+        ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
+        AUTOMATION_TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        HTML_NOTES: ${{ inputs.html-notes }}
+        TASK_NAME: ${{ inputs.task-name }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        payload="{ \"data\": { \"name\": \"${TASK_NAME}\", \"html_notes\": \"${HTML_NOTES}\", \"assignee\": \"${ASSIGNEE_ID}\" } }"
         echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
 
     - id: create-task
       shell: bash
       env:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        ASSIGNEE_ID: ${{ steps.set-assignee-id.outputs.assignee-id }}
         TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
-        PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-comment-payload.outputs.payload-base64 }}
+        PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-notes-payload.outputs.payload-base64 || steps.process-html-notes-payload.outputs.payload-base64 }}
       run: |
         # Create a subtask and retrieve its ID from the response (.data.gid) to return as an output
         new_task_id=$(set -o pipefail && curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/subtasks?opt_fields=gid" \

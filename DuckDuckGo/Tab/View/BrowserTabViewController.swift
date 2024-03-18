@@ -23,6 +23,7 @@ import Common
 import SwiftUI
 import WebKit
 
+// swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
 
@@ -157,6 +158,10 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseSubscriptionPage),
                                                name: .subscriptionPageCloseAndOpenPreferences,
                                                object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onSubscriptionAccountDidSignOut),
+                                               name: .accountDidSignOut,
+                                               object: nil)
 #endif
     }
 
@@ -230,6 +235,22 @@ final class BrowserTabViewController: NSViewController {
 
         openNewTab(with: .settings(pane: .subscription))
     }
+
+    @objc
+    private func onSubscriptionAccountDidSignOut(_ notification: Notification) {
+        Task { @MainActor in
+            tabCollectionViewModel.removeAll { tabContent in
+                if case .subscription = tabContent {
+                    return true
+                } else if case .identityTheftRestoration = tabContent {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+    }
+
 #endif
 
     private func subscribeToSelectedTabViewModel() {
@@ -442,7 +463,7 @@ final class BrowserTabViewController: NSViewController {
              .url(_, _, source: .reload):
             return true
 
-        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboarding:
+        case .settings, .bookmarks, .dataBrokerProtection, .subscription, .onboarding, .identityTheftRestoration:
             return true
 
         case .none:
@@ -463,7 +484,7 @@ final class BrowserTabViewController: NSViewController {
             return
         case .onboarding:
             getView = { [weak self] in self?.transientTabContentViewController?.view }
-        case .url, .subscription:
+        case .url, .subscription, .identityTheftRestoration:
             getView = { [weak self] in self?.webView }
         case .settings:
             getView = { [weak self] in self?.preferencesViewController?.view }
@@ -585,7 +606,7 @@ final class BrowserTabViewController: NSViewController {
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
-        case .url, .subscription:
+        case .url, .subscription, .identityTheftRestoration:
             if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
@@ -934,9 +955,11 @@ extension BrowserTabViewController: TabDelegate {
         dispatchPrecondition(condition: .onQueue(.main))
         guard let window = view.window else { return nil }
 
+        let preferences = DownloadsPreferences.shared
+        let directoryURL = preferences.lastUsedCustomDownloadLocation ?? preferences.effectiveDownloadLocation
         let savePanel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: request.parameters.fileTypes,
                                                                  suggestedFilename: request.parameters.suggestedFilename,
-                                                                 directoryURL: DownloadsPreferences().effectiveDownloadLocation)
+                                                                 directoryURL: directoryURL)
 
         savePanel.beginSheetModal(for: window) { [request] response in
             if case .abort = response {
@@ -1188,3 +1211,5 @@ extension BrowserTabViewController {
 #Preview {
     BrowserTabViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: [.init(content: .url(.duckDuckGo, source: .ui))])))
 }
+
+// swiftlint:enable file_length

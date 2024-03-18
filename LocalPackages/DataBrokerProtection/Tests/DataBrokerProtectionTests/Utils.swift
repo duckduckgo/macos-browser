@@ -57,7 +57,7 @@ func areDatesEqualsOnDayMonthAndYear(date1: Date?, date2: Date?) -> Bool {
 }
 
 extension HTTPURLResponse {
-    static let ok = HTTPURLResponse(url: URL(string: "www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: [String: String]())!
+    static let ok = HTTPURLResponse(url: URL(string: "http://www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: [String: String]())!
 }
 
 typealias RequestHandler = ((URLRequest) throws -> (HTTPURLResponse, Data?))

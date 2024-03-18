@@ -23,6 +23,7 @@ import Common
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionIPC
 #endif
 
 final class MainViewController: NSViewController {
@@ -56,14 +57,53 @@ final class MainViewController: NSViewController {
         fatalError("MainViewController: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel? = nil,
-         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(tabCollectionViewModel: TabCollectionViewModel? = nil, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, autofillPopoverPresenter: AutofillPopoverPresenter) {
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
-        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner)
+
+#if NETWORK_PROTECTION
+        let networkProtectionPopoverManager: NetPPopoverManager = {
+#if DEBUG
+            guard case .normal = NSApp.runType else {
+                return NetPPopoverManagerMock()
+            }
+#endif
+            let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
+            let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
+            ipcClient.register()
+
+            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
+        }()
+        let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
+            var connectivityIssuesObserver: ConnectivityIssueObserver!
+            var controllerErrorMessageObserver: ControllerErrorMesssageObserver!
+#if DEBUG
+            if ![.normal, .integrationTests].contains(NSApp.runType) {
+                connectivityIssuesObserver = ConnectivityIssueObserverMock()
+                controllerErrorMessageObserver = ControllerErrorMesssageObserverMock()
+            }
+#endif
+            connectivityIssuesObserver = connectivityIssuesObserver ?? DisabledConnectivityIssueObserver()
+            controllerErrorMessageObserver = controllerErrorMessageObserver ?? ControllerErrorMesssageObserverThroughDistributedNotifications()
+
+            let ipcClient = networkProtectionPopoverManager.ipcClient
+            return DefaultNetworkProtectionStatusReporter(
+                statusObserver: ipcClient.ipcStatusObserver,
+                serverInfoObserver: ipcClient.ipcServerInfoObserver,
+                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
+                connectivityIssuesObserver: connectivityIssuesObserver,
+                controllerErrorMessageObserver: controllerErrorMessageObserver
+            )
+        }()
+
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter)
+#else
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, autofillPopoverPresenter: AutofillPopoverPresenter)
+#endif
+
         browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
         fireViewController = FireViewController.create(tabCollectionViewModel: tabCollectionViewModel)
@@ -129,13 +169,15 @@ final class MainViewController: NSViewController {
             tabBarViewController.view.isHidden = true
             mainView.tabBarContainerView.isHidden = true
             mainView.navigationBarTopConstraint.constant = 0.0
-            mainView.addressBarHeightConstraint.constant = mainView.tabBarContainerView.frame.height
+            resizeNavigationBar(isHomePage: false, animated: false)
+
             updateBookmarksBarViewVisibility(visible: false)
         } else {
             mainView.navigationBarContainerView.wantsLayer = true
             mainView.navigationBarContainerView.layer?.masksToBounds = false
 
-            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab, animated: false)
+            resizeNavigationBar(isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
+                                animated: false)
 
             let bookmarksBarVisible = AppearancePreferences.shared.showBookmarksBar
             updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
@@ -247,7 +289,7 @@ final class MainViewController: NSViewController {
 
     private func updateDividerColor(isShowingHomePage isHomePage: Bool) {
         NSAppearance.withAppAppearance {
-            let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .bookmarkBarBackground : .addressBarSolidSeparatorColor
+            let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .bookmarkBarBackground : .addressBarSolidSeparator
             mainView.divider.backgroundColor = backgroundColor
         }
     }
@@ -291,7 +333,7 @@ final class MainViewController: NSViewController {
             }
     }
 
-    private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
+    private func resizeNavigationBar(isHomePage homePage: Bool, animated: Bool) {
         updateDividerColor(isShowingHomePage: homePage)
         navigationBarViewController.resizeAddressBar(for: homePage ? .homePage : (isInPopUpWindow ? .popUpWindow : .default), animated: animated)
     }
@@ -303,7 +345,7 @@ final class MainViewController: NSViewController {
                 guard let self, let selectedTabViewModel else { return }
                 defer { lastTabContent = content }
 
-                resizeNavigationBarForHomePage(content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
+                resizeNavigationBar(isHomePage: content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
                 updateBookmarksBar(content)
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
             }
@@ -410,7 +452,7 @@ final class MainViewController: NSViewController {
 #if NETWORK_PROTECTION
     private func sendActiveNetworkProtectionWaitlistUserPixel() {
         if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
-            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly)
         }
     }
 #endif
@@ -419,7 +461,6 @@ final class MainViewController: NSViewController {
 
     func adjustFirstResponder(selectedTabViewModel: TabViewModel? = nil, tabContent: Tab.TabContent? = nil, force: Bool = false) {
         guard let selectedTabViewModel = selectedTabViewModel ?? tabCollectionViewModel.selectedTabViewModel else {
-            assertionFailure("No tab view model selected")
             return
         }
         let tabContent = tabContent ?? selectedTabViewModel.tab.content
@@ -482,6 +523,13 @@ extension MainViewController {
             .subtracting(.capsLock)
 
         switch Int(event.keyCode) {
+        case kVK_Return  where navigationBarViewController.addressBarViewController?
+                .addressBarTextField.isFirstResponder == true:
+
+            navigationBarViewController.addressBarViewController?.addressBarTextField.addressBarEnterPressed()
+
+            return true
+
         case kVK_Escape:
             var isHandled = false
             if !mainView.findInPageContainerView.isHidden {
@@ -552,7 +600,7 @@ extension MainViewController {
     ]))
     bkman.loadBookmarks()
 
-    let vc = MainViewController(bookmarkManager: bkman)
+    let vc = MainViewController(bookmarkManager: bkman, autofillPopoverPresenter: DefaultAutofillPopoverPresenter())
     var c: AnyCancellable!
     c = vc.publisher(for: \.view.window).sink { window in
         window?.titlebarAppearsTransparent = true

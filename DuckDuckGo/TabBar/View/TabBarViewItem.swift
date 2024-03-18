@@ -30,7 +30,9 @@ protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
 
+    func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool
+    func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
@@ -320,7 +322,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     private func updateBorderLayerColor() {
         NSAppearance.withAppAppearance {
             withoutAnimation {
-                borderLayer.borderColor = NSColor(named: TabShadowConfig.colorName)?.cgColor
+                borderLayer.borderColor = NSColor.tabShadowLine.cgColor
             }
         }
     }
@@ -339,9 +341,9 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func updateSubviews() {
         NSAppearance.withAppAppearance {
-            let backgroundColor = isSelected || isDragged ? NSColor.navigationBarBackground : NSColor.clear
+            let backgroundColor: NSColor = isSelected || isDragged ? .navigationBarBackground : .clear
             view.layer?.backgroundColor = backgroundColor.cgColor
-            mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
+            mouseOverView.mouseOverColor = isSelected || isDragged ? .clear : .tabMouseOver
         }
 
         let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
@@ -384,13 +386,13 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
     private func updateUsedPermissions() {
         if usedPermissions.camera.isActive {
-            permissionButton.image = .cameraActiveImage
+            permissionButton.image = .cameraTabActive
         } else if usedPermissions.microphone.isActive {
-            permissionButton.image = .micActiveImage
+            permissionButton.image = .microphoneActive
         } else if usedPermissions.camera.isPaused {
-            permissionButton.image = .cameraBlockedImage
+            permissionButton.image = .cameraTabBlocked
         } else if usedPermissions.microphone.isPaused {
-            permissionButton.image = .micBlockedImage
+            permissionButton.image = .microphoneIcon
         } else {
             permissionButton.isHidden = true
             tabLoadingPermissionLeadingConstraint.isActive = false
@@ -451,7 +453,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func setupMutedTabIconColor() {
         mutedTabIcon.image?.isTemplate = true
-        mutedTabIcon.contentTintColor = NSColor(named: "MutedTabIconColor")
+        mutedTabIcon.contentTintColor = .mutedTabIcon
     }
 
     private func setupMutedTabIconPosition() {
@@ -505,6 +507,7 @@ extension TabBarViewItem: NSMenuDelegate {
     private func addDuplicateMenuItem(to menu: NSMenu) {
         let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
         duplicateMenuItem.target = self
+        duplicateMenuItem.isEnabled = delegate?.tabBarViewItemCanBeDuplicated(self) ?? false
         menu.addItem(duplicateMenuItem)
     }
 
@@ -518,6 +521,7 @@ extension TabBarViewItem: NSMenuDelegate {
     private func addBookmarkMenuItem(to menu: NSMenu) {
         let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
         bookmarkMenuItem.target = self
+        bookmarkMenuItem.isEnabled = delegate?.tabBarViewItemCanBeBookmarked(self) ?? false
         menu.addItem(bookmarkMenuItem)
     }
 
@@ -648,12 +652,4 @@ private extension TabBarViewItem {
         static let trailingSpaceWithButton: CGFloat = 20
         static let trailingSpaceWithPermissionAndButton: CGFloat = 40
     }
-}
-
-private extension NSImage {
-    static let cameraActiveImage = NSImage(named: "Camera-Tab-Active")
-    static let cameraBlockedImage = NSImage(named: "Camera-Tab-Blocked")
-
-    static let micActiveImage = NSImage(named: "Microphone-Active")
-    static let micBlockedImage = NSImage(named: "Microphone-Icon")
 }

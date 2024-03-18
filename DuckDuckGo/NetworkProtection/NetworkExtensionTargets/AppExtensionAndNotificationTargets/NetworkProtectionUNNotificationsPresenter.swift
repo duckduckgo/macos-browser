@@ -19,6 +19,7 @@
 import Foundation
 import UserNotifications
 import NetworkProtection
+import NetworkProtectionUI
 
 extension UNNotificationAction {
 
@@ -138,6 +139,10 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         let content = notificationContent(title: "Test notification",
                                           subtitle: "Test notification")
         showNotification(.test, content)
+    }
+
+    func showEntitlementNotification() {
+        // todo
     }
 
     private func showNotification(_ identifier: NetworkProtectionNotificationIdentifier, _ content: UNNotificationContent) {

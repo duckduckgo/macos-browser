@@ -32,7 +32,7 @@ final class TabWKUIDelegateTests: XCTestCase {
         try super.setUpWithError()
         testData = try XCTUnwrap("test".data(using: .utf8))
         testDirectory = fileManager.temporaryDirectory
-        originatingURL = try XCTUnwrap(URL(string: "www.duckduckgo.com"))
+        originatingURL = URL(string: "https://www.duckduckgo.com")!
     }
 
     override func tearDownWithError() throws {
@@ -57,13 +57,22 @@ final class TabWKUIDelegateTests: XCTestCase {
         XCTAssertNil(downloadExtensionMock.capturedSavedDownloadData)
         XCTAssertNil(downloadExtensionMock.capturedMimeType)
 
+        let eDidCallSaveDownloadedData = expectation(description: "didCallSaveDownloadedData")
+        let c = downloadExtensionMock.$didCallSaveDownloadedData.sink { didCall in
+            if didCall {
+                eDidCallSaveDownloadedData.fulfill()
+            }
+        }
+
         // WHEN
         sut.webView(WKWebView(), saveDataToFile: testData, suggestedFilename: filename, mimeType: "application/pdf", originatingURL: originatingURL)
 
         // THEN
-        XCTAssertTrue(downloadExtensionMock.didCallSaveDownloadedData)
+        waitForExpectations(timeout: 1)
         XCTAssertEqual(downloadExtensionMock.capturedSavedDownloadData, testData)
         XCTAssertNotNil(downloadExtensionMock.capturedMimeType, "application/pdf")
+
+        withExtendedLifetime(c) {}
     }
 
 }

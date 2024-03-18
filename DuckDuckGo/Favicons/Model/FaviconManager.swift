@@ -21,6 +21,7 @@ import Cocoa
 import Combine
 import BrowserServicesKit
 import Common
+import History
 
 @MainActor
 protocol FaviconManagement: AnyObject {
@@ -45,7 +46,7 @@ protocol FaviconManagement: AnyObject {
     func burnDomains(_ domains: Set<String>,
                      exceptBookmarks bookmarkManager: BookmarkManager,
                      exceptSavedLogins: Set<String>,
-                     exceptExistingHistory history: History,
+                     exceptExistingHistory history: BrowsingHistory,
                      tld: TLD,
                      completion: @escaping @MainActor () -> Void)
 
@@ -244,7 +245,7 @@ final class FaviconManager: FaviconManagement {
     nonisolated func burnDomains(_ baseDomains: Set<String>,
                                  exceptBookmarks bookmarkManager: BookmarkManager,
                                  exceptSavedLogins: Set<String> = [],
-                                 exceptExistingHistory history: History,
+                                 exceptExistingHistory history: BrowsingHistory,
                                  tld: TLD,
                                  completion: @escaping @MainActor () -> Void) {
         let existingHistoryDomains = Set(history.compactMap { $0.url.host })
@@ -268,7 +269,12 @@ final class FaviconManager: FaviconManagement {
     // MARK: - Private
 
     private nonisolated func createFallbackLinksIfNeeded(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) -> [FaviconUserScript.FaviconLink] {
-        guard faviconLinks.isEmpty, let host = documentUrl.host else { return faviconLinks }
+        let validSchemes: [URL.NavigationalScheme?] = [.http, .https]
+        guard faviconLinks.isEmpty,
+              let host = documentUrl.host,
+              validSchemes.contains(documentUrl.navigationalScheme) else {
+            return faviconLinks
+        }
         return [
             FaviconUserScript.FaviconLink(href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
                                           rel: "favicon.ico")

@@ -19,18 +19,23 @@
 import XCTest
 import BrowserServicesKit
 import Common
+import History
 @testable import DuckDuckGo_Privacy_Browser
 
 final class HistoryCoordinatingMock: HistoryCoordinating {
 
-    var history: History?
-    var allHistoryVisits: [DuckDuckGo_Privacy_Browser.Visit]?
-    @Published private(set) var historyDictionary: [URL: DuckDuckGo_Privacy_Browser.HistoryEntry]?
-    var historyDictionaryPublisher: Published<[URL: DuckDuckGo_Privacy_Browser.HistoryEntry]?>.Publisher { $historyDictionary }
+    func loadHistory(onCleanFinished: @escaping () -> Void) {
+        onCleanFinished()
+    }
+
+    var history: BrowsingHistory?
+    var allHistoryVisits: [Visit]?
+    @Published private(set) var historyDictionary: [URL: HistoryEntry]?
+    var historyDictionaryPublisher: Published<[URL: HistoryEntry]?>.Publisher { $historyDictionary }
 
     var addVisitCalled = false
     var visit: Visit?
-    func addVisit(of url: URL) -> DuckDuckGo_Privacy_Browser.Visit? {
+    func addVisit(of url: URL) -> Visit? {
         addVisitCalled = true
         return visit
     }

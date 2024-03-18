@@ -23,8 +23,15 @@ import BrowserServicesKit
 final class WindowsManager {
 
     class var windows: [NSWindow] {
-        return NSApplication.shared.windows
+        NSApplication.shared.windows
     }
+
+    class var mainWindows: [MainWindow] {
+        NSApplication.shared.windows.compactMap { $0 as? MainWindow }
+    }
+
+    // Shared type to enable managing `PasswordManagementPopover`s in multiple windows
+    private static let autofillPopoverPresenter: AutofillPopoverPresenter = DefaultAutofillPopoverPresenter()
 
     class func closeWindows(except windows: [NSWindow] = []) {
         for controller in WindowControllersManager.shared.mainWindowControllers {
@@ -57,7 +64,8 @@ final class WindowsManager {
                              lazyLoadTabs: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel,
                                                  popUp: popUp,
-                                                 burnerMode: burnerMode)
+                                                 burnerMode: burnerMode,
+                                                 autofillPopoverPresenter: autofillPopoverPresenter)
 
         if let contentSize {
             mainWindowController.window?.setContentSize(contentSize)
@@ -157,8 +165,9 @@ final class WindowsManager {
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil,
                                      contentSize: NSSize? = nil,
                                      popUp: Bool = false,
-                                     burnerMode: BurnerMode) -> MainWindowController {
-        let mainViewController = MainViewController(tabCollectionViewModel: tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode))
+                                     burnerMode: BurnerMode,
+                                     autofillPopoverPresenter: AutofillPopoverPresenter) -> MainWindowController {
+        let mainViewController = MainViewController(tabCollectionViewModel: tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode), autofillPopoverPresenter: autofillPopoverPresenter)
 
         var contentSize = contentSize ?? NSSize(width: 1024, height: 790)
         contentSize.width = min(NSScreen.main?.frame.size.width ?? 1024, max(contentSize.width, 300))

@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import AppKit
+import Combine
 import Foundation
 import Lottie
-import Combine
 
 final class MouseOverAnimationButton: AddressBarButton {
 
@@ -103,7 +104,7 @@ final class MouseOverAnimationButton: AddressBarButton {
             return
         }
 
-        let isAquaMode = NSApp.effectiveAppearance.name == NSAppearance.Name.aqua
+        let isAquaMode = NSApp.effectiveAppearance.name == .aqua
         let newAnimationView: AnimationView
         // Animation view causes problems in tests
         if case .normal = NSApp.runType {
@@ -134,9 +135,10 @@ final class MouseOverAnimationButton: AddressBarButton {
         }
 
         set {
-            if isAnimationViewVisible {
+            if imageCache !== newValue {
                 imageCache = newValue
-            } else {
+            }
+            if !isAnimationViewVisible {
                 super.image = newValue
             }
         }
@@ -145,7 +147,6 @@ final class MouseOverAnimationButton: AddressBarButton {
     var imageCache: NSImage?
 
     private func hideImage() {
-        imageCache = image
         super.image = nil
     }
 

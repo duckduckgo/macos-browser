@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1400"
+   LastUpgradeVersion = "1520"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -119,6 +119,9 @@
                </Test>
                <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreRemovedThenTheyAreNotInCache()">
+               </Test>
+               <Test
+                  Identifier = "PreferencesSidebarModelTests/testWhenResetTabSelectionIfNeededCalledThenPreferencesTabIsSelected()">
                </Test>
                <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">

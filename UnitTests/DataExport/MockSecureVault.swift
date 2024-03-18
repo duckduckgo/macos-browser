@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
-import SecureStorage
+import Foundation
 import GRDB
+import SecureStorage
 
 typealias MockVaultFactory = SecureVaultFactory<MockSecureVault<MockDatabaseProvider>>
 
@@ -79,6 +79,11 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
     func deleteWebsiteCredentialsFor(accountId: Int64) throws {
         storedCredentials[accountId] = nil
+    }
+
+    func deleteAllWebsiteCredentials() throws {
+        storedAccounts.removeAll()
+        storedCredentials.removeAll()
     }
 
     func neverPromptWebsites() throws -> [SecureVaultModels.NeverPromptWebsites] {
@@ -222,7 +227,29 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
 }
 
+extension MockSecureVault {
+    func addWebsiteCredentials(identifiers: [Int64]) {
+        var credentials = [Int64: SecureVaultModels.WebsiteCredentials]()
+
+        for identifier in identifiers {
+            let account = SecureVaultModels.WebsiteAccount(id: String(identifier),
+                                                           title: "title-\(identifier)",
+                                                           username: "user-\(identifier)",
+                                                           domain: "domain-\(identifier)")
+            let credential = SecureVaultModels.WebsiteCredentials(account: account, password: "password\"containing\"quotes".data(using: .utf8)!)
+            credentials[identifier] = credential
+        }
+
+        self.storedAccounts = credentials.map(\.value.account)
+        self.storedCredentials = credentials
+    }
+}
+
 // MARK: - Mock Providers
+
+private extension URL {
+    static let duckduckgo = URL(string: "https://duckduckgo.com/")!
+}
 
 class MockDatabaseProvider: AutofillDatabaseProvider {
 
@@ -239,7 +266,7 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     var db: GRDB.DatabaseWriter
     // swiftlint:enable identifier_name
 
-    required init(file: URL = URL(string: "https://duckduckgo.com/")!, key: Data = Data()) throws {
+    required init(file: URL = .duckduckgo, key: Data = Data()) throws {
         db = try! DatabaseQueue(named: "TestQueue")
     }
 
@@ -273,6 +300,11 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func deleteWebsiteCredentialsForAccountId(_ accountId: Int64) throws {
         self._accounts = self._accounts.filter { $0.id != String(accountId) }
+    }
+
+    func deleteAllWebsiteCredentials() throws {
+        self._accounts.removeAll()
+        self._credentialsDict.removeAll()
     }
 
     func accounts() throws -> [SecureVaultModels.WebsiteAccount] {

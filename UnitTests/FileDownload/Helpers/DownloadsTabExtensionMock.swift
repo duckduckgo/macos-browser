@@ -27,10 +27,12 @@ class DownloadsTabExtensionMock: NSObject, DownloadsTabExtensionProtocol {
     private(set) var didCallSaveWebViewContent = false
     private(set) var capturedWebView: WKWebView?
 
+    @Published
     private(set) var didCallSaveDownloadedData = false
     private(set) var capturedSavedDownloadData: Data?
     private(set) var capturedSuggestedFilename: String?
     private(set) var capturedMimeType: String?
+    private(set) var capturedOriginatingURL: URL?
 
     var savePanelDialogSubject = PassthroughSubject<DuckDuckGo_Privacy_Browser.Tab.UserDialog?, Never>()
 
@@ -40,19 +42,22 @@ class DownloadsTabExtensionMock: NSObject, DownloadsTabExtensionProtocol {
         savePanelDialogSubject.eraseToAnyPublisher()
     }
 
-    func saveWebViewContentAs(_ webView: WKWebView) {
+    func saveWebViewContent(from webView: WKWebView, pdfHUD: WKPDFHUDViewWrapper?, location: DownloadsTabExtension.DownloadLocation) {
         didCallSaveWebViewContent = true
         capturedWebView = webView
     }
 
-    func saveDownloaded(data: Data, suggestedFilename: String, mimeType: String) {
+    func saveDownloadedData(_ data: Data?, suggestedFilename: String, mimeType: String, originatingURL: URL) async throws -> URL? {
         didCallSaveDownloadedData = true
         capturedSavedDownloadData = data
         capturedSuggestedFilename = suggestedFilename
         capturedMimeType = mimeType
+        capturedOriginatingURL = originatingURL
+
+        return nil
     }
 
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {}
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {}
 
     func fileIconFlyAnimationOriginalRect(for downloadTask: DuckDuckGo_Privacy_Browser.WebKitDownloadTask) -> NSRect? { .zero }
 

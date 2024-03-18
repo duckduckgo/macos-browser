@@ -69,7 +69,20 @@ extension DataBrokerOperation {
 
     // MARK: - Shared functions
 
+    // swiftlint:disable:next cyclomatic_complexity
     func runNextAction(_ action: Action) async {
+        switch action {
+        case is GetCaptchaInfoAction:
+            stageCalculator?.setStage(.captchaParse)
+        case is ClickAction:
+            stageCalculator?.setStage(.fillForm)
+        case is FillFormAction:
+            stageCalculator?.setStage(.fillForm)
+        case is ExpectationAction:
+            stageCalculator?.setStage(.submit)
+        default: ()
+        }
+
         if let emailConfirmationAction = action as? EmailConfirmationAction {
             do {
                 stageCalculator?.fireOptOutSubmit()
@@ -99,7 +112,9 @@ extension DataBrokerOperation {
         if action.needsEmail {
             do {
                 stageCalculator?.setStage(.emailGenerate)
-                extractedProfile?.email = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url)
+                let emailData = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url)
+                extractedProfile?.email = emailData.emailAddress
+                stageCalculator?.setEmailPattern(emailData.pattern)
                 stageCalculator?.fireOptOutEmailGenerate()
             } catch {
                 await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
@@ -107,15 +122,7 @@ extension DataBrokerOperation {
             }
         }
 
-        if action as? GetCaptchaInfoAction != nil {
-            stageCalculator?.setStage(.captchaParse)
-        }
-
-        if let extractedProfile = self.extractedProfile {
-            await webViewHandler?.execute(action: action, data: .extractedProfile(extractedProfile))
-        } else {
-            await webViewHandler?.execute(action: action, data: .profile(query.profileQuery))
-        }
+        await webViewHandler?.execute(action: action, data: .userData(query.profileQuery, self.extractedProfile))
     }
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
@@ -178,7 +185,11 @@ extension DataBrokerOperation {
     func success(actionId: String, actionType: ActionType) async {
         switch actionType {
         case .click:
+            stageCalculator?.fireOptOutFillForm()
             try? await webViewHandler?.waitForWebViewLoad(timeoutInSeconds: 30)
+            await executeNextStep()
+        case .fillForm:
+            stageCalculator?.fireOptOutFillForm()
             await executeNextStep()
         default: await executeNextStep()
         }

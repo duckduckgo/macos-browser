@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import PixelKit
 
 /// Structure containing information about a pixel fire event.
 ///
@@ -27,10 +28,35 @@ public struct PixelFireExpectations {
     let pixelName: String
     var error: Error?
     var underlyingError: Error?
+    var customFields: [String: String]?
 
-    public init(pixelName: String, error: Error? = nil, underlyingError: Error? = nil) {
+    /// Convenience initializer for cleaner semantics
+    ///
+    public static func expect(pixelName: String, error: Error? = nil, underlyingError: Error? = nil, customFields: [String: String]? = nil) -> PixelFireExpectations {
+
+        .init(pixelName: pixelName, error: error, underlyingError: underlyingError, customFields: customFields)
+    }
+
+    public init(pixelName: String, error: Error? = nil, underlyingError: Error? = nil, customFields: [String: String]? = nil) {
         self.pixelName = pixelName
         self.error = error
         self.underlyingError = underlyingError
+        self.customFields = customFields
+    }
+
+    public var parameters: [String: String] {
+        var parameters = customFields ?? [String: String]()
+
+        if let nsError = error as? NSError {
+            parameters[PixelKit.Parameters.errorCode] = String(nsError.code)
+            parameters[PixelKit.Parameters.errorDomain] = nsError.domain
+        }
+
+        if let nsUnderlyingError = underlyingError as? NSError {
+            parameters[PixelKit.Parameters.underlyingErrorCode] = String(nsUnderlyingError.code)
+            parameters[PixelKit.Parameters.underlyingErrorDomain] = nsUnderlyingError.domain
+        }
+
+        return parameters
     }
 }

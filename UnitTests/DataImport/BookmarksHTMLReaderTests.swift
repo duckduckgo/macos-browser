@@ -35,7 +35,7 @@ final class BookmarksHTMLReaderTests: XCTestCase {
         for fileName in try FileManager.default.contentsOfDirectory(atPath: bookmarksHTMLReaderTestFilesURL.path) {
             let fileNameWithoutExtension = fileName.dropping(suffix: "html")
             let fileURL = bookmarksHTMLReaderTestFilesURL.appendingPathComponent(fileName)
-            let reader = BookmarkHTMLReader(bookmarksFileURL: fileURL)
+            let reader = BookmarkHTMLReader(bookmarksFileURL: fileURL, otherBookmarksFolderTitle: "Other bookmarks")
             let result = reader.readBookmarks()
 
             if expectedToThrow.contains(fileName) {

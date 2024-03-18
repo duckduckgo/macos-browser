@@ -19,6 +19,7 @@
 import Cocoa
 import BrowserServicesKit
 import Common
+import History
 
 @MainActor
 final class FirePopoverViewModel {
@@ -224,7 +225,7 @@ final class FirePopoverViewModel {
 
 }
 
-extension History {
+extension BrowsingHistory {
 
     func visitedDomains(tld: TLD) -> Set<String> {
         return reduce(Set<String>(), { result, historyEntry in

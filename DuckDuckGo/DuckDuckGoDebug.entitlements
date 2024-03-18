@@ -14,6 +14,7 @@
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>$(NETP_APP_GROUP)</string>
+		<string>$(DBP_APP_GROUP)</string>
 	</array>
 	<key>com.apple.security.device.audio-input</key>
 	<true/>
@@ -27,6 +28,7 @@
 	<array>
 		<string>$(AppIdentifierPrefix)com.duckduckgo.macos.browser</string>
 		<string>$(NETP_APP_GROUP)</string>
+		<string>$(SUBSCRIPTION_APP_GROUP)</string>
 		<string>$(DBP_APP_GROUP)</string>
 	</array>
 </dict>

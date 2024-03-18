@@ -26,66 +26,88 @@ public struct SubscriptionAccessView: View {
 
     private let dismissAction: (() -> Void)?
 
-    @State private var selection: AccessChannel?
-    @State var fullHeight: CGFloat = 0.0
-
     public init(model: SubscriptionAccessModel, dismiss: (() -> Void)? = nil) {
         self.model = model
         self.dismissAction = dismiss
-        _selection = State(initialValue: model.items.first)
     }
 
     public var body: some View {
-        VStack(spacing: 8) {
-            VStack(spacing: 8) {
-                Text(model.title)
-                    .font(.title2)
-                    .bold()
-                    .foregroundColor(Color("TextPrimary", bundle: .module))
-                Text(model.description)
-                    .font(.body)
-                    .multilineTextAlignment(.center)
-                    .fixMultilineScrollableText()
-                    .foregroundColor(Color("TextPrimary", bundle: .module))
-            }
-            .padding(4)
-
+        VStack(spacing: 0) {
             VStack(spacing: 0) {
-                ForEach(model.items) { item in
-                    SubscriptionAccessRow(iconName: item.iconName,
-                                          name: item.title,
-                                          descriptionHeader: model.descriptionHeader(for: item),
-                                          description: model.description(for: item),
-                                          isExpanded: self.selection == item,
-                                          buttonTitle: model.buttonTitle(for: item),
-                                          buttonAction: {
-                        dismiss {
-                            model.handleAction(for: item)
-                        }
-                    })
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            self.selection = item
+
+                VStack(spacing: 8) {
+                    Text(model.title)
+                        .font(.title2)
+                        .bold()
+                        .foregroundColor(Color(.textPrimary))
+                    Text(model.description)
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .fixMultilineScrollableText()
+                        .foregroundColor(Color(.textPrimary))
+                }
+
+                Spacer().frame(height: 20)
+
+                VStack(spacing: 0) {
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack(alignment: .center, spacing: 8) {
+                            Image("email-icon", bundle: .module)
+
+                            Text(model.emailLabel)
+                                .font(.system(size: 14, weight: .regular, design: .default))
+                            Spacer()
                         }
                         .padding(.vertical, 10)
 
-                    if model.items.last != item {
-                        Divider()
+                        if let header = model.email, !header.isEmpty {
+                            Text(header)
+                                .bold()
+                                .foregroundColor(Color("TextPrimary", bundle: .module))
+                                .padding(.bottom, 4)
+                        }
+
+                        Text(model.emailDescription)
+                            .font(.system(size: 13, weight: .regular, design: .default))
+                            .foregroundColor(Color("TextSecondary", bundle: .module))
+                            .fixMultilineScrollableText()
+
+                        Button(model.emailButtonTitle) {
+                            dismiss {
+                                model.handleEmailAction()
+                            }
+                        }
+                        .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                        .padding(.vertical, 16)
                     }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 20)
                 }
-                .padding(.horizontal, 20)
+                .roundedBorder()
 
+                if let purchaseRestoringModel = model as? PurchaseRestoringSubscriptionAccessModel, purchaseRestoringModel.shouldShowRestorePurchase {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(purchaseRestoringModel.restorePurchaseDescription)
+                            .font(.system(size: 13, weight: .regular, design: .default))
+                            .foregroundColor(Color("TextSecondary", bundle: .module))
+                            .fixMultilineScrollableText()
+                        HStack {
+                            TextButton(purchaseRestoringModel.restorePurchaseButtonTitle) {
+                                dismiss {
+                                    purchaseRestoringModel.handleRestorePurchaseAction()
+                                }
+                            }
+                            Spacer()
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                    .padding(.top, 20)
+                }
             }
-            .roundedBorder()
-            .animation(.easeOut(duration: 0.3))
-
-            Spacer()
-                .frame(minHeight: 4, idealHeight: 60)
+            .padding(20)
 
             Divider()
-
-            Spacer()
-                .frame(height: 8)
 
             HStack {
                 Spacer()
@@ -93,9 +115,11 @@ public struct SubscriptionAccessView: View {
                 Button("Cancel") {
                     dismiss()
                 }
+                .buttonStyle(DismissActionButtonStyle())
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
-        .padding(20)
         .frame(width: 480)
     }
 

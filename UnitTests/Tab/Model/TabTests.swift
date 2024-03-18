@@ -117,14 +117,18 @@ final class TabTests: XCTestCase {
         // GIVEN
         let tab = Tab(content: .none, extensionsBuilder: TestTabExtensionsBuilder(load: [DownloadsTabExtension.self]))
         tab.url = .duckDuckGo
-        DownloadsPreferences().alwaysRequestDownloadLocation = true
+        DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor()).alwaysRequestDownloadLocation = true
         tab.webView(WebViewMock(), saveDataToFile: Data(), suggestedFilename: "anything", mimeType: "application/pdf", originatingURL: .duckDuckGo)
         var expectedDialog: Tab.UserDialog?
+        let expectation = expectation(description: "savePanelDialog published")
         tab.downloads?.savePanelDialogPublisher.sink(receiveValue: { userDialog in
-            expectedDialog = userDialog
+            if let userDialog {
+                expectation.fulfill()
+                expectedDialog = userDialog
+            }
         }).store(in: &cancellables)
-        XCTAssertNotNil(expectedDialog)
 
+        waitForExpectations(timeout: 1)
         // WHEN
         tab.url = .duckDuckGoMorePrivacyInfo
 
