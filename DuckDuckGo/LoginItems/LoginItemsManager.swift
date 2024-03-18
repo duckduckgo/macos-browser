@@ -20,8 +20,8 @@ import Common
 import Foundation
 import LoginItems
 
-/// Class to manage the login items for Network Protection and DBP
-/// 
+/// Class to manage the login items for the VPN and DBP
+///
 final class LoginItemsManager {
     private enum Action: String {
         case enable

@@ -27,7 +27,7 @@ import SystemExtensions
 import LoginItems
 import NetworkProtectionIPC
 
-/// Utility code to help implement our debug menu options for Network Protection.
+/// Utility code to help implement our debug menu options for the VPN.
 ///
 final class NetworkProtectionDebugUtilities {
 

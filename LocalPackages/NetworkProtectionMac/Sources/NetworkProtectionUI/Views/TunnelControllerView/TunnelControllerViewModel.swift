@@ -437,9 +437,9 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Toggling Network Protection
+    // MARK: - Toggling VPN
 
-    /// Start network protection.
+    /// Start the VPN.
     ///
     func startNetworkProtection() {
         if shouldFlipToggle {
@@ -454,7 +454,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
-    /// Stop network protection.
+    /// Stop the VPN.
     ///
     func stopNetworkProtection() {
         toggleTransition = .switchingOff(locallyInitiated: true)

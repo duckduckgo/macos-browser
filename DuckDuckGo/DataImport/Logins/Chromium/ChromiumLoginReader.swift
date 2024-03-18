@@ -65,9 +65,9 @@ final class ChromiumLoginReader {
     private let decryptionKey: String?
     private let decryptionKeyPrompt: ChromiumKeychainPrompting
 
-    private static let sqlSelectWithPasswordTimestamp = "SELECT signon_realm, username_value, password_value, date_password_modified FROM logins;"
-    private static let sqlSelectWithCreatedTimestamp = "SELECT signon_realm, username_value, password_value, date_created FROM logins;"
-    private static let sqlSelectWithoutTimestamp = "SELECT signon_realm, username_value, password_value FROM logins;"
+    private static let sqlSelectWithPasswordTimestamp = "SELECT signon_realm, username_value, password_value, date_password_modified, blacklisted_by_user FROM logins WHERE blacklisted_by_user != 1;"
+    private static let sqlSelectWithCreatedTimestamp = "SELECT signon_realm, username_value, password_value, date_created, blacklisted_by_user FROM logins WHERE blacklisted_by_user != 1;"
+    private static let sqlSelectWithoutTimestamp = "SELECT signon_realm, username_value, password_value, blacklisted_by_user FROM logins WHERE blacklisted_by_user != 1;"
 
     private let source: DataImport.Source
 
