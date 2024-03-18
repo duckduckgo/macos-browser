@@ -142,11 +142,9 @@ protocol NewWindowPolicyDecisionMaker {
 #if SUBSCRIPTION
             if let url {
                 if url.isChild(of: URL.subscriptionBaseURL) {
-                    // TODO: Subs. logic for converting subscription URL to environment if it lacks one
-                    if SubscriptionPurchaseEnvironment.currentServiceEnvironment == .staging, url.getParameter(named: "environment") == nil {
-                        return .subscription(url.appendingParameter(name: "environment", value: "staging"))
-                    }
-                    return .subscription(url)
+                    let urlProvider = NSApp.delegateTyped.subscriptionManager.urlProvider
+                    let updatedURL = urlProvider.updateURLToCurrentEnvironment(url)
+                    return .subscription(updatedURL)
                 } else if url.isChild(of: URL.identityTheftRestorationBaseURL) {
                     return .identityTheftRestoration(url)
                 }
