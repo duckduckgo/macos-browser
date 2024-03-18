@@ -187,9 +187,7 @@ class FindInPageTests: XCTestCase {
 		app.typeText("maximus\r")
 		let statusField = app.textFields["FindInPageController.statusField"]
 		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
-		XCTAssertNotNil(statusField.value as? String, "There was no string content in the \"Find in Page\" status field when it was expected.")
-		let statusFieldTextContent = statusField.value as! String
-
+		let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
 		XCTAssertEqual(statusFieldTextContent, "1 of 4") // Note: this is not a localized test element, and it should have a localization strategy.
 	}
 
@@ -209,8 +207,7 @@ class FindInPageTests: XCTestCase {
 		app.typeText("maximus\r")
 		let statusField = app.textFields["FindInPageController.statusField"]
 		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
-		XCTAssertNotNil(statusField.value as? String, "There was no string content in the \"Find in Page\" status field when it was expected.")
-		let statusFieldTextContent = statusField.value as! String
+		let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
 		// Note: the following is not a localized test element, but it should have a localization strategy.
 		XCTAssertEqual(statusFieldTextContent, "1 of 4", "Unexpected status field text content after a \"Find in Page\" operation.")
 
@@ -238,8 +235,7 @@ class FindInPageTests: XCTestCase {
 		app.typeText("maximus\r")
 		let statusField = app.textFields["FindInPageController.statusField"]
 		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
-		XCTAssertNotNil(statusField.value as? String, "There was no string content in the \"Find in Page\" status field when it was expected.")
-		let statusFieldTextContent = statusField.value as! String
+		let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
 		// Note: the following is not a localized test element, but it should have a localization strategy.
 		XCTAssertEqual(statusFieldTextContent, "1 of 4", "Unexpected status field text content after a \"Find in Page\" operation.")
 		let findInPageScreenshot = loremIpsumWebView.screenshot()
@@ -292,8 +288,7 @@ class FindInPageTests: XCTestCase {
 		app.typeText("maximus\r")
 		let statusField = app.textFields["FindInPageController.statusField"]
 		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
-		XCTAssertNotNil(statusField.value as? String, "There was no string content in the \"Find in Page\" status field when it was expected.")
-		let statusFieldTextContent = statusField.value as! String
+		let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
 		// Note: the following is not a localized test element, but it should have a localization strategy.
 		XCTAssertEqual(statusFieldTextContent, "1 of 4", "Unexpected status field text content after a \"Find in Page\" operation.")
 		let findInPageScreenshot = loremIpsumWebView.screenshot()
@@ -345,8 +340,8 @@ class FindInPageTests: XCTestCase {
 		app.typeText("maximus\r")
 		let statusField = app.textFields["FindInPageController.statusField"]
 		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
-		XCTAssertNotNil(statusField.value as? String, "There was no string content in the \"Find in Page\" status field when it was expected.")
-		let statusFieldTextContent = statusField.value as! String
+		let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
+
 		// Note: the following is not a localized test element, but it should have a localization strategy.
 		XCTAssertEqual(statusFieldTextContent, "1 of 4", "Unexpected status field text content after a \"Find in Page\" operation.")
 		let findInPageScreenshot = loremIpsumWebView.screenshot()
