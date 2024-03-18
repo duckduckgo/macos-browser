@@ -177,7 +177,7 @@ class FindInPageTests: XCTestCase {
 			loremIpsumWebView.waitForExistence(timeout: timeout),
 			"Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
 		)
-		
+
 		app.typeKey("f", modifierFlags: .command)
 		XCTAssertTrue(
 			findInPageCloseButton.waitForExistence(timeout: timeout),
@@ -205,7 +205,7 @@ class FindInPageTests: XCTestCase {
 			findInPageCloseButton.waitForExistence(timeout: timeout),
 			"After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
 		)
-		
+
 		app.typeText("maximus\r")
 		let statusField = app.textFields["FindInPageController.statusField"]
 		XCTAssertTrue(statusField.waitForExistence(timeout: timeout), "Couldn't find \"Find in Page\" statusField in a reasonable timeframe.")
