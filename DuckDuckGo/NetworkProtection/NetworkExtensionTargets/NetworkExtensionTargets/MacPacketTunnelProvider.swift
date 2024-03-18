@@ -63,13 +63,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .couldNotGetInterfaceAddressRange:
                 domainEvent = .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange
             case .failedToFetchServerList(let eventError):
-                domainEvent = .networkProtectionClientFailedToFetchServerList(error: eventError)
+                domainEvent = .networkProtectionClientFailedToFetchServerList(eventError)
             case .failedToParseServerListResponse:
                 domainEvent = .networkProtectionClientFailedToParseServerListResponse
             case .failedToEncodeRegisterKeyRequest:
                 domainEvent = .networkProtectionClientFailedToEncodeRegisterKeyRequest
             case .failedToFetchRegisteredServers(let eventError):
-                domainEvent = .networkProtectionClientFailedToFetchRegisteredServers(error: eventError)
+                domainEvent = .networkProtectionClientFailedToFetchRegisteredServers(eventError)
             case .failedToParseRegisteredServersResponse:
                 domainEvent = .networkProtectionClientFailedToParseRegisteredServersResponse
             case .failedToEncodeRedeemRequest:
@@ -77,9 +77,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .invalidInviteCode:
                 domainEvent = .networkProtectionClientInvalidInviteCode
             case .failedToRedeemInviteCode(let error):
-                domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error: error)
+                domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error)
             case .failedToParseRedeemResponse(let error):
-                domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error: error)
+                domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error)
             case .invalidAuthToken:
                 domainEvent = .networkProtectionClientInvalidAuthToken
             case .serverListInconsistency:
@@ -89,13 +89,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .failedToDecodeServerList:
                 domainEvent = .networkProtectionServerListStoreFailedToDecodeServerList
             case .failedToWriteServerList(let eventError):
-                domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(error: eventError)
+                domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(eventError)
             case .noServerListFound:
                 return
             case .couldNotCreateServerListDirectory:
                 return
             case .failedToReadServerList(let eventError):
-                domainEvent = .networkProtectionServerListStoreFailedToReadServerList(error: eventError)
+                domainEvent = .networkProtectionServerListStoreFailedToReadServerList(eventError)
             case .failedToCastKeychainValueToData(let field):
                 domainEvent = .networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: field)
             case .keychainReadError(let field, let status):
@@ -113,7 +113,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .wireGuardDnsResolution:
                 domainEvent = .networkProtectionWireguardErrorFailedDNSResolution
             case .wireGuardSetNetworkSettings(let error):
-                domainEvent = .networkProtectionWireguardErrorCannotSetNetworkSettings(error: error)
+                domainEvent = .networkProtectionWireguardErrorCannotSetNetworkSettings(error)
             case .startWireGuardBackend(let code):
                 domainEvent = .networkProtectionWireguardErrorCannotStartWireguardBackend(code: code)
             case .noAuthTokenFound:
@@ -210,9 +210,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             case .failure(let error):
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionRekeyFailure,
+                    NetworkProtectionPixelEvent.networkProtectionRekeyFailure(error),
                     frequency: .dailyAndContinuous,
-                    withError: error,
                     includeAppVersionParameter: true)
             case .success:
                 PixelKit.fire(
@@ -229,9 +228,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             case .failure(let error):
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionTunnelStartFailure,
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStartFailure(error),
                     frequency: .dailyAndContinuous,
-                    withError: error,
                     includeAppVersionParameter: true)
             case .success:
                 PixelKit.fire(
@@ -248,9 +246,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     includeAppVersionParameter: true)
             case .failure(let error):
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionTunnelUpdateFailure,
+                    NetworkProtectionPixelEvent.networkProtectionTunnelUpdateFailure(error),
                     frequency: .dailyAndContinuous,
-                    withError: error,
                     includeAppVersionParameter: true)
             case .success:
                 PixelKit.fire(
