@@ -25,7 +25,6 @@ protocol VPNUninstalling {
 }
 
 final class VPNUninstaller: VPNUninstalling {
-    static let vpnUninstalledNotificationName = NSNotification.Name(rawValue: "com.duckduckgo.NetworkProtection.uninstalled")
     let networkExtensionController: NetworkExtensionController
     let vpnConfiguration: VPNConfigurationManager
     let defaults: UserDefaults
