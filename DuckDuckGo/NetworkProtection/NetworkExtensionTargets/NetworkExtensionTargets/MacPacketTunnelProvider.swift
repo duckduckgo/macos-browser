@@ -158,6 +158,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndContinuous,
                     includeAppVersionParameter: true)
             case .success:
+                let lastVersionRunStore = NetworkProtectionLastVersionRunStore(userDefaults: .netP)
+                lastVersionRunStore.lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
+
                 PixelKit.fire(
                     NetworkProtectionPixelEvent.networkProtectionEnableAttemptSuccess,
                     frequency: .dailyAndContinuous,
