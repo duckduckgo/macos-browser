@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NetworkProtection
 import NetworkProtectionUI
 
 #if NETP_SYSTEM_EXTENSION
@@ -32,11 +33,13 @@ final class NetworkExtensionController {
 
 #if NETP_SYSTEM_EXTENSION
     private let systemExtensionManager: SystemExtensionManager
+    private let defaults: UserDefaults
 #endif
 
-    init(extensionBundleID: String) {
+    init(extensionBundleID: String, defaults: UserDefaults = .netP) {
 #if NETP_SYSTEM_EXTENSION
         systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionBundleID)
+        self.defaults = defaults
 #endif
     }
 
@@ -48,8 +51,8 @@ extension NetworkExtensionController {
 #if NETP_SYSTEM_EXTENSION
         let extensionVersion = try await systemExtensionManager.activate(
             waitingForUserApproval: waitingForUserApproval)
-        // TODO: change this
-        UserDefaults.netP.setValue(extensionVersion, forKey: "extensionVersion")
+
+        NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
 
         try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
 #endif
