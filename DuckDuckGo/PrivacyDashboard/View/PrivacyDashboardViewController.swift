@@ -258,11 +258,13 @@ extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelega
                                     didRequestSubmitBrokenSiteReportWithCategory category: String,
                                     description: String) {
         let source: BrokenSiteReport.Source = privacyDashboardController.initDashboardMode == .report ? .appMenu : .dashboard
-        do {
-            let report = try makeBrokenSiteReport(category: category, description: description, source: source)
-            try brokenSiteReporter.report(report, reportMode: .regular)
-        } catch {
-            os_log("Failed to generate or send the broken site report: \(error.localizedDescription)", type: .error)
+        Task { @MainActor in
+            do {
+                let report = try await makeBrokenSiteReport(category: category, description: description, source: source)
+                try brokenSiteReporter.report(report, reportMode: .regular)
+            } catch {
+                os_log("Failed to generate or send the broken site report: \(error.localizedDescription)", type: .error)
+            }
         }
     }
 
@@ -281,13 +283,15 @@ extension PrivacyDashboardViewController: PrivacyDashboardToggleReportDelegate {
                                    didRequestSubmitToggleReportWithSource source: BrokenSiteReport.Source,
                                    didOpenReportInfo: Bool,
                                    toggleReportCounter: Int?) {
-       do {
-           let report = try makeBrokenSiteReport(source: source,
-                                                 didOpenReportInfo: didOpenReportInfo,
-                                                 toggleReportCounter: toggleReportCounter)
-           try toggleProtectionsOffReporter.report(report, reportMode: .toggle)
-       } catch {
-           os_log("Failed to generate or send the broken site report: %@", type: .error, error.localizedDescription)
+       Task { @MainActor in
+           do {
+               let report = try await makeBrokenSiteReport(source: source,
+                                                     didOpenReportInfo: didOpenReportInfo,
+                                                     toggleReportCounter: toggleReportCounter)
+               try toggleProtectionsOffReporter.report(report, reportMode: .toggle)
+           } catch {
+               os_log("Failed to generate or send the broken site report: %@", type: .error, error.localizedDescription)
+           }
        }
    }
 
@@ -305,7 +309,7 @@ extension PrivacyDashboardViewController {
                                       description: String = "",
                                       source: BrokenSiteReport.Source,
                                       didOpenReportInfo: Bool = false,
-                                      toggleReportCounter: Int? = nil) throws -> BrokenSiteReport {
+                                      toggleReportCounter: Int? = nil) async throws -> BrokenSiteReport {
 
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         guard let currentTab = tabViewModel?.tab,
@@ -320,6 +324,15 @@ extension PrivacyDashboardViewController {
         // current domain's protection status
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.url?.host)
+
+        var webVitals: [Double]?
+        if configuration.isEnabled(featureKey: .performanceMetrics) {
+            webVitals = await withCheckedContinuation { continuation in
+                currentTab.performanceMetrics.notifyHandler { result in
+                    continuation.resume(returning: result)
+                }
+            }
+        }
 
         var errors: [Error]?
         var statusCodes: [Int]?
@@ -348,7 +361,7 @@ extension PrivacyDashboardViewController {
                                                httpStatusCodes: statusCodes,
                                                openerContext: currentTab.inferredOpenerContext,
                                                vpnOn: currentTab.tunnelController?.isConnected ?? false,
-                                               jsPerformance: nil,
+                                               jsPerformance: webVitals,
                                                userRefreshCount: currentTab.refreshCountSinceLoad,
                                                didOpenReportInfo: didOpenReportInfo,
                                                toggleReportCounter: toggleReportCounter)

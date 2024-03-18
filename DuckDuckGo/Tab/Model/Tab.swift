@@ -782,6 +782,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @Published private(set) var inferredOpenerContext: BrokenSiteReport.OpenerContext?
     @Published private(set) var refreshCountSinceLoad: Int = 0
+    private (set) var performanceMetrics: PerformanceMetricsSubfeature = PerformanceMetricsSubfeature()
 
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var loadingProgress: Double = 0.0
@@ -1293,6 +1294,8 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
+        userScripts.contentScopeUserScriptIsolated.registerSubfeature(delegate: performanceMetrics)
+        performanceMetrics.targetWebview = webView
     }
 
 }
