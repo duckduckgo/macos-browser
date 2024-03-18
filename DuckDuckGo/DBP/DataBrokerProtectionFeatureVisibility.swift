@@ -107,10 +107,11 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
 
     /// Returns true if a cleanup was performed, false otherwise
     func cleanUpDBPForPrivacyProIfNecessary() -> Bool {
+#if SUBSCRIPTION
         let isPrivacyProFeatureFlagEnabled = NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
-
-        // Early return to avoid unnecessary storage calls
-        guard isPrivacyProFeatureFlagEnabled else { return false }
+#else
+        let isPrivacyProFeatureFlagEnabled = false
+#endif
 
         let wasWaitlistUser = DataBrokerProtectionWaitlist().waitlistStorage.getWaitlistInviteCode() != nil
 
