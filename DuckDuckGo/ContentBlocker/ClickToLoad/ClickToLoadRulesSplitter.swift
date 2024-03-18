@@ -52,12 +52,13 @@ struct ClickToLoadRulesSplitter {
     }
 
     private func split(trackerData: TrackerDataManager.DataSet) -> (withoutBlockCTL: TrackerDataManager.DataSet, withBlockCTL: TrackerDataManager.DataSet)? {
-        let trackersWithBlockCTL = filterTrackersWithCTLAction(trackerData.tds.trackers)
+        // the logic for CTL tracker management has been updated, now the main TDS list retains the CTL blocking/surrogate rules at all times, and there is a separate CTL "ignore" override rule set
+        // this CTL override side are now only added when CTL protections are removed, to override the corresponding blocking / surrogate rules
+        let (mainTDSTrackers, ctlTrackers) = processCTLActions(trackerData.tds.trackers)
 
-        if !trackersWithBlockCTL.isEmpty {
-            let trackersWithoutBlockCTL = filterTrackersWithoutCTLAction(trackerData.tds.trackers)
-            let trackerDataWithoutBlockCTL = makeTrackerData(using: trackersWithoutBlockCTL, originalTDS: trackerData.tds)
-            let trackerDataWithBlockCTL = makeTrackerData(using: trackersWithBlockCTL, originalTDS: trackerData.tds)
+        if !ctlTrackers.isEmpty {
+            let trackerDataWithoutBlockCTL = makeTrackerData(using: mainTDSTrackers, originalTDS: trackerData.tds)
+            let trackerDataWithBlockCTL = makeTrackerData(using: ctlTrackers, originalTDS: trackerData.tds)
 
             return (
                 (tds: trackerDataWithoutBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag),
@@ -76,6 +77,42 @@ struct ClickToLoadRulesSplitter {
                            cnames: originalTDS.cnames)
     }
 
+    private func processCTLActions(_ trackers: [String: KnownTracker]) -> (mainTDS: [String: KnownTracker], ctlOverrides: [String: KnownTracker]) {
+        var mainTDSTrackers = trackers
+        var ctlTrackers: [String: KnownTracker] = [:]
+
+        for (key, tracker) in mainTDSTrackers {
+            if let rules = tracker.rules as [KnownTracker.Rule]? {
+                var ctlRules: [KnownTracker.Rule] = []
+
+                for ruleIndex in rules.indices.reversed() {
+                    if let action = rules[ruleIndex].action, action == .blockCtlFB {
+                        var newRule = rules[ruleIndex]
+                        if newRule.surrogate != nil {
+                            // if rule includes a surroate, the action should be nil, as it gets converted to a redirect
+                            newRule.action = nil
+                        } else {
+                            newRule.action = .block
+                        }
+                        print("RULE MATCH for \(key): \(rules[ruleIndex]) -> \(newRule)")
+
+                        mainTDSTrackers[key]?.rules?.remove(at: ruleIndex)
+                        ctlRules.insert(newRule, at: 0)
+                    }
+                }
+
+                if !ctlRules.isEmpty {
+                    var ctlTracker = tracker
+                    ctlTracker.defaultAction = .ignore
+                    ctlTracker.rules = ctlRules
+                    ctlTrackers[key] = ctlTracker
+                }
+            }
+        }
+
+        return (mainTDSTrackers, ctlTrackers)
+    }
+
     private func filterTrackersWithoutCTLAction(_ trackers: [String: KnownTracker]) -> [String: KnownTracker] {
         trackers.filter { (_, tracker) in tracker.containsCTLActions == false }
     }
@@ -89,7 +126,7 @@ struct ClickToLoadRulesSplitter {
             if modifiedTracker.defaultAction == .blockCtlFB {
                 modifiedTracker.defaultAction = .block
             }
-            print("RULES BEFORE \(modifiedTracker.rules)")
+//            print("RULES BEFORE \(modifiedTracker.rules)")
 
             if let rules = modifiedTracker.rules as [KnownTracker.Rule]? {
                 for ruleIndex in rules.indices {
@@ -99,7 +136,7 @@ struct ClickToLoadRulesSplitter {
                     }
                 }
             }
-            print("RULES AFTER \(modifiedTracker.rules)")
+//            print("RULES AFTER \(modifiedTracker.rules)")
 
             return (key, modifiedTracker)
         })
