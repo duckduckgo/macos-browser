@@ -48,6 +48,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
         let configuration = WKWebViewConfiguration()
         configuration.applyDataBrokerConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: delegate)
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+        configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
 
         self.webViewConfiguration = configuration
         self.isFakeBroker = isFakeBroker
@@ -85,6 +86,9 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
 
         webView?.stopLoading()
         userContentController?.cleanUpBeforeClosing()
+        WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache], modifiedSince: Date(timeIntervalSince1970: 0)) {
+            os_log("WKWebView data store deleted correctly", log: .action)
+        }
 
         userContentController = nil
         webView?.navigationDelegate = nil
