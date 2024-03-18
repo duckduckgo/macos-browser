@@ -422,53 +422,45 @@ extension NSImage {
 	/// - Parameter colorToMatch: the NSColor to match
 	/// - Returns: An array of Pixel structs
 	func matchingPixels(of colorToMatch: NSColor) -> [Pixel] {
-		let pixelArray = self.pixels().pixelArray // Pixels of the image we will check for the requested color
-		let colorSpace = self.pixels().colorSpace // We have to check in the same colorspace of the image
-		XCTAssertNotNil(
-			colorToMatch.usingColorSpace(colorSpace),
-			"It wasn't possible to get the local colorspace for the UI Tests when this is expected."
-		)
-		let colorToMatchWithColorSpace = colorToMatch
-			.usingColorSpace(colorSpace)! // And this is the same color converted to the image's colorspace, so we can compare
-		let colorToMatchRed = UInt8(colorToMatchWithColorSpace.redComponent * 255.999999) // color components in 0-255 values in this colorspace
-		let colorToMatchGreen = UInt8(colorToMatchWithColorSpace.greenComponent * 255.999999)
-		let colorToMatchBlue = UInt8(colorToMatchWithColorSpace.blueComponent * 255.999999)
-		var matchingPixels = [Pixel]()
-		for pixel in pixelArray {
-			if pixel.red == colorToMatchRed, pixel.green == colorToMatchGreen, pixel.blue == colorToMatchBlue {
-				matchingPixels.append(pixel)
-			}
-		}
-		return matchingPixels
-	}
 
-	/// The pixels in an NSSpace with their colorspace
-	/// - Returns: a tuple consisting of the array of Pixel structs in the NSImage and the NSColorSpace their colors are in
-	func pixels() -> (pixelArray: [Pixel], colorSpace: NSColorSpace) {
 		let cgImage = cgImage(forProposedRect: nil, context: nil, hints: nil)
 		XCTAssertNotNil(cgImage, "It wasn't possible to obtain the CGImage of the NSImage.")
 		let bitmap = NSBitmapImageRep(cgImage: cgImage!)
 		let colorSpace = bitmap.colorSpace
+
+		XCTAssertNotNil(
+			colorToMatch.usingColorSpace(colorSpace),
+			"It wasn't possible to get the color to match in the local colorspace."
+		)
+		let colorToMatchWithColorSpace = colorToMatch
+			.usingColorSpace(colorSpace)! // We need to compare the color we want to look for in the image after it is in the same colorspace as the image
+
 		XCTAssertNotNil(bitmap.bitmapData, "It wasn't possible to obtain the bitmapData of the bitmap.")
 		var bitmapData: UnsafeMutablePointer<UInt8> = bitmap.bitmapData!
-		var red, green, blue, alpha: UInt8
+		var redInImage, greenInImage, blueInImage, alphaInImage: UInt8
+
+		let redToMatch = UInt8(colorToMatchWithColorSpace.redComponent * 255.999999) // color components in 0-255 values in this colorspace
+		let greenToMatch = UInt8(colorToMatchWithColorSpace.greenComponent * 255.999999)
+		let blueToMatch = UInt8(colorToMatchWithColorSpace.blueComponent * 255.999999)
+
 		var pixels: [Pixel] = []
 
 		for yPoint in 0 ..< bitmap.pixelsHigh {
 			for xPoint in 0 ..< bitmap.pixelsWide {
-				red = bitmapData.pointee
+				redInImage = bitmapData.pointee
 				bitmapData = bitmapData.advanced(by: 1)
-				green = bitmapData.pointee
+				greenInImage = bitmapData.pointee
 				bitmapData = bitmapData.advanced(by: 1)
-				blue = bitmapData.pointee
+				blueInImage = bitmapData.pointee
 				bitmapData = bitmapData.advanced(by: 1)
-				alpha = bitmapData.pointee
+				alphaInImage = bitmapData.pointee
 				bitmapData = bitmapData.advanced(by: 1)
-				pixels.append(Pixel(red: red, green: green, blue: blue, alpha: alpha, point: CGPoint(x: xPoint, y: yPoint)))
+				if redInImage == redToMatch, greenInImage == greenToMatch, blueInImage == blueToMatch { // We aren't matching alpha
+					pixels.append(Pixel(red: redInImage, green: greenInImage, blue: blueInImage, alpha: alphaInImage, point: CGPoint(x: xPoint, y: yPoint)))
+				}
 			}
 		}
-
-		return (pixelArray: pixels, colorSpace: colorSpace)
+		return pixels
 	}
 }
 
