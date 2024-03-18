@@ -19,10 +19,11 @@
 import Foundation
 import BrowserServicesKit
 import Common
+import Suggestions
 
 struct BookmarkList {
 
-    struct IdentifiableBookmark: Equatable, BrowserServicesKit.Bookmark {
+    struct IdentifiableBookmark: Equatable, Suggestions.Bookmark {
         let id: String
         let url: String
         let urlObject: URL?
