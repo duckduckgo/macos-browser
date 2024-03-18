@@ -65,13 +65,15 @@ public final class SubscriptionAccessViewController: NSViewController {
                                                 refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
                                                 addEmailURL: addEmailURL,
                                                 manageEmailURL: manageEmailURL,
-                                                flowProvider: subscriptionManager.flowProvider)
+                                                flowProvider: subscriptionManager.flowProvider,
+                                                purchasePlatform: subscriptionManager.configuration.currentPurchasePlatform)
         } else {
             let shouldShowRestore = subscriptionManager.configuration.currentPurchasePlatform == .appStore
             let activateURL = subscriptionManager.urlProvider.url(for: .activateWithEmail)
             return ActivateSubscriptionAccessModel(actionHandlers: actionHandlers,
                                                    shouldShowRestorePurchase: shouldShowRestore,
-                                                   activateViaEmailURL: activateURL)
+                                                   activateViaEmailURL: activateURL,
+                                                   purchasePlatform: subscriptionManager.configuration.currentPurchasePlatform)
         }
     }
 }

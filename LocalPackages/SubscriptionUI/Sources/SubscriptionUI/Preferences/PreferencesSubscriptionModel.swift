@@ -160,14 +160,16 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                                                 refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
                                                 addEmailURL: addEmailURL,
                                                 manageEmailURL: manageEmailURL,
-                                                flowProvider: subscriptionManager.flowProvider)
+                                                flowProvider: subscriptionManager.flowProvider,
+                                                purchasePlatform: subscriptionManager.configuration.currentPurchasePlatform)
 
         } else {
             let shouldShowRestore = subscriptionManager.configuration.currentPurchasePlatform == .appStore
             let activateURL = subscriptionManager.urlProvider.url(for: .activateWithEmail)
             return ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler,
                                                    shouldShowRestorePurchase: shouldShowRestore,
-                                                   activateViaEmailURL: activateURL)
+                                                   activateViaEmailURL: activateURL,
+                                                   purchasePlatform: subscriptionManager.configuration.currentPurchasePlatform)
         }
     }
 
@@ -267,10 +269,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func refreshSubscriptionPendingState() {
-        if SubscriptionPurchaseEnvironment.current == .appStore {
+        if subscriptionManager.configuration.currentPurchasePlatform == .appStore {
             if #available(macOS 12.0, *) {
                 Task {
-                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: subscriptionAppGroup)
+                    _ = await subscriptionManager.flowProvider.appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     fetchAndUpdateSubscriptionDetails()
                 }
             }

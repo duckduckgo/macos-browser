@@ -100,7 +100,7 @@ enum UserText {
 
     // MARK: - Activate subscription modal
     static let activateModalTitle = NSLocalizedString("subscription.activate.modal.title", value: "Activate your subscription on this device", comment: "Activate subscription modal view title")
-    static func activateModalDescription(platform: SubscriptionPurchaseEnvironment.Environment) -> String {
+    static func activateModalDescription(platform: SubscriptionPurchasePlatform) -> String {
         switch platform {
         case .appStore:
             NSLocalizedString("subscription.appstore.activate.modal.description", value: "Access your subscription on other devices via Apple ID or an email address.", comment: "Activate subscription modal view subtitle description")
@@ -114,7 +114,7 @@ enum UserText {
 
     // MARK: - Share subscription modal
     static let shareModalTitle = NSLocalizedString("subscription.share.modal.title", value: "Use your subscription on other devices", comment: "Share subscription modal view title")
-    static func shareModalDescription(platform: SubscriptionPurchaseEnvironment.Environment) -> String {
+    static func shareModalDescription(platform: SubscriptionPurchasePlatform) -> String {
         switch platform {
         case .appStore:
             NSLocalizedString("subscription.appstore.share.modal.description", value: "Access your subscription via Apple ID or by adding an email address.", comment: "Share subscription modal view subtitle description")

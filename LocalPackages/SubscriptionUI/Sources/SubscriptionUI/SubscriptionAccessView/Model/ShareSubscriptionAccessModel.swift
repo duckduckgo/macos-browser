@@ -21,7 +21,7 @@ import Subscription
 
 public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var title = UserText.shareModalTitle
-    public var description = UserText.shareModalDescription(platform: SubscriptionPurchaseEnvironment.current)
+    public var description: String { UserText.shareModalDescription(platform: purchasePlatform) }
 
     private var refreshAuthTokenOnOpenURL: Bool
 
@@ -35,14 +35,16 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     private var addEmailURL: URL
     private var manageEmailURL: URL
     private var flowProvider: SubscriptionFlowProviding
+    private var purchasePlatform: SubscriptionPurchasePlatform
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, refreshAuthTokenOnOpenURL: Bool, addEmailURL: URL, manageEmailURL: URL, flowProvider: SubscriptionFlowProviding) {
+    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, refreshAuthTokenOnOpenURL: Bool, addEmailURL: URL, manageEmailURL: URL, flowProvider: SubscriptionFlowProviding, purchasePlatform: SubscriptionPurchasePlatform) {
         self.actionHandlers = actionHandlers
         self.email = email
         self.refreshAuthTokenOnOpenURL = refreshAuthTokenOnOpenURL
         self.addEmailURL = addEmailURL
         self.manageEmailURL = manageEmailURL
         self.flowProvider = flowProvider
+        self.purchasePlatform = purchasePlatform
     }
 
     private var hasEmail: Bool { !(email?.isEmpty ?? true) }

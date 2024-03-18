@@ -23,7 +23,7 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
     private var actionHandlers: SubscriptionAccessActionHandlers
 
     public var title = UserText.activateModalTitle
-    public var description = UserText.activateModalDescription(platform: SubscriptionPurchaseEnvironment.current)
+    public var description: String { UserText.activateModalDescription(platform: purchasePlatform) }
 
     public var email: String?
     public var emailLabel: String { UserText.email }
@@ -35,11 +35,13 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, Pur
     public var restorePurchaseButtonTitle = UserText.restorePurchaseButton
 
     private var activateViaEmailURL: URL
+    private var purchasePlatform: SubscriptionPurchasePlatform
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers, shouldShowRestorePurchase: Bool, activateViaEmailURL: URL) {
+    public init(actionHandlers: SubscriptionAccessActionHandlers, shouldShowRestorePurchase: Bool, activateViaEmailURL: URL, purchasePlatform: SubscriptionPurchasePlatform) {
         self.actionHandlers = actionHandlers
         self.shouldShowRestorePurchase = shouldShowRestorePurchase
         self.activateViaEmailURL = activateViaEmailURL
+        self.purchasePlatform = purchasePlatform
     }
 
     public func handleEmailAction() {
