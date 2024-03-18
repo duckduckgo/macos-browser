@@ -317,6 +317,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             let launchedOnStartup = launchInformation.wasLaunchedByStartup
             launchInformation.update()
 
+#if SUBSCRIPTION
+            SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
+#endif
+
             setUpSubscriptionMonitoring()
 
             if launchedOnStartup {
