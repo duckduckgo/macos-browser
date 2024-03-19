@@ -38,8 +38,11 @@ extension NSAlert {
         alert.informativeText = UserText.clearAllDataDescription
         alert.alertStyle = .warning
         alert.icon = .burnAlert
-        alert.addButton(withTitle: UserText.clear)
-        alert.addButton(withTitle: UserText.cancel)
+        
+        let clearButton = alert.addButton(withTitle: UserText.clear)
+        let cancelButton = alert.addButton(withTitle: UserText.cancel)
+        clearButton.setAccessibilityIdentifier("ClearAllHistoryAndDataAlert.clearButton")
+        cancelButton.setAccessibilityIdentifier("ClearAllHistoryAndDataAlert.cancelButton")
         return alert
     }
 
