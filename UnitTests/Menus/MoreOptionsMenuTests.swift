@@ -197,5 +197,13 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
     func disableForWaitlistUsers() {
         // intentional no-op
     }
+
+    var isEligibleForThankYouMessage: Bool {
+        false
+    }
+
+    func disableIfUserHasNoAccess() async -> Bool {
+        // intentional no-op
+    }
 }
 #endif
