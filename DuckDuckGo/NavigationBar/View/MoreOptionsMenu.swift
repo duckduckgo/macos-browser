@@ -68,6 +68,7 @@ final class MoreOptionsMenu: NSMenu {
 #endif
 
 #if SUBSCRIPTION
+    private let subscriptionManager: SubscriptionManaging = NSApp.delegateTyped.subscriptionManager
     private let subscriptionAccountManager: AccountManaging = NSApp.delegateTyped.subscriptionManager.accountManager
 #endif
 
@@ -322,7 +323,7 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && !subscriptionAccountManager.isUserAuthenticated {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && !subscriptionManager.isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
         } else {
             items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
@@ -349,7 +350,7 @@ final class MoreOptionsMenu: NSMenu {
 
             items.append(networkProtectionItem)
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionAccountManager.isUserAuthenticated {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -381,7 +382,7 @@ final class MoreOptionsMenu: NSMenu {
             items.append(dataBrokerProtectionItem)
 
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionAccountManager.isUserAuthenticated {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -405,7 +406,7 @@ final class MoreOptionsMenu: NSMenu {
 #endif // DBP
 
 #if SUBSCRIPTION
-        if subscriptionAccountManager.isUserAuthenticated {
+        if subscriptionManager.isUserAuthenticated {
             let identityTheftRestorationItem = NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
                                                           action: #selector(openIdentityTheftRestoration),
                                                           keyEquivalent: "")
@@ -413,7 +414,7 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.itrIcon)
             items.append(identityTheftRestorationItem)
 
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionAccountManager.isUserAuthenticated {
+            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && subscriptionManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 

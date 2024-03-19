@@ -97,7 +97,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
 
-        self.isUserAuthenticated = accountManager.isUserAuthenticated
+        self.isUserAuthenticated = subscriptionManager.isUserAuthenticated
 
         if let token = subscriptionManager.tokenStorage.accessToken {
             Task {
@@ -151,7 +151,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
-        if accountManager.isUserAuthenticated {
+        if subscriptionManager.isUserAuthenticated {
             let shouldRefreshAuthToken = subscriptionManager.configuration.currentPurchasePlatform == .appStore
             let addEmailURL = subscriptionManager.urlProvider.url(for: .addEmail)
             let manageEmailURL = subscriptionManager.urlProvider.url(for: .manageEmail)

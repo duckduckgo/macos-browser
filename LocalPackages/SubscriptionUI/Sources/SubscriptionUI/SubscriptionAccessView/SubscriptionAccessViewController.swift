@@ -56,7 +56,7 @@ public final class SubscriptionAccessViewController: NSViewController {
     }
 
     private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
-        if accountManager.isUserAuthenticated {
+        if subscriptionManager.isUserAuthenticated {
             let shouldRefreshAuthToken = subscriptionManager.configuration.currentPurchasePlatform == .appStore
             let addEmailURL = subscriptionManager.urlProvider.url(for: .addEmail)
             let manageEmailURL = subscriptionManager.urlProvider.url(for: .manageEmail)

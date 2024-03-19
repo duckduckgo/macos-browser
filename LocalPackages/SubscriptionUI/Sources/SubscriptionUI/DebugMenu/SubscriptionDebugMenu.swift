@@ -174,8 +174,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func showAccountDetails() {
-        let title = accountManager.isUserAuthenticated ? "Authenticated" : "Not Authenticated"
-        let message = accountManager.isUserAuthenticated ? ["AuthToken: \(subscriptionManager.tokenStorage.authToken ?? "")",
+        let title = subscriptionManager.isUserAuthenticated ? "Authenticated" : "Not Authenticated"
+        let message = subscriptionManager.isUserAuthenticated ? ["AuthToken: \(subscriptionManager.tokenStorage.authToken ?? "")",
                                                    "AccessToken: \(subscriptionManager.tokenStorage.accessToken ?? "")",
                                                    "Email: \(accountManager.email ?? "")"].joined(separator: "\n") : nil
         showAlert(title: title, message: message)
