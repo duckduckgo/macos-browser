@@ -43,7 +43,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let networkProtectionWaitlist = NetworkProtectionWaitlist()
     private let privacyConfigurationManager: PrivacyConfigurationManaging
-    private let subscriptionAvailability: SubscriptionFeatureAvailability
     private let defaults: UserDefaults
 
     var waitlistIsOngoing: Bool {
@@ -54,7 +53,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides(),
          featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
-         subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(),
          defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection) {
 
@@ -62,7 +60,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.featureDisabler = featureDisabler
         self.featureOverrides = featureOverrides
-        self.subscriptionAvailability = subscriptionAvailability
         self.defaults = defaults
     }
 
@@ -81,7 +78,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
 #if SUBSCRIPTION
-        return subscriptionAvailability.isFeatureAvailable() && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
+        return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
@@ -194,7 +191,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Checks whether the VPN needs to be disabled.
     ///
     var isEligibleForThankYouMessage: Bool {
-        isPreSubscriptionUser() && subscriptionAvailability.isFeatureAvailable()
+        isPreSubscriptionUser() && NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
     }
 
     /// Disables the VPN for legacy users, if necessary.

@@ -87,7 +87,7 @@ final class UserScripts: UserScriptsProvider {
         }
 
 #if SUBSCRIPTION
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
             subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
             userScripts.append(subscriptionPagesUserScript)
 

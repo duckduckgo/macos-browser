@@ -28,6 +28,7 @@ import Subscription
 
 extension NetworkProtectionDeviceManager {
 
+    @MainActor
     static func create() -> NetworkProtectionDeviceManager {
         let settings = VPNSettings(defaults: .netP)
         let keyStore = NetworkProtectionKeychainKeyStore()
@@ -36,7 +37,7 @@ extension NetworkProtectionDeviceManager {
                                               tokenStore: tokenStore,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents,
-                                              isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable())
+                                              isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable)
     }
 }
 
@@ -46,13 +47,13 @@ extension NetworkProtectionCodeRedemptionCoordinator {
         self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable())
+                  isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable)
     }
 }
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
-        self.init(isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable())
+        self.init(isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable)
     }
 
     convenience init(isSubscriptionEnabled: Bool) {
@@ -82,7 +83,7 @@ extension NetworkProtectionLocationListCompositeRepository {
             environment: settings.selectedEnvironment,
             tokenStore: NetworkProtectionKeychainTokenStore(),
             errorEvents: .networkProtectionAppDebugEvents,
-            isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable()
+            isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
         )
     }
 }
