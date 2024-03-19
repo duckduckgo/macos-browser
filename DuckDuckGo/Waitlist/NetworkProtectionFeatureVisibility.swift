@@ -78,8 +78,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
 #if SUBSCRIPTION
-        return true && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
-        // return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
+        return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser

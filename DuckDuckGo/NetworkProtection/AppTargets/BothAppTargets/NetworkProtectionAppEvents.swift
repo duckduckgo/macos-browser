@@ -80,7 +80,7 @@ final class NetworkProtectionAppEvents {
     ///
     func applicationDidBecomeActive() {
         Task { @MainActor in
-            await featureVisibility.disableIfUserHasNoAccess()
+            // await featureVisibility.disableIfUserHasNoAccess()
         }
     }
 
