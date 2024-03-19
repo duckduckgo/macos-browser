@@ -1,5 +1,5 @@
 //
-//  AccountManagerExtension.swift
+//  NetworkProtection+VPNAgentConvenienceInitializers.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,13 +16,18 @@
 //  limitations under the License.
 //
 
-#if SUBSCRIPTION
 import Foundation
-import Subscription
+import NetworkProtection
 
-public extension AccountManager {
+#if SUBSCRIPTION
+import Subscription
+#endif
+
+extension NetworkProtectionKeychainTokenStore {
     convenience init() {
-        self.init(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        self.init(keychainType: .default,
+                  errorEvents: .networkProtectionAppDebugEvents,
+                  isSubscriptionEnabled: false,
+                  accessTokenProvider: { return nil })
     }
 }
-#endif
