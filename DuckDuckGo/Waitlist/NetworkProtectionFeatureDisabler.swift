@@ -34,8 +34,6 @@ protocol NetworkProtectionFeatureDisabling {
 }
 
 final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling {
-    static let vpnUninstalledNotificationName = NSNotification.Name(rawValue: "com.duckduckgo.NetworkProtection.uninstalled")
-
     private let log: OSLog
     private let loginItemsManager: LoginItemsManager
     private let pinningManager: LocalPinningManager
@@ -92,7 +90,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         }
 
         unpinNetworkProtection()
-        postVPNUninstalledNotification()
+        notifyVPNUninstalled()
         return true
     }
 
@@ -128,14 +126,11 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         userDefaults.resetVPNLegacyUserAccessDisabledOnce()
     }
 
-    private func postVPNUninstalledNotification() {
-        Task { @MainActor in
+    private func notifyVPNUninstalled() {
             // Wait a bit since the NetP button is likely being hidden
+        Task {
             try? await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
-
-            NotificationCenter.default.post(
-                name: Self.vpnUninstalledNotificationName,
-                object: nil)
+            userDefaults.networkProtectionShouldShowVPNUninstalledMessage = true
         }
     }
 }
