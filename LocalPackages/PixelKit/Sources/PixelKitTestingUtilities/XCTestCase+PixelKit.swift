@@ -109,9 +109,9 @@ public extension XCTestCase {
 
         let expectedPixelName = event.name.hasPrefix(Self.pixelPlatformPrefix) ? event.name : Self.pixelPlatformPrefix + event.name
         let knownExpectedParameters = knownExpectedParameters(for: event)
-        let callbackExecutedExpectation = expectation(description: "PixelKit expectation for event \(event)")
+        let callbackExecutedExpectation = expectation(description: "The PixelKit callback has been executed")
 
-        PixelKit.setUp(dryRun: false,
+        PixelKit.setUp(dryRun: true,
                        appVersion: "1.0.5",
                        source: "test-app",
                        defaultHeaders: [:],
