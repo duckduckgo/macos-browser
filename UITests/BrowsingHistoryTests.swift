@@ -24,10 +24,6 @@ class BrowsingHistoryTests: XCTestCase {
     let timeout = 0.3
     let historyMenuBarItem = XCUIApplication().menuBarItems["History"]
     let clearAllHistory = XCUIApplication().menuItems["HistoryMenu.clearAllHistory"]
-    
-    override class func setUp() {}
-
-    override class func tearDown() {}
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -51,11 +47,13 @@ class BrowsingHistoryTests: XCTestCase {
             app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: timeout),
             "Clear all history item didn't appear in a reasonable timeframe."
         )
-        app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click()
+        app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // And remove the history
+
+        // DuckDuckGo/macos-browser/DuckDuckGo/Menus/MainMenuActions.swift:279: Fatal error: Could not get currently active Tab
     }
 
     func test_visitedSiteIsAddedToRecentlyVisited() throws {
-// DuckDuckGo/macos-browser/DuckDuckGo/Menus/MainMenuActions.swift:279: Fatal error: Could not get currently active Tab
+
         let historyPageTitleExpectedToBeFirstInRecentlyVisited = "First History Entry"
         let url = URL.testsServer
             .appendingTestParameters(data: """
@@ -72,9 +70,14 @@ class BrowsingHistoryTests: XCTestCase {
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         let firstSiteInRecentlyVisitedSection = app.menuItems["HistoryMenu.recentlyVisitedMenuItem.0"]
 
+        XCTAssertTrue(
+            addressBarTextField.waitForExistence(timeout: timeout),
+            "The address bar text field didn't become available in a reasonable timeframe."
+        )
+
         addressBarTextField.typeText("\(url.absoluteString)\r")
         XCTAssertTrue(
-            XCUIApplication().windows.webViews["\(historyPageTitleExpectedToBeFirstInRecentlyVisited)"].waitForExistence(timeout: timeout),
+            app.windows.webViews["\(historyPageTitleExpectedToBeFirstInRecentlyVisited)"].waitForExistence(timeout: timeout),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         XCTAssertTrue(
