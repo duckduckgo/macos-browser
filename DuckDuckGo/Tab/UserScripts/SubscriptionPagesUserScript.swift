@@ -108,6 +108,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         static let subscriptionsWelcomeFaqClicked = "subscriptionsWelcomeFaqClicked"
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
         case Handlers.getSubscription: return getSubscription
