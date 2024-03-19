@@ -26,6 +26,8 @@ import NetworkProtection
 import NetworkProtectionUI
 
 protocol NetworkProtectionFeatureVisibility {
+    var isEligibleForThankYouMessage: Bool { get }
+
     func isNetworkProtectionVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
     func disableForAllUsers()
@@ -186,10 +188,8 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 
     /// Checks whether the VPN needs to be disabled.
     ///
-    private var shouldDisableVPN: Bool {
-        !defaults.vpnLegacyUserAccessDisabledOnce
-        && isPreSubscriptionUser()
-        && subscriptionAvailability.isFeatureAvailable()
+    var isEligibleForThankYouMessage: Bool {
+        isPreSubscriptionUser() && subscriptionAvailability.isFeatureAvailable()
     }
 
     /// Disables the VPN for legacy users, if necessary.
@@ -197,7 +197,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// This method does not seek to remove tokens or uninstall anything.
     ///
     private func disableVPNForLegacyUsersIfSubscriptionAvailable() async -> Bool {
-        guard !defaults.vpnLegacyUserAccessDisabledOnce else {
+        guard isEligibleForThankYouMessage && !defaults.vpnLegacyUserAccessDisabledOnce else {
             return false
         }
 

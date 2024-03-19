@@ -32,7 +32,7 @@ final class WaitlistThankYouPromptPresenter {
 
     convenience init() {
         self.init(isVPNBetaTester: {
-            return false
+            return DefaultNetworkProtectionVisibility().isEligibleForThankYouMessage
         }, isPIRBetaTester: {
             return false
         })
