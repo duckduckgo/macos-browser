@@ -80,6 +80,7 @@ final class NetworkProtectionAppEvents {
     ///
     func applicationDidBecomeActive() {
         Task { @MainActor in
+            try await Task.sleep(nanoseconds: 10 * NSEC_PER_MSEC)
             await featureVisibility.disableIfUserHasNoAccess()
         }
     }
