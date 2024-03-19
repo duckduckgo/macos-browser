@@ -266,6 +266,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
+#if SUBSCRIPTION
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
+#endif
 
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
 
@@ -318,6 +321,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
             let launchedOnStartup = launchInformation.wasLaunchedByStartup
             launchInformation.update()
+
+            setUpSubscriptionMonitoring()
 
             if launchedOnStartup {
                 Task {

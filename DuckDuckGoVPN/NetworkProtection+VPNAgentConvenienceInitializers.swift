@@ -25,16 +25,9 @@ import Subscription
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
-#if SUBSCRIPTION
-        let accessTokenProvider: () -> String? = { AccountManager().accessToken }
-        let isSubscriptionEnabled = true
-#else
-        let accessTokenProvider: () -> String? = { return nil }
-        let isSubscriptionEnabled = false
-#endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: isSubscriptionEnabled,
-                  accessTokenProvider: accessTokenProvider)
+                  isSubscriptionEnabled: false,
+                  accessTokenProvider: { return nil })
     }
 }

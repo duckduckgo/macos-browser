@@ -269,11 +269,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - Initialization
 
     @objc public init() {
-#if SUBSCRIPTION
-        let isSubscriptionEnabled = true
-#else
         let isSubscriptionEnabled = false
-#endif
 
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard
@@ -285,34 +281,23 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
-#if SUBSCRIPTION
-        let accountManagerTokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
+        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                                            serviceName: Self.tokenServiceName,
                                                                            errorEvents: debugEvents,
                                                                            isSubscriptionEnabled: isSubscriptionEnabled,
                                                                            accessTokenProvider: { nil }
         )
+#if SUBSCRIPTION
+
         let accountManager = AccountManager(
-            accessTokenStorage: accountManagerTokenStore,
+            accessTokenStorage: tokenStore,
             entitlementsCache: UserDefaultsCache<[Entitlement]>(key: UserDefaultsCacheKey.subscriptionEntitlements)
-        )
-        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
-                                                             serviceName: Self.tokenServiceName,
-                                                             errorEvents: debugEvents,
-                                                             isSubscriptionEnabled: isSubscriptionEnabled,
-                                                             accessTokenProvider: { accountManager.accessToken }
         )
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
         let entitlementsCheck = {
             await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 #else
-        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
-                                                             serviceName: Self.tokenServiceName,
-                                                             errorEvents: debugEvents,
-                                                             isSubscriptionEnabled: isSubscriptionEnabled,
-                                                             accessTokenProvider: { nil }
-        )
         let entitlementsCheck: (() async -> Result<Bool, Error>)? = nil
 #endif
 

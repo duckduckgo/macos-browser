@@ -753,11 +753,15 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 #if SUBSCRIPTION
         if let accessToken = accountManager.accessToken  {
             os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
-            return accessToken as NSString?
+            return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         }
 #endif
         os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
         return try tokenStore.fetchToken() as NSString?
+    }
+
+    private static func adaptAccessTokenForVPN(_ token: String) -> String {
+        "ddg:\(token)"
     }
 }
 

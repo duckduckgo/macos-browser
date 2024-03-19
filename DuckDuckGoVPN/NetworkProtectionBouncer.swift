@@ -38,7 +38,9 @@ final class NetworkProtectionBouncer {
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         let result = await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         switch result {
-        case .success(true), .failure:
+        case .success(true):
+            return
+        case .failure:
             break
         case .success(false):
             os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing entitlement.")
