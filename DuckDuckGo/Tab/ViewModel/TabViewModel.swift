@@ -35,6 +35,7 @@ final class TabViewModel {
 
     private(set) var tab: Tab
     private let appearancePreferences: AppearancePreferences
+    private let accessibilityPreferences: AccessibilityPreferences
     private var cancellables = Set<AnyCancellable>()
 
     @Published private(set) var canGoForward: Bool = false
@@ -78,9 +79,12 @@ final class TabViewModel {
         !isShowingErrorPage && canReload && !tab.webView.isInFullScreenMode
     }
 
-    init(tab: Tab, appearancePreferences: AppearancePreferences = .shared) {
+    init(tab: Tab,
+         appearancePreferences: AppearancePreferences = .shared,
+         accessibilityPreferences: AccessibilityPreferences = .shared) {
         self.tab = tab
         self.appearancePreferences = appearancePreferences
+        self.accessibilityPreferences = accessibilityPreferences
 
         subscribeToUrl()
         subscribeToCanGoBackForwardAndReload()
@@ -88,7 +92,7 @@ final class TabViewModel {
         subscribeToFavicon()
         subscribeToTabError()
         subscribeToPermissions()
-        subscribeToAppearancePreferences()
+        subscribeToPreferences()
         subscribeToWebViewDidFinishNavigation()
         tab.$isLoading
             .assign(to: \.isLoading, onWeaklyHeld: self)
@@ -209,12 +213,12 @@ final class TabViewModel {
             .store(in: &cancellables)
     }
 
-    private func subscribeToAppearancePreferences() {
+    private func subscribeToPreferences() {
         appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
             guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
             self.updatePassiveAddressBarString(showURL: newValue, url: url, hostURL: host)
         }.store(in: &cancellables)
-        appearancePreferences.$defaultPageZoom.sink { [weak self] newValue in
+        accessibilityPreferences.$defaultPageZoom.sink { [weak self] newValue in
             guard let self = self else { return }
             self.tab.webView.defaultZoomValue = newValue
             self.tab.webView.zoomLevel = newValue

@@ -1,5 +1,5 @@
 //
-//  PrivacyPreferencesModel.swift
+//  DataClearingPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,25 +18,14 @@
 
 import Foundation
 
-final class PrivacyPreferencesModel: ObservableObject {
+final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
+
+    static let shared = DataClearingPreferences()
 
     @Published
     var isLoginDetectionEnabled: Bool {
         didSet {
-            privacySecurityPreferences.loginDetectionEnabled = isLoginDetectionEnabled
-        }
-    }
-
-    @Published
-    var isGPCEnabled: Bool {
-        didSet {
-            privacySecurityPreferences.gpcEnabled = isGPCEnabled
-        }
-    }
-
-    @Published var isAutoconsentEnabled: Bool {
-        didSet {
-            privacySecurityPreferences.autoconsentEnabled = isAutoconsentEnabled
+            persistor.loginDetectionEnabled = isLoginDetectionEnabled
         }
     }
 
@@ -47,24 +36,28 @@ final class PrivacyPreferencesModel: ObservableObject {
         guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         else {
-            assertionFailure("Privacy Preferences: Failed to present FireproofDomainsViewController")
+            assertionFailure("DataClearingPreferences: Failed to present FireproofDomainsViewController")
             return
         }
 
         parentWindowController.window?.beginSheet(fireproofDomainsWindow)
     }
 
-    @MainActor
-    func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    init(persistor: FireButtonPreferencesPersistor = FireButtonPreferencesUserDefaultsPersistor()) {
+        self.persistor = persistor
+        isLoginDetectionEnabled = persistor.loginDetectionEnabled
     }
 
-    init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
-        self.privacySecurityPreferences = privacySecurityPreferences
-        isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
-        isGPCEnabled = privacySecurityPreferences.gpcEnabled
-        isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled
-    }
+    private var persistor: FireButtonPreferencesPersistor
+}
 
-    private let privacySecurityPreferences: PrivacySecurityPreferences
+protocol FireButtonPreferencesPersistor {
+    var loginDetectionEnabled: Bool { get set }
+}
+
+struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersistor {
+
+    @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: false)
+    var loginDetectionEnabled: Bool
+
 }

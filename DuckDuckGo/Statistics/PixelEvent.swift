@@ -258,6 +258,12 @@ extension Pixel {
 
         case dailyPixel(Event, isFirst: Bool)
 
+        // Default Browser
+        case defaultRequestedFromHomepage
+        case defaultRequestedFromHomepageSetupView
+        case defaultRequestedFromSettings
+        case defaultRequestedFromOnboarding
+
         case protectionToggledOffBreakageReport
         case toggleProtectionsDailyCount
         case toggleReportDoNotSend
@@ -639,6 +645,11 @@ extension Pixel.Event {
         case .networkProtectionGeoswitchingNoLocations:
             return "m_mac_netp_ev_geoswitching_no_locations"
 
+        case .defaultRequestedFromHomepage: return "m_mac_default_requested_from_homepage"
+        case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
+        case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
+        case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+
             // MARK: - Subscription
         case .privacyProSubscriptionActive: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_active"
         case .privacyProOfferScreenImpression: return "m_mac_\(appDistribution)_privacy-pro_offer_screen_impression"
@@ -682,6 +693,7 @@ extension Pixel.Event {
         case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
         case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
         case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
+
         }
     }
 }
