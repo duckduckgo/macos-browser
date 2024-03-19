@@ -716,6 +716,10 @@ extension MainViewController {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
+
+        // Aid to transition VPN from waitlist to subscription
+        // by resetting this we allow users to go back to waitlist.
+        UserDefaults.netP.vpnLegacyUserAccessDisabledOnce = true
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
