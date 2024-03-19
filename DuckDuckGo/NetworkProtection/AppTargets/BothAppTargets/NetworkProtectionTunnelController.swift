@@ -455,12 +455,15 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     // MARK: - Starting & Stopping the VPN
 
     enum StartError: LocalizedError {
+        case noAuthToken
         case connectionStatusInvalid
         case connectionAlreadyStarted
         case simulateControllerFailureError
 
         var errorDescription: String? {
             switch self {
+            case .noAuthToken:
+                return "You need a subscription to start the VPN"
             case .connectionAlreadyStarted:
 #if DEBUG
                 return "[Debug] Connection already started"
@@ -545,7 +548,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         var options = [String: NSObject]()
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        options[NetworkProtectionOptionKey.authToken] = try fetchAuthToken()
+        guard let authToken = try fetchAuthToken() else {
+            throw StartError.noAuthToken
+        }
+        options[NetworkProtectionOptionKey.authToken] = authToken
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 

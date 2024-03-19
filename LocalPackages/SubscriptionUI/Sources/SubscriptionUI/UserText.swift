@@ -103,9 +103,9 @@ enum UserText {
     static func activateModalDescription(platform: SubscriptionPurchaseEnvironment.Environment) -> String {
         switch platform {
         case .appStore:
-            NSLocalizedString("subscription.appstore.activate.modal.description", value: "Access your subscription on other devices via Apple ID or an email address.", comment: "Activate subscription modal view subtitle description")
+            NSLocalizedString("subscription.appstore.activate.modal.description", value: "Access your Privacy Pro subscription on this device via Apple ID or an email address.", comment: "Activate subscription modal view subtitle description")
         case .stripe:
-            NSLocalizedString("subscription.activate.modal.description", value: "Access your subscription on other devices via an email address.", comment: "Activate subscription modal view subtitle description")
+            NSLocalizedString("subscription.activate.modal.description", value: "Access your Privacy Pro subscription via an email address.", comment: "Activate subscription modal view subtitle description")
         }
     }
 

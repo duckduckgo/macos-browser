@@ -201,7 +201,11 @@ extension Pixel.Event {
              .protectionToggledOffBreakageReport,
              .toggleProtectionsDailyCount,
              .toggleReportDoNotSend,
-             .toggleReportDismiss:
+             .toggleReportDismiss,
+             .privacyProOfferMonthlyPriceClick,
+             .privacyProOfferYearlyPriceClick,
+             .privacyProAddEmailSuccess,
+             .privacyProWelcomeFAQClick:
             return nil
         }
     }

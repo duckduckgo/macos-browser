@@ -272,7 +272,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         setupMenuVisibility()
 
         Task { @MainActor in
-            await bouncer.requireAuthenticationOrKillApp()
+            // The reason we want to await for this is that nothing else should be executed
+            // if the app should quit.
+            await bouncer.requireAuthTokenOrKillApp(controller: tunnelController)
 
             // Initialize lazy properties
             _ = tunnelControllerIPCService
@@ -316,12 +318,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
             let launchedOnStartup = launchInformation.wasLaunchedByStartup
             launchInformation.update()
-
-#if SUBSCRIPTION
-            SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
-#endif
-
-            setUpSubscriptionMonitoring()
 
             if launchedOnStartup {
                 Task {

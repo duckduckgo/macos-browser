@@ -33,7 +33,7 @@ final class NetworkProtectionBouncer {
     /// Simply verifies that the VPN feature is enabled and if not, takes care of killing the
     /// current app.
     ///
-    func requireAuthenticationOrKillApp() async {
+    func requireAuthTokenOrKillApp(controller: TunnelController) async {
 #if SUBSCRIPTION
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         let result = await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
@@ -42,6 +42,7 @@ final class NetworkProtectionBouncer {
             return
         case .success(false):
             os_log(.error, log: .networkProtection, "🔴 Stopping: VPN not authorized. Missing entitlement.")
+            await controller.stop()
 
             // EXIT_SUCCESS ensures the login item won't relaunch
             // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
@@ -56,6 +57,8 @@ final class NetworkProtectionBouncer {
                                                                 accessTokenProvider: { nil })
         guard keychainStore.isFeatureActivated else {
             os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing token.")
+
+            await controller.stop()
 
             // EXIT_SUCCESS ensures the login item won't relaunch
             // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()

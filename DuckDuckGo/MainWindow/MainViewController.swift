@@ -196,6 +196,7 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
+        presentWaitlistThankYouPromptIfNecessary()
 
 #if NETWORK_PROTECTION
         sendActiveNetworkProtectionWaitlistUserPixel()
@@ -456,6 +457,16 @@ final class MainViewController: NSViewController {
         }
     }
 #endif
+
+    func presentWaitlistThankYouPromptIfNecessary() {
+        guard let window = self.view.window else {
+            assertionFailure("Couldn't get main view controller's window")
+            return
+        }
+
+        let presenter = WaitlistThankYouPromptPresenter()
+        presenter.presentThankYouPromptIfNecessary(in: window)
+    }
 
     // MARK: - First responder
 
