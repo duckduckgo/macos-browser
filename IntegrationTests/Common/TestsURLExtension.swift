@@ -17,8 +17,7 @@
 //
 
 import Foundation
-
-@testable import DuckDuckGo_Privacy_Browser
+import Common
 
 // Integration Tests helpers
 extension URL {
