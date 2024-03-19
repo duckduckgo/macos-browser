@@ -48,7 +48,8 @@ struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
     }
 
     private var isInternalUser: Bool {
-        NSApp.delegateTyped.internalUserDecider.isInternalUser
+        return false
+        // NSApp.delegateTyped.internalUserDecider.isInternalUser
     }
 
     private var isDBPActivated: Bool {
