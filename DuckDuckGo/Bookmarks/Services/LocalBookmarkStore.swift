@@ -391,18 +391,27 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     func update(folder: BookmarkFolder) {
-
         do {
-            _ = try applyChangesAndSave(changes: { context in
-                let folderFetchRequest = BaseBookmarkEntity.singleEntity(with: folder.id)
-                let folderFetchRequestResults = try? context.fetch(folderFetchRequest)
-
-                guard let bookmarkFolderMO = folderFetchRequestResults?.first else {
-                    assertionFailure("LocalBookmarkStore: Failed to get BookmarkEntity from the context")
-                    throw BookmarkStoreError.missingEntity
+            _ = try applyChangesAndSave(changes: { [weak self] context in
+                guard let self = self else {
+                    throw BookmarkStoreError.storeDeallocated
                 }
+                try update(folder: folder, in: context)
+            })
+        } catch {
+            let error = error as NSError
+            commonOnSaveErrorHandler(error)
+        }
+    }
 
-                bookmarkFolderMO.update(with: folder)
+    func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType) {
+        do {
+            _ = try applyChangesAndSave(changes: { [weak self] context in
+                guard let self = self else {
+                    throw BookmarkStoreError.storeDeallocated
+                }
+                let folderEntity = try update(folder: folder, in: context)
+                try move(entities: [folderEntity], toIndex: nil, withinParentFolderType: parent, in: context)
             })
         } catch {
             let error = error as NSError
@@ -566,10 +575,6 @@ final class LocalBookmarkStore: BookmarkStore {
                 throw BookmarkStoreError.storeDeallocated
             }
 
-            guard let rootFolder = self.bookmarksRoot(in: context) else {
-                throw BookmarkStoreError.missingRoot
-            }
-
             // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
             // batch fetch request and have them sorted in the correct order.
             let bookmarkManagedObjects: [BookmarkEntity] = objectUUIDs.compactMap { uuid in
@@ -577,28 +582,8 @@ final class LocalBookmarkStore: BookmarkStore {
                 return (try? context.fetch(entityFetchRequest))?.first
             }
 
-            let newParentFolder: BookmarkEntity
+            try move(entities: bookmarkManagedObjects, toIndex: index, withinParentFolderType: type, in: context)
 
-            switch type {
-            case .root: newParentFolder = rootFolder
-            case .parent(let newParentUUID):
-                let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: newParentUUID)
-
-                if let fetchedParent = try context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
-                    newParentFolder = fetchedParent
-                } else {
-                    throw BookmarkStoreError.missingEntity
-                }
-            }
-
-            if let index = index, index < newParentFolder.childrenArray.count {
-                self.move(entities: bookmarkManagedObjects, to: index, within: newParentFolder)
-            } else {
-                for bookmarkManagedObject in bookmarkManagedObjects {
-                    bookmarkManagedObject.parent = nil
-                    newParentFolder.addToChildren(bookmarkManagedObject)
-                }
-            }
         }, onError: { [weak self] error in
             self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
@@ -990,6 +975,53 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 continuation.resume(returning: nil)
+            }
+        }
+    }
+
+}
+
+private extension LocalBookmarkStore {
+
+    @discardableResult
+    func update(folder: BookmarkFolder, in context: NSManagedObjectContext) throws -> BookmarkEntity {
+        let folderFetchRequest = BaseBookmarkEntity.singleEntity(with: folder.id)
+        let folderFetchRequestResults = try? context.fetch(folderFetchRequest)
+
+        guard let bookmarkFolderMO = folderFetchRequestResults?.first else {
+            assertionFailure("LocalBookmarkStore: Failed to get BookmarkEntity from the context")
+            throw BookmarkStoreError.missingEntity
+        }
+
+        bookmarkFolderMO.update(with: folder)
+        return bookmarkFolderMO
+    }
+
+    func move(entities: [BookmarkEntity], toIndex index: Int?, withinParentFolderType type: ParentFolderType, in context: NSManagedObjectContext) throws {
+        guard let rootFolder = bookmarksRoot(in: context) else {
+            throw BookmarkStoreError.missingRoot
+        }
+
+        let newParentFolder: BookmarkEntity
+
+        switch type {
+        case .root: newParentFolder = rootFolder
+        case .parent(let newParentUUID):
+            let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: newParentUUID)
+
+            if let fetchedParent = try context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
+                newParentFolder = fetchedParent
+            } else {
+                throw BookmarkStoreError.missingEntity
+            }
+        }
+
+        if let index = index, index < newParentFolder.childrenArray.count {
+            self.move(entities: entities, to: index, within: newParentFolder)
+        } else {
+            for bookmarkManagedObject in entities {
+                bookmarkManagedObject.parent = nil
+                newParentFolder.addToChildren(bookmarkManagedObject)
             }
         }
     }
