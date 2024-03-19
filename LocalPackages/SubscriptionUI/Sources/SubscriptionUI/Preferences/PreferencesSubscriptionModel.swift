@@ -244,7 +244,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func removeFromThisDeviceAction() {
-        accountManager.signOut()
+        subscriptionManager.signOut()
     }
 
     @MainActor
@@ -299,7 +299,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.subscriptionPlatform = subscription.platform
                 self?.subscriptionStatus = subscription.status
             } else {
-                self?.accountManager.signOut()
+                self?.subscriptionManager.signOut()
             }
 
             if let self {

@@ -169,7 +169,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func signOut() {
-        accountManager.signOut()
+        subscriptionManager.signOut()
     }
 
     @objc
