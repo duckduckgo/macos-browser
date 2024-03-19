@@ -32,9 +32,9 @@ final class WaitlistThankYouPromptPresenter {
 
     convenience init() {
         self.init(isVPNBetaTester: {
-            return DefaultDataBrokerProtectionFeatureVisibility().isEligibleForThankYouMessage()
-        }, isPIRBetaTester: {
             return false
+        }, isPIRBetaTester: {
+            return DefaultDataBrokerProtectionFeatureVisibility().isEligibleForThankYouMessage()
         })
     }
 
