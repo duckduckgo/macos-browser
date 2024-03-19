@@ -48,13 +48,10 @@ class BrowsingHistoryTests: XCTestCase {
             "Clear all history item didn't appear in a reasonable timeframe."
         )
         app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // And remove the history
-
-        // DuckDuckGo/macos-browser/DuckDuckGo/Menus/MainMenuActions.swift:279: Fatal error: Could not get currently active Tab
     }
 
     func test_visitedSiteIsAddedToRecentlyVisited() throws {
-
-        let historyPageTitleExpectedToBeFirstInRecentlyVisited = "First History Entry"
+        let historyPageTitleExpectedToBeFirstInRecentlyVisited = "Title 1"
         let url = URL.testsServer
             .appendingTestParameters(data: """
             <html>
@@ -92,5 +89,127 @@ class BrowsingHistoryTests: XCTestCase {
         )
 
         XCTAssertEqual(historyPageTitleExpectedToBeFirstInRecentlyVisited, firstSiteInRecentlyVisitedSection.title)
+    }
+
+    func test_visitedSiteIsInHistoryAfterClosingAndReopeningWindow() throws {
+        let historyPageTitleExpectedToBeFirstInTodayHistory = "Title 2"
+        let url = URL.testsServer
+            .appendingTestParameters(data: """
+            <html>
+            <head>
+            <title>\(historyPageTitleExpectedToBeFirstInTodayHistory)</title>
+            </head>
+            <body>
+            <p>Text</p>
+            </body>
+            </html>
+            """.utf8data)
+
+        let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
+        let firstSiteInHistory = app.menuItems["HistoryMenu.historyMenuItem.Today.0"]
+
+        XCTAssertTrue(
+            addressBarTextField.waitForExistence(timeout: timeout),
+            "The address bar text field didn't become available in a reasonable timeframe."
+        )
+
+        addressBarTextField.typeText("\(url.absoluteString)\r")
+        XCTAssertTrue(
+            app.windows.webViews["\(historyPageTitleExpectedToBeFirstInTodayHistory)"].waitForExistence(timeout: timeout),
+            "Visited site didn't load with the expected title in a reasonable timeframe."
+        )
+
+        app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
+        app.typeKey("n", modifierFlags: .command)
+
+        XCTAssertTrue(
+            historyMenuBarItem.waitForExistence(timeout: timeout),
+            "History menu bar item didn't appear in a reasonable timeframe."
+        )
+        historyMenuBarItem.click() // The visited sites identifiers will not be available until after the History menu has been accessed.
+
+        XCTAssertTrue(
+            firstSiteInHistory.waitForExistence(timeout: timeout),
+            "The first site in the recently visited section didn't appear in a reasonable timeframe."
+        )
+
+        XCTAssertEqual(historyPageTitleExpectedToBeFirstInTodayHistory, firstSiteInHistory.title)
+    }
+
+    func test_previousSessionTabsCanBeReopenedViaHistory() throws {
+        let titleOfFirstTabWhichShouldRestore = UUID().uuidString.prefix(4)
+        let titleOfSecondTabWhichShouldRestore = UUID().uuidString.prefix(4)
+
+        let urlForFirstTab = URL.testsServer
+            .appendingTestParameters(data: """
+            <html>
+            <head>
+            <title>\(titleOfFirstTabWhichShouldRestore)</title>
+            </head>
+            <body>
+            <p>Text</p>
+            </body>
+            </html>
+            """.utf8data)
+
+        let urlForSecondTab = URL.testsServer
+            .appendingTestParameters(data: """
+            <html>
+            <head>
+            <title>\(titleOfSecondTabWhichShouldRestore)</title>
+            </head>
+            <body>
+            <p>Text</p>
+            </body>
+            </html>
+            """.utf8data)
+
+        let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
+
+        XCTAssertTrue(
+            addressBarTextField.waitForExistence(timeout: timeout),
+            "The address bar text field didn't become available in a reasonable timeframe."
+        )
+
+        addressBarTextField.typeText("\(urlForFirstTab.absoluteString)\r")
+        XCTAssertTrue(
+            app.windows.webViews["\(titleOfFirstTabWhichShouldRestore)"].waitForExistence(timeout: timeout),
+            "Visited site didn't load with the expected title in a reasonable timeframe."
+        )
+
+        app.typeKey("t", modifierFlags: .command)
+
+        addressBarTextField.typeText("\(urlForSecondTab.absoluteString)\r")
+        XCTAssertTrue(
+            app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: timeout),
+            "Visited site didn't load with the expected title in a reasonable timeframe."
+        )
+
+        let reopenLastClosedWindowOrTab = app.menuItems["HistoryMenu.reopenLastClosedWindowOrTab"]
+
+        app.typeKey("w", modifierFlags: [.command, .option, .shift])
+        app.typeKey("n", modifierFlags: .command)
+
+        XCTAssertTrue(
+            historyMenuBarItem.waitForExistence(timeout: timeout),
+            "History menu bar item didn't appear in a reasonable timeframe."
+        )
+        historyMenuBarItem.click() // The visited sites identifiers will not be available until after the History menu has been accessed.
+        let reopenAllWindowsFromLastSessionMenuItem = app.menuItems["HistoryMenu.reopenAllWindowsFromLastSessionMenuItem"]
+        XCTAssertTrue(
+            reopenLastClosedWindowOrTab.waitForExistence(timeout: timeout),
+            "The first site in the recently visited section didn't appear in a reasonable timeframe."
+        )
+        reopenLastClosedWindowOrTab.click()
+
+        XCTAssertTrue(
+            app.windows.webViews["\(titleOfFirstTabWhichShouldRestore)"].waitForExistence(timeout: timeout),
+            "Restored visited site wasn't available with the expected title in a reasonable timeframe."
+        )
+        app.typeKey("w", modifierFlags: [.command])
+        XCTAssertTrue(
+            app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: timeout),
+            "Restored visited site wasn't available with the expected title in a reasonable timeframe."
+        )
     }
 }

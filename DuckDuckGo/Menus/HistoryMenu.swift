@@ -60,6 +60,7 @@ final class HistoryMenu: NSMenu {
         }
 
         reopenMenuItemKeyEquivalentManager.reopenLastClosedMenuItem = reopenLastClosedMenuItem
+        reopenAllWindowsFromLastSessionMenuItem.setAccessibilityIdentifier("HistoryMenu.reopenAllWindowsFromLastSessionMenuItem")
         reopenMenuItemKeyEquivalentManager.lastSessionMenuItem = reopenAllWindowsFromLastSessionMenuItem
     }
 
@@ -96,6 +97,7 @@ final class HistoryMenu: NSMenu {
         default:
             reopenLastClosedMenuItem.title = UserText.reopenLastClosedTab
         }
+        reopenLastClosedMenuItem.setAccessibilityIdentifier("HistoryMenu.reopenLastClosedWindowOrTab")
 
     }
 
@@ -179,6 +181,13 @@ final class HistoryMenu: NSMenu {
             let dateString = isToday ? nil : title.1
             let subMenuItems = makeClearThisHistoryMenuItems(with: dateString) + makeMenuItems(from: grouping)
             let submenu = NSMenu(items: subMenuItems)
+            subMenuItems.indices.forEach { index in
+                if index > 1 {
+                    // The first two indices are the clear all item and the separator, so we zero index the
+                    // accessibilityIdentifier to match expected convention in the UI test.
+                    subMenuItems[index].setAccessibilityIdentifier("HistoryMenu.historyMenuItem.\(isToday ? "Today" : title.1).\(index - 2)")
+                }
+            }
             menuItem.submenu = submenu
             return menuItem
         }
