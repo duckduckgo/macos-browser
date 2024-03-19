@@ -155,8 +155,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             let shouldRefreshAuthToken = subscriptionManager.configuration.currentPurchasePlatform == .appStore
             let addEmailURL = subscriptionManager.urlProvider.url(for: .addEmail)
             let manageEmailURL = subscriptionManager.urlProvider.url(for: .manageEmail)
+            let email = subscriptionManager.accountStorage.email
             return ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler,
-                                                email: accountManager.email,
+                                                email: email,
                                                 refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
                                                 addEmailURL: addEmailURL,
                                                 manageEmailURL: manageEmailURL,
@@ -218,7 +219,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
         case .stripe:
             Task {
-                guard let accessToken = subscriptionManager.tokenStorage.accessToken, let externalID = accountManager.externalID,
+                guard let accessToken = subscriptionManager.tokenStorage.accessToken, let externalID = subscriptionManager.accountStorage.externalID,
                       case let .success(response) = await subscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
@@ -233,7 +234,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             switch await authService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
-                return response.externalID == accountManager.externalID
+                return response.externalID == subscriptionManager.accountStorage.externalID
             case .failure:
                 return false
             }

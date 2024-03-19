@@ -60,8 +60,9 @@ public final class SubscriptionAccessViewController: NSViewController {
             let shouldRefreshAuthToken = subscriptionManager.configuration.currentPurchasePlatform == .appStore
             let addEmailURL = subscriptionManager.urlProvider.url(for: .addEmail)
             let manageEmailURL = subscriptionManager.urlProvider.url(for: .manageEmail)
+            let email = subscriptionManager.accountStorage.email
             return ShareSubscriptionAccessModel(actionHandlers: actionHandlers,
-                                                email: accountManager.email,
+                                                email: email,
                                                 refreshAuthTokenOnOpenURL: shouldRefreshAuthToken,
                                                 addEmailURL: addEmailURL,
                                                 manageEmailURL: manageEmailURL,
