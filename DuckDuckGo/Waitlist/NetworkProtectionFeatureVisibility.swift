@@ -201,7 +201,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return false
         }
 
-        //defaults.vpnLegacyUserAccessDisabledOnce = true
+        defaults.vpnLegacyUserAccessDisabledOnce = true
         await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
         return true
     }
