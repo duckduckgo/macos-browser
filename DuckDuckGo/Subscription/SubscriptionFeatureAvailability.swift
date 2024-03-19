@@ -24,6 +24,7 @@ import Subscription
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import BrowserServicesKit
 #endif
 
 protocol SubscriptionFeatureAvailability {
@@ -48,8 +49,7 @@ struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
     }
 
     private var isInternalUser: Bool {
-        return false
-        // NSApp.delegateTyped.internalUserDecider.isInternalUser
+        Self.internalUserDecider.isInternalUser
     }
 
     private var isDBPActivated: Bool {
@@ -59,4 +59,18 @@ struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
         return false
 #endif
     }
+
+    private static var internalUserDecider: InternalUserDecider = {
+        let keyStore = EncryptionKeyStore()
+        let fileStore: FileStore
+        do {
+            let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
+            fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
+        } catch {
+            fileStore = EncryptedFileStore()
+        }
+
+        let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
+        return DefaultInternalUserDecider(store: internalUserDeciderStore)
+    }()
 }
