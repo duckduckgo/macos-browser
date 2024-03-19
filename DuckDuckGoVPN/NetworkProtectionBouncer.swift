@@ -39,9 +39,9 @@ final class NetworkProtectionBouncer {
         let result = await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         switch result {
         case .success(true), .failure:
-            return
+            break
         case .success(false):
-            os_log(.error, log: .networkProtection, "🔴 Stopping: VPN not authorized. Missing entitlement.")
+            os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing entitlement.")
             await controller.stop()
 
             // EXIT_SUCCESS ensures the login item won't relaunch
@@ -50,7 +50,7 @@ final class NetworkProtectionBouncer {
             //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
             exit(EXIT_SUCCESS)
         }
-#else
+#endif
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
                                                                 errorEvents: nil,
                                                                 isSubscriptionEnabled: false,
@@ -66,6 +66,5 @@ final class NetworkProtectionBouncer {
             //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
             exit(EXIT_SUCCESS)
         }
-#endif
     }
 }
