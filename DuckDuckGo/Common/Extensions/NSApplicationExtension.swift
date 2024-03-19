@@ -76,7 +76,11 @@ extension NSApplication {
     }
 
     var delegateTyped: AppDelegate {
-        return delegate as! AppDelegate // swiftlint:disable:this force_cast
+        if let delegate = delegate as? AppDelegate {
+            return delegate
+        } else {
+            fatalError("Failed to cast delegate: \(type(of: delegate))")
+        }
     }
 #endif
 
