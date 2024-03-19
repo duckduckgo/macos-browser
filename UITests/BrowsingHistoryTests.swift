@@ -22,7 +22,9 @@ import XCTest
 class BrowsingHistoryTests: XCTestCase {
     let app = XCUIApplication()
     let timeout = 0.3
-
+    let historyMenuBarItem = XCUIApplication().menuBarItems["History"]
+    let clearAllHistory = XCUIApplication().menuItems["HistoryMenu.clearAllHistory"]
+    
     override class func setUp() {}
 
     override class func tearDown() {}
@@ -32,10 +34,28 @@ class BrowsingHistoryTests: XCTestCase {
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
         app.typeKey("n", modifierFlags: .command)
+
+        XCTAssertTrue(
+            historyMenuBarItem.waitForExistence(timeout: timeout),
+            "History menu bar item didn't appear in a reasonable timeframe."
+        )
+        historyMenuBarItem.click()
+
+        XCTAssertTrue(
+            clearAllHistory.waitForExistence(timeout: timeout),
+            "Clear all history item didn't appear in a reasonable timeframe."
+        )
+        clearAllHistory.click()
+
+        XCTAssertTrue(
+            app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: timeout),
+            "Clear all history item didn't appear in a reasonable timeframe."
+        )
+        app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click()
     }
 
     func test_visitedSiteIsAddedToRecentlyVisited() throws {
-
+// DuckDuckGo/macos-browser/DuckDuckGo/Menus/MainMenuActions.swift:279: Fatal error: Could not get currently active Tab
         let historyPageTitleExpectedToBeFirstInRecentlyVisited = "First History Entry"
         let url = URL.testsServer
             .appendingTestParameters(data: """
@@ -50,7 +70,6 @@ class BrowsingHistoryTests: XCTestCase {
             """.utf8data)
 
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
-        let historyMenuBarItem = app.menuBarItems["History"]
         let firstSiteInRecentlyVisitedSection = app.menuItems["HistoryMenu.recentlyVisitedMenuItem.0"]
 
         addressBarTextField.typeText("\(url.absoluteString)\r")
@@ -63,6 +82,7 @@ class BrowsingHistoryTests: XCTestCase {
             "History menu bar item didn't appear in a reasonable timeframe."
         )
         historyMenuBarItem.click() // The visited sites identifiers will not be available until after the History menu has been accessed.
+
         XCTAssertTrue(
             firstSiteInRecentlyVisitedSection.waitForExistence(timeout: timeout),
             "The first site in the recently visited section didn't appear in a reasonable timeframe."
