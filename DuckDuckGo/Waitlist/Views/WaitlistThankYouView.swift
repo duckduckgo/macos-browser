@@ -96,7 +96,7 @@ final class WaitlistBetaThankYouDialogViewModel: ObservableObject {
 
 final class WaitlistBetaThankYouDialogViewController: NSViewController {
 
-    private let defaultSize = CGSize(width: 460, height: 470)
+    private let defaultSize = CGSize(width: 360, height: 498)
     private let viewModel: WaitlistBetaThankYouDialogViewModel
 
     private var heightConstraint: NSLayoutConstraint?
@@ -153,7 +153,8 @@ struct WaitlistBetaThankYouView: View {
             VStack {
                 Text(copy.title)
                     .font(.system(size: 18, weight: .semibold))
-                    .padding([.top, .bottom], 24)
+                    .padding(24)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity)
             .background(Color.backgroundSecondary)
