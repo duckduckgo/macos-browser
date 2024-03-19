@@ -22,6 +22,10 @@ import Foundation
 import NetworkProtection
 import Common
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 extension NetworkProtectionDeviceManager {
 
     static func create() -> NetworkProtectionDeviceManager {
@@ -32,7 +36,7 @@ extension NetworkProtectionDeviceManager {
                                               tokenStore: tokenStore,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents,
-                                              isSubscriptionEnabled: false)
+                                              isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable())
     }
 }
 
@@ -42,16 +46,21 @@ extension NetworkProtectionCodeRedemptionCoordinator {
         self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false)
+                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable())
     }
 }
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
+#if SUBSCRIPTION
+        let accessTokenProvider: () -> String? = { AccountManager().accessToken }
+#else
+        let accessTokenProvider: () -> String? = { return nil }
+#endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false,
-                  accessTokenProvider: { nil })
+                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable(),
+                  accessTokenProvider: accessTokenProvider)
     }
 }
 
@@ -59,6 +68,18 @@ extension NetworkProtectionKeychainKeyStore {
     convenience init() {
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents)
+    }
+}
+
+extension NetworkProtectionLocationListCompositeRepository {
+    convenience init() {
+        let settings = VPNSettings(defaults: .netP)
+        self.init(
+            environment: settings.selectedEnvironment,
+            tokenStore: NetworkProtectionKeychainTokenStore(),
+            errorEvents: .networkProtectionAppDebugEvents,
+            isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable()
+        )
     }
 }
 

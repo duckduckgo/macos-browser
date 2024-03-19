@@ -86,7 +86,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
-    private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+    // Needs to be lazy as indirectly depends on AppDelegate
+    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
 #endif
 
 #if DBP && SUBSCRIPTION

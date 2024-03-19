@@ -438,14 +438,20 @@ final class NavigationBarViewController: NSViewController {
                                                object: nil)
 
 #if NETWORK_PROTECTION
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(showVPNUninstalledFeedback(_:)),
-                                               name: NetworkProtectionFeatureDisabler.vpnUninstalledNotificationName,
-                                               object: nil)
+        UserDefaults.netP
+            .publisher(for: \.networkProtectionShouldShowVPNUninstalledMessage)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] shouldShowUninstalledMessage in
+                if shouldShowUninstalledMessage {
+                    self?.showVPNUninstalledFeedback()
+                    UserDefaults.netP.networkProtectionShouldShowVPNUninstalledMessage = false
+                }
+            }
+            .store(in: &cancellables)
 #endif
     }
 
-    @objc private func showVPNUninstalledFeedback(_ sender: Notification) {
+    @objc private func showVPNUninstalledFeedback() {
         guard view.window?.isKeyWindow == true else { return }
 
         DispatchQueue.main.async {
