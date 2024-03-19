@@ -28,6 +28,7 @@ import Subscription
 
 extension NetworkProtectionDeviceManager {
 
+    @MainActor
     static func create() -> NetworkProtectionDeviceManager {
         let settings = VPNSettings(defaults: .netP)
         let keyStore = NetworkProtectionKeychainKeyStore()
@@ -36,7 +37,7 @@ extension NetworkProtectionDeviceManager {
                                               tokenStore: tokenStore,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents,
-                                              isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable())
+                                              isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable)
     }
 }
 
@@ -46,7 +47,7 @@ extension NetworkProtectionCodeRedemptionCoordinator {
         self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable())
+                  isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable)
     }
 }
 
@@ -59,7 +60,7 @@ extension NetworkProtectionKeychainTokenStore {
 #endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable(),
+                  isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable,
                   accessTokenProvider: accessTokenProvider)
     }
 }
@@ -78,7 +79,7 @@ extension NetworkProtectionLocationListCompositeRepository {
             environment: settings.selectedEnvironment,
             tokenStore: NetworkProtectionKeychainTokenStore(),
             errorEvents: .networkProtectionAppDebugEvents,
-            isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable()
+            isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
         )
     }
 }
