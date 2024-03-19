@@ -82,9 +82,8 @@ final class NetworkProtectionAppEvents {
     /// Call this method when the app becomes active to run the associated NetP logic.
     ///
     func applicationDidBecomeActive() {
-        guard featureVisibility.isNetworkProtectionVisible() else {
-            featureVisibility.disableForAllUsers()
-            return
+        Task { @MainActor in
+            await featureVisibility.disableIfUserHasNoAccess()
         }
     }
 
