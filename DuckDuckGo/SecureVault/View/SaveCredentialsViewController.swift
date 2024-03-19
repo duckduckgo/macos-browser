@@ -279,7 +279,7 @@ final class SaveCredentialsViewController: NSViewController {
             delegate?.shouldCloseSaveCredentialsViewController(self)
         }
 
-        guard PrivacySecurityPreferences.shared.loginDetectionEnabled else {
+        guard DataClearingPreferences.shared.isLoginDetectionEnabled else {
             notifyDelegate()
             return
         }
