@@ -174,6 +174,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         []
     }
 
+    func accountTitlesForSyncableCredentials(modifiedBefore date: Date) throws -> [String] {
+        []
+    }
+
     func deleteSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {
         if let accountId = syncableCredentials.metadata.objectId {
             try deleteWebsiteCredentialsFor(accountId: accountId)
@@ -410,6 +414,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     }
 
     func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func modifiedSyncableCredentials(before date: Date) throws -> [SecureVaultModels.SyncableCredentials] {
         []
     }
 
