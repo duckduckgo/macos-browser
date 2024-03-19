@@ -250,6 +250,11 @@ extension Pixel {
         case privacyProSubscriptionManagementEmail
         case privacyProSubscriptionManagementPlanBilling
         case privacyProSubscriptionManagementRemoval
+        // Web pixels
+        case privacyProOfferMonthlyPriceClick
+        case privacyProOfferYearlyPriceClick
+        case privacyProAddEmailSuccess
+        case privacyProWelcomeFAQClick
 
         case dailyPixel(Event, isFirst: Bool)
 
@@ -667,6 +672,11 @@ extension Pixel.Event {
         case .privacyProSubscriptionManagementEmail: return "m_mac_\(appDistribution)_privacy-pro_manage-email_edit_click"
         case .privacyProSubscriptionManagementPlanBilling: return "m_mac_\(appDistribution)_privacy-pro_settings_change-plan-or-billing_click"
         case .privacyProSubscriptionManagementRemoval: return "m_mac_\(appDistribution)_privacy-pro_settings_remove-from-device_click"
+            // Web
+        case .privacyProOfferMonthlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_monthly-price_click"
+        case .privacyProOfferYearlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_yearly-price_click"
+        case .privacyProAddEmailSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_add-email_success_u"
+        case .privacyProWelcomeFAQClick: return "m_mac_\(appDistribution)_privacy-pro_welcome_faq_click_u"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
         case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"

@@ -217,4 +217,174 @@ class BookmarkNodeTests: XCTestCase {
         XCTAssertNotEqual(rootNode.findOrCreateChildNode(with: TestObject()), childNode)
     }
 
+    // MARK: - Equality Bookmarks
+
+    func testWhenTwoNodesWithSameIdAndSameBookmarkAsRepresentedObject_ThenIsEqualShouldBeTrue() {
+        // GIVEN
+        let lhsBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let rhsBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let lhsNode = BookmarkNode(representedObject: lhsBookmark, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsBookmark, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
+    func testWhenTwoNodesWithDifferentIdAndSameBookmarkAsRepresentedObject_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let rhsBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let lhsNode = BookmarkNode(representedObject: lhsBookmark, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsBookmark, parent: nil, uniqueId: 2)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenTwoNodesContainBookmarkAsRepresentedObjectWithDifferentId_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let rhsBookmark = Bookmark(id: "2", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let lhsNode = BookmarkNode(representedObject: lhsBookmark, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsBookmark, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenTwoNodesContainBookmarkAsRepresentedObjectWithDifferentURL_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let rhsBookmark = Bookmark(id: "2", url: URL.ddgLearnMore.absoluteString, title: "DDG", isFavorite: true)
+        let lhsNode = BookmarkNode(representedObject: lhsBookmark, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsBookmark, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenTwoNodesContainBookmarkAsRepresentedObjectWithDifferentTitle_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let rhsBookmark = Bookmark(id: "2", url: URL.duckDuckGo.absoluteString, title: "DDG 2", isFavorite: true)
+        let lhsNode = BookmarkNode(representedObject: lhsBookmark, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsBookmark, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenTwoNodesContainBookmarkAsRepresentedObjectWithDifferentIsFavorite_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)
+        let rhsBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: false)
+        let lhsNode = BookmarkNode(representedObject: lhsBookmark, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsBookmark, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenTwoNodesWithSameIdAndSameFolderAsRepresentedObject_ThenIsEqualShouldBeTrue() {
+        // GIVEN
+        let lhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "1", children: [])
+        let rhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "1", children: [])
+        let lhsNode = BookmarkNode(representedObject: lhsFolder, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsFolder, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
+    func testWhenTwoNodesWithDifferentIdAndSameFolderAsRepresentedObject_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "1", children: [])
+        let rhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "1", children: [])
+        let lhsNode = BookmarkNode(representedObject: lhsFolder, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsFolder, parent: nil, uniqueId: 2)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenTwoNodesContainFolderAsRepresentedObjectWithDifferentId_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "1", children: [])
+        let rhsFolder = BookmarkFolder(id: "2", title: "Folder", parentFolderUUID: "1", children: [])
+        let lhsNode = BookmarkNode(representedObject: lhsFolder, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsFolder, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenTwoNodesContainFolderAsRepresentedObjectWithDifferentName_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "1", children: [])
+        let rhsFolder = BookmarkFolder(id: "1", title: "Folder 1", parentFolderUUID: "1", children: [])
+        let lhsNode = BookmarkNode(representedObject: lhsFolder, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsFolder, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenTwoNodesContainBookmarkAsRepresentedObjectWithDifferentParentFolder_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "1", children: [])
+        let rhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "2", children: [])
+        let lhsNode = BookmarkNode(representedObject: lhsFolder, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsFolder, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenTwoNodesContainFolderAsRepresentedObjectWithDifferentChildren_ThenIsEqualShouldBeFalse() {
+        // GIVEN
+        let lhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "1", children: [Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true)])
+        let rhsFolder = BookmarkFolder(id: "1", title: "Folder", parentFolderUUID: "2", children: [])
+        let lhsNode = BookmarkNode(representedObject: lhsFolder, parent: nil, uniqueId: 1)
+        let rhsNode = BookmarkNode(representedObject: rhsFolder, parent: nil, uniqueId: 1)
+
+        // WHEN
+        let result = lhsNode == rhsNode
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
 }

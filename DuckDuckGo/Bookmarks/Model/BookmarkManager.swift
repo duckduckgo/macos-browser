@@ -35,7 +35,9 @@ protocol BookmarkManager: AnyObject {
     func remove(folder: BookmarkFolder)
     func remove(objectsWithUUIDs uuids: [String])
     func update(bookmark: Bookmark)
+    func update(bookmark: Bookmark, withURL url: URL, title: String, isFavorite: Bool)
     func update(folder: BookmarkFolder)
+    func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType)
     @discardableResult func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark?
     func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
     func add(objectsWithUUIDs uuids: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
@@ -211,8 +213,31 @@ final class LocalBookmarkManager: BookmarkManager {
 
     }
 
+    func update(bookmark: Bookmark, withURL url: URL, title: String, isFavorite: Bool) {
+        guard list != nil else { return }
+        guard getBookmark(forUrl: bookmark.url) != nil else {
+            os_log("LocalBookmarkManager: Failed to update bookmark url - not in the list.", type: .error)
+            return
+        }
+
+        guard let newBookmark = list?.update(bookmark: bookmark, newURL: url.absoluteString, newTitle: title, newIsFavorite: isFavorite) else {
+            os_log("LocalBookmarkManager: Failed to update URL of bookmark.", type: .error)
+            return
+        }
+
+        bookmarkStore.update(bookmark: newBookmark)
+        loadBookmarks()
+        requestSync()
+    }
+
     func update(folder: BookmarkFolder) {
         bookmarkStore.update(folder: folder)
+        loadBookmarks()
+        requestSync()
+    }
+
+    func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType) {
+        bookmarkStore.update(folder: folder, andMoveToParent: parent)
         loadBookmarks()
         requestSync()
     }
