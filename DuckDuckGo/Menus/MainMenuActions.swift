@@ -779,6 +779,11 @@ extension MainViewController {
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
     }
 
+    @objc func resetThankYouModalChecks(_ sender: Any?) {
+        let presenter = WaitlistThankYouPromptPresenter()
+        presenter.resetPromptCheck()
+    }
+
     @objc func showVPNThankYouModal(_ sender: Any?) {
         let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
         let thankYouWindowController = thankYouModalView.wrappedInWindowController()

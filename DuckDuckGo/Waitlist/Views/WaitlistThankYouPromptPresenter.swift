@@ -55,13 +55,11 @@ final class WaitlistThankYouPromptPresenter {
         }
 
         if isPIRBetaTester() {
+            saveDidShowPromptCheck()
             presentPIRThankYouPrompt(in: window)
+        } else if isVPNBetaTester() {
             saveDidShowPromptCheck()
-        }
-
-        if isVPNBetaTester() {
             presentVPNThankYouPrompt(in: window)
-            saveDidShowPromptCheck()
         }
     }
 

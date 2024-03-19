@@ -593,6 +593,7 @@ import SubscriptionUI
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
                 NSMenuItem(title: "Show VPN Thank You Modal", action: #selector(MainViewController.showVPNThankYouModal))
                 NSMenuItem(title: "Show PIR Thank You Modal", action: #selector(MainViewController.showPIRThankYouModal))
+                NSMenuItem(title: "Reset Thank You Modal Checks", action: #selector(MainViewController.resetThankYouModalChecks))
             }
             NSMenuItem(title: "Remote Configuration") {
                 customConfigurationUrlMenuItem
