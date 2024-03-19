@@ -43,7 +43,7 @@ final class VPNAppEventsHandler {
 #if DEBUG || REVIEW // Since DEBUG and REVIEW builds may not change version No. we want them to always reset.
         restartTunnel()
 #else
-        if versionStore.lastVersionRun != currentVersion {
+        if versionStore.lastAgentVersionRun != currentVersion {
             restartTunnel()
         }
 #endif
