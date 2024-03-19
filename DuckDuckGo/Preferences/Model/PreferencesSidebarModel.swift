@@ -21,6 +21,10 @@ import Combine
 import DDGSync
 import SwiftUI
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 final class PreferencesSidebarModel: ObservableObject {
 
     let tabSwitcherTabs: [Tab.TabContent]
@@ -75,10 +79,13 @@ final class PreferencesSidebarModel: ObservableObject {
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
         syncService: DDGSyncing,
-        includeDuckPlayer: Bool
+        includeDuckPlayer: Bool,
+        userDefaults: UserDefaults = .netP
     ) {
         let loadSections = {
-#if NETWORK_PROTECTION
+#if SUBSCRIPTION
+            let includingVPN = !userDefaults.networkProtectionEntitlementsExpired && DefaultNetworkProtectionVisibility().isOnboarded
+#elseif NETWORK_PROTECTION
             let includingVPN = DefaultNetworkProtectionVisibility().isOnboarded
 #else
             let includingVPN = false
@@ -113,6 +120,16 @@ final class PreferencesSidebarModel: ObservableObject {
                 self.refreshSections()
             }
             .store(in: &cancellables)
+
+        UserDefaults.netP.publisher(for: \.networkProtectionEntitlementsExpired)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] entitlementsExpired in
+                guard let self else { return }
+                if !entitlementsExpired && self.selectedPane == .vpn {
+                    self.selectedPane = .general
+                }
+                self.refreshSections()
+        }.store(in: &cancellables)
     }
 #endif
 

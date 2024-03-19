@@ -34,6 +34,10 @@ import SystemExtensionManager
 import SystemExtensions
 #endif
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
@@ -71,6 +75,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
+
+#if SUBSCRIPTION
+    // MARK: - Subscriptions
+
+    private let accountManager = AccountManager()
+#endif
 
     // MARK: - Debug Options Support
 
@@ -538,7 +548,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         var options = [String: NSObject]()
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        guard let authToken = try tokenStore.fetchToken() as NSString? else {
+        guard let authToken = try fetchAuthToken() else {
             throw StartError.noAuthToken
         }
         options[NetworkProtectionOptionKey.authToken] = authToken
@@ -737,6 +747,21 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         if let errorMessage {
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }
+    }
+
+    private func fetchAuthToken() throws -> NSString? {
+#if SUBSCRIPTION
+        if let accessToken = accountManager.accessToken  {
+            os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
+            return Self.adaptAccessTokenForVPN(accessToken) as NSString?
+        }
+#endif
+        os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
+        return try tokenStore.fetchToken() as NSString?
+    }
+
+    private static func adaptAccessTokenForVPN(_ token: String) -> String {
+        "ddg:\(token)"
     }
 }
 

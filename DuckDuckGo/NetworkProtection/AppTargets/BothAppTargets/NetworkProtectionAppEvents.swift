@@ -72,9 +72,11 @@ final class NetworkProtectionAppEvents {
     ///
     func applicationDidBecomeActive() {
         guard featureVisibility.isNetworkProtectionVisible() else {
+            UserDefaults.netP.networkProtectionVPNEnabledViaWaitlist = false
             featureVisibility.disableForAllUsers()
             return
         }
+        UserDefaults.netP.networkProtectionVPNEnabledViaWaitlist = true
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
