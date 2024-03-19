@@ -143,8 +143,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         updateSyncFeatureFlags(self.syncFeatureFlags)
         setUpObservables()
         setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
-
-        updateInvalidObjects()
     }
 
     private func updateInvalidObjects() {
@@ -174,15 +172,17 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             }
             .store(in: &cancellables)
 
-        syncService.isSyncInProgressPublisher
-            .removeDuplicates()
-            .filter { !$0 }
-            .asVoid()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                self?.updateInvalidObjects()
-            }
-            .store(in: &cancellables)
+        if DDGSync.isFieldValidationEnabled {
+            syncService.isSyncInProgressPublisher
+                .removeDuplicates()
+                .filter { !$0 }
+                .asVoid()
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] in
+                    self?.updateInvalidObjects()
+                }
+                .store(in: &cancellables)
+        }
 
         $syncErrorMessage
             .map { $0 != nil }
