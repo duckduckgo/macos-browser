@@ -207,8 +207,10 @@ final class AppearancePreferences: ObservableObject {
     }
 
     var isContinueSetUpAvailable: Bool {
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
-        return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp)
+        return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp) && osVersion.majorVersion >= 12
     }
 
     func updateUserInterfaceStyle() {

@@ -237,6 +237,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .showSettings)
                     }),
+                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
+                        await self?.appLauncher.launchApp(withCommand: .showFAQ)
+                    }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .justOpen)
                     }),
@@ -257,57 +260,61 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         setupMenuVisibility()
 
-        bouncer.requireAuthTokenOrKillApp()
+        Task { @MainActor in
+            // The reason we want to await for this is that nothing else should be executed
+            // if the app should quit.
+            await bouncer.requireAuthTokenOrKillApp(controller: tunnelController)
 
-        // Initialize lazy properties
-        _ = tunnelControllerIPCService
-        _ = vpnProxyLauncher
+            // Initialize lazy properties
+            _ = tunnelControllerIPCService
+            _ = vpnProxyLauncher
 
-        let dryRun: Bool
+            let dryRun: Bool
 
 #if DEBUG
-        dryRun = true
+            dryRun = true
 #else
-        dryRun = false
+            dryRun = false
 #endif
 
-        let pixelSource: String
+            let pixelSource: String
 
 #if NETP_SYSTEM_EXTENSION
-        pixelSource = "vpnAgent"
+            pixelSource = "vpnAgent"
 #else
-        pixelSource = "vpnAgentAppStore"
+            pixelSource = "vpnAgentAppStore"
 #endif
 
-        PixelKit.setUp(dryRun: dryRun,
-                       appVersion: AppVersion.shared.versionNumber,
-                       source: pixelSource,
-                       defaultHeaders: [:],
-                       log: .networkProtectionPixel,
-                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
+            PixelKit.setUp(dryRun: dryRun,
+                           appVersion: AppVersion.shared.versionNumber,
+                           source: pixelSource,
+                           defaultHeaders: [:],
+                           log: .networkProtectionPixel,
+                           defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
-            let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
-            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
-            let request = APIRequest(configuration: configuration)
+                let url = URL.pixelUrl(forPixelNamed: pixelName)
+                let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
+                let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+                let request = APIRequest(configuration: configuration)
 
-            request.fetch { _, error in
-                onComplete(error == nil, error)
+                request.fetch { _, error in
+                    onComplete(error == nil, error)
+                }
             }
-        }
 
-        vpnAppEventsHandler.appDidFinishLaunching()
+            vpnAppEventsHandler.appDidFinishLaunching()
 
-        let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
-        let launchedOnStartup = launchInformation.wasLaunchedByStartup
-        launchInformation.update()
+            let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
+            let launchedOnStartup = launchInformation.wasLaunchedByStartup
+            launchInformation.update()
 
-        if launchedOnStartup {
-            Task {
-                let isConnected = await tunnelController.isConnected
+            if launchedOnStartup {
+                Task {
+                    let isConnected = await tunnelController.isConnected
 
-                if !isConnected && tunnelSettings.connectOnLogin {
-                    await tunnelController.start()
+                    if !isConnected && tunnelSettings.connectOnLogin {
+                        await tunnelController.start()
+                    }
                 }
             }
         }

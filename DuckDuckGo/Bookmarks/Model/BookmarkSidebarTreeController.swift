@@ -33,19 +33,11 @@ final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
     // MARK: - Private
 
     private func childNodesForRootNode(_ node: BookmarkNode) -> [BookmarkNode] {
-        let favorites = PseudoFolder.favorites
-        let favoritesNode = BookmarkNode(representedObject: favorites, parent: node)
-        favoritesNode.canHaveChildNodes = false
-
-        let blankSpacer = SpacerNode.blank
-        let spacerNode = BookmarkNode(representedObject: blankSpacer, parent: node)
-        spacerNode.canHaveChildNodes = false
-
         let bookmarks = PseudoFolder.bookmarks
         let bookmarksNode = BookmarkNode(representedObject: bookmarks, parent: node)
         bookmarksNode.canHaveChildNodes = true
 
-        return [favoritesNode, spacerNode, bookmarksNode]
+        return [bookmarksNode]
     }
 
     private func childNodes(for parentNode: BookmarkNode) -> [BookmarkNode] {
