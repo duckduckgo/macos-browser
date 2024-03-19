@@ -152,8 +152,9 @@ struct WaitlistBetaThankYouView: View {
         VStack(spacing: 0) {
             VStack {
                 Text(copy.title)
-                    .font(.system(size: 18, weight: .semibold))
-                    .padding(24)
+                    .font(.system(size: 17, weight: .semibold))
+                    .padding([.leading, .trailing], 21.5)
+                    .padding([.top, .bottom], 24)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity)
