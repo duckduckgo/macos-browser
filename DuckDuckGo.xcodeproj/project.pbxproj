@@ -10095,7 +10095,6 @@
 				3706FADE293F65D500E42796 /* PreferencesDuckPlayerView.swift in Sources */,
 				EEC4A65E2B277E8D00F7C0AA /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
 				B66260E729ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift in Sources */,
-				3706FADF293F65D500E42796 /* AddBookmarkFolderModalView.swift in Sources */,
 				1DDD3EC52B84F96B004CBF2B /* CookiePopupProtectionPreferences.swift in Sources */,
 				3706FAE0293F65D500E42796 /* BookmarkSidebarTreeController.swift in Sources */,
 				3706FAE1293F65D500E42796 /* HomePageFavoritesModel.swift in Sources */,
@@ -11720,9 +11719,8 @@
 				B66CA4212AD910B300447CF0 /* DataImportView.swift in Sources */,
 				4B957B162AC7AE700062CA31 /* Downloads.xcdatamodeld in Sources */,
 				4B957B172AC7AE700062CA31 /* TabPreviewViewController.swift in Sources */,
-				B6F9BDDA2B45B7D900677B33 /* AddBookmarkModalViewModel.swift in Sources */,
 				4B957B182AC7AE700062CA31 /* PreferencesDataClearingView.swift in Sources */,
-				4B957B182AC7AE700062CA31 /* PreferencesPrivacyView.swift in Sources */,
+				4B957B182AC7AE700062CA31 /* PreferencesDataClearingView.swift in Sources */,
 				4B957B192AC7AE700062CA31 /* NSPasteboardExtension.swift in Sources */,
 				4B957B1A2AC7AE700062CA31 /* OnboardingViewModel.swift in Sources */,
 				4B957B1B2AC7AE700062CA31 /* ScriptSourceProviding.swift in Sources */,
@@ -12048,7 +12046,6 @@
 				1D1A33492A6FEB170080ACED /* BurnerMode.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
 				987799F12999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
-				B6F9BDE02B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */,
 				1D220BF82B86192200F8BBC6 /* PreferencesEmailProtectionView.swift in Sources */,
 				4B8AC93526B3B2FD00879451 /* NSAlert+DataImport.swift in Sources */,
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
@@ -14065,8 +14062,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = daniel/privacyProFF;
-				kind = branch;
+				kind = exactVersion;
+				version = 126.2.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
