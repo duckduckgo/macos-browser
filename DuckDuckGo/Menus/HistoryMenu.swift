@@ -106,6 +106,7 @@ final class HistoryMenu: NSMenu {
     var recentlyVisitedHeaderMenuItem: NSMenuItem {
         let item = NSMenuItem(title: UserText.recentlyVisitedMenuSection)
         item.isEnabled = false
+        item.setAccessibilityIdentifier("HistoryMenu.recentlyVisitedHeaderMenuItem")
         return item
     }
 
@@ -118,8 +119,13 @@ final class HistoryMenu: NSMenu {
                 VisitMenuItem(visitViewModel: VisitViewModel(visit: $0))
             }
         )
-        recentlyVisitedMenuItems.forEach {
-            addItem($0)
+        for index in recentlyVisitedMenuItems.indices {
+            let menuItem = recentlyVisitedMenuItems[index]
+            if index > 0 { // index zero is set in recentlyVisitedHeaderMenuItem,
+                // and we're zero-indexing the list of recently visited sites, so their naming in tests follows convention.
+                menuItem.setAccessibilityIdentifier("HistoryMenu.recentlyVisitedMenuItem.\(index - 1)")
+            }
+            addItem(menuItem)
         }
     }
 
