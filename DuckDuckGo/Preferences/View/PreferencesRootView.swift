@@ -31,9 +31,16 @@ import SubscriptionUI
 enum Preferences {
 
     enum Const {
-        static let sidebarWidth: CGFloat = 310
+        static var sidebarWidth: CGFloat {
+            switch Locale.current.languageCode {
+            case "en":
+                return 310
+            default:
+                return 355
+            }
+        }
         static let paneContentWidth: CGFloat = 524
-        static let panePaddingHorizontal: CGFloat = 48
+        static let panePaddingHorizontal: CGFloat = 40
         static let panePaddingVertical: CGFloat = 40
     }
 

@@ -172,7 +172,7 @@ extension Preferences {
 
             }
             .padding(.top, 18)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 10)
         }
 
         @ViewBuilder

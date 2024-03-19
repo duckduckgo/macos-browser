@@ -46,16 +46,18 @@ extension Preferences {
                             if defaultBrowserModel.isDefault {
                                 Text(UserText.isDefaultBrowser)
                             } else {
-                                Image(.warning).foregroundColor(Color(.linkBlue))
-                                Text(UserText.isNotDefaultBrowser)
+                                HStack {
+                                    Image(.warning).foregroundColor(Color(.linkBlue))
+                                    Text(UserText.isNotDefaultBrowser)
+                                }
+                                .padding(.trailing, 8)
                                 Button(action: {
                                     Pixel.fire(.defaultRequestedFromSettings)
                                     defaultBrowserModel.becomeDefault()
                                 }) {
                                     Text(UserText.makeDefaultBrowser)
-                                        .fixedSize(horizontal: false, vertical: true)
+                                        .fixedSize(horizontal: true, vertical: false)
                                         .multilineTextAlignment(.center)
-                                        .lineLimit(2)
                                 }
                             }
                         }
