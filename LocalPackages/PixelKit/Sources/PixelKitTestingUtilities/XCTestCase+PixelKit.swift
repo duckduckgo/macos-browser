@@ -117,6 +117,7 @@ public extension XCTestCase {
                        defaultHeaders: [:],
                        log: .disabled,
                        defaults: userDefaults) { firedPixelName, _, firedParameters, _, _, completion in
+            print("DEBUG: Firing pixel named \(firedPixelName)")
             callbackExecutedExpectation.fulfill()
 
             let firedParameters = Self.filterStandardPixelParameters(from: firedParameters)
