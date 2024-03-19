@@ -71,7 +71,6 @@ extension HomePage.Models {
         private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
-        private let privacyPreferences: PrivacySecurityPreferences
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
         private let randomNumberGenerator: RandomNumberGenerating
 
@@ -144,7 +143,6 @@ extension HomePage.Models {
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
-             privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              homePageRemoteMessaging: HomePageRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
@@ -153,7 +151,6 @@ extension HomePage.Models {
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
-            self.privacyPreferences = privacyPreferences
             self.duckPlayerPreferences = duckPlayerPreferences
             self.homePageRemoteMessaging = homePageRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager
@@ -170,6 +167,7 @@ extension HomePage.Models {
             switch featureType {
             case .defaultBrowser:
                 do {
+                    Pixel.fire(.defaultRequestedFromHomepageSetupView)
                     try defaultBrowserProvider.presentDefaultBrowserPrompt()
                 } catch {
                     defaultBrowserProvider.openSystemPreferences()

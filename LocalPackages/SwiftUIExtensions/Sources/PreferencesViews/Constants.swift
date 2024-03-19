@@ -34,6 +34,7 @@ public enum Const {
 
     public enum Fonts {
         public static let popUpButton: NSFont = .preferredFont(forTextStyle: .title1, options: [:])
+        public static let sideBarHeader: Font = .system(size: 11)
         public static let sideBarItem: Font = .body
         public static let preferencePaneTitle: Font = .title2.weight(.semibold)
         public static let preferencePaneSectionHeader: Font = .title3.weight(.semibold)
