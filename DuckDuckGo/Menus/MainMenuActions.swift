@@ -779,6 +779,27 @@ extension MainViewController {
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
     }
 
+    @objc func resetThankYouModalChecks(_ sender: Any?) {
+        let presenter = WaitlistThankYouPromptPresenter()
+        presenter.resetPromptCheck()
+    }
+
+    @objc func showVPNThankYouModal(_ sender: Any?) {
+        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
+        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
+        if let thankYouWindow = thankYouWindowController.window {
+            WindowsManager.windows.first?.beginSheet(thankYouWindow)
+        }
+    }
+
+    @objc func showPIRThankYouModal(_ sender: Any?) {
+        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
+        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
+        if let thankYouWindow = thankYouWindowController.window {
+            WindowsManager.windows.first?.beginSheet(thankYouWindow)
+        }
+    }
+
     @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
