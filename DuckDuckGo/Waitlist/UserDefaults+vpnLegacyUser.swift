@@ -19,22 +19,22 @@
 import Foundation
 
 extension UserDefaults {
-    private var vpnLegacyUserAccessDisabledOnceKey: String {
+    static var vpnLegacyUserAccessDisabledOnceKey: String {
         "vpnLegacyUserAccessDisabledOnce"
     }
 
     @objc
     dynamic var vpnLegacyUserAccessDisabledOnce: Bool {
         get {
-            bool(forKey: vpnLegacyUserAccessDisabledOnceKey)
+            bool(forKey: Self.vpnLegacyUserAccessDisabledOnceKey)
         }
 
         set {
-            set(newValue, forKey: vpnLegacyUserAccessDisabledOnceKey)
+            set(newValue, forKey: Self.vpnLegacyUserAccessDisabledOnceKey)
         }
     }
 
     func resetVPNLegacyUserAccessDisabledOnce() {
-        removeObject(forKey: vpnLegacyUserAccessDisabledOnceKey)
+        removeObject(forKey: Self.vpnLegacyUserAccessDisabledOnceKey)
     }
 }

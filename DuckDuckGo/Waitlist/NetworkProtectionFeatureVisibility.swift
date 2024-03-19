@@ -81,7 +81,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
 #if SUBSCRIPTION
-        return defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
+        return subscriptionAvailability.isFeatureAvailable() && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
@@ -154,7 +154,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 
     func disableForAllUsers() {
         Task {
-            await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+            await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
         }
     }
 
@@ -184,7 +184,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// To query whether we're a legacy (waitlist or easter egg) user.
     ///
     private func isPreSubscriptionUser() -> Bool {
-        guard let token = try? NetworkProtectionKeychainTokenStore().fetchToken() else {
+        guard let token = try? NetworkProtectionKeychainTokenStore(isSubscriptionEnabled: false).fetchToken() else {
             return false
         }
 

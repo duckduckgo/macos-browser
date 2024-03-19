@@ -782,6 +782,7 @@ extension MainViewController {
     @objc func resetThankYouModalChecks(_ sender: Any?) {
         let presenter = WaitlistThankYouPromptPresenter()
         presenter.resetPromptCheck()
+        UserDefaults.netP.removeObject(forKey: UserDefaults.vpnLegacyUserAccessDisabledOnceKey)
     }
 
     @objc func showVPNThankYouModal(_ sender: Any?) {
