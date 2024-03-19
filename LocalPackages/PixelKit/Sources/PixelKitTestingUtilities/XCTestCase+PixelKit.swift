@@ -111,13 +111,15 @@ public extension XCTestCase {
         let knownExpectedParameters = knownExpectedParameters(for: event)
         let callbackExecutedExpectation = expectation(description: "The PixelKit callback has been executed")
 
+        // Ensure PixelKit is torn down before setting it back up, avoiding unit test race conditions:
+        PixelKit.tearDown()
+
         PixelKit.setUp(dryRun: false,
                        appVersion: "1.0.5",
                        source: "test-app",
                        defaultHeaders: [:],
                        log: .disabled,
                        defaults: userDefaults) { firedPixelName, _, firedParameters, _, _, completion in
-            print("DEBUG: Firing pixel named \(firedPixelName)")
             callbackExecutedExpectation.fulfill()
 
             let firedParameters = Self.filterStandardPixelParameters(from: firedParameters)
