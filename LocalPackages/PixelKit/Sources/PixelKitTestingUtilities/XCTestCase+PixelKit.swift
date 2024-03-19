@@ -111,7 +111,7 @@ public extension XCTestCase {
         let knownExpectedParameters = knownExpectedParameters(for: event)
         let callbackExecutedExpectation = expectation(description: "The PixelKit callback has been executed")
 
-        PixelKit.setUp(dryRun: true,
+        PixelKit.setUp(dryRun: false,
                        appVersion: "1.0.5",
                        source: "test-app",
                        defaultHeaders: [:],
