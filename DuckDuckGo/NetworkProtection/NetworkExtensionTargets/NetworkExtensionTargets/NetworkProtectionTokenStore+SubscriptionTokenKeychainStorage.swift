@@ -25,8 +25,7 @@ import Common
 
 extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStorage {
     public func store(accessToken: String) throws {
-        let tokenToStore = makeToken(from: accessToken)
-        try store(tokenToStore)
+        try store(accessToken)
     }
 
     public func getAccessToken() throws -> String? {
