@@ -34,6 +34,13 @@ struct BookmarksBarMenuFactory {
         menu.addItem(makeMenuItem(prefs))
     }
 
+    static func addToMenuWithManageBookmarksSection(_ menu: NSMenu, target: AnyObject, addFolderSelector: Selector, manageBookmarksSelector: Selector, prefs: AppearancePreferences = .shared) {
+        addToMenu(menu, prefs)
+        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: UserText.addFolder, action: addFolderSelector, target: target))
+        menu.addItem(NSMenuItem(title: UserText.bookmarksManageBookmarks, action: manageBookmarksSelector, target: target))
+    }
+
     private static func makeMenuItem( _ prefs: AppearancePreferences) -> NSMenuItem {
         let item = NSMenuItem(title: UserText.showBookmarksBar, action: nil, keyEquivalent: "B")
         item.submenu = NSMenu(items: [

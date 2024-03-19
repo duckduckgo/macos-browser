@@ -974,6 +974,10 @@ extension ScanOperationData {
             historyEvents: [HistoryEvent]()
         )
     }
+
+    static func mockWith(historyEvents: [HistoryEvent]) -> ScanOperationData {
+        ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents)
+    }
 }
 
 extension OptOutOperationData {
@@ -1029,6 +1033,19 @@ extension DataBroker {
             steps: [Step](),
             version: "1.0",
             schedulingConfig: DataBrokerScheduleConfig(
+                retryError: 0,
+                confirmOptOutScan: 0,
+                maintenanceScan: 0
+            )
+        )
+    }
+
+    static func mockWithURL(_ url: String) -> DataBroker {
+        .init(name: "Test",
+              url: url,
+              steps: [Step](),
+              version: "1.0",
+              schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 0,
                 confirmOptOutScan: 0,
                 maintenanceScan: 0

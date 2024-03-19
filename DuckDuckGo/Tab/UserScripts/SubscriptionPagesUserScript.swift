@@ -91,16 +91,40 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         self.broker = broker
     }
 
+    struct Handlers {
+        static let getSubscription = "getSubscription"
+        static let setSubscription = "setSubscription"
+        static let backToSettings = "backToSettings"
+        static let getSubscriptionOptions = "getSubscriptionOptions"
+        static let subscriptionSelected = "subscriptionSelected"
+        static let activateSubscription = "activateSubscription"
+        static let featureSelected = "featureSelected"
+        static let completeStripePayment = "completeStripePayment"
+        // Pixels related events
+        static let subscriptionsMonthlyPriceClicked = "subscriptionsMonthlyPriceClicked"
+        static let subscriptionsYearlyPriceClicked = "subscriptionsYearlyPriceClicked"
+        static let subscriptionsUnknownPriceClicked = "subscriptionsUnknownPriceClicked"
+        static let subscriptionsAddEmailSuccess = "subscriptionsAddEmailSuccess"
+        static let subscriptionsWelcomeFaqClicked = "subscriptionsWelcomeFaqClicked"
+    }
+
+    // swiftlint:disable:next cyclomatic_complexity
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
-        case "getSubscription": return getSubscription
-        case "setSubscription": return setSubscription
-        case "backToSettings": return backToSettings
-        case "getSubscriptionOptions": return getSubscriptionOptions
-        case "subscriptionSelected": return subscriptionSelected
-        case "activateSubscription": return activateSubscription
-        case "featureSelected": return featureSelected
-        case "completeStripePayment": return completeStripePayment
+        case Handlers.getSubscription: return getSubscription
+        case Handlers.setSubscription: return setSubscription
+        case Handlers.backToSettings: return backToSettings
+        case Handlers.getSubscriptionOptions: return getSubscriptionOptions
+        case Handlers.subscriptionSelected: return subscriptionSelected
+        case Handlers.activateSubscription: return activateSubscription
+        case Handlers.featureSelected: return featureSelected
+        case Handlers.completeStripePayment: return completeStripePayment
+            // Pixel related events
+        case Handlers.subscriptionsMonthlyPriceClicked: return subscriptionsMonthlyPriceClicked
+        case Handlers.subscriptionsYearlyPriceClicked: return subscriptionsYearlyPriceClicked
+        case Handlers.subscriptionsUnknownPriceClicked: return subscriptionsUnknownPriceClicked
+        case Handlers.subscriptionsAddEmailSuccess: return subscriptionsAddEmailSuccess
+        case Handlers.subscriptionsWelcomeFaqClicked: return subscriptionsWelcomeFaqClicked
         default:
             return nil
         }
@@ -488,6 +512,33 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         await mainViewController?.dismiss(progressViewController)
 
         return [String: String]() // cannot be nil
+    }
+
+    // MARK: Pixel related actions
+
+    func subscriptionsMonthlyPriceClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
+        Pixel.fire(.privacyProOfferMonthlyPriceClick)
+        return nil
+    }
+
+    func subscriptionsYearlyPriceClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
+        Pixel.fire(.privacyProOfferYearlyPriceClick)
+        return nil
+    }
+
+    func subscriptionsUnknownPriceClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
+        // Not used
+        return nil
+    }
+
+    func subscriptionsAddEmailSuccess(params: Any, original: WKScriptMessage) async -> Encodable? {
+        Pixel.fire(.privacyProAddEmailSuccess, limitTo: .initial)
+        return nil
+    }
+
+    func subscriptionsWelcomeFaqClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
+        Pixel.fire(.privacyProWelcomeFAQClick, limitTo: .initial)
+        return nil
     }
 
     // MARK: Push actions
