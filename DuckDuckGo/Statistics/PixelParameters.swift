@@ -201,7 +201,11 @@ extension Pixel.Event {
              .protectionToggledOffBreakageReport,
              .toggleProtectionsDailyCount,
              .toggleReportDoNotSend,
-             .toggleReportDismiss:
+             .toggleReportDismiss,
+             .privacyProOfferMonthlyPriceClick,
+             .privacyProOfferYearlyPriceClick,
+             .privacyProAddEmailSuccess,
+             .privacyProWelcomeFAQClick:
             return nil
         }
     }
@@ -345,11 +349,11 @@ extension Error {
         let nsError = self as NSError
 
         params[PixelKit.Parameters.errorCode] = "\(nsError.code)"
-        params[PixelKit.Parameters.errorDesc] = nsError.domain
+        params[PixelKit.Parameters.errorDomain] = nsError.domain
 
         if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
             params[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            params[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
+            params[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
         }
 
         if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {

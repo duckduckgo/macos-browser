@@ -445,12 +445,15 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     // MARK: - Starting & Stopping the VPN
 
     enum StartError: LocalizedError {
+        case noAuthToken
         case connectionStatusInvalid
         case connectionAlreadyStarted
         case simulateControllerFailureError
 
         var errorDescription: String? {
             switch self {
+            case .noAuthToken:
+                return "You need a subscription to start the VPN"
             case .connectionAlreadyStarted:
 #if DEBUG
                 return "[Debug] Connection already started"
@@ -519,7 +522,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
         } catch {
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure, frequency: .dailyAndContinuous, withError: error, includeAppVersionParameter: true
+                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndContinuous, includeAppVersionParameter: true
             )
 
             await stop()
@@ -535,7 +538,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         var options = [String: NSObject]()
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
+        guard let authToken = try tokenStore.fetchToken() as NSString? else {
+            throw StartError.noAuthToken
+        }
+        options[NetworkProtectionOptionKey.authToken] = authToken
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 

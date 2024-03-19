@@ -118,7 +118,7 @@ final class MockCSSCommunicationDelegate: CCFCommunicationDelegate {
         self.url = url
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) {
+    func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async {
         self.profiles = profiles
     }
 
