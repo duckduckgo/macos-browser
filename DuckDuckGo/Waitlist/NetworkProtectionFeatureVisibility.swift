@@ -79,9 +79,10 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         return isEasterEggUser || waitlistIsOngoing
     }
 
+    /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
+    ///
     var subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability {
-        DefaultSubscriptionFeatureAvailability(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-                                                                                 purchasePlatform: SubscriptionPurchaseEnvironment.current)
+        DefaultSubscriptionFeatureAvailability()
     }
 
     /// Returns whether the VPN should be uninstalled automatically.

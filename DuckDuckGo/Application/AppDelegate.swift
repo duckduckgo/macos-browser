@@ -193,8 +193,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     #else
         SubscriptionPurchaseEnvironment.current = .stripe
     #endif
-        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-                                                                                 purchasePlatform: SubscriptionPurchaseEnvironment.current)
+        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
 #endif
     }
 
