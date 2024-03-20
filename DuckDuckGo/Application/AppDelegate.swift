@@ -31,6 +31,7 @@ import PixelKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
+import Lottie
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -223,6 +224,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         bookmarksManager.loadBookmarks()
         if case .normal = NSApp.runType {
             FaviconManager.shared.loadFavicons()
+            LottieConfiguration.shared.renderingEngine = .mainThread
         }
         ConfigurationManager.shared.start()
         FileDownloadManager.shared.delegate = self
