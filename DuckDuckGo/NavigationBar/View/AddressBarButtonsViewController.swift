@@ -90,11 +90,11 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var buttonsContainer: NSStackView!
 
     @IBOutlet weak var animationWrapperView: NSView!
-    var trackerAnimationView1: AnimationView!
-    var trackerAnimationView2: AnimationView!
-    var trackerAnimationView3: AnimationView!
-    var shieldAnimationView: AnimationView!
-    var shieldDotAnimationView: AnimationView!
+    var trackerAnimationView1: LottieAnimationView!
+    var trackerAnimationView2: LottieAnimationView!
+    var trackerAnimationView3: LottieAnimationView!
+    var shieldAnimationView: LottieAnimationView!
+    var shieldDotAnimationView: LottieAnimationView!
     @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
 
     @IBOutlet weak var permissionButtons: NSView!
@@ -532,13 +532,13 @@ final class AddressBarButtonsViewController: NSViewController {
         externalSchemeButton.sendAction(on: .leftMouseDown)
     }
 
-    private var animationViewCache = [String: AnimationView]()
-    private func getAnimationView(for animationName: String) -> AnimationView? {
+    private var animationViewCache = [String: LottieAnimationView]()
+    private func getAnimationView(for animationName: String) -> LottieAnimationView? {
         if let animationView = animationViewCache[animationName] {
             return animationView
         }
 
-        guard let animationView = AnimationView(named: animationName,
+        guard let animationView = LottieAnimationView(named: animationName,
                                                 imageProvider: trackerAnimationImageProvider) else {
             assertionFailure("Missing animation file")
             return nil
@@ -553,19 +553,19 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func setupAnimationViews() {
-        func addAndLayoutAnimationViewIfNeeded(animationView: AnimationView?, animationName: String) -> AnimationView {
+        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?, animationName: String) -> LottieAnimationView {
             if let animationView = animationView, animationView.identifier?.rawValue == animationName {
                 return animationView
             }
 
             animationView?.removeFromSuperview()
 
-            let newAnimationView: AnimationView
+            let newAnimationView: LottieAnimationView
             // For unknown reason, this caused infinite execution of various unit tests.
             if NSApp.runType.requiresEnvironment {
-                newAnimationView = getAnimationView(for: animationName) ?? AnimationView()
+                newAnimationView = getAnimationView(for: animationName) ?? LottieAnimationView()
             } else {
-                newAnimationView = AnimationView()
+                newAnimationView = LottieAnimationView()
             }
             animationWrapperView.addAndLayout(newAnimationView)
             newAnimationView.isHidden = true
@@ -819,7 +819,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 break
             }
 
-            var animationView: AnimationView
+            var animationView: LottieAnimationView
             if url.scheme == "http" {
                 animationView = shieldDotAnimationView
             } else {
@@ -838,7 +838,7 @@ final class AddressBarButtonsViewController: NSViewController {
             let lastTrackerImages = PrivacyIconViewModel.trackerImages(from: trackerInfo)
             trackerAnimationImageProvider.lastTrackerImages = lastTrackerImages
 
-            let trackerAnimationView: AnimationView?
+            let trackerAnimationView: LottieAnimationView?
             switch lastTrackerImages.count {
             case 0: trackerAnimationView = nil
             case 1: trackerAnimationView = trackerAnimationView1
@@ -862,7 +862,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private func stopAnimations(trackerAnimations: Bool = true,
                                 shieldAnimations: Bool = true,
                                 badgeAnimations: Bool = true) {
-        func stopAnimation(_ animationView: AnimationView) {
+        func stopAnimation(_ animationView: LottieAnimationView) {
             if animationView.isAnimationPlaying || !animationView.isHidden {
                 animationView.isHidden = true
                 animationView.stop()

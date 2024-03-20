@@ -695,7 +695,6 @@
 		3706FCA9293F65D500E42796 /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA76293F65D500E42796 /* ContentBlocking */; };
 		3706FCAA293F65D500E42796 /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA78293F65D500E42796 /* UserScript */; };
 		3706FCAB293F65D500E42796 /* TrackerRadarKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA6B293F65D500E42796 /* TrackerRadarKit */; };
-		3706FCAE293F65D500E42796 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA6D293F65D500E42796 /* Lottie */; };
 		3706FCAF293F65D500E42796 /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 3706FA77293F65D500E42796 /* PrivacyDashboard */; };
 		3706FCB4293F65D500E42796 /* CrashReports.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA693E5D2696E5B90007BB78 /* CrashReports.storyboard */; };
 		3706FCB5293F65D500E42796 /* trackerData.json in Resources */ = {isa = PBXBuildFile; fileRef = 9833913027AAA4B500DAF119 /* trackerData.json */; };
@@ -1143,7 +1142,6 @@
 		4B25377A2A11C01700610219 /* UserText+NetworkProtectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D607C2A0B29FA00BCD287 /* UserText+NetworkProtectionExtensions.swift */; };
 		4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */; };
 		4B2975992828285900187C4E /* FirefoxKeyReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */; };
-		4B2AAAF529E70DEA0026AFC0 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 4B2AAAF429E70DEA0026AFC0 /* Lottie */; };
 		4B2D06292A11C0C900DE1F49 /* Bundle+VPN.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D605E2A0B29FA00BCD287 /* Bundle+VPN.swift */; };
 		4B2D062A2A11C0C900DE1F49 /* NetworkProtectionOptionKeyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D605F2A0B29FA00BCD287 /* NetworkProtectionOptionKeyExtension.swift */; };
 		4B2D062C2A11C0E100DE1F49 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 4B2D062B2A11C0E100DE1F49 /* Networking */; };
@@ -1954,7 +1952,6 @@
 		4B957BDC2AC7AE700062CA31 /* SwiftUIExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579372AC7AE700062CA31 /* SwiftUIExtensions */; };
 		4B957BDD2AC7AE700062CA31 /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579302AC7AE700062CA31 /* UserScript */; };
 		4B957BDE2AC7AE700062CA31 /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579322AC7AE700062CA31 /* Configuration */; };
-		4B957BE02AC7AE700062CA31 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 4B95793A2AC7AE700062CA31 /* Lottie */; };
 		4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579292AC7AE700062CA31 /* Sparkle */; };
 		4B957BE32AC7AE700062CA31 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579332AC7AE700062CA31 /* Navigation */; };
 		4B957BE42AC7AE700062CA31 /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579352AC7AE700062CA31 /* DDGSync */; };
@@ -2539,6 +2536,9 @@
 		9FEE986D2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */; };
 		9FEE986E2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */; };
 		9FEE986F2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */; };
+		9FF521462BAA908500B9819B /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 9FF521452BAA908500B9819B /* Lottie */; };
+		9FF521482BAA909C00B9819B /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 9FF521472BAA909C00B9819B /* Lottie */; };
+		9FF5214A2BAA90C400B9819B /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 9FF521492BAA90C400B9819B /* Lottie */; };
 		AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA06B6B62672AF8100F541C5 /* Sparkle */; };
 		AA0877B826D5160D00B05660 /* SafariVersionReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */; };
 		AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */; };
@@ -4711,6 +4711,7 @@
 				4BF97AD32B43C43F00EB4240 /* NetworkProtectionUI in Frameworks */,
 				7B1459572B7D43E500047F2C /* NetworkProtectionProxy in Frameworks */,
 				B6F7128229F6820A00594A45 /* QuickLookUI.framework in Frameworks */,
+				9FF521482BAA909C00B9819B /* Lottie in Frameworks */,
 				984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */,
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
 				9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */,
@@ -4733,7 +4734,6 @@
 				4BF97AD52B43C43F00EB4240 /* NetworkProtection in Frameworks */,
 				3739326529AE4B39009346AE /* DDGSync in Frameworks */,
 				37DF000729F9C061002B7D3E /* SyncDataProviders in Frameworks */,
-				3706FCAE293F65D500E42796 /* Lottie in Frameworks */,
 				37BA812F29B3CD6E0053F1A3 /* SyncUI in Frameworks */,
 				3706FCAF293F65D500E42796 /* PrivacyDashboard in Frameworks */,
 			);
@@ -4861,7 +4861,6 @@
 				F1D43AF72B98E48F00BAB743 /* BareBonesBrowserKit in Frameworks */,
 				7B31FD902AD1257B0086AA24 /* NetworkProtectionIPC in Frameworks */,
 				4B957BDE2AC7AE700062CA31 /* Configuration in Frameworks */,
-				4B957BE02AC7AE700062CA31 /* Lottie in Frameworks */,
 				4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */,
 				373FB4B52B4D6C57004C88D6 /* PreferencesViews in Frameworks */,
 				4B957BE32AC7AE700062CA31 /* Navigation in Frameworks */,
@@ -4870,6 +4869,7 @@
 				4B957BE52AC7AE700062CA31 /* OpenSSL in Frameworks */,
 				85E2BBD22B8F536F00DBEC7A /* History in Frameworks */,
 				4B957BE62AC7AE700062CA31 /* PrivacyDashboard in Frameworks */,
+				9FF5214A2BAA90C400B9819B /* Lottie in Frameworks */,
 				7B8C083C2AE1268E00F4C67F /* PixelKit in Frameworks */,
 				85D44B8A2BA08D3B001B4AB5 /* Suggestions in Frameworks */,
 				4B957BE72AC7AE700062CA31 /* SyncDataProviders in Frameworks */,
@@ -4950,13 +4950,13 @@
 				CBC83E3629B63D380008E19C /* Configuration in Frameworks */,
 				7B31FD8C2AD125620086AA24 /* NetworkProtectionIPC in Frameworks */,
 				37269EFB2B332F9E005E8E46 /* Common in Frameworks */,
-				4B2AAAF529E70DEA0026AFC0 /* Lottie in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
 				1EA7B8D52B7E078C000330A4 /* Subscription in Frameworks */,
 				B6B77BE8297973D4001E68A1 /* Navigation in Frameworks */,
 				3739326729AE4B42009346AE /* DDGSync in Frameworks */,
 				7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */,
 				371D00E129D8509400EC8598 /* OpenSSL in Frameworks */,
+				9FF521462BAA908500B9819B /* Lottie in Frameworks */,
 				1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */,
 				85D44B862BA08D29001B4AB5 /* Suggestions in Frameworks */,
 				37DF000529F9C056002B7D3E /* SyncDataProviders in Frameworks */,
@@ -8738,7 +8738,6 @@
 			name = "DuckDuckGo Privacy Browser App Store";
 			packageProductDependencies = (
 				3706FA6B293F65D500E42796 /* TrackerRadarKit */,
-				3706FA6D293F65D500E42796 /* Lottie */,
 				3706FA71293F65D500E42796 /* BrowserServicesKit */,
 				3706FA76293F65D500E42796 /* ContentBlocking */,
 				3706FA77293F65D500E42796 /* PrivacyDashboard */,
@@ -8766,6 +8765,7 @@
 				4BCBE4572BA7E17800FC75A1 /* SubscriptionUI */,
 				85D44B872BA08D30001B4AB5 /* Suggestions */,
 				4BCBE4592BA7E17800FC75A1 /* Subscription */,
+				9FF521472BAA909C00B9819B /* Lottie */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -9040,7 +9040,6 @@
 				4B9579362AC7AE700062CA31 /* SyncUI */,
 				4B9579372AC7AE700062CA31 /* SwiftUIExtensions */,
 				4B9579382AC7AE700062CA31 /* OpenSSL */,
-				4B95793A2AC7AE700062CA31 /* Lottie */,
 				4B95793C2AC7AE700062CA31 /* SyncDataProviders */,
 				4B95793D2AC7AE700062CA31 /* NetworkProtectionUI */,
 				4B95793E2AC7AE700062CA31 /* NetworkProtection */,
@@ -9056,6 +9055,7 @@
 				85E2BBD12B8F536F00DBEC7A /* History */,
 				F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */,
 				85D44B892BA08D3B001B4AB5 /* Suggestions */,
+				9FF521492BAA90C400B9819B /* Lottie */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -9210,7 +9210,6 @@
 				37BA812C29B3CD690053F1A3 /* SyncUI */,
 				378F44E329B4BDE900899924 /* SwiftUIExtensions */,
 				371D00E029D8509400EC8598 /* OpenSSL */,
-				4B2AAAF429E70DEA0026AFC0 /* Lottie */,
 				37DF000429F9C056002B7D3E /* SyncDataProviders */,
 				4B4D60B02A0C83B900BCD287 /* NetworkProtectionUI */,
 				EE7295E22A545B9A008C0991 /* NetworkProtection */,
@@ -9228,6 +9227,7 @@
 				1EA7B8D42B7E078C000330A4 /* Subscription */,
 				F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */,
 				85D44B852BA08D29001B4AB5 /* Suggestions */,
+				9FF521452BAA908500B9819B /* Lottie */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -9364,10 +9364,10 @@
 				9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
 				B6EC37F529B5DAAC001ACE79 /* XCRemoteSwiftPackageReference "swifter" */,
 				371D00DF29D8509400EC8598 /* XCRemoteSwiftPackageReference "OpenSSL-XCFramework" */,
-				4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 				B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */,
 				F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */,
+				9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -14102,14 +14102,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		3706FA6E293F65D500E42796 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/airbnb/lottie-ios";
-			requirement = {
-				kind = exactVersion;
-				version = 3.3.0;
-			};
-		};
 		3706FA72293F65D500E42796 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
@@ -14132,14 +14124,6 @@
 			requirement = {
 				kind = exactVersion;
 				version = 3.1.4000;
-			};
-		};
-		4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/duckduckgo/lottie-ios.git";
-			requirement = {
-				kind = exactVersion;
-				version = 3.3.0;
 			};
 		};
 		4B95792A2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -14166,20 +14150,20 @@
 				version = 3.1.2000;
 			};
 		};
-		4B95793B2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/duckduckgo/lottie-ios.git";
-			requirement = {
-				kind = exactVersion;
-				version = 3.3.0;
-			};
-		};
 		9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
 				version = 132.0.1;
+			};
+		};
+		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = exactVersion;
+				version = 4.4.1;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -14287,11 +14271,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3706FA6C293F65D500E42796 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
 			productName = TrackerRadarKit;
-		};
-		3706FA6D293F65D500E42796 /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3706FA6E293F65D500E42796 /* XCRemoteSwiftPackageReference "lottie-ios" */;
-			productName = Lottie;
 		};
 		3706FA71293F65D500E42796 /* BrowserServicesKit */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -14435,11 +14414,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = PixelKit;
 		};
-		4B2AAAF429E70DEA0026AFC0 /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */;
-			productName = Lottie;
-		};
 		4B2D062B2A11C0E100DE1F49 /* Networking */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
@@ -14552,11 +14526,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B9579392AC7AE700062CA31 /* XCRemoteSwiftPackageReference "OpenSSL-XCFramework" */;
 			productName = OpenSSL;
-		};
-		4B95793A2AC7AE700062CA31 /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4B95793B2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "lottie-ios" */;
-			productName = Lottie;
 		};
 		4B95793C2AC7AE700062CA31 /* SyncDataProviders */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -14802,6 +14771,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Networking;
+		};
+		9FF521452BAA908500B9819B /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+		9FF521472BAA909C00B9819B /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+		9FF521492BAA90C400B9819B /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
 		};
 		AA06B6B62672AF8100F541C5 /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;
