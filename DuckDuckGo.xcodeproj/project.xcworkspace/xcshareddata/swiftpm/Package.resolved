@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "michal/cache-fixes",
-        "revision" : "04e9b7aaa887b0a639cfd23c92b6949cc20da4f8"
+        "revision" : "1ba3e3682b9231a1d8685f1d16f950e7910b8593",
+        "version" : "127.1.1"
       }
     },
     {
