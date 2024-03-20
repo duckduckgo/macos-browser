@@ -87,7 +87,7 @@ final class ScanOperation: DataBrokerOperation {
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) async {
+    func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async {
         complete(profiles)
         await executeNextStep()
     }

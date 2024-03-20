@@ -69,7 +69,20 @@ extension DataBrokerOperation {
 
     // MARK: - Shared functions
 
+    // swiftlint:disable:next cyclomatic_complexity
     func runNextAction(_ action: Action) async {
+        switch action {
+        case is GetCaptchaInfoAction:
+            stageCalculator?.setStage(.captchaParse)
+        case is ClickAction:
+            stageCalculator?.setStage(.fillForm)
+        case is FillFormAction:
+            stageCalculator?.setStage(.fillForm)
+        case is ExpectationAction:
+            stageCalculator?.setStage(.submit)
+        default: ()
+        }
+
         if let emailConfirmationAction = action as? EmailConfirmationAction {
             do {
                 stageCalculator?.fireOptOutSubmit()
@@ -107,10 +120,6 @@ extension DataBrokerOperation {
                 await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
                 return
             }
-        }
-
-        if action as? GetCaptchaInfoAction != nil {
-            stageCalculator?.setStage(.captchaParse)
         }
 
         await webViewHandler?.execute(action: action, data: .userData(query.profileQuery, self.extractedProfile))
@@ -176,7 +185,11 @@ extension DataBrokerOperation {
     func success(actionId: String, actionType: ActionType) async {
         switch actionType {
         case .click:
+            stageCalculator?.fireOptOutFillForm()
             try? await webViewHandler?.waitForWebViewLoad(timeoutInSeconds: 30)
+            await executeNextStep()
+        case .fillForm:
+            stageCalculator?.fireOptOutFillForm()
             await executeNextStep()
         default: await executeNextStep()
         }

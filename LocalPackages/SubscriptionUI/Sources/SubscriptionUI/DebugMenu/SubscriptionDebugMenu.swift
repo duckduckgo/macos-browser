@@ -271,7 +271,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     private func askAndUpdateEnvironment(to newEnvironmentString: String) {
         let alert = makeAlert(title: "Are you sure you want to change the environment to \(newEnvironmentString.capitalized)",
-                              message: "Please make sure you have manually removed your current active Subscription and reset all related features. \nYou may also need to change environment of related features e.g. Network Protection's to a matching one.",
+                              message: "Please make sure you have manually removed your current active Subscription and reset all related features. \nYou may also need to change environment of related features.",
                               buttonNames: ["Yes", "No"])
         let response = alert.runModal()
 

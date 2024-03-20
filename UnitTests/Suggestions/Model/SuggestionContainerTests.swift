@@ -17,7 +17,7 @@
 //
 
 import XCTest
-import BrowserServicesKit
+import Suggestions
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SuggestionContainerTests: XCTestCase {

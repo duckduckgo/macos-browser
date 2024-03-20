@@ -204,7 +204,7 @@ public final class PixelKit {
 
     private func printDebugInfo(pixelName: String, parameters: [String: String], skipped: Bool = false) {
 #if DEBUG
-        let params = parameters.filter { key, _ in !["appVersion", "test"].contains(key) }
+        let params = parameters.filter { key, _ in !["test"].contains(key) }
         os_log(.debug, log: log, "👾 [%{public}@] %{public}@ %{public}@", skipped ? "SKIPPED" : "FIRED", pixelName.replacingOccurrences(of: "_", with: "."), params)
 #endif
     }
@@ -377,7 +377,6 @@ extension Dictionary where Key == String, Value == String {
 
         self[PixelKit.Parameters.errorCode] = "\(nsError.code)"
         self[PixelKit.Parameters.errorDomain] = nsError.domain
-        self[PixelKit.Parameters.errorDesc] = nsError.localizedDescription
 
         if let error = error as? PixelKitEventErrorDetails,
            let underlyingError = error.underlyingError {
@@ -385,7 +384,6 @@ extension Dictionary where Key == String, Value == String {
             let underlyingNSError = underlyingError as NSError
             self[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingNSError.code)"
             self[PixelKit.Parameters.underlyingErrorDomain] = underlyingNSError.domain
-            self[PixelKit.Parameters.underlyingErrorDesc] = underlyingNSError.localizedDescription
         } else if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
             self[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
             self[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain

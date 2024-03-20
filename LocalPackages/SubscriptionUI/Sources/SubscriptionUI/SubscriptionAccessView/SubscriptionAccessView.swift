@@ -115,6 +115,7 @@ public struct SubscriptionAccessView: View {
                 Button("Cancel") {
                     dismiss()
                 }
+                .buttonStyle(DismissActionButtonStyle())
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)

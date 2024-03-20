@@ -1,0 +1,51 @@
+{
+  "name": "People-Wizard.com",
+  "url": "people-wizard.com",
+  "version": "0.1.6",
+  "parent": "peoplewhiz.com",
+  "addedDatetime": 1709445600000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "19d2fe20-8de2-4719-b6af-d6e405544697",
+          "url": "https://www.people-wizard.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+        },
+        {
+          "actionType": "extract",
+          "id": "1344b079-bb6b-417b-9c4d-eec858914b13",
+          "selector": "[class^='ResultsTable__Record-sc']",
+          "profile": {
+            "name": {
+              "selector": "[class^='ResultsTable__Name-sc']"
+            },
+            "age": {
+              "selector": "[class^='ResultsTable__Age-sc']"
+            },
+            "addressCityState": {
+              "selector": ".MuiGrid-item:nth-child(3) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".MuiGrid-item:nth-child(4) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}
