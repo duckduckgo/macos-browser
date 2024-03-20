@@ -23,6 +23,10 @@ import WebKit
 import Configuration
 import History
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
+
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
@@ -716,11 +720,15 @@ extension MainViewController {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
+<<<<<<< Updated upstream
 
         // Aid to transition VPN from waitlist to subscription
         // by resetting this we allow users to go back to waitlist
         // and re-test.
         resetThankYouModalChecks(nil)
+=======
+        UserDefaults.netP.networkProtectionEntitlementsExpired = false
+>>>>>>> Stashed changes
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
