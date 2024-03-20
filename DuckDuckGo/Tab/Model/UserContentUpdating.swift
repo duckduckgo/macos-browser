@@ -50,13 +50,13 @@ final class UserContentUpdating {
          privacyConfigurationManager: PrivacyConfigurationManaging,
          trackerDataManager: TrackerDataManager,
          configStorage: ConfigurationStoring,
-         privacySecurityPreferences: PrivacySecurityPreferences,
+         webTrackingProtectionPreferences: WebTrackingProtectionPreferences,
          tld: TLD) {
 
         let makeValue: (Update) -> NewContent = { rulesUpdate in
             let sourceProvider = ScriptSourceProvider(configStorage: configStorage,
                                                       privacyConfigurationManager: privacyConfigurationManager,
-                                                      privacySettings: privacySecurityPreferences,
+                                                      webTrackingProtectionPreferences: webTrackingProtectionPreferences,
                                                       contentBlockingManager: contentBlockerRulesManager,
                                                       trackerDataManager: trackerDataManager,
                                                       tld: tld)
@@ -78,7 +78,7 @@ final class UserContentUpdating {
         // 1. Collect updates from ContentBlockerRulesManager and generate UserScripts based on its output
         cancellable = contentBlockerRulesManager.updatesPublisher
             // regenerate UserScripts on gpcEnabled preference updated
-            .combineLatest(privacySecurityPreferences.$gpcEnabled)
+            .combineLatest(webTrackingProtectionPreferences.$isGPCEnabled)
             .map { $0.0 } // drop gpcEnabled value: $0.1
             .combineLatest(onNotificationWithInitial(.autofillUserSettingsDidChange), combine)
             .combineLatest(onNotificationWithInitial(.autofillScriptDebugSettingsDidChange), combine)
