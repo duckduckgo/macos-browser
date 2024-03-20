@@ -81,9 +81,10 @@ final class NetworkProtectionAppEvents {
     /// Call this method when the app becomes active to run the associated NetP logic.
     ///
     func applicationDidBecomeActive() {
-        Task { @MainActor in
-            try await Task.sleep(nanoseconds: 10 * NSEC_PER_MSEC)
-            await featureVisibility.disableIfUserHasNoAccess()
+        if NSApp.runType != .uiTests {
+            Task { @MainActor in
+                await featureVisibility.disableIfUserHasNoAccess()
+            }
         }
     }
 
