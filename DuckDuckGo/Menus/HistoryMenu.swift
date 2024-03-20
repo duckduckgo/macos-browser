@@ -94,10 +94,11 @@ final class HistoryMenu: NSMenu {
         switch RecentlyClosedCoordinator.shared.cache.last {
         case is RecentlyClosedWindow:
             reopenLastClosedMenuItem.title = UserText.reopenLastClosedWindow
+            reopenLastClosedMenuItem.setAccessibilityIdentifier("HistoryMenu.reopenLastClosedWindow")
         default:
             reopenLastClosedMenuItem.title = UserText.reopenLastClosedTab
+            reopenLastClosedMenuItem.setAccessibilityIdentifier("HistoryMenu.reopenLastClosedTab")
         }
-        reopenLastClosedMenuItem.setAccessibilityIdentifier("HistoryMenu.reopenLastClosedWindowOrTab")
 
     }
 
