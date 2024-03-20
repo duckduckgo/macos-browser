@@ -22,6 +22,10 @@ import NetworkProtection
 import ServiceManagement
 import AppKit
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 /// Class that implements the necessary logic to ensure the VPN is enabled, or prevent the app from running otherwise.
 ///
 final class NetworkProtectionBouncer {
@@ -30,13 +34,31 @@ final class NetworkProtectionBouncer {
     /// current app.
     ///
     func requireAuthTokenOrKillApp(controller: TunnelController) async {
+#if SUBSCRIPTION
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        let result = await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        switch result {
+        case .success(true):
+            return
+        case .failure:
+            break
+        case .success(false):
+            os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing entitlement.")
+            await controller.stop()
+
+            // EXIT_SUCCESS ensures the login item won't relaunch
+            // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
+            // See where it mentions:
+            //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
+            exit(EXIT_SUCCESS)
+        }
+#endif
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
                                                                 errorEvents: nil,
                                                                 isSubscriptionEnabled: false,
                                                                 accessTokenProvider: { nil })
-
         guard keychainStore.isFeatureActivated else {
-            os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized.")
+            os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing token.")
 
             await controller.stop()
 
