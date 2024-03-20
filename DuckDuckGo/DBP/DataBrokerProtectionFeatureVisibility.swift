@@ -22,6 +22,7 @@ import Foundation
 import BrowserServicesKit
 import Common
 import DataBrokerProtection
+import Subscription
 
 protocol DataBrokerProtectionFeatureVisibility {
     func isFeatureVisible() -> Bool
@@ -36,9 +37,9 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
-
-    @UserDefaultsWrapper(key: .dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro, defaultValue: false)
-    var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool
+    private let waitlistStorage: WaitlistStorage
+    private let subscriptionAvailability: SubscriptionFeatureAvailability
+    private let dataBrokerProtectionKey = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
 
     /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
     static var bypassWaitlist = false
@@ -46,11 +47,15 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler(),
          pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
-         userDefaults: UserDefaults = .standard) {
+         userDefaults: UserDefaults = .standard,
+         waitlistStorage: WaitlistStorage = DataBrokerProtectionWaitlist().waitlistStorage,
+         subscriptionAvailability: SubscriptionFeatureAvailability = NSApp.delegateTyped.subscriptionFeatureAvailability) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
+        self.waitlistStorage = waitlistStorage
+        self.subscriptionAvailability = subscriptionAvailability
     }
 
     var waitlistIsOngoing: Bool {
@@ -89,16 +94,16 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     }
 
     private var isWaitlistUser: Bool {
-        DataBrokerProtectionWaitlist().waitlistStorage.isWaitlistUser
+        waitlistStorage.isWaitlistUser
     }
 
     private var wasWaitlistUser: Bool {
-        DataBrokerProtectionWaitlist().waitlistStorage.getWaitlistInviteCode() != nil
+        waitlistStorage.getWaitlistInviteCode() != nil
     }
 
     func isPrivacyProEnabled() -> Bool {
 #if SUBSCRIPTION
-        return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
+        return subscriptionAvailability.isFeatureAvailable
 #else
         return false
 #endif
@@ -125,10 +130,10 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     }
 
     /// Returns true if a cleanup was performed, false otherwise
-    func cleanUpDBPForPrivacyProIfNecessary() -> Bool {
-        if isPrivacyProEnabled() && wasWaitlistUser && !dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro {
+     func cleanUpDBPForPrivacyProIfNecessary() -> Bool {
+        if isPrivacyProEnabled() && wasWaitlistUser && !fetchMigrationCleanedUpFlag() {
             disableAndDeleteForWaitlistUsers()
-            dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = true
+            setMigrationCleanedUpFlag(true)
             return true
         } else {
             return false
@@ -150,6 +155,28 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         } else {
             return isWaitlistEnabled && isWaitlistBetaActive
         }
+    }
+
+    private func setMigrationCleanedUpFlag(_ flag: Bool) {
+        userDefaults.set(flag, forKey: dataBrokerProtectionKey)
+    }
+
+    private func fetchMigrationCleanedUpFlag() -> Bool {
+        userDefaults.bool(forKey: dataBrokerProtectionKey)
+    }
+}
+
+protocol SubscriptionFeatureAvailabilityWrapper {
+    var isFeatureAvailable: Bool { get }
+}
+
+struct DefaultSubscriptionFeatureAvailabilityWrapper: SubscriptionFeatureAvailabilityWrapper {
+    var isFeatureAvailable: Bool {
+#if SUBSCRIPTION
+        return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
+#else
+        return false
+#endif
     }
 }
 
