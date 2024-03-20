@@ -24,7 +24,7 @@ import NetworkProtection
 import Common
 
 extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStorage {
-    
+
     public var accessToken: String? {
         get {
             guard var token = try? fetchToken() else { return nil }
@@ -42,12 +42,12 @@ extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStorage {
             }
         }
     }
-    
+
     public var authToken: String? {
         get { nil }
         set(newValue) { }
     }
-    
+
     public func clear() {
         try? deleteToken()
     }

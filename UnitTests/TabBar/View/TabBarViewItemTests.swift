@@ -179,7 +179,6 @@ final class TabBarViewItemTests: XCTestCase {
         tabBarViewItem.tabLoadingPermissionLeadingConstraint = constraints
         tabBarViewItem.closeButton = mouseButton
 
-
         // Update url
         let tab = Tab(content: .subscription(SubscriptionURLType.purchase.url))
         delegate.mockedCurrentTab = tab

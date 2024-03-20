@@ -88,7 +88,20 @@ final class UserScripts: UserScriptsProvider {
 
 #if SUBSCRIPTION
         if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
-            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
+
+            guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window,
+                let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else {
+                assertionFailure("Missing UI components")
+                return
+            }
+
+            let uiHandler = SubscriptionUIHandler(window: window,
+                                                  subscriptionManager: NSApp.delegateTyped.subscriptionManager,
+                                                  mainViewController: mainViewController)
+
+            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature(uiHandler: uiHandler,
+                                                                                                             subscriptionManager: NSApp.delegateTyped.subscriptionManager,
+                                                                                                             accountManager: NSApp.delegateTyped.subscriptionManager.accountManager))
             userScripts.append(subscriptionPagesUserScript)
 
             identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())

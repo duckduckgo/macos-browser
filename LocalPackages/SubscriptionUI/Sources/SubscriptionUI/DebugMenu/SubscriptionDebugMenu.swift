@@ -276,7 +276,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
         guard case .alertFirstButtonReturn = response else { return }
 
-
         if let configuration = subscriptionManager.configuration as? DebugSubscriptionConfiguration {
             configuration.updateServiceEnvironment(to: newEnvironment)
             persistSubscriptionServiceEnvironment(newEnvironment)

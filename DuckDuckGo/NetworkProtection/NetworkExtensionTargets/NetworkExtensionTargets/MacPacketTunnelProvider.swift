@@ -293,7 +293,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 //            accessTokenStorage: tokenStore,
 //            entitlementsCache: UserDefaultsCache<[Entitlement]>(key: UserDefaultsCacheKey.subscriptionEntitlements)
 //        )
-        //TODO: Not sure if netp should enforce the subs env
+        // TODO: Not sure if netp should enforce the subs env
 //        SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
 
         let serviceEnvironment: SubscriptionServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging

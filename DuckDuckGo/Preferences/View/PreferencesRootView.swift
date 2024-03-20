@@ -180,7 +180,8 @@ enum Preferences {
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
-                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow { _ in }
+                    // TODO: fire in some other way, notification?
+//                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow { _ in }
                 }
             },
                                                                       openURLHandler: openURL,

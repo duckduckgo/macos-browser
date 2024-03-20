@@ -3268,6 +3268,12 @@
 		EEDE50122BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */; };
 		EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
+		F1D42FEF2BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D42FEE2BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift */; };
+		F1D42FF02BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D42FEE2BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift */; };
+		F1D42FF12BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D42FEE2BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift */; };
+		F1D42FF42BAB28870092D1ED /* SubscriptionUIHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D42FF32BAB28870092D1ED /* SubscriptionUIHandler.swift */; };
+		F1D42FF52BAB28870092D1ED /* SubscriptionUIHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D42FF32BAB28870092D1ED /* SubscriptionUIHandler.swift */; };
+		F1D42FF62BAB28870092D1ED /* SubscriptionUIHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D42FF32BAB28870092D1ED /* SubscriptionUIHandler.swift */; };
 		F1D43AEE2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
 		F1D43AEF2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
 		F1D43AF02B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */; };
@@ -4661,6 +4667,8 @@
 		EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+VPNAgentConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
+		F1D42FEE2BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPagesUseSubscriptionFeature.swift; sourceTree = "<group>"; };
+		F1D42FF32BAB28870092D1ED /* SubscriptionUIHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionUIHandler.swift; sourceTree = "<group>"; };
 		F1D43AED2B98D8DF00BAB743 /* MainMenuActions+VanillaBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MainMenuActions+VanillaBrowser.swift"; sourceTree = "<group>"; };
 		F41D174025CB131900472416 /* NSColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSColorExtension.swift; sourceTree = "<group>"; };
 		F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppearanceExtension.swift; sourceTree = "<group>"; };
@@ -8425,7 +8433,7 @@
 				4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */,
 				856CADEF271710F400E79BB0 /* HoverUserScript.swift */,
 				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
-				1E0C72052ABC63BD00802009 /* SubscriptionPagesUserScript.swift */,
+				F1D42FF22BAB224A0092D1ED /* Subscription */,
 				1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */,
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
 			);
@@ -8646,6 +8654,16 @@
 				EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */,
 			);
 			path = JSAlert;
+			sourceTree = "<group>";
+		};
+		F1D42FF22BAB224A0092D1ED /* Subscription */ = {
+			isa = PBXGroup;
+			children = (
+				1E0C72052ABC63BD00802009 /* SubscriptionPagesUserScript.swift */,
+				F1D42FEE2BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift */,
+				F1D42FF32BAB28870092D1ED /* SubscriptionUIHandler.swift */,
+			);
+			path = Subscription;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -10404,6 +10422,7 @@
 				B66260E829ACD0C900E9E3EE /* DuckPlayerTabExtension.swift in Sources */,
 				3706FBAA293F65D500E42796 /* HoverUserScript.swift in Sources */,
 				3706FBAC293F65D500E42796 /* MainMenuActions.swift in Sources */,
+				F1D42FF52BAB28870092D1ED /* SubscriptionUIHandler.swift in Sources */,
 				4BF97AD92B43C5C000EB4240 /* Bundle+VPN.swift in Sources */,
 				3706FBAE293F65D500E42796 /* DataImport.swift in Sources */,
 				3706FBAF293F65D500E42796 /* FireproofDomains.xcdatamodeld in Sources */,
@@ -10686,6 +10705,7 @@
 				3706FC71293F65D500E42796 /* NSColorExtension.swift in Sources */,
 				1DB9618229F67F6100CF5568 /* FaviconNullStore.swift in Sources */,
 				3706FC73293F65D500E42796 /* AddressBarButtonsViewController.swift in Sources */,
+				F1D42FF02BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift in Sources */,
 				3706FC76293F65D500E42796 /* PixelDataRecord.swift in Sources */,
 				7BFE955A2A9DF4550081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift in Sources */,
 				9FDA6C222B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */,
@@ -11371,6 +11391,7 @@
 				4B9579C92AC7AE700062CA31 /* SetExtension.swift in Sources */,
 				4B9579CA2AC7AE700062CA31 /* YoutubePlayerNavigationHandler.swift in Sources */,
 				4B9579CB2AC7AE700062CA31 /* PreferencesAboutView.swift in Sources */,
+				F1D42FF62BAB28870092D1ED /* SubscriptionUIHandler.swift in Sources */,
 				4B9579CC2AC7AE700062CA31 /* ContentBlocking.swift in Sources */,
 				4B37EE792B4CFF6F00A89A61 /* DataBrokerProtectionRemoteMessage.swift in Sources */,
 				4B9579CD2AC7AE700062CA31 /* LocalAuthenticationService.swift in Sources */,
@@ -11663,6 +11684,7 @@
 				4B957AC22AC7AE700062CA31 /* FindInPageViewController.swift in Sources */,
 				4B957AC32AC7AE700062CA31 /* Cryptography.swift in Sources */,
 				4B957AC42AC7AE700062CA31 /* BWVault.swift in Sources */,
+				F1D42FF12BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift in Sources */,
 				4B957AC52AC7AE700062CA31 /* NSViewExtension.swift in Sources */,
 				BBDFDC5C2B2B8D7000F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */,
 				9FA173E52B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */,
@@ -12136,6 +12158,7 @@
 				4BBDEE9428FC14760092FAA6 /* ConnectBitwardenViewController.swift in Sources */,
 				1DDF076428F815AD00EDFBE3 /* BWManager.swift in Sources */,
 				9833912F27AAA3CE00DAF119 /* AppTrackerDataSetProvider.swift in Sources */,
+				F1D42FF42BAB28870092D1ED /* SubscriptionUIHandler.swift in Sources */,
 				B65211252B29A42C00B30633 /* BookmarkStoreMock.swift in Sources */,
 				4BA1A6B3258B080A00F6F690 /* EncryptionKeyGeneration.swift in Sources */,
 				37B11B3928095E6600CBB621 /* TabLazyLoader.swift in Sources */,
@@ -12399,6 +12422,7 @@
 				56D6A3D629DB2BAB0055215A /* ContinueSetUpView.swift in Sources */,
 				B6B5F5842B03580A008DB58A /* RequestFilePermissionView.swift in Sources */,
 				4B1E6EEE27AB5E5100F51793 /* PasswordManagementListSection.swift in Sources */,
+				F1D42FEF2BAB22450092D1ED /* SubscriptionPagesUseSubscriptionFeature.swift in Sources */,
 				31C9ADE52AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */,
 				AA222CB92760F74E00321475 /* FaviconReferenceCache.swift in Sources */,
 				4B9292A126670D2A00AD2C21 /* BookmarkTreeController.swift in Sources */,
