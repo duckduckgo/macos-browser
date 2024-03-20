@@ -15,12 +15,16 @@
 
 #include "../Common.xcconfig"
 
+CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] =
+CODE_SIGN_STYLE[config=Review][sdk=macosx*] = Manual
+CODE_SIGNING_ALLOWED[config=Review][sdk=macosx*] = NO
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 CODE_SIGN_STYLE[config=CI][sdk=macosx*] = Manual
 CODE_SIGNING_ALLOWED[config=CI][sdk=macosx*] = NO
 COPY_PHASE_STRIP = NO
 DEAD_CODE_STRIPPING = YES
 DEVELOPMENT_TEAM[config=CI][sdk=macosx*] =
+DEVELOPMENT_TEAM[config=Review][sdk=macosx*] =
 ENABLE_USER_SCRIPT_SANDBOXING = YES
 GCC_NO_COMMON_BLOCKS = YES
 GENERATE_INFOPLIST_FILE = YES

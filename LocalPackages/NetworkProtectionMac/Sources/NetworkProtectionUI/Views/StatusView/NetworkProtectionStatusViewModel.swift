@@ -18,14 +18,13 @@
 
 import Combine
 import LoginItems
-import Macros
 import NetworkExtension
 import NetworkProtection
 import ServiceManagement
 import SwiftUI
 
-/// This view can be shown from any location where we want the user to be able to interact with NetP.
-/// This view shows status information about Network Protection, and offers a chance to toggle it ON and OFF.
+/// This view can be shown from any location where we want the user to be able to interact with VPN.
+/// This view shows status information about the VPN, and offers a chance to toggle it ON and OFF.
 ///
 extension NetworkProtectionStatusView {
 
@@ -58,7 +57,7 @@ extension NetworkProtectionStatusView {
         private(set) var onboardingStatus: OnboardingStatus = .completed
 
         var tunnelControllerViewDisabled: Bool {
-            onboardingStatus != .completed || loginItemNeedsApproval
+            onboardingStatus != .completed || loginItemNeedsApproval || shouldShowSubscriptionExpired
         }
 
         @MainActor
@@ -95,6 +94,10 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
+        private let appLauncher: AppLaunching
+
+        private let uninstallHandler: () async -> Void
+
         private var cancellables = Set<AnyCancellable>()
 
         // MARK: - Dispatch Queues
@@ -114,7 +117,9 @@ extension NetworkProtectionStatusView {
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
                     isMenuBarStatusView: Bool,
-                    runLoopMode: RunLoop.Mode? = nil) {
+                    runLoopMode: RunLoop.Mode? = nil,
+                    userDefaults: UserDefaults,
+                    uninstallHandler: @escaping () async -> Void) {
 
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -124,6 +129,8 @@ extension NetworkProtectionStatusView {
             self.agentLoginItem = agentLoginItem
             self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
+            self.appLauncher = appLauncher
+            self.uninstallHandler = uninstallHandler
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
@@ -147,8 +154,14 @@ extension NetworkProtectionStatusView {
             onboardingStatusPublisher
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] status in
-                    self?.onboardingStatus = status
-                }
+                self?.onboardingStatus = status
+            }
+            .store(in: &cancellables)
+
+            userDefaults
+                .publisher(for: \.networkProtectionEntitlementsExpired)
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.shouldShowSubscriptionExpired, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }
 
@@ -160,8 +173,20 @@ extension NetworkProtectionStatusView {
             if #available(macOS 13.0, *) {
                 SMAppService.openSystemSettingsLoginItems()
             } else {
-                let loginItemsURL = #URL("x-apple.systempreferences:com.apple.LoginItems-Settings.extension")
+                let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension")!
                 NSWorkspace.shared.open(loginItemsURL)
+            }
+        }
+
+        func openPrivacyPro() {
+            Task {
+                await appLauncher.launchApp(withCommand: .showPrivacyPro)
+            }
+        }
+
+        func uninstallVPN() {
+            Task {
+                await uninstallHandler()
             }
         }
 
@@ -280,6 +305,9 @@ extension NetworkProtectionStatusView {
         // MARK: - Child View Models
 
         let tunnelControllerViewModel: TunnelControllerViewModel
+
+        @Published
+        var shouldShowSubscriptionExpired: Bool = false
 
         var promptActionViewModel: PromptActionView.Model? {
 #if !APPSTORE && !DEBUG

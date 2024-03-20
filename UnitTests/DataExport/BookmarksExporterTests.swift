@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -25,10 +24,10 @@ import XCTest
 class BookmarksExporterTests: XCTestCase {
 
     struct TestData {
-        static let exampleUrl = #URL("https://example.com")
+        static let exampleUrl = URL(string: "https://example.com")!
         static let exampleTitle = "Example"
 
-        static let otherUrl = #URL("https://other.com")
+        static let otherUrl = URL(string: "https://other.com")!
         static let otherTitle = "Other"
 
         static let titleWithUnescapedHTMLEntities = "< > &"

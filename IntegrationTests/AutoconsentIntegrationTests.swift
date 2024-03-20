@@ -18,7 +18,6 @@
 
 import Combine
 import Common
-import Macros
 import PrivacyDashboard
 import XCTest
 
@@ -40,7 +39,7 @@ class AutoconsentIntegrationTests: XCTestCase {
     @MainActor
     override func setUp() {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         window = WindowsManager.openNewWindow(with: Tab(content: .none))
     }
@@ -50,7 +49,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         window.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
@@ -58,9 +57,8 @@ class AutoconsentIntegrationTests: XCTestCase {
     @MainActor
     func testWhenAutoconsentEnabled_cookieConsentManaged() async throws {
         // enable the feature
-        PrivacySecurityPreferences.shared.autoconsentEnabled = true
-        let url = #URL("http://privacy-test-pages.site/features/autoconsent/")
-
+        CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/")!
         let tab = self.tabViewModel.tab
 
         // expect cookieConsentManaged to be published
@@ -85,9 +83,8 @@ class AutoconsentIntegrationTests: XCTestCase {
     @MainActor
     func testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
         // enable the feature
-        PrivacySecurityPreferences.shared.autoconsentEnabled = true
-        let url = #URL("http://privacy-test-pages.site/features/autoconsent/banner.html")
-
+        CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/banner.html")!
         let tab = self.tabViewModel.tab
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
@@ -136,9 +133,8 @@ class AutoconsentIntegrationTests: XCTestCase {
     @MainActor
     func testCosmeticRule_whenFakeCookieBannerIsDisplayedAndScriptsAreReloaded_bannerIsHidden() async throws {
         // enable the feature
-        PrivacySecurityPreferences.shared.autoconsentEnabled = true
-        let url = #URL("http://privacy-test-pages.site/features/autoconsent/banner.html")
-
+        CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/banner.html")!
         let tab = self.tabViewModel.tab
         // expect `cosmetic` to be published
         let cookieConsentManagedPromise = tab.privacyInfoPublisher
@@ -161,8 +157,8 @@ class AutoconsentIntegrationTests: XCTestCase {
             os_log("navigationResponse: %s", "\(String(describing: response))")
 
             // cause UserScripts reload (ContentBlockingUpdating)
-            PrivacySecurityPreferences.shared.gpcEnabled = true
-            PrivacySecurityPreferences.shared.gpcEnabled = false
+            WebTrackingProtectionPreferences.shared.isGPCEnabled = true
+            WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
             return .allow
         })

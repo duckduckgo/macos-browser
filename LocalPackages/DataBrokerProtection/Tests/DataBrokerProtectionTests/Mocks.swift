@@ -21,7 +21,6 @@ import Combine
 import Common
 import Foundation
 import GRDB
-import Macros
 import SecureStorage
 
 @testable import DataBrokerProtection
@@ -67,6 +66,8 @@ final class InternalUserDeciderStoreMock: InternalUserStoring {
 }
 
 final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
+    var toggleProtectionsCounter: ToggleProtectionsCounter = ToggleProtectionsCounter(eventReporting: nil)
+
     var currentConfig: Data = Data()
 
     var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
@@ -213,6 +214,14 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasExecuteJavascriptCalled = true
     }
 
+    func takeSnaphost(path: String, fileName: String) async throws {
+
+    }
+
+    func saveHTML(path: String, fileName: String) async throws {
+
+    }
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil
@@ -241,7 +250,7 @@ final class EmailServiceMock: EmailServiceProtocol {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return #URL("https://www.duckduckgo.com")
+        return URL(string: "https://www.duckduckgo.com")!
     }
 
     func reset() {
@@ -823,5 +832,76 @@ final class MockAppVersion: AppVersionNumberProvider {
 
     init(versionNumber: String) {
         self.versionNumber = versionNumber
+    }
+}
+
+final class MockStageDurationCalculator: StageDurationCalculator {
+    var stage: Stage?
+
+    func durationSinceLastStage() -> Double {
+        return 0.0
+    }
+
+    func durationSinceStartTime() -> Double {
+        return 0.0
+    }
+
+    func fireOptOutStart() {
+    }
+
+    func fireOptOutEmailGenerate() {
+    }
+
+    func fireOptOutCaptchaParse() {
+    }
+
+    func fireOptOutCaptchaSend() {
+    }
+
+    func fireOptOutCaptchaSolve() {
+    }
+
+    func fireOptOutSubmit() {
+    }
+
+    func fireOptOutEmailReceive() {
+    }
+
+    func fireOptOutEmailConfirm() {
+    }
+
+    func fireOptOutValidate() {
+    }
+
+    func fireOptOutSubmitSuccess(tries: Int) {
+    }
+
+    func fireOptOutFillForm() {
+    }
+
+    func fireOptOutFailure(tries: Int) {
+    }
+
+    func fireScanSuccess(matchesFound: Int) {
+    }
+
+    func fireScanFailed() {
+    }
+
+    func fireScanError(error: any Error) {
+    }
+
+    func setStage(_ stage: DataBrokerProtection.Stage) {
+        self.stage = stage
+    }
+
+    func setEmailPattern(_ emailPattern: String?) {
+    }
+
+    func setLastActionId(_ actionID: String) {
+    }
+
+    func clear() {
+        self.stage = nil
     }
 }

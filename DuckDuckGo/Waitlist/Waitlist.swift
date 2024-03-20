@@ -155,7 +155,7 @@ extension ProductWaitlistRequest {
     }
 }
 
-// MARK: - Network Protection Waitlist
+// MARK: - VPN Waitlist
 
 struct NetworkProtectionWaitlist: Waitlist {
 
@@ -234,7 +234,7 @@ struct NetworkProtectionWaitlist: Waitlist {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
                         sendInviteCodeAvailableNotification {
-                            DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                            DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
                         }
                         completion(nil)
                     } catch {

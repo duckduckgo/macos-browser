@@ -575,11 +575,14 @@ import SubscriptionUI
                 NSMenuItem(title: "Reset Pinned Tabs", action: #selector(MainViewController.resetPinnedTabs))
                 NSMenuItem(title: "Reset YouTube Overlay Interactions", action: #selector(MainViewController.resetDuckPlayerOverlayInteractions))
                 NSMenuItem(title: "Reset MakeDuckDuckYours user settings", action: #selector(MainViewController.resetMakeDuckDuckGoYoursUserSettings))
+                NSMenuItem(title: "Survey 10% on", action: #selector(MainViewController.in10PercentSurveyOn))
+                NSMenuItem(title: "Survey 10% off", action: #selector(MainViewController.in10PercentSurveyOff))
                 NSMenuItem(title: "Change Activation Date") {
                     NSMenuItem(title: "Today", action: #selector(MainViewController.changeInstallDateToToday), keyEquivalent: "N")
-                    NSMenuItem(title: "Less Than a 21 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan21DaysAgo))
-                    NSMenuItem(title: "More Than 21 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan21DaysAgoButLessThan27))
-                    NSMenuItem(title: "More Than 27 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan27DaysAgo))
+                    NSMenuItem(title: "Less Than a 1 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan1DayAgo(_:)))
+                    NSMenuItem(title: "More Than 1 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan1DayAgoButLessThan14(_:)))
+                    NSMenuItem(title: "More Than 14 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan14DaysAgoButLessThan15(_:)))
+                    NSMenuItem(title: "More Than 15 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan15DaysAgo(_:)))
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Daily Pixels", action: #selector(MainViewController.resetDailyPixels))
@@ -588,6 +591,9 @@ import SubscriptionUI
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
                 NSMenuItem(title: "Show Credentials Saved Popover", action: #selector(MainViewController.showCredentialsSavedPopover))
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
+                NSMenuItem(title: "Show VPN Thank You Modal", action: #selector(MainViewController.showVPNThankYouModal))
+                NSMenuItem(title: "Show PIR Thank You Modal", action: #selector(MainViewController.showPIRThankYouModal))
+                NSMenuItem(title: "Reset Thank You Modal Checks", action: #selector(MainViewController.resetThankYouModalChecks))
             }
             NSMenuItem(title: "Remote Configuration") {
                 customConfigurationUrlMenuItem
@@ -609,8 +615,10 @@ import SubscriptionUI
 #endif
 
 #if NETWORK_PROTECTION
-            NSMenuItem(title: "Network Protection")
-                .submenu(NetworkProtectionDebugMenu())
+            if case .normal = NSApp.runType {
+                NSMenuItem(title: "VPN")
+                    .submenu(NetworkProtectionDebugMenu())
+            }
 #endif
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
@@ -619,16 +627,21 @@ import SubscriptionUI
             let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
 
-            SubscriptionDebugMenu(currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
-                                  updateEnvironment: {
-                guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
-                currentEnvironmentWrapper.wrappedValue = newEnvironment
-                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment },
-                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
-                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
-                                  currentViewController: {
-                WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            }, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            SubscriptionDebugMenu(
+                currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
+                updateEnvironment: {
+                    guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
+                    currentEnvironmentWrapper.wrappedValue = newEnvironment
+                    SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment
+                    VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
+                },
+                isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                currentViewController: {
+                    WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+            },
+                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)
+            )
 #endif
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())

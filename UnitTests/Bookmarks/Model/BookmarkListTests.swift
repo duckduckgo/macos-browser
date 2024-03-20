@@ -17,22 +17,26 @@
 //
 
 import Foundation
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
 final class BookmarkListTests: XCTestCase {
 
-    func testWhenBookmarkIsInserted_ThenItIsPartOfTheList() {
+    func testWhenBookmarkIsInserted_ThenItIsPartOfTheList() throws {
         var bookmarkList = BookmarkList()
 
         let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
 
+        let result = try XCTUnwrap(bookmarkList[bookmark.url])
         XCTAssert(bookmarkList.bookmarks().count == 1)
         XCTAssert((bookmarkList.bookmarks()).first == bookmark.identifiableBookmark)
-        XCTAssertNotNil(bookmarkList[bookmark.url])
+        XCTAssertEqual(result.id, bookmark.id)
+        XCTAssertEqual(result.title, bookmark.title)
+        XCTAssertEqual(result.url, bookmark.url)
+        XCTAssertEqual(result.isFavorite, bookmark.isFavorite)
+        XCTAssertEqual(result.parentFolderUUID, bookmark.parentFolderUUID)
     }
 
     func testWhenBookmarkIsAlreadyPartOfTheListInserted_ThenItCantBeInserted() {
@@ -94,7 +98,7 @@ final class BookmarkListTests: XCTestCase {
         XCTAssertNil(updateUrlResult)
     }
 
-    func testWhenBookmarkUrlIsUpdated_ThenJustTheBookmarkUrlIsUpdated() {
+    func testWhenBookmarkUrlIsUpdated_ThenJustTheBookmarkUrlIsUpdated() throws {
         var bookmarkList = BookmarkList()
 
         let bookmarks = [
@@ -105,17 +109,20 @@ final class BookmarkListTests: XCTestCase {
         bookmarks.forEach { bookmarkList.insert($0) }
         let bookmarkToReplace = bookmarks[2]
 
-        let newBookmark = bookmarkList.updateUrl(of: bookmarkToReplace, to: URL.duckDuckGoAutocomplete.absoluteString)
+        let newBookmark = try XCTUnwrap(bookmarkList.updateUrl(of: bookmarkToReplace, to: URL.duckDuckGoAutocomplete.absoluteString))
 
+        let result = try XCTUnwrap(bookmarkList[newBookmark.url])
         XCTAssert(bookmarkList.bookmarks().count == bookmarks.count)
         XCTAssertNil(bookmarkList[bookmarkToReplace.url])
-        XCTAssertNotNil(bookmarkList[newBookmark!.url])
+        XCTAssertEqual(result.title, "Title")
+        XCTAssertEqual(result.url, URL.duckDuckGoAutocomplete.absoluteString)
+        XCTAssertTrue(result.isFavorite)
     }
 
     func testWhenBookmarkUrlIsUpdatedToAlreadyBookmarkedUrl_ThenUpdatingMustFail() {
         var bookmarkList = BookmarkList()
 
-        let firstUrl = #URL("http://wikipedia.org")
+        let firstUrl = URL(string: "http://wikipedia.org")!
         let bookmarks = [
             Bookmark(id: UUID().uuidString, url: firstUrl.absoluteString, title: "Title", isFavorite: true),
             Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "Title", isFavorite: true)
@@ -128,8 +135,49 @@ final class BookmarkListTests: XCTestCase {
 
         XCTAssert(bookmarkList.bookmarks().count == bookmarks.count)
         XCTAssertNotNil(bookmarkList[firstUrl.absoluteString])
+        XCTAssertEqual(bookmarkList[firstUrl.absoluteString]?.url, firstUrl.absoluteString)
         XCTAssertNotNil(bookmarkList[bookmarkToReplace.url])
+        XCTAssertEqual(bookmarkList[bookmarkToReplace.url]?.url, URL.duckDuckGo.absoluteString)
         XCTAssertNil(newBookmark)
+    }
+
+    func testWhenBookmarkURLTitleAndIsFavoriteIsUpdated_ThenURLTitleAndIsFavoriteIsUpdated() throws {
+        // GIVEN
+        var bookmarkList = BookmarkList()
+        let bookmarks = [
+            Bookmark(id: UUID().uuidString, url: "wikipedia.org", title: "Wikipedia", isFavorite: true),
+            Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DDG", isFavorite: true),
+            Bookmark(id: UUID().uuidString, url: "apple.com", title: "Apple", isFavorite: true)
+        ]
+        bookmarks.forEach { bookmarkList.insert($0) }
+        let bookmarkToReplace = bookmarks[2]
+        XCTAssertEqual(bookmarkList.bookmarks().count, bookmarks.count)
+        XCTAssertEqual(bookmarkList["wikipedia.org"]?.url, "wikipedia.org")
+        XCTAssertEqual(bookmarkList["wikipedia.org"]?.title, "Wikipedia")
+        XCTAssertEqual(bookmarkList["wikipedia.org"]?.isFavorite, true)
+        XCTAssertEqual(bookmarkList[URL.duckDuckGo.absoluteString]?.url, URL.duckDuckGo.absoluteString)
+        XCTAssertEqual(bookmarkList[URL.duckDuckGo.absoluteString]?.title, "DDG")
+        XCTAssertEqual(bookmarkList[URL.duckDuckGo.absoluteString]?.isFavorite, true)
+        XCTAssertEqual(bookmarkList["apple.com"]?.url, "apple.com")
+        XCTAssertEqual(bookmarkList["apple.com"]?.title, "Apple")
+        XCTAssertEqual(bookmarkList["apple.com"]?.isFavorite, true)
+
+        // WHEN
+        let newBookmark = try XCTUnwrap(bookmarkList.update(bookmark: bookmarkToReplace, newURL: "www.example.com", newTitle: "Example", newIsFavorite: false))
+
+        // THEN
+        let result = try XCTUnwrap(bookmarkList[newBookmark.url])
+        XCTAssertEqual(bookmarkList.bookmarks().count, bookmarks.count)
+        XCTAssertNil(bookmarkList[bookmarkToReplace.url])
+        XCTAssertEqual(bookmarkList["wikipedia.org"]?.url, "wikipedia.org")
+        XCTAssertEqual(bookmarkList["wikipedia.org"]?.title, "Wikipedia")
+        XCTAssertEqual(bookmarkList["wikipedia.org"]?.isFavorite, true)
+        XCTAssertEqual(bookmarkList[URL.duckDuckGo.absoluteString]?.url, URL.duckDuckGo.absoluteString)
+        XCTAssertEqual(bookmarkList[URL.duckDuckGo.absoluteString]?.title, "DDG")
+        XCTAssertEqual(bookmarkList[URL.duckDuckGo.absoluteString]?.isFavorite, true)
+        XCTAssertEqual(result.url, "www.example.com")
+        XCTAssertEqual(result.title, "Example")
+        XCTAssertEqual(result.isFavorite, false)
     }
 
 }

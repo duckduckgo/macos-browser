@@ -24,12 +24,12 @@ import NetworkProtection
 
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class MoreOptionsMenuTests: XCTestCase {
 
     var tabCollectionViewModel: TabCollectionViewModel!
     var passwordManagerCoordinator: PasswordManagerCoordinator!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
+    @MainActor
     lazy var moreOptionMenu: MoreOptionsMenu! = {
 #if NETWORK_PROTECTION
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
@@ -53,6 +53,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
 #endif
 
+    @MainActor
     override func setUp() {
         super.setUp()
         tabCollectionViewModel = TabCollectionViewModel()
@@ -65,6 +66,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 #endif
     }
 
+    @MainActor
     override func tearDown() {
         tabCollectionViewModel = nil
         passwordManagerCoordinator = nil
@@ -73,6 +75,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         super.tearDown()
     }
 
+    @MainActor
     func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsEnabled() {
 #if NETWORK_PROTECTION
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
@@ -87,7 +90,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                          internalUserDecider: internalUserDecider)
 #endif
 
-        XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
+        XCTAssertEqual(moreOptionMenu.items[0].title, UserText.sendFeedback)
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
         XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
@@ -112,6 +115,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 #endif
     }
 
+    @MainActor
     func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsDisabled() {
 #if NETWORK_PROTECTION
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
@@ -126,7 +130,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                          internalUserDecider: internalUserDecider)
 #endif
 
-        XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
+        XCTAssertEqual(moreOptionMenu.items[0].title, UserText.sendFeedback)
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
         XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
@@ -145,6 +149,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     // MARK: Zoom
 
+    @MainActor
     func testWhenClickingDefaultZoomInZoomSubmenuThenTheActionDelegateIsAlerted() {
         guard let zoomSubmenu = moreOptionMenu.zoomMenuItem.submenu else {
             XCTFail("No zoom submenu available")
@@ -159,6 +164,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     // MARK: Preferences
 
+    @MainActor
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
         moreOptionMenu.performActionForItem(at: 14)
 
@@ -184,12 +190,20 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return visible
     }
 
-    func disableForAllUsers() {
+    func disableForAllUsers() async {
         // intentional no-op
     }
 
     func disableForWaitlistUsers() {
         // intentional no-op
+    }
+
+    var isEligibleForThankYouMessage: Bool {
+        false
+    }
+
+    func disableIfUserHasNoAccess() async -> Bool {
+        return false
     }
 }
 #endif

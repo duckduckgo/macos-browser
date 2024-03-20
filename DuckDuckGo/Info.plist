@@ -60,7 +60,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>CFBundleURLName</key>
-			<string>Network Protection URLs</string>
+			<string>VPN URLs</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>networkprotection</string>

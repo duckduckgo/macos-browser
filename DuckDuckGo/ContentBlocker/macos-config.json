@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1709563256742,
+    "version": 1710501855617,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -262,6 +262,21 @@
                     "domain": "newsmax.com"
                 },
                 {
+                    "domain": "meneame.net"
+                },
+                {
+                    "domain": "espn.com"
+                },
+                {
+                    "domain": "usaa.com"
+                },
+                {
+                    "domain": "publico.es"
+                },
+                {
+                    "domain": "cnbc.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -284,7 +299,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "1ba9ece92f6e27c88a54cc69b63b3df1"
+            "hash": "ec25d3a0b633fbc4f208f35999f4ab0e"
         },
         "autofill": {
             "exceptions": [
@@ -965,8 +980,11 @@
         },
         "clientBrandHint": {
             "exceptions": [],
+            "settings": {
+                "domains": []
+            },
             "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "hash": "d35dd75140cdfe166762013e59eb076d"
         },
         "contentBlocking": {
             "state": "enabled",
@@ -1097,6 +1115,10 @@
                     {
                         "domain": "discord.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1839"
+                    },
+                    {
+                        "domain": "spectrum.net",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1876"
                     }
                 ],
                 "webViewDefault": [
@@ -1120,7 +1142,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "9b6023fe353530899b721c7e2eba4119"
+            "hash": "150400f9bcd5a8d7eb6fa7589047fe45"
         },
         "dbp": {
             "state": "enabled",
@@ -2985,6 +3007,9 @@
                         "domain": "newser.com",
                         "rules": [
                             {
+                                "type": "disable-default"
+                            },
+                            {
                                 "selector": ".RightRailAds",
                                 "type": "hide-empty"
                             },
@@ -3895,6 +3920,23 @@
                         ]
                     },
                     {
+                        "domain": "uzone.id",
+                        "rules": [
+                            {
+                                "selector": "[class^='box-ads']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[class^='section-ads']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".parallax-container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "washingtontimes.com",
                         "rules": [
                             {
@@ -3974,7 +4016,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "d0c2a82c472355a8396b1f2c5af8cf6e"
+            "hash": "3098b766cd343378237605f207f4fd17"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4710,11 +4752,6 @@
             "state": "disabled",
             "hash": "d07b5bf740e4d648c94e1ac65c4305d9"
         },
-        "notificationPermissions": {
-            "exceptions": [],
-            "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
-        },
         "privacyDashboard": {
             "exceptions": [],
             "features": {
@@ -4873,6 +4910,16 @@
             "state": "enabled",
             "settings": {
                 "allowlistedTrackers": {
+                    "2mdn.net": {
+                        "rules": [
+                            {
+                                "rule": "2mdn.net",
+                                "domains": [
+                                    "crunchyroll.com"
+                                ]
+                            }
+                        ]
+                    },
                     "3lift.com": {
                         "rules": [
                             {
@@ -4968,6 +5015,16 @@
                                 "rule": "c1.adform.net/serving/cookie/match",
                                 "domains": [
                                     "dhl.de"
+                                ]
+                            }
+                        ]
+                    },
+                    "adition.com": {
+                        "rules": [
+                            {
+                                "rule": "ad3.adfarm1.adition.com/js",
+                                "domains": [
+                                    "servustv.com"
                                 ]
                             }
                         ]
@@ -5629,7 +5686,8 @@
                                 "rule": "dpm.demdex.net/id",
                                 "domains": [
                                     "dhl.de",
-                                    "homedepot.com"
+                                    "homedepot.com",
+                                    "sbs.com.au"
                                 ]
                             }
                         ]
@@ -5997,15 +6055,10 @@
                     "fwmrm.net": {
                         "rules": [
                             {
-                                "rule": "2a7e9.v.fwmrm.net/ad/g/1",
+                                "rule": "v.fwmrm.net/ad",
                                 "domains": [
+                                    "6play.fr",
                                     "channel4.com"
-                                ]
-                            },
-                            {
-                                "rule": "7cbf2.v.fwmrm.net/ad/g/1",
-                                "domains": [
-                                    "6play.fr"
                                 ]
                             }
                         ]
@@ -6175,6 +6228,7 @@
                                 "domains": [
                                     "arkadium.com",
                                     "bloomberg.com",
+                                    "crunchyroll.com",
                                     "gamak.tv",
                                     "games.washingtonpost.com",
                                     "metro.co.uk",
@@ -7924,7 +7978,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "58e30d6e8e826a78d0c9bd448f50ae5d"
+            "hash": "1bbefc586e08d2c42b5db17ed95cc8e5"
         },
         "trackingCookies1p": {
             "settings": {

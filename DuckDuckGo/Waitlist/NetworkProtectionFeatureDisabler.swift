@@ -29,12 +29,11 @@ import SystemExtensions
 protocol NetworkProtectionFeatureDisabling {
     /// - Returns: `true` if the uninstallation was completed.  `false` if it was cancelled by the user or an error.
     ///
+    @discardableResult
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool
 }
 
 final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling {
-    static let vpnUninstalledNotificationName = NSNotification.Name(rawValue: "com.duckduckgo.NetworkProtection.uninstalled")
-
     private let log: OSLog
     private let loginItemsManager: LoginItemsManager
     private let pinningManager: LocalPinningManager
@@ -57,7 +56,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         self.ipcClient = ipcClient
     }
 
-    /// This method disables Network Protection and clear all of its state.
+    /// This method disables the VPN and clear all of its state.
     ///
     /// - Parameters:
     ///     - keepAuthToken: If `true`, the auth token will not be removed.
@@ -91,7 +90,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         }
 
         unpinNetworkProtection()
-        postVPNUninstalledNotification()
+        notifyVPNUninstalled()
         return true
     }
 
@@ -126,14 +125,11 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         settings.resetToDefaults()
     }
 
-    private func postVPNUninstalledNotification() {
-        Task { @MainActor in
+    private func notifyVPNUninstalled() {
             // Wait a bit since the NetP button is likely being hidden
+        Task {
             try? await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
-
-            NotificationCenter.default.post(
-                name: Self.vpnUninstalledNotificationName,
-                object: nil)
+            userDefaults.networkProtectionShouldShowVPNUninstalledMessage = true
         }
     }
 }

@@ -75,7 +75,7 @@ final class SuggestionContainerViewModel {
     }
 
     func setUserStringValue(_ userStringValue: String, userAppendedStringToTheEnd: Bool) {
-        guard AppearancePreferences.shared.showAutocompleteSuggestions else {
+        guard SearchPreferences.shared.showAutocompleteSuggestions else {
             return
         }
 

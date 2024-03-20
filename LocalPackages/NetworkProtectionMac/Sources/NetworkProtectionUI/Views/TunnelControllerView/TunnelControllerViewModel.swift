@@ -95,7 +95,7 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         connectionStatus = statusReporter.statusObserver.recentValue
         internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
-        internalServerLocation = statusReporter.serverInfoObserver.recentValue.serverLocation
+        internalServerLocation = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation
 
         // Particularly useful when unit testing with an initial status of our choosing.
         refreshInternalIsRunning()
@@ -146,7 +146,7 @@ public final class TunnelControllerViewModel: ObservableObject {
 
             Task { @MainActor in
                 self.internalServerAddress = serverInfo.serverAddress
-                self.internalServerLocation = serverInfo.serverLocation
+                self.internalServerLocation = serverInfo.serverLocation?.serverLocation
             }
         }
             .store(in: &cancellables)
@@ -437,9 +437,9 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Toggling Network Protection
+    // MARK: - Toggling VPN
 
-    /// Start network protection.
+    /// Start the VPN.
     ///
     func startNetworkProtection() {
         if shouldFlipToggle {
@@ -454,7 +454,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
-    /// Stop network protection.
+    /// Stop the VPN.
     ///
     func stopNetworkProtection() {
         toggleTransition = .switchingOff(locallyInitiated: true)

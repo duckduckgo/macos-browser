@@ -133,7 +133,7 @@ final class LocalPinningManager: PinningManager {
     /// This method is useful for knowing if the view was manually toggled.
     /// It's particularly useful for initializing a pin to a certain value at a certain point during the execution of code,
     /// only if the user hasn't explicitly specified a desired state.
-    /// As an example: this is used in Network Protection for pinning the icon to the navigation bar the first time the
+    /// As an example: this is used in the VPN for pinning the icon to the navigation bar the first time the
     /// feature is enabled.
     ///
     func wasManuallyToggled(_ view: PinnableView) -> Bool {

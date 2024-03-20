@@ -343,7 +343,8 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
-        let properties = ContentScopeProperties(gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
+        let properties = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                                 sessionKey: topAutofillUserScript?.sessionKey ?? "",
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig))
 
