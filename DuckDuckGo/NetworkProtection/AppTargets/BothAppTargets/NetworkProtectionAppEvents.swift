@@ -65,7 +65,7 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            if NSApp.runType != .uiTests {
+            if NSApp.runType != .integrationTests {
                 let disabled = await featureVisibility.disableIfUserHasNoAccess()
 
                 guard !disabled else {
@@ -81,7 +81,7 @@ final class NetworkProtectionAppEvents {
     /// Call this method when the app becomes active to run the associated NetP logic.
     ///
     func applicationDidBecomeActive() {
-        if NSApp.runType != .uiTests {
+        if NSApp.runType != .integrationTests {
             Task { @MainActor in
                 await featureVisibility.disableIfUserHasNoAccess()
             }
