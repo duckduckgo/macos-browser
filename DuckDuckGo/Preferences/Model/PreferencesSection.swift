@@ -60,7 +60,7 @@ struct PreferencesSection: Hashable, Identifiable {
         ]
 
 #if SUBSCRIPTION
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
             let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
             sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
         }

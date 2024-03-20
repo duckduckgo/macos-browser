@@ -34,7 +34,7 @@ final class WaitlistThankYouPromptPresenter {
         self.init(isVPNBetaTester: {
             return false
         }, isPIRBetaTester: {
-            return false
+            return DefaultDataBrokerProtectionFeatureVisibility().isEligibleForThankYouMessage()
         })
     }
 

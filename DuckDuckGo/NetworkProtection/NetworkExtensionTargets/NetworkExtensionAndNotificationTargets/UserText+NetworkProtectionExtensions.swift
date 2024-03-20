@@ -43,4 +43,6 @@ final class UserText {
     static let networkProtectionSupersededNotificationSubtitle = NSLocalizedString("network.protection.superceded.notification.subtitle", value: "Another VPN app on your Mac may have disabled it.", comment: "The subtitle of the notification shown when VPN connection is replaced by another app VPN connection taking over")
     static let networkProtectionSupersededReconnectActionTitle = NSLocalizedString("network.protection.superceded.action.reconnect.title", value: "Reconnect", comment: "The title of the `Reconnect` notification action button shown when VPN connection is replaced by another app VPN connection taking over")
 
+    static let networkProtectionEntitlementExpiredNotificationTitle = NSLocalizedString("network.protection.entitlement.expired.notification.title", value: "VPN disconnected", comment: "The title of the notification when Privacy Pro subscription expired")
+    static let networkProtectionEntitlementExpiredNotificationBody = NSLocalizedString("network.protection.entitlement.expired.notification.body", value: "Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.", comment: "The body of the notification when Privacy Pro subscription expired")
 }
