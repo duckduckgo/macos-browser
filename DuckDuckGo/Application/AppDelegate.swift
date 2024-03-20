@@ -307,9 +307,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if NETWORK_PROTECTION
-        DispatchQueue.main.async {
-            NetworkProtectionAppEvents().applicationDidFinishLaunching()
-        }
+        NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 #endif
 
