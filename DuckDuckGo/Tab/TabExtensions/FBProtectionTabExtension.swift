@@ -83,7 +83,7 @@ extension FBProtectionTabExtension {
             do {
                 try userContentController.disableGlobalContentRuleList(withIdentifier: ContentBlockerRulesLists.Constants.clickToLoadRulesListName)
             } catch {
-                assertionFailure("FB List was not enabled")
+                assertionFailure("Missing FB List")
                 return false
             }
         }

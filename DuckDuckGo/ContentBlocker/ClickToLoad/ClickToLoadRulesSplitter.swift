@@ -25,6 +25,7 @@ struct ClickToLoadRulesSplitter {
     public enum Constants {
 
         public static let clickToLoadRuleListPrefix = "CTL_"
+        public static let tdsRuleListPrefix = "TDS_"
 
     }
 
@@ -52,21 +53,20 @@ struct ClickToLoadRulesSplitter {
     }
 
     private func split(trackerData: TrackerDataManager.DataSet) -> (withoutBlockCTL: TrackerDataManager.DataSet, withBlockCTL: TrackerDataManager.DataSet)? {
-        // the logic for CTL tracker management has been updated, now the main TDS list retains the CTL blocking/surrogate rules at all times, and there is a separate CTL "ignore" override rule set
-        // this CTL override side are now only added when CTL protections are removed, to override the corresponding blocking / surrogate rules
-        let (mainTDSTrackers, ctlTrackers) = processCTLActions(trackerData.tds.trackers)
+           let trackersWithBlockCTL = filterTrackersWithCTLAction(trackerData.tds.trackers)
 
-        if !ctlTrackers.isEmpty {
-            let trackerDataWithoutBlockCTL = makeTrackerData(using: mainTDSTrackers, originalTDS: trackerData.tds)
-            let trackerDataWithBlockCTL = makeTrackerData(using: ctlTrackers, originalTDS: trackerData.tds)
+           if !trackersWithBlockCTL.isEmpty {
+               let trackersWithoutBlockCTL = filterTrackersWithoutCTLAction(trackerData.tds.trackers)
+               let trackerDataWithoutBlockCTL = makeTrackerData(using: trackersWithoutBlockCTL, originalTDS: trackerData.tds)
+               let trackerDataWithBlockCTL = makeTrackerData(using: trackersWithBlockCTL, originalTDS: trackerData.tds)
 
-            return (
-                (tds: trackerDataWithoutBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag),
-                (tds: trackerDataWithBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag)
-            )
-        }
-        return nil
-    }
+               return (
+                   (tds: trackerDataWithoutBlockCTL, etag: Constants.tdsRuleListPrefix + trackerData.etag),
+                   (tds: trackerDataWithBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag)
+               )
+           }
+           return nil
+       }
 
     private func makeTrackerData(using trackers: [String: KnownTracker], originalTDS: TrackerData) -> TrackerData {
         let entities = originalTDS.extractEntities(for: trackers)
@@ -94,7 +94,6 @@ struct ClickToLoadRulesSplitter {
                         } else {
                             newRule.action = .block
                         }
-                        print("RULE MATCH for \(key): \(rules[ruleIndex]) -> \(newRule)")
 
                         mainTDSTrackers[key]?.rules?.remove(at: ruleIndex)
                         ctlRules.insert(newRule, at: 0)
@@ -122,21 +121,19 @@ struct ClickToLoadRulesSplitter {
             return tracker.containsCTLActions == true
         }.map { (key, value) in
             var modifiedTracker = value
-            // Modify the tracker here
-            if modifiedTracker.defaultAction == .blockCtlFB {
-                modifiedTracker.defaultAction = .block
-            }
-//            print("RULES BEFORE \(modifiedTracker.rules)")
 
+            // Modify the tracker here
             if let rules = modifiedTracker.rules as [KnownTracker.Rule]? {
                 for ruleIndex in rules.indices {
                     if let action = rules[ruleIndex].action, action == .blockCtlFB {
-//                        modifiedTracker.rules?[ruleIndex].action = .block
-                        modifiedTracker.rules?[ruleIndex].action = nil
+                        if rules[ruleIndex].surrogate != nil {
+                            modifiedTracker.rules?[ruleIndex].action = nil
+                        } else {
+                            modifiedTracker.rules?[ruleIndex].action = .block
+                        }
                     }
                 }
             }
-//            print("RULES AFTER \(modifiedTracker.rules)")
 
             return (key, modifiedTracker)
         })
