@@ -99,7 +99,7 @@ final class OptOutOperation: DataBrokerOperation {
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) async {
+    func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async {
         // No - op
     }
 
@@ -109,6 +109,7 @@ final class OptOutOperation: DataBrokerOperation {
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
         if let action = actionsHandler?.nextAction(), self.shouldRunNextStep() {
+            stageCalculator?.setLastActionId(action.id)
             await runNextAction(action)
         } else {
             await webViewHandler?.finish() // If we executed all steps we release the web view

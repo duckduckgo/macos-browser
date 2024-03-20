@@ -117,6 +117,21 @@ extension ProfileQuery {
                              birthYear: birthYear,
                              deprecated: deprecated)
      }
+
+    func with(id: Int64) -> ProfileQuery {
+        return ProfileQuery(id: id,
+                            firstName: firstName,
+                            lastName: lastName,
+                            middleName: middleName,
+                            suffix: suffix,
+                            city: city,
+                            state: state,
+                            street: street,
+                            zipCode: zip,
+                            phone: phone,
+                            birthYear: birthYear,
+                            deprecated: deprecated)
+    }
 }
 
 extension ProfileQuery: Hashable {

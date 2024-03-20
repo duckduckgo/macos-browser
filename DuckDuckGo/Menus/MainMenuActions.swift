@@ -708,7 +708,7 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay7.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay14.rawValue)
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
     }
 
@@ -716,28 +716,49 @@ extension MainViewController {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
+
+        // Aid to transition VPN from waitlist to subscription
+        // by resetting this we allow users to go back to waitlist
+        // and re-test.
+        resetThankYouModalChecks(nil)
+        UserDefaults.netP.networkProtectionEntitlementsExpired = false
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
         UserDefaults.standard.removePersistentDomain(forName: DailyPixel.Constant.dailyPixelStorageIdentifier)
     }
 
+    @objc func in10PercentSurveyOn(_ sender: Any?) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay0in10Percent.rawValue)
+    }
+
+    @objc func in10PercentSurveyOff(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay0in10Percent.rawValue)
+    }
+
     @objc func changeInstallDateToToday(_ sender: Any?) {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToLessThan21DaysAgo(_ sender: Any?) {
-        let lessThanTwentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -20, to: Date())
-        UserDefaults.standard.set(lessThanTwentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToLessThan1DayAgo(_ sender: Any?) {
+        let lessThanOneDaysAgo = Calendar.current.date(byAdding: .hour, value: -23, to: Date())
+        UserDefaults.standard.set(lessThanOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToMoreThan21DaysAgoButLessThan27(_ sender: Any?) {
-        let twentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -21, to: Date())
-        UserDefaults.standard.set(twentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToMoreThan1DayAgoButLessThan14(_ sender: Any?) {
+        let between1And4DaysAgo = Calendar.current.date(byAdding: .day, value: -13, to: Date())
+        UserDefaults.standard.set(between1And4DaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToMoreThan27DaysAgo(_ sender: Any?) {
-        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -28, to: Date())
+    @objc func changeInstallDateToMoreThan14DaysAgoButLessThan15(_ sender: Any?) {
+        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -14, to: Date())
+        UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    }
+
+    @objc func changeInstallDateToMoreThan15DaysAgo(_ sender: Any?) {
+        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -16, to: Date())
         UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
@@ -762,6 +783,28 @@ extension MainViewController {
                       webViewSize: .zero)
 
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
+    }
+
+    @objc func resetThankYouModalChecks(_ sender: Any?) {
+        let presenter = WaitlistThankYouPromptPresenter()
+        presenter.resetPromptCheck()
+        UserDefaults.netP.removeObject(forKey: UserDefaults.vpnLegacyUserAccessDisabledOnceKey)
+    }
+
+    @objc func showVPNThankYouModal(_ sender: Any?) {
+        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
+        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
+        if let thankYouWindow = thankYouWindowController.window {
+            WindowsManager.windows.first?.beginSheet(thankYouWindow)
+        }
+    }
+
+    @objc func showPIRThankYouModal(_ sender: Any?) {
+        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
+        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
+        if let thankYouWindow = thankYouWindowController.window {
+            WindowsManager.windows.first?.beginSheet(thankYouWindow)
+        }
     }
 
     @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {

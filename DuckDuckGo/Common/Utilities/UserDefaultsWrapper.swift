@@ -111,8 +111,10 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
         case homePageShowSurveyDay0 = "home.page.show.survey.0"
+        case homePageShowSurveyDay0in10Percent = "home.page.show.survey.0.in.10.pervent"
+        case homePageShowSurveyDay14in10Percent = "home.page.show.survey.0.in.14.pervent"
         case homePageUserInteractedWithSurveyDay0 = "home.page.user.interacted.with.survey.0"
-        case homePageShowSurveyDay7 = "home.page.show.survey.7"
+        case homePageShowSurveyDay14 = "home.page.show.survey.14"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
@@ -145,6 +147,7 @@ public struct UserDefaultsWrapper<T> {
 
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
         case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
+        case dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
 
         // VPN
 

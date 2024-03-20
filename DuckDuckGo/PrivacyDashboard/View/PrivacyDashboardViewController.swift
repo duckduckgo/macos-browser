@@ -221,7 +221,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 
         switch target {
         case .cookiePopupManagement:
-            tabCollection.appendNewTab(with: .settings(pane: .privacy), selected: true)
+            tabCollection.appendNewTab(with: .settings(pane: .dataClearing), selected: true)
         default:
             tabCollection.appendNewTab(with: .anySettingsPane, selected: true)
         }
@@ -328,7 +328,8 @@ extension PrivacyDashboardViewController {
         var webVitals: [Double]?
         if configuration.isEnabled(featureKey: .performanceMetrics) {
             webVitals = await withCheckedContinuation { continuation in
-                currentTab.performanceMetrics.notifyHandler { result in
+                guard let performanceMetrics = currentTab.performanceMetrics else { continuation.resume(returning: nil); return }
+                performanceMetrics.notifyHandler { result in
                     continuation.resume(returning: result)
                 }
             }
@@ -352,7 +353,7 @@ extension PrivacyDashboardViewController {
                                                tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                                blockedTrackerDomains: blockedTrackerDomains,
                                                installedSurrogates: installedSurrogates,
-                                               isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                               isGPCEnabled: WebTrackingProtectionPreferences.shared.isGPCEnabled,
                                                ampURL: ampURL,
                                                urlParametersRemoved: urlParametersRemoved,
                                                protectionsState: protectionsState,

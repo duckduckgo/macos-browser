@@ -782,7 +782,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @Published private(set) var inferredOpenerContext: BrokenSiteReport.OpenerContext?
     @Published private(set) var refreshCountSinceLoad: Int = 0
-    private (set) var performanceMetrics: PerformanceMetricsSubfeature = PerformanceMetricsSubfeature()
+    private (set) var performanceMetrics: PerformanceMetricsSubfeature?
 
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var loadingProgress: Double = 0.0
@@ -1294,8 +1294,9 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
-        userScripts.contentScopeUserScriptIsolated.registerSubfeature(delegate: performanceMetrics)
-        performanceMetrics.targetWebview = webView
+
+        performanceMetrics = PerformanceMetricsSubfeature(targetWebview: webView)
+        userScripts.contentScopeUserScriptIsolated.registerSubfeature(delegate: performanceMetrics!)
     }
 
 }
@@ -1366,6 +1367,14 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         committedURL = navigation.url
     }
 
+    func resetRefreshCount() {
+        refreshCountSinceLoad = 0
+    }
+
+    func setOpenerContext(_ context: BrokenSiteReport.OpenerContext?) {
+        inferredOpenerContext = context
+    }
+
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // allow local file navigations
@@ -1373,12 +1382,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         switch navigationAction.navigationType {
         case .linkActivated, .formSubmitted:
-            refreshCountSinceLoad = 0
-            inferredOpenerContext = .navigation
+            resetRefreshCount()
+            setOpenerContext(.navigation)
         case .reload, .other:
             break
         default:
-            refreshCountSinceLoad = 0
+            resetRefreshCount()
         }
 
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
@@ -1436,7 +1445,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
 
         if inferredOpenerContext != .external {
-            inferredOpenerContext = .external
+            inferredOpenerContext = nil
         }
 
         invalidateInteractionStateData()
@@ -1449,8 +1458,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
 
         Task { @MainActor in
-            if await ReferrerInfo.isSERPReferred(from: webView) {
-                inferredOpenerContext = .serp
+            if await webView.isCurrentSiteReferredFromDuckDuckGo {
+                setOpenerContext(.serp)
             }
         }
 

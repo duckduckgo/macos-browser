@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import BrowserServicesKit
+import Suggestions
 
 struct SuggestionViewModel: Equatable {
 

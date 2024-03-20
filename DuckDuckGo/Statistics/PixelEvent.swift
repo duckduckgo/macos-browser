@@ -250,8 +250,19 @@ extension Pixel {
         case privacyProSubscriptionManagementEmail
         case privacyProSubscriptionManagementPlanBilling
         case privacyProSubscriptionManagementRemoval
+        // Web pixels
+        case privacyProOfferMonthlyPriceClick
+        case privacyProOfferYearlyPriceClick
+        case privacyProAddEmailSuccess
+        case privacyProWelcomeFAQClick
 
         case dailyPixel(Event, isFirst: Bool)
+
+        // Default Browser
+        case defaultRequestedFromHomepage
+        case defaultRequestedFromHomepageSetupView
+        case defaultRequestedFromSettings
+        case defaultRequestedFromOnboarding
 
         case protectionToggledOffBreakageReport
         case toggleProtectionsDailyCount
@@ -634,6 +645,11 @@ extension Pixel.Event {
         case .networkProtectionGeoswitchingNoLocations:
             return "m_mac_netp_ev_geoswitching_no_locations"
 
+        case .defaultRequestedFromHomepage: return "m_mac_default_requested_from_homepage"
+        case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
+        case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
+        case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+
             // MARK: - Subscription
         case .privacyProSubscriptionActive: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_active"
         case .privacyProOfferScreenImpression: return "m_mac_\(appDistribution)_privacy-pro_offer_screen_impression"
@@ -667,11 +683,17 @@ extension Pixel.Event {
         case .privacyProSubscriptionManagementEmail: return "m_mac_\(appDistribution)_privacy-pro_manage-email_edit_click"
         case .privacyProSubscriptionManagementPlanBilling: return "m_mac_\(appDistribution)_privacy-pro_settings_change-plan-or-billing_click"
         case .privacyProSubscriptionManagementRemoval: return "m_mac_\(appDistribution)_privacy-pro_settings_remove-from-device_click"
+            // Web
+        case .privacyProOfferMonthlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_monthly-price_click"
+        case .privacyProOfferYearlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_yearly-price_click"
+        case .privacyProAddEmailSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_add-email_success_u"
+        case .privacyProWelcomeFAQClick: return "m_mac_\(appDistribution)_privacy-pro_welcome_faq_click_u"
 
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
         case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
         case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
         case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
+
         }
     }
 }
