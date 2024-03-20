@@ -47,8 +47,15 @@ final class NetworkProtectionAppEvents {
     // MARK: - Feature Visibility
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
+    private let featureDisabler: NetworkProtectionFeatureDisabling
+    private let defaults: UserDefaults
 
-    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()) {
+    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         defaults: UserDefaults = .netP) {
+
+        self.defaults = defaults
+        self.featureDisabler = featureDisabler
         self.featureVisibility = featureVisibility
     }
 
@@ -58,8 +65,9 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            if featureVisibility.shouldUninstallAutomatically() {
-                featureVisibility.disableForAllUsers()
+            let disabled = await featureVisibility.disableIfUserHasNoAccess()
+
+            guard !disabled else {
                 return
             }
 
@@ -71,12 +79,9 @@ final class NetworkProtectionAppEvents {
     /// Call this method when the app becomes active to run the associated NetP logic.
     ///
     func applicationDidBecomeActive() {
-        guard featureVisibility.isNetworkProtectionVisible() else {
-            UserDefaults.netP.networkProtectionVPNEnabledViaWaitlist = false
-            featureVisibility.disableForAllUsers()
-            return
+        Task { @MainActor in
+            await featureVisibility.disableIfUserHasNoAccess()
         }
-        UserDefaults.netP.networkProtectionVPNEnabledViaWaitlist = true
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
