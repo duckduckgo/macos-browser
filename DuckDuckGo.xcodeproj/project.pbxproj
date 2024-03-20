@@ -3243,6 +3243,7 @@
 		EE7295E92A545BC4008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295E82A545BC4008C0991 /* NetworkProtection */; };
 		EE7295ED2A545C0A008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295EC2A545C0A008C0991 /* NetworkProtection */; };
 		EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295EE2A545C12008C0991 /* NetworkProtection */; };
+		EE8BEF0E2BAAF5FB0093CB6D /* AutocompleteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8BEF0D2BAAF5FA0093CB6D /* AutocompleteTests.swift */; };
 		EEA3EEB12B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */; };
 		EEA3EEB32B24EC0600E8333A /* VPNLocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB22B24EC0600E8333A /* VPNLocationViewModel.swift */; };
 		EEAD7A7C2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
@@ -4663,6 +4664,7 @@
 		EE4F2C722BAAE50E00F2DA55 /* FindInPageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindInPageTests.swift; sourceTree = "<group>"; };
 		EE66418B2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift"; sourceTree = "<group>"; };
 		EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationsHostingViewController.swift; sourceTree = "<group>"; };
+		EE8BEF0D2BAAF5FA0093CB6D /* AutocompleteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutocompleteTests.swift; path = UITests/AutocompleteTests.swift; sourceTree = SOURCE_ROOT; };
 		EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionVPNCountryLabelsModel.swift; sourceTree = "<group>"; };
 		EEA3EEB22B24EC0600E8333A /* VPNLocationViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNLocationViewModel.swift; sourceTree = "<group>"; };
 		EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppLauncher.swift; sourceTree = "<group>"; };
@@ -6418,6 +6420,7 @@
 			isa = PBXGroup;
 			children = (
 				EE4F2C702BAAE50E00F2DA55 /* Common */,
+				EE8BEF0D2BAAF5FA0093CB6D /* AutocompleteTests.swift */,
 				EE4F2C6F2BAAE50D00F2DA55 /* BrowsingHistoryTests.swift */,
 				EE4F2C722BAAE50E00F2DA55 /* FindInPageTests.swift */,
 				7B4CE8E626F02134009134B1 /* TabBarTests.swift */,
@@ -12019,6 +12022,7 @@
 				EE4F2C7D2BAAE5A900F2DA55 /* DataExtension.swift in Sources */,
 				EE4F2C7A2BAAE57400F2DA55 /* TestsURLExtension.swift in Sources */,
 				EE4F2C742BAAE50E00F2DA55 /* XCUIElementExtension.swift in Sources */,
+				EE8BEF0E2BAAF5FB0093CB6D /* AutocompleteTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
