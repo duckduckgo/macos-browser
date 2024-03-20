@@ -82,15 +82,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     var privacyDashboardWindow: NSWindow?
 
 #if SUBSCRIPTION
-    nonisolated lazy var subscriptionFeatureAvailability: SubscriptionFeatureAvailability = {
-    #if APPSTORE || !STRIPE
-        SubscriptionPurchaseEnvironment.current = .appStore
-    #else
-        SubscriptionPurchaseEnvironment.current = .stripe
-    #endif
-        return DefaultSubscriptionFeatureAvailability(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-                                                                                 purchasePlatform: SubscriptionPurchaseEnvironment.current)
-    }()
+    let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 #endif
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
@@ -195,7 +187,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
 
-
+#if SUBSCRIPTION
+    #if APPSTORE || !STRIPE
+        SubscriptionPurchaseEnvironment.current = .appStore
+    #else
+        SubscriptionPurchaseEnvironment.current = .stripe
+    #endif
+        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+                                                                                 purchasePlatform: SubscriptionPurchaseEnvironment.current)
+#endif
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

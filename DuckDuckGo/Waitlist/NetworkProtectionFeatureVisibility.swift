@@ -26,6 +26,10 @@ import NetworkProtection
 import NetworkProtectionUI
 import LoginItems
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 protocol NetworkProtectionFeatureVisibility {
     var isEligibleForThankYouMessage: Bool { get }
 
@@ -75,11 +79,16 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         return isEasterEggUser || waitlistIsOngoing
     }
 
+    var subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability {
+        DefaultSubscriptionFeatureAvailability(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+                                                                                 purchasePlatform: SubscriptionPurchaseEnvironment.current)
+    }
+
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
 #if SUBSCRIPTION
-        return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
+        return subscriptionFeatureAvailability.isFeatureAvailable && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
@@ -205,7 +214,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Checks whether the VPN needs to be disabled.
     ///
     var isEligibleForThankYouMessage: Bool {
-        isPreSubscriptionUser() && NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
+        isPreSubscriptionUser() && subscriptionFeatureAvailability.isFeatureAvailable
     }
 }
 
