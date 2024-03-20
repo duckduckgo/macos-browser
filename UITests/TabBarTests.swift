@@ -25,9 +25,9 @@ class TabBarTests: XCTestCase {
 	}
 
 	func testWhenClickingAddTab_ThenTabsOpen() throws {
-		let app = XCUIApplication()
-
-		let tabbarviewitemElementsQuery = app.windows.collectionViews.otherElements.containing(.group, identifier: "TabBarViewItem")
+//		let app = XCUIApplication()
+//
+//		let tabbarviewitemElementsQuery = app.windows.collectionViews.otherElements.containing(.group, identifier: "TabBarViewItem")
 		// click on add tab button twice
 		//        tabbarviewitemElementsQuery.children(matching: .group).element(boundBy: 1).children(matching: .button).element.click()
 		//        tabbarviewitemElementsQuery.children(matching: .group).element(boundBy: 2).children(matching: .button).element.click()
@@ -37,6 +37,6 @@ class TabBarTests: XCTestCase {
 
 		//        XCTAssertEqual(tabs.count, 3)
 		// TODO: replace with working identifiers
-		XCTSkip("Test needs accessibility identifier debugging before usage")
+		let _ = XCTSkip("Test needs accessibility identifier debugging before usage")
 	}
 }
