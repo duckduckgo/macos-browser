@@ -65,11 +65,12 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            try await Task.sleep(nanoseconds: 10 * NSEC_PER_MSEC)
-            let disabled = await featureVisibility.disableIfUserHasNoAccess()
+            if NSApp.runType != .uiTests {
+                let disabled = await featureVisibility.disableIfUserHasNoAccess()
 
-            guard !disabled else {
-                return
+                guard !disabled else {
+                    return
+                }
             }
 
             restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
