@@ -35,14 +35,11 @@ class FindInPageTests: XCTestCase {
 	}
 
 	override func setUpWithError() throws {
-        app = XCUIApplication()
-
-        addressBarTextField = XCUIApplication().windows.textFields["AddressBarViewController.addressBarTextField"]
-        loremIpsumWebView = XCUIApplication().windows.webViews["Lorem Ipsum"]
-        findInPageCloseButton = XCUIApplication().windows.buttons["FindInPageController.closeButton"]
-
         continueAfterFailure = false
-
+        app = XCUIApplication()
+        addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
+        loremIpsumWebView = app.windows.webViews["Lorem Ipsum"]
+        findInPageCloseButton = app.windows.buttons["FindInPageController.closeButton"]
         app.launch()
 		app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
 		app.typeKey("n", modifierFlags: .command)
@@ -382,7 +379,7 @@ class FindInPageTests: XCTestCase {
 }
 
 /// Helpers for the Find in Page tests
-extension FindInPageTests {
+private extension FindInPageTests {
 	/// A shared URL to reference the local HTML file
 	class var loremIpsumFileURL: URL {
 		let loremIpsumFileName = "lorem_ipsum.html"
@@ -424,11 +421,11 @@ extension FindInPageTests {
 	}
 }
 
-extension NSImage {
+private extension NSImage {
 	/// Find matching pixels in an NSImage for a specific NSColor
 	/// - Parameter colorToMatch: the NSColor to match
 	/// - Returns: An array of Pixel structs
-	func matchingPixels(of colorToMatch: NSColor) -> [Pixel] {
+    func matchingPixels(of colorToMatch: NSColor) -> [Pixel] {
 
 		let cgImage = cgImage(forProposedRect: nil, context: nil, hints: nil)
 		XCTAssertNotNil(cgImage, "It wasn't possible to obtain the CGImage of the NSImage.")
@@ -472,7 +469,7 @@ extension NSImage {
 }
 
 /// A struct of pixel color and coordinate values in 0-255 color values
-struct Pixel: Hashable {
+private struct Pixel: Hashable {
 	var red: UInt8
 	var green: UInt8
 	var blue: UInt8
