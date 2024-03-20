@@ -190,12 +190,20 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return visible
     }
 
-    func disableForAllUsers() {
+    func disableForAllUsers() async {
         // intentional no-op
     }
 
     func disableForWaitlistUsers() {
         // intentional no-op
+    }
+
+    var isEligibleForThankYouMessage: Bool {
+        false
+    }
+
+    func disableIfUserHasNoAccess() async -> Bool {
+        return false
     }
 }
 #endif

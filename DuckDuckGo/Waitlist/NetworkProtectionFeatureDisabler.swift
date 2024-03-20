@@ -29,6 +29,7 @@ import SystemExtensions
 protocol NetworkProtectionFeatureDisabling {
     /// - Returns: `true` if the uninstallation was completed.  `false` if it was cancelled by the user or an error.
     ///
+    @discardableResult
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool
 }
 
