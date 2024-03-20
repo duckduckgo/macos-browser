@@ -221,7 +221,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 
         switch target {
         case .cookiePopupManagement:
-            tabCollection.appendNewTab(with: .settings(pane: .privacy), selected: true)
+            tabCollection.appendNewTab(with: .settings(pane: .dataClearing), selected: true)
         default:
             tabCollection.appendNewTab(with: .anySettingsPane, selected: true)
         }
@@ -339,7 +339,7 @@ extension PrivacyDashboardViewController {
                                                tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                                blockedTrackerDomains: blockedTrackerDomains,
                                                installedSurrogates: installedSurrogates,
-                                               isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                               isGPCEnabled: WebTrackingProtectionPreferences.shared.isGPCEnabled,
                                                ampURL: ampURL,
                                                urlParametersRemoved: urlParametersRemoved,
                                                protectionsState: protectionsState,
