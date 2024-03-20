@@ -39,7 +39,16 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     private let userDefaults: UserDefaults
     private let waitlistStorage: WaitlistStorage
     private let subscriptionAvailability: SubscriptionFeatureAvailability
+
     private let dataBrokerProtectionKey = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
+    private var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool {
+        get {
+            return userDefaults.bool(forKey: dataBrokerProtectionKey)
+        }
+        nonmutating set {
+            userDefaults.set(newValue, forKey: dataBrokerProtectionKey)
+        }
+    }
 
     /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
     static var bypassWaitlist = false
@@ -131,9 +140,9 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
 
     /// Returns true if a cleanup was performed, false otherwise
      func cleanUpDBPForPrivacyProIfNecessary() -> Bool {
-        if isPrivacyProEnabled() && wasWaitlistUser && !fetchMigrationCleanedUpFlag() {
+        if isPrivacyProEnabled() && wasWaitlistUser && !dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro {
             disableAndDeleteForWaitlistUsers()
-            setMigrationCleanedUpFlag(true)
+            dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = true
             return true
         } else {
             return false
@@ -155,14 +164,6 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         } else {
             return isWaitlistEnabled && isWaitlistBetaActive
         }
-    }
-
-    private func setMigrationCleanedUpFlag(_ flag: Bool) {
-        userDefaults.set(flag, forKey: dataBrokerProtectionKey)
-    }
-
-    private func fetchMigrationCleanedUpFlag() -> Bool {
-        userDefaults.bool(forKey: dataBrokerProtectionKey)
     }
 }
 
