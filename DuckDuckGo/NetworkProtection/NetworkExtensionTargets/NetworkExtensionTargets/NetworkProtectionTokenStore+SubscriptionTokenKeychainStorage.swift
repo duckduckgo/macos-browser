@@ -24,21 +24,32 @@ import NetworkProtection
 import Common
 
 extension NetworkProtectionKeychainTokenStore: SubscriptionTokenStorage {
-    public func store(accessToken: String) throws {
-        try store(accessToken)
-    }
-
-    public func getAccessToken() throws -> String? {
-        guard var token = try fetchToken() else { return nil }
-        if token.hasPrefix("ddg:") {
-            token = token.replacingOccurrences(of: "ddg:", with: "")
+    
+    public var accessToken: String? {
+        get {
+            guard var token = try? fetchToken() else { return nil }
+            if token.hasPrefix("ddg:") {
+                token = token.replacingOccurrences(of: "ddg:", with: "")
+            }
+            os_log("🔵 Wrapper successfully fetched token %{token}@", log: .networkProtection, type: .info, token)
+            return token
         }
-        os_log("🔵 Wrapper successfully fetched token %{token}@", log: .networkProtection, type: .info, token)
-        return token
+        set(newValue) {
+            if let token = newValue {
+                try? store(token)
+            } else {
+                try? deleteToken()
+            }
+        }
     }
-
-    public func removeAccessToken() throws {
-        try deleteToken()
+    
+    public var authToken: String? {
+        get { nil }
+        set(newValue) { }
+    }
+    
+    public func clear() {
+        try? deleteToken()
     }
 }
 

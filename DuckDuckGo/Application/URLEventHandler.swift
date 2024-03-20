@@ -145,7 +145,8 @@ final class URLEventHandler {
             WindowControllersManager.shared.showLocationPickerSheet()
 #if SUBSCRIPTION
         case AppLaunchCommand.showPrivacyPro.launchURL:
-            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            let purchaseURL = NSApp.delegateTyped.subscriptionManager.urlProvider.url(for: .purchase)
+            WindowControllersManager.shared.showTab(with: .subscription(purchaseURL))
 #endif
 #if !APPSTORE && !DEBUG
         case AppLaunchCommand.moveAppToApplications.launchURL:

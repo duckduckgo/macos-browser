@@ -79,7 +79,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 #if SUBSCRIPTION
     // MARK: - Subscriptions
 
-    private let accountManager = AccountManager()
+    private let subscriptionTokenStorage = {
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        return SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
+    }()
 #endif
 
     // MARK: - Debug Options Support
@@ -751,7 +754,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     private func fetchAuthToken() throws -> NSString? {
 #if SUBSCRIPTION
-        if let accessToken = accountManager.accessToken  {
+        if let accessToken = subscriptionTokenStorage.accessToken  {
             os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         }

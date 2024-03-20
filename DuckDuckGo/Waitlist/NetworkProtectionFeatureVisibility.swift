@@ -82,7 +82,9 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
     ///
     var subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability {
-        DefaultSubscriptionFeatureAvailability()
+        // TODO: Check if it breaks the tests
+        let currentPurchasePlatform = NSApp.delegateTyped.subscriptionManager.configuration.currentPurchasePlatform
+        return DefaultSubscriptionFeatureAvailability(purchasePlatform: currentPurchasePlatform)
     }
 
     /// Returns whether the VPN should be uninstalled automatically.

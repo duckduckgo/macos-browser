@@ -49,13 +49,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
         self.delegate = _delegate
 
 #if DEBUG && SUBSCRIPTION
-        let configuration = DefaultSubscriptionConfiguration(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs),
-                                                             purchasePlatform: .stripe,
-                                                             serviceEnvironment: currentEnvironment)
-        // TODO: Subs.
-        let tokenStorage = SubscriptionManager(configuration: configuration).tokenStorage
-
-        if let token = tokenStorage.accessToken {
+        if let token = _delegate.subscriptionManager.tokenStorage.accessToken {
             os_log(.error, log: .networkProtection, "🟢 VPN Agent found token: %{public}d", token)
         } else {
             os_log(.error, log: .networkProtection, "🔴 VPN Agent found no token")
@@ -74,9 +68,28 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private static let recentThreshold: TimeInterval = 5.0
 
     private let appLauncher = AppLauncher()
-    private let bouncer = NetworkProtectionBouncer()
+    lazy var bouncer: NetworkProtectionBouncer = {
+#if SUBSCRIPTION
+        return NetworkProtectionBouncer(accountManager: subscriptionManager.accountManager)
+#else
+        return NetworkProtectionBouncer()
+#endif
+    }()
 
     private var cancellables = Set<AnyCancellable>()
+
+#if SUBSCRIPTION
+    lazy var subscriptionManager: SubscriptionManaging = {
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let tokenStore = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
+        let serviceEnvironment: SubscriptionServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
+
+        let configuration = DefaultSubscriptionConfiguration(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs),
+                                                             purchasePlatform: .stripe, // TODO: Not relevant in this context
+                                                             serviceEnvironment: serviceEnvironment)
+        return SubscriptionManager(configuration: configuration)
+    }()
+#endif
 
     var proxyExtensionBundleID: String {
         Bundle.proxyExtensionBundleID
@@ -271,7 +284,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
 #if SUBSCRIPTION
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
+        // TODO: not sure if VPN should be toggling that
+//        SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
 #endif
 
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
@@ -363,9 +377,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUpSubscriptionMonitoring() {
 #if SUBSCRIPTION
-        guard AccountManager().isUserAuthenticated else { return }
+        guard subscriptionManager.isUserAuthenticated else { return }
         let entitlementsCheck = {
-            await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            await self.subscriptionManager.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 
         Task {

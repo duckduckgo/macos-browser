@@ -86,11 +86,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
-    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager)
 #endif
 
 #if DBP && SUBSCRIPTION
-    private lazy var dataBrokerProtectionSubscriptionEventHandler = { DataBrokerProtectionSubscriptionEventHandler(tokenStorage: subscriptionManager.tokenStorage) }()
+    private lazy var dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler(tokenStorage: subscriptionManager.tokenStorage)
 #endif
 
 #if SUBSCRIPTION
@@ -208,12 +208,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
 
 #if SUBSCRIPTION
-    #if APPSTORE || !STRIPE
-        SubscriptionPurchaseEnvironment.current = .appStore
-    #else
-        SubscriptionPurchaseEnvironment.current = .stripe
-    #endif
-        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
+        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability(purchasePlatform: subscriptionManager.configuration.currentPurchasePlatform)
 #endif
     }
 

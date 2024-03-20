@@ -282,20 +282,28 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
-                                                                           serviceName: Self.tokenServiceName,
-                                                                           errorEvents: debugEvents,
-                                                                           isSubscriptionEnabled: isSubscriptionEnabled,
-                                                                           accessTokenProvider: { nil }
+                                                             serviceName: Self.tokenServiceName,
+                                                             errorEvents: debugEvents,
+                                                             isSubscriptionEnabled: isSubscriptionEnabled,
+                                                             accessTokenProvider: { nil }
         )
 #if SUBSCRIPTION
+        // tokenStore is conforming to protocol for prociding accesstoken
+//        let accountManager = AccountManager(
+//            accessTokenStorage: tokenStore,
+//            entitlementsCache: UserDefaultsCache<[Entitlement]>(key: UserDefaultsCacheKey.subscriptionEntitlements)
+//        )
+        //TODO: Not sure if netp should enforce the subs env
+//        SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
 
-        let accountManager = AccountManager(
-            accessTokenStorage: tokenStore,
-            entitlementsCache: UserDefaultsCache<[Entitlement]>(key: UserDefaultsCacheKey.subscriptionEntitlements)
-        )
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
+        let serviceEnvironment: SubscriptionServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
+        let configuration = DefaultSubscriptionConfiguration(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs),
+                                                             purchasePlatform: .stripe, // TODO: Not relevant in this context
+                                                             serviceEnvironment: serviceEnvironment)
+        let subscriptionManager = SubscriptionManager(configuration: configuration)
+
         let entitlementsCheck = {
-            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            await subscriptionManager.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 #else
         let entitlementsCheck: (() async -> Result<Bool, Error>)? = nil

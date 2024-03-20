@@ -25,18 +25,18 @@ import NetworkProtectionUI
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let tokenStorage: SubscriptionTokenStorage
+    private let subscriptionManager: SubscriptionManaging
     private let networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
     private let userDefaults: UserDefaults
 
-    init(tokenStorage: SubscriptionTokenStorage,
+    init(subscriptionManager: SubscriptionManaging,
          networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming = NetworkProtectionCodeRedemptionCoordinator(),
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
-         userDefaults: UserDefaults = .netP)) {
-        self.accountManager = accountManager
+         userDefaults: UserDefaults = .netP) {
+        self.subscriptionManager = subscriptionManager
         self.networkProtectionRedemptionCoordinator = networkProtectionRedemptionCoordinator
         self.networkProtectionTokenStorage = networkProtectionTokenStorage
         self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
@@ -46,9 +46,9 @@ final class NetworkProtectionSubscriptionEventHandler {
     private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
 
     private func setUpEntitlementMonitoring() {
-        guard AccountManager().isUserAuthenticated else { return }
+        guard subscriptionManager.isUserAuthenticated else { return }
         let entitlementsCheck = {
-            await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            await self.subscriptionManager.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 
         Task {
@@ -72,7 +72,7 @@ final class NetworkProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignIn() {
-        guard let token = tokenStorage.accessToken else {
+        guard let token = subscriptionManager.tokenStorage.accessToken else {
             assertionFailure("[NetP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }

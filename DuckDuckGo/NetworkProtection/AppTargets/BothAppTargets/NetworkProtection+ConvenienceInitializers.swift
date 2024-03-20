@@ -58,7 +58,10 @@ extension NetworkProtectionKeychainTokenStore {
 
     convenience init(isSubscriptionEnabled: Bool) {
 #if SUBSCRIPTION
-        let accessTokenProvider: () -> String? = { AccountManager().accessToken }
+        let accessTokenProvider: () -> String? = {
+            let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+            return SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup))).accessToken
+        }
 #else
         let accessTokenProvider: () -> String? = { return nil }
 #endif

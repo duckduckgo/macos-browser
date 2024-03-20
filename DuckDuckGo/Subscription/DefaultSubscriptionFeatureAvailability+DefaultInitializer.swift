@@ -16,15 +16,17 @@
 //  limitations under the License.
 //
 
-import Foundation
-
 #if SUBSCRIPTION
+
+import Foundation
 import Subscription
-#endif
 
 extension DefaultSubscriptionFeatureAvailability {
-    convenience init() {
+
+    convenience init(purchasePlatform: SubscriptionPurchasePlatform) {
         self.init(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-                  purchasePlatform: SubscriptionPurchaseEnvironment.current)
+                  purchasePlatform: purchasePlatform)
     }
 }
+
+#endif
