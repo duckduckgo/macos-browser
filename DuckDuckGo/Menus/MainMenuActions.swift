@@ -718,8 +718,9 @@ extension MainViewController {
         internalUserDecider.debugSetInternalUserState(!state)
 
         // Aid to transition VPN from waitlist to subscription
-        // by resetting this we allow users to go back to waitlist.
-        UserDefaults.netP.vpnLegacyUserAccessDisabledOnce = true
+        // by resetting this we allow users to go back to waitlist
+        // and re-test.
+        resetThankYouModalChecks(nil)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {

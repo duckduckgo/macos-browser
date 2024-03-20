@@ -31,7 +31,7 @@ protocol NetworkProtectionFeatureVisibility {
 
     func isNetworkProtectionVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
-    func disableForAllUsers()
+    func disableForAllUsers() async
     func disableForWaitlistUsers()
     @discardableResult
     func disableIfUserHasNoAccess() async -> Bool
@@ -150,10 +150,22 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         }
     }
 
-    func disableForAllUsers() {
-        Task {
-            await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
+    func disableForAllUsers() async {
+        await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
+    }
+
+    /// Disables the VPN for legacy users, if necessary.
+    ///
+    /// This method does not seek to remove tokens or uninstall anything.
+    ///
+    private func disableVPNForLegacyUsersIfSubscriptionAvailable() async -> Bool {
+        guard isEligibleForThankYouMessage && !defaults.vpnLegacyUserAccessDisabledOnce else {
+            return false
         }
+
+        defaults.vpnLegacyUserAccessDisabledOnce = true
+        await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
+        return true
     }
 
     func disableForWaitlistUsers() {
@@ -171,7 +183,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     @discardableResult
     func disableIfUserHasNoAccess() async -> Bool {
         if shouldUninstallAutomatically() {
-            disableForAllUsers()
+            await disableForAllUsers()
             return true
         }
 
@@ -194,20 +206,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     var isEligibleForThankYouMessage: Bool {
         isPreSubscriptionUser() && NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
-    }
-
-    /// Disables the VPN for legacy users, if necessary.
-    ///
-    /// This method does not seek to remove tokens or uninstall anything.
-    ///
-    private func disableVPNForLegacyUsersIfSubscriptionAvailable() async -> Bool {
-        guard isEligibleForThankYouMessage && !defaults.vpnLegacyUserAccessDisabledOnce else {
-            return false
-        }
-
-        defaults.vpnLegacyUserAccessDisabledOnce = true
-        await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
-        return true
     }
 }
 
