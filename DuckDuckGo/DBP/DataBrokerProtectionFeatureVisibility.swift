@@ -83,10 +83,9 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
             regionCode = "US"
         }
 
-        #if DEBUG // Always assume US for debug builds
+#if DEBUG // Always assume US for debug builds
         regionCode = "US"
-        #endif
-
+#endif
         return (regionCode ?? "US") == "US"
     }
 
@@ -139,7 +138,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     }
 
     /// Returns true if a cleanup was performed, false otherwise
-     func cleanUpDBPForPrivacyProIfNecessary() -> Bool {
+    func cleanUpDBPForPrivacyProIfNecessary() -> Bool {
         if isPrivacyProEnabled() && wasWaitlistUser && !dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro {
             disableAndDeleteForWaitlistUsers()
             dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = true
