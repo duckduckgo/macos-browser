@@ -52,6 +52,10 @@ public struct LoginItem: Equatable, Hashable {
             self == .enabled
         }
 
+        public var isInstalled: Bool {
+            self == .enabled || self == .requiresApproval
+        }
+
         @available(macOS 13.0, *)
         public init(_ status: SMAppService.Status) {
             switch status {

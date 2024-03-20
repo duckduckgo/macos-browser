@@ -166,6 +166,10 @@ extension Pixel.Event {
              .dataBrokerEnableLoginItemDaily,
              .dataBrokerDisableLoginItemDaily,
              .dataBrokerResetLoginItemDaily,
+             .defaultRequestedFromHomepage,
+             .defaultRequestedFromHomepageSetupView,
+             .defaultRequestedFromSettings,
+             .defaultRequestedFromOnboarding,
              .privacyProSubscriptionActive,
              .privacyProOfferScreenImpression,
              .privacyProPurchaseAttempt,
@@ -201,7 +205,11 @@ extension Pixel.Event {
              .protectionToggledOffBreakageReport,
              .toggleProtectionsDailyCount,
              .toggleReportDoNotSend,
-             .toggleReportDismiss:
+             .toggleReportDismiss,
+             .privacyProOfferMonthlyPriceClick,
+             .privacyProOfferYearlyPriceClick,
+             .privacyProAddEmailSuccess,
+             .privacyProWelcomeFAQClick:
             return nil
         }
     }

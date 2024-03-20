@@ -24,15 +24,25 @@ import Common
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
+import LoginItems
+
+#if SUBSCRIPTION
+import Subscription
+#endif
 
 protocol NetworkProtectionFeatureVisibility {
+    var isEligibleForThankYouMessage: Bool { get }
+
     func isNetworkProtectionVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
-    func disableForAllUsers()
+    func disableForAllUsers() async
     func disableForWaitlistUsers()
+    @discardableResult
+    func disableIfUserHasNoAccess() async -> Bool
 }
 
 struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
+    private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let featureDisabler: NetworkProtectionFeatureDisabling
     private let featureOverrides: WaitlistBetaOverriding
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
@@ -69,14 +79,24 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         return isEasterEggUser || waitlistIsOngoing
     }
 
+    /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
+    ///
+    var subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability {
+        DefaultSubscriptionFeatureAvailability()
+    }
+
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
+#if SUBSCRIPTION
+        return subscriptionFeatureAvailability.isFeatureAvailable && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
+#else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
         let isOnboarded = UserDefaults.netP.networkProtectionOnboardingStatus != .default
 
         return isNotEasterEggUser && waitlistAccessEnded && isOnboarded
+#endif
     }
 
     /// Whether the user is fully onboarded
@@ -140,10 +160,22 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         }
     }
 
-    func disableForAllUsers() {
-        Task {
-            await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+    func disableForAllUsers() async {
+        await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
+    }
+
+    /// Disables the VPN for legacy users, if necessary.
+    ///
+    /// This method does not seek to remove tokens or uninstall anything.
+    ///
+    private func disableVPNForLegacyUsersIfSubscriptionAvailable() async -> Bool {
+        guard isEligibleForThankYouMessage && !defaults.vpnLegacyUserAccessDisabledOnce else {
+            return false
         }
+
+        defaults.vpnLegacyUserAccessDisabledOnce = true
+        await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
+        return true
     }
 
     func disableForWaitlistUsers() {
@@ -154,6 +186,36 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         Task {
             await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
         }
+    }
+
+    /// A method meant to be called safely from different places to disable the VPN if the user isn't meant to have access to it.
+    ///
+    @discardableResult
+    func disableIfUserHasNoAccess() async -> Bool {
+        if shouldUninstallAutomatically() {
+            await disableForAllUsers()
+            return true
+        }
+
+        return await disableVPNForLegacyUsersIfSubscriptionAvailable()
+    }
+
+    // MARK: - Subscription Start Support
+
+    /// To query whether we're a legacy (waitlist or easter egg) user.
+    ///
+    private func isPreSubscriptionUser() -> Bool {
+        guard let token = try? NetworkProtectionKeychainTokenStore(isSubscriptionEnabled: false).fetchToken() else {
+            return false
+        }
+
+        return !token.hasPrefix(Self.subscriptionAuthTokenPrefix)
+    }
+
+    /// Checks whether the VPN needs to be disabled.
+    ///
+    var isEligibleForThankYouMessage: Bool {
+        isPreSubscriptionUser() && subscriptionFeatureAvailability.isFeatureAvailable
     }
 }
 

@@ -81,8 +81,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
+#if SUBSCRIPTION
+    let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
+#endif
+
 #if NETWORK_PROTECTION && SUBSCRIPTION
-    private lazy var networkProtectionSubscriptionEventHandler = { NetworkProtectionSubscriptionEventHandler(tokenStorage: subscriptionManager.tokenStorage) }()
+    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
 #endif
 
 #if DBP && SUBSCRIPTION
@@ -203,6 +207,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
 
+#if SUBSCRIPTION
+    #if APPSTORE || !STRIPE
+        SubscriptionPurchaseEnvironment.current = .appStore
+    #else
+        SubscriptionPurchaseEnvironment.current = .stripe
+    #endif
+        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
+#endif
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {

@@ -36,6 +36,7 @@ extension AppLaunchCommand {
         case .showVPNLocations: return "showVPNLocations"
         case .enableOnDemand: return "enableOnDemand"
         case .moveAppToApplications: return "moveAppToApplications"
+        case .showPrivacyPro: return "showPrivacyPro"
         }
     }
 }
@@ -97,6 +98,8 @@ extension AppLaunchCommand {
             return "networkprotection://show-settings/locations"
         case .moveAppToApplications:
             return "networkprotection://move-app-to-applications"
+        case .showPrivacyPro:
+            return "networkprotection://show-privacy-pro"
         default:
             return nil
         }
