@@ -19,11 +19,11 @@
 import XCTest
 
 class FindInPageTests: XCTestCase {
-	let app = XCUIApplication()
+    var app: XCUIApplication!
 	let timeout = 0.3
-	let addressBarTextField = XCUIApplication().windows.textFields["AddressBarViewController.addressBarTextField"]
-	let loremIpsumWebView = XCUIApplication().windows.webViews["Lorem Ipsum"]
-	let findInPageCloseButton = XCUIApplication().windows.buttons["FindInPageController.closeButton"]
+    var addressBarTextField: XCUIElement!
+	var loremIpsumWebView: XCUIElement!
+    var findInPageCloseButton: XCUIElement!
 	let minimumExpectedMatchingPixelsInFindHighlight = 150
 
 	override class func setUp() {
@@ -35,8 +35,15 @@ class FindInPageTests: XCTestCase {
 	}
 
 	override func setUpWithError() throws {
-		continueAfterFailure = false
-		app.launch()
+        app = XCUIApplication()
+
+        addressBarTextField = XCUIApplication().windows.textFields["AddressBarViewController.addressBarTextField"]
+        loremIpsumWebView = XCUIApplication().windows.webViews["Lorem Ipsum"]
+        findInPageCloseButton = XCUIApplication().windows.buttons["FindInPageController.closeButton"]
+
+        continueAfterFailure = false
+
+        app.launch()
 		app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
 		app.typeKey("n", modifierFlags: .command)
 	}
@@ -294,7 +301,7 @@ class FindInPageTests: XCTestCase {
 		let findInPageScreenshot = loremIpsumWebView.screenshot()
 		let highlightedPixelsInFindScreenshot = findInPageScreenshot.image.matchingPixels(of: .findHighlightColor)
 		let findHighlightPoints = Set(highlightedPixelsInFindScreenshot.map { $0.point }) // Coordinates of highlighted pixels in the find screenshot
-		let findInPageNextButton = XCUIApplication().windows.buttons["FindInPageController.nextButton"]
+		let findInPageNextButton = app.windows.buttons["FindInPageController.nextButton"]
 		XCTAssertTrue(
 			findInPageNextButton.waitForExistence(timeout: timeout),
 			"Couldn't find \"Find Next\" main menu bar item in a reasonable timeframe."
