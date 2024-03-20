@@ -20,14 +20,17 @@ import Common
 import XCTest
 
 class BrowsingHistoryTests: XCTestCase {
-    let app = XCUIApplication()
-    let timeout = 0.3
-    let historyMenuBarItem = XCUIApplication().menuBarItems["History"]
-    let clearAllHistory = XCUIApplication().menuItems["HistoryMenu.clearAllHistory"]
+    var app: XCUIApplication!
+    var historyMenuBarItem: XCUIElement!
+    var clearAllHistory: XCUIElement!
     let lengthForRandomPageTitle = 8
+    let timeout = 0.3
 
     override func setUpWithError() throws {
         continueAfterFailure = false
+        app = XCUIApplication()
+        historyMenuBarItem = app.menuBarItems["History"]
+        clearAllHistory = app.menuItems["HistoryMenu.clearAllHistory"]
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
         app.typeKey("n", modifierFlags: .command)
@@ -157,7 +160,7 @@ class BrowsingHistoryTests: XCTestCase {
     }
 }
 
-extension BrowsingHistoryTests {
+private extension BrowsingHistoryTests {
 
     func randomPageTitle(length: Int) -> String {
         return String(UUID().uuidString.prefix(length))
