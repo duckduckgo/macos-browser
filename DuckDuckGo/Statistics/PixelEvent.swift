@@ -269,6 +269,10 @@ extension Pixel {
         case toggleReportDoNotSend
         case toggleReportDismiss
 
+        // Password Import Keychain Prompt
+        case passwordImportKeychainPrompt
+        case passwordImportKeychainPromptDenied
+
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
             /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
@@ -693,6 +697,10 @@ extension Pixel.Event {
         case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
         case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
         case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
+
+        // Password Import Keychain Prompt
+        case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
+        case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
 
         }
     }
