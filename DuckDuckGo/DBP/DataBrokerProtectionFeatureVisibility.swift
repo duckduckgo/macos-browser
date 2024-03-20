@@ -166,19 +166,3 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         }
     }
 }
-
-protocol SubscriptionFeatureAvailabilityWrapper {
-    var isFeatureAvailable: Bool { get }
-}
-
-struct DefaultSubscriptionFeatureAvailabilityWrapper: SubscriptionFeatureAvailabilityWrapper {
-    var isFeatureAvailable: Bool {
-#if SUBSCRIPTION
-        return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
-#else
-        return false
-#endif
-    }
-}
-
-#endif
