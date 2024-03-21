@@ -253,6 +253,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
                                    promptUserToAutofillCredentialsForDomain domain: String,
                                    withAccounts accounts: [SecureVaultModels.WebsiteAccount],
                                    withTrigger trigger: AutofillUserScript.GetTriggerType,
+                                   onAccountSelected account: @escaping (SecureVaultModels.WebsiteAccount?) -> Void,
                                    completionHandler: @escaping (SecureVaultModels.WebsiteAccount?) -> Void) {
         // no-op on macOS
     }

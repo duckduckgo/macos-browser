@@ -721,6 +721,7 @@ extension MainViewController {
         // by resetting this we allow users to go back to waitlist
         // and re-test.
         resetThankYouModalChecks(nil)
+        UserDefaults.netP.networkProtectionEntitlementsExpired = false
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
