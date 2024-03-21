@@ -507,7 +507,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         await StripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         await mainViewController?.dismiss(progressViewController)
 
-        return [String: String]() // cannot be nil
+        DailyPixel.fire(pixel: .privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
+
+        return [String: String]() // cannot be nil, the web app expect something back before redirecting the user to the final page
     }
 
     // MARK: Pixel related actions
