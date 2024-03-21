@@ -80,7 +80,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 }
             }
             .removeDuplicates()
-            .throttle(for: .milliseconds(1000), scheduler: DispatchQueue.main, latest: true)
             .eraseToAnyPublisher()
     }()
 
