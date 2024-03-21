@@ -1067,9 +1067,9 @@ import XCTest
     // MARK: - File Import after failure (or nil result for a data type)
 
     // all possible import summaries for combining
-    let bookmarksSummaries: [DataImportViewModel.DataTypeImportResult?] = [
+    var bookmarksSummaries: [DataImportViewModel.DataTypeImportResult?] {
         // bookmarks import didn‘t happen (or skipped)
-        nil,
+        [nil,
         // bookmarks import succeeded
         .init(.bookmarks, .success(.init(successful: 42, duplicate: 3, failed: 1))),
         // bookmarks import succeeded with no bookmarks imported
@@ -1077,8 +1077,10 @@ import XCTest
         // bookmarks import failed with error
         .init(.bookmarks, .failure(Failure(.bookmarks, .dataCorrupted))),
         // bookmarks import failed with file not found
-        .init(.bookmarks, .failure(Failure(.bookmarks, .noData))),
-    ]
+        bookmarkSummaryNoData]
+    }
+
+    private let bookmarkSummaryNoData: DataImportViewModel.DataTypeImportResult? = .init(.bookmarks, .failure(Failure(.bookmarks, .noData)))
 
     let bookmarksResults: [DataImportResult<DataTypeSummary>?] = [
         .failure(Failure(.bookmarks, .dataCorrupted)),
@@ -1087,9 +1089,9 @@ import XCTest
         nil, // skip
     ]
 
-    let passwordsSummaries: [DataImportViewModel.DataTypeImportResult?] = [
+    var passwordsSummaries: [DataImportViewModel.DataTypeImportResult?] {
         // passwords import didn‘t happen (or skipped)
-        nil,
+        [nil,
         // passwords import succeeded
         .init(.passwords, .success(.init(successful: 99, duplicate: 4, failed: 2))),
         // passwords import succeeded with no passwords imported
@@ -1097,8 +1099,10 @@ import XCTest
         // passwords import failed with error
         .init(.passwords, .failure(Failure(.passwords, .keychainError))),
         // passwords import failed with file not found
-        .init(.passwords, .failure(Failure(.passwords, .noData))),
-    ]
+        passwordSummaryNoData]
+    }
+
+    private let passwordSummaryNoData: DataImportViewModel.DataTypeImportResult? = .init(.passwords, .failure(Failure(.passwords, .noData)))
 
     let passwordsResults: [DataImportResult<DataTypeSummary>?] = [
         .failure(Failure(.passwords, .dataCorrupted)),
@@ -1192,8 +1196,8 @@ import XCTest
     func testWhenBrowsersBookmarksFileImportFailsAndNoPasswordsFileImportNeeded_feedbackShown() async throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries
-            // initial bookmark import failed or ended with empty result
-            where bookmarksSummary?.result.isSuccess == false || (try? bookmarksSummary?.result.get())?.isEmpty == true {
+            // initial bookmark import failed and is not a `noData` error, or empty
+            where (bookmarksSummary?.result.isSuccess == false && bookmarkSummaryNoData != bookmarksSummary) || (try? bookmarksSummary?.result.get())?.isEmpty == true {
 
                 for passwordsSummary in passwordsSummaries
                 // passwords successfully imported
@@ -1226,6 +1230,45 @@ import XCTest
                         XCTAssertEqual(model.actionButton, .submit, xctDescr)
                         XCTAssertEqual(model.secondaryButton, .cancel, xctDescr)
                     }
+                }
+            }
+        }
+    }
+
+    func testWhenBrowsersBookmarksImportFailsNoDataAndFileImportSkippedAndNoPasswordsFileImportNeeded_summaryShown() async throws {
+        for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
+
+            let bookmarksSummary = bookmarkSummaryNoData
+
+            for passwordsSummary in passwordsSummaries
+            // passwords successfully imported
+            where (try? passwordsSummary?.result.get().isEmpty) == false {
+
+                for result in bookmarksResults
+                // bookmarks file import failed or skipped when initial result was a failure
+                where result == nil {
+
+                    // setup model with pre-failed bookmarks import
+                    setupModel(with: source,
+                               profiles: [BrowserProfile.test, BrowserProfile.default, BrowserProfile.test2],
+                               screen: .fileImport(dataType: .bookmarks, summary: []),
+                               summary: [bookmarksSummary, passwordsSummary].compactMap { $0 })
+                    var xctDescr = "bookmarksSummary: \(bookmarksSummary?.description) passwordsSummary: \(passwordsSummary?.description ?? "<nil>") result: \(result?.description ?? ".skip")"
+
+                    // run File Import (or skip)
+                    if let result {
+                        try await initiateImport(of: [.bookmarks], fromFile: .testHTML, resultingWith: [.bookmarks: result], xctDescr)
+                    } else {
+                        XCTAssertEqual(model.actionButton, .skip)
+                        model.performAction(.skip)
+                    }
+
+                    xctDescr = "\(source): " + xctDescr
+
+                    // expect Summary
+                    let expectation = DataImportViewModel(importSource: source, screen: .summary([.bookmarks, .passwords]), summary: [bookmarksSummary, passwordsSummary, result.map { .init(.bookmarks, $0) }].compactMap { $0 })
+                    XCTAssertEqual(model.description, expectation.description, xctDescr)
+                    XCTAssertEqual(model.actionButton, .done, xctDescr)
                 }
             }
         }
@@ -1434,8 +1477,8 @@ import XCTest
             for bookmarksSummary in bookmarksSummaries {
 
                 for passwordsSummary in passwordsSummaries
-                // passwords import failed or empty
-                where passwordsSummary?.result.isSuccess == false || (try? passwordsSummary?.result.get().isEmpty) == false {
+                // passwords import failed and is not a `noData` error, or empty
+                where (passwordsSummary?.result.isSuccess == false && passwordSummaryNoData != passwordsSummary) || (try? passwordsSummary?.result.get().isEmpty) == false {
 
                     for bookmarksFileImportSummary in bookmarksSummaries
                     // if bookmarks result was failure - append successful bookmarks file import result
@@ -1473,6 +1516,51 @@ import XCTest
                         }
                     }
                 }
+            }
+        }
+    }
+
+    func testWhenBrowsersPasswordsImportFailNoDataAndFileImportSkipped_summaryShown() async throws {
+        for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
+            for bookmarksSummary in bookmarksSummaries {
+
+                let passwordsSummary = passwordSummaryNoData
+
+                for bookmarksFileImportSummary in bookmarksSummaries
+                // if bookmarks result was failure - append successful bookmarks file import result
+                where (bookmarksSummary?.result.isSuccess == false && bookmarksFileImportSummary?.result.isSuccess == true)
+                // if bookmarks file import summary was successful and non empty - don‘t append bookmarks file import result
+                // or if bookmarks file import was empty - and bookmarks file import skipped
+                || (bookmarksSummary?.result.isSuccess == true && bookmarksFileImportSummary == nil) {
+
+                    for result in passwordsResults
+                    // passwords file import failed or skipped when initial result was a failure
+                    where result == nil {
+
+                        // setup model with pre-failed passwords import
+                        setupModel(with: source,
+                                   profiles: [BrowserProfile.test, BrowserProfile.default, BrowserProfile.test2],
+                                   screen: .fileImport(dataType: .passwords, summary: []),
+                                   summary: [bookmarksSummary, passwordsSummary, bookmarksFileImportSummary].compactMap { $0 })
+                        var xctDescr = "bookmarksSummary: \(bookmarksSummary?.description ?? "<nil>") passwordsSummary: \(passwordsSummary?.description ?? "<nil>"), bookmarksFileSummary: \(bookmarksFileImportSummary?.description ?? ".skip") result: \(result?.description ?? ".skip")"
+
+                        // run File Import (or skip)
+                        if let result {
+                            try await initiateImport(of: [.passwords], fromFile: .testCSV, resultingWith: [.passwords: result], xctDescr)
+                        } else {
+                            XCTAssertEqual(model.actionButton, .skip)
+                            model.performAction(.skip)
+                        }
+
+                        xctDescr = "\(source): " + xctDescr
+
+                        // expect Report Feedback
+                        let expectation = DataImportViewModel(importSource: source, screen: .summary([.bookmarks, .passwords]), summary: [bookmarksSummary, passwordsSummary, bookmarksFileImportSummary, result.map { .init(.passwords, $0) }].compactMap { $0 })
+                        XCTAssertEqual(model.description, expectation.description, xctDescr)
+                        XCTAssertEqual(model.actionButton, .done, xctDescr)
+                    }
+                }
+
             }
         }
     }
