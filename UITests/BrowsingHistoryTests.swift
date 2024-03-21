@@ -20,62 +20,62 @@ import Common
 import XCTest
 
 class BrowsingHistoryTests: XCTestCase {
-    var app: XCUIApplication!
-    var historyMenuBarItem: XCUIElement!
-    var clearAllHistory: XCUIElement!
-    let lengthForRandomPageTitle = 8
-    let timeout = 0.3
+    private var app: XCUIApplication!
+    private var historyMenuBarItem: XCUIElement!
+    private var clearAllHistoryMenuItem: XCUIElement!
+    private let lengthForRandomPageTitle = 8
+    private let elementExistenceTimeout = 0.3
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
         historyMenuBarItem = app.menuBarItems["History"]
-        clearAllHistory = app.menuItems["HistoryMenu.clearAllHistory"]
+        clearAllHistoryMenuItem = app.menuItems["HistoryMenu.clearAllHistory"]
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
         app.typeKey("n", modifierFlags: .command)
 
         XCTAssertTrue(
-            historyMenuBarItem.waitForExistence(timeout: timeout),
+            historyMenuBarItem.waitForExistence(timeout: elementExistenceTimeout),
             "History menu bar item didn't appear in a reasonable timeframe."
         )
         historyMenuBarItem.click()
 
         XCTAssertTrue(
-            clearAllHistory.waitForExistence(timeout: timeout),
+            clearAllHistoryMenuItem.waitForExistence(timeout: elementExistenceTimeout),
             "Clear all history item didn't appear in a reasonable timeframe."
         )
-        clearAllHistory.click()
+        clearAllHistoryMenuItem.click()
 
         XCTAssertTrue(
-            app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: timeout),
+            app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: elementExistenceTimeout),
             "Clear all history item didn't appear in a reasonable timeframe."
         )
         app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // And manually remove the history
     }
 
     func test_visitedSiteIsAddedToRecentlyVisited() throws {
-        let historyPageTitleExpectedToBeFirstInRecentlyVisited = randomPageTitle(length: lengthForRandomPageTitle)
+        let historyPageTitleExpectedToBeFirstInRecentlyVisited = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
         let url = locallyServedURL(pageTitle: historyPageTitleExpectedToBeFirstInRecentlyVisited)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         let firstSiteInRecentlyVisitedSection = app.menuItems["HistoryMenu.recentlyVisitedMenuItem.0"]
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: timeout),
+            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The address bar text field didn't become available in a reasonable timeframe."
         )
 
         addressBarTextField.typeText("\(url.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(historyPageTitleExpectedToBeFirstInRecentlyVisited)"].waitForExistence(timeout: timeout),
+            app.windows.webViews["\(historyPageTitleExpectedToBeFirstInRecentlyVisited)"].waitForExistence(timeout: elementExistenceTimeout),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         XCTAssertTrue(
-            historyMenuBarItem.waitForExistence(timeout: timeout),
+            historyMenuBarItem.waitForExistence(timeout: elementExistenceTimeout),
             "History menu bar item didn't appear in a reasonable timeframe."
         )
         historyMenuBarItem.click() // The visited sites identifiers will not be available until after the History menu has been accessed.
         XCTAssertTrue(
-            firstSiteInRecentlyVisitedSection.waitForExistence(timeout: timeout),
+            firstSiteInRecentlyVisitedSection.waitForExistence(timeout: elementExistenceTimeout),
             "The first site in the recently visited section didn't appear in a reasonable timeframe."
         )
 
@@ -83,29 +83,29 @@ class BrowsingHistoryTests: XCTestCase {
     }
 
     func test_visitedSiteIsInHistoryAfterClosingAndReopeningWindow() throws {
-        let historyPageTitleExpectedToBeFirstInTodayHistory = randomPageTitle(length: lengthForRandomPageTitle)
+        let historyPageTitleExpectedToBeFirstInTodayHistory = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
         let url = locallyServedURL(pageTitle: historyPageTitleExpectedToBeFirstInTodayHistory)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         let firstSiteInHistory = app.menuItems["HistoryMenu.historyMenuItem.Today.0"]
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: timeout),
+            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The address bar text field didn't become available in a reasonable timeframe."
         )
 
         addressBarTextField.typeText("\(url.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(historyPageTitleExpectedToBeFirstInTodayHistory)"].waitForExistence(timeout: timeout),
+            app.windows.webViews["\(historyPageTitleExpectedToBeFirstInTodayHistory)"].waitForExistence(timeout: elementExistenceTimeout),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close all windows
         app.typeKey("n", modifierFlags: .command) // New window
         XCTAssertTrue(
-            historyMenuBarItem.waitForExistence(timeout: timeout),
+            historyMenuBarItem.waitForExistence(timeout: elementExistenceTimeout),
             "History menu bar item didn't appear in a reasonable timeframe."
         )
         historyMenuBarItem.click() // The visited sites identifiers will not be available until after the History menu has been accessed.
         XCTAssertTrue(
-            firstSiteInHistory.waitForExistence(timeout: timeout),
+            firstSiteInHistory.waitForExistence(timeout: elementExistenceTimeout),
             "The first site in the recently visited section didn't appear in a reasonable timeframe."
         )
 
@@ -113,59 +113,54 @@ class BrowsingHistoryTests: XCTestCase {
     }
 
     func test_lastClosedWindowsTabsCanBeReopenedViaHistory() throws {
-        let titleOfFirstTabWhichShouldRestore = randomPageTitle(length: lengthForRandomPageTitle)
-        let titleOfSecondTabWhichShouldRestore = randomPageTitle(length: lengthForRandomPageTitle)
+        let titleOfFirstTabWhichShouldRestore = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
+        let titleOfSecondTabWhichShouldRestore = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
         let urlForFirstTab = locallyServedURL(pageTitle: titleOfFirstTabWhichShouldRestore)
         let urlForSecondTab = locallyServedURL(pageTitle: titleOfSecondTabWhichShouldRestore)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: timeout),
+            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The address bar text field didn't become available in a reasonable timeframe."
         )
         addressBarTextField.typeText("\(urlForFirstTab.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(titleOfFirstTabWhichShouldRestore)"].waitForExistence(timeout: timeout),
+            app.windows.webViews["\(titleOfFirstTabWhichShouldRestore)"].waitForExistence(timeout: elementExistenceTimeout),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         app.typeKey("t", modifierFlags: .command)
 
         addressBarTextField.typeText("\(urlForSecondTab.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: timeout),
+            app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: elementExistenceTimeout),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         let reopenLastClosedWindowMenuItem = app.menuItems["HistoryMenu.reopenLastClosedWindow"]
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close all windows
         app.typeKey("n", modifierFlags: .command) // New window
         XCTAssertTrue(
-            historyMenuBarItem.waitForExistence(timeout: timeout),
+            historyMenuBarItem.waitForExistence(timeout: elementExistenceTimeout),
             "History menu bar item didn't appear in a reasonable timeframe."
         )
         historyMenuBarItem.click() // The visited sites identifiers will not be available until after the History menu has been accessed.
         XCTAssertTrue(
-            reopenLastClosedWindowMenuItem.waitForExistence(timeout: timeout),
+            reopenLastClosedWindowMenuItem.waitForExistence(timeout: elementExistenceTimeout),
             "The \"Reopen Last Closed Window\" menu item didn't appear in a reasonable timeframe."
         )
         reopenLastClosedWindowMenuItem.click()
 
         XCTAssertTrue(
-            app.windows.webViews["\(titleOfFirstTabWhichShouldRestore)"].waitForExistence(timeout: timeout),
+            app.windows.webViews["\(titleOfFirstTabWhichShouldRestore)"].waitForExistence(timeout: elementExistenceTimeout),
             "Restored visited tab 1 wasn't available with the expected title in a reasonable timeframe."
         )
         app.typeKey("w", modifierFlags: [.command])
         XCTAssertTrue(
-            app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: timeout),
+            app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: elementExistenceTimeout),
             "Restored visited tab 2 wasn't available with the expected title in a reasonable timeframe."
         )
     }
 }
 
 private extension BrowsingHistoryTests {
-
-    func randomPageTitle(length: Int) -> String {
-        return String(UUID().uuidString.prefix(length))
-    }
-
     func locallyServedURL(pageTitle: String) -> URL {
         return URL.testsServer
             .appendingTestParameters(data: """

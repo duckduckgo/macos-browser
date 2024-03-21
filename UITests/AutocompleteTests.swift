@@ -20,26 +20,26 @@ import Common
 import XCTest
 
 class AutocompleteTests: XCTestCase {
-    var app: XCUIApplication!
-    var addBookmarkButton: XCUIElement!
-    var resetBookMarksDataMenuItem: XCUIElement!
-    var historyMenuBarItem: XCUIElement!
-    var clearAllHistory: XCUIElement!
-    var addressBarTextField: XCUIElement!
-    var tableView: XCUIElement!
-    let timeout = 0.3
-    let siteTitleForBookmarkedSite = String(UUID().uuidString.prefix(16))
-    let siteTitleForHistorySite = String(UUID().uuidString.prefix(16))
+    private var app: XCUIApplication!
+    private var addBookmarkButton: XCUIElement!
+    private var resetBookMarksMenuItem: XCUIElement!
+    private var historyMenuBarItem: XCUIElement!
+    private var clearAllHistoryMenuItem: XCUIElement!
+    private var addressBarTextField: XCUIElement!
+    private var suggestionsTableView: XCUIElement!
+    private let elementExistenceTimeout = 0.3
+    private let siteTitleForBookmarkedSite = String(UUID().uuidString.prefix(16))
+    private let siteTitleForHistorySite = String(UUID().uuidString.prefix(16))
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
         addBookmarkButton = app.buttons["BookmarkDialogButtonsView.defaultButton"]
-        resetBookMarksDataMenuItem = app.menuItems["MainMenu.resetBookmarks"]
+        resetBookMarksMenuItem = app.menuItems["MainMenu.resetBookmarks"]
         historyMenuBarItem = app.menuBarItems["History"]
-        clearAllHistory = app.menuItems["HistoryMenu.clearAllHistory"]
+        clearAllHistoryMenuItem = app.menuItems["HistoryMenu.clearAllHistory"]
         addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
-        tableView = app.tables["SuggestionViewController.tableView"]
+        suggestionsTableView = app.tables["SuggestionViewController.tableView"]
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Enforce a single window
         app.typeKey("n", modifierFlags: .command)
@@ -49,72 +49,84 @@ class AutocompleteTests: XCTestCase {
     func test_typingTitleOfBookmarkedPageShowsItInSuggestionsAsBookmark() throws {
         app.typeText(siteTitleForBookmarkedSite)
         XCTAssertTrue(
-            tableView.waitForExistence(timeout: timeout),
+            suggestionsTableView.waitForExistence(timeout: elementExistenceTimeout),
             "Suggestions tableView didn't become available in a reasonable timeframe."
         )
-        
-        let suggestionCellWithBookmarkedSite = tableView.tableRows.cells.staticTexts["\(siteTitleForBookmarkedSite)"].firstMatch
+
+        let suggestionCellWithBookmarkedSite = suggestionsTableView.tableRows.cells.staticTexts["\(siteTitleForBookmarkedSite)"].firstMatch
         XCTAssertTrue( // It should match something in suggestions
-            suggestionCellWithBookmarkedSite.waitForExistence(timeout: timeout),
+            suggestionCellWithBookmarkedSite.waitForExistence(timeout: elementExistenceTimeout),
             "The expected table view cell with the suggestion for the bookmarked site didn't become available in a reasonable timeframe."
         )
         let containerCellForBookmarkedSuggestion = app.tables.cells.containing(.any, identifier: suggestionCellWithBookmarkedSite.identifier)
             .firstMatch
 
         XCTAssertTrue(
-            containerCellForBookmarkedSuggestion.waitForExistence(timeout: timeout),
-            "The enclosing cell for the suggestion cell for the bookmarked site didn't become available in a reasonable timeframe."
+            containerCellForBookmarkedSuggestion.waitForExistence(timeout: elementExistenceTimeout),
+            "The enclosing cell for the suggestion cell for the bookmarked site didn't become available in a reasonable timeframe. If this is unexpected, it could be due to a significant change in the layout of this interface."
         )
         // And that should be a bookmark suggestion
-        XCTAssertEqual(containerCellForBookmarkedSuggestion.images.firstMatch.label, "BookmarkSuggestion")
+        XCTAssertEqual(
+            containerCellForBookmarkedSuggestion.images.firstMatch.label,
+            "BookmarkSuggestion",
+            "Although the suggestion was found, it didn't have the \"BookmarkSuggestion\" image next to it in suggestions."
+        )
     }
 
     func test_typingTitleOfHistoryPageShowsItInSuggestionsAsHistory() throws {
         app.typeText(siteTitleForHistorySite)
         XCTAssertTrue(
-            tableView.waitForExistence(timeout: timeout),
+            suggestionsTableView.waitForExistence(timeout: elementExistenceTimeout),
             "Suggestions tableView didn't become available in a reasonable timeframe."
         )
 
-        let suggestionCellWithHistorySite = tableView.tableRows.cells.staticTexts["\(siteTitleForHistorySite)"].firstMatch
+        let suggestionCellWithHistorySite = suggestionsTableView.tableRows.cells.staticTexts["\(siteTitleForHistorySite)"].firstMatch
         XCTAssertTrue( // It should match something in suggestions
-            suggestionCellWithHistorySite.waitForExistence(timeout: timeout),
+            suggestionCellWithHistorySite.waitForExistence(timeout: elementExistenceTimeout),
             "The expected table view cell with the suggestion for the history site didn't become available in a reasonable timeframe."
         )
         let containerCellForHistorySuggestion = app.tables.cells.containing(.any, identifier: suggestionCellWithHistorySite.identifier)
             .firstMatch
 
         XCTAssertTrue(
-            containerCellForHistorySuggestion.waitForExistence(timeout: timeout),
-            "The enclosing cell for the suggestion cell for the history site didn't become available in a reasonable timeframe."
+            containerCellForHistorySuggestion.waitForExistence(timeout: elementExistenceTimeout),
+            "The enclosing cell for the suggestion cell for the history site didn't become available in a reasonable timeframe. If this is unexpected, it could be due to a significant change in the layout of this interface."
         )
         // And that should be a history suggestion
-        XCTAssertEqual(containerCellForHistorySuggestion.images.firstMatch.label, "HistorySuggestion")
+        XCTAssertEqual(
+            containerCellForHistorySuggestion.images.firstMatch.label,
+            "HistorySuggestion",
+            "Although the suggestion was found, it didn't have the \"HistorySuggestion\" image next to it in suggestions."
+        )
     }
 
     func test_typingURLOfWebsiteNotInBookmarksOrHistoryShowsItInSuggestionsAsWebsite() throws {
         let websiteURLString = "https://www.duckduckgo.com"
         app.typeText(websiteURLString)
         XCTAssertTrue(
-            tableView.waitForExistence(timeout: timeout),
+            suggestionsTableView.waitForExistence(timeout: elementExistenceTimeout),
             "Suggestions tableView didn't become available in a reasonable timeframe."
         )
 
-        let suggestionCellWithWebsite = tableView.tableRows.cells.staticTexts["\(websiteURLString)"].firstMatch
+        let suggestionCellWithWebsite = suggestionsTableView.tableRows.cells.staticTexts["\(websiteURLString)"].firstMatch
         XCTAssertTrue( // It should match something in suggestions
-            suggestionCellWithWebsite.waitForExistence(timeout: timeout),
+            suggestionCellWithWebsite.waitForExistence(timeout: elementExistenceTimeout),
             "The expected table view cell with the suggestion for the website didn't become available in a reasonable timeframe."
         )
         let containerCellForWebsiteSuggestion = app.tables.cells.containing(.any, identifier: suggestionCellWithWebsite.identifier)
             .firstMatch
 
         XCTAssertTrue(
-            containerCellForWebsiteSuggestion.waitForExistence(timeout: timeout),
-            "The enclosing cell for the suggestion cell for the website didn't become available in a reasonable timeframe."
+            containerCellForWebsiteSuggestion.waitForExistence(timeout: elementExistenceTimeout),
+            "The enclosing cell for the suggestion cell for the website didn't become available in a reasonable timeframe. If this is unexpected, it could be due to a significant change in the layout of this interface."
         )
 
         // And that should be a website suggestion
-        XCTAssertEqual(containerCellForWebsiteSuggestion.images.firstMatch.label, "Web")
+        XCTAssertEqual(
+            containerCellForWebsiteSuggestion.images.firstMatch.label,
+            "Web",
+            "Although the suggestion was found, it didn't have the \"Web\" image next to it in suggestions."
+        )
     }
 }
 
@@ -122,46 +134,46 @@ private extension AutocompleteTests {
     /// Make sure there is exactly one site in the history, and exactly one site in the bookmarks, and they aren't the same site.
     func resetAndArrangeBookmarksAndHistory() {
         XCTAssertTrue(
-            resetBookMarksDataMenuItem.waitForExistence(timeout: timeout),
+            resetBookMarksMenuItem.waitForExistence(timeout: elementExistenceTimeout),
             "Reset bookmarks menu item didn't become available in a reasonable timeframe."
         )
 
-        resetBookMarksDataMenuItem.click()
+        resetBookMarksMenuItem.click()
 
         let urlForBookmarks = locallyServedURL(pageTitle: siteTitleForBookmarkedSite)
 
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: timeout),
+            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The address bar text field didn't become available in a reasonable timeframe."
         )
 
         addressBarTextField.typeText("\(urlForBookmarks.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(siteTitleForBookmarkedSite)"].waitForExistence(timeout: timeout),
+            app.windows.webViews["\(siteTitleForBookmarkedSite)"].waitForExistence(timeout: elementExistenceTimeout),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
 
         app.typeKey("d", modifierFlags: [.command]) // Bookmark the page
         XCTAssertTrue(
-            addBookmarkButton.waitForExistence(timeout: timeout),
+            addBookmarkButton.waitForExistence(timeout: elementExistenceTimeout),
             "Bookmark button didn't appear with the expected title in a reasonable timeframe."
         )
         addBookmarkButton.click()
 
         XCTAssertTrue(
-            historyMenuBarItem.waitForExistence(timeout: timeout),
+            historyMenuBarItem.waitForExistence(timeout: elementExistenceTimeout),
             "History menu bar item didn't appear in a reasonable timeframe."
         )
         historyMenuBarItem.click()
 
         XCTAssertTrue(
-            clearAllHistory.waitForExistence(timeout: timeout),
+            clearAllHistoryMenuItem.waitForExistence(timeout: elementExistenceTimeout),
             "Clear all history item didn't appear in a reasonable timeframe."
         )
-        clearAllHistory.click()
+        clearAllHistoryMenuItem.click()
 
         XCTAssertTrue(
-            app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: timeout),
+            app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: elementExistenceTimeout),
             "Clear all history item didn't appear in a reasonable timeframe."
         )
         app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // And manually remove the history
@@ -169,13 +181,13 @@ private extension AutocompleteTests {
         let urlForHistory = locallyServedURL(pageTitle: siteTitleForHistorySite)
 
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: timeout),
+            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The address bar text field didn't become available in a reasonable timeframe."
         )
 
         addressBarTextField.typeText("\(urlForHistory.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(siteTitleForHistorySite)"].waitForExistence(timeout: timeout),
+            app.windows.webViews["\(siteTitleForHistorySite)"].waitForExistence(timeout: elementExistenceTimeout),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
