@@ -184,8 +184,9 @@ public struct PreferencesSubscriptionView: View {
             TextMenuItemHeader(model.subscriptionDetails ?? UserText.preferencesSubscriptionInactiveHeader)
             TextMenuItemCaption(UserText.preferencesSubscriptionExpiredCaption)
         } buttons: {
-            Button(UserText.viewPlansButtonTitle) { model.purchaseAction() }
-                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+            // We need to improve re-purchase flow
+            /* Button(UserText.viewPlansButtonTitle) { model.purchaseAction() }
+                .buttonStyle(DefaultActionButtonStyle(enabled: true)) */
             Menu {
                 Button(UserText.removeFromThisDeviceButton, action: {
                     showingRemoveConfirmationDialog.toggle()
