@@ -284,7 +284,10 @@ extension Pixel {
 
             case fileStoreWriteFailed
             case fileMoveToDownloadsFailed
+            case fileAccessRelatedItemFailed
             case fileGetDownloadLocationFailed
+            case fileDownloadCreatePresentersFailed
+            case downloadResumeDataCodingFailed
 
             case suggestionsFetchFailed
             case appOpenURLFailed
@@ -736,6 +739,12 @@ extension Pixel.Event.Debug {
             return "df"
         case .fileGetDownloadLocationFailed:
             return "dl"
+        case .fileAccessRelatedItemFailed:
+            return "dari"
+        case .fileDownloadCreatePresentersFailed:
+            return "dfpf"
+        case .downloadResumeDataCodingFailed:
+            return "drdc"
 
         case .suggestionsFetchFailed:
             return "sgf"

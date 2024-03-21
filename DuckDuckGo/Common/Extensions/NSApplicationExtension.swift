@@ -70,7 +70,7 @@ extension NSApplication {
     }()
     var runType: RunType { Self.runType }
 
-#if !NETWORK_EXTENSION
+#if !NETWORK_EXTENSION && !SANDBOX_TEST_TOOL
     var mainMenuTyped: MainMenu {
         return mainMenu as! MainMenu // swiftlint:disable:this force_cast
     }

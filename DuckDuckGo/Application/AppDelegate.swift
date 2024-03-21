@@ -342,7 +342,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
             // if there‘re downloads without location chosen yet (save dialog should display) - ignore them
-            if FileDownloadManager.shared.downloads.contains(where: { $0.location.destinationURL != nil }) {
+            if FileDownloadManager.shared.downloads.contains(where: { $0.state.isDownloading }) {
                 let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
                 if alert.runModal() == .cancel {
                     return .terminateCancel
@@ -354,20 +354,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
-    }
-
-    func askUserToGrantAccessToDestination(_ folderUrl: URL) {
-        if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
-            let alert = NSAlert.noAccessToDownloads()
-            if alert.runModal() != .cancel {
-                let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")!
-                NSWorkspace.shared.open(preferencesLink)
-                return
-            }
-        } else {
-            let alert = NSAlert.noAccessToSelectedFolder()
-            alert.runModal()
-        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

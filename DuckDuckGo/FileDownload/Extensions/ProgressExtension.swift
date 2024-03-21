@@ -20,19 +20,42 @@ import Foundation
 
 extension Progress {
 
+    private enum Constants {
+        /// delay before we start calculating the estimated time - because initially it‘s not reliable
+        static let remainingDownloadTimeEstimationDelay: TimeInterval = 1
+        /// this seems to be working…
+        static let downloadSpeedSmoothingFactor = 0.1
+    }
+
     convenience init(totalUnitCount: Int64,
-                     fileOperationKind: FileOperationKind,
-                     kind: ProgressKind,
-                     isPausable: Bool,
-                     isCancellable: Bool,
-                     fileURL: URL) {
+                     completedUnitCount: Int64 = 0,
+                     fileOperationKind: FileOperationKind? = nil,
+                     kind: ProgressKind? = nil,
+                     isPausable: Bool = false,
+                     isCancellable: Bool = false,
+                     fileURL: URL? = nil,
+                     sourceURL: URL? = nil) {
         self.init(totalUnitCount: totalUnitCount)
 
+        self.completedUnitCount = completedUnitCount
         self.fileOperationKind = fileOperationKind
         self.kind = kind
         self.isPausable = isPausable
         self.isCancellable = isCancellable
         self.fileURL = fileURL
+        self.fileDownloadingSourceURL = sourceURL
+    }
+
+    convenience init(copy progress: Progress) {
+        self.init(totalUnitCount: progress.totalUnitCount)
+
+        self.completedUnitCount = progress.completedUnitCount
+        self.fileOperationKind = progress.fileOperationKind
+        self.kind = progress.kind
+        self.isPausable = progress.isPausable
+        self.isCancellable = progress.isCancellable
+        self.fileURL = progress.fileURL
+        self.fileDownloadingSourceURL = progress.fileDownloadingSourceURL
     }
 
     var fileDownloadingSourceURL: URL? {
@@ -64,6 +87,15 @@ extension Progress {
         }
     }
 
+    var fileIcon: NSImage? {
+        get {
+            self.userInfo[.fileIconKey] as? NSImage
+        }
+        set {
+            self.setUserInfoObject(newValue, forKey: .fileIconKey)
+        }
+    }
+
     var fileIconOriginalRect: NSRect? {
         get {
             (self.userInfo[.fileIconOriginalRectKey] as? NSValue)?.rectValue
@@ -73,39 +105,50 @@ extension Progress {
         }
     }
 
-    var isPublished: Bool {
+    var startTime: Date? {
         get {
-            self.userInfo[.isPublishedKey] as? Bool ?? false
+            self.userInfo[.startTimeKey] as? Date
         }
         set {
-            self.setUserInfoObject(newValue, forKey: .isPublishedKey)
+            self.setUserInfoObject(newValue, forKey: .startTimeKey)
         }
     }
 
-    var isUnpublished: Bool {
+    /// set totalUnitCount, completedUnitCount with updating startTime, throughput and estimated time remaining
+    var totalAndCompletedForEstimatedTimeAndThroughput: (/* total: */ Int64, /* completed: */ Int64) {
         get {
-            self.userInfo[.isUnpublishedKey] as? Bool ?? false
+            (totalUnitCount, completedUnitCount)
         }
         set {
-            self.setUserInfoObject(newValue, forKey: .isUnpublishedKey)
+            let (total, completed) = newValue
+            if totalUnitCount != total {
+                totalUnitCount = total
+            }
+            completedUnitCount = completed
+            guard completed > 0 else { return }
+            guard let startTime else {
+                // track start time from a first received byte (completed > 0)
+                startTime = Date()
+                return
+            }
+
+            let elapsedTime = Date().timeIntervalSince(startTime)
+            // delay before we start calculating the estimated time - because initially it‘s not reliable
+            guard elapsedTime > Constants.remainingDownloadTimeEstimationDelay else { return }
+
+            // calculate instantaneous download speed
+            var throughput = Double(completed) / elapsedTime
+
+            // calculate the moving average of download speed
+            if let oldThroughput = self.throughput.map(Double.init) {
+                throughput = Constants.downloadSpeedSmoothingFactor * throughput + (1 - Constants.downloadSpeedSmoothingFactor) * oldThroughput
+            }
+            self.throughput = Int(throughput)
+
+            if total > 0 {
+                self.estimatedTimeRemaining = Double(total - completed) / Double(throughput)
+            }
         }
-    }
-
-    func publishIfNotPublished() {
-        dispatchPrecondition(condition: .onQueue(.main))
-        guard !self.isPublished else { return }
-        self.isPublished = true
-
-        self.publish()
-    }
-
-    func unpublishIfNeeded() {
-        guard self.isPublished,
-              !self.isUnpublished
-        else { return }
-        self.isUnpublished = true
-
-        self.unpublish()
     }
 
     /// Initialize a new Progress that publishes the progress of a file operation.
@@ -141,8 +184,8 @@ extension ProgressUserInfoKey {
     static let fileDownloadingSourceURLKey = ProgressUserInfoKey(rawValue: "NSProgressFileDownloadingSourceURL")
     static let fileLocationCanChangeKey = ProgressUserInfoKey(rawValue: "NSProgressFileLocationCanChangeKey")
     static let flyToImageKey = ProgressUserInfoKey(rawValue: "NSProgressFlyToImageKey")
+    static let fileIconKey = ProgressUserInfoKey(rawValue: "NSProgressFileIconKey")
     static let fileIconOriginalRectKey = ProgressUserInfoKey(rawValue: "NSProgressFileAnimationImageOriginalRectKey")
 
-    fileprivate static let isPublishedKey = ProgressUserInfoKey(rawValue: "isPublishedKey")
-    fileprivate static let isUnpublishedKey = ProgressUserInfoKey(rawValue: "isUnpublishedKey")
+    fileprivate static let startTimeKey = ProgressUserInfoKey(rawValue: "startTimeKey")
 }

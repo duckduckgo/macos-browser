@@ -165,13 +165,13 @@ final class DownloadsPreferences: ObservableObject {
 
     private var persistor: DownloadsPreferencesPersistor
 
-    static func defaultDownloadLocation() -> URL? {
+    static func defaultDownloadLocation(validate: Bool = true) -> URL? {
         let fileManager = FileManager.default
         let folders = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask)
 
         guard let folderURL = folders.first,
               let resolvedURL = try? URL(resolvingAliasFileAt: folderURL),
-              fileManager.isWritableFile(atPath: resolvedURL.path) else { return nil }
+              fileManager.isWritableFile(atPath: resolvedURL.path) || !validate else { return nil }
 
         return resolvedURL
     }

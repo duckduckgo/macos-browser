@@ -67,3 +67,15 @@ extension NSWorkspace {
     }
 
 }
+
+extension NSWorkspace.OpenConfiguration {
+
+    convenience init(newInstance: Bool, environment: [String: String]? = nil) {
+        self.init()
+        self.createsNewApplicationInstance = newInstance
+        if let environment {
+            self.environment = environment
+        }
+    }
+
+}
