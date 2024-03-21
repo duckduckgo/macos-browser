@@ -16,13 +16,13 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import UniformTypeIdentifiers
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class DownloadListCoordinatorTests: XCTestCase {
     let store = DownloadListStoreMock()
     let downloadManager = FileDownloadManagerMock()
@@ -37,23 +37,9 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
     lazy var webView = DownloadsWebViewMock()
 
-    func clearTemp() {
-        let tempDir = fm.temporaryDirectory
-        for file in (try? fm.contentsOfDirectory(atPath: tempDir.path)) ?? [] where file.hasPrefix(testFile) {
-            try? fm.removeItem(at: tempDir.appendingPathComponent(file))
-        }
-    }
-
     override func setUp() {
-        clearTemp()
-
         self.destURL = fm.temporaryDirectory.appendingPathComponent(testFile)
         self.tempURL = fm.temporaryDirectory.appendingPathComponent(testFile).appendingPathExtension("duckload")
-        fm.createFile(atPath: tempURL.path, contents: "test".data(using: .utf8)!, attributes: nil)
-    }
-
-    override func tearDown() {
-        clearTemp()
     }
 
     func setUpCoordinator() {
@@ -62,18 +48,29 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
     }
 
+    @MainActor
     func setUpCoordinatorAndAddDownload(isBurner: Bool = false) -> (WKDownloadMock, WebKitDownloadTask, UUID) {
         setUpCoordinator()
         let download = WKDownloadMock(url: .duckDuckGo)
-        let task = WebKitDownloadTask(download: download, promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isBurner: isBurner)
+
+        let fm = FileManager.default
+        XCTAssertTrue(fm.createFile(atPath: destURL.path, contents: nil))
+        let destFile = try! FilePresenter(url: destURL)
+        XCTAssertTrue(fm.createFile(atPath: tempURL.path, contents: "test".utf8data))
+        let tempFile = try! FilePresenter(url: tempURL)
+
+        let task = WebKitDownloadTask(download: download, destination: .resume(destination: destFile, tempFile: tempFile), isBurner: isBurner)
 
         let e = expectation(description: "download added")
         var id: UUID!
-        let c = coordinator.updates.sink { _, item in
-            e.fulfill()
-            id = item.identifier
+        let c = coordinator.updates.sink { kind, item in
+            if kind == .added {
+                e.fulfill()
+                id = item.identifier
+            }
         }
         downloadManager.downloadAddedSubject.send(task)
+        task.start(delegate: downloadManager)
         waitForExpectations(timeout: 1)
         c.cancel()
 
@@ -82,40 +79,51 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
     // MARK: - Tests
 
-    func testWhenCoordinatorInitializedThenClearItemsBeforeIsCalled() {
-        let clearDate: Date = Date.daysAgo(2)
-        let e = expectation(description: "clear older than date called")
-        store.fetchBlock = { date, _ in
-            e.fulfill()
-            XCTAssertEqual(Int(clearDate.timeIntervalSinceReferenceDate), Int(date.timeIntervalSinceReferenceDate))
-        }
-        setUpCoordinator()
-
-        waitForExpectations(timeout: 0)
-    }
-
+    @MainActor
     func testWhenCoordinatorInitializedThenDownloadItemsAreLoadedFromStore() {
-        store.fetchBlock = { _, completionHandler in
-            completionHandler(.success([.testItem, .olderItem]))
+        OSLog.enabledLoggingCategories = [OSLog.AppCategories.downloads.rawValue]
+
+        let items: [DownloadListItem] = [.testItem, .yesterdaysItem, .olderItem, .testRemovedItem, .testFailedItem]
+        let expectedItems: [DownloadListItem] = [.testItem, .yesterdaysItem, .testFailedItem]
+
+        let e1 = expectation(description: "fetch called")
+        store.fetchBlock = { completionHandler in
+            e1.fulfill()
+            let fm = FileManager()
+            for item in items where item != .testRemovedItem {
+                XCTAssertTrue(fm.createFile(atPath: item.destinationURL!.path, contents: nil))
+                if let tempURL = item.tempURL {
+                    XCTAssertTrue(fm.createFile(atPath: tempURL.path, contents: "test".utf8data))
+                }
+            }
+            completionHandler(.success(items))
         }
         setUpCoordinator()
+        waitForExpectations(timeout: 1)
 
-        XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true), [.olderItem, .testItem])
+        let resultItems = coordinator.downloads(sortedBy: \.modified, ascending: true)
+        XCTAssertEqual(resultItems.map(\.identifier), expectedItems.map(\.identifier))
+        XCTAssertEqual(resultItems.compactMap { $0.destinationBookmarkData }.count, 3)
     }
 
+    @MainActor
     func testWhenInitialLoadingFailsThenDownloadItemsAreEmpty() {
-        store.fetchBlock = { _, completionHandler in
+        let e1 = expectation(description: "fetch called")
+        store.fetchBlock = { completionHandler in
+            e1.fulfill()
             completionHandler(.failure(TestError()))
         }
         setUpCoordinator()
 
-        XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true), [])
+        waitForExpectations(timeout: 0)
 
+        XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true), [])
     }
 
+    @MainActor
     func testWhenStoreItemsAreLoadedThenUpdatesArePublished() {
         var itemsLoaded: ((Result<[DownloadListItem], Error>) -> Void)!
-        store.fetchBlock = { _, completionHandler in
+        store.fetchBlock = { completionHandler in
             itemsLoaded = completionHandler
         }
 
@@ -142,22 +150,26 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testWhenDownloadAddedThenDownloadItemIsPublished() {
         setUpCoordinator()
 
-        let task = WebKitDownloadTask(download: WKDownloadMock(url: .duckDuckGo), promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isBurner: false)
+        let destURL = fm.temporaryDirectory.appendingPathComponent("test file.pdf")
+        let tempURL = fm.temporaryDirectory.appendingPathComponent("test file.duckload")
+        let task = WebKitDownloadTask(download: WKDownloadMock(url: .duckDuckGo), destination: .preset(destURL), isBurner: false)
 
         let e = expectation(description: "download added")
         let c = coordinator.updates.sink { [coordinator] (kind, item) in
             XCTAssertEqual(kind, .added)
-            XCTAssertEqual(item.destinationURL, self.destURL)
-            XCTAssertEqual(item.tempURL, self.tempURL)
+            XCTAssertEqual(item.destinationURL, destURL)
+            XCTAssertEqual(item.tempURL, tempURL)
             XCTAssertEqual(item.progress, task.progress)
             XCTAssertTrue(coordinator!.hasActiveDownloads)
             e.fulfill()
         }
 
         downloadManager.downloadAddedSubject.send(task)
+        task.start(delegate: downloadManager)
 
         withExtendedLifetime(c) {
             waitForExpectations(timeout: 1)
@@ -165,6 +177,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertTrue(coordinator.hasActiveDownloads)
     }
 
+    @MainActor
     func testWhenDownloadFinishesThenDownloadItemUpdated() {
         let (download, task, _) = setUpCoordinatorAndAddDownload()
 
@@ -191,6 +204,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertFalse(coordinator.hasActiveDownloads)
     }
 
+    @MainActor
     func testWhenDownloadFromBurnerWindowFinishesThenDownloadItemRemoved() {
         let (download, task, _) = setUpCoordinatorAndAddDownload(isBurner: true)
 
@@ -211,14 +225,18 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertFalse(coordinator.hasActiveDownloads)
     }
 
+    @MainActor
     func testWhenDownloadFailsThenDownloadItemUpdatedWithError() {
         let (download, task, _) = setUpCoordinatorAndAddDownload()
 
         let taskCompleted = expectation(description: "location updated")
+        var isFulfilled = false
         let c = coordinator.updates.sink { (kind, item) in
             XCTAssertEqual(kind, .updated)
-            taskCompleted.fulfill()
-
+            if !isFulfilled {
+                isFulfilled = true
+                taskCompleted.fulfill()
+            }
             XCTAssertEqual(item.destinationURL, self.destURL)
             XCTAssertEqual(item.tempURL, self.tempURL)
             XCTAssertNil(item.progress)
@@ -234,18 +252,22 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertFalse(coordinator.hasActiveDownloads)
     }
 
-    func testWhenPreloadedDownloadRestartedWithResumeDataThenResumeIsCalled() {
+    @MainActor
+    func testWhenPreloadedDownloadRestartedWithResumeDataThenResumeIsCalled() throws {
         var item: DownloadListItem = .testFailedItem
         item.tempURL = self.tempURL
-        store.fetchBlock = { _, completionHandler in
+
+        store.fetchBlock = { completionHandler in
             completionHandler(.success([item]))
         }
         setUpCoordinator()
 
         let resumeCalled = expectation(description: "resume called")
-        webView.resumeDownloadBlock = { data in
+        webView.resumeDownloadBlock = { [testFile, tempURL] data in
             resumeCalled.fulfill()
-            XCTAssertEqual(data, .resumeData)
+            let resumeData = try? data.map(DownloadResumeData.init(resumeData:))
+            XCTAssertEqual(resumeData?.localPath, tempURL!.path)
+            XCTAssertEqual(resumeData?.tempFileName, testFile.dropping(suffix: "." + testFile.pathExtension).appendingPathExtension("duckload"))
             return WKDownloadMock(url: .duckDuckGo)
         }
         webView.startDownloadBlock = { _ in
@@ -254,15 +276,17 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let downloadAdded = expectation(description: "download addeed")
-        downloadManager.addDownloadBlock = { [unowned self] download, _, location in
+        downloadManager.addDownloadBlock = { [unowned self] download, _, destination in
             downloadAdded.fulfill()
-            let task = WebKitDownloadTask(download: download,
-                                          promptForLocation: location == .prompt ? true : false,
-                                          destinationURL: location.destinationURL,
-                                          tempURL: location.tempURL,
-                                          isBurner: false)
+            let task = WebKitDownloadTask(download: download, destination: destination, isBurner: false)
             self.downloadManager.downloadAddedSubject.send(task)
-            XCTAssertEqual(location, .preset(destinationURL: item.destinationURL!, tempURL: item.tempURL))
+            task.start(delegate: self.downloadManager)
+            if case .resume(destination: let dest, tempFile: let temp) = destination {
+                XCTAssertEqual(dest.url, destURL)
+                XCTAssertEqual(temp.url, tempURL)
+            } else {
+                XCTFail("unexpected destination: \(destination)")
+            }
             return task
         }
 
@@ -285,7 +309,8 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)
     }
 
-    func testWhenAddedDownloadRestartedWithResumeDataThenResumeIsCalled() {
+    @MainActor
+    func testWhenAddedDownloadRestartedWithResumeDataThenResumeIsCalled() throws {
         let (download, task, id) = setUpCoordinatorAndAddDownload()
         let taskFailed = expectation(description: "task failed")
         let c1 = coordinator.updates.sink { _, _ in
@@ -307,15 +332,17 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let downloadAdded = expectation(description: "download addeed")
-        downloadManager.addDownloadBlock = { [unowned self] download, _, location in
+        downloadManager.addDownloadBlock = { [unowned self] download, _, destination in
             downloadAdded.fulfill()
-            let task = WebKitDownloadTask(download: download,
-                                          promptForLocation: location == .prompt ? true : false,
-                                          destinationURL: location.destinationURL,
-                                          tempURL: location.tempURL,
-                                          isBurner: false)
+            let task = WebKitDownloadTask(download: download, destination: destination, isBurner: false)
             self.downloadManager.downloadAddedSubject.send(task)
-            XCTAssertEqual(location, .preset(destinationURL: self.destURL, tempURL: self.tempURL))
+            task.start(delegate: self.downloadManager)
+            if case .resume(destination: let dest, tempFile: let temp) = destination {
+                XCTAssertEqual(dest.url, destURL)
+                XCTAssertEqual(temp.url, tempURL)
+            } else {
+                XCTFail("unexpected destination: \(destination)")
+            }
             return task
         }
 
@@ -338,11 +365,12 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)
     }
 
-    func testWhenDownloadRestartedWithoutResumeDataThenDownloadIsStarted() {
+    @MainActor
+    func testWhenDownloadRestartedWithoutResumeDataThenDownloadIsStarted() throws {
         var item: DownloadListItem = .testFailedItem
         item.tempURL = self.tempURL
         item.error = .failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: nil, isRetryable: false)
-        store.fetchBlock = { _, completionHandler in
+        store.fetchBlock = { completionHandler in
             completionHandler(.success([item]))
         }
         setUpCoordinator()
@@ -354,20 +382,22 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
         webView.startDownloadBlock = { request in
             startCalled.fulfill()
-            XCTAssertEqual(request?.url, item.url)
+            XCTAssertEqual(request?.url, item.downloadURL)
             return WKDownloadMock(url: .duckDuckGo)
         }
 
         let downloadAdded = expectation(description: "download addeed")
-        downloadManager.addDownloadBlock = { [unowned self] download, _, location in
+        downloadManager.addDownloadBlock = { [unowned self] download, _, destination in
             downloadAdded.fulfill()
-            let task = WebKitDownloadTask(download: download,
-                                          promptForLocation: location == .prompt ? true : false,
-                                          destinationURL: location.destinationURL,
-                                          tempURL: location.tempURL,
-                                          isBurner: false)
+            let task = WebKitDownloadTask(download: download, destination: destination, isBurner: false)
             self.downloadManager.downloadAddedSubject.send(task)
-            XCTAssertEqual(location, .preset(destinationURL: item.destinationURL!, tempURL: item.tempURL))
+            task.start(delegate: self.downloadManager)
+            if case .resume(destination: let dest, tempFile: let temp) = destination {
+                XCTAssertEqual(dest.url, destURL)
+                XCTAssertEqual(temp.url, tempURL)
+            } else {
+                XCTFail("unexpected destination: \(destination)")
+            }
             return task
         }
 
@@ -390,6 +420,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.downloads(sortedBy: \.modified, ascending: true).count, 1)
     }
 
+    @MainActor
     func testWhenDownloadRemovedThenUpdateIsPublished() {
         let (download, _, id) = setUpCoordinatorAndAddDownload()
 
@@ -411,6 +442,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testWhenInactiveDownloadsClearedThenOnlyInactiveDownloadsRemoved() {
         let (download1, task1, _) = setUpCoordinatorAndAddDownload()
         let (download2, task2, _) = setUpCoordinatorAndAddDownload()
@@ -434,6 +466,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         task1.download(download1.asWKDownload(), didFailWithError: TestError(), resumeData: nil)
     }
 
+    @MainActor
     func testWhenDownloadCancelledThenTaskIsCancelled() {
         let (download, _, id) = setUpCoordinatorAndAddDownload()
         let e = expectation(description: "cancelled")
@@ -444,6 +477,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
+    @MainActor
     func testSync() {
         let e = expectation(description: "sync called")
         store.syncBlock = {
@@ -458,20 +492,87 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
 private struct TestError: Error, Equatable {}
 private extension Data {
-    static let resumeData = "resumeData".data(using: .utf8)!
+    static let resumeData: Data = {
+        let dict = [
+            "NSURLSessionResumeInfoLocalPath": FileManager.default.temporaryDirectory.appendingPathComponent("downloaded file.duckload"),
+            "NSURLSessionResumeInfoTempFileName": "downloaded file.pdf"
+        ]
+        let archiver = NSKeyedArchiver(requiringSecureCoding: false)
+        archiver.encode(dict, forKey: "NSKeyedArchiveRootObjectKey")
+        archiver.finishEncoding()
+        return archiver.encodedData
+    }()
 }
 private extension DownloadListItem {
+
+    static let testItem = DownloadListItem(identifier: UUID(),
+                                           added: Date(),
+                                           modified: Date(),
+                                           downloadURL: URL(string: "https://duckduckgo.com/testdload")!,
+                                           websiteURL: .duckDuckGo,
+                                           fileName: "testItem.pdf",
+                                           progress: nil,
+                                           isBurner: false,
+                                           destinationURL: FileManager.default.temporaryDirectory.appendingPathComponent("testItem.pdf"),
+                                           destinationBookmarkData: nil,
+                                           tempURL: nil,
+                                           tempFileBookmarkData: nil,
+                                           error: nil)
+
+    static let yesterdaysItem = DownloadListItem(identifier: UUID(),
+                                                 added: .daysAgo(30),
+                                                 modified: .daysAgo(1),
+                                                 downloadURL: .duckDuckGo,
+                                                 websiteURL: .duckDuckGo,
+                                                 fileName: "oldItem.pdf",
+                                                 progress: nil,
+                                                 isBurner: false,
+                                                 destinationURL: FileManager.default.temporaryDirectory.appendingPathComponent("oldItem.pdf"),
+                                                 destinationBookmarkData: nil,
+                                                 tempURL: nil,
+                                                 tempFileBookmarkData: nil,
+                                                 error: nil)
+
+    static let olderItem = DownloadListItem(identifier: UUID(),
+                                            added: .daysAgo(30),
+                                            modified: .daysAgo(3),
+                                            downloadURL: URL(string: "https://testdownload.com")!,
+                                            websiteURL: nil,
+                                            fileName: "outdated_fileName",
+                                            progress: nil,
+                                            isBurner: false,
+                                            destinationURL: FileManager.default.temporaryDirectory.appendingPathComponent("olderItem.pdf"),
+                                            destinationBookmarkData: nil,
+                                            tempURL: nil,
+                                            tempFileBookmarkData: nil,
+                                            error: nil)
+
+    static let testRemovedItem = DownloadListItem(identifier: UUID(),
+                                                  added: Date(),
+                                                  modified: Date(),
+                                                  downloadURL: URL(string: "https://duckduckgo.com/testdload")!,
+                                                  websiteURL: .duckDuckGo,
+                                                  fileName: "fileName",
+                                                  progress: nil,
+                                                  isBurner: false,
+                                                  destinationURL: URL(fileURLWithPath: "/test/path"),
+                                                  destinationBookmarkData: nil,
+                                                  tempURL: URL(fileURLWithPath: "/temp/file/path"),
+                                                  tempFileBookmarkData: nil,
+                                                  error: nil)
 
     static let testFailedItem = DownloadListItem(identifier: UUID(),
                                                  added: Date(),
                                                  modified: Date(),
-                                                 url: URL(string: "https://duckduckgo.com/testdload")!,
-                                                 websiteURL: URL(string: "https://duckduckgo.com")!,
+                                                 downloadURL: URL(string: "https://duckduckgo.com/testdload")!,
+                                                 websiteURL: .duckDuckGo,
+                                                 fileName: "testFailedItem.pdf",
                                                  progress: nil,
                                                  isBurner: false,
-                                                 fileType: .pdf,
-                                                 destinationURL: URL(fileURLWithPath: "/test/file/path"),
-                                                 tempURL: URL(fileURLWithPath: "/temp/file/path"),
+                                                 destinationURL: FileManager.default.temporaryDirectory.appendingPathComponent("testFailedItem.pdf"),
+                                                 destinationBookmarkData: nil,
+                                                 tempURL: FileManager.default.temporaryDirectory.appendingPathComponent("testFailedItem.duckload"),
+                                                 tempFileBookmarkData: nil,
                                                  error: .failedToCompleteDownloadTask(underlyingError: TestError(), resumeData: .resumeData, isRetryable: false))
 
 }

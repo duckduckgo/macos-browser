@@ -195,6 +195,7 @@ internal class FilePresenter {
     }
 
     deinit {
+        innerPresenter?.delegate = nil
         removeFilePresenter()
     }
 

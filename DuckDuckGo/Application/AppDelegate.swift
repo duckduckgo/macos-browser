@@ -41,7 +41,7 @@ import Subscription
 #endif
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
@@ -230,7 +230,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             FaviconManager.shared.loadFavicons()
         }
         ConfigurationManager.shared.start()
-        FileDownloadManager.shared.delegate = self
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 

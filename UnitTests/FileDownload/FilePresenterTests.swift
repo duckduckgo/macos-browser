@@ -209,7 +209,6 @@ final class FilePresenterTests: XCTestCase {
         }
     }
 
-    // TODO: test file presenter for non-existent URLs
     func testWhenFileIsRenamed_accessIsPreserved() async throws {
         // 1. make non-sandbox file; open the file and create bookmark with the helper app
         let nonSandboxUrl = try makeNonSandboxFile()
@@ -239,8 +238,7 @@ final class FilePresenterTests: XCTestCase {
             e2.fulfill()
         }
 
-        // TODO: test if moving works without "to"
-        try NSFileCoordinator().coordinate(movingItemAt: nonSandboxUrl, to: newUrl) { from, to in
+        try NSFileCoordinator().coordinateMove(from: nonSandboxUrl, to: newUrl) { from, to in
             try FileManager.default.moveItem(at: from, to: to)
         }
         await fulfillment(of: [e1, e2], timeout: 5)
@@ -259,7 +257,7 @@ final class FilePresenterTests: XCTestCase {
             e4.fulfill()
         }
 
-        try NSFileCoordinator().coordinate(movingItemAt: newUrl, to: newUrl2) { from, to in
+        try NSFileCoordinator().coordinateMove(from: newUrl, to: newUrl2) { from, to in
             try FileManager.default.moveItem(at: from, to: to)
         }
         await fulfillment(of: [e3, e4], timeout: 5)
@@ -338,7 +336,7 @@ final class FilePresenterTests: XCTestCase {
             e2.fulfill()
         }
 
-        try NSFileCoordinator().coordinate(writingItemAt: nonSandboxUrl, options: .forMoving) { url in
+        try NSFileCoordinator().coordinateWrite(at: nonSandboxUrl, with: .forMoving) { url in
             try FileManager.default.trashItem(at: url, resultingItemURL: &newUrl)
         }
         await fulfillment(of: [e1, e2], timeout: 5)
@@ -371,7 +369,7 @@ final class FilePresenterTests: XCTestCase {
             e.fulfill()
         }
 
-        try NSFileCoordinator().coordinate(movingItemAt: nonSandboxUrl, to: newUrl) { from, to in
+        try NSFileCoordinator().coordinateMove(from: nonSandboxUrl, to: newUrl) { from, to in
             try FileManager.default.moveItem(at: from, to: to)
         }
         await fulfillment(of: [e], timeout: 5)
@@ -429,7 +427,7 @@ final class FilePresenterTests: XCTestCase {
         let c = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.fileMoved.name).sink { n in
             e.fulfill()
         }
-        try NSFileCoordinator().coordinate(movingItemAt: nonSandboxUrl, to: newUrl) { from, to in
+        try NSFileCoordinator().coordinateMove(from: nonSandboxUrl, to: newUrl) { from, to in
             try FileManager.default.moveItem(at: from, to: to)
         }
 
@@ -472,7 +470,7 @@ final class FilePresenterTests: XCTestCase {
             e.fulfill()
         }
 
-        try NSFileCoordinator().coordinate(movingItemAt: nonSandboxUrl, to: newUrl) { from, to in
+        try NSFileCoordinator().coordinateMove(from: nonSandboxUrl, to: newUrl) { from, to in
             try FileManager.default.moveItem(at: from, to: to)
         }
         await fulfillment(of: [e], timeout: 5)
@@ -523,7 +521,7 @@ final class FilePresenterTests: XCTestCase {
             e2.fulfill()
         }
 
-        try NSFileCoordinator().coordinate(writingItemAt: nonSandboxUrl, options: .forDeleting) { url in
+        try NSFileCoordinator().coordinateWrite(at: nonSandboxUrl, with: .forDeleting) { url in
             try FileManager.default.removeItem(at: url)
         }
         await fulfillment(of: [e1, e2], timeout: 5)
@@ -563,7 +561,7 @@ final class FilePresenterTests: XCTestCase {
                 XCTAssertEqual(to.path, n.object as? String)
                 e.fulfill()
             }
-            try NSFileCoordinator().coordinate(movingItemAt: from, to: to) { from, to in
+            try NSFileCoordinator().coordinateMove(from: from, to: to) { from, to in
                 try FileManager.default.moveItem(at: from, to: to)
             }
             await fulfillment(of: [e], timeout: 5)
@@ -613,13 +611,14 @@ final class FilePresenterTests: XCTestCase {
         post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
 
         // 3. close the file presenter
-        let e3 = expectation(description: "access stopped")
-        let c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.stopAccessingSecurityScopedResourceCalled.name).sink { n in
+        let e = expectation(description: "access stopped")
+        let c = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.stopAccessingSecurityScopedResourceCalled.name).sink { n in
             XCTAssertEqual(n.object as? String, nonSandboxUrl.path)
-            e3.fulfill()
+            e.fulfill()
         }
         post(.closeFilePresenter, with: nonSandboxUrl.path)
-        await fulfillment(of: [e3], timeout: 1)
+        await fulfillment(of: [e], timeout: 1)
+        withExtendedLifetime(c) {}
 
         // 4. validate file can still be read
         fileReadPromise = self.fileReadPromise()
@@ -672,7 +671,7 @@ final class FilePresenterTests: XCTestCase {
             e2.fulfill()
         }
 
-        try NSFileCoordinator().coordinate(movingItemAt: nonSandboxUrl, to: newUrl) { from, to in
+        try NSFileCoordinator().coordinateMove(from: nonSandboxUrl, to: newUrl) { from, to in
             try FileManager.default.moveItem(at: from, to: to)
         }
         await fulfillment(of: [e1, e2], timeout: 5)
@@ -703,7 +702,7 @@ final class FilePresenterTests: XCTestCase {
             e2.fulfill()
         }
 
-        try NSFileCoordinator().coordinate(writingItemAt: nonSandboxUrl, options: .forDeleting) { url in
+        try NSFileCoordinator().coordinateWrite(at: nonSandboxUrl, with: .forDeleting) { url in
             try FileManager.default.removeItem(at: url)
         }
         await fulfillment(of: [e1, e2], timeout: 5)
@@ -743,7 +742,7 @@ final class FilePresenterTests: XCTestCase {
             let c3 = ((presenter === filePresenter1) ? filePresenter2 : filePresenter1).urlPublisher.dropFirst().sink { _ in
                 XCTFail("Unexpected url published from another file presenter")
             }
-            try NSFileCoordinator().coordinate(movingItemAt: from, to: to) { from, to in
+            try NSFileCoordinator().coordinateMove(from: from, to: to) { from, to in
                 try FileManager.default.moveItem(at: from, to: to)
             }
             await fulfillment(of: [e1, e2], timeout: 5)

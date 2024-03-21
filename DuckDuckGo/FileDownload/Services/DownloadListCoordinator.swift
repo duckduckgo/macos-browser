@@ -124,6 +124,7 @@ final class DownloadListCoordinator {
     }
     private func add(_ item: DownloadListItem, ifModifiedLaterThan minModificationDate: Date) throws {
         var item = item
+        let modified = item.modified // setting error would reset `.modified`
         if item.tempURL != nil, item.error == nil {
             // initially loaded item with non-nil `tempURL` means the browser was terminated without writing a cancellation error
             item.error = .failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil, isRetryable: false)
@@ -133,7 +134,7 @@ final class DownloadListCoordinator {
         let presenters = try setupFilePresenters(for: item)
 
         // clear old downloads
-        guard item.modified > minModificationDate else { throw FileAddError.itemOutdated }
+        guard modified > minModificationDate else { throw FileAddError.itemOutdated }
         guard let destinationFilePresenter = try presenters.destination.get() else { throw FileAddError.noDestinationUrl }
 
         self.subscribeToPresenters((destination: destinationFilePresenter, tempFile: try? presenters.tempFile.get()), of: item)
@@ -421,7 +422,6 @@ final class DownloadListCoordinator {
                 let destination: WebKitDownloadTask.DownloadDestination = if let presenters {
                     .resume(destination: presenters.destination, tempFile: presenters.tempFile)
                 } else {
-                    // TODO: validate restart download works, should it be .preset?
                     .auto
                 }
                 let task = self.downloadManager.add(download, fromBurnerWindow: item.isBurner, destination: destination)
@@ -456,8 +456,8 @@ final class DownloadListCoordinator {
             guard var resumeData = item.error?.resumeData,
                   case .some((destination: .some(let destination), tempFile: .some(let tempFile))) = filePresenters[item.identifier],
                   let tempURL = tempFile.url else {
-                struct ThrowableError: Error {}
-                throw ThrowableError()
+                struct NoResumeData: Error {}
+                throw NoResumeData()
             }
 
             do {
@@ -473,10 +473,17 @@ final class DownloadListCoordinator {
             }
 
             webView.resumeDownload(fromResumeData: resumeData,
-                                   completionHandler: self.downloadRestartedCallback(for: item, webView: webView, presenters: (destination: destination, tempFile: tempFile)))
+                                   completionHandler: self.downloadRestartedCallback(for: item,
+                                                                                     webView: webView,
+                                                                                     presenters: (destination: destination, tempFile: tempFile)))
         } catch {
+            let presenters: (destination: FilePresenter, tempFile: FilePresenter)? = if case .some((destination: .some(let destination), tempFile: .some(let tempFile))) = filePresenters[item.identifier] {
+                (destination, tempFile)
+            } else {
+                nil
+            }
             let request = item.createRequest()
-            webView.startDownload(using: request, completionHandler: self.downloadRestartedCallback(for: item, webView: webView, presenters: nil))
+            webView.startDownload(using: request, completionHandler: self.downloadRestartedCallback(for: item, webView: webView, presenters: presenters))
         }
     }
 

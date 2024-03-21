@@ -163,7 +163,10 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         bindProgress(to: download)
 
         // if resuming download – file presenters are provided as init parameter
-        // `decideDestination` callback wouldn‘t be called
+        // when the resumed download is started using `WKWebView.resumeDownload`,
+        // `decideDestination` callback wouldn‘t be called.
+        // if the download is “resumed” as a new download (replacing the destination file) -
+        // the presenters will be used in the `decideDestination` callback
         if case .initial(.resume(destination: let destination, tempFile: let tempFile)) = state {
             state = .downloading(destination: destination, tempFile: tempFile)
         }
@@ -259,17 +262,24 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     }
 
     /// called at `WKDownload`s `decideDestination` completion callback with selected URL (or `nil` if cancelled)
-    private nonisolated func prepareChosenDestinationURL(_ destinationURL: URL?, fileType _: UTType?) async -> URL? {
+    private enum DestinationCleanupStyle { case remove, clear }
+    private nonisolated func prepareChosenDestinationURL(_ destinationURL: URL?, fileType _: UTType?, cleanupStyle: DestinationCleanupStyle) async -> URL? {
         do {
             guard let destinationURL else { throw URLError(.cancelled) }
             os_log(.debug, log: log, "download task callback: creating temp directory for \"\(destinationURL.path)\"")
 
-            // 1. remove the destination file if exists – that would clear existing downloads file presenters and stop downloads accordingly (if any)
             let fm = FileManager.default
-            try NSFileCoordinator().coordinateWrite(at: destinationURL, with: .forDeleting) { url in
-                guard fm.fileExists(atPath: url.path) else { return }
-                os_log(.debug, log: log, "🧹 removing \"\(url.path)\"")
-                try fm.removeItem(at: url)
+            switch cleanupStyle {
+            case .remove:
+                // 1. remove the destination file if exists – that would clear existing downloads file presenters and stop downloads accordingly (if any)
+                try NSFileCoordinator().coordinateWrite(at: destinationURL, with: .forDeleting) { url in
+                    guard fm.fileExists(atPath: url.path) else { return }
+                    os_log(.debug, log: log, "🧹 removing \"\(url.path)\"")
+                    try fm.removeItem(at: url)
+                }
+            case .clear:
+                // 2. the download is “resumed” to existing destinationURL – clear it.
+                try Data().write(to: destinationURL)
             }
 
             // 2. start downloading to a newly created same-volume temporary directory
@@ -339,8 +349,13 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         os_log(.debug, log: log, "temp file created: \(self): \(tempURL.path)")
 
         do {
-            // instantiate File Presenters and move the temp file to the final destination directory
-            let presenters = try await self.filePresenters(for: destinationURL, tempURL: tempURL)
+            let presenters = if case .downloading(destination: let destination, tempFile: let tempFile) = state {
+                // when “resuming” a non-resumable download - use the existing file presenters
+                try await self.reuseFilePresenters(tempFile: tempFile, destination: destination, tempURL: tempURL)
+            } else {
+                // instantiate File Presenters and move the temp file to the final destination directory
+                try await self.filePresenters(for: destinationURL, tempURL: tempURL)
+            }
             self.state = .downloading(destination: presenters.destinationFile, tempFile: presenters.tempFile)
 
         } catch {
@@ -409,6 +424,17 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         os_log(.debug, log: log, "🧙‍♂️ \"\(duckloadURL.path)\" (\"\(tempFilePresenter.url?.path ?? "<nil>")\") ready")
 
         return (tempFile: tempFilePresenter, destinationFile: destinationFilePresenter)
+    }
+
+    private nonisolated func reuseFilePresenters(tempFile: FilePresenter, destination: FilePresenter, tempURL: URL) async throws -> (tempFile: FilePresenter, destinationFile: FilePresenter) {
+
+        // if the download is “resumed” as a new download (replacing the destination file) -
+        // use the existing `.duckload` file and move the temp file in its place
+        _=try tempFile.coordinateWrite(with: .forReplacing) { duckloadURL in
+            try FileManager.default.replaceItemAt(duckloadURL, withItemAt: tempURL)
+        }
+
+        return (tempFile: tempFile, destinationFile: destination)
     }
 
     func cancel() {
@@ -583,12 +609,17 @@ extension WebKitDownloadTask: WKDownloadDelegate {
             suggestedFilename = urlSuggestedFilename
         }
 
+        var cleanupStyle: DestinationCleanupStyle = .remove
         guard let destinationURL = switch state {
         case .initial(.auto), .initial(.prompt):
             await delegate.fileDownloadTaskNeedsDestinationURL(self, suggestedFilename: suggestedFilename, suggestedFileType: suggestedFileType).0
         case .initial(.preset(let destinationURL)):
             destinationURL
-        case .initial(.resume), .downloading, .downloaded, .failed: {
+        case .initial(.resume(destination: let destination, tempFile: _)): {
+            cleanupStyle = .clear
+            return destination.url
+        }()
+        case .downloading, .downloaded, .failed: {
             assertionFailure("Unexpected state in decideDestination callback – \(state)")
             return nil
         }()
@@ -596,7 +627,7 @@ extension WebKitDownloadTask: WKDownloadDelegate {
             return nil
         }
 
-        return await prepareChosenDestinationURL(destinationURL, fileType: suggestedFileType)
+        return await prepareChosenDestinationURL(destinationURL, fileType: suggestedFileType, cleanupStyle: cleanupStyle)
     }
 
     @MainActor
@@ -691,7 +722,8 @@ extension WebKitDownloadTask {
             case .failed(_, _, resumeData: _, error: let error):
                 throw error
             }
-        }.mapError { $0 as! FileDownloadError } // swiftlint:disable:this force_cast
+        }
+        .mapError { $0 as! FileDownloadError } // swiftlint:disable:this force_cast
         .first()
         .eraseToAnyPublisher()
     }
