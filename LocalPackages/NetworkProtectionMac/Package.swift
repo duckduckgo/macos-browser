@@ -92,6 +92,7 @@ let package = Package(
                 "NetworkProtectionUI",
                 .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit"),
                 .product(name: "LoginItems", package: "LoginItems"),
+                .product(name: "PixelKitTestingUtilities", package: "PixelKit"),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
