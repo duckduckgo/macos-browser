@@ -553,7 +553,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func setupAnimationViews() {
-        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?, animationName: String) -> LottieAnimationView {
+        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?, animationName: String, renderingEngine: Lottie.RenderingEngineOption = .automatic) -> LottieAnimationView {
             if let animationView = animationView, animationView.identifier?.rawValue == animationName {
                 return animationView
             }
@@ -567,6 +567,7 @@ final class AddressBarButtonsViewController: NSViewController {
             } else {
                 newAnimationView = LottieAnimationView()
             }
+            newAnimationView.configuration = LottieConfiguration(renderingEngine: renderingEngine)
             animationWrapperView.addAndLayout(newAnimationView)
             newAnimationView.isHidden = true
             return newAnimationView
@@ -575,11 +576,14 @@ final class AddressBarButtonsViewController: NSViewController {
         let isAquaMode = NSApp.effectiveAppearance.name == .aqua
 
         trackerAnimationView1 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView1,
-                                                                  animationName: isAquaMode ? "trackers-1" : "dark-trackers-1")
+                                                                  animationName: isAquaMode ? "trackers-1" : "dark-trackers-1",
+                                                                  renderingEngine: .mainThread)
         trackerAnimationView2 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView2,
-                                                                  animationName: isAquaMode ? "trackers-2" : "dark-trackers-2")
+                                                                  animationName: isAquaMode ? "trackers-2" : "dark-trackers-2",
+                                                                  renderingEngine: .mainThread)
         trackerAnimationView3 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView3,
-                                                                  animationName: isAquaMode ? "trackers-3" : "dark-trackers-3")
+                                                                  animationName: isAquaMode ? "trackers-3" : "dark-trackers-3",
+                                                                  renderingEngine: .mainThread)
         shieldAnimationView = addAndLayoutAnimationViewIfNeeded(animationView: shieldAnimationView,
                                                                 animationName: isAquaMode ? "shield" : "dark-shield")
         shieldDotAnimationView = addAndLayoutAnimationViewIfNeeded(animationView: shieldDotAnimationView,
