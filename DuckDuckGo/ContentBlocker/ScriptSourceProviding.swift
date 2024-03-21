@@ -21,6 +21,7 @@ import Combine
 import Common
 import BrowserServicesKit
 import Configuration
+import TrackerRadarKit
 
 protocol ScriptSourceProviding {
 
@@ -114,12 +115,11 @@ struct ScriptSourceProvider: ScriptSourceProviding {
 #endif
 
         let surrogates = configStorage.loadData(for: .surrogates)?.utf8String() ?? ""
-        let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
-        let rules = contentBlockingManager.currentRules.first(where: { $0.name == tdsName})
+        let allTrackers = mergeTrackerDataSets(rules: contentBlockingManager.currentRules)
         return DefaultSurrogatesUserScriptConfig(privacyConfig: privacyConfigurationManager.privacyConfig,
                                                  surrogates: surrogates,
-                                                 trackerData: rules?.trackerData,
-                                                 encodedSurrogateTrackerData: rules?.encodedTrackerData,
+                                                 trackerData: allTrackers.trackerData,
+                                                 encodedSurrogateTrackerData: allTrackers.encodedTrackerData,
                                                  trackerDataManager: trackerDataManager,
                                                  tld: tld,
                                                  isDebugBuild: isDebugBuild)
@@ -136,6 +136,29 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         }
 
         return data
+    }
+
+    private func mergeTrackerDataSets(rules: [ContentBlockerRulesManager.Rules]) -> (trackerData: TrackerData, encodedTrackerData: String) {
+        let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
+        let tdsIndex = contentBlockingManager.currentRules.firstIndex(where: { $0.name == tdsName})
+
+        // copy main TDS, to retain cnames (also, perf)
+        var combinedTrackerData = rules[tdsIndex!].trackerData
+        for index in 0...rules.count-1 {
+            print("\(rules[index].name): \(rules[index].trackerData.trackers.count) trackers, \(rules[index].trackerData.entities.count) entities, \(rules[index].trackerData.domains.count) domains")
+            if index != tdsIndex {
+                combinedTrackerData.trackers.merge(rules[index].trackerData.trackers) { (current, _) in current }
+                combinedTrackerData.entities.merge(rules[index].trackerData.entities) { (current, _) in current }
+                combinedTrackerData.domains.merge(rules[index].trackerData.domains) { (current, _) in current }
+            }
+        }
+        print("COMBINED: \(combinedTrackerData.trackers.count) trackers, \(combinedTrackerData.entities.count) entities, \(combinedTrackerData.domains.count) domains")
+
+        let surrogateTDS = ContentBlockerRulesManager.extractSurrogates(from: combinedTrackerData)
+        let encodedData = try? JSONEncoder().encode(surrogateTDS)
+        let encodedTrackerData = String(data: encodedData!, encoding: .utf8)!
+
+        return (trackerData: combinedTrackerData, encodedTrackerData: encodedTrackerData)
     }
 
     private func loadFont(_ fileName: String, _ fileExt: String) -> String? {
