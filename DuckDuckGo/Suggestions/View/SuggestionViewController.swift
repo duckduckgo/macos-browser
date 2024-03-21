@@ -87,6 +87,7 @@ final class SuggestionViewController: NSViewController {
 
     private func setupTableView() {
         tableView.style = .plain
+        tableView.setAccessibilityIdentifier("SuggestionViewController.tableView")
     }
 
     private func addTrackingArea() {
