@@ -1,5 +1,5 @@
 //
-//  VPNPrivacyProPixel.swift
+//  VPNPrivacyProPixelTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import PixelKit
 import PixelKitTestingUtilities
 import XCTest
-@testable import VPNPrivacyPro
+@testable import NetworkProtectionUI
 
 final class VPNPrivacyProPixelTests: XCTestCase {
 

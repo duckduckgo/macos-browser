@@ -29,7 +29,6 @@ let package = Package(
         .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
         .library(name: "NetworkProtectionProxy", targets: ["NetworkProtectionProxy"]),
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"]),
-        .library(name: "VPNPrivacyPro", targets: ["VPNPrivacyPro"])
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "128.0.0"),
@@ -76,6 +75,7 @@ let package = Package(
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "LoginItems", package: "LoginItems"),
+                .product(name: "PixelKit", package: "PixelKit"),
             ],
             resources: [
                 .copy("Resources/Assets.xcassets")
@@ -92,29 +92,6 @@ let package = Package(
                 "NetworkProtectionUI",
                 .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit"),
                 .product(name: "LoginItems", package: "LoginItems"),
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
-        ),
-
-        // MARK: - VPNPixels
-
-        .target(
-            name: "VPNPrivacyPro",
-            dependencies: [
-                .product(name: "PixelKit", package: "PixelKit"),
-            ],
-            swiftSettings: [
-                .define("DEBUG", .when(configuration: .debug))
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
-        ),
-
-        .testTarget(
-            name: "VPNPrivacyProTests",
-            dependencies: [
-                .byName(name: "VPNPrivacyPro"),
-                .product(name: "PixelKit", package: "PixelKit"),
-                .product(name: "PixelKitTestingUtilities", package: "PixelKit"),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),

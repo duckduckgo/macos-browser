@@ -30,7 +30,6 @@ import PixelKit
 
 #if SUBSCRIPTION
 import Subscription
-import VPNPrivacyPro
 #endif
 
 @objc(Application)
@@ -372,12 +371,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     UserDefaults.netP.networkProtectionEntitlementsExpired = false
                 case .invalidEntitlement:
                     UserDefaults.netP.networkProtectionEntitlementsExpired = true
+                    PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndContinuous)
+
                     guard let self else { return }
                     Task {
                         let isConnected = await self.tunnelController.isConnected
                         if isConnected {
                             await self.tunnelController.stop()
-                            PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndContinuous)
                             DistributedNotificationCenter.default().post(.showExpiredEntitlementNotification)
                         }
                     }

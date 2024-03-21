@@ -29,7 +29,6 @@ import PixelKit
 
 #if SUBSCRIPTION
 import Subscription
-import VPNPrivacyPro
 #endif
 
 protocol NetworkProtectionFeatureVisibility {

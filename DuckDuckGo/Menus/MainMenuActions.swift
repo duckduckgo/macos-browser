@@ -23,7 +23,6 @@ import WebKit
 import Configuration
 import History
 import PixelKit
-import VPNPrivacyPro
 
 // Actions are sent to objects of responder chain
 
