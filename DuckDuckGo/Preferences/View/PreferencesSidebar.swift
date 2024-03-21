@@ -66,6 +66,7 @@ extension Preferences {
                 }
             }
             .buttonStyle(SidebarItemButtonStyle(isSelected: isSelected))
+            .accessibilityIdentifier("PreferencesSidebar.\(pane.id.rawValue)Button")
         }
     }
 
