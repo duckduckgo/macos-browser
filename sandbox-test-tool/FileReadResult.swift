@@ -17,3 +17,22 @@
 //
 
 import Foundation
+
+struct FileReadResult: Codable {
+
+    let path: String
+    let data: String
+    let bookmark: Data?
+
+    static func decode(from string: String) throws -> FileReadResult {
+        try JSONDecoder().decode(Self.self, from: string.data(using: .utf8)!)
+    }
+
+    func encoded() -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let json = try? encoder.encode(self)
+        return String(data: json!, encoding: .utf8)!
+    }
+
+}
