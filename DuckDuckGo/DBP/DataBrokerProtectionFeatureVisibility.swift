@@ -165,3 +165,4 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         }
     }
 }
+#endif
