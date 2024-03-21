@@ -100,9 +100,11 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     private func setupIconSubscription() {
-        iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
-            self?.buttonImage = self?.buttonImageFromWaitlistState(icon: icon)
-        }
+        iconPublisherCancellable = iconPublisher.$icon
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] icon in
+                self?.buttonImage = self?.buttonImageFromWaitlistState(icon: icon)
+            }
     }
 
     /// Temporary override used for the NetP waitlist beta, as a different asset is used for users who are invited to join the beta but haven't yet accepted.
