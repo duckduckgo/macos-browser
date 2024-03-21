@@ -22,6 +22,8 @@ import Common
 import WebKit
 import Configuration
 import History
+import PixelKit
+import VPNPrivacyPro
 
 // Actions are sent to objects of responder chain
 
@@ -717,11 +719,19 @@ extension MainViewController {
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
 
-        // Aid to transition VPN from waitlist to subscription
-        // by resetting this we allow users to go back to waitlist
-        // and re-test.
+        clearPrivacyProState()
+    }
+
+    /// Clears the PrivacyPro state to make testing easier.
+    ///
+    private func clearPrivacyProState() {
         resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
+
+        // Clear pixel data
+        DailyPixel.clearLastFireDate(pixel: .privacyProEnabled)
+        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouDBP)
+        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouVPN)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {

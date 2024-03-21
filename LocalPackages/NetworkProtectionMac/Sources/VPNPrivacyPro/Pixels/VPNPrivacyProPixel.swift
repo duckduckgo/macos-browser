@@ -33,18 +33,12 @@ public enum VPNPrivacyProPixel: PixelKitEventV2 {
     ///
     case vpnBetaStoppedWhenPrivacyProEnabled
 
-    /// Fired only once when the thank you alert is shown.
-    ///
-    case vpnBetaThankYouShown
-
     public var name: String {
         switch self {
         case .vpnAccessRevokedDialogShown:
             return "vpn_access_revoked_dialog_shown"
         case .vpnBetaStoppedWhenPrivacyProEnabled:
             return "vpn_beta_stopped_when_privacy_pro_enabled"
-        case .vpnBetaThankYouShown:
-            return "privacy_pro_promotion_dialog_shown"
         }
     }
 
@@ -52,7 +46,7 @@ public enum VPNPrivacyProPixel: PixelKitEventV2 {
         nil
     }
 
-    public var parameters: [String : String]? {
+    public var parameters: [String: String]? {
         nil
     }
 }

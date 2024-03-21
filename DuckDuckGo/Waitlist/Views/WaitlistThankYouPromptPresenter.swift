@@ -18,8 +18,6 @@
 
 import AppKit
 import Foundation
-import PixelKit
-import VPNPrivacyPro
 
 final class WaitlistThankYouPromptPresenter {
 
@@ -53,23 +51,29 @@ final class WaitlistThankYouPromptPresenter {
     // If the user tested both, the PIR prompt will be displayed.
     @MainActor
     func presentThankYouPromptIfNecessary(in window: NSWindow) {
+        // Wiring this here since it's mostly useful for rolling out PrivacyPro, and should
+        // go away once PPro is fully rolled out.
+        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
+            DailyPixel.fire(pixel: .privacyProEnabled, frequency: .dailyOnly)
+        }
+
         guard canShowPromptCheck() else {
             return
         }
 
         if isPIRBetaTester() {
             saveDidShowPromptCheck()
+            Pixel.fire(Pixel.Event.privacyProBetaUserThankYouDBP, limitTo: .initial)
             presentPIRThankYouPrompt(in: window)
         } else if isVPNBetaTester() {
             saveDidShowPromptCheck()
+            Pixel.fire(Pixel.Event.privacyProBetaUserThankYouVPN, limitTo: .initial)
             presentVPNThankYouPrompt(in: window)
         }
     }
 
     @MainActor
     func presentVPNThankYouPrompt(in window: NSWindow) {
-        PixelKit.fire(VPNPrivacyProPixel.vpnBetaThankYouShown)
-
         let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
         let thankYouWindowController = thankYouModalView.wrappedInWindowController()
         if let thankYouWindow = thankYouWindowController.window {

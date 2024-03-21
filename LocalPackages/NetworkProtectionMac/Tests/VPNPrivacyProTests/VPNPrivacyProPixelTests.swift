@@ -68,9 +68,5 @@ final class VPNPrivacyProPixelTests: XCTestCase {
              and: .expect(pixelName: "m_mac_vpn_beta_stopped_when_privacy_pro_enabled"),
              file: #filePath,
              line: #line)
-        fire(VPNPrivacyProPixel.vpnBetaThankYouShown,
-             and: .expect(pixelName: "m_mac_privacy_pro_promotion_dialog_shown"),
-             file: #filePath,
-             line: #line)
     }
 }

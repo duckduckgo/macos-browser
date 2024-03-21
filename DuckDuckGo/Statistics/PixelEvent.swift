@@ -218,6 +218,9 @@ extension Pixel {
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
         // Subscription
+        case privacyProEnabled
+        case privacyProBetaUserThankYouVPN
+        case privacyProBetaUserThankYouDBP
         case privacyProSubscriptionActive
         case privacyProOfferScreenImpression
         case privacyProPurchaseAttempt
@@ -651,6 +654,10 @@ extension Pixel.Event {
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
 
             // MARK: - Subscription
+        case .privacyProEnabled: return
+            "m_mac_\(appDistribution)_privacy-pro_enabled"
+        case .privacyProBetaUserThankYouVPN: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_vpn_u"
+        case .privacyProBetaUserThankYouDBP: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_dbp_u"
         case .privacyProSubscriptionActive: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_active"
         case .privacyProOfferScreenImpression: return "m_mac_\(appDistribution)_privacy-pro_offer_screen_impression"
         case .privacyProPurchaseAttempt: return "m_mac_\(appDistribution)_privacy-pro_terms-conditions_subscribe_click"
@@ -693,7 +700,6 @@ extension Pixel.Event {
         case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
         case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
         case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
-
         }
     }
 }
