@@ -218,7 +218,7 @@ extension Pixel {
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
         // Subscription
-        case privacyProEnabled
+        case privacyProFeatureEnabled
         case privacyProBetaUserThankYouVPN
         case privacyProBetaUserThankYouDBP
         case privacyProSubscriptionActive
@@ -654,8 +654,8 @@ extension Pixel.Event {
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
 
             // MARK: - Subscription
-        case .privacyProEnabled: return
-            "m_mac_\(appDistribution)_privacy-pro_enabled"
+        case .privacyProFeatureEnabled: return
+            "m_mac_\(appDistribution)_privacy-pro_feature_enabled"
         case .privacyProBetaUserThankYouVPN: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_vpn"
         case .privacyProBetaUserThankYouDBP: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_dbp"
         case .privacyProSubscriptionActive: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_active"

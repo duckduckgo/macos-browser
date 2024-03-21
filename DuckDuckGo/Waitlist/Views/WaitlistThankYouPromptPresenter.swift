@@ -54,7 +54,7 @@ final class WaitlistThankYouPromptPresenter {
         // Wiring this here since it's mostly useful for rolling out PrivacyPro, and should
         // go away once PPro is fully rolled out.
         if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
-            DailyPixel.fire(pixel: .privacyProEnabled, frequency: .dailyOnly)
+            DailyPixel.fire(pixel: .privacyProFeatureEnabled, frequency: .dailyOnly)
         }
 
         guard canShowPromptCheck() else {

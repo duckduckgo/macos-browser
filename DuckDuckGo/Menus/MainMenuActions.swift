@@ -728,7 +728,7 @@ extension MainViewController {
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
 
         // Clear pixel data
-        DailyPixel.clearLastFireDate(pixel: .privacyProEnabled)
+        DailyPixel.clearLastFireDate(pixel: .privacyProFeatureEnabled)
         Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouDBP)
         Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouVPN)
     }

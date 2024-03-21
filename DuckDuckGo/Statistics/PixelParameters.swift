@@ -170,7 +170,7 @@ extension Pixel.Event {
              .defaultRequestedFromHomepageSetupView,
              .defaultRequestedFromSettings,
              .defaultRequestedFromOnboarding,
-             .privacyProEnabled,
+             .privacyProFeatureEnabled,
              .privacyProBetaUserThankYouVPN,
              .privacyProBetaUserThankYouDBP,
              .privacyProSubscriptionActive,
