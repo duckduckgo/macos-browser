@@ -398,10 +398,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         if isBackendError {
             DailyPixel.fire(pixel: .privacyProPurchaseFailureBackendError, frequency: .dailyAndCount)
         }
-
-        if subscriptionActivationError != .hasActiveSubscription && subscriptionActivationError != .cancelledByUser {
-            DailyPixel.fire(pixel: .privacyProPurchaseFailure, frequency: .dailyAndCount)
-        }
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -577,6 +573,7 @@ extension MainWindowController {
 
     @MainActor
     func showSomethingWentWrongAlert() {
+        DailyPixel.fire(pixel: .privacyProPurchaseFailure, frequency: .dailyAndCount)
         guard let window else { return }
 
         window.show(.somethingWentWrongAlert())

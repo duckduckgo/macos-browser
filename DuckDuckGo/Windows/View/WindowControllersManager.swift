@@ -185,6 +185,9 @@ extension WindowControllersManager {
     }
 
     func showTab(with content: Tab.TabContent) {
+
+        reportTabOpening(with: content)
+
         guard let windowController = self.mainWindowController else {
             let tabCollection = TabCollection(tabs: [Tab(content: content)])
             let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
@@ -196,6 +199,14 @@ extension WindowControllersManager {
         let tabCollectionViewModel = viewController.tabCollectionViewModel
         tabCollectionViewModel.appendNewTab(with: content)
         windowController.window?.orderFront(nil)
+    }
+
+    func reportTabOpening(with content: Tab.TabContent) {
+        switch content {
+        case .subscription(let uRL):
+            Pixel.fire(.privacyProOfferScreenImpression)
+        default: break
+        }
     }
 
     // MARK: - VPN

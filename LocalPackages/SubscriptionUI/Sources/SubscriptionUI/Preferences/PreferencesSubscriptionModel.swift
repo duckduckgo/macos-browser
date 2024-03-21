@@ -225,6 +225,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func removeFromThisDeviceAction() {
+        userEventHandler(.removeSubscriptionClick)
         accountManager.signOut()
     }
 
