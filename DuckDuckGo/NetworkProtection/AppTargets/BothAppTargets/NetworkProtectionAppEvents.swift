@@ -90,6 +90,10 @@ final class NetworkProtectionAppEvents {
     }
 
     private func restartNetworkProtectionMenu(using loginItemsManager: LoginItemsManager) {
+        guard loginItemsManager.isAnyEnabled(LoginItemsManager.networkProtectionLoginItems) else {
+            return
+        }
+
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
 
