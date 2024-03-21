@@ -240,6 +240,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
+        self.isUserAuthenticated = accountManager.isUserAuthenticated
+
         guard fetchSubscriptionDetailsTask == nil else { return }
 
         fetchSubscriptionDetailsTask = Task { [weak self] in
@@ -247,16 +249,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.fetchSubscriptionDetailsTask = nil
             }
 
-            if let self, self.accountManager.isUserAuthenticated {
-                await self.updateSubscription(with: .reloadIgnoringLocalCacheData)
-                await self.updateAllEntitlement(with: .reloadIgnoringLocalCacheData)
-            }
+            await self?.updateSubscription(with: .reloadIgnoringLocalCacheData)
+            await self?.updateAllEntitlement(with: .reloadIgnoringLocalCacheData)
         }
     }
 
     @MainActor
     private func updateSubscription(with cachePolicy: SubscriptionService.CachePolicy) async {
-        guard let token = accountManager.accessToken else { return }
+        guard let token = accountManager.accessToken else {
+            SubscriptionService.signOut()
+            return
+        }
 
         switch await SubscriptionService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
         case .success(let subscription):
