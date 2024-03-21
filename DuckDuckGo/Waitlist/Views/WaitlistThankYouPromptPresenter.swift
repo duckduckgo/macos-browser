@@ -16,7 +16,10 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
+import PixelKit
+import VPNPrivacyPro
 
 final class WaitlistThankYouPromptPresenter {
 
@@ -65,6 +68,8 @@ final class WaitlistThankYouPromptPresenter {
 
     @MainActor
     func presentVPNThankYouPrompt(in window: NSWindow) {
+        PixelKit.fire(VPNPrivacyProPixel.vpnBetaThankYouShown)
+
         let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
         let thankYouWindowController = thankYouModalView.wrappedInWindowController()
         if let thankYouWindow = thankYouWindowController.window {

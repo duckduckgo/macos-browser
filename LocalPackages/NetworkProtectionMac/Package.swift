@@ -28,7 +28,8 @@ let package = Package(
     products: [
         .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
         .library(name: "NetworkProtectionProxy", targets: ["NetworkProtectionProxy"]),
-        .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
+        .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"]),
+        .library(name: "VPNPrivacyPro", targets: ["VPNPrivacyPro"])
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "128.0.0"),
@@ -84,6 +85,7 @@ let package = Package(
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
+
         .testTarget(
             name: "NetworkProtectionUITests",
             dependencies: [
@@ -92,6 +94,29 @@ let package = Package(
                 .product(name: "LoginItems", package: "LoginItems"),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
-        )
+        ),
+
+        // MARK: - VPNPixels
+
+        .target(
+            name: "VPNPrivacyPro",
+            dependencies: [
+                .product(name: "PixelKit", package: "PixelKit"),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
+        ),
+
+        .testTarget(
+            name: "VPNPrivacyProTests",
+            dependencies: [
+                .byName(name: "VPNPrivacyPro"),
+                .product(name: "PixelKit", package: "PixelKit"),
+                .product(name: "PixelKitTestingUtilities", package: "PixelKit"),
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
+        ),
     ]
 )

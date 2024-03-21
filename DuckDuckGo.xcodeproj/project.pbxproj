@@ -2261,6 +2261,9 @@
 		7BA076BB2B65D61400D7FB72 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA076BA2B65D61400D7FB72 /* NetworkProtectionProxy */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */; };
+		7BA75D6D2BAC4D9400AC79B2 /* VPNPrivacyPro in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA75D6C2BAC4D9400AC79B2 /* VPNPrivacyPro */; };
+		7BA75D6F2BAC4D9B00AC79B2 /* VPNPrivacyPro in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA75D6E2BAC4D9B00AC79B2 /* VPNPrivacyPro */; };
+		7BA75D712BAC4DA000AC79B2 /* VPNPrivacyPro in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA75D702BAC4DA000AC79B2 /* VPNPrivacyPro */; };
 		7BA7CC392AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */; };
 		7BA7CC3A2AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */; };
 		7BA7CC3D2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC112AD11DC80042E5CE /* TunnelControllerIPCService.swift */; };
@@ -4684,6 +4687,7 @@
 				4BF97AD32B43C43F00EB4240 /* NetworkProtectionUI in Frameworks */,
 				7B1459572B7D43E500047F2C /* NetworkProtectionProxy in Frameworks */,
 				B6F7128229F6820A00594A45 /* QuickLookUI.framework in Frameworks */,
+				7BA75D6F2BAC4D9B00AC79B2 /* VPNPrivacyPro in Frameworks */,
 				984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */,
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
 				9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */,
@@ -4838,6 +4842,7 @@
 				4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */,
 				373FB4B52B4D6C57004C88D6 /* PreferencesViews in Frameworks */,
 				4B957BE32AC7AE700062CA31 /* Navigation in Frameworks */,
+				7BA75D712BAC4DA000AC79B2 /* VPNPrivacyPro in Frameworks */,
 				1E21F8E32B73E48600FB272E /* Subscription in Frameworks */,
 				4B957BE42AC7AE700062CA31 /* DDGSync in Frameworks */,
 				4B957BE52AC7AE700062CA31 /* OpenSSL in Frameworks */,
@@ -4924,6 +4929,7 @@
 				37269EFB2B332F9E005E8E46 /* Common in Frameworks */,
 				4B2AAAF529E70DEA0026AFC0 /* Lottie in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
+				7BA75D6D2BAC4D9400AC79B2 /* VPNPrivacyPro in Frameworks */,
 				1EA7B8D52B7E078C000330A4 /* Subscription in Frameworks */,
 				B6B77BE8297973D4001E68A1 /* Navigation in Frameworks */,
 				3739326729AE4B42009346AE /* DDGSync in Frameworks */,
@@ -8707,6 +8713,7 @@
 				4BCBE4572BA7E17800FC75A1 /* SubscriptionUI */,
 				85D44B872BA08D30001B4AB5 /* Suggestions */,
 				4BCBE4592BA7E17800FC75A1 /* Subscription */,
+				7BA75D6E2BAC4D9B00AC79B2 /* VPNPrivacyPro */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -8997,6 +9004,7 @@
 				85E2BBD12B8F536F00DBEC7A /* History */,
 				F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */,
 				85D44B892BA08D3B001B4AB5 /* Suggestions */,
+				7BA75D702BAC4DA000AC79B2 /* VPNPrivacyPro */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -9167,6 +9175,7 @@
 				1EA7B8D42B7E078C000330A4 /* Subscription */,
 				F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */,
 				85D44B852BA08D29001B4AB5 /* Suggestions */,
+				7BA75D6C2BAC4D9400AC79B2 /* VPNPrivacyPro */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -14611,6 +14620,18 @@
 		7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SystemExtensionManager;
+		};
+		7BA75D6C2BAC4D9400AC79B2 /* VPNPrivacyPro */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = VPNPrivacyPro;
+		};
+		7BA75D6E2BAC4D9B00AC79B2 /* VPNPrivacyPro */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = VPNPrivacyPro;
+		};
+		7BA75D702BAC4DA000AC79B2 /* VPNPrivacyPro */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = VPNPrivacyPro;
 		};
 		7BA7CC5E2AD1210C0042E5CE /* Networking */ = {
 			isa = XCSwiftPackageProductDependency;
