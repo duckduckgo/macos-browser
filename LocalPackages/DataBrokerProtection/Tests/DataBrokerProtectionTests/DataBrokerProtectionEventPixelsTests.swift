@@ -107,7 +107,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let weeklyReportScanningPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let hadReAppereance = weeklyReportScanningPixel.params!["had_re-appearance"]!
 
-        XCTAssertTrue(Bool(hadReAppereance)!)
+        XCTAssertEqual(hadReAppereance, "1")
     }
 
     func testWhenReAppereanceDidNotOcurrInTheLastWeek_thenReAppereanceFlagIsFalse() {
@@ -131,7 +131,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let weeklyReportScanningPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let hadReAppereance = weeklyReportScanningPixel.params!["had_re-appearance"]!
 
-        XCTAssertFalse(Bool(hadReAppereance)!)
+        XCTAssertEqual(hadReAppereance, "0")
     }
 
     func testWhenNoMatchesHappendInTheLastWeek_thenHadNewMatchFlagIsFalse() {
@@ -155,7 +155,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let weeklyReportScanningPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let hadNewMatch = weeklyReportScanningPixel.params!["had_new_match"]!
 
-        XCTAssertFalse(Bool(hadNewMatch)!)
+        XCTAssertEqual(hadNewMatch, "0")
     }
 
     func testWhenMatchesHappendInTheLastWeek_thenHadNewMatchFlagIsTrue() {
@@ -179,7 +179,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let weeklyReportScanningPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let hadNewMatch = weeklyReportScanningPixel.params!["had_new_match"]!
 
-        XCTAssertTrue(Bool(hadNewMatch)!)
+        XCTAssertEqual(hadNewMatch, "1")
     }
 
     func testWhenNoRemovalsHappendInTheLastWeek_thenRemovalsCountIsZero() {
@@ -231,7 +231,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         XCTAssertEqual("2", removals)
     }
 
-    func testWhenNoHistoryEventsHappenedInTheLastWeek_thenBrokersScannedIsZero() {
+    func testWhenNoHistoryEventsHappenedInTheLastWeek_thenBrokersScannedIsZero25Range() {
         guard let eighDaysSinceToday = Calendar.current.date(byAdding: .day, value: -8, to: Date()) else {
             XCTFail("This should no throw")
             return
@@ -255,10 +255,49 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let weeklyReportScanningPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let scanCoverage = weeklyReportScanningPixel.params!["scan_coverage"]!
 
-        XCTAssertEqual("0", scanCoverage)
+        XCTAssertEqual("0-25", scanCoverage)
     }
 
-    func testWhenHistoryEventsHappenedInTheLastWeek_thenBrokersScannedIsMoreThanZero() {
+    func testWhenHistoryEventsHappenedInTheLastWeek_thenBrokersScannedIs2550Range() {
+        guard let eighDaysSinceToday = Calendar.current.date(byAdding: .day, value: -8, to: Date()) else {
+            XCTFail("This should no throw")
+            return
+        }
+
+        guard let sixDaysSinceToday = Calendar.current.date(byAdding: .day, value: -6, to: Date()) else {
+            XCTFail("This should no throw")
+            return
+        }
+
+        let eventOne = HistoryEvent(brokerId: 1, profileQueryId: 1, type: .scanStarted, date: eighDaysSinceToday)
+        let eventTwo = HistoryEvent(brokerId: 1, profileQueryId: 1, type: .scanStarted, date: sixDaysSinceToday)
+        let dataBrokerProfileQueries: [BrokerProfileQueryData] = [
+            .init(dataBroker: .mockWithURL("www.brokerone.com"),
+                  profileQuery: .mock,
+                  scanOperationData: .mockWith(historyEvents: [eventOne])),
+            .init(dataBroker: .mockWithURL("www.brokertwo.com"),
+                  profileQuery: .mock,
+                  scanOperationData: .mockWith(historyEvents: [eventOne])),
+            .init(dataBroker: .mockWithURL("www.brokerthree.com"),
+                  profileQuery: .mock,
+                  scanOperationData: .mockWith(historyEvents: [eventOne])),
+            .init(dataBroker: .mockWithURL("www.brokerfour.com"),
+                  profileQuery: .mock,
+                  scanOperationData: .mockWith(historyEvents: [eventTwo]))
+        ]
+        let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
+        database.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
+        repository.customGetLatestWeeklyPixel = nil
+
+        sut.tryToFireWeeklyPixels()
+
+        let weeklyReportScanningPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
+        let scanCoverage = weeklyReportScanningPixel.params!["scan_coverage"]!
+
+        XCTAssertEqual("25-50", scanCoverage)
+    }
+
+    func testWhenHistoryEventsHappenedInTheLastWeek_thenBrokersScannedIs5075Range() {
         guard let eighDaysSinceToday = Calendar.current.date(byAdding: .day, value: -8, to: Date()) else {
             XCTFail("This should no throw")
             return
@@ -294,7 +333,46 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
         let weeklyReportScanningPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
         let scanCoverage = weeklyReportScanningPixel.params!["scan_coverage"]!
 
-        XCTAssertEqual("50", scanCoverage)
+        XCTAssertEqual("50-75", scanCoverage)
+    }
+
+    func testWhenHistoryEventsHappenedInTheLastWeek_thenBrokersScannedIs75100Range() {
+        guard let eighDaysSinceToday = Calendar.current.date(byAdding: .day, value: -8, to: Date()) else {
+            XCTFail("This should no throw")
+            return
+        }
+
+        guard let sixDaysSinceToday = Calendar.current.date(byAdding: .day, value: -6, to: Date()) else {
+            XCTFail("This should no throw")
+            return
+        }
+
+        let eventOne = HistoryEvent(brokerId: 1, profileQueryId: 1, type: .scanStarted, date: eighDaysSinceToday)
+        let eventTwo = HistoryEvent(brokerId: 1, profileQueryId: 1, type: .scanStarted, date: sixDaysSinceToday)
+        let dataBrokerProfileQueries: [BrokerProfileQueryData] = [
+            .init(dataBroker: .mockWithURL("www.brokerone.com"),
+                  profileQuery: .mock,
+                  scanOperationData: .mockWith(historyEvents: [eventTwo])),
+            .init(dataBroker: .mockWithURL("www.brokertwo.com"),
+                  profileQuery: .mock,
+                  scanOperationData: .mockWith(historyEvents: [eventTwo])),
+            .init(dataBroker: .mockWithURL("www.brokerthree.com"),
+                  profileQuery: .mock,
+                  scanOperationData: .mockWith(historyEvents: [eventTwo])),
+            .init(dataBroker: .mockWithURL("www.brokerfour.com"),
+                  profileQuery: .mock,
+                  scanOperationData: .mockWith(historyEvents: [eventTwo]))
+        ]
+        let sut = DataBrokerProtectionEventPixels(database: database, repository: repository, handler: handler)
+        database.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
+        repository.customGetLatestWeeklyPixel = nil
+
+        sut.tryToFireWeeklyPixels()
+
+        let weeklyReportScanningPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
+        let scanCoverage = weeklyReportScanningPixel.params!["scan_coverage"]!
+
+        XCTAssertEqual("75-100", scanCoverage)
     }
 }
 
