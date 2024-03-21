@@ -48,7 +48,7 @@ final class SandboxTestToolApp: NSApplication {
 
 extension FileLogger: FilePresenterLogger {
     func log(_ message: @autoclosure () -> String) {
-        log(message, includeTimestamp: true)
+        log(message(), includeTimestamp: true)
     }
 }
 
