@@ -286,7 +286,7 @@ struct DataImportViewModel {
             switch error {
             // chromium user denied keychain prompt error
             case let error as ChromiumLoginReader.ImportError where error.type == .userDeniedKeychainPrompt:
-                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
+                Pixel.fire(.passwordImportKeychainPromptDenied)
                 // stay on the same screen
                 return true
 
