@@ -150,8 +150,8 @@ struct MapperToUI {
     }
 
     private func getLastScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
-                                            currentDate: Date = Date(),
-                                            format: String = "dd/MM/yyyy") -> DBPUIScanDate {
+                                         currentDate: Date = Date(),
+                                         format: String = "dd/MM/yyyy") -> DBPUIScanDate {
         let eightDaysBeforeToday = currentDate.addingTimeInterval(-8 * 24 * 60 * 60)
         let scansInTheLastEightDays = brokerProfileQueryData
             .filter { $0.scanOperationData.lastRunDate != nil && $0.scanOperationData.lastRunDate! <= currentDate && $0.scanOperationData.lastRunDate! > eightDaysBeforeToday }
@@ -180,8 +180,8 @@ struct MapperToUI {
     }
 
     private func getNextScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
-                                            currentDate: Date = Date(),
-                                            format: String = "dd/MM/yyyy") -> DBPUIScanDate {
+                                         currentDate: Date = Date(),
+                                         format: String = "dd/MM/yyyy") -> DBPUIScanDate {
         let eightDaysAfterToday = currentDate.addingTimeInterval(8 * 24 * 60 * 60)
         let scansHappeningInTheNextEightDays = brokerProfileQueryData
             .filter { $0.scanOperationData.preferredRunDate != nil && $0.scanOperationData.preferredRunDate! > currentDate && $0.scanOperationData.preferredRunDate! < eightDaysAfterToday }
