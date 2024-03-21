@@ -238,7 +238,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
         let connectionState = String(describing: statusReporter.statusObserver.recentValue)
         let lastErrorMessage = statusReporter.connectionErrorObserver.recentValue ?? "none"
-        let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation ?? "none"
+        let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation ?? "none"
         let connectedServerIP = statusReporter.serverInfoObserver.recentValue.serverAddress ?? "none"
         return .init(onboardingState: onboardingState,
                      connectionState: connectionState,
