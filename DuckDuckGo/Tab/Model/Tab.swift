@@ -1455,9 +1455,9 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
            self.content.urlForWebView == url {
 
             self.error = error
-            // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
-            let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
-            loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
+//             when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
+//            let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
+//            loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
         }
     }
 

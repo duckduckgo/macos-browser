@@ -185,6 +185,10 @@ extension TabExtensionsBuilder {
                                    scriptsPublisher: userScripts.compactMap { $0 },
                                    webViewPublisher: args.webViewFuture)
         }
+
+        add {
+            ErrorPageTabExtension(webViewPublisher: args.webViewFuture)
+        }
     }
 
 }

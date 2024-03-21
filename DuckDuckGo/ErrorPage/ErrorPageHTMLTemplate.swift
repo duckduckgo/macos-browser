@@ -43,3 +43,27 @@ struct ErrorPageHTMLTemplate {
     }
 
 }
+
+
+struct SSLErrorPageHTMLTemplate {
+    let siteURL: String
+    let specificErrorMessage: String
+
+    static var htmlTemplatePath: String {
+        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/sslerrorpage") else {
+            assertionFailure("HTML template not found")
+            return ""
+        }
+        return file
+    }
+
+    func makeHTMLFromTemplate() -> String {
+        guard let html = try? String(contentsOfFile: Self.htmlTemplatePath) else {
+            assertionFailure("Should be able to load template")
+            return ""
+        }
+        return html.replacingOccurrences(of: "$URL$", with: "<b>\(siteURL)</b>", options: .literal).replacingOccurrences(of: "$SPECIFIC_ERROR$", with: specificErrorMessage, options: .literal)
+    }
+
+}
+
