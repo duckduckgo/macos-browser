@@ -63,11 +63,11 @@ final class WaitlistThankYouPromptPresenter {
 
         if isPIRBetaTester() {
             saveDidShowPromptCheck()
-            Pixel.fire(Pixel.Event.privacyProBetaUserThankYouDBP, limitTo: .initial)
+            DailyPixel.fire(pixel: Pixel.Event.privacyProBetaUserThankYouDBP, frequency: .dailyAndCount)
             presentPIRThankYouPrompt(in: window)
         } else if isVPNBetaTester() {
             saveDidShowPromptCheck()
-            Pixel.fire(Pixel.Event.privacyProBetaUserThankYouVPN, limitTo: .initial)
+            DailyPixel.fire(pixel: Pixel.Event.privacyProBetaUserThankYouVPN, frequency: .dailyAndCount)
             presentVPNThankYouPrompt(in: window)
         }
     }
