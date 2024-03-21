@@ -1367,12 +1367,22 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         committedURL = navigation.url
     }
 
-    func resetRefreshCount() {
-        refreshCountSinceLoad = 0
+    func resetRefreshCountIfNeeded(action: NavigationAction) {
+        switch action.navigationType {
+        case .reload, .other:
+            break
+        default:
+            refreshCountSinceLoad = 0
+        }
     }
 
-    func setOpenerContext(_ context: BrokenSiteReport.OpenerContext?) {
-        inferredOpenerContext = context
+    func setOpenerContextIfNeeded(action: NavigationAction) {
+        switch action.navigationType {
+        case .linkActivated, .formSubmitted:
+            inferredOpenerContext = .navigation
+        default:
+            break
+        }
     }
 
     @MainActor
@@ -1380,15 +1390,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         // allow local file navigations
         if navigationAction.url.isFileURL { return .allow }
 
-        switch navigationAction.navigationType {
-        case .linkActivated, .formSubmitted:
-            resetRefreshCount()
-            setOpenerContext(.navigation)
-        case .reload, .other:
-            break
-        default:
-            resetRefreshCount()
-        }
+        resetRefreshCountIfNeeded(action: navigationAction)
+        setOpenerContextIfNeeded(action: navigationAction)
 
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if let mainFrame = navigationAction.mainFrameTarget,
@@ -1459,7 +1462,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         Task { @MainActor in
             if await webView.isCurrentSiteReferredFromDuckDuckGo {
-                setOpenerContext(.serp)
+                inferredOpenerContext = .serp
             }
         }
 

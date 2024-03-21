@@ -286,8 +286,8 @@ extension PrivacyDashboardViewController: PrivacyDashboardToggleReportDelegate {
        Task { @MainActor in
            do {
                let report = try await makeBrokenSiteReport(source: source,
-                                                     didOpenReportInfo: didOpenReportInfo,
-                                                     toggleReportCounter: toggleReportCounter)
+                                                           didOpenReportInfo: didOpenReportInfo,
+                                                           toggleReportCounter: toggleReportCounter)
                try toggleProtectionsOffReporter.report(report, reportMode: .toggle)
            } catch {
                os_log("Failed to generate or send the broken site report: %@", type: .error, error.localizedDescription)
@@ -303,6 +303,20 @@ extension PrivacyDashboardViewController {
 
     enum BrokenSiteReportError: Error {
         case failedToFetchTheCurrentURL
+    }
+
+    private func calculateWebVitals(performanceMetrics: PerformanceMetricsSubfeature?, privacyConfig: PrivacyConfiguration) async -> [Double]? {
+        var webVitalsResult: [Double]?
+        if privacyConfig.isEnabled(featureKey: .performanceMetrics) {
+            webVitalsResult = await withCheckedContinuation({ continuation in
+                guard let performanceMetrics else { continuation.resume(returning: nil); return }
+                performanceMetrics.notifyHandler { result in
+                    continuation.resume(returning: result)
+                }
+            })
+        }
+
+        return webVitalsResult
     }
 
     private func makeBrokenSiteReport(category: String = "",
@@ -325,15 +339,7 @@ extension PrivacyDashboardViewController {
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.url?.host)
 
-        var webVitals: [Double]?
-        if configuration.isEnabled(featureKey: .performanceMetrics) {
-            webVitals = await withCheckedContinuation { continuation in
-                guard let performanceMetrics = currentTab.performanceMetrics else { continuation.resume(returning: nil); return }
-                performanceMetrics.notifyHandler { result in
-                    continuation.resume(returning: result)
-                }
-            }
-        }
+        let webVitals = await calculateWebVitals(performanceMetrics: currentTab.performanceMetrics, privacyConfig: configuration)
 
         var errors: [Error]?
         var statusCodes: [Int]?
