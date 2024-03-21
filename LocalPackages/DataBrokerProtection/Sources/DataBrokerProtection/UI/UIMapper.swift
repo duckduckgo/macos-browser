@@ -138,8 +138,8 @@ struct MapperToUI {
             }
         }.flatMap { $0 }
 
-        let lastScans = newGetLastScansInformation(brokerProfileQueryData: brokerProfileQueryData)
-        let nextScans = newGetNextScansInformation(brokerProfileQueryData: brokerProfileQueryData)
+        let lastScans = getLastScansInformation(brokerProfileQueryData: brokerProfileQueryData)
+        let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData)
 
         return DBPUIScanAndOptOutMaintenanceState(
             inProgressOptOuts: inProgressOptOuts,
@@ -149,7 +149,7 @@ struct MapperToUI {
         )
     }
 
-    private func newGetLastScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
+    private func getLastScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
                                             currentDate: Date = Date(),
                                             format: String = "dd/MM/yyyy") -> DBPUIScanDate {
         let eightDaysBeforeToday = currentDate.addingTimeInterval(-8 * 24 * 60 * 60)
@@ -179,7 +179,7 @@ struct MapperToUI {
         }
     }
 
-    private func newGetNextScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
+    private func getNextScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
                                             currentDate: Date = Date(),
                                             format: String = "dd/MM/yyyy") -> DBPUIScanDate {
         let eightDaysAfterToday = currentDate.addingTimeInterval(8 * 24 * 60 * 60)
