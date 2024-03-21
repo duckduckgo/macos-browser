@@ -587,6 +587,7 @@ extension MainWindowController {
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
             WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            Pixel.fire(.privacyProOfferScreenImpression)
         })
     }
 
@@ -596,6 +597,7 @@ extension MainWindowController {
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
             WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            Pixel.fire(.privacyProOfferScreenImpression)
         })
     }
 
