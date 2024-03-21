@@ -85,19 +85,15 @@ final class NetworkProtectionAppEvents {
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
-        let versionStore = NetworkProtectionLastVersionRunStore()
-
-        // should‘ve been run at least once with NetP enabled
-        guard versionStore.lastVersionRun != nil else {
-            os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
-            return
-        }
-
         // We want to restart the VPN menu app to make sure it's always on the latest.
         restartNetworkProtectionMenu(using: loginItemsManager)
     }
 
     private func restartNetworkProtectionMenu(using loginItemsManager: LoginItemsManager) {
+        guard loginItemsManager.isAnyEnabled(LoginItemsManager.networkProtectionLoginItems) else {
+            return
+        }
+
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
 
