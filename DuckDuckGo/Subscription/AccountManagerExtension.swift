@@ -17,6 +17,7 @@
 //
 
 #if SUBSCRIPTION
+import Foundation
 import Subscription
 
 public extension AccountManager {

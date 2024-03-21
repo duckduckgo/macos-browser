@@ -86,7 +86,7 @@ final class AppContentBlocking {
                                                   privacyConfigurationManager: privacyConfigurationManager,
                                                   trackerDataManager: trackerDataManager,
                                                   configStorage: configStorage,
-                                                  privacySecurityPreferences: PrivacySecurityPreferences.shared,
+                                                  webTrackingProtectionPreferences: WebTrackingProtectionPreferences.shared,
                                                   tld: tld)
 
         adClickAttributionRulesProvider = AdClickAttributionRulesProvider(config: adClickAttribution,

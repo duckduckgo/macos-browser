@@ -318,7 +318,7 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && !AccountManager().isUserAuthenticated {
+        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && !AccountManager().isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
         } else {
             items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
@@ -339,23 +339,13 @@ final class MoreOptionsMenu: NSMenu {
 
 #if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
-            let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
-            let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
-
             let networkProtectionItem: NSMenuItem
 
-            // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
-            // badge to bring it to their attention.
-            if !isWaitlistUser && !hasAuthToken {
-                networkProtectionItem = makeNetworkProtectionItem(showNewLabel: true)
-            } else {
-                networkProtectionItem = makeNetworkProtectionItem(showNewLabel: false)
-            }
+            networkProtectionItem = makeNetworkProtectionItem()
 
             items.append(networkProtectionItem)
-
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated {
+            if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && AccountManager().isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -378,7 +368,8 @@ final class MoreOptionsMenu: NSMenu {
 #endif // NETWORK_PROTECTION
 
 #if DBP
-        if DefaultDataBrokerProtectionFeatureVisibility().isFeatureVisible() {
+        let dbpVisibility = DefaultDataBrokerProtectionFeatureVisibility()
+        if dbpVisibility.isFeatureVisible() || dbpVisibility.isPrivacyProEnabled() {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")
@@ -387,7 +378,7 @@ final class MoreOptionsMenu: NSMenu {
             items.append(dataBrokerProtectionItem)
 
 #if SUBSCRIPTION
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
+            if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && AccountManager().isUserAuthenticated  {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -419,7 +410,7 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.itrIcon)
             items.append(identityTheftRestorationItem)
 
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && AccountManager().isUserAuthenticated  {
+            if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && AccountManager().isUserAuthenticated  {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -441,19 +432,13 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionScanOptionsMenuItem,
-                                                  action: #selector(openSubscriptionPurchasePage(_:)),
-                                                  keyEquivalent: "")
-            .targetting(self)
-            .withImage(.dbpIcon)
-
         let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
             .withImage(.subscriptionIcon)
 
-        return [dataBrokerProtectionItem, privacyProItem]
+        return [privacyProItem]
     }
 #endif
 
@@ -490,25 +475,12 @@ final class MoreOptionsMenu: NSMenu {
     }
 
 #if NETWORK_PROTECTION
-    private func makeNetworkProtectionItem(showNewLabel: Bool) -> NSMenuItem {
+    private func makeNetworkProtectionItem() -> NSMenuItem {
         let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(.image(for: .vpnIcon))
 
-        if showNewLabel {
-            let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
-            attributedText.append(NSAttributedString(string: "  "))
-
-            let imageAttachment = NSTextAttachment()
-            imageAttachment.image = .newLabel
-            imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
-
-            attributedText.append(NSAttributedString(attachment: imageAttachment))
-
-            networkProtectionItem.attributedTitle = attributedText
-        } else {
-            networkProtectionItem.title = UserText.networkProtection
-        }
+        networkProtectionItem.title = UserText.networkProtection
 
         return networkProtectionItem
     }

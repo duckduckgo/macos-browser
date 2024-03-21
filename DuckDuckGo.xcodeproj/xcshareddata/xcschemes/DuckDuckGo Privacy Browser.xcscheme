@@ -121,6 +121,9 @@
                   Identifier = "PixelStoreTests/testWhenValuesAreRemovedThenTheyAreNotInCache()">
                </Test>
                <Test
+                  Identifier = "PreferencesSidebarModelTests/testWhenResetTabSelectionIfNeededCalledThenPreferencesTabIsSelected()">
+               </Test>
+               <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
                <Test
