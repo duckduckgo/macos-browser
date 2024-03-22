@@ -151,44 +151,42 @@ enum UserText {
     static let invalidBookmarksPresentTitle = NSLocalizedString("prefrences.sync.invalid-bookmarks-present-title", bundle: Bundle.module, value: "Some bookmarks are not syncing due to excessively long content in certain fields.", comment: "Alert title for invalid bookmarks being filtered out of synced data")
     static let invalidCredentialsPresentTitle = NSLocalizedString("prefrences.sync.invalid-credentials-present-title", bundle: Bundle.module, value: "Some logins are not syncing due to excessively long content in certain fields.", comment: "Alert title for invalid logins being filtered out of synced data")
 
-    static func invalidBookmarksPresentDescription(_ invalidItemTitle: String, numberOfOtherInvalidItems: Int) -> String {
-        let localized: String = {
-            guard numberOfOtherInvalidItems > 0 else {
-                return NSLocalizedString(
-                    "prefrences.sync.invalid-bookmarks-present-description-one",
-                    bundle: Bundle.module,
-                    value: "Your bookmark for %@ can't sync because one of its fields exceeds the character limit.",
-                    comment: "Alert message for 1 invalid bookmark being filtered out of synced data"
-                )
-            }
-            return NSLocalizedString(
-                "prefrences.sync.invalid-bookmarks-present-description-many",
+    static func invalidBookmarksPresentDescription(_ invalidItemTitle: String, numberOfInvalidItems: Int) -> String {
+        guard numberOfInvalidItems > 1 else {
+            let message = NSLocalizedString(
+                "prefrences.sync.invalid-bookmarks-present-description-one",
                 bundle: Bundle.module,
-                value: "Your bookmarks for %@ and other sites (%d) can't sync because some of their fields exceed the character limit.",
-                comment: "Alert message for multiple invalid bookmark being filtered out of synced data"
+                value: "Your bookmark for %@ can't sync because one of its fields exceeds the character limit.",
+                comment: "Alert message for 1 invalid bookmark being filtered out of synced data"
             )
-        }()
-        return String(format: localized, invalidItemTitle, numberOfOtherInvalidItems)
+            return String(format: message, invalidItemTitle)
+        }
+        let message = NSLocalizedString(
+            "prefrences.sync.invalid-bookmarks-present-description-many",
+            bundle: Bundle.module,
+            value: "Some bookmarks (%d) can't sync because some of their fields exceed the character limit.",
+            comment: "Alert message for multiple invalid bookmark being filtered out of synced data"
+        )
+        return String(format: message, numberOfInvalidItems)
     }
 
-    static func invalidCredentialsPresentDescription(_ invalidItemTitle: String, numberOfOtherInvalidItems: Int) -> String {
-        let localized: String = {
-            guard numberOfOtherInvalidItems > 0 else {
-                return NSLocalizedString(
-                    "prefrences.sync.invalid-credentials-present-description-one",
-                    bundle: Bundle.module,
-                    value: "Your password for %@ can't sync because one of its fields exceeds the character limit.",
-                    comment: "Alert message for 1 invalid login being filtered out of synced data"
-                )
-            }
-            return NSLocalizedString(
-                "prefrences.sync.invalid-credentials-present-description-many",
+    static func invalidCredentialsPresentDescription(_ invalidItemTitle: String, numberOfInvalidItems: Int) -> String {
+        guard numberOfInvalidItems > 1 else {
+            let message = NSLocalizedString(
+                "prefrences.sync.invalid-credentials-present-description-one",
                 bundle: Bundle.module,
-                value: "Your passwords for %@ and other sites (%d) can't sync because some of their fields exceed the character limit.",
-                comment: "Alert message for multiple invalid logins being filtered out of synced data"
+                value: "Your password for %@ can't sync because one of its fields exceeds the character limit.",
+                comment: "Alert message for 1 invalid login being filtered out of synced data"
             )
-        }()
-        return String(format: localized, invalidItemTitle, numberOfOtherInvalidItems)
+            return String(format: message, invalidItemTitle)
+        }
+        let message = NSLocalizedString(
+            "prefrences.sync.invalid-credentials-present-description-many",
+            bundle: Bundle.module,
+            value: "Some passwords (n) can't sync because some of their fields exceed the character limit.",
+            comment: "Alert message for multiple invalid logins being filtered out of synced data"
+        )
+        return String(format: message, numberOfInvalidItems)
     }
 
     static let syncErrorAlertTitle = NSLocalizedString("alert.sync-error", bundle: Bundle.module, value: "Sync & Backup Error", comment: "Title for sync error alert")

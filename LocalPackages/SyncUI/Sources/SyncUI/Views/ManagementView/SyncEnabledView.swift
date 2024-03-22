@@ -128,12 +128,12 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             case .bookmarks:
                 assert(!model.invalidBookmarksTitles.isEmpty)
                 let firstInvalidBookmarkTitle = model.invalidBookmarksTitles.first ?? ""
-                return UserText.invalidBookmarksPresentDescription(firstInvalidBookmarkTitle, numberOfOtherInvalidItems: model.invalidBookmarksTitles.count - 1)
+                return UserText.invalidBookmarksPresentDescription(firstInvalidBookmarkTitle, numberOfInvalidItems: model.invalidBookmarksTitles.count)
 
             case .credentials:
                 assert(!model.invalidCredentialsTitles.isEmpty)
                 let firstInvalidCredentialTitle = model.invalidCredentialsTitles.first ?? ""
-                return UserText.invalidCredentialsPresentDescription(firstInvalidCredentialTitle, numberOfOtherInvalidItems: model.invalidCredentialsTitles.count - 1)
+                return UserText.invalidCredentialsPresentDescription(firstInvalidCredentialTitle, numberOfInvalidItems: model.invalidCredentialsTitles.count)
             }
         }
         var actionTitle: String {
