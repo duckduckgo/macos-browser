@@ -95,35 +95,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
-        if let token = accountManager.accessToken {
+        if accountManager.isUserAuthenticated {
             Task {
-                let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .returnCacheDataElseLoad)
-                if case .success(let subscription) = subscriptionResult {
-                    self.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
-                    self.subscriptionPlatform = subscription.platform
-                    self.subscriptionStatus = subscription.status
-                }
-
-                switch await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .returnCacheDataElseLoad) {
-                case let .success(result):
-                    self.hasAccessToVPN = result
-                case .failure:
-                    self.hasAccessToVPN = false
-                }
-
-                switch await self.accountManager.hasEntitlement(for: .dataBrokerProtection, cachePolicy: .returnCacheDataElseLoad) {
-                case let .success(result):
-                    self.hasAccessToDBP = result
-                case .failure:
-                    self.hasAccessToDBP = false
-                }
-
-                switch await self.accountManager.hasEntitlement(for: .identityTheftRestoration, cachePolicy: .returnCacheDataElseLoad) {
-                case let .success(result):
-                    self.hasAccessToITR = result
-                case .failure:
-                    self.hasAccessToITR = false
-                }
+                await self.updateSubscription(with: .returnCacheDataElseLoad)
+                await self.updateAllEntitlement(with: .returnCacheDataElseLoad)
             }
         }
 
@@ -264,6 +239,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
+        self.isUserAuthenticated = accountManager.isUserAuthenticated
+
         guard fetchSubscriptionDetailsTask == nil else { return }
 
         fetchSubscriptionDetailsTask = Task { [weak self] in
@@ -271,43 +248,53 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.fetchSubscriptionDetailsTask = nil
             }
 
-            guard let token = self?.accountManager.accessToken else { return }
-
-            let subscriptionResult = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
-
-            if case .success(let subscription) = subscriptionResult {
-                self?.updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
-                self?.subscriptionPlatform = subscription.platform
-                self?.subscriptionStatus = subscription.status
-            } else {
-                self?.accountManager.signOut()
-            }
-
-            if let self {
-                switch await self.accountManager.hasEntitlement(for: .networkProtection) {
-                case let .success(result):
-                    hasAccessToVPN = result
-                case .failure:
-                    hasAccessToVPN = false
-                }
-
-                switch await self.accountManager.hasEntitlement(for: .dataBrokerProtection) {
-                case let .success(result):
-                    hasAccessToDBP = result
-                case .failure:
-                    hasAccessToDBP = false
-                }
-
-                switch await self.accountManager.hasEntitlement(for: .identityTheftRestoration) {
-                case let .success(result):
-                    hasAccessToITR = result
-                case .failure:
-                    hasAccessToITR = false
-                }
-            }
+            await self?.updateSubscription(with: .reloadIgnoringLocalCacheData)
+            await self?.updateAllEntitlement(with: .reloadIgnoringLocalCacheData)
         }
     }
 
+    @MainActor
+    private func updateSubscription(with cachePolicy: SubscriptionService.CachePolicy) async {
+        guard let token = accountManager.accessToken else {
+            SubscriptionService.signOut()
+            return
+        }
+
+        switch await SubscriptionService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
+        case .success(let subscription):
+            updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
+            subscriptionPlatform = subscription.platform
+            subscriptionStatus = subscription.status
+        case .failure:
+            break
+        }
+    }
+
+    @MainActor
+    private func updateAllEntitlement(with cachePolicy: AccountManager.CachePolicy) async {
+        switch await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: cachePolicy) {
+        case let .success(result):
+            hasAccessToVPN = result
+        case .failure:
+            hasAccessToVPN = false
+        }
+
+        switch await self.accountManager.hasEntitlement(for: .dataBrokerProtection, cachePolicy: cachePolicy) {
+        case let .success(result):
+            hasAccessToDBP = result
+        case .failure:
+            hasAccessToDBP = false
+        }
+
+        switch await self.accountManager.hasEntitlement(for: .identityTheftRestoration, cachePolicy: cachePolicy) {
+        case let .success(result):
+            hasAccessToITR = result
+        case .failure:
+            hasAccessToITR = false
+        }
+    }
+
+    @MainActor
     func updateDescription(for date: Date, status: Subscription.Status, period: Subscription.BillingPeriod) {
 
         let formattedDate = dateFormatter.string(from: date)

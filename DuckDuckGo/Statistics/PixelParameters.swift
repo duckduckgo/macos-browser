@@ -212,7 +212,9 @@ extension Pixel.Event {
              .privacyProOfferMonthlyPriceClick,
              .privacyProOfferYearlyPriceClick,
              .privacyProAddEmailSuccess,
-             .privacyProWelcomeFAQClick:
+             .privacyProWelcomeFAQClick,
+             .passwordImportKeychainPrompt,
+             .passwordImportKeychainPromptDenied:
             return nil
         }
     }

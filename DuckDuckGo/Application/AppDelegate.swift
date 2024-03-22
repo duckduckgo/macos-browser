@@ -261,19 +261,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         Task {
             let accountManager = AccountManager()
-            do {
-                try accountManager.migrateAccessTokenToNewStore()
-            } catch {
-                if let error = error as? AccountManager.MigrationError {
-                    switch error {
-                    case AccountManager.MigrationError.migrationFailed:
-                        os_log(.default, log: .subscription, "Access token migration failed")
-                    case AccountManager.MigrationError.noMigrationNeeded:
-                        os_log(.default, log: .subscription, "No access token migration needed")
-                    }
-                }
+            if let token = accountManager.accessToken {
+                _ = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
+                _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
             }
-            await accountManager.checkSubscriptionState()
         }
 #endif
 
