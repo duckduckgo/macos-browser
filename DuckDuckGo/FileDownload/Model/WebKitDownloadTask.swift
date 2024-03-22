@@ -224,15 +224,18 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     private enum DestinationCleanupStyle { case remove, clear }
     private nonisolated func prepareChosenDestinationURL(_ destinationURL: URL?, fileType _: UTType?, cleanupStyle: DestinationCleanupStyle) async -> URL? {
         do {
+            let fm = FileManager()
             guard let destinationURL else { throw URLError(.cancelled) }
             os_log(.debug, log: log, "download task callback: creating temp directory for \"\(destinationURL.path)\"")
 
-            let fm = FileManager.default
             switch cleanupStyle {
             case .remove:
                 // 1. remove the destination file if exists – that would clear existing downloads file presenters and stop downloads accordingly (if any)
                 try NSFileCoordinator().coordinateWrite(at: destinationURL, with: .forDeleting) { url in
-                    guard fm.fileExists(atPath: url.path) else { return }
+                    if !fm.fileExists(atPath: url.path) {
+                        // validate we can write to the directory even if there‘s no existing file
+                        try Data().write(to: destinationURL)
+                    }
                     os_log(.debug, log: log, "🧹 removing \"\(url.path)\"")
                     try fm.removeItem(at: url)
                 }
