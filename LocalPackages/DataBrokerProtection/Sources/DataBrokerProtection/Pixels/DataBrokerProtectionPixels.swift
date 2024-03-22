@@ -211,7 +211,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             } else {
                 return ["dataBroker": dataBroker, "name": error.name]
             }
-        case .generalError(let error, let functionOccurredIn):
+        case .generalError(_, let functionOccurredIn):
             return ["functionOccurredIn": functionOccurredIn]
         case .parentChildMatches(let parent, let child, let value):
             return ["parent": parent, "child": child, "value": String(value)]
