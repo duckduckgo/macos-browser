@@ -218,6 +218,9 @@ extension Pixel {
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
         // Subscription
+        case privacyProFeatureEnabled
+        case privacyProBetaUserThankYouVPN
+        case privacyProBetaUserThankYouDBP
         case privacyProSubscriptionActive
         case privacyProOfferScreenImpression
         case privacyProPurchaseAttempt
@@ -655,6 +658,10 @@ extension Pixel.Event {
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
 
             // MARK: - Subscription
+        case .privacyProFeatureEnabled: return
+            "m_mac_\(appDistribution)_privacy-pro_feature_enabled"
+        case .privacyProBetaUserThankYouVPN: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_vpn"
+        case .privacyProBetaUserThankYouDBP: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_dbp"
         case .privacyProSubscriptionActive: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_active"
         case .privacyProOfferScreenImpression: return "m_mac_\(appDistribution)_privacy-pro_offer_screen_impression"
         case .privacyProPurchaseAttempt: return "m_mac_\(appDistribution)_privacy-pro_terms-conditions_subscribe_click"
@@ -701,7 +708,6 @@ extension Pixel.Event {
         // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
         case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
-
         }
     }
 }
