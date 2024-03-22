@@ -131,6 +131,7 @@ final class DataBrokerProtectionProcessor {
             operationQueue.addBarrierBlock {
                 completion(error)
             }
+            return
         }
 
         operationQueue.addBarrierBlock {
