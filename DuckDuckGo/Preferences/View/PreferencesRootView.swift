@@ -135,7 +135,7 @@ enum Preferences {
         }
 
 #if SUBSCRIPTION
-        // swiftlint:disable:next cyclomatic_complexity
+        // swiftlint:disable:next cyclomatic_complexity function_body_length
         private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
                 DispatchQueue.main.async {
@@ -179,7 +179,14 @@ enum Preferences {
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
-                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow { _ in }
+                    Task {
+                        guard let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
+                              let windowControllerManager = WindowControllersManager.shared.lastKeyMainWindowController else {
+                            return
+                        }
+
+                        await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
+                    }
                 }
             },
                                                                       openURLHandler: openURL,
