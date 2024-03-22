@@ -90,11 +90,15 @@ final class FileLogger {
 
 final class SandboxTestToolAppDelegate: NSObject, NSApplicationDelegate {
 
-    let logger = FileLogger.shared
+    // uncomment these for logging
+//#if CI
+    let logger = OSLog.disabled
+//#else
+//    let logger = FileLogger.shared
+//#endif
 
     override init() {
-        logger.log("\n\n\n", includeTimestamp: false)
-        logger.log("🚦 starting…\n")
+        logger.log("\n\n\n🚦 starting…\n")
 
         super.init()
 
