@@ -57,6 +57,8 @@ public enum DataBrokerProtectionPixels {
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
     case generalError(error: Error, functionOccurredIn: String)
+    case secureVaultInitError(error: Error)
+    case secureVaultError(error: Error)
     case parentChildMatches(parent: String, child: String, value: Int)
 
     // Stage Pixels
@@ -148,6 +150,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Debug Pixels
         case .error: return "m_mac_data_broker_error"
         case .generalError: return "m_mac_data_broker_error"
+        case .secureVaultInitError: return "m_mac_dbp_secure_vault_init_error"
+        case .secureVaultError: return "m_mac_dbp_secure_vault_error"
 
         case .backgroundAgentStarted: return "m_mac_dbp_background-agent_started"
         case .backgroundAgentStartedStoppingDueToAnotherInstanceRunning: return "m_mac_dbp_background-agent_started_stopping-due-to-another-instance-running"
@@ -260,7 +264,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                 .dailyActiveUser,
                 .weeklyActiveUser,
-                .monthlyActiveUser:
+                .monthlyActiveUser,
+                .secureVaultInitError,
+                .secureVaultError:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -292,6 +298,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .error(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .generalError(let error, _):
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .secureVaultInitError(let error),
+                    .secureVaultError(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerScanAllBrokersCompletion(error: let error),

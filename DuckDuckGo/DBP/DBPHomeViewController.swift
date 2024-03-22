@@ -150,7 +150,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
-            case .generalError(let error, _):
+            case .generalError(let error, _),
+                    .secureVaultInitError(let error),
+                    .secureVaultError(let error):
                 // We can't use .debug directly because it modifies the pixel name and clobbers the params
                 Pixel.fire(.pixelKitEvent(DebugEvent(event, error: error)))
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
