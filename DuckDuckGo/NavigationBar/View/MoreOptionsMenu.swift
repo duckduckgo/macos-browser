@@ -355,7 +355,7 @@ final class MoreOptionsMenu: NSMenu {
                         isMenuItemEnabled = false
                     }
 
-                    networkProtectionItem.isHidden = !isMenuItemEnabled
+                    networkProtectionItem.isEnabled = !isMenuItemEnabled
                 }
             }
 #endif
