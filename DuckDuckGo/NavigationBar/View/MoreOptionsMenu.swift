@@ -435,6 +435,11 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
+        switch (SubscriptionPurchaseEnvironment.current, SubscriptionPurchaseEnvironment.canPurchase) {
+        case (.appStore, false): return []
+        default: break
+        }
+
         let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
