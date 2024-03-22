@@ -697,7 +697,20 @@ extension WebKitDownloadTask {
     override var description: String {
         guard Thread.isMainThread else {
 #if DEBUG
-            breakByRaisingSigInt("❗️accessing WebKitDownloadTask.description from non-main thread")
+            os_log("""
+
+
+            ------------------------------------------------------------------------------------------------------
+                BREAK:
+            ------------------------------------------------------------------------------------------------------
+
+            ❗️accessing WebKitDownloadTask.description from non-main thread
+
+                Hit Continue (^⌘Y) to continue program execution
+            ------------------------------------------------------------------------------------------------------
+
+            """, type: .fault)
+            raise(SIGINT)
 #endif
             return ""
         }
