@@ -337,8 +337,6 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-
-
         let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
 #endif
 
