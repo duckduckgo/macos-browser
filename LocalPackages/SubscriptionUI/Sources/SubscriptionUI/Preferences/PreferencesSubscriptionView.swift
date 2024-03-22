@@ -125,7 +125,6 @@ public struct PreferencesSubscriptionView: View {
                     }
                 })
                 Button(UserText.removeFromThisDeviceButton, action: {
-                    model.userEventHandler(.removeSubscriptionClick)
                     showingRemoveConfirmationDialog.toggle()
                 })
             } label: {
@@ -190,7 +189,6 @@ public struct PreferencesSubscriptionView: View {
                 .buttonStyle(DefaultActionButtonStyle(enabled: true)) */
             Menu {
                 Button(UserText.removeFromThisDeviceButton, action: {
-                    model.userEventHandler(.removeSubscriptionClick)
                     showingRemoveConfirmationDialog.toggle()
                 })
             } label: {

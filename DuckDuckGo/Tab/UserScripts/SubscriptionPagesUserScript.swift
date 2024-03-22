@@ -398,10 +398,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         if isBackendError {
             DailyPixel.fire(pixel: .privacyProPurchaseFailureBackendError, frequency: .dailyAndCount)
         }
-
-        if subscriptionActivationError != .hasActiveSubscription && subscriptionActivationError != .cancelledByUser {
-            DailyPixel.fire(pixel: .privacyProPurchaseFailure, frequency: .dailyAndCount)
-        }
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -511,7 +507,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         await StripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         await mainViewController?.dismiss(progressViewController)
 
-        return [String: String]() // cannot be nil
+        DailyPixel.fire(pixel: .privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
+
+        return [String: String]() // cannot be nil, the web app expect something back before redirecting the user to the final page
     }
 
     // MARK: Pixel related actions
@@ -577,6 +575,7 @@ extension MainWindowController {
 
     @MainActor
     func showSomethingWentWrongAlert() {
+        DailyPixel.fire(pixel: .privacyProPurchaseFailure, frequency: .dailyAndCount)
         guard let window else { return }
 
         window.show(.somethingWentWrongAlert())
@@ -588,6 +587,7 @@ extension MainWindowController {
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
             WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            Pixel.fire(.privacyProOfferScreenImpression)
         })
     }
 
@@ -597,6 +597,7 @@ extension MainWindowController {
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
             WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            Pixel.fire(.privacyProOfferScreenImpression)
         })
     }
 
