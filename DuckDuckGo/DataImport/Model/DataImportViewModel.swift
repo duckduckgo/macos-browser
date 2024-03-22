@@ -109,7 +109,7 @@ struct DataImportViewModel {
         }
 
         static func == (lhs: DataTypeImportResult, rhs: DataTypeImportResult) -> Bool {
-            lhs.dataType.description == rhs.dataType.description &&
+            lhs.dataType == rhs.dataType &&
             lhs.result.description == rhs.result.description
         }
     }
