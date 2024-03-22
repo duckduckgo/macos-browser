@@ -81,10 +81,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-#if SUBSCRIPTION
-    let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
-#endif
-
 #if NETWORK_PROTECTION && SUBSCRIPTION
     // Needs to be lazy as indirectly depends on AppDelegate
     private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
@@ -193,7 +189,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     #else
         SubscriptionPurchaseEnvironment.current = .stripe
     #endif
-        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
 #endif
     }
 

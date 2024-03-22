@@ -22,6 +22,7 @@ import Foundation
 import BrowserServicesKit
 import Common
 import DataBrokerProtection
+import Subscription
 
 protocol DataBrokerProtectionFeatureVisibility {
     func isFeatureVisible() -> Bool
@@ -98,7 +99,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
 
     func isPrivacyProEnabled() -> Bool {
 #if SUBSCRIPTION
-        return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
+        return DefaultSubscriptionFeatureAvailability().isFeatureAvailable
 #else
         return false
 #endif
