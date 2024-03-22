@@ -643,8 +643,8 @@ final class FilePresenterTests: XCTestCase {
         _=filePresenter.urlPublisher.sink { publishedUrl = $0 }
         var publishedBookmarkData: Data?
         _=filePresenter.fileBookmarkDataPublisher.sink { publishedBookmarkData = $0 }
-        XCTAssertEqual(filePresenter.url, nonSandboxUrl)
-        XCTAssertEqual(publishedUrl, nonSandboxUrl)
+        XCTAssertEqual(filePresenter.url?.resolvingSymlinksInPath(), nonSandboxUrl.resolvingSymlinksInPath())
+        XCTAssertEqual(publishedUrl?.resolvingSymlinksInPath(), nonSandboxUrl.resolvingSymlinksInPath())
         XCTAssertEqual(filePresenter.fileBookmarkData, bookmarkData)
         XCTAssertEqual(publishedBookmarkData, bookmarkData)
 
@@ -754,10 +754,12 @@ final class FilePresenterTests: XCTestCase {
         XCTAssertEqual(filePresenter2.url, nonSandboxUrl1)
         var isStale = false
         XCTAssertEqual(newBookmarkData1, filePresenter1.fileBookmarkData)
-        XCTAssertEqual(try URL(resolvingBookmarkData: filePresenter1.fileBookmarkData ?? Data(), bookmarkDataIsStale: &isStale), nonSandboxUrl2)
+        XCTAssertEqual(try URL(resolvingBookmarkData: filePresenter1.fileBookmarkData ?? Data(), bookmarkDataIsStale: &isStale).resolvingSymlinksInPath(),
+                       nonSandboxUrl2.resolvingSymlinksInPath())
         // XCTAssertFalse(isStale) - why it‘s false?
         XCTAssertEqual(newBookmarkData2, filePresenter2.fileBookmarkData)
-        XCTAssertEqual(try URL(resolvingBookmarkData: filePresenter2.fileBookmarkData ?? Data(), bookmarkDataIsStale: &isStale), nonSandboxUrl1)
+        XCTAssertEqual(try URL(resolvingBookmarkData: filePresenter2.fileBookmarkData ?? Data(), bookmarkDataIsStale: &isStale).resolvingSymlinksInPath(),
+                       nonSandboxUrl1.resolvingSymlinksInPath())
         // XCTAssertFalse(isStale) - why it‘s false?
     }
 
