@@ -61,8 +61,12 @@ struct PreferencesSection: Hashable, Identifiable {
 
 #if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
-            sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
+            switch (SubscriptionPurchaseEnvironment.current, SubscriptionPurchaseEnvironment.canPurchase) {
+            case (.appStore, false): break
+            default:
+                let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+                sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
+            }
         }
 #endif
 

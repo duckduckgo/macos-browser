@@ -337,9 +337,14 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-
-
         let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
+
+        if subscriptionFeatureAvailability.isFeatureAvailable {
+            switch (SubscriptionPurchaseEnvironment.current, SubscriptionPurchaseEnvironment.canPurchase) {
+            case (.appStore, false): return []
+            default: break
+            }
+        }
 #endif
 
 #if NETWORK_PROTECTION
@@ -437,6 +442,11 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
+        switch (SubscriptionPurchaseEnvironment.current, SubscriptionPurchaseEnvironment.canPurchase) {
+        case (.appStore, false): return []
+        default: break
+        }
+
         let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
