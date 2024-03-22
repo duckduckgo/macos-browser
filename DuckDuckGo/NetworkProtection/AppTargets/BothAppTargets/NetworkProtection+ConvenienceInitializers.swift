@@ -54,7 +54,7 @@ extension NetworkProtectionCodeRedemptionCoordinator {
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
-        self.init(isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable)
+        self.init(isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
     }
 
     convenience init(isSubscriptionEnabled: Bool) {
@@ -84,7 +84,7 @@ extension NetworkProtectionLocationListCompositeRepository {
             environment: settings.selectedEnvironment,
             tokenStore: NetworkProtectionKeychainTokenStore(),
             errorEvents: .networkProtectionAppDebugEvents,
-            isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
+            isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable
         )
     }
 }

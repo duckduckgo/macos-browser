@@ -123,6 +123,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     private func resetUserDefaults() {
         settings.resetToDefaults()
+        userDefaults.networkProtectionOnboardingStatus = .default
     }
 
     private func notifyVPNUninstalled() {
