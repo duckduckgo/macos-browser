@@ -35,14 +35,18 @@ final class NetworkProtectionBouncer {
     ///
     func requireAuthTokenOrKillApp(controller: TunnelController) async {
 #if SUBSCRIPTION
+        os_log(.error, log: .networkProtection, "🔥 Ahoi! 1")
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         let result = await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         switch result {
         case .success(true):
+            os_log(.error, log: .networkProtection, "🔥 Ahoi! 2")
             return
         case .failure:
+            os_log(.error, log: .networkProtection, "🔥 Ahoi! 2.5")
             break
         case .success(false):
+            os_log(.error, log: .networkProtection, "🔥 Ahoi! 2.9")
             os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing entitlement.")
             await controller.stop()
 
@@ -53,6 +57,7 @@ final class NetworkProtectionBouncer {
             exit(EXIT_SUCCESS)
         }
 #endif
+        os_log(.error, log: .networkProtection, "🔥 Ahoi! 3")
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
                                                                 errorEvents: nil,
                                                                 isSubscriptionEnabled: false,

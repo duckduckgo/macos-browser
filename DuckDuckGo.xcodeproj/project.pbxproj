@@ -3984,6 +3984,8 @@
 		7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSimulateFailureMenu.swift; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
+		7B4EBE612BADC4FA00B93B41 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
+		7B4EBE622BADD0C800B93B41 /* DuckDuckGoVPNAppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoVPNAppStore.entitlements; sourceTree = "<group>"; };
 		7B5291882A1697680022E406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B5291892A169BC90022E406 /* DeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DeveloperID.xcconfig; sourceTree = "<group>"; };
 		7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemScheduler.swift; sourceTree = "<group>"; };
@@ -5372,6 +5374,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
+				7B4EBE612BADC4FA00B93B41 /* BrowserServicesKit */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
@@ -7012,6 +7015,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				7B4EBE622BADD0C800B93B41 /* DuckDuckGoVPNAppStore.entitlements */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -13483,6 +13487,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPNAppStore.entitlements;
 			};
 			name = Debug;
 		};
@@ -13490,6 +13495,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPNAppStore.entitlements;
 			};
 			name = CI;
 		};
@@ -13497,6 +13503,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPNAppStore.entitlements;
 			};
 			name = Release;
 		};
@@ -13504,6 +13511,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPNAppStore.entitlements;
 			};
 			name = Review;
 		};

@@ -100,7 +100,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         }
 
         if case .success(let hasEntitlement) = await AccountManager().hasEntitlement(for: .networkProtection) {
-            return hasEntitlement
+            return !hasEntitlement
         }
 
         return false

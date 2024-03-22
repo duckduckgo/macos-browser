@@ -29,7 +29,7 @@ final class Pixel {
 #if DEBUG
         if dryRun {
             shared = Pixel(store: LocalPixelDataStore.shared) { event, params, _, _, onComplete in
-                let params = params.filter { key, _ in !["appVersion", "test"].contains(key) }
+                //let params = params.filter { key, _ in !["appVersion", "test"].contains(key) }
                 os_log(.debug, log: .pixel, "Pixel dry fire: %{public}@ %{public}@", event.name.replacingOccurrences(of: "_", with: "."), params.isEmpty ? "" : params.debugDescription)
                 // simulate server response time for Dry Run mode
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
