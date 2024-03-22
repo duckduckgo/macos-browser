@@ -109,7 +109,7 @@ final class DataBrokerProtectionProcessor {
 
         // Before running new operations we check if there is any updates to the broker files.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
-            let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault)
+            let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
 

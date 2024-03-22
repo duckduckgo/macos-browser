@@ -141,6 +141,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
             self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] error in
                 if let error = error {
                     os_log("Error during startScheduler in dataBrokerProcessor.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                    self?.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.startScheduler"))
                 }
                 self?.status = .idle
                 completion(.finished)
@@ -157,13 +158,22 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public func runAllOperations(showWebView: Bool = false) {
         os_log("Running all operations...", log: .dataBrokerProtection)
-        self.dataBrokerProcessor.runAllOperations(showWebView: showWebView)
+        self.dataBrokerProcessor.runAllOperations(showWebView: showWebView) { [weak self] error in
+            if let error = error {
+                os_log("Error during DefaultDataBrokerProtectionScheduler.runAllOperations in dataBrokerProcessor.runAllOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                self?.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.runAllOperations"))
+            }
+        }
     }
 
     public func runQueuedOperations(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
         dataBrokerProcessor.runQueuedOperations(showWebView: showWebView,
-                                                completion: { error in
+                                                completion: { [weak self] error in
+            if let error = error {
+                os_log("Error during DefaultDataBrokerProtectionScheduler.runQueuedOperations in dataBrokerProcessor.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                self?.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.runQueuedOperations"))
+            }
             completion?(error)
         })
 
@@ -187,6 +197,11 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
+            if let error = error {
+                os_log("Error during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                self.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.scanAllBrokers"))
+            }
+
             completion?(error)
         }
     }
@@ -194,7 +209,12 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     public func optOutAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)?) {
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runAllOptOutOperations(showWebView: showWebView,
-                                                        completion: { error in
+                                                        completion: { [weak self] error in
+            if let error = error {
+                os_log("Error during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                self?.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.optOutAllBrokers"))
+            }
+
             completion?(error)
         })
     }

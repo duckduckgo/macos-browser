@@ -103,15 +103,18 @@ public struct DataBrokerProtectionBrokerUpdater {
     private let resources: ResourcesRepository
     private let vault: any DataBrokerProtectionSecureVault
     private let appVersion: AppVersionNumberProvider
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     init(repository: BrokerUpdaterRepository = BrokerUpdaterUserDefaults(),
          resources: ResourcesRepository = FileResources(),
          vault: any DataBrokerProtectionSecureVault,
-         appVersion: AppVersionNumberProvider = AppVersionNumber()) {
+         appVersion: AppVersionNumberProvider = AppVersionNumber(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
         self.repository = repository
         self.resources = resources
         self.vault = vault
         self.appVersion = appVersion
+        self.pixelHandler = pixelHandler
     }
 
     public static func provide() -> DataBrokerProtectionBrokerUpdater? {
@@ -129,6 +132,7 @@ public struct DataBrokerProtectionBrokerUpdater {
             brokers = try resources.fetchBrokerFromResourceFiles()
         } catch {
             os_log("DataBrokerProtectionBrokerUpdater updateBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             return
         }
         guard let brokers = brokers else { return }
@@ -138,6 +142,7 @@ public struct DataBrokerProtectionBrokerUpdater {
                 try update(broker)
             } catch {
                 os_log("Error updating broker: %{public}@, with version: %{public}@", log: .dataBrokerProtection, broker.name, broker.version)
+                pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             }
         }
     }

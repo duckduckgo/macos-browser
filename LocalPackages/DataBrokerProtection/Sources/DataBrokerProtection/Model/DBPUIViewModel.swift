@@ -36,6 +36,7 @@ final class DBPUIViewModel {
     private var communicationLayer: DBPUICommunicationLayer?
     private var webView: WKWebView?
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     init(dataManager: DataBrokerProtectionDataManaging,
          scheduler: DataBrokerProtectionScheduler,
@@ -82,6 +83,7 @@ extension DBPUIViewModel: DBPUIScanOps {
             _ = try await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
         } catch {
             os_log("DBPUIViewModel error: updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPUIViewModel.updateCacheWithCurrentScans"))
         }
     }
 }

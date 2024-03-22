@@ -33,6 +33,7 @@ public extension Notification.Name {
 final class DBPHomeViewController: NSViewController {
     private var presentedWindowController: NSWindowController?
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
         let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
@@ -90,6 +91,7 @@ final class DBPHomeViewController: NSViewController {
             }
         } catch {
             os_log("DBPHomeViewController error: viewDidLoad, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPHomeViewController.viewDidLoad"))
         }
     }
 
