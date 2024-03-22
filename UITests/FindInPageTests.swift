@@ -300,7 +300,7 @@ class FindInPageTests: XCTestCase {
             .matchingPixels(of: .findHighlightColor)) // Coordinates of highlighted pixels in the find next screenshot
         let findNextHighlightPoints = highlightedPixelsInFindNextScreenshot.map { $0.point }
         let pixelSetIntersection = findHighlightPoints
-            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should have no elements
+            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should not have many elements
 
         XCTAssertGreaterThan(
             highlightedPixelsInFindNextScreenshot.count,
@@ -358,7 +358,7 @@ class FindInPageTests: XCTestCase {
         let highlightedPixelsInFindNextScreenshot = findNextScreenshot.image.matchingPixels(of: .findHighlightColor)
         let findNextHighlightPoints = highlightedPixelsInFindNextScreenshot.map { $0.point }
         let pixelSetIntersection = findHighlightPoints
-            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should have no elements
+            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should not have many elements
 
         XCTAssertGreaterThan(
             highlightedPixelsInFindNextScreenshot.count,
@@ -412,7 +412,7 @@ class FindInPageTests: XCTestCase {
         let highlightedPixelsInFindNextScreenshot = findNextScreenshot.image.matchingPixels(of: .findHighlightColor)
         let findNextHighlightPoints = highlightedPixelsInFindNextScreenshot.map { $0.point }
         let pixelSetIntersection = findHighlightPoints
-            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should have no elements
+            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should not have many elements
 
         XCTAssertGreaterThan(
             highlightedPixelsInFindNextScreenshot.count,
