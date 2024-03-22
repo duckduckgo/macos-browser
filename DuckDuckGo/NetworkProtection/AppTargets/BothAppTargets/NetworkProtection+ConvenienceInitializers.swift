@@ -53,6 +53,10 @@ extension NetworkProtectionCodeRedemptionCoordinator {
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
+        self.init(isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable)
+    }
+
+    convenience init(isSubscriptionEnabled: Bool) {
 #if SUBSCRIPTION
         let accessTokenProvider: () -> String? = { AccountManager().accessToken }
 #else
@@ -60,7 +64,7 @@ extension NetworkProtectionKeychainTokenStore {
 #endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable,
+                  isSubscriptionEnabled: isSubscriptionEnabled,
                   accessTokenProvider: accessTokenProvider)
     }
 }

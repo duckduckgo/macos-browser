@@ -199,7 +199,9 @@ final class BrowserTabViewController: NSViewController {
 #if DBP
     @objc
     private func onDBPFeatureDisabled(_ notification: Notification) {
-        tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
+        Task { @MainActor in
+            tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
+        }
     }
 
     @objc

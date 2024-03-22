@@ -251,7 +251,6 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
-        Pixel.fire(.privacyProOfferScreenImpression)
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
 
