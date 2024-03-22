@@ -347,7 +347,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
 
         Pixel.fire(.privacyProRestorePurchaseOfferPageEntry)
-        let restorer = SubscriptionAppStoreRestorer()
         guard let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
               let windowControllerManager = await WindowControllersManager.shared.lastKeyMainWindowController else {
             return nil
@@ -356,7 +355,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         let actionHandlers = SubscriptionAccessActionHandlers(restorePurchases: {
             Task { @MainActor in
-                await restorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
+                await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
                 message.webView?.reload()
             }
         },

@@ -23,7 +23,7 @@ import SubscriptionUI
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
 
-    func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
+    static func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
 
         let progressViewController = await ProgressViewController(title: UserText.restoringSubscriptionTitle)
         defer {
@@ -35,13 +35,13 @@ struct SubscriptionAppStoreRestorer {
         DispatchQueue.main.async {
             mainViewController.presentAsSheet(progressViewController)
         }
-        
+
         guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else {
             return
         }
 
         let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-        
+
         switch result {
         case .success:
             DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
