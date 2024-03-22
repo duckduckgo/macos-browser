@@ -338,13 +338,6 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
         let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
-
-        if subscriptionFeatureAvailability.isFeatureAvailable {
-            switch (SubscriptionPurchaseEnvironment.current, SubscriptionPurchaseEnvironment.canPurchase) {
-            case (.appStore, false): return []
-            default: break
-            }
-        }
 #endif
 
 #if NETWORK_PROTECTION
