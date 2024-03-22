@@ -56,7 +56,7 @@ class BrowsingHistoryTests: XCTestCase {
 
     func test_visitedSiteIsAddedToRecentlyVisited() throws {
         let historyPageTitleExpectedToBeFirstInRecentlyVisited = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
-        let url = locallyServedURL(pageTitle: historyPageTitleExpectedToBeFirstInRecentlyVisited)
+        let url = URL.simpleServedPage(titled: historyPageTitleExpectedToBeFirstInRecentlyVisited)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         let firstSiteInRecentlyVisitedSection = app.menuItems["HistoryMenu.recentlyVisitedMenuItem.0"]
         XCTAssertTrue(
@@ -84,7 +84,7 @@ class BrowsingHistoryTests: XCTestCase {
 
     func test_visitedSiteIsInHistoryAfterClosingAndReopeningWindow() throws {
         let historyPageTitleExpectedToBeFirstInTodayHistory = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
-        let url = locallyServedURL(pageTitle: historyPageTitleExpectedToBeFirstInTodayHistory)
+        let url = URL.simpleServedPage(titled: historyPageTitleExpectedToBeFirstInTodayHistory)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         let firstSiteInHistory = app.menuItems["HistoryMenu.historyMenuItem.Today.0"]
         XCTAssertTrue(
@@ -115,8 +115,8 @@ class BrowsingHistoryTests: XCTestCase {
     func test_lastClosedWindowsTabsCanBeReopenedViaHistory() throws {
         let titleOfFirstTabWhichShouldRestore = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
         let titleOfSecondTabWhichShouldRestore = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
-        let urlForFirstTab = locallyServedURL(pageTitle: titleOfFirstTabWhichShouldRestore)
-        let urlForSecondTab = locallyServedURL(pageTitle: titleOfSecondTabWhichShouldRestore)
+        let urlForFirstTab = URL.simpleServedPage(titled: titleOfFirstTabWhichShouldRestore)
+        let urlForSecondTab = URL.simpleServedPage(titled: titleOfSecondTabWhichShouldRestore)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
@@ -157,21 +157,5 @@ class BrowsingHistoryTests: XCTestCase {
             app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: elementExistenceTimeout),
             "Restored visited tab 2 wasn't available with the expected title in a reasonable timeframe."
         )
-    }
-}
-
-private extension BrowsingHistoryTests {
-    func locallyServedURL(pageTitle: String) -> URL {
-        return URL.testsServer
-            .appendingTestParameters(data: """
-            <html>
-            <head>
-            <title>\(pageTitle)</title>
-            </head>
-            <body>
-            <p>Sample text</p>
-            </body>
-            </html>
-            """.utf8data)
     }
 }
