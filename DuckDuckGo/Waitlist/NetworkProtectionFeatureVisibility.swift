@@ -35,7 +35,7 @@ protocol NetworkProtectionFeatureVisibility {
     var isEligibleForThankYouMessage: Bool { get }
 
     func isNetworkProtectionVisible() -> Bool
-    func shouldUninstallAutomatically() -> Bool
+    func shouldUninstallAutomatically() async -> Bool
     func disableForAllUsers() async
     func disableForWaitlistUsers()
     @discardableResult
@@ -80,6 +80,10 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         return isEasterEggUser || waitlistIsOngoing
     }
 
+    var isInstalled: Bool {
+        LoginItem.vpnMenu.status.isInstalled && isOnboarded
+    }
+
     /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
     ///
     var subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability {
@@ -88,9 +92,18 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
-    func shouldUninstallAutomatically() -> Bool {
+    func shouldUninstallAutomatically() async -> Bool {
 #if SUBSCRIPTION
-        return subscriptionFeatureAvailability.isFeatureAvailable && defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
+        guard subscriptionFeatureAvailability.isFeatureAvailable,
+              LoginItem.vpnMenu.status.isInstalled else {
+            return false
+        }
+
+        if case .success(let hasEntitlement) = await AccountManager().hasEntitlement(for: .networkProtection) {
+            return hasEntitlement
+        }
+
+        return false
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
@@ -194,7 +207,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     @discardableResult
     func disableIfUserHasNoAccess() async -> Bool {
-        if shouldUninstallAutomatically() {
+        if await shouldUninstallAutomatically() {
             await disableForAllUsers()
             return true
         }

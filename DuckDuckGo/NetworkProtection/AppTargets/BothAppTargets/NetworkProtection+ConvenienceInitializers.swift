@@ -20,6 +20,7 @@
 
 import Foundation
 import NetworkProtection
+import NetworkProtectionSubscription
 import Common
 
 #if SUBSCRIPTION
@@ -85,6 +86,12 @@ extension NetworkProtectionLocationListCompositeRepository {
             errorEvents: .networkProtectionAppDebugEvents,
             isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
         )
+    }
+}
+
+extension VPNSubscriptionStatusObserver {
+    convenience init() {
+        self.init(accountManager: AccountManager())
     }
 }
 

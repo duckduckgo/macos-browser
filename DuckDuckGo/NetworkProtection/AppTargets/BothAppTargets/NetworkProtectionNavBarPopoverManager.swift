@@ -23,6 +23,7 @@ import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import NetworkProtectionSubscription
 
 #if SUBSCRIPTION
 import Subscription
@@ -82,7 +83,10 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             _ = VPNSettings(defaults: .netP)
             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
 
+            let subscriptionStatusObserver = VPNSubscriptionStatusObserver()
+
             let popover = NetworkProtectionPopover(controller: controller,
+                                                   showSubscriptionExpired: subscriptionStatusObserver.$showSubscriptionExpired,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,
                                                    statusReporter: statusReporter,
                                                    appLauncher: appLauncher,

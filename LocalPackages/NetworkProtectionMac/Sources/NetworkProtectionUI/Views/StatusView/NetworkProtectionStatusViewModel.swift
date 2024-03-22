@@ -51,13 +51,16 @@ extension NetworkProtectionStatusView {
         @Published
         private var connectionStatus: NetworkProtection.ConnectionStatus = .default
 
+        @Published
+        var showSubscriptionExpired: Bool = false
+
         /// The type of extension that's being used for NetP
         ///
         @Published
         private(set) var onboardingStatus: OnboardingStatus = .completed
 
         var tunnelControllerViewDisabled: Bool {
-            onboardingStatus != .completed || loginItemNeedsApproval || shouldShowSubscriptionExpired
+            onboardingStatus != .completed || loginItemNeedsApproval || showSubscriptionExpired
         }
 
         @MainActor
@@ -110,6 +113,7 @@ extension NetworkProtectionStatusView {
         // MARK: - Initialization & Deinitialization
 
         public init(controller: TunnelController,
+                    showSubscriptionExpired: Published<Bool>.Publisher,
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
@@ -144,6 +148,7 @@ extension NetworkProtectionStatusView {
             showDebugInformation = false
 
             // Particularly useful when unit testing with an initial status of our choosing.
+            subscribeToShowSubscriptionExpired(showSubscriptionExpired)
             subscribeToStatusChanges()
             subscribeToConnectivityIssues()
             subscribeToTunnelErrorMessages()
@@ -157,12 +162,6 @@ extension NetworkProtectionStatusView {
                 self?.onboardingStatus = status
             }
             .store(in: &cancellables)
-
-            userDefaults
-                .publisher(for: \.networkProtectionEntitlementsExpired)
-                .receive(on: DispatchQueue.main)
-                .assign(to: \.shouldShowSubscriptionExpired, onWeaklyHeld: self)
-                .store(in: &cancellables)
         }
 
         func refreshLoginItemStatus() {
@@ -188,6 +187,12 @@ extension NetworkProtectionStatusView {
             Task {
                 await uninstallHandler()
             }
+        }
+
+        private func subscribeToShowSubscriptionExpired(_ publisher: Published<Bool>.Publisher) {
+            publisher.receive(on: DispatchQueue.main)
+                .assign(to: \.showSubscriptionExpired, onWeaklyHeld: self)
+                .store(in: &cancellables)
         }
 
         private func subscribeToStatusChanges() {
@@ -305,9 +310,6 @@ extension NetworkProtectionStatusView {
         // MARK: - Child View Models
 
         let tunnelControllerViewModel: TunnelControllerViewModel
-
-        @Published
-        var shouldShowSubscriptionExpired: Bool = false
 
         var promptActionViewModel: PromptActionView.Model? {
 #if !APPSTORE && !DEBUG

@@ -725,7 +725,6 @@ extension MainViewController {
     ///
     private func clearPrivacyProState() {
         resetThankYouModalChecks(nil)
-        UserDefaults.netP.networkProtectionEntitlementsExpired = false
 
         // Clear pixel data
         DailyPixel.clearLastFireDate(pixel: .privacyProFeatureEnabled)

@@ -85,11 +85,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
 #endif
 
-#if NETWORK_PROTECTION && SUBSCRIPTION
-    // Needs to be lazy as indirectly depends on AppDelegate
-    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
-#endif
-
 #if DBP && SUBSCRIPTION
     private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
 #endif
@@ -291,10 +286,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         subscribeToDataImportCompleteNotification()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
-
-#if NETWORK_PROTECTION && SUBSCRIPTION
-        networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
-#endif
 
 #if NETWORK_PROTECTION
         NetworkProtectionAppEvents().applicationDidFinishLaunching()

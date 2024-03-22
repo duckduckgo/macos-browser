@@ -50,7 +50,7 @@ public struct NetworkProtectionStatusView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            if model.shouldShowSubscriptionExpired {
+            if model.showSubscriptionExpired {
                 SubscriptionExpiredView {
                     model.openPrivacyPro()
                 } uninstallButtonHandler: {

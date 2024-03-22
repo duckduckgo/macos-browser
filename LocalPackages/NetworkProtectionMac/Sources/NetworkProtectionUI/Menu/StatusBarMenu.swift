@@ -49,6 +49,7 @@ public final class StatusBarMenu: NSObject {
     @MainActor
     public init(model: StatusBarMenuModel,
                 statusItem: NSStatusItem? = nil,
+                showSubscriptionExpired: Published<Bool>.Publisher,
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
@@ -66,6 +67,7 @@ public final class StatusBarMenu: NSObject {
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)
 
         popover = NetworkProtectionPopover(controller: controller,
+                                           showSubscriptionExpired: showSubscriptionExpired,
                                            onboardingStatusPublisher: onboardingStatusPublisher,
                                            statusReporter: statusReporter,
                                            appLauncher: appLauncher,

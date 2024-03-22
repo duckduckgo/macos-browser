@@ -51,6 +51,7 @@ public final class NetworkProtectionPopover: NSPopover {
     private var appLifecycleCancellable: AnyCancellable?
 
     public required init(controller: TunnelController,
+                         showSubscriptionExpired: Published<Bool>.Publisher,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
                          appLauncher: AppLaunching,
@@ -62,6 +63,7 @@ public final class NetworkProtectionPopover: NSPopover {
 
         self.statusReporter = statusReporter
         self.model = NetworkProtectionStatusView.Model(controller: controller,
+                                                       showSubscriptionExpired: showSubscriptionExpired,
                                                        onboardingStatusPublisher: onboardingStatusPublisher,
                                                        statusReporter: statusReporter,
                                                        debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),

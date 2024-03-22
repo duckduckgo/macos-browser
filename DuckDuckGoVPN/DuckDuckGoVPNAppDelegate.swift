@@ -25,6 +25,7 @@ import NetworkExtension
 import NetworkProtection
 import NetworkProtectionProxy
 import NetworkProtectionUI
+import NetworkProtectionSubscription
 import ServiceManagement
 import PixelKit
 
@@ -95,6 +96,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var tunnelSettings = VPNSettings(defaults: .netP)
     private lazy var userDefaults = UserDefaults.netP
     private lazy var proxySettings = TransparentProxySettings(defaults: .netP)
+    private let subscriptionStatusObserver = VPNSubscriptionStatusObserver()
 
     @MainActor
     private lazy var vpnProxyLauncher = VPNProxyLauncher(
@@ -232,6 +234,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         return StatusBarMenu(
             model: model,
+            showSubscriptionExpired: subscriptionStatusObserver.$showSubscriptionExpired,
             onboardingStatusPublisher: onboardingStatusPublisher,
             statusReporter: statusReporter,
             controller: tunnelController,
@@ -355,37 +358,24 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         }.store(in: &cancellables)
     }
 
-    private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
-
     private func setUpSubscriptionMonitoring() {
 #if SUBSCRIPTION
-        guard AccountManager().isUserAuthenticated else { return }
-        let entitlementsCheck = {
-            await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
-        }
+        subscriptionStatusObserver.$showSubscriptionExpired.sink { expired in
+            guard expired else {
+                return
+            }
 
-        Task {
-            await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { [weak self] result in
-                switch result {
-                case .validEntitlement:
-                    UserDefaults.netP.networkProtectionEntitlementsExpired = false
-                case .invalidEntitlement:
-                    UserDefaults.netP.networkProtectionEntitlementsExpired = true
-                    PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndContinuous)
+            PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndContinuous)
 
-                    guard let self else { return }
-                    Task {
-                        let isConnected = await self.tunnelController.isConnected
-                        if isConnected {
-                            await self.tunnelController.stop()
-                            DistributedNotificationCenter.default().post(.showExpiredEntitlementNotification)
-                        }
-                    }
-                case .error:
-                    break
+            Task {
+                let isConnected = await self.tunnelController.isConnected
+                if isConnected {
+                    await self.tunnelController.stop()
+                    DistributedNotificationCenter.default().post(.showExpiredEntitlementNotification)
                 }
             }
         }
+        .store(in: &cancellables)
 #endif
     }
 }
