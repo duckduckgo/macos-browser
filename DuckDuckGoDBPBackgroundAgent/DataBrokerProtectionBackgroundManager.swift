@@ -78,22 +78,29 @@ public final class DataBrokerProtectionBackgroundManager {
     public func runOperationsAndStartSchedulerIfPossible() {
         pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossible)
 
-        // If there's no saved profile we don't need to start the scheduler
-        if (try? dataManager.fetchProfile()) != nil {
-            scheduler.runQueuedOperations(showWebView: false) { [weak self] error in
-                if let error = error {
-                    // Now the scheduler does return errors, we should fire a pixel here
-                    os_log("Error during BackgroundManager runOperationsAndStartSchedulerIfPossible in scheduler.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-                    self?.pixelHandler.fire(.generalError(error: error,
-                                                          functionOccurredIn: "DataBrokerProtectionBackgroundManager.runOperationsAndStartSchedulerIfPossible"))
-                    return
-                }
-
-                self?.pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler)
-                self?.scheduler.startScheduler()
+        do {
+            // If there's no saved profile we don't need to start the scheduler
+            guard (try dataManager.fetchProfile()) != nil else {
+                pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile)
+                return
             }
-        } else {
-            pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile)
+        } catch {
+            pixelHandler.fire(.generalError(error: error,
+                                            functionOccurredIn: "DataBrokerProtectionBackgroundManager.runOperationsAndStartSchedulerIfPossible"))
+            return
+        }
+
+        scheduler.runQueuedOperations(showWebView: false) { [weak self] error in
+            if let error = error {
+                // Now the scheduler does return errors, we should fire a pixel here
+                os_log("Error during BackgroundManager runOperationsAndStartSchedulerIfPossible in scheduler.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                self?.pixelHandler.fire(.generalError(error: error,
+                                                      functionOccurredIn: "DataBrokerProtectionBackgroundManager.runOperationsAndStartSchedulerIfPossible"))
+                return
+            }
+
+            self?.pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler)
+            self?.scheduler.startScheduler()
         }
     }
 }
