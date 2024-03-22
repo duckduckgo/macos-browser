@@ -138,7 +138,10 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
             }
             self.status = .running
             os_log("Scheduler running...", log: .dataBrokerProtection)
-            self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] in
+            self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] error in
+                if let error = error {
+                    os_log("Error during startScheduler in dataBrokerProcessor.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                }
                 self?.status = .idle
                 completion(.finished)
             }
@@ -160,7 +163,9 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     public func runQueuedOperations(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
         dataBrokerProcessor.runQueuedOperations(showWebView: showWebView,
-                                                completion: { completion?(nil) })
+                                                completion: { error in
+            completion?(error)
+        })
 
     }
 
@@ -170,7 +175,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         userNotificationService.requestNotificationPermission()
 
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] in
+        dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] error in
             guard let self = self else { return }
 
             self.startScheduler(showWebView: showWebView)
@@ -182,13 +187,15 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
-            completion?(nil)
+            completion?(error)
         }
     }
 
     public func optOutAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)?) {
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runAllOptOutOperations(showWebView: showWebView,
-                                                        completion: { completion?(nil) })
+                                                        completion: { error in
+            completion?(error)
+        })
     }
 }

@@ -53,13 +53,13 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runAllScanOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
+    func runAllScanOperations(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
         operationQueue.cancelAllOperations()
         runOperations(operationType: .scan,
                       priorityDate: nil,
-                      showWebView: showWebView) {
+                      showWebView: showWebView) { error in
             os_log("Scans done", log: .dataBrokerProtection)
-            completion?()
+            completion?(error)
             self.calculateMisMatches()
         }
     }
@@ -69,31 +69,31 @@ final class DataBrokerProtectionProcessor {
         mismatchUseCase.calculateMismatches()
     }
 
-    func runAllOptOutOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
+    func runAllOptOutOperations(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
         operationQueue.cancelAllOperations()
         runOperations(operationType: .optOut,
                       priorityDate: nil,
-                      showWebView: showWebView) {
+                      showWebView: showWebView) { error in
             os_log("Optouts done", log: .dataBrokerProtection)
-            completion?()
+            completion?(error)
         }
     }
 
-    func runQueuedOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
+    func runQueuedOperations(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil ) {
         runOperations(operationType: .all,
                       priorityDate: Date(),
-                      showWebView: showWebView) {
+                      showWebView: showWebView) { error in
             os_log("Queued operations done", log: .dataBrokerProtection)
-            completion?()
+            completion?(error)
         }
     }
 
-    func runAllOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
+    func runAllOperations(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil ) {
         runOperations(operationType: .all,
                       priorityDate: nil,
-                      showWebView: showWebView) {
+                      showWebView: showWebView) { error in
             os_log("Queued operations done", log: .dataBrokerProtection)
-            completion?()
+            completion?(error)
         }
     }
 
@@ -105,7 +105,7 @@ final class DataBrokerProtectionProcessor {
     private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
                                priorityDate: Date?,
                                showWebView: Bool,
-                               completion: @escaping () -> Void) {
+                               completion: @escaping ((Error?) -> Void)) {
 
         // Before running new operations we check if there is any updates to the broker files.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
@@ -117,7 +117,6 @@ final class DataBrokerProtectionProcessor {
         engagementPixels.fireEngagementPixel()
 
         do {
-            // Temporary do/catch to allow merging error handling work in stages
             let brokersProfileData = try database.fetchAllBrokerProfileQueryData()
             let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                       operationType: operationType,
@@ -129,10 +128,13 @@ final class DataBrokerProtectionProcessor {
             }
         } catch {
             os_log("DataBrokerProtectionProcessor error: runOperations, error: %{public}@", log: .error, error.localizedDescription)
+            operationQueue.addBarrierBlock {
+                completion(error)
+            }
         }
 
         operationQueue.addBarrierBlock {
-            completion()
+            completion(nil)
         }
     }
 

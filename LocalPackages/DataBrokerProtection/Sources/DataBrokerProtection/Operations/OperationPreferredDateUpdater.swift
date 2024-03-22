@@ -33,7 +33,7 @@ protocol OperationPreferredDateUpdater {
                                   extractedProfileId: Int64?,
                                   schedulingConfig: DataBrokerScheduleConfig) throws
 
-    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64)
+    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64) throws
 }
 
 struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
@@ -70,9 +70,8 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
 
     /// 1, This method fetches scan operations with the profileQueryId and with child sites of parentBrokerId
     /// 2. Then for each one it updates the preferredRunDate of the scan to its confirm scan
-    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64) {
+    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64) throws {
         do {
-            // Temporary do/catch to allow merging error handling work in stages
             let childBrokers =  try database.fetchChildBrokers(for: parentBroker.name)
 
             try childBrokers.forEach { childBroker in
@@ -85,6 +84,7 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
             }
         } catch {
             os_log("OperationPreferredDateUpdaterUseCase error: updateChildrenBrokerForParentBroker, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
     }
 
@@ -107,10 +107,10 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
         }
 
         if newScanPreferredRunDate != currentScanPreferredRunDate {
-            updatePreferredRunDate(newScanPreferredRunDate,
-                                   brokerId: brokerId,
-                                   profileQueryId: profileQueryId,
-                                   extractedProfileId: nil)
+            try updatePreferredRunDate(newScanPreferredRunDate,
+                                       brokerId: brokerId,
+                                       profileQueryId: profileQueryId,
+                                       extractedProfileId: nil)
         }
     }
 
@@ -134,10 +134,10 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
         }
 
         if newOptOutPreferredDate != currentOptOutPreferredRunDate {
-            updatePreferredRunDate(newOptOutPreferredDate,
-                                   brokerId: brokerId,
-                                   profileQueryId: profileQueryId,
-                                   extractedProfileId: extractedProfileId)
+            try updatePreferredRunDate(newOptOutPreferredDate,
+                                       brokerId: brokerId,
+                                       profileQueryId: profileQueryId,
+                                       extractedProfileId: extractedProfileId)
         }
     }
 
@@ -151,9 +151,8 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
     private func updatePreferredRunDate( _ date: Date?,
                                          brokerId: Int64,
                                          profileQueryId: Int64,
-                                         extractedProfileId: Int64?) {
+                                         extractedProfileId: Int64?) throws {
         do {
-            // Temporary do/catch to allow merging error handling work in stages
             if let extractedProfileId = extractedProfileId {
                 try database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             } else {
@@ -161,6 +160,7 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
             }
         } catch {
             os_log("OperationPreferredDateUpdaterUseCase error: updatePreferredRunDate, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
 
         os_log("Updating preferredRunDate on operation with brokerId %{public}@ and profileQueryId %{public}@", log: .dataBrokerProtection, brokerId.description, profileQueryId.description)

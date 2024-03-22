@@ -325,7 +325,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             stageDurationCalculator.fireOptOutSubmitSuccess(tries: tries)
 
             let updater = OperationPreferredDateUpdaterUseCase(database: database)
-            updater.updateChildrenBrokerForParentBroker(brokerProfileQueryData.dataBroker,
+            try updater.updateChildrenBrokerForParentBroker(brokerProfileQueryData.dataBroker,
                                                         profileQueryId: profileQueryId)
 
             try database.addAttempt(extractedProfileId: extractedProfileId,
