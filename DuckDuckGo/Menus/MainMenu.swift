@@ -43,7 +43,7 @@ import SubscriptionUI
 
     // MARK: DuckDuckGo
     let servicesMenu = NSMenu(title: UserText.mainMenuAppServices)
-    let preferencesMenuItem = NSMenuItem(title: UserText.mainMenuAppPreferences, action: #selector(AppDelegate.openPreferences), keyEquivalent: ",")
+    let preferencesMenuItem = NSMenuItem(title: UserText.mainMenuAppPreferences, action: #selector(AppDelegate.openPreferences), keyEquivalent: ",").withAccessibilityIdentifier("MainMenu.preferencesMenuItem")
 
     // MARK: File
     let newWindowMenuItem = NSMenuItem(title: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "n")
@@ -207,12 +207,12 @@ import SubscriptionUI
             NSMenuItem.separator()
 
             NSMenuItem(title: UserText.mainMenuEditFind) {
-                NSMenuItem(title: UserText.findInPageMenuItem, action: #selector(MainViewController.findInPage), keyEquivalent: "f")
-                NSMenuItem(title: UserText.mainMenuEditFindFindNext, action: #selector(MainViewController.findInPageNext), keyEquivalent: "g")
-                NSMenuItem(title: UserText.mainMenuEditFindFindPrevious, action: #selector(MainViewController.findInPagePrevious), keyEquivalent: "G")
+                NSMenuItem(title: UserText.findInPageMenuItem, action: #selector(MainViewController.findInPage), keyEquivalent: "f").withAccessibilityIdentifier("MainMenu.findInPage")
+                NSMenuItem(title: UserText.mainMenuEditFindFindNext, action: #selector(MainViewController.findInPageNext), keyEquivalent: "g").withAccessibilityIdentifier("MainMenu.findNext")
+                NSMenuItem(title: UserText.mainMenuEditFindFindPrevious, action: #selector(MainViewController.findInPagePrevious), keyEquivalent: "G").withAccessibilityIdentifier("MainMenu.findPrevious")
                 NSMenuItem.separator()
 
-                NSMenuItem(title: UserText.mainMenuEditFindHideFind, action: #selector(MainViewController.findInPageDone), keyEquivalent: "F")
+                NSMenuItem(title: UserText.mainMenuEditFindHideFind, action: #selector(MainViewController.findInPageDone), keyEquivalent: "F").withAccessibilityIdentifier("MainMenu.findInPageDone")
             }
 
             NSMenuItem(title: UserText.mainMenuEditSpellingandGrammar) {

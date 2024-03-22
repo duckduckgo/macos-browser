@@ -25,6 +25,7 @@ import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
 import LoginItems
+import PixelKit
 
 #if SUBSCRIPTION
 import Subscription
@@ -173,6 +174,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return false
         }
 
+        PixelKit.fire(VPNPrivacyProPixel.vpnBetaStoppedWhenPrivacyProEnabled, frequency: .dailyAndContinuous)
         defaults.vpnLegacyUserAccessDisabledOnce = true
         await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
         return true
