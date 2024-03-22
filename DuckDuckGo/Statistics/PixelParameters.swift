@@ -170,6 +170,9 @@ extension Pixel.Event {
              .defaultRequestedFromHomepageSetupView,
              .defaultRequestedFromSettings,
              .defaultRequestedFromOnboarding,
+             .privacyProFeatureEnabled,
+             .privacyProBetaUserThankYouVPN,
+             .privacyProBetaUserThankYouDBP,
              .privacyProSubscriptionActive,
              .privacyProOfferScreenImpression,
              .privacyProPurchaseAttempt,
@@ -210,6 +213,7 @@ extension Pixel.Event {
              .privacyProOfferYearlyPriceClick,
              .privacyProAddEmailSuccess,
              .privacyProWelcomeFAQClick,
+             .privacyProPurchaseStripeSuccess,
              .passwordImportKeychainPrompt,
              .passwordImportKeychainPromptDenied:
             return nil

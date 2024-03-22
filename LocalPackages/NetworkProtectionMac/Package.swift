@@ -28,7 +28,7 @@ let package = Package(
     products: [
         .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
         .library(name: "NetworkProtectionProxy", targets: ["NetworkProtectionProxy"]),
-        .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
+        .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "129.1.0"),
@@ -75,6 +75,7 @@ let package = Package(
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "LoginItems", package: "LoginItems"),
+                .product(name: "PixelKit", package: "PixelKit"),
             ],
             resources: [
                 .copy("Resources/Assets.xcassets")
@@ -84,14 +85,16 @@ let package = Package(
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
+
         .testTarget(
             name: "NetworkProtectionUITests",
             dependencies: [
                 "NetworkProtectionUI",
                 .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit"),
                 .product(name: "LoginItems", package: "LoginItems"),
+                .product(name: "PixelKitTestingUtilities", package: "PixelKit"),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
-        )
+        ),
     ]
 )
