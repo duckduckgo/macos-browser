@@ -116,12 +116,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case Handlers.backToSettings: return backToSettings
         case Handlers.getSubscriptionOptions: return getSubscriptionOptions
         case Handlers.subscriptionSelected: return subscriptionSelected
-        case Handlers.activateSubscription:
-            if #available(macOS 12.0, *) {
-                return activateSubscription
-            } else {
-                return nil
-            }
+        case Handlers.activateSubscription: return activateSubscription
         case Handlers.featureSelected: return featureSelected
         case Handlers.completeStripePayment: return completeStripePayment
             // Pixel related events
@@ -343,7 +338,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         return nil
     }
 
-    @available(macOS 12.0, *)
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
 
         Pixel.fire(.privacyProRestorePurchaseOfferPageEntry)
@@ -354,12 +348,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let message = original
 
         let actionHandlers = SubscriptionAccessActionHandlers(restorePurchases: {
-            Task { @MainActor in
-                await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
-                message.webView?.reload()
+            if #available(macOS 12.0, *) {
+                Task { @MainActor in
+                    await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
+                    message.webView?.reload()
+                }
             }
-        },
-                                                              openURLHandler: { url in
+        }, openURLHandler: { url in
             DispatchQueue.main.async {
                 WindowControllersManager.shared.showTab(with: .subscription(url))
             }
