@@ -254,7 +254,7 @@ class FindInPageTests: XCTestCase {
         )
     }
 
-    func test_findInPage_findNextGoesToNextOccurrence() throws {
+    func test_findNext_menuItemGoesToNextOccurrence() throws {
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The Address Bar text field did not exist when it was expected."
@@ -313,7 +313,7 @@ class FindInPageTests: XCTestCase {
         )
     }
 
-    func test_findInPage_findNextNextArrowGoesToNextOccurrence() throws {
+    func test_findNext_nextArrowGoesToNextOccurrence() throws {
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The Address Bar text field did not exist when it was expected."
@@ -371,7 +371,7 @@ class FindInPageTests: XCTestCase {
         )
     }
 
-    func test_findInPage_commandGGoesToNextOccurrence() throws {
+    func test_findNext_commandGGoesToNextOccurrence() throws {
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The Address Bar text field did not exist when it was expected."
