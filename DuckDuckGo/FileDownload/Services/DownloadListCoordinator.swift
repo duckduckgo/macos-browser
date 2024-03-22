@@ -145,13 +145,14 @@ final class DownloadListCoordinator {
         self.updatesSubject.send((.added, item))
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func setupFilePresenters(for item: DownloadListItem) throws -> (destination: Result<FilePresenter?, Error>, tempFile: Result<FilePresenter?, Error>) {
         let fm = FileManager.default
 
         // locate destination file
         let destinationPresenterResult = Result<FilePresenter?, Error> {
-            if let destinationBookmarkData = item.destinationBookmarkData {
-                try SandboxFilePresenter(bookmarkData: destinationBookmarkData, logger: log)
+            if let destinationFileBookmarkData = item.destinationFileBookmarkData {
+                try SandboxFilePresenter(fileBookmarkData: destinationFileBookmarkData, logger: log)
             } else if let destinationURL = item.destinationURL {
                 try SandboxFilePresenter(url: destinationURL, logger: log)
             } else {
@@ -160,14 +161,18 @@ final class DownloadListCoordinator {
         }
 
         // locate temp download file
-        let tempFilePresenterResult = Result<FilePresenter?, Error> {
+        var tempFilePresenterResult = Result<FilePresenter?, Error> {
             if let tempFileBookmarkData = item.tempFileBookmarkData {
-                try SandboxFilePresenter(bookmarkData: tempFileBookmarkData, logger: log)
+                try SandboxFilePresenter(fileBookmarkData: tempFileBookmarkData, logger: log)
             } else if let tempURL = item.tempURL {
                 try SandboxFilePresenter(url: tempURL, logger: log)
             } else {
                 nil
             }
+        }
+        // corner-case when downloading a `.duckload` file - the source and destination files will be the same then
+        if (try? tempFilePresenterResult.get()?.url) == (try? destinationPresenterResult.get()?.url) {
+            tempFilePresenterResult = destinationPresenterResult
         }
         self.filePresenters[item.identifier] = (destination: try? destinationPresenterResult.get(), tempFile: try? tempFilePresenterResult.get())
 
@@ -245,10 +250,10 @@ final class DownloadListCoordinator {
 
         Publishers.CombineLatest(
             presenters.destination?.urlPublisher ?? Just(nil).eraseToAnyPublisher(),
-            (presenters.destination as? SandboxFilePresenter)?.bookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
+            (presenters.destination as? SandboxFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
         )
-        .scan((oldURL: nil, newURL: nil, bookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, bookmarkData: $1.1) }
-        .sink { [weak self] oldURL, newURL, bookmarkData in
+        .scan((oldURL: nil, newURL: nil, fileBookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, fileBookmarkData: $1.1) }
+        .sink { [weak self] oldURL, newURL, fileBookmarkData in
             DispatchQueue.main.asyncOrNow {
                 self?.updateItem(withId: item.identifier) { [id=item.identifier, log=(self?.log ?? .disabled)] item in
                     guard !Self.checkIfFileWasRemoved(oldURL: oldURL, newURL: newURL) else {
@@ -259,7 +264,7 @@ final class DownloadListCoordinator {
 
                     os_log(.debug, log: log, "⚠️coordinator: destination url updated \(id): \"\(newURL?.path ?? "<nil>")\"")
                     item?.destinationURL = newURL
-                    item?.destinationBookmarkData = bookmarkData
+                    item?.destinationFileBookmarkData = fileBookmarkData
                     // keep the filename even when the destinationURL is nullified
                     let fileName = if let lastPathComponent = newURL?.lastPathComponent, !lastPathComponent.isEmpty {
                         lastPathComponent
@@ -274,13 +279,12 @@ final class DownloadListCoordinator {
 
         Publishers.CombineLatest(
             presenters.tempFile?.urlPublisher ?? Just(nil).eraseToAnyPublisher(),
-            (presenters.tempFile as? SandboxFilePresenter)?.bookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
+            (presenters.tempFile as? SandboxFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
         )
-        .scan((oldURL: nil, newURL: nil, bookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, bookmarkData: $1.1) }
-        .sink { [weak self] oldURL, newURL, bookmarkData in
+        .scan((oldURL: nil, newURL: nil, fileBookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, fileBookmarkData: $1.1) }
+        .sink { [weak self] oldURL, newURL, fileBookmarkData in
             DispatchQueue.main.asyncOrNow {
                 self?.updateItem(withId: item.identifier) { [id=item.identifier, log=(self?.log ?? .disabled)] item in
-                    // TODO: remove when temp is present but no destination?
                     guard !Self.checkIfFileWasRemoved(oldURL: oldURL, newURL: newURL) else {
                         os_log(.debug, log: log, "coordinator: temp file removed \(id)")
                         item = nil
@@ -289,7 +293,7 @@ final class DownloadListCoordinator {
 
                     os_log(.debug, log: log, "coordinator: temp url updated \(id): \"\(newURL?.path ?? "<nil>")\"")
                     item?.tempURL = newURL
-                    item?.tempFileBookmarkData = bookmarkData
+                    item?.tempFileBookmarkData = fileBookmarkData
                 }
             }
         }

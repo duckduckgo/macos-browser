@@ -2,7 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22757" systemVersion="23E214" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="DownloadManagedObject" representedClassName="DownloadManagedObject" syncable="YES" codeGenerationType="class">
         <attribute name="added" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="destinationBookmarkDataEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSDataTransformer"/>
+        <attribute name="destinationFileBookmarkDataEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSDataTransformer"/>
         <attribute name="destinationURLEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSURLTransformer"/>
         <attribute name="errorEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSErrorTransformer"/>
         <attribute name="filenameEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="NSStringTransformer"/>

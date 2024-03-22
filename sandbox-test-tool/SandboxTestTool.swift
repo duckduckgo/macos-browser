@@ -172,14 +172,14 @@ final class SandboxTestToolAppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         do {
-            let filePresenter = try SandboxFilePresenter(bookmarkData: bookmark, logger: logger)
+            let filePresenter = try SandboxFilePresenter(fileBookmarkData: bookmark, logger: logger)
             guard let url = filePresenter.url else { throw NSError(domain: "SandboxTestTool", code: -1, userInfo: [NSLocalizedDescriptionKey: "FilePresenter URL is nil"]) }
 
             filePresenter.urlPublisher.dropFirst().sink { [unowned self] url in
                 post(.fileMoved, with: url?.path)
             }.store(in: &filePresenterCancellables[url, default: []])
-            filePresenter.bookmarkDataPublisher.dropFirst().sink { [unowned self] bookmarkData in
-                post(.bookmarkDataUpdated, with: bookmarkData?.base64EncodedString())
+            filePresenter.fileBookmarkDataPublisher.dropFirst().sink { [unowned self] fileBookmarkData in
+                post(.fileBookmarkDataUpdated, with: fileBookmarkData?.base64EncodedString())
             }.store(in: &filePresenterCancellables[url, default: []])
             self.filePresenters[url] = filePresenter
             logger.log("📗 openBookmarkWithFilePresenter done: \"\(filePresenter.url?.path ?? "<nil>")\"")

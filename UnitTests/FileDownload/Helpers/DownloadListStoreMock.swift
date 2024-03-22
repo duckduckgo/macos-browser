@@ -36,11 +36,6 @@ final class DownloadListStoreMock: DownloadListStoring {
         removeBlock?(item, completionHandler)
     }
 
-    var clearBlock: ((Date, ((Error?) -> Void)?) -> Void)?
-    func clear(itemsOlderThan date: Date, completionHandler: ((Error?) -> Void)?) {
-        clearBlock?(date, completionHandler)
-    }
-
     var syncBlock: (() -> Void)?
     func sync() {
         syncBlock?()

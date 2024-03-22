@@ -208,7 +208,7 @@ extension DownloadListItem {
                   fileName: managedObject.filenameEncrypted as? String ?? destinationURL?.lastPathComponent ?? "",
                   isBurner: false,
                   destinationURL: destinationURL,
-                  destinationBookmarkData: managedObject.destinationBookmarkDataEncrypted as? Data,
+                  destinationFileBookmarkData: managedObject.destinationFileBookmarkDataEncrypted as? Data,
                   tempURL: managedObject.tempURLEncrypted as? URL,
                   tempFileBookmarkData: managedObject.tempFileBookmarkDataEncrypted as? Data,
                   error: error)
@@ -231,7 +231,7 @@ extension DownloadManagedObject {
         websiteURLEncrypted = item.websiteURL as NSURL?
         modified = item.modified
         destinationURLEncrypted = item.destinationURL as NSURL?
-        destinationBookmarkDataEncrypted = item.destinationBookmarkData as NSData?
+        destinationFileBookmarkDataEncrypted = item.destinationFileBookmarkData as NSData?
         tempURLEncrypted = item.tempURL as NSURL?
         tempFileBookmarkDataEncrypted = item.tempFileBookmarkData as NSData?
         errorEncrypted = item.error as NSError?

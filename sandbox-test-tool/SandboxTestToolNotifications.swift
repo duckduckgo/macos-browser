@@ -34,7 +34,7 @@ enum SandboxTestNotification: String {
     case closeFilePresenter = "sandbox_test_tool_close_file_presenter"
 
     case fileMoved = "sandbox_test_tool_file_presenter_file_moved"
-    case bookmarkDataUpdated = "sandbox_test_tool_file_presenter_bookmark_data_updated"
+    case fileBookmarkDataUpdated = "sandbox_test_tool_file_presenter_bookmark_data_updated"
 
     case stopAccessingSecurityScopedResourceCalled = "sandbox_test_tool_stop_accessing_security_scoped_resource"
 

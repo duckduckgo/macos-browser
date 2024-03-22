@@ -23,7 +23,12 @@ extension FileManager {
 
     @discardableResult
     func moveItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
-        return try withNonExistentUrl(for: destURL, incrementingIndexIfExistsUpTo: flag ? 10000 : 0, pathExtension: pathExtension) { url in
+        guard srcURL != destURL else { return destURL }
+        guard flag else {
+            try moveItem(at: srcURL, to: destURL)
+            return destURL
+        }
+        return try withNonExistentUrl(for: destURL, incrementingIndexIfExistsUpTo: 10000, pathExtension: pathExtension) { url in
             try moveItem(at: srcURL, to: url)
             return url
         }
@@ -31,6 +36,11 @@ extension FileManager {
 
     @discardableResult
     func copyItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
+        guard srcURL != destURL else { return destURL }
+        guard flag else {
+            try moveItem(at: srcURL, to: destURL)
+            return destURL
+        }
         return try withNonExistentUrl(for: destURL, incrementingIndexIfExistsUpTo: flag ? 10000 : 0, pathExtension: pathExtension) { url in
             try copyItem(at: srcURL, to: url)
             return url

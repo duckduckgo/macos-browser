@@ -20,13 +20,6 @@ import Foundation
 
 extension Progress {
 
-    private enum Constants {
-        /// delay before we start calculating the estimated time - because initially it‘s not reliable
-        static let remainingDownloadTimeEstimationDelay: TimeInterval = 1
-        /// this seems to be working…
-        static let downloadSpeedSmoothingFactor = 0.1
-    }
-
     convenience init(totalUnitCount: Int64,
                      completedUnitCount: Int64 = 0,
                      fileOperationKind: FileOperationKind? = nil,
@@ -111,43 +104,6 @@ extension Progress {
         }
         set {
             self.setUserInfoObject(newValue, forKey: .startTimeKey)
-        }
-    }
-
-    /// set totalUnitCount, completedUnitCount with updating startTime, throughput and estimated time remaining
-    var totalAndCompletedForEstimatedTimeAndThroughput: (/* total: */ Int64, /* completed: */ Int64) {
-        get {
-            (totalUnitCount, completedUnitCount)
-        }
-        set {
-            let (total, completed) = newValue
-            if totalUnitCount != total {
-                totalUnitCount = total
-            }
-            completedUnitCount = completed
-            guard completed > 0 else { return }
-            guard let startTime else {
-                // track start time from a first received byte (completed > 0)
-                startTime = Date()
-                return
-            }
-
-            let elapsedTime = Date().timeIntervalSince(startTime)
-            // delay before we start calculating the estimated time - because initially it‘s not reliable
-            guard elapsedTime > Constants.remainingDownloadTimeEstimationDelay else { return }
-
-            // calculate instantaneous download speed
-            var throughput = Double(completed) / elapsedTime
-
-            // calculate the moving average of download speed
-            if let oldThroughput = self.throughput.map(Double.init) {
-                throughput = Constants.downloadSpeedSmoothingFactor * throughput + (1 - Constants.downloadSpeedSmoothingFactor) * oldThroughput
-            }
-            self.throughput = Int(throughput)
-
-            if total > 0 {
-                self.estimatedTimeRemaining = Double(total - completed) / Double(throughput)
-            }
         }
     }
 

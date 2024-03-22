@@ -52,9 +52,9 @@ struct DownloadListItem: Equatable {
         }
     }
 
-    var destinationBookmarkData: Data? {
+    var destinationFileBookmarkData: Data? {
         didSet {
-            guard destinationBookmarkData != oldValue else { return }
+            guard destinationFileBookmarkData != oldValue else { return }
             modified = Date()
         }
     }

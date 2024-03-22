@@ -130,7 +130,7 @@ final class FilePresenterTests: XCTestCase {
     }
 
     // MARK: - Test sandboxed file access
-
+#if APPSTORE
     func testTool_run() async throws {
         // 1. make non-sandbox file
         let nonSandboxUrl = try makeNonSandboxFile()
@@ -234,7 +234,7 @@ final class FilePresenterTests: XCTestCase {
             e1.fulfill()
         }
         let e2 = expectation(description: "file presenter: bookmark updated")
-        var c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.bookmarkDataUpdated.name).sink { n in
+        var c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.fileBookmarkDataUpdated.name).sink { n in
             e2.fulfill()
         }
 
@@ -251,9 +251,9 @@ final class FilePresenterTests: XCTestCase {
             e3.fulfill()
         }
         let e4 = expectation(description: "file presenter: bookmark updated 2")
-        var newBookmarkData: Data?
-        c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.bookmarkDataUpdated.name).sink { n in
-            newBookmarkData = (n.object as? String).flatMap { Data(base64Encoded: $0) }
+        var newFileBookmarkData: Data?
+        c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.fileBookmarkDataUpdated.name).sink { n in
+            newFileBookmarkData = (n.object as? String).flatMap { Data(base64Encoded: $0) }
             e4.fulfill()
         }
 
@@ -272,7 +272,7 @@ final class FilePresenterTests: XCTestCase {
         // bookmark should update
         XCTAssertNotNil(result.bookmark)
         XCTAssertNotEqual(result.bookmark, bookmark)
-        XCTAssertEqual(result.bookmark, newBookmarkData)
+        XCTAssertEqual(result.bookmark, newFileBookmarkData)
     }
 
     func testWhenFileIsRenamed_renamedFileCanBeRead() async throws {
@@ -331,7 +331,7 @@ final class FilePresenterTests: XCTestCase {
             e1.fulfill()
         }
         let e2 = expectation(description: "file presenter: bookmark updated")
-        let c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.bookmarkDataUpdated.name).sink { n in
+        let c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.fileBookmarkDataUpdated.name).sink { n in
             XCTAssertNotNil((n.object as? String).flatMap { Data(base64Encoded: $0) })
             e2.fulfill()
         }
@@ -516,7 +516,7 @@ final class FilePresenterTests: XCTestCase {
             XCTAssertNil(n.object)
             e1.fulfill()
         }
-        let c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.bookmarkDataUpdated.name).sink { n in
+        let c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.fileBookmarkDataUpdated.name).sink { n in
             XCTAssertNil(n.object)
             e2.fulfill()
         }
@@ -626,26 +626,27 @@ final class FilePresenterTests: XCTestCase {
         let result = try await fileReadPromise.value
         XCTAssertEqual(result.path, nonSandboxUrl.path)
     }
+#endif
 
     // MARK: - Test non-sandboxed file access
 
     func testWhenSandboxFilePresenterIsOpen_itCanReadFile_accessIsNotStoppedWhenClosed_noSandbox() async throws {
         // 1. make non-sandbox file; create bookmark
         let nonSandboxUrl = try makeNonSandboxFile()
-        guard let bookmark = try SandboxFilePresenter(url: nonSandboxUrl).bookmarkData else { XCTFail("No bookmark"); return }
+        guard let bookmarkData = try SandboxFilePresenter(url: nonSandboxUrl).fileBookmarkData else { XCTFail("No bookmark"); return }
 
         // 2. open the bookmark with SandboxFilePresenter
-        var filePresenter: SandboxFilePresenter! = try SandboxFilePresenter(bookmarkData: bookmark)
+        var filePresenter: SandboxFilePresenter! = try SandboxFilePresenter(fileBookmarkData: bookmarkData)
 
         // 3. validate
         var publishedUrl: URL?
         _=filePresenter.urlPublisher.sink { publishedUrl = $0 }
         var publishedBookmarkData: Data?
-        _=filePresenter.bookmarkDataPublisher.sink { publishedBookmarkData = $0 }
+        _=filePresenter.fileBookmarkDataPublisher.sink { publishedBookmarkData = $0 }
         XCTAssertEqual(filePresenter.url, nonSandboxUrl)
         XCTAssertEqual(publishedUrl, nonSandboxUrl)
-        XCTAssertEqual(filePresenter.bookmarkData, bookmark)
-        XCTAssertEqual(publishedBookmarkData, bookmark)
+        XCTAssertEqual(filePresenter.fileBookmarkData, bookmarkData)
+        XCTAssertEqual(publishedBookmarkData, bookmarkData)
 
         // 4. close file presenter, access should not stop
         filePresenter = nil
@@ -665,9 +666,9 @@ final class FilePresenterTests: XCTestCase {
             e1.fulfill()
         }
         let e2 = expectation(description: "file presenter: bookmark updated")
-        var newBookmarkData: Data?
-        let c2 = filePresenter.bookmarkDataPublisher.dropFirst().sink { bookmark in
-            newBookmarkData = bookmark
+        var newFileBookmarkData: Data?
+        let c2 = filePresenter.fileBookmarkDataPublisher.dropFirst().sink { bookmark in
+            newFileBookmarkData = bookmark
             e2.fulfill()
         }
 
@@ -677,12 +678,12 @@ final class FilePresenterTests: XCTestCase {
         await fulfillment(of: [e1, e2], timeout: 5)
         withExtendedLifetime((c1, c2)) {}
 
-        let bookmark = try newUrl.bookmarkData(options: .withSecurityScope)
+        let bookmarkData = try newUrl.bookmarkData(options: .withSecurityScope)
 
         // url&bookmark should update
         XCTAssertEqual(filePresenter.url, newUrl)
-        XCTAssertEqual(filePresenter.bookmarkData, bookmark)
-        XCTAssertEqual(newBookmarkData, bookmark)
+        XCTAssertEqual(filePresenter.fileBookmarkData, bookmarkData)
+        XCTAssertEqual(newFileBookmarkData, bookmarkData)
     }
 
     func testWhenFileIsRemoved_removalIsDetected_noSandbox() async throws {
@@ -697,7 +698,7 @@ final class FilePresenterTests: XCTestCase {
             XCTAssertNil(url)
             e1.fulfill()
         }
-        let c2 = filePresenter.bookmarkDataPublisher.dropFirst().sink { bookmark in
+        let c2 = filePresenter.fileBookmarkDataPublisher.dropFirst().sink { bookmark in
             XCTAssertNil(bookmark)
             e2.fulfill()
         }
@@ -712,11 +713,11 @@ final class FilePresenterTests: XCTestCase {
     func testWhen2FilesAreCrossRenamedAnd1stFileClosed_accessTo2ndIsPreserved_noSandbox() async throws {
         // 1. make 2 non-sandbox files
         let nonSandboxUrl1 = try makeNonSandboxFile()
-        let bookmark1 = try nonSandboxUrl1.bookmarkData(options: .withSecurityScope)
+        let bookmarkData1 = try nonSandboxUrl1.bookmarkData(options: .withSecurityScope)
         let nonSandboxUrl2 = try makeNonSandboxFile()
-        let bookmark2 = try nonSandboxUrl2.bookmarkData(options: .withSecurityScope)
-        let filePresenter1 = try SandboxFilePresenter(bookmarkData: bookmark1)
-        let filePresenter2 = try SandboxFilePresenter(bookmarkData: bookmark2)
+        let bookmarkData2 = try nonSandboxUrl2.bookmarkData(options: .withSecurityScope)
+        let filePresenter1 = try SandboxFilePresenter(fileBookmarkData: bookmarkData1)
+        let filePresenter2 = try SandboxFilePresenter(fileBookmarkData: bookmarkData2)
 
         // 2. cross-rename the files
         let tempUrl = nonSandboxUrl1.appendingPathExtension("tmp")
@@ -730,8 +731,8 @@ final class FilePresenterTests: XCTestCase {
                 e1.fulfill()
             }
             let e2 = expectation(description: "file presenter: bookmark updated")
-            let c2 = presenter.bookmarkDataPublisher.dropFirst().sink { [unowned presenter] bookmarkData in
-                XCTAssertEqual(bookmarkData, presenter.bookmarkData)
+            let c2 = presenter.fileBookmarkDataPublisher.dropFirst().sink { [unowned presenter] bookmarkData in
+                XCTAssertEqual(bookmarkData, presenter.fileBookmarkData)
                 if presenter === filePresenter1 {
                     newBookmarkData1 = bookmarkData
                 } else {
@@ -752,11 +753,11 @@ final class FilePresenterTests: XCTestCase {
         XCTAssertEqual(filePresenter1.url, nonSandboxUrl2)
         XCTAssertEqual(filePresenter2.url, nonSandboxUrl1)
         var isStale = false
-        XCTAssertEqual(newBookmarkData1, filePresenter1.bookmarkData)
-        XCTAssertEqual(try URL(resolvingBookmarkData: filePresenter1.bookmarkData ?? Data(), bookmarkDataIsStale: &isStale), nonSandboxUrl2)
+        XCTAssertEqual(newBookmarkData1, filePresenter1.fileBookmarkData)
+        XCTAssertEqual(try URL(resolvingBookmarkData: filePresenter1.fileBookmarkData ?? Data(), bookmarkDataIsStale: &isStale), nonSandboxUrl2)
         // XCTAssertFalse(isStale) - why it‘s false?
-        XCTAssertEqual(newBookmarkData2, filePresenter2.bookmarkData)
-        XCTAssertEqual(try URL(resolvingBookmarkData: filePresenter2.bookmarkData ?? Data(), bookmarkDataIsStale: &isStale), nonSandboxUrl1)
+        XCTAssertEqual(newBookmarkData2, filePresenter2.fileBookmarkData)
+        XCTAssertEqual(try URL(resolvingBookmarkData: filePresenter2.fileBookmarkData ?? Data(), bookmarkDataIsStale: &isStale), nonSandboxUrl1)
         // XCTAssertFalse(isStale) - why it‘s false?
     }
 

@@ -70,6 +70,11 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
+        var destination = destination
+        // always prompt when "downloading" a local file
+        if download.originalRequest?.url?.isFileURL ?? true, case .auto = destination {
+            destination = .prompt
+        }
         let task = WebKitDownloadTask(download: download, destination: destination, isBurner: fromBurnerWindow)
         os_log(log: log, "add \(download): \(download.originalRequest?.url?.absoluteString ?? "<nil>") -> \(destination): \(task)")
 
@@ -195,10 +200,10 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         var url = downloadLocation.appendingPathComponent(fileName)
         os_log(log: log, "FileDownloadManager: using default download location for \"\(suggestedFilename)\": \"\(url.path)\"")
 
-        // Make sure the app has an access to destination
+        // make sure the app has access to the destination
         let folderUrl = url.deletingLastPathComponent()
         let fm = FileManager.default
-        guard FileManager.default.isWritableFile(atPath: folderUrl.path) else {
+        guard fm.isWritableFile(atPath: folderUrl.path) else {
             os_log(log: log, "FileDownloadManager: no write permissions for \"\(folderUrl.path)\": fallback to user request")
             return await requestDestinationFromUser(for: task, suggestedFilename: suggestedFilename, suggestedFileType: fileType)
         }

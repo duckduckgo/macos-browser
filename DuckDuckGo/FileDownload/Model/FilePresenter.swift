@@ -75,14 +75,24 @@ internal class FilePresenter {
             delegate?.presentedItemDidMove(to: newURL)
         }
 
-        final func accommodatePresentedItemDeletion() async throws {
+        func accommodatePresentedSubitemDeletion(at url: URL, completionHandler: @escaping ((any Error)?) -> Void) {
             assert(delegate != nil)
-            try delegate?.accommodatePresentedItemDeletion()
+            do {
+                try delegate?.accommodatePresentedItemDeletion()
+                completionHandler(nil)
+            } catch {
+                completionHandler(error)
+            }
         }
 
-        final func accommodatePresentedItemEviction() async throws {
+        func accommodatePresentedItemEviction(completionHandler: @escaping ((any Error)?) -> Void) {
             assert(delegate != nil)
+            do {
             try delegate?.accommodatePresentedItemEviction()
+                completionHandler(nil)
+            } catch {
+                completionHandler(error)
+            }
         }
 
     }
@@ -228,16 +238,16 @@ final class SandboxFilePresenter: FilePresenter {
 
     private let securityScopedURL: URL?
 
-    private var _bookmarkData: Data?
-    final var bookmarkData: Data? {
+    private var _fileBookmarkData: Data?
+    final var fileBookmarkData: Data? {
         lock.withLock {
-            _bookmarkData
+            _fileBookmarkData
         }
     }
 
-    private var bookmarkDataSubject = PassthroughSubject<Data?, Never>()
-    final var bookmarkDataPublisher: AnyPublisher<Data?, Never> {
-        bookmarkDataSubject.prepend(bookmarkData).eraseToAnyPublisher()
+    private var fileBookmarkDataSubject = PassthroughSubject<Data?, Never>()
+    final var fileBookmarkDataPublisher: AnyPublisher<Data?, Never> {
+        fileBookmarkDataSubject.prepend(fileBookmarkData).eraseToAnyPublisher()
     }
 
     /// - Parameter url: represented file URL access to which is coordinated by the File Presenter.
@@ -261,7 +271,7 @@ final class SandboxFilePresenter: FilePresenter {
         do {
             try self.coordinateRead(at: url, with: .withoutChanges) { url in
                 logger.log("📒 updating bookmark data for \"\(url.path)\"")
-                self._bookmarkData = try url.bookmarkData(options: .withSecurityScope)
+                self._fileBookmarkData = try url.bookmarkData(options: .withSecurityScope)
             }
         } catch {
             logger.log("📕 bookmark data retreival failed for \"\(url.path)\": \(error)")
@@ -269,12 +279,12 @@ final class SandboxFilePresenter: FilePresenter {
         }
     }
 
-    init(bookmarkData: Data, logger: FilePresenterLogger = OSLog.disabled) throws {
-        self._bookmarkData = bookmarkData
+    init(fileBookmarkData: Data, logger: FilePresenterLogger = OSLog.disabled) throws {
+        self._fileBookmarkData = fileBookmarkData
 
         var isStale = false
         logger.log("📒 resolving url from bookmark data")
-        let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, bookmarkDataIsStale: &isStale)
+        let url = try URL(resolvingBookmarkData: fileBookmarkData, options: .withSecurityScope, bookmarkDataIsStale: &isStale)
         if url.startAccessingSecurityScopedResource() == true {
             self.securityScopedURL = url
             logger.log("🏝️ started resource access for \"\(url.path)\"\(isStale ? " (stale)" : "")")
@@ -287,33 +297,33 @@ final class SandboxFilePresenter: FilePresenter {
 
         if isStale {
             DispatchQueue.global().async { [weak self] in
-                self?.updateBookmarkData(for: url)
+                self?.updateFileBookmarkData(for: url)
             }
         }
     }
 
     override func didSetURL(_ newValue: URL?, oldValue: URL?) {
         super.didSetURL(newValue, oldValue: oldValue)
-        updateBookmarkData(for: newValue)
+        updateFileBookmarkData(for: newValue)
     }
 
-    fileprivate func updateBookmarkData(for url: URL?) {
-        logger.log("📒 updateBookmarkData for \"\(url?.path ?? "<nil>")\"")
+    fileprivate func updateFileBookmarkData(for url: URL?) {
+        logger.log("📒 updateFileBookmarkData for \"\(url?.path ?? "<nil>")\"")
 
-        var bookmarkData: Data?
+        var fileBookmarkData: Data?
         do {
-            bookmarkData = try url?.bookmarkData(options: .withSecurityScope)
+            fileBookmarkData = try url?.bookmarkData(options: .withSecurityScope)
         } catch {
-            logger.log("📕 updateBookmarkData failed with \(error)")
+            logger.log("📕 updateFileBookmarkData failed with \(error)")
         }
 
         guard lock.withLock({
-            guard _bookmarkData != bookmarkData else { return false }
-            _bookmarkData = bookmarkData
+            guard _fileBookmarkData != fileBookmarkData else { return false }
+            _fileBookmarkData = fileBookmarkData
             return true
         }) else { return }
 
-        bookmarkDataSubject.send(bookmarkData)
+        fileBookmarkDataSubject.send(fileBookmarkData)
     }
 
     deinit {

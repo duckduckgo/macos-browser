@@ -91,14 +91,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         }
     }
 
-    @Published @MainActor private(set) var state: FileDownloadState
-
-    /// used to report the download progress, byte count and estimated time
-    let progress: Progress
-    /// used to report file progress in Finder and Dock
-    @MainActor private var fileProgress: Progress? {
+    @Published @MainActor private(set) var state: FileDownloadState {
         didSet {
-            oldValue?.unpublish()
+            subscribeToTempFileURL(state.tempFilePresenter)
         }
     }
 
@@ -109,12 +104,18 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     private weak var delegate: WebKitDownloadTaskDelegate?
 
     private let download: WebKitDownload
-    @MainActor private var progressCancellables = Set<AnyCancellable>()
-    @MainActor private var fileProgressCancellables = Set<AnyCancellable>()
+    /// used to report the download progress, byte count and estimated time
+    let progress: Progress
+    /// used to report file progress in Finder and Dock
+    private var fileProgressPresenter: FileProgressPresenter?
+#if DEBUG
+    var fileProgress: Progress? { fileProgressPresenter?.fileProgress }
+#endif
 
     /// temp directory for the downloaded item (removed after completion)
     @MainActor private var itemReplacementDirectory: URL?
     @MainActor private var itemReplacementDirectoryFSOCancellable: AnyCancellable?
+    @MainActor private var tempFileUrlCancellable: AnyCancellable?
 
     var originalRequest: URLRequest? {
         download.originalRequest
@@ -128,15 +129,14 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
     @MainActor(unsafe)
     init(download: WebKitDownload, destination: DownloadDestination, isBurner: Bool, log: OSLog = .downloads) {
-
         self.download = download
-        self.progress = Progress(totalUnitCount: -1, fileOperationKind: .downloading, kind: .file, isCancellable: true, sourceURL: download.originalRequest?.url)
+        self.progress = DownloadProgress(download: download)
+        self.fileProgressPresenter = FileProgressPresenter(progress: progress)
         self.state = .initial(destination)
         self.isBurner = isBurner
         self.log = log
         super.init()
 
-        progress.isCancellable = true
         progress.cancellationHandler = { [weak self, log, taskDescr=self.debugDescription] in
             os_log(log: log, "❌ progress.cancellationHandler \(taskDescr)")
             self?.cancel()
@@ -160,7 +160,6 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         os_log(.debug, log: log, "🟢 start \(self)")
 
         self.delegate = delegate
-        bindProgress(to: download)
 
         // if resuming download – file presenters are provided as init parameter
         // when the resumed download is started using `WKWebView.resumeDownload`,
@@ -175,70 +174,30 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         download.delegate = self
     }
 
-    @MainActor private func bindProgress(to download: WebKitDownload) {
-        guard let downloadProgress = (self.download as? ProgressReporting)?.progress else {
-            assertionFailure("WKDownload expected to be ProgressReporting")
-            return
-        }
-
-        // update the task progress, throughput and estimated time based on tatal&completed progress values of the download
-        downloadProgress.publisher(for: \.totalUnitCount)
-            .combineLatest(downloadProgress.publisher(for: \.completedUnitCount))
-            .dropFirst()
-            .assign(to: \.totalAndCompletedForEstimatedTimeAndThroughput, onWeaklyHeld: progress)
-            .store(in: &progressCancellables)
-
-        // display file fly-to-dock animation and download progress in Finder and Dock
-        $state.compactMap {
-            $0.tempFilePresenter?.urlPublisher ?? Just(nil).eraseToAnyPublisher()
-        }
-        .switchToLatest()
-        .receive(on: DispatchQueue.main)
-        .sink { [weak self] url in
-            self?.displayFileProgress(at: url)
-            Task.detached { [weak self] in
-                await self?.renameDestinationFileIfNeeded()
+    @MainActor func subscribeToTempFileURL(_ tempFilePresenter: FilePresenter?) {
+        tempFileUrlCancellable = (tempFilePresenter?.urlPublisher ?? Just(nil).eraseToAnyPublisher())
+            .sink { [weak self] url in
+                Task { [weak self] in
+                    await self?.tempFileUrlUpdated(to: url)
+                }
             }
-        }
-        .store(in: &progressCancellables)
     }
 
-    /// display file fly-to-dock animation and download progress in Finder and Dock
-    @MainActor private func displayFileProgress(at url: URL?) {
-        os_log(.debug, log: log, "updating fileProgress URL to: \"\(url?.path ?? "<nil>")\"")
+    /// Observe `.duckload` file moving and renaming, update the file progress and rename destination file if needed
+    private nonisolated func tempFileUrlUpdated(to url: URL?) async {
+        let (state, itemReplacementDirectory) = await MainActor.run {
+            // display file progress and fly-to-dock animation
+            // don‘t display progress in itemReplacementDirectory
+            if let url, self.itemReplacementDirectory == nil || !url.path.hasPrefix(self.itemReplacementDirectory!.path) {
+                self.fileProgressPresenter?.displayFileProgress(at: url)
+            } else {
+                self.fileProgressPresenter?.displayFileProgress(at: nil)
+            }
 
-        self.fileProgressCancellables.removeAll(keepingCapacity: true)
-        guard let url,
-              // don‘t display progress in itemReplacementDirectory
-              itemReplacementDirectory == nil || !url.path.hasPrefix(itemReplacementDirectory!.path) else {
-            self.fileProgress = nil
-            return
+            return (self.state, self.itemReplacementDirectory)
         }
 
-        let fileProgress = Progress(copy: progress)
-        fileProgress.fileURL = url
-        fileProgress.cancellationHandler = { [progress] in
-            progress.cancel()
-        }
-        // only display fly-to-dock animation only once - setting the original &progress.flyToImage to nil
-        swap(&fileProgress.fileIconOriginalRect, &progress.fileIconOriginalRect)
-        swap(&fileProgress.flyToImage, &progress.flyToImage)
-        fileProgress.fileIcon = progress.fileIcon
-
-        progress.publisher(for: \.totalUnitCount)
-            .assign(to: \.totalUnitCount, onWeaklyHeld: fileProgress)
-            .store(in: &fileProgressCancellables)
-        progress.publisher(for: \.completedUnitCount)
-            .assign(to: \.completedUnitCount, onWeaklyHeld: fileProgress)
-            .store(in: &fileProgressCancellables)
-
-        self.fileProgress = fileProgress
-        fileProgress.publish()
-    }
-
-    /// if user has renamed the `.duckload` file - also rename the destination file
-    private nonisolated func renameDestinationFileIfNeeded() async {
-        let (state, itemReplacementDirectory) = await (state, itemReplacementDirectory)
+        /// if user has renamed the `.duckload` file - also rename the destination file
         guard let destinationFilePresenter = state.destinationFilePresenter,
               let destinationURL = destinationFilePresenter.url,
               let newDestinationURL = state.tempFilePresenter?.url.flatMap({ tempFileURL -> URL? in
@@ -379,10 +338,14 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         os_log(.debug, log: log, "🧙‍♂️ magique.start: \"\(destinationURL.path)\" (\"\(duckloadURL.path)\") directory writable: \(fm.isWritableFile(atPath: destinationURL.deletingLastPathComponent().path))")
         // 1. create our final destination file (let‘s say myfile.zip) and setup a File Presenter for it
         //    doing this we preserve access to the file until it‘s actually downloaded
-        let destinationFilePresenter = try SandboxFilePresenter(url: destinationURL, consumeUnbalancedStartAccessingResource: true, logger: log) { url in
+        var destinationFilePresenter = try SandboxFilePresenter(url: destinationURL, consumeUnbalancedStartAccessingResource: true, logger: log) { url in
             try fm.createFile(atPath: url.path, contents: nil) ? url : {
                 throw CocoaError(.fileWriteNoPermission, userInfo: [NSFilePathErrorKey: url.path])
             }()
+        }
+        if duckloadURL == destinationURL {
+            // corner-case when downloading a `.duckload` file - the source and destination files will be the same then
+            return try await reuseFilePresenters(tempFile: destinationFilePresenter, destination: destinationFilePresenter, tempURL: tempURL)
         }
 
         // 2. mark the file as hidden until it‘s downloaded to not to confuse user
@@ -427,7 +390,6 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     }
 
     private nonisolated func reuseFilePresenters(tempFile: FilePresenter, destination: FilePresenter, tempURL: URL) async throws -> (tempFile: FilePresenter, destinationFile: FilePresenter) {
-
         // if the download is “resumed” as a new download (replacing the destination file) -
         // use the existing `.duckload` file and move the temp file in its place
         _=try tempFile.coordinateWrite(with: .forReplacing) { duckloadURL in
@@ -456,8 +418,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     @MainActor
     private func finish(with result: Result<FilePresenter, FileDownloadError>) {
         assert(state.isInitial || state.isDownloading)
-        progressCancellables.removeAll()
-        fileProgressCancellables.removeAll()
+        fileProgressPresenter = nil
         itemReplacementDirectoryFSOCancellable = nil // in case we‘ve failed without the temp file been created
 
         switch result {
@@ -470,16 +431,10 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             }
             progress.completedUnitCount = progress.totalUnitCount
 
-            fileProgress?.totalUnitCount = progress.totalUnitCount
-            fileProgress?.completedUnitCount = progress.completedUnitCount
-            fileProgress = nil
-
             self.state = .downloaded(presenter)
 
         case .failure(let error):
             os_log(.debug, log: log, "finish \(self) with .failure(\(error))")
-
-            fileProgress = nil
 
             self.state = .failed(destination: error.isRetryable ? self.state.destinationFilePresenter : nil, // stop tracking removed files for non-retryable downloads
                                  tempFile: error.isRetryable ? self.state.tempFilePresenter : nil,
@@ -570,12 +525,11 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
     deinit {
         @MainActor(unsafe)
-        func cleanup() {
+        func performRegardlessOfMainThread() {
             os_log(.debug, log: log, "<Task \(download)>.deinit")
             assert(state.isCompleted, "FileDownloadTask is deallocated without finish(with:) been called")
-            fileProgress?.unpublish()
         }
-        cleanup()
+        performRegardlessOfMainThread()
     }
 
 }
@@ -672,8 +626,10 @@ extension WebKitDownloadTask: WKDownloadDelegate {
             try tempFile.coordinateWrite(with: .forMoving) { tempURL in
                 // replace destination file with temp file
                 try destinationFile.coordinateWrite(with: .forReplacing) { [log] destinationURL in
-                    os_log(.debug, log: log, "replacing \"\(destinationURL.path)\" with \"\(tempURL.path)\"")
-                    _=try fm.replaceItemAt(destinationURL, withItemAt: tempURL)
+                    if destinationURL != tempURL { // could be a corner-case when downloading a `.duckload` file
+                        os_log(.debug, log: log, "replacing \"\(destinationURL.path)\" with \"\(tempURL.path)\"")
+                        _=try fm.replaceItemAt(destinationURL, withItemAt: tempURL)
+                    }
                     // set quarantine attributes
                     try? destinationURL.setQuarantineAttributes(sourceURL: originalRequest?.url, referrerURL: originalRequest?.mainDocumentURL)
                 }

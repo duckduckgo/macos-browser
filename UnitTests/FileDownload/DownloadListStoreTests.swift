@@ -119,7 +119,7 @@ private extension DownloadListItem {
                                            progress: nil,
                                            isBurner: false,
                                            destinationURL: URL(fileURLWithPath: "/test/path"),
-                                           destinationBookmarkData: nil,
+                                           destinationFileBookmarkData: nil,
                                            tempURL: URL(fileURLWithPath: "/temp/file/path"),
                                            tempFileBookmarkData: nil,
                                            error: nil)
@@ -132,7 +132,7 @@ private extension DownloadListItem {
                                           progress: nil,
                                           isBurner: false,
                                           destinationURL: URL(fileURLWithPath: "/test/path"),
-                                          destinationBookmarkData: nil,
+                                          destinationFileBookmarkData: nil,
                                           tempURL: nil,
                                           tempFileBookmarkData: nil,
                                           error: nil)
@@ -145,7 +145,7 @@ private extension DownloadListItem {
                                             progress: nil,
                                             isBurner: false,
                                             destinationURL: URL(fileURLWithPath: "/test/path.jpeg"),
-                                            destinationBookmarkData: nil,
+                                            destinationFileBookmarkData: nil,
                                             tempURL: nil,
                                             tempFileBookmarkData: nil,
                                             error: nil)
