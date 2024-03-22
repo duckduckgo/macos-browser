@@ -92,7 +92,9 @@ public final class DataBrokerProtectionBackgroundManager {
 
         scheduler.runQueuedOperations(showWebView: false) { [weak self] error in
             if let error = error {
-                os_log("Error during BackgroundManager runOperationsAndStartSchedulerIfPossible in scheduler.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                os_log("Error during BackgroundManager runOperationsAndStartSchedulerIfPossible in scheduler.runQueuedOperations(), error: %{public}@",
+                       log: .dataBrokerProtection,
+                       error.localizedDescription)
                 self?.pixelHandler.fire(.generalError(error: error,
                                                       functionOccurredIn: "DataBrokerProtectionBackgroundManager.runOperationsAndStartSchedulerIfPossible"))
                 return
