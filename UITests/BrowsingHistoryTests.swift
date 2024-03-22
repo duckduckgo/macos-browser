@@ -32,7 +32,7 @@ class BrowsingHistoryTests: XCTestCase {
         historyMenuBarItem = app.menuBarItems["History"]
         clearAllHistoryMenuItem = app.menuItems["HistoryMenu.clearAllHistory"]
         app.launch()
-        app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
+        app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Enforce a single window
         app.typeKey("n", modifierFlags: .command)
 
         XCTAssertTrue(
@@ -51,10 +51,10 @@ class BrowsingHistoryTests: XCTestCase {
             app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: elementExistenceTimeout),
             "Clear all history item didn't appear in a reasonable timeframe."
         )
-        app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // And manually remove the history
+        app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // Manually remove the history
     }
 
-    func test_visitedSiteIsAddedToRecentlyVisited() throws {
+    func test_recentlyVisited_showsLastVisitedSite() throws {
         let historyPageTitleExpectedToBeFirstInRecentlyVisited = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
         let url = URL.simpleServedPage(titled: historyPageTitleExpectedToBeFirstInRecentlyVisited)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
@@ -82,7 +82,7 @@ class BrowsingHistoryTests: XCTestCase {
         XCTAssertEqual(historyPageTitleExpectedToBeFirstInRecentlyVisited, firstSiteInRecentlyVisitedSection.title)
     }
 
-    func test_visitedSiteIsInHistoryAfterClosingAndReopeningWindow() throws {
+    func test_history_showsVisitedSiteAfterClosingAndReopeningWindow() throws {
         let historyPageTitleExpectedToBeFirstInTodayHistory = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
         let url = URL.simpleServedPage(titled: historyPageTitleExpectedToBeFirstInTodayHistory)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
@@ -112,7 +112,7 @@ class BrowsingHistoryTests: XCTestCase {
         XCTAssertEqual(historyPageTitleExpectedToBeFirstInTodayHistory, firstSiteInHistory.title)
     }
 
-    func test_lastClosedWindowsTabsCanBeReopenedViaHistory() throws {
+    func test_reopenLastClosedWindowMenuItem_canReopenTabsOfLastClosedWindow() throws {
         let titleOfFirstTabWhichShouldRestore = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
         let titleOfSecondTabWhichShouldRestore = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
         let urlForFirstTab = URL.simpleServedPage(titled: titleOfFirstTabWhichShouldRestore)
