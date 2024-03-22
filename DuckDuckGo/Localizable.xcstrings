@@ -480,6 +480,9 @@
         }
       }
     },
+    "0" : {
+
+    },
     "about.app_name" : {
       "comment" : "Application name to be displayed in the About dialog",
       "extractionState" : "extracted_with_value",

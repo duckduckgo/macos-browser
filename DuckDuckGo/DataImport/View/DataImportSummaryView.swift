@@ -78,18 +78,38 @@ struct DataImportSummaryView: View {
                         }
                     }
 
-                case (.bookmarks, .failure):
-                    HStack {
-                        failureImage()
-                        Text("Bookmark import failed.",
-                             comment: "Data import summary message of failed bookmarks import.")
+                case (.bookmarks, .failure(let error)):
+                    if error.errorType == .noData {
+                        HStack {
+                            failureImage()
+                            Text("Bookmarks:",
+                                 comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
+                            + Text(" " as String)
+                            + Text("0").bold()
+                        }
+                    } else {
+                        HStack {
+                            failureImage()
+                            Text("Bookmark import failed.",
+                                 comment: "Data import summary message of failed bookmarks import.")
+                        }
                     }
 
-                case (.passwords, .failure):
-                    HStack {
-                        failureImage()
-                        Text("Password import failed.",
-                             comment: "Data import summary message of failed passwords import.")
+                case (.passwords, .failure(let error)):
+                    if error.errorType == .noData {
+                        HStack {
+                            failureImage()
+                            Text("Passwords:",
+                                 comment: "Data import summary format of how many passwords (%lld) were successfully imported.")
+                            + Text(" " as String)
+                            + Text("0").bold()
+                        }
+                    } else {
+                        HStack {
+                            failureImage()
+                            Text("Password import failed.",
+                                 comment: "Data import summary message of failed passwords import.")
+                        }
                     }
 
                 case (.passwords, .success(let summary)):
