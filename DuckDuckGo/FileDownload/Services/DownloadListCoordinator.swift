@@ -95,8 +95,12 @@ final class DownloadListCoordinator {
                         try add(item, ifModifiedLaterThan: clearDate)
                     } catch {
                         os_log(.debug, log: self.log, "❗️ coordinator: drop item \(item.identifier): \(error)")
-                        // remove item from db removing temp files if needed
-                        remove(downloadWithIdentifier: item.identifier)
+                        // remove item from db removing temp files if needed without sending a `.removed` update
+                        cleanupTempFiles(for: item)
+                        filePresenters[item.identifier] = nil
+                        filePresenterCancellables[item.identifier] = nil
+                        self.items[item.identifier] = nil
+                        store.remove(item)
                     }
                 }
 

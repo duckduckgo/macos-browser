@@ -222,7 +222,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         }
         // only display fly-to-dock animation only once - setting the original &progress.flyToImage to nil
         swap(&fileProgress.fileIconOriginalRect, &progress.fileIconOriginalRect)
-        fileProgress.flyToImage = progress.flyToImage
+        swap(&fileProgress.flyToImage, &progress.flyToImage)
         fileProgress.fileIcon = progress.fileIcon
 
         progress.publisher(for: \.totalUnitCount)
@@ -478,6 +478,9 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
         case .failure(let error):
             os_log(.debug, log: log, "finish \(self) with .failure(\(error))")
+
+            fileProgress = nil
+
             self.state = .failed(destination: error.isRetryable ? self.state.destinationFilePresenter : nil, // stop tracking removed files for non-retryable downloads
                                  tempFile: error.isRetryable ? self.state.tempFilePresenter : nil,
                                  resumeData: error.resumeData,
@@ -734,7 +737,9 @@ extension WebKitDownloadTask {
 
     override var description: String {
         guard Thread.isMainThread else {
+#if DEBUG
             breakByRaisingSigInt("❗️accessing WebKitDownloadTask.description from non-main thread")
+#endif
             return ""
         }
         return MainActor.assumeIsolated {

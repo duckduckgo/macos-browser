@@ -61,7 +61,12 @@ internal class FilePresenter {
         }
 
         final var presentedItemURL: URL? {
-            let url = delegate?.url
+            guard let delegate else { return nil }
+            FilePresenter.dispatchSourceQueue.async {
+                // prevent owning FilePresenter deallocation inside the presentedItemURL getter
+                withExtendedLifetime(delegate) {}
+            }
+            let url = delegate.url
             return url
         }
 
@@ -195,7 +200,6 @@ internal class FilePresenter {
     }
 
     deinit {
-        innerPresenter?.delegate = nil
         removeFilePresenter()
     }
 

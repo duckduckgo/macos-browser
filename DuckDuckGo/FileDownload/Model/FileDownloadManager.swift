@@ -264,4 +264,3 @@ extension WebKitDownloadTask.DownloadDestination: CustomDebugStringConvertible {
         }
     }
 }
-

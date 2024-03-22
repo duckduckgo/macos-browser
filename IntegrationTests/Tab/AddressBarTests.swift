@@ -781,17 +781,3 @@ class AddressBarTests: XCTestCase {
     }
 
 }
-
-protocol MainActorPerformer {
-    func perform(_ closure: @MainActor () -> Void)
-}
-struct OnMainActor: MainActorPerformer {
-    private init() {}
-
-    static func instance() -> MainActorPerformer { OnMainActor() }
-
-    @MainActor(unsafe)
-    func perform(_ closure: @MainActor () -> Void) {
-        closure()
-    }
-}
