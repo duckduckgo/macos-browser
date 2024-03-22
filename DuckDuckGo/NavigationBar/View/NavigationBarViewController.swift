@@ -185,7 +185,7 @@ final class NavigationBarViewController: NSViewController {
         passwordManagementButton.sendAction(on: .leftMouseDown)
 
         optionsButton.toolTip = UserText.applicationMenuTooltip
-        optionsButton.setAccessibilityIdentifier("Options Button")
+        optionsButton.setAccessibilityIdentifier("NavigationBarViewController.optionsButton")
 
         networkProtectionButton.toolTip = UserText.networkProtectionButtonTooltip
 
