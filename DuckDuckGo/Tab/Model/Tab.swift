@@ -540,8 +540,7 @@ protocol NewWindowPolicyDecisionMaker {
             .sink { [weak self] onboardingStatus in
                 guard onboardingStatus == .completed else { return }
 
-                let machServiceName = Bundle.main.vpnMenuAgentBundleId
-                let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+                let ipcClient = TunnelControllerIPCClient()
                 ipcClient.register()
 
                 self?.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)

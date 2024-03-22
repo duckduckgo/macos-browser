@@ -20,6 +20,7 @@
 
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import Common
 
 #if SUBSCRIPTION
@@ -85,6 +86,36 @@ extension NetworkProtectionLocationListCompositeRepository {
             errorEvents: .networkProtectionAppDebugEvents,
             isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
         )
+    }
+}
+
+extension TunnelControllerIPCClient {
+
+    convenience init() {
+        self.init(machServiceName: Bundle.main.vpnMenuAgentBundleId) { ipcClient in
+            Task { @MainActor in
+                try await Task.sleep(interval: .seconds(1))
+
+                let featureVisibility = DefaultNetworkProtectionVisibility()
+                let isEnabled: Bool
+
+                do {
+                    // We want the login item to launch if the VPN should be working but isn't.
+                    isEnabled = try await featureVisibility.isFeatureEnabled()
+                } catch {
+                    // As a fallback if there's an error checking feature visibility,
+                    // we want to reconnect to XPC is the login item is installed.
+                    isEnabled = featureVisibility.isInstalled
+                }
+
+                if isEnabled {
+                    // By calling register we make sure that XPC will connect as soon as it
+                    // becomes available again, as requests are queued.  This helps ensure
+                    // that the client app will always be connected to XPC.
+                    ipcClient.register()
+                }
+            }
+        }
     }
 }
 

@@ -82,7 +82,6 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     @objc private func handleAccountDidSignOut() {
         print("[NetP Subscription] Deleted NetP auth token after signing out from Privacy Pro")
-        userDefaults.networkProtectionEntitlementsExpired = true
 
         Task {
             await networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)

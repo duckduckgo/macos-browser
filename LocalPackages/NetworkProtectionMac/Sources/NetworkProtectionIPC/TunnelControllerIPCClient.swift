@@ -38,6 +38,8 @@ protocol XPCClientInterface {
 
 public final class TunnelControllerIPCClient {
 
+    public typealias DisconnectHandler = (TunnelControllerIPCClient) -> Void
+
     // MARK: - XPC Communication
 
     let xpc: XPCClient<XPCClientInterface, XPCServerInterface>
@@ -56,9 +58,15 @@ public final class TunnelControllerIPCClient {
         }
     }
 
+    private var onDisconnect: DisconnectHandler?
+
     private let xpcDelegate: TunnelControllerXPCClientDelegate
 
-    public init(machServiceName: String) {
+    public init(machServiceName: String,
+                onDisconnect disconnectHandler: DisconnectHandler?) {
+
+        onDisconnect = disconnectHandler
+
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
         let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
         self.xpcDelegate = TunnelControllerXPCClientDelegate(
@@ -76,15 +84,7 @@ public final class TunnelControllerIPCClient {
         xpc.delegate = xpcDelegate
         xpc.onDisconnect = { [weak self] in
             guard let self else { return }
-
-            Task { @MainActor in
-                try await Task.sleep(interval: .seconds(1))
-
-                // By calling register we make sure that XPC will connect as soon as it
-                // becomes available again, as requests are queued.  This helps ensure
-                // that the client app will always be connected to XPC.
-                self.register()
-            }
+            onDisconnect?(self)
         }
     }
 }
