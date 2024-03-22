@@ -19,7 +19,7 @@
 import Foundation
 import UserScript
 
-final class SSLErrorPageUserScript: NSObject, Subfeature, ErrorPageTabExtensionUserScriptDelegate {
+final class SSLErrorPageUserScript: NSObject, Subfeature {
     enum MessageName: String, CaseIterable {
         case leaveSite
         case visitSite

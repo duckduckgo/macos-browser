@@ -30,14 +30,17 @@ extension UserScripts: SSLErrorPageScriptProvider {}
 
 final class ErrorPageTabExtension {
     weak var webView: ErrorPageTabExtensionNavigationDelegate?
-    private weak var sslErrorPageUserScript: ErrorPageTabExtensionUserScriptDelegate?
+    private weak var sslErrorPageUserScript: SSLErrorPageUserScript?
     private var shouldBypassSSLError = false
+    private var urlCredentialCreator: URLCredentialCreating
 
     private var cancellables = Set<AnyCancellable>()
 
     init(
         webViewPublisher: some Publisher<WKWebView, Never>,
-        scriptsPublisher: some Publisher<some SSLErrorPageScriptProvider, Never>) {
+        scriptsPublisher: some Publisher<some SSLErrorPageScriptProvider, Never>,
+        urlCredentialCreator: URLCredentialCreating = URLCredentialCreator()) {
+            self.urlCredentialCreator = urlCredentialCreator
             webViewPublisher.sink { [weak self] webView in
                 self?.webView = webView
             }.store(in: &cancellables)
@@ -97,7 +100,6 @@ extension ErrorPageTabExtension: NavigationResponder {
     @MainActor
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         let url = error.failingUrl ?? navigation.url
-        sslErrorPageUserScript?.failingURL = url
         guard navigation.isCurrent else { return }
 
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
@@ -107,7 +109,7 @@ extension ErrorPageTabExtension: NavigationResponder {
 
             if error.errorCode == NSURLErrorServerCertificateUntrusted,
                let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
-                print(error.userInfo)
+                sslErrorPageUserScript?.failingURL = url
                 var errorType: SSLErrorType = .invalid
                 switch errorCode {
                 case -9814:
@@ -134,13 +136,15 @@ extension ErrorPageTabExtension: NavigationResponder {
     @MainActor
     func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust else { return nil }
-        guard let serverTrust = challenge.protectionSpace.serverTrust else { return nil }
         guard shouldBypassSSLError else { return nil}
         guard navigation?.url == webView?.url else { return nil }
+        guard let credential = urlCredentialCreator.urlCredentialFrom(trust: challenge.protectionSpace.serverTrust) else { return nil }
 
-        let credential = URLCredential(trust: serverTrust)
+        shouldBypassSSLError = false
         return .credential(credential)
     }
+
+
 }
 
 extension ErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
@@ -175,10 +179,17 @@ protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     func reload() -> WKNavigation?
 }
 
-protocol ErrorPageTabExtensionUserScriptDelegate: AnyObject {
-    var isEnabled: Bool { get set }
-    var failingURL: URL? { get set }
-    var delegate: SSLErrorPageUserScriptDelegate? { get set }
+extension WKWebView: ErrorPageTabExtensionNavigationDelegate {}
+
+protocol URLCredentialCreating {
+    func urlCredentialFrom(trust: SecTrust?) -> URLCredential?
 }
 
-extension WKWebView: ErrorPageTabExtensionNavigationDelegate {}
+struct URLCredentialCreator: URLCredentialCreating {
+    func urlCredentialFrom(trust: SecTrust?) -> URLCredential? {
+        if let trust {
+            return URLCredential(trust: trust)
+        }
+        return nil
+    }
+}

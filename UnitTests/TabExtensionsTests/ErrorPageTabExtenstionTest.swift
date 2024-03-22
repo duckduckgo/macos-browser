@@ -29,16 +29,21 @@ final class ErrorPageTabExtenstionTest: XCTestCase {
     var mockWebViewPublisher: PassthroughSubject<WKWebView, Never>!
     var scriptPublisher: PassthroughSubject<MockSSLErrorPageScriptProvider, Never>!
     var errorPageExtention: ErrorPageTabExtension!
+    var credentialCreator: MockCredentialCreator!
     let errorURLString = "com.example.error"
 
     override func setUpWithError() throws {
         mockWebViewPublisher = PassthroughSubject<WKWebView, Never>()
         scriptPublisher = PassthroughSubject<MockSSLErrorPageScriptProvider, Never>()
-        errorPageExtention = ErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher)
+        credentialCreator = MockCredentialCreator()
+        errorPageExtention = ErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator)
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        mockWebViewPublisher = nil
+        scriptPublisher = nil
+        errorPageExtention = nil
+        credentialCreator = nil
     }
 
     func testWhenWebViewPublisherPublishWebViewThenErrorPageExtensionHasCorrectWebView() throws {
@@ -109,6 +114,202 @@ final class ErrorPageTabExtenstionTest: XCTestCase {
         XCTAssertTrue(mockWebView.capturedHTML.contains("DuckDuckGo can’t load this page."))
         XCTAssertTrue(mockWebView.capturedHTML.contains(errorDescription))
     }
+
+    @MainActor func test_WhenUserScriptsPublisherPublishSSLErrorPageScript_ThenErrorPageExtensionIsSetAsUserScriptDelegate() {
+        // GIVEN
+        let aSSLErrorUserScript = SSLErrorPageUserScript()
+        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: aSSLErrorUserScript)
+
+        // WHEN
+        scriptPublisher.send(mockScriptProvider)
+
+        // THEN
+        XCTAssertNotNil(aSSLErrorUserScript.delegate)
+    }
+
+    @MainActor func testWhenNavigationEnded_IfNoFailure_SSLUserScriptIsNotEnabled() {
+        // GIVEN
+        let userScript = SSLErrorPageUserScript()
+        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: userScript)
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
+        errorPageExtention.webView = mockWebView
+        scriptPublisher.send(mockScriptProvider)
+
+        // WHEN
+        errorPageExtention.navigationDidFinish(navigation)
+
+        // THEN
+        XCTAssertFalse(userScript.isEnabled)
+        XCTAssertNil(userScript.failingURL)
+    }
+
+    @MainActor func testWhenNavigationEnded_IfNonSSLFailure_SSLUserScriptIsNotEnabled() {
+        // GIVEN
+        let userScript = SSLErrorPageUserScript()
+        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: userScript)
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
+        let errorDescription = "some error"
+        let error = WKError(_nsError: NSError(domain: "com.example.error", code: NSURLErrorUnknown, userInfo: ["_kCFStreamErrorCodeKey": -9843, "NSErrorFailingURLKey": URL(string: errorURLString)!, NSLocalizedDescriptionKey: errorDescription]))
+        errorPageExtention.webView = mockWebView
+        scriptPublisher.send(mockScriptProvider)
+        errorPageExtention.navigation(navigation, didFailWith: error)
+
+        // WHEN
+        errorPageExtention.navigationDidFinish(navigation)
+
+        // THEN
+        XCTAssertFalse(userScript.isEnabled)
+        XCTAssertNil(userScript.failingURL)
+    }
+
+    @MainActor func testWhenNavigationEnded_IfSSLFailure_AndErrorURLIsDifferentFromNavigationURL_SSLUserScriptIsNotEnabled() {
+        // GIVEN
+        let userScript = SSLErrorPageUserScript()
+        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: userScript)
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        let action = NavigationAction(request: URLRequest(url: URL(string: "com.different.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
+        let errorDescription = "some error"
+        let error = WKError(_nsError: NSError(domain: "com.example.error", code: NSURLErrorServerCertificateUntrusted, userInfo: ["_kCFStreamErrorCodeKey": -9843, "NSErrorFailingURLKey": URL(string: errorURLString)!]))
+        errorPageExtention.webView = mockWebView
+        scriptPublisher.send(mockScriptProvider)
+        errorPageExtention.navigation(navigation, didFailWith: error)
+
+        // WHEN
+        errorPageExtention.navigationDidFinish(navigation)
+
+        // THEN
+        XCTAssertFalse(userScript.isEnabled)
+        XCTAssertEqual(userScript.failingURL?.absoluteString, errorURLString)
+    }
+
+    @MainActor func testWhenNavigationEnded_IfSSLFailure_AndErrorURLIsTheSameAsNavigationURL_SSLUserScriptIsEnabled() {
+        // GIVEN
+        let userScript = SSLErrorPageUserScript()
+        let mockScriptProvider = MockSSLErrorPageScriptProvider(script: userScript)
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
+        let errorDescription = "some error"
+        let error = WKError(_nsError: NSError(domain: "com.example.error", code: NSURLErrorServerCertificateUntrusted, userInfo: ["_kCFStreamErrorCodeKey": -9843, "NSErrorFailingURLKey": URL(string: errorURLString)!]))
+        errorPageExtention.webView = mockWebView
+        scriptPublisher.send(mockScriptProvider)
+        errorPageExtention.navigation(navigation, didFailWith: error)
+
+        // WHEN
+        errorPageExtention.navigationDidFinish(navigation)
+
+        // THEN
+        XCTAssertTrue(userScript.isEnabled)
+        XCTAssertEqual(userScript.failingURL?.absoluteString, errorURLString)
+    }
+
+    func testWhenLeaveSiteCalled_ThenWebViewGoesBack() {
+        // GIVEN
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        errorPageExtention.webView = mockWebView
+
+        // WHEN
+        errorPageExtention.leaveSite()
+
+        // THEN
+        XCTAssertTrue(mockWebView.goBackCalled)
+    }
+
+    func testWhenVisitSiteCalled_ThenWebViewReloads() {
+        // GIVEN
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        errorPageExtention.webView = mockWebView
+
+        // WHEN
+        errorPageExtention.visitSite()
+
+        // THEN
+        XCTAssertTrue(mockWebView.reloadCalled)
+    }
+
+    @MainActor
+    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWevViewURL_ThenReturnsCredentials() async {
+        // GIVEN
+        let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodServerTrust)
+        let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        errorPageExtention.webView = mockWebView
+        errorPageExtention.visitSite()
+
+        // WHEN
+        var disposition = await errorPageExtention.didReceive(URLAuthenticationChallenge(protectionSpace: protectionSpace, proposedCredential: nil, previousFailureCount: 0, failureResponse: nil, error: nil, sender: ChallangeSender()), for: navigation)
+
+        // THEN
+        if case .credential(let credential) = disposition {
+            XCTAssertNotNil(credential)
+        } else {
+            XCTFail("No credentials found")
+        }
+
+        // WHEN
+        disposition = await errorPageExtention.didReceive(URLAuthenticationChallenge(protectionSpace: protectionSpace, proposedCredential: nil, previousFailureCount: 0, failureResponse: nil, error: nil, sender: ChallangeSender()), for: navigation)
+
+        // THEN
+        XCTAssertNil(disposition)
+    }
+
+    @MainActor
+    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserRequestBypass_AndNavigationURLIsTheSameAsWevViewURL_ThenReturnsNoCredentials() async {
+        // GIVEN
+        let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodClientCertificate)
+        let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        errorPageExtention.webView = mockWebView
+        errorPageExtention.visitSite()
+
+        // WHEN
+        var disposition = await errorPageExtention.didReceive(URLAuthenticationChallenge(protectionSpace: protectionSpace, proposedCredential: nil, previousFailureCount: 0, failureResponse: nil, error: nil, sender: ChallangeSender()), for: navigation)
+
+        // THEN
+        XCTAssertNil(disposition)
+    }
+
+    @MainActor
+    func testWhenDidReceiveChallange_IfChallangeForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsTheSameAsWevViewURL_ThenReturnsNoCredentials() async {
+        // GIVEN
+        let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodServerTrust)
+        let action = NavigationAction(request: URLRequest(url: URL(string: "com.example.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        errorPageExtention.webView = mockWebView
+        errorPageExtention.leaveSite()
+
+        // WHEN
+        var disposition = await errorPageExtention.didReceive(URLAuthenticationChallenge(protectionSpace: protectionSpace, proposedCredential: nil, previousFailureCount: 0, failureResponse: nil, error: nil, sender: ChallangeSender()), for: navigation)
+
+        // THEN
+        XCTAssertNil(disposition)
+    }
+
+    @MainActor
+    func testWhenDidReceiveChallange_IfChallangeNotForCertificateValidation_AndUserDoesNotRequestBypass_AndNavigationURLIsNotTheSameAsWevViewURL_ThenReturnsNoCredentials() async {
+        // GIVEN
+        let protectionSpace = URLProtectionSpace(host: "", port: 4, protocol: nil, realm: nil, authenticationMethod: NSURLAuthenticationMethodServerTrust)
+        let action = NavigationAction(request: URLRequest(url: URL(string: "com.different.error")!), navigationType: .custom(.userEnteredUrl), currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: true, sourceFrame: FrameInfo(frame: WKFrameInfo()), targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [action], isCurrent: true, isCommitted: true)
+        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
+        errorPageExtention.webView = mockWebView
+        errorPageExtention.visitSite()
+
+        // WHEN
+        var disposition = await errorPageExtention.didReceive(URLAuthenticationChallenge(protectionSpace: protectionSpace, proposedCredential: nil, previousFailureCount: 0, failureResponse: nil, error: nil, sender: ChallangeSender()), for: navigation)
+
+        // THEN
+        XCTAssertNil(disposition)
+    }
+
 }
 
 class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
@@ -146,4 +347,49 @@ class MockSSLErrorPageScriptProvider: SSLErrorPageScriptProvider {
     init(script: SSLErrorPageUserScript?) {
         self.sslErrorPageUserScript = script
     }
+}
+
+class MockCredentialCreator: URLCredentialCreating {
+    func urlCredentialFrom(trust: SecTrust?) -> URLCredential? {
+        return URLCredential(user: "", password: "", persistence: .forSession)
+    }
+}
+
+class ChallangeSender: URLAuthenticationChallengeSender {
+    func use(_ credential: URLCredential, for challenge: URLAuthenticationChallenge) {}
+    func continueWithoutCredential(for challenge: URLAuthenticationChallenge) {}
+    func cancel(_ challenge: URLAuthenticationChallenge) {}
+    func isEqual(_ object: Any?) -> Bool {
+        return false
+    }
+    var hash: Int = 0
+    var superclass: AnyClass?
+    func `self`() -> Self {
+        self
+    }
+    func perform(_ aSelector: Selector!) -> Unmanaged<AnyObject>! {
+        return nil
+    }
+    func perform(_ aSelector: Selector!, with object: Any!) -> Unmanaged<AnyObject>! {
+        return nil
+    }
+    func perform(_ aSelector: Selector!, with object1: Any!, with object2: Any!) -> Unmanaged<AnyObject>! {
+        return nil
+    }
+    func isProxy() -> Bool {
+        return false
+    }
+    func isKind(of aClass: AnyClass) -> Bool {
+        return false
+    }
+    func isMember(of aClass: AnyClass) -> Bool {
+        return false
+    }
+    func conforms(to aProtocol: Protocol) -> Bool {
+        return false
+    }
+    func responds(to aSelector: Selector!) -> Bool {
+        return false
+    }
+    var description: String = ""
 }
