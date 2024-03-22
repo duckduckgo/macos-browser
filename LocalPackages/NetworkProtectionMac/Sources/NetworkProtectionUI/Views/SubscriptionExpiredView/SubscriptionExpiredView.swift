@@ -49,7 +49,7 @@ struct SubscriptionExpiredView: View {
                 .padding(.bottom, 3)
 
             Button(UserText.networkProtectionSubscriptionExpiredUninstallButton, action: uninstallButtonHandler)
-                .buttonStyle(.borderless)
+                .buttonStyle(TransparentActionButtonStyle(enabled: true))
                 .foregroundColor(.accentColor)
                 .padding(.top, 3)
         }
