@@ -35,7 +35,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
     private let dataManager: InMemoryDataCacheDelegate
 
     init(scheduler: DataBrokerProtectionLoginItemScheduler = DataBrokerProtectionManager.shared.scheduler,
-         dataManager: InMemoryDataCacheDelegate = DataBrokerProtectionDataManager()) {
+         dataManager: InMemoryDataCacheDelegate = DataBrokerProtectionDataManager(pixelHandler: DataBrokerProtectionPixelsHandler())) {
         self.dataManager = dataManager
         self.scheduler = scheduler
     }

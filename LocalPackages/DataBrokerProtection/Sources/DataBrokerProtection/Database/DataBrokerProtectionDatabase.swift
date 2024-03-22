@@ -53,13 +53,16 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
     private static let profileId: Int64 = 1 // At the moment, we only support one profile for DBP.
 
     private let fakeBrokerFlag: DataBrokerDebugFlag
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let vault: (any DataBrokerProtectionSecureVault)?
     private let secureVaultErrorReporter: SecureVaultErrorReporting?
 
     init(fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          vault: (any DataBrokerProtectionSecureVault)? = nil,
          secureVaultErrorReporter: SecureVaultErrorReporting? = DataBrokerProtectionSecureVaultErrorReporter.shared) {
         self.fakeBrokerFlag = fakeBrokerFlag
+        self.pixelHandler = pixelHandler
         self.vault = vault
         self.secureVaultErrorReporter = secureVaultErrorReporter
     }

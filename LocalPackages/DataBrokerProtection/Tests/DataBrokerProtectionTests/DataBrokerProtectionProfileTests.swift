@@ -162,7 +162,8 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                                                                 database: SecureStorageDatabaseProviderMock(),
                                                                 keystore: EmptySecureStorageKeyStoreProviderMock()))
 
-        let database = DataBrokerProtectionDatabase(vault: vault)
+        let database = DataBrokerProtectionDatabase(pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                                                    vault: vault)
 
         let profile = DataBrokerProtectionProfile(
             names: [
@@ -188,7 +189,8 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                                                                 database: SecureStorageDatabaseProviderMock(),
                                                                 keystore: EmptySecureStorageKeyStoreProviderMock()))
 
-        let database = DataBrokerProtectionDatabase(vault: vault)
+        let database = DataBrokerProtectionDatabase(pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                                                    vault: vault)
 
         vault.brokers = [DataBroker.mock]
         vault.profileQueries = [ProfileQuery.mock]
@@ -231,7 +233,8 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                                                                 database: SecureStorageDatabaseProviderMock(),
                                                                 keystore: EmptySecureStorageKeyStoreProviderMock()))
 
-        let database = DataBrokerProtectionDatabase(vault: vault)
+        let database = DataBrokerProtectionDatabase(pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                                                    vault: vault)
 
         vault.brokers = [DataBroker.mock]
         vault.profileQueries = [ProfileQuery.mock]

@@ -36,7 +36,7 @@ public final class DataBrokerProtectionBackgroundManager {
     private lazy var ipcServiceManager = IPCServiceManager(scheduler: scheduler, pixelHandler: pixelHandler)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
-        DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
+        DataBrokerProtectionDataManager(pixelHandler: pixelHandler, fakeBrokerFlag: fakeBrokerFlag)
     }()
 
     lazy var scheduler: DataBrokerProtectionScheduler = {

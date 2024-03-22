@@ -23,7 +23,8 @@ final class DataBrokerForceOptOutViewModel: ObservableObject {
     private let dataManager: DataBrokerProtectionDataManager
     @Published var optOutData = [OptOutViewData]()
 
-    internal init(dataManager: DataBrokerProtectionDataManager = DataBrokerProtectionDataManager()) {
+    internal init(dataManager: DataBrokerProtectionDataManager =
+                  DataBrokerProtectionDataManager(pixelHandler: DataBrokerProtectionPixelsHandler())) {
         self.dataManager = dataManager
         loadNotRemovedOptOutData()
     }
