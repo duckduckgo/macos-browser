@@ -27,12 +27,14 @@ import XCTest
 final class ErrorPageTabExtenstionTest: XCTestCase {
 
     var mockWebViewPublisher: PassthroughSubject<WKWebView, Never>!
+    var scriptPublisher: PassthroughSubject<MockSSLErrorPageScriptProvider, Never>!
     var errorPageExtention: ErrorPageTabExtension!
     let errorURLString = "com.example.error"
 
     override func setUpWithError() throws {
         mockWebViewPublisher = PassthroughSubject<WKWebView, Never>()
-        errorPageExtention = ErrorPageTabExtension(webViewPublisher: mockWebViewPublisher)
+        scriptPublisher = PassthroughSubject<MockSSLErrorPageScriptProvider, Never>()
+        errorPageExtention = ErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher)
     }
 
     override func tearDownWithError() throws {
@@ -109,9 +111,11 @@ final class ErrorPageTabExtenstionTest: XCTestCase {
     }
 }
 
-class MockWKWebView: NSObject, ErrorPageTabExtensionDelegate {
+class MockWKWebView: NSObject, ErrorPageTabExtensionNavigationDelegate {
     var url: URL?
     var capturedHTML: String = ""
+    var goBackCalled = false
+    var reloadCalled = false
 
     init(url: URL) {
         self.url = url
@@ -123,5 +127,23 @@ class MockWKWebView: NSObject, ErrorPageTabExtensionDelegate {
 
     func setDocumentHtml(_ html: String) {
         capturedHTML = html
+    }
+
+    func goBack() -> WKNavigation? {
+        goBackCalled = true
+        return nil
+    }
+
+    func reload() -> WKNavigation? {
+        reloadCalled = true
+        return nil
+    }
+}
+
+class MockSSLErrorPageScriptProvider: SSLErrorPageScriptProvider {
+    var sslErrorPageUserScript: SSLErrorPageUserScript?
+
+    init(script: SSLErrorPageUserScript?) {
+        self.sslErrorPageUserScript = script
     }
 }

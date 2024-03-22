@@ -45,6 +45,7 @@ final class UserScripts: UserScriptsProvider {
     let autoconsentUserScript: UserScriptWithAutoconsent
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
+    let sslErrorPageUserScript: SSLErrorPageUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
@@ -63,6 +64,8 @@ final class UserScripts: UserScriptsProvider {
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
+        sslErrorPageUserScript = SSLErrorPageUserScript()
+
         if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
             youtubePlayerUserScript = YoutubePlayerUserScript()
@@ -79,11 +82,14 @@ final class UserScripts: UserScriptsProvider {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
 
-        if let youtubePlayerUserScript {
-            if let specialPages = specialPages {
-                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
-                userScripts.append(specialPages)
+        if let specialPages = specialPages {
+            if let sslErrorPageUserScript {
+                specialPages.registerSubfeature(delegate: sslErrorPageUserScript)
             }
+            if let youtubePlayerUserScript {
+                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
+            }
+            userScripts.append(specialPages)
         }
 
 #if SUBSCRIPTION

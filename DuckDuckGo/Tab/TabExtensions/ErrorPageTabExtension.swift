@@ -22,15 +22,30 @@ import WebKit
 import Combine
 import ContentScopeScripts
 
+protocol SSLErrorPageScriptProvider {
+    var sslErrorPageUserScript: SSLErrorPageUserScript? { get }
+}
+
+extension UserScripts: SSLErrorPageScriptProvider {}
+
 final class ErrorPageTabExtension {
-    weak var webView: ErrorPageTabExtensionDelegate?
+    weak var webView: ErrorPageTabExtensionNavigationDelegate?
+    private weak var sslErrorPageUserScript: ErrorPageTabExtensionUserScriptDelegate?
+    private var shouldBypassSSLError = false
+
     private var cancellables = Set<AnyCancellable>()
 
-    init(webViewPublisher: some Publisher<WKWebView, Never>) {
-        webViewPublisher.sink { [weak self] webView in
-            self?.webView = webView
-        }.store(in: &cancellables)
-    }
+    init(
+        webViewPublisher: some Publisher<WKWebView, Never>,
+        scriptsPublisher: some Publisher<some SSLErrorPageScriptProvider, Never>) {
+            webViewPublisher.sink { [weak self] webView in
+                self?.webView = webView
+            }.store(in: &cancellables)
+            scriptsPublisher.sink { [weak self] scripts in
+                self?.sslErrorPageUserScript = scripts.sslErrorPageUserScript
+                self?.sslErrorPageUserScript?.delegate = self
+            }.store(in: &cancellables)
+        }
 
     @MainActor
     private func loadSSLErrorHTML(errorType: SSLErrorType, url: URL, alternate: Bool) {
@@ -82,6 +97,7 @@ extension ErrorPageTabExtension: NavigationResponder {
     @MainActor
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         let url = error.failingUrl ?? navigation.url
+        sslErrorPageUserScript?.failingURL = url
         guard navigation.isCurrent else { return }
 
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
@@ -109,10 +125,36 @@ extension ErrorPageTabExtension: NavigationResponder {
             }
         }
     }
+
+    @MainActor
+    func navigationDidFinish(_ navigation: Navigation) {
+        sslErrorPageUserScript?.isEnabled = navigation.url == sslErrorPageUserScript?.failingURL
+    }
+
+    @MainActor
+    func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust else { return nil }
+        guard let serverTrust = challenge.protectionSpace.serverTrust else { return nil }
+        guard shouldBypassSSLError else { return nil}
+        guard navigation?.url == webView?.url else { return nil }
+
+        let credential = URLCredential(trust: serverTrust)
+        return .credential(credential)
+    }
 }
 
-protocol ErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {
+extension ErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
+    func leaveSite() {
+        _ = webView?.goBack()
+    }
+
+    func visitSite() {
+        shouldBypassSSLError = true
+        _ = webView?.reload()
+    }
 }
+
+protocol ErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
 
 extension ErrorPageTabExtension: TabExtension, ErrorPageTabExtensionProtocol {
     typealias PublicProtocol = ErrorPageTabExtensionProtocol
@@ -125,10 +167,18 @@ extension TabExtensions {
     }
 }
 
-protocol ErrorPageTabExtensionDelegate: NSObject {
+protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     var url: URL? { get }
     func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL)
     func setDocumentHtml(_ html: String)
+    func goBack() -> WKNavigation?
+    func reload() -> WKNavigation?
 }
 
-extension WKWebView: ErrorPageTabExtensionDelegate {}
+protocol ErrorPageTabExtensionUserScriptDelegate: AnyObject {
+    var isEnabled: Bool { get set }
+    var failingURL: URL? { get set }
+    var delegate: SSLErrorPageUserScriptDelegate? { get set }
+}
+
+extension WKWebView: ErrorPageTabExtensionNavigationDelegate {}

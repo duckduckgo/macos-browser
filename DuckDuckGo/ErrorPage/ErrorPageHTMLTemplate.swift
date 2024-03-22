@@ -44,7 +44,6 @@ struct ErrorPageHTMLTemplate {
 
 }
 
-
 struct SSLErrorPageHTMLTemplate {
     let siteURL: String
     let specificErrorMessage: String
@@ -66,4 +65,3 @@ struct SSLErrorPageHTMLTemplate {
     }
 
 }
-
