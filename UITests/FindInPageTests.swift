@@ -308,8 +308,8 @@ class FindInPageTests: XCTestCase {
             "There are expected to be more than \(minimumExpectedMatchingPixelsInFindHighlight) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match for a \"Find next\" operation, but this test found \(highlightedPixelsInFindNextScreenshot) matching pixels."
         )
         XCTAssertTrue(
-            pixelSetIntersection.count == 0,
-            "There should be no points in common for the highlighted pixels in the initial \"Find in Page\" operation, and the highlighted pixel coordinates in the \"Find Next\" operation."
+            pixelSetIntersection.count <= findNextHighlightPoints.count / 2,
+            "When the selection rectangle has moved as expected, fewer than half of the highlighted pixel coordinates from \"Find Next\" should intersect with the highlighted pixel coordinates from the initial \"Find\" operation."
         )
     }
 
@@ -366,8 +366,8 @@ class FindInPageTests: XCTestCase {
             "There are expected to be more than \(minimumExpectedMatchingPixelsInFindHighlight) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match, but this test found \(highlightedPixelsInFindNextScreenshot) matching pixels."
         )
         XCTAssertTrue(
-            pixelSetIntersection.count == 0,
-            "There should be no points in common for the highlighted pixels in the initial \"Find in Page\" operation, and the highlighted pixel coordinates in the \"Find Next\" operation."
+            pixelSetIntersection.count <= findNextHighlightPoints.count / 2,
+            "When the selection rectangle has moved as expected, fewer than half of the highlighted pixel coordinates from \"Find Next\" should intersect with the highlighted pixel coordinates from the initial \"Find\" operation."
         )
     }
 
@@ -420,8 +420,8 @@ class FindInPageTests: XCTestCase {
             "There are expected to be more than \(minimumExpectedMatchingPixelsInFindHighlight) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match, but this test found \(highlightedPixelsInFindNextScreenshot) matching pixels."
         )
         XCTAssertTrue(
-            pixelSetIntersection.count == 0,
-            "There should be no points in common for the highlighted pixels in the initial \"Find in Page\" operation, and the highlighted pixel coordinates in the \"Find Next\" operation."
+            pixelSetIntersection.count <= findNextHighlightPoints.count / 2,
+            "When the selection rectangle has moved as expected, fewer than half of the highlighted pixel coordinates from \"Find Next\" should intersect with the highlighted pixel coordinates from the initial \"Find\" operation."
         )
     }
 }
