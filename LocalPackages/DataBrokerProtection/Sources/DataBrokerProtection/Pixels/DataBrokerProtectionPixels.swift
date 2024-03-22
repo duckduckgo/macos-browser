@@ -292,7 +292,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .error(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .generalError(let error, _):
-                PixelKit.fire(DebugEvent(event, error: error)) //TODO check this, not 100% params will work
+                PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerScanAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
