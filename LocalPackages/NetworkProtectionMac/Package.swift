@@ -75,9 +75,6 @@ let package = Package(
             dependencies: [
                 .product(name: "Subscription", package: "BrowserServicesKit"),
             ],
-            resources: [
-                .copy("Resources/Assets.xcassets")
-            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],

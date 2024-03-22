@@ -49,6 +49,7 @@ final class StatusBarMenuTests: XCTestCase {
         let menu = StatusBarMenu(
             model: model,
             statusItem: item,
+            showSubscriptionExpired: Just(false).eraseToAnyPublisher(),
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: MockNetworkProtectionStatusReporter(),
             controller: TestTunnelController(),
@@ -74,6 +75,7 @@ final class StatusBarMenuTests: XCTestCase {
         let menu = StatusBarMenu(
             model: model,
             statusItem: item,
+            showSubscriptionExpired: Just(false).eraseToAnyPublisher(),
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: MockNetworkProtectionStatusReporter(),
             controller: TestTunnelController(),

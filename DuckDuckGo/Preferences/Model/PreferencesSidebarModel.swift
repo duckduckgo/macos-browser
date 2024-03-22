@@ -121,7 +121,7 @@ final class PreferencesSidebarModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-        VPNSubscriptionStatusObserver().$showSubscriptionExpired.sink { expired in
+        VPNSubscriptionStatusObserver().showSubscriptionExpired.sink { expired in
             if expired && self.selectedPane == .vpn {
                 self.selectedPane = .general
             }

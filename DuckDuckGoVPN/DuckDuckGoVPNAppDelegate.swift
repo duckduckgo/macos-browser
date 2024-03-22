@@ -234,7 +234,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         return StatusBarMenu(
             model: model,
-            showSubscriptionExpired: subscriptionStatusObserver.$showSubscriptionExpired,
+            showSubscriptionExpired: subscriptionStatusObserver.showSubscriptionExpired,
             onboardingStatusPublisher: onboardingStatusPublisher,
             statusReporter: statusReporter,
             controller: tunnelController,
@@ -360,7 +360,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private func setUpSubscriptionMonitoring() {
 #if SUBSCRIPTION
-        subscriptionStatusObserver.$showSubscriptionExpired.sink { expired in
+        subscriptionStatusObserver.showSubscriptionExpired.sink { expired in
             guard expired else {
                 return
             }

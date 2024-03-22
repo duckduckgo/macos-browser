@@ -113,7 +113,7 @@ extension NetworkProtectionStatusView {
         // MARK: - Initialization & Deinitialization
 
         public init(controller: TunnelController,
-                    showSubscriptionExpired: Published<Bool>.Publisher,
+                    showSubscriptionExpired: AnyPublisher<Bool, Never>,
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
@@ -189,7 +189,7 @@ extension NetworkProtectionStatusView {
             }
         }
 
-        private func subscribeToShowSubscriptionExpired(_ publisher: Published<Bool>.Publisher) {
+        private func subscribeToShowSubscriptionExpired(_ publisher: AnyPublisher<Bool, Never>) {
             publisher.receive(on: DispatchQueue.main)
                 .assign(to: \.showSubscriptionExpired, onWeaklyHeld: self)
                 .store(in: &cancellables)

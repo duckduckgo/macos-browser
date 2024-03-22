@@ -86,7 +86,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             let subscriptionStatusObserver = VPNSubscriptionStatusObserver()
 
             let popover = NetworkProtectionPopover(controller: controller,
-                                                   showSubscriptionExpired: subscriptionStatusObserver.$showSubscriptionExpired,
+                                                   showSubscriptionExpired: subscriptionStatusObserver.showSubscriptionExpired,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,
                                                    statusReporter: statusReporter,
                                                    appLauncher: appLauncher,

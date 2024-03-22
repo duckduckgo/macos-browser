@@ -22,17 +22,14 @@ import Subscription
 
 public final class VPNSubscriptionStatusObserver {
 
-    private let accountManager: AccountManager
+    public var showSubscriptionExpired: AnyPublisher<Bool, Never> {
+        publisher.eraseToAnyPublisher()
+    }
 
-    @Published
-    public var showSubscriptionExpired = false
+    private let publisher = CurrentValueSubject<Bool, Never>(false)
     private var cancellables = Set<AnyCancellable>()
 
-    public init(accountManager: AccountManager,
-                notificationCenter: NotificationCenter = .default) {
-
-        self.accountManager = accountManager
-
+    public init(notificationCenter: NotificationCenter = .default) {
         subscribeToEntitlementChangeNotifications(through: notificationCenter)
     }
 
@@ -45,7 +42,7 @@ public final class VPNSubscriptionStatusObserver {
                     return
                 }
 
-                self.showSubscriptionExpired = !entitlements.contains { entitlement in
+                publisher.value = !entitlements.contains { entitlement in
                     entitlement.product == .networkProtection
                 }
             }

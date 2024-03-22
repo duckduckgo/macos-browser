@@ -49,7 +49,7 @@ public final class StatusBarMenu: NSObject {
     @MainActor
     public init(model: StatusBarMenuModel,
                 statusItem: NSStatusItem? = nil,
-                showSubscriptionExpired: Published<Bool>.Publisher,
+                showSubscriptionExpired: AnyPublisher<Bool, Never>,
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,

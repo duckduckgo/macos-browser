@@ -89,10 +89,4 @@ extension NetworkProtectionLocationListCompositeRepository {
     }
 }
 
-extension VPNSubscriptionStatusObserver {
-    convenience init() {
-        self.init(accountManager: AccountManager())
-    }
-}
-
 #endif
