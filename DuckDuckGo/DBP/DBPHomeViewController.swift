@@ -150,6 +150,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
+            case .generalError(let error, _): // TODO same as other todo
+                Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerScanAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
