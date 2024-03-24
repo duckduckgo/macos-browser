@@ -166,6 +166,13 @@ extension Pixel.Event {
              .dataBrokerEnableLoginItemDaily,
              .dataBrokerDisableLoginItemDaily,
              .dataBrokerResetLoginItemDaily,
+             .defaultRequestedFromHomepage,
+             .defaultRequestedFromHomepageSetupView,
+             .defaultRequestedFromSettings,
+             .defaultRequestedFromOnboarding,
+             .privacyProFeatureEnabled,
+             .privacyProBetaUserThankYouVPN,
+             .privacyProBetaUserThankYouDBP,
              .privacyProSubscriptionActive,
              .privacyProOfferScreenImpression,
              .privacyProPurchaseAttempt,
@@ -205,7 +212,10 @@ extension Pixel.Event {
              .privacyProOfferMonthlyPriceClick,
              .privacyProOfferYearlyPriceClick,
              .privacyProAddEmailSuccess,
-             .privacyProWelcomeFAQClick:
+             .privacyProWelcomeFAQClick,
+             .privacyProPurchaseStripeSuccess,
+             .passwordImportKeychainPrompt,
+             .passwordImportKeychainPromptDenied:
             return nil
         }
     }

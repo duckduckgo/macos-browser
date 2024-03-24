@@ -199,7 +199,9 @@ final class BrowserTabViewController: NSViewController {
 #if DBP
     @objc
     private func onDBPFeatureDisabled(_ notification: Notification) {
-        tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
+        Task { @MainActor in
+            tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
+        }
     }
 
     @objc
@@ -1092,12 +1094,13 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
-        let defaultBrowserPreferences = DefaultBrowserPreferences()
+        let defaultBrowserPreferences = DefaultBrowserPreferences.shared
         if defaultBrowserPreferences.isDefault {
             completion()
             return
         }
 
+        Pixel.fire(.defaultRequestedFromOnboarding)
         defaultBrowserPreferences.becomeDefault { _ in
             _ = defaultBrowserPreferences
             withAnimation {

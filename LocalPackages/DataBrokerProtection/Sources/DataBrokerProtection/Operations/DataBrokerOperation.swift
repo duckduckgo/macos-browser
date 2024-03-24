@@ -186,7 +186,9 @@ extension DataBrokerOperation {
         switch actionType {
         case .click:
             stageCalculator?.fireOptOutFillForm()
-            try? await webViewHandler?.waitForWebViewLoad(timeoutInSeconds: 30)
+            try? await webViewHandler?.waitForWebViewLoad()
+            // We wait 10 seconds before tapping
+            try? await Task.sleep(nanoseconds: UInt64(10) * 1_000_000_000)
             await executeNextStep()
         case .fillForm:
             stageCalculator?.fireOptOutFillForm()

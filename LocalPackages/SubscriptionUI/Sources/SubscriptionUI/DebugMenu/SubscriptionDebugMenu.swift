@@ -202,7 +202,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
             let entitlements: [Entitlement.ProductName] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
             for entitlement in entitlements {
-                if case let .success(result) = await accountManager.hasEntitlement(for: entitlement) {
+                if case let .success(result) = await accountManager.hasEntitlement(for: entitlement, cachePolicy: .reloadIgnoringLocalCacheData) {
                     let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
                     results.append(resultSummary)
                     print(resultSummary)
@@ -217,7 +217,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func getSubscriptionDetails() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await SubscriptionService.getSubscription(accessToken: token) {
+            switch await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")
             case .failure(let error):
@@ -271,7 +271,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     private func askAndUpdateEnvironment(to newEnvironmentString: String) {
         let alert = makeAlert(title: "Are you sure you want to change the environment to \(newEnvironmentString.capitalized)",
-                              message: "Please make sure you have manually removed your current active Subscription and reset all related features. \nYou may also need to change environment of related features e.g. VPN's to a matching one.",
+                              message: "Please make sure you have manually removed your current active Subscription and reset all related features. \nYou may also need to change environment of related features.",
                               buttonNames: ["Yes", "No"])
         let response = alert.runModal()
 

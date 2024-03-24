@@ -166,6 +166,8 @@ final class DebugScanOperation: DataBrokerOperation {
         } else {
             os_log("Releasing the web view", log: .action)
             await webViewHandler?.finish() // If we executed all steps we release the web view
+            continuation = nil
+            webViewHandler = nil
         }
     }
 
@@ -177,5 +179,9 @@ final class DebugScanOperation: DataBrokerOperation {
         } catch {
             await completeWith(error: error)
         }
+    }
+
+    deinit {
+        os_log("DebugScanOperation Deinit", log: .action)
     }
 }
