@@ -15,11 +15,16 @@ _extract_origins_and_variants() {
     local origin_field="Origin"
     local atb_field="ATB"
     
+    # For each element in the data array.
+    # Filter out element with null `origin`.
+    # Select `origin` and `variant` from the custom_fields response and make a key:value pair structure like {origin: <origin_value>, variant: <variant_value>}. 
+    # If variant is not null we need to create two entries. One only with `origin` and one with `origin` and `variant` 
+    # Concatenate the pair by a comma and remove the trailing comma at the end of the line.
     jq -c '.data[]
         | select(.custom_fields[] | select(.name == "'"${origin_field}"'").text_value != null)
         | {origin: (.custom_fields[] | select(.name == "'"${origin_field}"'") | .text_value), variant: (.custom_fields[] | select(.name == "'"${atb_field}"'") | .text_value)}
-        | del(.variant | nulls)' <<< "$response" \
-        | tr '\n' ',' | sed 's/,$//' #concatenates the pair by a comma and remove the trailing comma at the end of the line.
+        | if .variant != null then {origin}, {origin, variant} else {origin} end' <<< "$response" \
+        | tr '\n' ',' | sed 's/,$//'
 }
 
 # Fetch all the Asana tasks for a specific section of a project.
