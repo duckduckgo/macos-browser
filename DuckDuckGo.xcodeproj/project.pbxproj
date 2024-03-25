@@ -13566,7 +13566,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Debug.entitlements;
 			};
 			name = Debug;
 		};
@@ -13574,7 +13575,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 			};
 			name = CI;
 		};
@@ -13582,7 +13583,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements;
 			};
 			name = Release;
 		};
@@ -13590,7 +13592,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements;
 			};
 			name = Review;
 		};
