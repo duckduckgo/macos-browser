@@ -60,6 +60,7 @@ final class DebugScanOperation: DataBrokerOperation {
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
     var scanURL: String?
+    let clickAwaitTime: TimeInterval
 
     private let fileManager = FileManager.default
     private let debugScanContentPath: String?
@@ -70,6 +71,7 @@ final class DebugScanOperation: DataBrokerOperation {
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
          operationAwaitTime: TimeInterval = 3,
+         clickAwaitTime: TimeInterval = 0,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -79,6 +81,7 @@ final class DebugScanOperation: DataBrokerOperation {
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
         self.shouldRunNextStep = shouldRunNextStep
+        self.clickAwaitTime = clickAwaitTime
         if let desktopPath = fileManager.urls(for: .desktopDirectory, in: .userDomainMask).first?.relativePath {
             self.debugScanContentPath = desktopPath + "/PIR-Debug"
         } else {

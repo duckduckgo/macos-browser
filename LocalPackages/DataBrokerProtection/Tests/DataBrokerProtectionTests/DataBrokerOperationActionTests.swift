@@ -174,13 +174,14 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            clickAwaitTime: 0,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
 
         await sut.success(actionId: "1", actionType: .click)
 
-        XCTAssertTrue(webViewHandler.wasWaitForWebViewLoadCalled)
+        XCTAssertFalse(webViewHandler.wasWaitForWebViewLoadCalled)
         XCTAssertTrue(webViewHandler.wasFinishCalled)
     }
 

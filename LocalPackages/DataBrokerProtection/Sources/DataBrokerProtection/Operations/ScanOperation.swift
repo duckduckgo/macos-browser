@@ -39,6 +39,7 @@ final class ScanOperation: DataBrokerOperation {
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
+    let clickAwaitTime: TimeInterval
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
@@ -46,6 +47,7 @@ final class ScanOperation: DataBrokerOperation {
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
          operationAwaitTime: TimeInterval = 3,
+         clickAwaitTime: TimeInterval = 0,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -55,6 +57,7 @@ final class ScanOperation: DataBrokerOperation {
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
         self.shouldRunNextStep = shouldRunNextStep
+        self.clickAwaitTime = clickAwaitTime
     }
 
     func run(inputValue: Void,

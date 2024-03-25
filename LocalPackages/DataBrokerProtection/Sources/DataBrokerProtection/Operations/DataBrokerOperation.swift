@@ -39,6 +39,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var extractedProfile: ExtractedProfile? { get set }
     var shouldRunNextStep: () -> Bool { get }
     var retriesCountOnError: Int { get set }
+    var clickAwaitTime: TimeInterval { get }
 
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
@@ -193,7 +194,7 @@ extension DataBrokerOperation {
         case .click:
             stageCalculator?.fireOptOutFillForm()
             // We wait 40 seconds before tapping
-            try? await Task.sleep(nanoseconds: UInt64(40) * 1_000_000_000)
+            try? await Task.sleep(nanoseconds: UInt64(clickAwaitTime) * 1_000_000_000)
             await executeNextStep()
         case .fillForm:
             stageCalculator?.fireOptOutFillForm()
