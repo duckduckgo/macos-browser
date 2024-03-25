@@ -94,12 +94,10 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     }
 
     private var isWaitlistBetaActive: Bool {
-        return false
         return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlistBetaActive)
     }
 
     private var isWaitlistEnabled: Bool {
-        return false
         return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlist)
     }
 
