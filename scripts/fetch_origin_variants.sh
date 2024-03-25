@@ -17,7 +17,8 @@ _extract_origins_and_variants() {
     
     jq -c '.data[]
         | select(.custom_fields[] | select(.name == "'"${origin_field}"'").text_value != null)
-        | {origin: (.custom_fields[] | select(.name == "'"${origin_field}"'") | .text_value), variant: (.custom_fields[] | select(.name == "'"${atb_field}"'") | .text_value)}' <<< "$response" \
+        | {origin: (.custom_fields[] | select(.name == "'"${origin_field}"'") | .text_value), variant: (.custom_fields[] | select(.name == "'"${atb_field}"'") | .text_value)}
+        | del(.variant | nulls)' <<< "$response" \
         | tr '\n' ',' | sed 's/,$//' #concatenates the pair by a comma and remove the trailing comma at the end of the line.
 }
 
