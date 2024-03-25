@@ -37,6 +37,7 @@ class FindInPageTests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         loremIpsumWebView = app.windows.webViews["Lorem Ipsum"]
         findInPageCloseButton = app.windows.buttons["FindInPageController.closeButton"]
