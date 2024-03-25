@@ -80,6 +80,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionClientFailedToEncodeRedeemRequest
             case .invalidInviteCode:
                 domainEvent = .networkProtectionClientInvalidInviteCode
+            case .noResponseFromRedeemEndpoint:
+                return
+            case .unexpectedStatusFromRedeemEndpoint:
+                return
             case .failedToRedeemInviteCode(let error):
                 domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error)
             case .failedToParseRedeemResponse(let error):
@@ -130,7 +134,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
             case .vpnAccessRevoked:
-                // todo
                 return
             }
 
