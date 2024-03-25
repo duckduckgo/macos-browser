@@ -10,6 +10,15 @@ on:
           required: false
           type: string
     workflow_call:
+      inputs:
+        atb-variant:
+          description: "Origin variant. Used for measuring attribution only. Passed by the caller workflow."
+          required: false
+          type: string
+        origin-variant:
+          description: "Origin variant. Used for measuring attribution only. Passed by the caller workflow."
+          required: false
+          type: string
       secrets:
         BUILD_CERTIFICATE_BASE64:
           required: true
@@ -60,22 +69,14 @@ jobs:
   
       name: Create DMG Variant
   
+      env:
+        ATB_VARIANT_NAME: ${{ inputs.atb-variant || github.event.inputs.atb-variant }}
+        ORIGIN_VARIANT_NAME: ${{ inputs.origin-variant || github.event.inputs.origin-variant }}
+
       runs-on: macos-12
       timeout-minutes: 15
   
       steps:
-
-      - name: Set Environment variables for build variants (Workflow Run)
-        if: github.event_name == 'workflow_run'
-        run: |
-          echo "ATB_VARIANT_NAME=${{ github.event.workflow_run.outputs.atb-variant }}" >> $GITHUB_ENV
-          echo "ORIGIN_VARIANT_NAME=${{ github.event.workflow_run.outputs.origin-variant }}" >> $GITHUB_ENV
-      
-      - name: Set Environment variables for build variants (Workflow Dispatch)
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo "ATB_VARIANT_NAME=${{ github.event.inputs.atb-variant }}" >> $GITHUB_ENV
-          echo "ORIGIN_VARIANT_NAME=${{ github.event.inputs.origin-variant }}" >> $GITHUB_ENV
   
       - name: Download release app
         run: |
@@ -180,11 +181,11 @@ jobs:
       - name: Set variant name
         id: set-variant-name
         run: |
-          if [ -n "$ATB_VARIANT_NAME" ] && [ -z "$ORIGIN_VARIANT_NAME" ]; then
+          if [ -z "$ORIGIN_VARIANT_NAME" ] && [ -n "$ATB_VARIANT_NAME" ]; then
             name=$ATB_VARIANT_NAME
           elif [ -n "$ORIGIN_VARIANT_NAME" ] && [ -z "$ATB_VARIANT_NAME" ]; then
             name=$ORIGIN_VARIANT_NAME
-          elif [ -n "$ORIGIN" ] && [ -n "$ATB_VARIANT_NAME" ]; then
+          elif [ -n "$ORIGIN_VARIANT_NAME" ] && [ -n "$ATB_VARIANT_NAME" ]; then
             name="${ORIGIN_VARIANT_NAME}-${ATB_VARIANT_NAME}"
           else
             echo "Neither ATB_VARIANT_NAME nor ORIGIN_VARIANT_NAME is set"
@@ -239,4 +240,3 @@ jobs:
                     -d "$(envsubst < message-template.json | jq ".${status}")" \
                     ${{ secrets.MM_WEBHOOK_URL }}
             fi
-  
