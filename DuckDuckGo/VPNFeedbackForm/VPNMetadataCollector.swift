@@ -287,25 +287,4 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
 }
 
-extension Network.NWPath {
-    /// A description that's safe from a privacy standpoint.
-    ///
-    /// Ref: https://app.asana.com/0/0/1206712493935053/1206712516729780/f
-    ///
-    var anonymousDescription: String {
-        var description = "NWPath("
-
-        description += "status: \(status), "
-
-        if case .unsatisfied = status {
-            description += "unsatisfiedReason: \(unsatisfiedReason), "
-        }
-
-        description += "availableInterfaces: \(availableInterfaces)"
-        description += ")"
-
-        return description
-    }
-}
-
 #endif
