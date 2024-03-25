@@ -20,13 +20,11 @@ import Foundation
 
 extension Bundle {
 
-    struct Keys {
-        static let appGroup = "DBP_APP_GROUP"
-    }
+    static let dbpAppGroupName = "DBP_APP_GROUP"
 
     var appGroupName: String {
-        guard let appGroup = object(forInfoDictionaryKey: Keys.appGroup) as? String else {
-            fatalError("Info.plist is missing \(Keys.appGroup)")
+        guard let appGroup = object(forInfoDictionaryKey: Bundle.dbpAppGroupName) as? String else {
+            fatalError("Info.plist is missing \(Bundle.dbpAppGroupName)")
         }
         return appGroup
     }

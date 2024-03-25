@@ -92,7 +92,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return isNetworkProtectionVisible()
         }
 
-        switch await AccountManager().hasEntitlement(for: .networkProtection) {
+        switch await AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).hasEntitlement(for: .networkProtection) {
         case .success(let hasEntitlement):
             return hasEntitlement
         case .failure(let error):
