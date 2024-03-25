@@ -31,6 +31,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var query: BrokerProfileQueryData { get }
     var emailService: EmailServiceProtocol { get }
     var captchaService: CaptchaServiceProtocol { get }
+    var cookieHandler: CookieHandler { get }
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
@@ -178,7 +179,7 @@ extension DataBrokerOperation {
         do {
             // https://app.asana.com/0/1204167627774280/1206912494469284/f
             if query.dataBroker.url == "spokeo.com" {
-                if let cookies = await BrokerCookieHandler().getAllCookiesFromDomain(url) {
+                if let cookies = await cookieHandler.getAllCookiesFromDomain(url) {
                     await webViewHandler?.setCookies(cookies)
                 }
             }
@@ -253,7 +254,11 @@ extension DataBrokerOperation {
     }
 }
 
-private struct BrokerCookieHandler {
+protocol CookieHandler {
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]?
+}
+
+struct BrokerCookieHandler: CookieHandler {
 
     func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
         guard let domainURL = extractSchemeAndHostAsURL(from: url.absoluteString) else { return nil }
@@ -271,7 +276,7 @@ private struct BrokerCookieHandler {
         return nil
     }
 
-    func extractSchemeAndHostAsURL(from url: String) -> URL? {
+    private func extractSchemeAndHostAsURL(from url: String) -> URL? {
         if let urlComponents = URLComponents(string: url), let scheme = urlComponents.scheme, let host = urlComponents.host {
             return URL(string: "\(scheme)://\(host)")
         }

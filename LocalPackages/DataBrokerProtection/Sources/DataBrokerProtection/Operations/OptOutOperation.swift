@@ -31,6 +31,7 @@ final class OptOutOperation: DataBrokerOperation {
     let query: BrokerProfileQueryData
     let emailService: EmailServiceProtocol
     let captchaService: CaptchaServiceProtocol
+    let cookieHandler: CookieHandler
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<Void, Error>?
@@ -52,6 +53,7 @@ final class OptOutOperation: DataBrokerOperation {
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
+         cookieHandler: CookieHandler = BrokerCookieHandler(),
          operationAwaitTime: TimeInterval = 3,
          clickAwaitTime: TimeInterval = 40,
          shouldRunNextStep: @escaping () -> Bool
@@ -64,6 +66,7 @@ final class OptOutOperation: DataBrokerOperation {
         self.operationAwaitTime = operationAwaitTime
         self.shouldRunNextStep = shouldRunNextStep
         self.clickAwaitTime = clickAwaitTime
+        self.cookieHandler = cookieHandler
     }
 
     func run(inputValue: ExtractedProfile,

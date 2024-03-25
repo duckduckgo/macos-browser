@@ -42,6 +42,12 @@ struct DebugScanReturnValue {
     }
 }
 
+struct EmptyCookieHandler: CookieHandler {
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
+        return nil
+    }
+}
+
 final class DebugScanOperation: DataBrokerOperation {
     typealias ReturnValue = DebugScanReturnValue
     typealias InputValue = Void
@@ -61,6 +67,7 @@ final class DebugScanOperation: DataBrokerOperation {
     var retriesCountOnError: Int = 0
     var scanURL: String?
     let clickAwaitTime: TimeInterval
+    let cookieHandler: CookieHandler
 
     private let fileManager = FileManager.default
     private let debugScanContentPath: String?
@@ -87,6 +94,7 @@ final class DebugScanOperation: DataBrokerOperation {
         } else {
             self.debugScanContentPath = nil
         }
+        self.cookieHandler = EmptyCookieHandler()
     }
 
     func run(inputValue: Void,
