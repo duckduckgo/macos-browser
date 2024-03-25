@@ -18,6 +18,7 @@
 
 import AppKit
 import Foundation
+import Subscription
 
 final class WaitlistThankYouPromptPresenter {
 
@@ -53,7 +54,7 @@ final class WaitlistThankYouPromptPresenter {
     func presentThankYouPromptIfNecessary(in window: NSWindow) {
         // Wiring this here since it's mostly useful for rolling out PrivacyPro, and should
         // go away once PPro is fully rolled out.
-        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             DailyPixel.fire(pixel: .privacyProFeatureEnabled, frequency: .dailyOnly)
         }
 

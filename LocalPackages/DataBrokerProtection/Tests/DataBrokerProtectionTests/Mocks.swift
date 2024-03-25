@@ -191,7 +191,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasLoadCalledWithURL = url
     }
 
-    func waitForWebViewLoad(timeoutInSeconds: Int) async throws {
+    func waitForWebViewLoad() async throws {
         wasWaitForWebViewLoadCalled = true
     }
 

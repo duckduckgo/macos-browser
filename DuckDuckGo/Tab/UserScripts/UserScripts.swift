@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import UserScript
 import WebKit
+import Subscription
 
 @MainActor
 final class UserScripts: UserScriptsProvider {
@@ -87,7 +88,7 @@ final class UserScripts: UserScriptsProvider {
         }
 
 #if SUBSCRIPTION
-        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
             userScripts.append(subscriptionPagesUserScript)
 

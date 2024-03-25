@@ -81,10 +81,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-#if SUBSCRIPTION
-    let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
-#endif
-
 #if NETWORK_PROTECTION && SUBSCRIPTION
     // Needs to be lazy as indirectly depends on AppDelegate
     private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
@@ -193,7 +189,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     #else
         SubscriptionPurchaseEnvironment.current = .stripe
     #endif
-        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
 #endif
     }
 
@@ -572,18 +567,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 func updateSubscriptionStatus() {
 #if SUBSCRIPTION
     Task {
-        guard let token = AccountManager().accessToken else {
-            return
-        }
-        let result = await SubscriptionService.getSubscription(accessToken: token)
+        let accountManager = AccountManager()
 
-        switch result {
-        case .success(let success):
-            if success.isActive {
+        guard let token = accountManager.accessToken else { return }
+
+        if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+            if subscription.isActive {
                 DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
             }
-        case .failure: break
         }
+
+        _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
     }
 #endif
 }
