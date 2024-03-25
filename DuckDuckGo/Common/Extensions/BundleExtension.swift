@@ -95,7 +95,7 @@ extension Bundle {
 #endif
 
     func appGroup(bundle: BundleGroup) -> String {
-        var appGroupName = bundle.appGroupKey
+        let appGroupName = bundle.appGroupKey
         guard let appGroup = object(forInfoDictionaryKey: appGroupName) as? String else {
             fatalError("Info.plist is missing \(appGroupName)")
         }
