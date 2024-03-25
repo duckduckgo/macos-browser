@@ -58,7 +58,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
          pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
          userDefaults: UserDefaults = .standard,
          waitlistStorage: WaitlistStorage = DataBrokerProtectionWaitlist().waitlistStorage,
-         subscriptionAvailability: SubscriptionFeatureAvailability = NSApp.delegateTyped.subscriptionFeatureAvailability) {
+         subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
