@@ -205,7 +205,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
         }
 
-        return nil
+        return SubscriptionOptions.empty
     }
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
