@@ -225,7 +225,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     func setCookies(_ cookies: [HTTPCookie]) async {
 
     }
-    
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil
