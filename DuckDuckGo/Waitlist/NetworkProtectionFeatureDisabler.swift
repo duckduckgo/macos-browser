@@ -31,6 +31,8 @@ protocol NetworkProtectionFeatureDisabling {
     ///
     @discardableResult
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool
+
+    func stop()
 }
 
 final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling {
@@ -92,6 +94,10 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         unpinNetworkProtection()
         notifyVPNUninstalled()
         return true
+    }
+
+    func stop() {
+        ipcClient.stop()
     }
 
     private func enableLoginItems() {
