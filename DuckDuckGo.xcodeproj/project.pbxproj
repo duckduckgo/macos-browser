@@ -13446,7 +13446,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 			};
 			name = Debug;
 		};
@@ -13454,7 +13454,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 			};
 			name = CI;
 		};
@@ -13462,7 +13462,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 			};
 			name = Release;
 		};
@@ -13470,7 +13470,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 			};
 			name = Review;
 		};
