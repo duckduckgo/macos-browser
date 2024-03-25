@@ -6,21 +6,25 @@
 set -e -o pipefail
 
 section_id="1206716555947176"
+# TODO: Pass this as Environment Variable
 ASANA_ACCESS_TOKEN="2/1206329551987270/1206904223324738:1c68ff7d9f9afcdb84089276681dbc47"
 
-# Create `origin-variant` pairs
+# Create a JSON string with the `origin-variant` pairs.
 _extract_origins_and_variants() {
     local response="$1"
     local origin_field="Origin"
     local atb_field="ATB"
     
-    jq -r '.data[]
+    jq -c '.data[]
         | select(.custom_fields[] | select(.name == "'"${origin_field}"'").text_value != null)
-        | {origin: (.custom_fields[] | select(.name == "'"${origin_field}"'") | .text_value), variant: (.custom_fields[] | select(.name == "'"${atb_field}"'") | .text_value)}' <<< "$response"
+        | {origin: (.custom_fields[] | select(.name == "'"${origin_field}"'") | .text_value), variant: (.custom_fields[] | select(.name == "'"${atb_field}"'") | .text_value)}' <<< "$response" \
+        | tr '\n' ',' | sed 's/,$//' #concatenates the pair by a comma and remove the trailing comma at the end of the line.
 }
 
 # Fetch all the Asana tasks for a specific section of a project.
-#  
+# This function fetches only uncompleted tasks.
+# If there are more than 100 items the function takes care of pagination.
+# Returns a JSON string consisting of a list of `origin-variant` pairs concatenated by a comma. Eg. `{"origin":"app","variant":"ab"},{"origin":"app.search","variant":null}`.  
 _fetch_tasks() {
     local asana_api_url="https://app.asana.com/api/1.0"
     # Fetches only tasks that have not been completed yet, includes in the response section name, name of the task and its custom fields. 
