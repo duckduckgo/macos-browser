@@ -71,8 +71,8 @@ final class MainViewController: NSViewController {
                 return NetPPopoverManagerMock()
             }
 #endif
-            let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
-            let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
+
+            let ipcClient = TunnelControllerIPCClient()
             ipcClient.register()
 
             return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient, networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler())

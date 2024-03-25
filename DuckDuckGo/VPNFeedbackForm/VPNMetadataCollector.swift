@@ -115,8 +115,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     private let statusReporter: NetworkProtectionStatusReporter
 
     init() {
-        let machServiceName = Bundle.main.vpnMenuAgentBundleId
-        let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+        let ipcClient = TunnelControllerIPCClient()
         ipcClient.register()
 
         self.statusReporter = DefaultNetworkProtectionStatusReporter(
