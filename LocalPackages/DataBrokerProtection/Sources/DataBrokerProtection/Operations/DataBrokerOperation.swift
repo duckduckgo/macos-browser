@@ -175,8 +175,11 @@ extension DataBrokerOperation {
 
     func loadURL(url: URL) async {
         do {
-            if let cookies = await BrokerCookieHandler().getAllCookiesFromDomain(url) {
-                await webViewHandler?.setCookies(cookies)
+            // https://app.asana.com/0/1204167627774280/1206912494469284/f
+            if query.dataBroker.url == "spokeo.com" {
+                if let cookies = await BrokerCookieHandler().getAllCookiesFromDomain(url) {
+                    await webViewHandler?.setCookies(cookies)
+                }
             }
             try await webViewHandler?.load(url: url)
             await executeNextStep()
@@ -189,9 +192,8 @@ extension DataBrokerOperation {
         switch actionType {
         case .click:
             stageCalculator?.fireOptOutFillForm()
-            try? await webViewHandler?.waitForWebViewLoad()
-            // We wait 10 seconds before tapping
-            try? await Task.sleep(nanoseconds: UInt64(10) * 1_000_000_000)
+            // We wait 40 seconds before tapping
+            try? await Task.sleep(nanoseconds: UInt64(40) * 1_000_000_000)
             await executeNextStep()
         case .fillForm:
             stageCalculator?.fireOptOutFillForm()
@@ -274,5 +276,4 @@ private struct BrokerCookieHandler {
         }
         return nil
     }
-
 }
