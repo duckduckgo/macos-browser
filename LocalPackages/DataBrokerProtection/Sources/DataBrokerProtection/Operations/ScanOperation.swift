@@ -32,11 +32,11 @@ final class ScanOperation: DataBrokerOperation {
     let emailService: EmailServiceProtocol
     let captchaService: CaptchaServiceProtocol
     let cookieHandler: CookieHandler
+    let stageCalculator: StageDurationCalculator
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
     var extractedProfile: ExtractedProfile?
-    var stageCalculator: StageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
@@ -50,6 +50,7 @@ final class ScanOperation: DataBrokerOperation {
          cookieHandler: CookieHandler = BrokerCookieHandler(),
          operationAwaitTime: TimeInterval = 3,
          clickAwaitTime: TimeInterval = 0,
+         stageDurationCalculator: StageDurationCalculator,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -58,6 +59,7 @@ final class ScanOperation: DataBrokerOperation {
         self.emailService = emailService
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
+        self.stageCalculator = stageDurationCalculator
         self.shouldRunNextStep = shouldRunNextStep
         self.clickAwaitTime = clickAwaitTime
         self.cookieHandler = cookieHandler
@@ -66,10 +68,8 @@ final class ScanOperation: DataBrokerOperation {
     func run(inputValue: Void,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
-             stageCalculator: StageDurationCalculator, // We do not need it for scans - for now.
              showWebView: Bool) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
-            self.stageCalculator = stageCalculator
             self.continuation = continuation
             Task {
                 await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker, showWebView: showWebView)
