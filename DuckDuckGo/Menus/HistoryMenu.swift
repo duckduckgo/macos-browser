@@ -31,13 +31,11 @@ final class HistoryMenu: NSMenu {
     private let reopenLastClosedMenuItem = NSMenuItem(title: UserText.reopenLastClosedTab, action: #selector(AppDelegate.reopenLastClosedTab))
     private let reopenAllWindowsFromLastSessionMenuItem = NSMenuItem(title: UserText.mainMenuHistoryReopenAllWindowsFromLastSession,
                                                                      action: #selector(AppDelegate.reopenAllWindowsFromLastSession))
-    private let clearAllHistoryMenuItem: NSMenuItem = {
-        let item = NSMenuItem(title: UserText.mainMenuHistoryClearAllHistory,
-                   action: #selector(MainViewController.clearAllHistory),
-                   keyEquivalent: [.command, .shift, .backspace])
-        item.setAccessibilityIdentifier("HistoryMenu.clearAllHistory")
-        return item
-    }()
+
+    private let clearAllHistoryMenuItem = NSMenuItem(title: UserText.mainMenuHistoryClearAllHistory,
+                                                     action: #selector(MainViewController.clearAllHistory),
+                                                     keyEquivalent: [.command, .shift, .backspace])
+        .withAccessibilityIdentifier("HistoryMenu.clearAllHistory")
     private let clearAllHistorySeparator = NSMenuItem.separator()
 
     private let historyCoordinator: HistoryCoordinating
