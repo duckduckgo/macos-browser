@@ -342,6 +342,8 @@ protocol NewWindowPolicyDecisionMaker {
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
+    private let certificateTustEvaluator: CertificateTustEvaluating
+    var isCertificateValid: Bool?
 
 #if NETWORK_PROTECTION
     private var tunnelController: NetworkProtectionIPCTunnelController?
@@ -386,7 +388,8 @@ protocol NewWindowPolicyDecisionMaker {
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
-                     startupPreferences: StartupPreferences = StartupPreferences.shared
+                     startupPreferences: StartupPreferences = StartupPreferences.shared,
+                     certificateTustEvaluator: CertificateTustEvaluating = CertificateTustEvaluator()
     ) {
 
         let duckPlayer = duckPlayer
@@ -425,7 +428,8 @@ protocol NewWindowPolicyDecisionMaker {
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
                   webViewSize: webViewSize,
-                  startupPreferences: startupPreferences)
+                  startupPreferences: startupPreferences, 
+                  certificateTustEvaluator: certificateTustEvaluator)
     }
 
     @MainActor
@@ -455,7 +459,8 @@ protocol NewWindowPolicyDecisionMaker {
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
          webViewSize: CGSize,
-         startupPreferences: StartupPreferences
+         startupPreferences: StartupPreferences,
+         certificateTustEvaluator: CertificateTustEvaluating
     ) {
 
         self.content = content
@@ -471,6 +476,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.interactionState = interactionStateData.map(InteractionState.loadCachedFromTabContent) ?? .none
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
+        self.certificateTustEvaluator = certificateTustEvaluator
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
@@ -1222,7 +1228,13 @@ protocol NewWindowPolicyDecisionMaker {
 
         webView.publisher(for: \.serverTrust)
             .sink { [weak self] serverTrust in
-                self?.privacyInfo?.serverTrust = serverTrust
+                guard let self else { return }
+                self.isCertificateValid = self.certificateTustEvaluator.evaluateCertificateTrust(trust: serverTrust)
+                if self.isCertificateValid ?? false {
+                    self.privacyInfo?.serverTrust = serverTrust
+                } else {
+                    self.privacyInfo?.serverTrust = nil
+                }
             }
             .store(in: &webViewCancellables)
 
