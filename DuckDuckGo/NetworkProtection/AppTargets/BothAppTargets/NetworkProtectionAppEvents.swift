@@ -84,7 +84,7 @@ final class NetworkProtectionAppEvents {
             await featureVisibility.disableIfUserHasNoAccess()
 
 #if SUBSCRIPTION
-            await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            _ = await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
 #endif
         }
     }
