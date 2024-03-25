@@ -31,7 +31,6 @@ final class HistoryMenu: NSMenu {
     private let reopenLastClosedMenuItem = NSMenuItem(title: UserText.reopenLastClosedTab, action: #selector(AppDelegate.reopenLastClosedTab))
     private let reopenAllWindowsFromLastSessionMenuItem = NSMenuItem(title: UserText.mainMenuHistoryReopenAllWindowsFromLastSession,
                                                                      action: #selector(AppDelegate.reopenAllWindowsFromLastSession))
-
     private let clearAllHistoryMenuItem = NSMenuItem(title: UserText.mainMenuHistoryClearAllHistory,
                                                      action: #selector(MainViewController.clearAllHistory),
                                                      keyEquivalent: [.command, .shift, .backspace])
@@ -119,7 +118,6 @@ final class HistoryMenu: NSMenu {
 
     private func addRecentlyVisited() {
         recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
-
         let recentVisits = historyCoordinator.getRecentVisits(maxCount: 14)
         for (index, visit) in zip(
             recentVisits.indices, recentVisits
