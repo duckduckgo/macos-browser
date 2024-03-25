@@ -28,6 +28,7 @@ extension Preferences {
         @ObservedObject var startupModel: StartupPreferences
         @ObservedObject var downloadsModel: DownloadsPreferences
         @ObservedObject var searchModel: SearchPreferences
+        @ObservedObject var dataClearingModel: DataClearingPreferences
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
@@ -43,7 +44,16 @@ extension Preferences {
                             Text(UserText.reopenAllWindowsFromLastSession).tag(true)
                         }, label: {})
                         .pickerStyle(.radioGroup)
+                        .disabled(dataClearingModel.isBurnDataOnQuitEnabled)
                         .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        if dataClearingModel.isBurnDataOnQuitEnabled {
+                            VStack(alignment: .leading, spacing: 1) {
+                                TextMenuItemCaption(UserText.disableBurnOnQuitToEnableSessionRestore())
+                                TextButton(UserText.showDataClearingSettings()) {
+                                    startupModel.show(url: .settingsPane(.dataClearing))
+                                }
+                            }
+                        }
                     }
                 }
 

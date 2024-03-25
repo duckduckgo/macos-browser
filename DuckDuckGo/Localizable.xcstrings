@@ -12547,6 +12547,18 @@
         }
       }
     },
+    "disable.burn.on.quit.to.enable.session.restore" : {
+      "comment" : "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Disable the %@ setting to enable session restore on startup."
+          }
+        }
+      }
+    },
     "disable.email.protection.mesage" : {
       "comment" : "Message for alert shown when user disables email protection",
       "extractionState" : "extracted_with_value",
@@ -47425,6 +47437,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показывать функции работы с текстом"
+          }
+        }
+      }
+    },
+    "show.data.clearing.settings" : {
+      "comment" : "Button in Settings. It navigates user to Data Clearing Settings.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show %@ Settings."
           }
         }
       }

@@ -1040,6 +1040,18 @@ struct UserText {
     static let automaticallyClearData = NSLocalizedString("automatically.clear.data", value: "Automatically Clear Data", comment: "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.")
     static let burnDataOnQuit = NSLocalizedString("burn.data.on.quit", value: "Burn data on quit", comment: "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.")
     static let burnDataOnQuitExplanation = NSLocalizedString("burn.data.on.quit.explanation", value: "Clear all browsing data, history, and cookies whenever you close the browser. Cookies for Fireproof Sites won't be erased.", comment: "Explanation of a setting which configures clearing data automatically after quitting the app.")
+    static func disableBurnOnQuitToEnableSessionRestore() -> String {
+        let localized = NSLocalizedString("disable.burn.on.quit.to.enable.session.restore",
+                                          value: "Disable the %@ setting to enable session restore on startup.",
+                                          comment: "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit")
+        return String(format: localized, automaticallyClearData)
+    }
+    static func showDataClearingSettings() -> String {
+        let localized = NSLocalizedString("show.data.clearing.settings",
+                                          value: "Show %@ Settings.",
+                                          comment: "Button in Settings. It navigates user to Data Clearing Settings.")
+        return String(format: localized, dataClearing)
+    }
 
     // MARK: Crash Report
     static let crashReportTitle = NSLocalizedString("crash-report.title", value: "DuckDuckGo Privacy Browser quit unexpectedly.", comment: "Title of the dialog where the user can send a crash report")

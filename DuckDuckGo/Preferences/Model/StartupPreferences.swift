@@ -40,7 +40,7 @@ struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
 
 }
 
-final class StartupPreferences: ObservableObject {
+final class StartupPreferences: ObservableObject, PreferencesTabOpening {
 
     static let shared = StartupPreferences()
     private let pinningManager: LocalPinningManager
