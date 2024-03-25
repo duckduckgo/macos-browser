@@ -33,6 +33,8 @@ struct DataImportSummaryView: View {
         self.model = model
     }
 
+    private let zeroString = "0"
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             {
@@ -85,7 +87,7 @@ struct DataImportSummaryView: View {
                             Text("Bookmarks:",
                                  comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
                             + Text(" " as String)
-                            + Text("0").bold()
+                            + Text(zeroString).bold()
                         }
                     } else {
                         HStack {
@@ -102,7 +104,7 @@ struct DataImportSummaryView: View {
                             Text("Passwords:",
                                  comment: "Data import summary format of how many passwords (%lld) were successfully imported.")
                             + Text(" " as String)
-                            + Text("0").bold()
+                            + Text(zeroString).bold()
                         }
                     } else {
                         HStack {
