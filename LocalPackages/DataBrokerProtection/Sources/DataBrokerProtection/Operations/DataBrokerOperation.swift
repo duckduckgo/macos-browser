@@ -175,10 +175,13 @@ extension DataBrokerOperation {
 
     func loadURL(url: URL) async {
         do {
+            if let cookies = await BrokerCookieHandler().getAllCookiesFromDomain(url) {
+                await webViewHandler?.setCookies(cookies)
+            }
             try await webViewHandler?.load(url: url)
             await executeNextStep()
         } catch {
-           await onError(error: error)
+            await onError(error: error)
         }
     }
 
@@ -245,4 +248,31 @@ extension DataBrokerOperation {
             await onError(error: DataBrokerProtectionError.unknown("No current action to execute"))
         }
     }
+}
+
+private struct BrokerCookieHandler {
+
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
+        guard let domainURL = extractSchemeAndHostAsURL(from: url.absoluteString) else { return nil }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: domainURL)
+            guard let httpResponse = response as? HTTPURLResponse,
+                  let allHeaderFields = httpResponse.allHeaderFields as? [String: String] else { return nil }
+
+            let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeaderFields, for: domainURL)
+            return cookies
+        } catch {
+            print("Error fetching data: \(error)")
+        }
+
+        return nil
+    }
+
+    func extractSchemeAndHostAsURL(from url: String) -> URL? {
+        if let urlComponents = URLComponents(string: url), let scheme = urlComponents.scheme, let host = urlComponents.host {
+            return URL(string: "\(scheme)://\(host)")
+        }
+        return nil
+    }
+
 }
