@@ -1197,7 +1197,7 @@ import XCTest
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker && source.supportedDataTypes.contains(.passwords) {
             for bookmarksSummary in bookmarksSummaries
             // initial bookmark import failed and is not a `noData` error, or empty
-            where (bookmarksSummary?.result.isSuccess == false && bookmarkSummaryNoData != bookmarksSummary) 
+            where (bookmarksSummary?.result.isSuccess == false && bookmarkSummaryNoData != bookmarksSummary)
             || (try? bookmarksSummary?.result.get())?.isEmpty == true {
 
                 for passwordsSummary in passwordsSummaries
@@ -1472,7 +1472,7 @@ import XCTest
 
                 for passwordsSummary in passwordsSummaries
                 // passwords import failed and is not a `noData` error, or empty
-                where (passwordsSummary?.result.isSuccess == false && passwordSummaryNoData != passwordsSummary) 
+                where (passwordsSummary?.result.isSuccess == false && passwordSummaryNoData != passwordsSummary)
                 || (try? passwordsSummary?.result.get().isEmpty) == false {
 
                     for bookmarksFileImportSummary in bookmarksSummaries
