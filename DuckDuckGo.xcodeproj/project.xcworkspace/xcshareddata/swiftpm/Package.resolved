@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "michal/update-caches-from-confirm",
-        "revision" : "bf2e431c7f530c1d30e8d0d8088d50e13ea8425a"
+        "revision" : "c34a4d0298a33c4c7f3b8c0ac4ca249b51e350db",
+        "version" : "129.1.7"
       }
     },
     {
