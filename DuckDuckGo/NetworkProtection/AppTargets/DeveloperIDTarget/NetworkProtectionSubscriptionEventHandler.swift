@@ -52,7 +52,7 @@ final class NetworkProtectionSubscriptionEventHandler {
             switch await AccountManager().hasEntitlement(for: .networkProtection) {
             case .success(let hasEntitlements):
                 handleEntitlementsChange(hasEntitlements: hasEntitlements)
-            case .failure(let error):
+            case .failure:
                 break
             }
 
