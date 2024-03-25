@@ -3234,7 +3234,6 @@
 		EE2833752BADE33000C4CCF4 /* BrowsingHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2833742BADE33000C4CCF4 /* BrowsingHistoryTests.swift */; };
 		EE2833772BADE33F00C4CCF4 /* UITestsURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2833762BADE33F00C4CCF4 /* UITestsURLExtension.swift */; };
 		EE2833782BADE35E00C4CCF4 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8EDF2624923EC70071C2E8 /* StringExtension.swift */; };
-		EE2833792BADE36600C4CCF4 /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3AF625D5DBFD00C7D2AA /* DataExtension.swift */; };
 		EE28337A2BADE37100C4CCF4 /* TestsURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */; };
 		EE28337E2BADE3A500C4CCF4 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = EE28337D2BADE3A500C4CCF4 /* BrowserServicesKit */; };
 		EE2F9C5B2B90F2FF00D45FC9 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = EE2F9C5A2B90F2FF00D45FC9 /* Subscription */; };
@@ -12074,7 +12073,6 @@
 				EE2833782BADE35E00C4CCF4 /* StringExtension.swift in Sources */,
 				EEBCE6832BA463DD00B9DF00 /* NSImageExtensions.swift in Sources */,
 				EE2833772BADE33F00C4CCF4 /* UITestsURLExtension.swift in Sources */,
-				EE2833792BADE36600C4CCF4 /* DataExtension.swift in Sources */,
 				EEBCE6822BA444FA00B9DF00 /* XCUIElementExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
