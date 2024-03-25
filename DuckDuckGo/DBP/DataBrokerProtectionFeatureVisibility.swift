@@ -110,12 +110,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     }
 
     func isPrivacyProEnabled() -> Bool {
-#if SUBSCRIPTION
         return DefaultSubscriptionFeatureAvailability().isFeatureAvailable
-#else
-        return false
-#endif
-
     }
 
     func isEligibleForThankYouMessage() -> Bool {
