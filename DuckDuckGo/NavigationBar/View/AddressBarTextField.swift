@@ -21,6 +21,7 @@ import Carbon.HIToolbox
 import Combine
 import Common
 import Suggestions
+import Subscription
 
 final class AddressBarTextField: NSTextField {
 
@@ -347,7 +348,7 @@ final class AddressBarTextField: NSTextField {
 #endif
 
 #if SUBSCRIPTION
-        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             if providedUrl.isChild(of: URL.subscriptionBaseURL) || providedUrl.isChild(of: URL.identityTheftRestoration) {
                 self.updateValue(selectedTabViewModel: nil, addressBarString: nil) // reset
                 self.window?.makeFirstResponder(nil)

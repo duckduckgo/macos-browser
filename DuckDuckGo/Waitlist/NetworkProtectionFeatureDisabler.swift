@@ -45,7 +45,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .netP,
          settings: VPNSettings = .init(defaults: .netP),
-         ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId),
+         ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(),
          log: OSLog = .networkProtection) {
 
         self.log = log
@@ -123,6 +123,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     private func resetUserDefaults() {
         settings.resetToDefaults()
+        userDefaults.networkProtectionOnboardingStatus = .default
     }
 
     private func notifyVPNUninstalled() {

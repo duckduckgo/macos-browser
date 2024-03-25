@@ -25,6 +25,7 @@ import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
 import LoginItems
+import PixelKit
 
 #if SUBSCRIPTION
 import Subscription
@@ -33,6 +34,7 @@ import Subscription
 protocol NetworkProtectionFeatureVisibility {
     var isEligibleForThankYouMessage: Bool { get }
 
+    func isFeatureEnabled() async throws -> Bool
     func isNetworkProtectionVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
     func disableForAllUsers() async
@@ -77,6 +79,25 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding the VPN from the user.
     func isNetworkProtectionVisible() -> Bool {
         return isEasterEggUser || waitlistIsOngoing
+    }
+
+    var isInstalled: Bool {
+        LoginItem.vpnMenu.status.isInstalled && isOnboarded
+    }
+
+    /// Replaces `isNetworkProtectionVisible` to add subscriptions support
+    ///
+    func isFeatureEnabled() async throws -> Bool {
+        guard subscriptionFeatureAvailability.isFeatureAvailable else {
+            return isNetworkProtectionVisible()
+        }
+
+        switch await AccountManager().hasEntitlement(for: .networkProtection) {
+        case .success(let hasEntitlement):
+            return hasEntitlement
+        case .failure(let error):
+            throw error
+        }
     }
 
     /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
@@ -173,6 +194,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return false
         }
 
+        PixelKit.fire(VPNPrivacyProPixel.vpnBetaStoppedWhenPrivacyProEnabled, frequency: .dailyAndContinuous)
         defaults.vpnLegacyUserAccessDisabledOnce = true
         await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
         return true
