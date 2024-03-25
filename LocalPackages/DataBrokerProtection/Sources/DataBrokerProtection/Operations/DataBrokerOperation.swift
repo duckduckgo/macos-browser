@@ -97,10 +97,11 @@ extension DataBrokerOperation {
             return
         }
 
-        if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId {
+        if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId, let attemptId = stageCalculator?.attemptId {
             actionsHandler?.captchaTransactionId = nil
             stageCalculator?.setStage(.captchaSolve)
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
+                                                                                     attemptId: attemptId,
                                                                                      shouldRunNextStep: shouldRunNextStep) {
                 stageCalculator?.fireOptOutCaptchaSolve()
                 await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
@@ -209,8 +210,12 @@ extension DataBrokerOperation {
         do {
             stageCalculator?.fireOptOutCaptchaParse()
             stageCalculator?.setStage(.captchaSend)
-            actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo,
-                                                                                                     shouldRunNextStep: shouldRunNextStep)
+
+            guard let attemptId = stageCalculator?.attemptId else {
+                return
+            }
+
+            actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo, attemptId: attemptId, shouldRunNextStep: shouldRunNextStep)
             stageCalculator?.fireOptOutCaptchaSend()
             await executeNextStep()
         } catch {
