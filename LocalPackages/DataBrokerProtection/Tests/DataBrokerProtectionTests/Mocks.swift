@@ -255,7 +255,7 @@ final class EmailServiceMock: EmailServiceProtocol {
 
     var shouldThrow: Bool = false
 
-    func getEmail(dataBrokerURL: String?) async throws -> EmailData {
+    func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
@@ -263,7 +263,7 @@ final class EmailServiceMock: EmailServiceProtocol {
         return EmailData(pattern: nil, emailAddress: "test@duck.com")
     }
 
-    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingInterval: TimeInterval, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
+    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingInterval: TimeInterval, attemptId: UUID, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
@@ -854,6 +854,7 @@ final class MockAppVersion: AppVersionNumberProvider {
 }
 
 final class MockStageDurationCalculator: StageDurationCalculator {
+    var attemptId: UUID = UUID()
     var stage: Stage?
 
     func durationSinceLastStage() -> Double {

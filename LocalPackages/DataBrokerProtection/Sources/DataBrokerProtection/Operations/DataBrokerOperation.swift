@@ -111,10 +111,10 @@ extension DataBrokerOperation {
             return
         }
 
-        if action.needsEmail {
+        if action.needsEmail, let attemptId = stageCalculator?.attemptId {
             do {
                 stageCalculator?.setStage(.emailGenerate)
-                let emailData = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url)
+                let emailData = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url, attemptId: attemptId)
                 extractedProfile?.email = emailData.emailAddress
                 stageCalculator?.setEmailPattern(emailData.pattern)
                 stageCalculator?.fireOptOutEmailGenerate()
@@ -128,12 +128,13 @@ extension DataBrokerOperation {
     }
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
-        if let email = extractedProfile?.email {
+        if let email = extractedProfile?.email, let attemptId = stageCalculator?.attemptId {
             stageCalculator?.setStage(.emailReceive)
             let url =  try await emailService.getConfirmationLink(
                 from: email,
                 numberOfRetries: 100, // Move to constant
                 pollingInterval: action.pollingTime,
+                attemptId: attemptId,
                 shouldRunNextStep: shouldRunNextStep
             )
             stageCalculator?.fireOptOutEmailReceive()

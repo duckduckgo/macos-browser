@@ -466,6 +466,8 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 }
 
 final class FakeStageDurationCalculator: StageDurationCalculator {
+    var attemptId: UUID = UUID()
+
     func durationSinceLastStage() -> Double {
         0.0
     }
