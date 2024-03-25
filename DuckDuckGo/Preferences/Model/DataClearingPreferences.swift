@@ -20,6 +20,7 @@ import Foundation
 
 final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
 
+    static let burnOnQuitNotificationKey = "isBurnDataOnQuitEnabled"
     static let shared = DataClearingPreferences()
 
     @Published
@@ -33,6 +34,9 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
     var isBurnDataOnQuitEnabled: Bool {
         didSet {
             persistor.burnDataOnQuitEnabled = isBurnDataOnQuitEnabled
+            NotificationCenter.default.post(name: .burnDataOnQuitDidChange,
+                                            object: nil,
+                                            userInfo: [Self.burnOnQuitNotificationKey: isBurnDataOnQuitEnabled])
         }
     }
 
@@ -72,4 +76,8 @@ struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersisto
     @UserDefaultsWrapper(key: .burnDataOnQuitEnabled, defaultValue: false)
     var burnDataOnQuitEnabled: Bool
 
+}
+
+extension Notification.Name {
+    static let burnDataOnQuitDidChange = Notification.Name("burnDataOnQuitDidChange")
 }

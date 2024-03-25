@@ -46,6 +46,7 @@ final class StartupPreferences: ObservableObject {
     private let pinningManager: LocalPinningManager
     private var persistor: StartupPreferencesPersistor
     private var pinnedViewsNotificationCancellable: AnyCancellable?
+    private var dataClearingPreferencesNotificationCancellable: AnyCancellable?
 
     init(pinningManager: LocalPinningManager = LocalPinningManager.shared,
          persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared)) {
@@ -56,6 +57,7 @@ final class StartupPreferences: ObservableObject {
         customHomePageURL = persistor.customHomePageURL
         updateHomeButtonState()
         listenToPinningManagerNotifications()
+        listenToDataClearingPreferencesNotifications()
     }
 
     @Published var restorePreviousSession: Bool {
@@ -126,6 +128,18 @@ final class StartupPreferences: ObservableObject {
                 return
             }
             self.updateHomeButtonState()
+        }
+    }
+
+    private func listenToDataClearingPreferencesNotifications() {
+        dataClearingPreferencesNotificationCancellable = NotificationCenter.default.publisher(for: .burnDataOnQuitDidChange).sink { [weak self] notification in
+            guard let self = self,
+                  let isBurnDataOnQuitEnabled = notification.userInfo?[DataClearingPreferences.burnOnQuitNotificationKey] as? Bool else {
+                return
+            }
+            if isBurnDataOnQuitEnabled {
+                self.restorePreviousSession = false
+            }
         }
     }
 
