@@ -20,6 +20,7 @@
 
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import Common
 
 #if SUBSCRIPTION
@@ -85,6 +86,13 @@ extension NetworkProtectionLocationListCompositeRepository {
             errorEvents: .networkProtectionAppDebugEvents,
             isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable
         )
+    }
+}
+
+extension TunnelControllerIPCClient {
+
+    convenience init() {
+        self.init(machServiceName: Bundle.main.vpnMenuAgentBundleId)
     }
 }
 
