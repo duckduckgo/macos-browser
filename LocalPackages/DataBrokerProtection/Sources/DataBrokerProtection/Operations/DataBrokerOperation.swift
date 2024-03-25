@@ -255,7 +255,7 @@ private struct BrokerCookieHandler {
     func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
         guard let domainURL = extractSchemeAndHostAsURL(from: url.absoluteString) else { return nil }
         do {
-            let (data, response) = try await URLSession.shared.data(from: domainURL)
+            let (_, response) = try await URLSession.shared.data(from: domainURL)
             guard let httpResponse = response as? HTTPURLResponse,
                   let allHeaderFields = httpResponse.allHeaderFields as? [String: String] else { return nil }
 
