@@ -95,7 +95,7 @@ extension Bundle {
 #endif
 
     func appGroup(bundle: BundleGroup) -> String {
-        var appGroupName = bundle.appGroupName
+        var appGroupName = bundle.appGroupKey
         guard let appGroup = object(forInfoDictionaryKey: appGroupName) as? String else {
             fatalError("Info.plist is missing \(appGroupName)")
         }
@@ -122,7 +122,7 @@ enum BundleGroup {
     case dbp
     case subs
 
-    var appGroupName: String {
+    var appGroupKey: String {
         switch self {
         case .dbp:
             return "DBP_APP_GROUP"
