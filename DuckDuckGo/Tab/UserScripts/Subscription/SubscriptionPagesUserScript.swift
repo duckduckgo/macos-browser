@@ -203,7 +203,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
         }
 
-        return nil
+        return SubscriptionOptions.empty
     }
 
     let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
