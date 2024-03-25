@@ -18,6 +18,7 @@
 
 import Foundation
 import UserNotifications
+import Subscription
 
 #if NETWORK_PROTECTION || DBP
 
@@ -82,7 +83,7 @@ struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControll
 
     static func shouldPresentWaitlist() -> Bool {
 #if SUBSCRIPTION
-        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             return false
         }
 #endif

@@ -317,7 +317,7 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && !AccountManager().isUserAuthenticated {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable && !AccountManager().isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
         } else {
             items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
@@ -336,6 +336,10 @@ final class MoreOptionsMenu: NSMenu {
     private func makeActiveSubscriptionItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = []
 
+#if SUBSCRIPTION
+        let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
+#endif
+
 #if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
             let networkProtectionItem: NSMenuItem
@@ -344,7 +348,7 @@ final class MoreOptionsMenu: NSMenu {
 
             items.append(networkProtectionItem)
 #if SUBSCRIPTION
-            if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && AccountManager().isUserAuthenticated {
+            if subscriptionFeatureAvailability.isFeatureAvailable && AccountManager().isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -377,7 +381,7 @@ final class MoreOptionsMenu: NSMenu {
             items.append(dataBrokerProtectionItem)
 
 #if SUBSCRIPTION
-            if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && AccountManager().isUserAuthenticated  {
+            if subscriptionFeatureAvailability.isFeatureAvailable && AccountManager().isUserAuthenticated  {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -409,7 +413,7 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.itrIcon)
             items.append(identityTheftRestorationItem)
 
-            if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable && AccountManager().isUserAuthenticated  {
+            if subscriptionFeatureAvailability.isFeatureAvailable && AccountManager().isUserAuthenticated  {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -431,6 +435,11 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
+        switch (SubscriptionPurchaseEnvironment.current, SubscriptionPurchaseEnvironment.canPurchase) {
+        case (.appStore, false): return []
+        default: break
+        }
+
         let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
