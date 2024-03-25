@@ -99,7 +99,10 @@ extension EventMapping where Event == NetworkProtectionError {
             frequency = .standard
             return
         case .vpnAccessRevoked:
-            // todo
+            return
+        case .noResponseFromRegisterEndpoint:
+            return
+        case .unexpectedStatusFromRegisterEndpoint:
             return
         }
 

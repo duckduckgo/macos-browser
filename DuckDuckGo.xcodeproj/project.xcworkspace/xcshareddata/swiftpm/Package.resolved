@@ -32,8 +32,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "anh/pp/add-metadata",
-        "revision" : "0cba47cf651175806bc151366605f8b19802d3ee"
+        "revision" : "31281809a97f6b071314011f34ea5e7dee3ff073"
       }
     },
     {
@@ -41,8 +40,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "edd96481d49b094c260f9a79e078abdbdd3a83fb",
-        "version" : "5.6.0"
+        "revision" : "2f44185cca2edefbae7557393a61a23c282abbf8",
+        "version" : "5.7.0"
       }
     },
     {
