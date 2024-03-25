@@ -13678,7 +13678,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = VPNProxyExtension/VPNProxyExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 			};
 			name = Debug;
 		};
@@ -13686,7 +13686,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = VPNProxyExtension/VPNProxyExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 			};
 			name = CI;
 		};
@@ -13694,7 +13694,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = VPNProxyExtension/VPNProxyExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 			};
 			name = Release;
 		};
@@ -13702,7 +13702,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BDA36F62B7E06A300AD5388 /* VPNProxyExtension.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = VPNProxyExtension/VPNProxyExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 			};
 			name = Review;
 		};
