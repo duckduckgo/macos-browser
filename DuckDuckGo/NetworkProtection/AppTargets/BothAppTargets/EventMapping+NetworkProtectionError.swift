@@ -104,6 +104,10 @@ extension EventMapping where Event == NetworkProtectionError {
             return
         case .unexpectedStatusFromRegisterEndpoint:
             return
+        case .noResponseFromRedeemEndpoint:
+            return
+        case .unexpectedStatusFromRedeemEndpoint:
+            return
         }
 
         let debugEvent = DebugEvent(eventType: .custom(domainEvent))
