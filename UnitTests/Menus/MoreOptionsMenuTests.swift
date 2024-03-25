@@ -190,6 +190,10 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return visible
     }
 
+    func isFeatureEnabled() async throws -> Bool {
+        return false
+    }
+
     func disableForAllUsers() async {
         // intentional no-op
     }

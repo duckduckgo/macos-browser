@@ -83,10 +83,8 @@ final class PreferencesSidebarModel: ObservableObject {
         userDefaults: UserDefaults = .netP
     ) {
         let loadSections = {
-#if SUBSCRIPTION
-            let includingVPN = !userDefaults.networkProtectionEntitlementsExpired && DefaultNetworkProtectionVisibility().isOnboarded
-#elseif NETWORK_PROTECTION
-            let includingVPN = DefaultNetworkProtectionVisibility().isOnboarded
+#if NETWORK_PROTECTION
+            let includingVPN = DefaultNetworkProtectionVisibility().isInstalled
 #else
             let includingVPN = false
 #endif

@@ -48,7 +48,7 @@ final class NetworkProtectionDebugUtilities {
         self.loginItemsManager = loginItemsManager
         self.settings = settings
 
-        let ipcClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId)
+        let ipcClient = TunnelControllerIPCClient()
 
         self.ipcClient = ipcClient
         self.networkProtectionFeatureDisabler = NetworkProtectionFeatureDisabler(ipcClient: ipcClient)

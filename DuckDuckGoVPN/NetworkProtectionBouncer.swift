@@ -41,7 +41,9 @@ final class NetworkProtectionBouncer {
         case .success(true):
             return
         case .failure:
-            break
+            guard accountManager.accessToken == nil else {
+                return
+            }
         case .success(false):
             os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing entitlement.")
             await controller.stop()
