@@ -5478,6 +5478,18 @@
         }
       }
     },
+    "automatically.clear.data" : {
+      "comment" : "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically Clear Data"
+          }
+        }
+      }
+    },
     "Birthday" : {
       "comment" : "Title of the section of the Identities manager where the user can add/modify a date of birth",
       "localizations" : {
@@ -9743,6 +9755,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вынести все на передний план"
+          }
+        }
+      }
+    },
+    "burn.data.on.quit" : {
+      "comment" : "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Burn data on quit"
+          }
+        }
+      }
+    },
+    "burn.data.on.quit.explanation" : {
+      "comment" : "Explanation of a setting which configures clearing data automatically after quitting the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear all browsing data, history, and cookies whenever you close the browser. Cookies for Fireproof Sites won't be erased."
           }
         }
       }

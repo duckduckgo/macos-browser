@@ -1037,6 +1037,9 @@ struct UserText {
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
     static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button.", comment: "Fireproofing mechanism explanation")
     static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites…", comment: "Fireproof settings button caption")
+    static let automaticallyClearData = NSLocalizedString("automatically.clear.data", value: "Automatically Clear Data", comment: "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.")
+    static let burnDataOnQuit = NSLocalizedString("burn.data.on.quit", value: "Burn data on quit", comment: "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.")
+    static let burnDataOnQuitExplanation = NSLocalizedString("burn.data.on.quit.explanation", value: "Clear all browsing data, history, and cookies whenever you close the browser. Cookies for Fireproof Sites won't be erased.", comment: "Explanation of a setting which configures clearing data automatically after quitting the app.")
 
     // MARK: Crash Report
     static let crashReportTitle = NSLocalizedString("crash-report.title", value: "DuckDuckGo Privacy Browser quit unexpectedly.", comment: "Title of the dialog where the user can send a crash report")

@@ -29,6 +29,13 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
         }
     }
 
+    @Published
+    var isBurnDataOnQuitEnabled: Bool {
+        didSet {
+            persistor.burnDataOnQuitEnabled = isBurnDataOnQuitEnabled
+        }
+    }
+
     @MainActor
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
@@ -46,6 +53,7 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
     init(persistor: FireButtonPreferencesPersistor = FireButtonPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         isLoginDetectionEnabled = persistor.loginDetectionEnabled
+        isBurnDataOnQuitEnabled = persistor.burnDataOnQuitEnabled
     }
 
     private var persistor: FireButtonPreferencesPersistor
@@ -53,11 +61,15 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
 
 protocol FireButtonPreferencesPersistor {
     var loginDetectionEnabled: Bool { get set }
+    var burnDataOnQuitEnabled: Bool { get set }
 }
 
 struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersistor {
 
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: false)
     var loginDetectionEnabled: Bool
+
+    @UserDefaultsWrapper(key: .burnDataOnQuitEnabled, defaultValue: false)
+    var burnDataOnQuitEnabled: Bool
 
 }
