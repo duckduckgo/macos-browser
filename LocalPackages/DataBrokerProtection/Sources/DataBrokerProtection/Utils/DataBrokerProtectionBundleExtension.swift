@@ -23,7 +23,7 @@ extension UserDefaults {
 }
 
 extension Bundle {
-    
+
     var dbpAppGroup: String {
         guard let appGroup = object(forInfoDictionaryKey: Bundle.dbpAppGroupName) as? String else {
             fatalError("Info.plist is missing \(appGroupName)")
