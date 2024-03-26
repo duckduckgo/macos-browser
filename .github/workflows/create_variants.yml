@@ -68,7 +68,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         
-      - name: Add a comment to the release task
+      - name: Fetch Build Variants
         id: get-build-variants
         uses: ./.github/actions/asana-get-build-variants-list
         with:
