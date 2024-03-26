@@ -18,10 +18,6 @@ inputs:
     description: "GitHub Token"
     required: true
     type: string
-  atb-variants:
-    description: "A list of ATB variants (comma-separated). Used when running the workflow manually."
-    required: false
-    type: string
 outputs:
   build-variants:
     description: "The list of build variants to create"
@@ -36,6 +32,5 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
         ORIGIN_ASANA_SECTION_ID: ${{ inputs.origin-asana-section-id }}
         ATB_ASANA_TASK_ID: ${{ inputs.atb-asana-task-id }}
-        ATB_VARIANT_LIST: ${{ inputs.atb-variants }}
       run: |
         ${{ github.action_path }}/get_build_variants_task.sh

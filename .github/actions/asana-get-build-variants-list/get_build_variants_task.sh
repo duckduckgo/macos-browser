@@ -77,10 +77,8 @@ _create_atb_variant_pairs() {
 
 # Fetches all the ATB variants defined in the ATB_ASANA_TASK_ID at the Variants list (comma separated) section.
 _fetch_atb_variants() { 
-    local atb_variants="${ATB_VARIANT_LIST}"
-    # if we call the workflow manually from GitHub `Run Workflow` use that input. Otherwise fetch it.
-    if [[ -z "${atb_variants}" ]]; then
       local url="${asana_api_url}/tasks/${ATB_ASANA_TASK_ID}?opt_fields=notes"
+      local atb_variants
 
       # fetches the items
       # read the response raw
@@ -91,7 +89,6 @@ _fetch_atb_variants() {
       | jq -r .data.notes \
       | grep -A1 '^Variants list' \
       | tail -1)"
-    fi
 
     variants_list=("$(_create_atb_variant_pairs "$atb_variants")")
 

@@ -2,11 +2,7 @@ name: Create DMG Variants
 
 on:
   workflow_dispatch:
-    inputs:
-      atb-variants:
-        description: "ATB variants (comma-separated)"
-        required: true
-        type: string
+
   workflow_call:
     secrets:
       BUILD_CERTIFICATE_BASE64:
@@ -78,7 +74,6 @@ jobs:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           atb-asana-task-id: ${{ vars.DMG_VARIANTS_LIST_TASK_ID }}
           origin-asana-section-id: ${{ vars.DMG_VARIANTS_ORIGIN_SECTION_ID }}
-          atb-variants: ${{ github.event.inputs.atb-variants }} #Only used when running the workflow manually.
           
   
   create-variants:
