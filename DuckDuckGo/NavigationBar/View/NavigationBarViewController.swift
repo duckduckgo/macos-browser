@@ -327,7 +327,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         #if SUBSCRIPTION
-        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             let accountManager = AccountManager()
             let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
 
@@ -1094,6 +1094,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 #if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+        Pixel.fire(.privacyProOfferScreenImpression)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {

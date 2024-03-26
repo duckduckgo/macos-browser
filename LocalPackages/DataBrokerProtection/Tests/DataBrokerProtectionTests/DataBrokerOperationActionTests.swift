@@ -174,13 +174,14 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            clickAwaitTime: 0,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
 
         await sut.success(actionId: "1", actionType: .click)
 
-        XCTAssertTrue(webViewHandler.wasWaitForWebViewLoadCalled)
+        XCTAssertFalse(webViewHandler.wasWaitForWebViewLoadCalled)
         XCTAssertTrue(webViewHandler.wasFinishCalled)
     }
 
@@ -408,5 +409,45 @@ final class DataBrokerOperationActionTests: XCTestCase {
         await sut.runNextAction(fillFormAction)
 
         XCTAssertEqual(mockStageCalculator.stage, .fillForm)
+    }
+
+    func testWhenLoadUrlOnSpokeo_thenSetCookiesIsCalled() async {
+        let mockCookieHandler = MockCookieHandler()
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(url: "spokeo.com"),
+            emailService: emailService,
+            captchaService: captchaService,
+            cookieHandler: mockCookieHandler,
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
+        )
+
+        mockCookieHandler.cookiesToReturn = [.init()]
+        sut.webViewHandler = webViewHandler
+        await sut.loadURL(url: URL(string: "www.test.com")!)
+
+        XCTAssertTrue(webViewHandler.wasSetCookiesCalled)
+    }
+
+    func testWhenLoadUrlOnOtherBroker_thenSetCookiesIsNotCalled() async {
+        let mockCookieHandler = MockCookieHandler()
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(url: "verecor.com"),
+            emailService: emailService,
+            captchaService: captchaService,
+            cookieHandler: mockCookieHandler,
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
+        )
+
+        mockCookieHandler.cookiesToReturn = [.init()]
+        sut.webViewHandler = webViewHandler
+        await sut.loadURL(url: URL(string: "www.test.com")!)
+
+        XCTAssertFalse(webViewHandler.wasSetCookiesCalled)
     }
 }
