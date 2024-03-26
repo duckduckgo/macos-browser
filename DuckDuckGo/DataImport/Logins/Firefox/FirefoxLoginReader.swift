@@ -29,6 +29,7 @@ final class FirefoxLoginReader {
             case couldNotDetermineFormat = -2
 
             case couldNotFindLoginsFile = 0
+            case couldNotFindKeyDB
             case couldNotReadLoginsFile
 
             case key3readerStage1
@@ -49,7 +50,7 @@ final class FirefoxLoginReader {
 
         var errorType: DataImport.ErrorType {
             switch type {
-            case .couldNotFindLoginsFile, .couldNotReadLoginsFile: .noData
+            case .couldNotFindLoginsFile, .couldNotFindKeyDB, .couldNotReadLoginsFile: .noData
             case .key3readerStage1, .key3readerStage2, .key3readerStage3, .key4readerStage1, .key4readerStage2, .key4readerStage3, .decryptUsername, .decryptPassword: .decryptionError
             case .couldNotDetermineFormat: .dataCorrupted
             case .requiresPrimaryPassword: .other
@@ -136,12 +137,15 @@ final class FirefoxLoginReader {
             let databaseURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.databaseName)
             let loginsURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginsFileName)
 
-            if FileManager.default.fileExists(atPath: databaseURL.path) {
-                guard FileManager.default.fileExists(atPath: loginsURL.path) else {
-                    throw ImportError(type: .couldNotFindLoginsFile, underlyingError: nil)
-                }
-                return potentialFormat
+            guard FileManager.default.fileExists(atPath: databaseURL.path) else {
+                throw ImportError(type: .couldNotFindKeyDB, underlyingError: nil)
             }
+
+            guard FileManager.default.fileExists(atPath: loginsURL.path) else {
+                throw ImportError(type: .couldNotFindLoginsFile, underlyingError: nil)
+            }
+
+            return potentialFormat
         }
 
         return nil
