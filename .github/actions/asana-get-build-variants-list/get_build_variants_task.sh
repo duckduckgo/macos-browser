@@ -85,6 +85,10 @@ _fetch_atb_variants() {
     local url="${asana_api_url}/tasks/${ATB_ASANA_TASK_ID}?opt_fields=notes"
     local atb_variants
 
+    # fetches the items
+    # read the response raw
+    # select only Variants list section
+    # output last line of the input to get all the list of variants.
     atb_variants="$(curl -fSsL ${url} \
     -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
     | jq -r .data.notes \
@@ -99,15 +103,13 @@ _fetch_atb_variants() {
 main() {
     # fetch ATB variants
     local atb_variants=$(_fetch_atb_variants)
-    # fetch
+    # fetch Origin variants
     local origin_variants=$(_fetch_origin_tasks)
-
-    echo "ATB: "${atb_variants}""
-    echo "ORIGIN: "${origin_variants}""
-
-    local output="${atb_variants},${origin_variants}"
-
-    echo "OUTPUT: "${output}""
+    # merges the two list together. Use `include` keyword for later usage in matrix. 
+    # for more info see https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#example-adding-configurations.
+    local merged_variants="{\"include\": [\"${atb_variants},${origin_variants}\"]}"
+    # write in GitHub output
+    echo "build-variants=${merged_variants}" >> "$GITHUB_OUTPUT"
 }
 
 main 
