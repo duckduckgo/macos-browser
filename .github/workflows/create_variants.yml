@@ -64,6 +64,9 @@ jobs:
     runs-on: macos-13
     timeout-minutes: 15
 
+    outputs:
+      build-variants: ${{ steps.get-build-variants.outputs.build-variants }}
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
