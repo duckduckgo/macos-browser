@@ -90,8 +90,6 @@ jobs:
     steps:
       - name: Parse Matrix
         run: |
-          matrix={\"include\":[{\"variant\":\"ab\"},{\"origin\":\"abc.com\"},{\"origin\":\"abc.com\",\"variant\":\"ab\"}]}
-          echo "MATRIX1: ${{ fromJson(matrix) }}"
           echo "MATRIX2: ${{ fromJson(needs.set-up-variants.outputs.build-variants) }}"
   
   create-variants:
