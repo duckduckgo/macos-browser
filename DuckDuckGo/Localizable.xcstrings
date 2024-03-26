@@ -47718,6 +47718,126 @@
         }
       }
     },
+    "ssl.error.certificate.expired.message" : {
+      "comment" : "Describes an SSL error where a website's security certificate is expired. '%1$@' is a placeholder for the website's domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The security certificate for %1$@ is expired."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to see advanced options on click.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Advanced…"
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.info.body" : {
+      "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "It’s possible that the website is misconfigured or that an attacker has compromised your connection."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.info.title" : {
+      "comment" : "Title of the Advanced info section shown in an error page that warns users of security risks on a website due to SSL issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo warns you when a website has an invalid certificate."
+          }
+        }
+      }
+    },
+    "ssl.error.page.body" : {
+      "comment" : "Error description shown in an error page that warns users of security risks on a website due to SSL issues. %1$@ represent the site domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The certificate for this site is invalid. You might be connecting to a server that is pretending to be %1$@ which could put your confidential information at risk."
+          }
+        }
+      }
+    },
+    "ssl.error.page.header" : {
+      "comment" : "Title shown in an error page that warn users of security risks on a website due to SSL issues",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: This site may be insecure"
+          }
+        }
+      }
+    },
+    "ssl.error.page.leave.site.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to leave the website and navigate to previous page.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Leave This Site"
+          }
+        }
+      }
+    },
+    "ssl.error.page.visit.site.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to visit the website anyway despite the risks.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accept Risk and Visit Site"
+          }
+        }
+      }
+    },
+    "ssl.error.self.signed.message" : {
+      "comment" : "Warns the user that the site's security certificate is self-signed and not trusted. '%1$@' is the site's domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The security certificate for %1$@ is not trusted by your computer's operating system."
+          }
+        }
+      }
+    },
+    "ssl.error.wrong.host.message" : {
+      "comment" : "Explains an SSL error when a site's certificate doesn't match its domain. '%1$@' is the site's domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The security certificate for %1$@ does not match *.%1$@."
+          }
+        }
+      }
+    },
     "Start Speaking" : {
       "comment" : "Main Menu Edit-Speech item",
       "localizations" : {

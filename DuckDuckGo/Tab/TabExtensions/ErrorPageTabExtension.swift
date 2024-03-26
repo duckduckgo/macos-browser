@@ -51,10 +51,9 @@ final class ErrorPageTabExtension {
         }
 
     @MainActor
-    private func loadSSLErrorHTML(errorType: SSLErrorType, url: URL, alternate: Bool) {
-        let urlString = url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
-        let html = SSLErrorPageHTMLTemplate(siteURL: urlString, specificErrorMessage: errorType.message(for: urlString)).makeHTMLFromTemplate()
-
+    private func loadSSLErrorHTML(url: URL, alternate: Bool, errorCode: Int) {
+        let domain: String = url.host ?? url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true)
+        let html = SSLErrorPageHTMLTemplate(domain: domain, errorCode: errorCode).makeHTMLFromTemplate()
         webView?.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         loadHTML(html: html, url: url, alternate: alternate)
     }
@@ -74,26 +73,6 @@ final class ErrorPageTabExtension {
         }
     }
 
-    enum SSLErrorType {
-        case expired
-        case wrongHost
-        case selfSigned
-        case invalid
-
-        func message(for url: String) -> String {
-            switch self {
-            case .expired:
-                return "The security certificate for <b>\(url)</b> is expired."
-            case .wrongHost:
-                return "The security certificate for <b>\(url)</b> does not match <b>*.\(url)</b>."
-            case .selfSigned:
-                return "The security certificate for <b>\(url)</b> is not trusted by your computer's operating system."
-            case .invalid:
-                return "The security certificate for <b>\(url)</b> is not trusted by your computer's operating system."
-            }
-        }
-    }
-
 }
 
 extension ErrorPageTabExtension: NavigationResponder {
@@ -110,18 +89,7 @@ extension ErrorPageTabExtension: NavigationResponder {
             if error.errorCode == NSURLErrorServerCertificateUntrusted,
                let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
                 sslErrorPageUserScript?.failingURL = url
-                var errorType: SSLErrorType = .invalid
-                switch errorCode {
-                case -9814:
-                    errorType = .expired
-                case -9843:
-                    errorType = .wrongHost
-                case -9807:
-                    errorType = .selfSigned
-                default:
-                    errorType = .invalid
-                }
-                loadSSLErrorHTML(errorType: errorType, url: url, alternate: shouldPerformAlternateNavigation)
+                loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation, errorCode: errorCode)
             } else {
                 loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
             }
@@ -143,8 +111,6 @@ extension ErrorPageTabExtension: NavigationResponder {
         shouldBypassSSLError = false
         return .credential(credential)
     }
-
-
 }
 
 extension ErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
@@ -154,7 +120,7 @@ extension ErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
 
     func visitSite() {
         shouldBypassSSLError = true
-        _ = webView?.reload()
+        _ = webView?.reloadPage()
     }
 }
 
@@ -176,7 +142,17 @@ protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL)
     func setDocumentHtml(_ html: String)
     func goBack() -> WKNavigation?
-    func reload() -> WKNavigation?
+    func reloadPage() -> WKNavigation?
+}
+
+extension ErrorPageTabExtensionNavigationDelegate {
+    func reloadPage() -> WKNavigation? {
+        guard let wevView = self as? WKWebView else { return nil }
+        if let item = wevView.backForwardList.currentItem {
+            return wevView.go(to: item)
+        }
+        return nil
+    }
 }
 
 extension WKWebView: ErrorPageTabExtensionNavigationDelegate {}
