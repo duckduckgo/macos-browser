@@ -51,6 +51,8 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private let networkProtectionWaitlist = NetworkProtectionWaitlist()
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let defaults: UserDefaults
+    let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+    let accountManager: AccountManager
 
     var waitlistIsOngoing: Bool {
         isWaitlistEnabled && isWaitlistBetaActive
@@ -68,6 +70,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         self.featureDisabler = featureDisabler
         self.featureOverrides = featureOverrides
         self.defaults = defaults
+        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
     }
 
     /// Calculates whether the VPN is visible.
@@ -92,7 +95,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return isNetworkProtectionVisible()
         }
 
-        switch await AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).hasEntitlement(for: .networkProtection) {
+        switch await accountManager.hasEntitlement(for: .networkProtection) {
         case .success(let hasEntitlement):
             return hasEntitlement
         case .failure(let error):
@@ -110,7 +113,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
 #if SUBSCRIPTION
-        return subscriptionFeatureAvailability.isFeatureAvailable && !AccountManager().isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
+        return subscriptionFeatureAvailability.isFeatureAvailable && !accountManager.isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
