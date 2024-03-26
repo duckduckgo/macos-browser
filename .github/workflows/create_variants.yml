@@ -77,10 +77,25 @@ jobs:
           origin-asana-section-id: ${{ vars.DMG_VARIANTS_ORIGIN_SECTION_ID }}
           atb-variants: ${{ github.event.inputs.atb-variants }} #Only used when running the workflow manually.
 
+  read-matrix:
+    name: Read Matrix
+    needs: set-up-variants 
+
+    runs-on: macos-13
+    timeout-minutes: 15
+
+    steps:
+      - name: Parse Matrix
+        run: |
+          matrix={"include":[{"variant":"ab"},{"origin":"abc.com"},{"origin":"abc.com","variant":"ab"}]}
+          echo "VARIANT1: ${{ needs.set-up-variants.outputs.build-variants }}"
+          echo "VARIANT2: ${{ needs.set-up-variants.outputs.get-build-variants }}"
+  
   create-variants:
 
     name: Create Variant
     needs: set-up-variants
+    if: false
 
     strategy:
       fail-fast: false
