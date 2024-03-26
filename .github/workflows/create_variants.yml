@@ -51,6 +51,9 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY_RELEASE_S3:
         required: true
+  push:
+    branches:
+      - alessandro/installation-attribution-ci
 
 jobs:
 

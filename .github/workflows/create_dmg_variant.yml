@@ -64,9 +64,43 @@ on:
           required: true
 
 jobs:
+
+    test:
+      if: github.ref == 'refs/heads/alessandro/installation-attribution-ci'
+      name: Test Output
+
+      env:
+        ATB_VARIANT_NAME: ${{ inputs.atb-variant || github.event.inputs.atb-variant }}
+        ORIGIN_VARIANT_NAME: ${{ inputs.origin-variant || github.event.inputs.origin-variant }}
+
+      runs-on: macos-12
+      timeout-minutes: 15
+
+      steps:
+
+      - name: Set variant name
+        id: set-variant-name
+        run: |
+          if [ -z "$ORIGIN_VARIANT_NAME" ] && [ -n "$ATB_VARIANT_NAME" ]; then
+            name=$ATB_VARIANT_NAME
+          elif [ -n "$ORIGIN_VARIANT_NAME" ] && [ -z "$ATB_VARIANT_NAME" ]; then
+            name=$ORIGIN_VARIANT_NAME
+          elif [ -n "$ORIGIN_VARIANT_NAME" ] && [ -n "$ATB_VARIANT_NAME" ]; then
+            name="${ORIGIN_VARIANT_NAME}-${ATB_VARIANT_NAME}"
+          else
+            echo "Neither ATB_VARIANT_NAME nor ORIGIN_VARIANT_NAME is set"
+            exit 1
+          fi
+          echo "variant_name=$name" >> $GITHUB_OUTPUT
+
+      - name: Print All
+        run: |
+          echo "ATB: ${{ env.ATB_VARIANT_NAME }}"
+          echo "ORIGIN: ${{ env.ORIGIN_VARIANT_NAME }}"
+          echo "URL: s3://${{ vars.RELEASE_BUCKET_NAME }}/${{ vars.RELEASE_BUCKET_PREFIX }}/${{ steps.set-variant-name.outputs.variant-name }}/duckduckgo.dmg"
   
     create-dmg-variant:
-  
+      if: false
       name: Create DMG Variant
   
       env:
