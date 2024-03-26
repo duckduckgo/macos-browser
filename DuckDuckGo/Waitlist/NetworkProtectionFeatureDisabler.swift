@@ -24,6 +24,7 @@ import NetworkExtension
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import LoginItems
 import SystemExtensions
 
 protocol NetworkProtectionFeatureDisabling {
@@ -31,6 +32,8 @@ protocol NetworkProtectionFeatureDisabling {
     ///
     @discardableResult
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool
+
+    func stop()
 }
 
 final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling {
@@ -66,6 +69,16 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool {
         // To disable NetP we need the login item to be running
         // This should be fine though as we'll disable them further down below
+
+        defer {
+            unpinNetworkProtection()
+            resetUserDefaults()
+        }
+
+        guard LoginItem.vpnMenu.status.isInstalled else {
+            return true
+        }
+
         enableLoginItems()
 
         // Allow some time for the login items to fully launch
@@ -83,15 +96,17 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         // We want to give some time for the login item to reset state before disabling it
         try? await Task.sleep(interval: 0.5)
         disableLoginItems()
-        resetUserDefaults()
 
         if !keepAuthToken {
             try? removeAppAuthToken()
         }
 
-        unpinNetworkProtection()
         notifyVPNUninstalled()
         return true
+    }
+
+    func stop() {
+        ipcClient.stop()
     }
 
     private func enableLoginItems() {
