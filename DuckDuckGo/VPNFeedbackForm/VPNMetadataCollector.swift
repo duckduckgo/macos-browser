@@ -31,7 +31,8 @@ struct VPNMetadata: Encodable {
 
     struct AppInfo: Encodable {
         let appVersion: String
-        let lastVersionRun: String
+        let lastAgentVersionRun: String
+        let lastExtensionVersionRun: String
         let isInternalUser: Bool
         let isInApplicationsDirectory: Bool
     }
@@ -114,8 +115,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     private let statusReporter: NetworkProtectionStatusReporter
 
     init() {
-        let machServiceName = Bundle.main.vpnMenuAgentBundleId
-        let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+        let ipcClient = TunnelControllerIPCClient()
         ipcClient.register()
 
         self.statusReporter = DefaultNetworkProtectionStatusReporter(
@@ -154,13 +154,14 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     private func collectAppInfoMetadata() -> VPNMetadata.AppInfo {
         let appVersion = AppVersion.shared.versionAndBuildNumber
-        let versionStore = NetworkProtectionLastVersionRunStore()
+        let versionStore = NetworkProtectionLastVersionRunStore(userDefaults: .netP)
         let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
         let isInApplicationsDirectory = Bundle.main.isInApplicationsDirectory
 
         return .init(
             appVersion: appVersion,
-            lastVersionRun: versionStore.lastVersionRun ?? "Unknown",
+            lastAgentVersionRun: versionStore.lastAgentVersionRun ?? "none",
+            lastExtensionVersionRun: versionStore.lastExtensionVersionRun ?? "none",
             isInternalUser: isInternalUser,
             isInApplicationsDirectory: isInApplicationsDirectory
         )
@@ -236,7 +237,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
         let connectionState = String(describing: statusReporter.statusObserver.recentValue)
         let lastErrorMessage = statusReporter.connectionErrorObserver.recentValue ?? "none"
-        let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation ?? "none"
+        let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation ?? "none"
         let connectedServerIP = statusReporter.serverInfoObserver.recentValue.serverAddress ?? "none"
         return .init(onboardingState: onboardingState,
                      connectionState: connectionState,
@@ -283,27 +284,6 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         )
     }
 
-}
-
-extension Network.NWPath {
-    /// A description that's safe from a privacy standpoint.
-    ///
-    /// Ref: https://app.asana.com/0/0/1206712493935053/1206712516729780/f
-    ///
-    var anonymousDescription: String {
-        var description = "NWPath("
-
-        description += "status: \(status), "
-
-        if case .unsatisfied = status {
-            description += "unsatisfiedReason: \(unsatisfiedReason), "
-        }
-
-        description += "availableInterfaces: \(availableInterfaces)"
-        description += ")"
-
-        return description
-    }
 }
 
 #endif

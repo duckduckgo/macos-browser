@@ -25,15 +25,26 @@ import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
 import LoginItems
+import PixelKit
+
+#if SUBSCRIPTION
+import Subscription
+#endif
 
 protocol NetworkProtectionFeatureVisibility {
+    var isEligibleForThankYouMessage: Bool { get }
+
+    func isFeatureEnabled() async throws -> Bool
     func isNetworkProtectionVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
-    func disableForAllUsers()
+    func disableForAllUsers() async
     func disableForWaitlistUsers()
+    @discardableResult
+    func disableIfUserHasNoAccess() async -> Bool
 }
 
 struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
+    private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let featureDisabler: NetworkProtectionFeatureDisabling
     private let featureOverrides: WaitlistBetaOverriding
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
@@ -70,15 +81,40 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         return isEasterEggUser || waitlistIsOngoing
     }
 
+    var isInstalled: Bool {
+        LoginItem.vpnMenu.status.isInstalled && isOnboarded
+    }
+
+    /// Replaces `isNetworkProtectionVisible` to add subscriptions support
+    ///
+    func isFeatureEnabled() async throws -> Bool {
+        guard subscriptionFeatureAvailability.isFeatureAvailable else {
+            return isNetworkProtectionVisible()
+        }
+
+        switch await AccountManager().hasEntitlement(for: .networkProtection) {
+        case .success(let hasEntitlement):
+            return hasEntitlement
+        case .failure(let error):
+            throw error
+        }
+    }
+
+    /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
+    ///
+    var subscriptionFeatureAvailability: DefaultSubscriptionFeatureAvailability {
+        DefaultSubscriptionFeatureAvailability()
+    }
+
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
 #if SUBSCRIPTION
-        return defaults.networkProtectionEntitlementsExpired && LoginItem.vpnMenu.status.isInstalled
+        return subscriptionFeatureAvailability.isFeatureAvailable && !AccountManager().isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
-        let isOnboarded = UserDefaults.netP.networkProtectionOnboardingStatus != .default
+        let isOnboarded = defaults.networkProtectionOnboardingStatus != .default
 
         return isNotEasterEggUser && waitlistAccessEnded && isOnboarded
 #endif
@@ -145,10 +181,23 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         }
     }
 
-    func disableForAllUsers() {
-        Task {
-            await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+    func disableForAllUsers() async {
+        await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
+    }
+
+    /// Disables the VPN for legacy users, if necessary.
+    ///
+    /// This method does not seek to remove tokens or uninstall anything.
+    ///
+    private func disableVPNForLegacyUsersIfSubscriptionAvailable() async -> Bool {
+        guard isEligibleForThankYouMessage && !defaults.vpnLegacyUserAccessDisabledOnce else {
+            return false
         }
+
+        PixelKit.fire(VPNPrivacyProPixel.vpnBetaStoppedWhenPrivacyProEnabled, frequency: .dailyAndContinuous)
+        defaults.vpnLegacyUserAccessDisabledOnce = true
+        await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
+        return true
     }
 
     func disableForWaitlistUsers() {
@@ -159,6 +208,36 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         Task {
             await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
         }
+    }
+
+    /// A method meant to be called safely from different places to disable the VPN if the user isn't meant to have access to it.
+    ///
+    @discardableResult
+    func disableIfUserHasNoAccess() async -> Bool {
+        if shouldUninstallAutomatically() {
+            await disableForAllUsers()
+            return true
+        }
+
+        return await disableVPNForLegacyUsersIfSubscriptionAvailable()
+    }
+
+    // MARK: - Subscription Start Support
+
+    /// To query whether we're a legacy (waitlist or easter egg) user.
+    ///
+    private func isPreSubscriptionUser() -> Bool {
+        guard let token = try? NetworkProtectionKeychainTokenStore(isSubscriptionEnabled: false).fetchToken() else {
+            return false
+        }
+
+        return !token.hasPrefix(Self.subscriptionAuthTokenPrefix)
+    }
+
+    /// Checks whether the VPN needs to be disabled.
+    ///
+    var isEligibleForThankYouMessage: Bool {
+        isPreSubscriptionUser() && subscriptionFeatureAvailability.isFeatureAvailable
     }
 }
 

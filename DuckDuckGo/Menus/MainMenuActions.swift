@@ -22,6 +22,8 @@ import Common
 import WebKit
 import Configuration
 import History
+import PixelKit
+import Subscription
 
 // Actions are sent to objects of responder chain
 
@@ -716,6 +718,21 @@ extension MainViewController {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
+
+        clearPrivacyProState()
+    }
+
+    /// Clears the PrivacyPro state to make testing easier.
+    ///
+    private func clearPrivacyProState() {
+        AccountManager().signOut()
+        resetThankYouModalChecks(nil)
+        UserDefaults.netP.networkProtectionEntitlementsExpired = false
+
+        // Clear pixel data
+        DailyPixel.clearLastFireDate(pixel: .privacyProFeatureEnabled)
+        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouDBP)
+        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouVPN)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
@@ -782,6 +799,7 @@ extension MainViewController {
     @objc func resetThankYouModalChecks(_ sender: Any?) {
         let presenter = WaitlistThankYouPromptPresenter()
         presenter.resetPromptCheck()
+        UserDefaults.netP.removeObject(forKey: UserDefaults.vpnLegacyUserAccessDisabledOnceKey)
     }
 
     @objc func showVPNThankYouModal(_ sender: Any?) {

@@ -20,6 +20,7 @@
 
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import Common
 
 #if SUBSCRIPTION
@@ -37,7 +38,7 @@ extension NetworkProtectionDeviceManager {
                                               tokenStore: tokenStore,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents,
-                                              isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable)
+                                              isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
     }
 }
 
@@ -47,12 +48,16 @@ extension NetworkProtectionCodeRedemptionCoordinator {
         self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable)
+                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
     }
 }
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
+        self.init(isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
+    }
+
+    convenience init(isSubscriptionEnabled: Bool) {
 #if SUBSCRIPTION
         let accessTokenProvider: () -> String? = { AccountManager().accessToken }
 #else
@@ -60,7 +65,7 @@ extension NetworkProtectionKeychainTokenStore {
 #endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable,
+                  isSubscriptionEnabled: isSubscriptionEnabled,
                   accessTokenProvider: accessTokenProvider)
     }
 }
@@ -79,8 +84,15 @@ extension NetworkProtectionLocationListCompositeRepository {
             environment: settings.selectedEnvironment,
             tokenStore: NetworkProtectionKeychainTokenStore(),
             errorEvents: .networkProtectionAppDebugEvents,
-            isSubscriptionEnabled: NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
+            isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable
         )
+    }
+}
+
+extension TunnelControllerIPCClient {
+
+    convenience init() {
+        self.init(machServiceName: Bundle.main.vpnMenuAgentBundleId)
     }
 }
 

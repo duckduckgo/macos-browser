@@ -4739,6 +4739,78 @@
         }
       }
     },
+    "prefrences.sync.invalid-bookmarks-present-description-many" : {
+      "comment" : "Alert message for multiple invalid bookmark being filtered out of synced data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
+          }
+        }
+      }
+    },
+    "prefrences.sync.invalid-bookmarks-present-description-one" : {
+      "comment" : "Alert message for 1 invalid bookmark being filtered out of synced data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        }
+      }
+    },
+    "prefrences.sync.invalid-bookmarks-present-title" : {
+      "comment" : "Alert title for invalid bookmarks being filtered out of synced data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
+          }
+        }
+      }
+    },
+    "prefrences.sync.invalid-credentials-present-description-many" : {
+      "comment" : "Alert message for multiple invalid logins being filtered out of synced data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
+          }
+        }
+      }
+    },
+    "prefrences.sync.invalid-credentials-present-description-one" : {
+      "comment" : "Alert message for 1 invalid login being filtered out of synced data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        }
+      }
+    },
+    "prefrences.sync.invalid-credentials-present-title" : {
+      "comment" : "Alert title for invalid logins being filtered out of synced data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some logins are not syncing due to excessively long content in certain fields."
+          }
+        }
+      }
+    },
     "prefrences.sync.keep-favicons-updated" : {
       "comment" : "Title of the confirmation button for favicons fetching",
       "extractionState" : "extracted_with_value",

@@ -59,6 +59,12 @@ final class LoginItemsManager {
         }
     }
 
+    func isAnyEnabled(_ items: Set<LoginItem>) -> Bool {
+        return items.contains(where: { item in
+            item.status == .enabled
+        })
+    }
+
     private func handleError(for item: LoginItem, action: Action, error: NSError) {
         let event = Pixel.Event.Debug.loginItemUpdateError(
             loginItemBundleID: item.agentBundleID,

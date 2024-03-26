@@ -69,6 +69,34 @@ public struct DefaultActionButtonStyle: ButtonStyle {
     }
 }
 
+public struct TransparentActionButtonStyle: ButtonStyle {
+
+    public let enabled: Bool
+
+    public init(enabled: Bool) {
+        self.enabled = enabled
+    }
+
+    public func makeBody(configuration: Self.Configuration) -> some View {
+
+        let enabledForegroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
+        let disabledForegroundColor = Color.gray.opacity(0.1)
+
+        configuration.label
+            .font(.system(size: 13))
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
+            .padding(.top, 2.5)
+            .padding(.bottom, 3)
+            .padding(.horizontal, 0)
+            .background(Color.clear)
+            .foregroundColor(enabled ? enabledForegroundColor : disabledForegroundColor)
+            .cornerRadius(5)
+
+    }
+}
+
 public struct DismissActionButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) var colorScheme
 
