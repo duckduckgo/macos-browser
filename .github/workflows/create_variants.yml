@@ -84,7 +84,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.get-build-variants.outputs.build-variants) }}
+      matrix: ${{ fromJSON(needs.set-up-variants.outputs.build-variants) }}
     uses: ./.github/workflows/create_dmg_variant.yml
     with:
       atb-variant: ${{ matrix.variant }}
