@@ -105,7 +105,7 @@ main() {
     local origin_variants=$(_fetch_origin_tasks)
     # merges the two list together. Use `include` keyword for later usage in matrix. 
     # for more info see https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#example-adding-configurations.
-    local merged_variants="{\"include\": [\"${atb_variants},${origin_variants}\"]}"
+    local merged_variants="{\"include\": [${atb_variants},${origin_variants}]}"
     # write in GitHub output
     echo "build-variants=${merged_variants}" >> "$GITHUB_OUTPUT"
 }
