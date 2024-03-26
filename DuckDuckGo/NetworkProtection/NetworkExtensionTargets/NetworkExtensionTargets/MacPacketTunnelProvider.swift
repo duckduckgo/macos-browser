@@ -68,10 +68,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionClientFailedToParseServerListResponse
             case .failedToEncodeRegisterKeyRequest:
                 domainEvent = .networkProtectionClientFailedToEncodeRegisterKeyRequest
-            case .noResponseFromRegisterEndpoint:
-                return
-            case .unexpectedStatusFromRegisterEndpoint:
-                return
             case .failedToFetchRegisteredServers(let eventError):
                 domainEvent = .networkProtectionClientFailedToFetchRegisteredServers(eventError)
             case .failedToParseRegisteredServersResponse:
@@ -80,10 +76,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionClientFailedToEncodeRedeemRequest
             case .invalidInviteCode:
                 domainEvent = .networkProtectionClientInvalidInviteCode
-            case .noResponseFromRedeemEndpoint:
-                return
-            case .unexpectedStatusFromRedeemEndpoint:
-                return
             case .failedToRedeemInviteCode(let error):
                 domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error)
             case .failedToParseRedeemResponse(let error):
