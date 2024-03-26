@@ -50,10 +50,10 @@ _fetch_origin_tasks() {
         # set new URL to next page URL
         url="$(jq -r .next_page.uri <<< "$response")"
 
-		# break on last page
-		if [[ "$url" == "null" ]]; then
-			break
-		fi
+	    # break on last page
+	    if [[ "$url" == "null" ]]; then
+		    break
+	    fi
     done
 
     echo "${origin_variants}"
@@ -69,26 +69,26 @@ _create_atb_variant_pairs() {
     # replace the new line with a comma
     # remove the trailing comma at the end of the line.
     jq -R -c 'split(",") 
-    | map({variant: .}) 
-    | .[]' <<< "$response" \
-    | tr '\n' ',' \
-    | sed 's/,$//'
+        | map({variant: .}) 
+        | .[]' <<< "$response" \
+        | tr '\n' ',' \
+        | sed 's/,$//'
 }
 
 # Fetches all the ATB variants defined in the ATB_ASANA_TASK_ID at the Variants list (comma separated) section.
 _fetch_atb_variants() { 
-      local url="${asana_api_url}/tasks/${ATB_ASANA_TASK_ID}?opt_fields=notes"
-      local atb_variants
+    local url="${asana_api_url}/tasks/${ATB_ASANA_TASK_ID}?opt_fields=notes"
+    local atb_variants
 
-      # fetches the items
-      # read the response raw
-      # select only Variants list section
-      # output last line of the input to get all the list of variants.
-      atb_variants="$(curl -fSsL ${url} \
-      -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-      | jq -r .data.notes \
-      | grep -A1 '^Variants list' \
-      | tail -1)"
+    # fetches the items
+    # read the response raw
+    # select only Variants list section
+    # output last line of the input to get all the list of variants.
+    atb_variants="$(curl -fSsL ${url} \
+        -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+        | jq -r .data.notes \
+        | grep -A1 '^Variants list' \
+        | tail -1)"
 
     variants_list=("$(_create_atb_variant_pairs "$atb_variants")")
 
