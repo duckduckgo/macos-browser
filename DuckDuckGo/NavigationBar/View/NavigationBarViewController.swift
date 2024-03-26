@@ -320,7 +320,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func toggleNetworkProtectionPopover() {
         let featureVisibility = DefaultNetworkProtectionVisibility()
-        guard featureVisibility.isNetworkProtectionVisible() else {
+        guard featureVisibility.isNetworkProtectionBetaVisible() else {
             featureVisibility.disableForWaitlistUsers()
             LocalPinningManager.shared.unpin(.networkProtection)
             return
@@ -945,7 +945,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 #if NETWORK_PROTECTION
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && DefaultNetworkProtectionVisibility().isInstalled {
+        if !isPopUpWindow && DefaultNetworkProtectionVisibility().isVPNVisible() {
             let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
@@ -980,7 +980,7 @@ extension NavigationBarViewController: NSMenuDelegate {
     func showNetworkProtectionStatus() {
         let featureVisibility = DefaultNetworkProtectionVisibility()
 
-        if featureVisibility.isNetworkProtectionVisible() {
+        if featureVisibility.isNetworkProtectionBetaVisible() {
             popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
                                                   withDelegate: networkProtectionButtonModel)
         } else {

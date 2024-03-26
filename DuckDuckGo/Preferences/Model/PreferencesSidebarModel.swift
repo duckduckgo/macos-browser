@@ -111,10 +111,6 @@ final class PreferencesSidebarModel: ObservableObject {
             .sink { [weak self] _ in
                 guard let self else { return }
 
-                if !DefaultNetworkProtectionVisibility().isInstalled && self.selectedPane == .vpn {
-                    self.selectedPane = .general
-                }
-
                 self.refreshSections()
             }
             .store(in: &cancellables)

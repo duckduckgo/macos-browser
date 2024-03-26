@@ -550,15 +550,11 @@ import SubscriptionUI
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
 #if NETWORK_PROTECTION
-            do {
-                if try await DefaultNetworkProtectionVisibility().isFeatureEnabled() {
-                    toggleNetworkProtectionShortcutMenuItem.isHidden = false
-                    toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
-                } else {
-                    toggleNetworkProtectionShortcutMenuItem.isHidden = true
-                }
-            } catch {
-                // Don't change the visibility if the call errors out
+            if await DefaultNetworkProtectionVisibility().isVPNVisible() {
+                toggleNetworkProtectionShortcutMenuItem.isHidden = false
+                toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
+            } else {
+                toggleNetworkProtectionShortcutMenuItem.isHidden = true
             }
 #endif
         }

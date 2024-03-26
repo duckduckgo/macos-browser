@@ -62,24 +62,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         self.ipcClient = ipcClient
     }
 
-    private var isSystemExtensionInstalled: Bool {
-#if NETP_SYSTEM_EXTENSION
-        userDefaults.networkProtectionOnboardingStatus != .isOnboarding(step: .userNeedsToAllowExtension)
-#else
-        return false
-#endif
-    }
-
-    private var isVPNConfigurationInstalled: Bool {
-        userDefaults.networkProtectionOnboardingStatus == .completed
-    }
-
     @MainActor
     private func canUninstall(includingSystemExtension: Bool) -> Bool {
-        !isDisabling
-        && LoginItem.vpnMenu.status.isInstalled
-        && ((includingSystemExtension && isSystemExtensionInstalled)
-            || isVPNConfigurationInstalled)
+        !isDisabling && LoginItem.vpnMenu.status.isInstalled
     }
 
     /// This method disables the VPN and clear all of its state.
@@ -93,17 +78,17 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool {
         // To disable NetP we need the login item to be running
         // This should be fine though as we'll disable them further down below
+        guard canUninstall(includingSystemExtension: uninstallSystemExtension) else {
+            return true
+        }
+
+        isDisabling = true
 
         defer {
             unpinNetworkProtection()
             resetUserDefaults(uninstallSystemExtension: uninstallSystemExtension)
         }
 
-        guard canUninstall(includingSystemExtension: uninstallSystemExtension) else {
-            return true
-        }
-
-        isDisabling = true
         enableLoginItems()
 
         // Allow some time for the login items to fully launch

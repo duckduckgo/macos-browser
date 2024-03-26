@@ -341,7 +341,7 @@ final class MoreOptionsMenu: NSMenu {
 #endif
 
 #if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
+        if networkProtectionFeatureVisibility.isNetworkProtectionBetaVisible() {
             let networkProtectionItem: NSMenuItem
 
             networkProtectionItem = makeNetworkProtectionItem()
