@@ -42,6 +42,12 @@ struct DebugScanReturnValue {
     }
 }
 
+struct EmptyCookieHandler: CookieHandler {
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
+        return nil
+    }
+}
+
 final class DebugScanOperation: DataBrokerOperation {
     typealias ReturnValue = DebugScanReturnValue
     typealias InputValue = Void
@@ -60,6 +66,8 @@ final class DebugScanOperation: DataBrokerOperation {
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
     var scanURL: String?
+    let clickAwaitTime: TimeInterval
+    let cookieHandler: CookieHandler
 
     private let fileManager = FileManager.default
     private let debugScanContentPath: String?
@@ -70,6 +78,7 @@ final class DebugScanOperation: DataBrokerOperation {
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
          operationAwaitTime: TimeInterval = 3,
+         clickAwaitTime: TimeInterval = 0,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -79,11 +88,13 @@ final class DebugScanOperation: DataBrokerOperation {
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
         self.shouldRunNextStep = shouldRunNextStep
+        self.clickAwaitTime = clickAwaitTime
         if let desktopPath = fileManager.urls(for: .desktopDirectory, in: .userDomainMask).first?.relativePath {
             self.debugScanContentPath = desktopPath + "/PIR-Debug"
         } else {
             self.debugScanContentPath = nil
         }
+        self.cookieHandler = EmptyCookieHandler()
     }
 
     func run(inputValue: Void,

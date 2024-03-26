@@ -62,8 +62,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     lazy var statePublisher: AnyPublisher<PreferencesSubscriptionState, Never> = {
-        let isSubscriptionActivePublisher = $subscriptionStatus.map {
-            $0 != .expired && $0 != .inactive
+        let isSubscriptionActivePublisher: AnyPublisher<Bool?, Never> = $subscriptionStatus.map {
+            guard let status = $0 else { return nil}
+            return status != .expired && status != .inactive
         }.eraseToAnyPublisher()
 
         let hasAnyEntitlementPublisher = Publishers.CombineLatest3($hasAccessToVPN, $hasAccessToDBP, $hasAccessToITR).map {
@@ -74,9 +75,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             .map { isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement in
                 switch (isUserAuthenticated, isSubscriptionActive, hasAnyEntitlement) {
                 case (false, _, _): return PreferencesSubscriptionState.noSubscription
-                case (true, false, _): return PreferencesSubscriptionState.subscriptionExpired
-                case (true, true, false): return PreferencesSubscriptionState.subscriptionPendingActivation
-                case (true, true, true): return PreferencesSubscriptionState.subscriptionActive
+                case (true, .some(false), _): return PreferencesSubscriptionState.subscriptionExpired
+                case (true, nil, _): return PreferencesSubscriptionState.subscriptionPendingActivation
+                case (true, .some(true), false): return PreferencesSubscriptionState.subscriptionPendingActivation
+                case (true, .some(true), true): return PreferencesSubscriptionState.subscriptionActive
                 }
             }
             .removeDuplicates()
