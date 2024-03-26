@@ -126,7 +126,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
             case .vpnAccessRevoked:
-                // todo
                 return
             }
 
