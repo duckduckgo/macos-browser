@@ -84,18 +84,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionClientInvalidAuthToken
             case .serverListInconsistency:
                 return
-            case .failedToEncodeServerList:
-                domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
-            case .failedToDecodeServerList:
-                domainEvent = .networkProtectionServerListStoreFailedToDecodeServerList
-            case .failedToWriteServerList(let eventError):
-                domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(eventError)
-            case .noServerListFound:
-                return
-            case .couldNotCreateServerListDirectory:
-                return
-            case .failedToReadServerList(let eventError):
-                domainEvent = .networkProtectionServerListStoreFailedToReadServerList(eventError)
             case .failedToCastKeychainValueToData(let field):
                 domainEvent = .networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: field)
             case .keychainReadError(let field, let status):
