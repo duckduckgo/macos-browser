@@ -77,7 +77,7 @@ jobs:
   create-variants:
 
     name: Create Variant
-    needs: get-build-variants
+    needs: set-up-variants
 
     strategy:
       fail-fast: false
