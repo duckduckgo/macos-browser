@@ -36,7 +36,7 @@ protocol NetworkProtectionFeatureVisibility {
 
     func isFeatureEnabled() async throws -> Bool
     func isNetworkProtectionVisible() -> Bool
-    func shouldUninstallAutomatically() async -> Bool
+    func shouldUninstallAutomatically() -> Bool
     func disableForAllUsers() async
     func disableForWaitlistUsers()
     @discardableResult
@@ -108,21 +108,9 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
-    func shouldUninstallAutomatically() async -> Bool {
+    func shouldUninstallAutomatically() -> Bool {
 #if SUBSCRIPTION
-        guard defaults.networkProtectionOnboardingStatus == .completed,
-              subscriptionFeatureAvailability.isFeatureAvailable,
-              LoginItem.vpnMenu.status.isInstalled else {
-            return false
-        }
-
-        switch await AccountManager().hasEntitlement(for: .networkProtection) {
-        case .success(let hasEntitlements):
-            return !hasEntitlements
-        case .failure:
-            // We can't uninstall if we don't know whether the user has entitlements
-            return false
-        }
+        return subscriptionFeatureAvailability.isFeatureAvailable && !AccountManager().isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
@@ -226,7 +214,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     @discardableResult
     func disableIfUserHasNoAccess() async -> Bool {
-        if await shouldUninstallAutomatically() {
+        if shouldUninstallAutomatically() {
             await disableForAllUsers()
             return true
         }
