@@ -57,11 +57,14 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
+    @Published var showLocationSection: Bool
+    @Published var showGeneralSection: Bool
+    @Published var showNotificationsSection: Bool
     @Published var showUninstallVPN: Bool
 
     private var onboardingStatus: OnboardingStatus {
         didSet {
-            showUninstallVPN = onboardingStatus != .default
+            showUninstallVPN = DefaultNetworkProtectionVisibility().isInstalled
         }
     }
 
@@ -69,6 +72,7 @@ final class VPNPreferencesModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     init(settings: VPNSettings = .init(defaults: .netP),
+         featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
          defaults: UserDefaults = .netP) {
         self.settings = settings
 
@@ -76,7 +80,8 @@ final class VPNPreferencesModel: ObservableObject {
         excludeLocalNetworks = settings.excludeLocalNetworks
         notifyStatusChanges = settings.notifyStatusChanges
         showInMenuBar = settings.showInMenuBar
-        showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
+        showLocationSection = featureVisibility.is
+        showUninstallVPN = featureVisibility.isInstalled
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 

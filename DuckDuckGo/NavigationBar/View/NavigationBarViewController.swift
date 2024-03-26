@@ -405,7 +405,7 @@ final class NavigationBarViewController: NSViewController {
                     self.updateHomeButton()
 #if NETWORK_PROTECTION
                 case .networkProtection:
-                    networkProtectionButtonModel.updateVisibility()
+                    self.networkProtectionButtonModel.updateVisibility()
 #endif
                 }
             } else {
@@ -945,7 +945,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 #if NETWORK_PROTECTION
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && networkProtectionFeatureActivation.isFeatureActivated {
+        if !isPopUpWindow && DefaultNetworkProtectionVisibility().isInstalled {
             let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }

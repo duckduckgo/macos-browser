@@ -33,6 +33,7 @@ import Subscription
 
 protocol NetworkProtectionFeatureVisibility {
     var isEligibleForThankYouMessage: Bool { get }
+    var isInstalled: Bool { get }
 
     func isFeatureEnabled() async throws -> Bool
     func isNetworkProtectionVisible() -> Bool
@@ -82,7 +83,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     }
 
     var isInstalled: Bool {
-        LoginItem.vpnMenu.status.isInstalled && isOnboarded
+        LoginItem.vpnMenu.status.isInstalled
     }
 
     /// Replaces `isNetworkProtectionVisible` to add subscriptions support

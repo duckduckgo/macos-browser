@@ -544,18 +544,24 @@ import SubscriptionUI
     }
 
     private func updateShortcutMenuItems() {
-        toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
-        toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
-        toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
+        Task { @MainActor in
+            toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
+            toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
+            toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
 #if NETWORK_PROTECTION
-        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            toggleNetworkProtectionShortcutMenuItem.isHidden = false
-            toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
-        } else {
-            toggleNetworkProtectionShortcutMenuItem.isHidden = true
-        }
+            do {
+                if try await DefaultNetworkProtectionVisibility().isFeatureEnabled() {
+                    toggleNetworkProtectionShortcutMenuItem.isHidden = false
+                    toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
+                } else {
+                    toggleNetworkProtectionShortcutMenuItem.isHidden = true
+                }
+            } catch {
+                // Don't change the visibility if the call errors out
+            }
 #endif
+        }
     }
 
     // MARK: - Debug
