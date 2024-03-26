@@ -46,7 +46,7 @@ class AutocompleteTests: XCTestCase {
         resetAndArrangeBookmarksAndHistory() // Manually reset to a clean state
     }
 
-    func test_typingTitleOfBookmarkedPageShowsItInSuggestionsAsBookmark() throws {
+    func test_suggestions_showsTypedTitleOfBookmarkedPageAsBookmark() throws {
         app.typeText(siteTitleForBookmarkedSite)
         XCTAssertTrue(
             suggestionsTableView.waitForExistence(timeout: elementExistenceTimeout),
@@ -73,7 +73,7 @@ class AutocompleteTests: XCTestCase {
         )
     }
 
-    func test_typingTitleOfHistoryPageShowsItInSuggestionsAsHistory() throws {
+    func test_suggestions_showsTypedTitleOfHistoryPageAsHistory() throws {
         app.typeText(siteTitleForHistorySite)
         XCTAssertTrue(
             suggestionsTableView.waitForExistence(timeout: elementExistenceTimeout),
@@ -100,7 +100,7 @@ class AutocompleteTests: XCTestCase {
         )
     }
 
-    func test_typingURLOfWebsiteNotInBookmarksOrHistoryShowsItInSuggestionsAsWebsite() throws {
+    func test_suggestions_showsTypedTitleOfWebsiteNotInBookmarksOrHistoryAsWebsite() throws {
         let websiteURLString = "https://www.duckduckgo.com"
         app.typeText(websiteURLString)
         XCTAssertTrue(
@@ -139,9 +139,7 @@ private extension AutocompleteTests {
         )
 
         resetBookMarksMenuItem.click()
-
-        let urlForBookmarks = locallyServedURL(pageTitle: siteTitleForBookmarkedSite)
-
+        let urlForBookmarks = URL.simpleServedPage(titled: siteTitleForBookmarkedSite)
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The address bar text field didn't become available in a reasonable timeframe."
@@ -178,7 +176,7 @@ private extension AutocompleteTests {
         )
         app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // And manually remove the history
 
-        let urlForHistory = locallyServedURL(pageTitle: siteTitleForHistorySite)
+        let urlForHistory = URL.simpleServedPage(titled: siteTitleForHistorySite)
 
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
@@ -192,19 +190,5 @@ private extension AutocompleteTests {
         )
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)
-    }
-
-    func locallyServedURL(pageTitle: String) -> URL {
-        return URL.testsServer
-            .appendingTestParameters(data: """
-            <html>
-            <head>
-            <title>\(pageTitle)</title>
-            </head>
-            <body>
-            Text
-            </body>
-            </html>
-            """.utf8data)
     }
 }
