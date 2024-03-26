@@ -22,7 +22,9 @@ class TabBarTests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        XCUIApplication().launch()
+        let app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
+        app.launch()
     }
 
     func testWhenClickingAddTab_ThenTabsOpen() throws {

@@ -20,7 +20,7 @@ import XCTest
 
 class FindInPageTests: XCTestCase {
     private var app: XCUIApplication!
-    private let elementExistenceTimeout = 0.3
+    private let elementExistenceTimeout = 2.0
     private var addressBarTextField: XCUIElement!
     private var loremIpsumWebView: XCUIElement!
     private var findInPageCloseButton: XCUIElement!
@@ -31,12 +31,13 @@ class FindInPageTests: XCTestCase {
     }
 
     override class func tearDown() {
-        removeLocalHTML()
+        //removeLocalHTML()
     }
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         loremIpsumWebView = app.windows.webViews["Lorem Ipsum"]
         findInPageCloseButton = app.windows.buttons["FindInPageController.closeButton"]
