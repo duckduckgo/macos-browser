@@ -114,7 +114,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
-        let isOnboarded = UserDefaults.netP.networkProtectionOnboardingStatus != .default
+        let isOnboarded = defaults.networkProtectionOnboardingStatus != .default
 
         return isNotEasterEggUser && waitlistAccessEnded && isOnboarded
 #endif

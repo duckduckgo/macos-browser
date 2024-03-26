@@ -93,7 +93,6 @@ extension EventMapping where Event == NetworkProtectionError {
             frequency = .standard
             return
         case .vpnAccessRevoked:
-            // todo
             return
         }
 

@@ -86,6 +86,9 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     @Published var isSyncCredentialsPaused: Bool
 
+    @Published var invalidBookmarksTitles: [String] = []
+    @Published var invalidCredentialsTitles: [String] = []
+
     private var shouldRequestSyncOnFavoritesOptionChange: Bool = true
     private var isScreenLocked: Bool = false
     private var recoveryKey: SyncCode.RecoveryKey?
@@ -117,12 +120,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     init(
         syncService: DDGSyncing,
         syncBookmarksAdapter: SyncBookmarksAdapter,
+        syncCredentialsAdapter: SyncCredentialsAdapter,
         appearancePreferences: AppearancePreferences = .shared,
         managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
+        self.syncCredentialsAdapter = syncCredentialsAdapter
         self.appearancePreferences = appearancePreferences
         self.syncFeatureFlags = syncService.featureFlags
         self.userAuthenticator = userAuthenticator
@@ -140,6 +145,16 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
     }
 
+    private func updateInvalidObjects() {
+        invalidBookmarksTitles = syncBookmarksAdapter.provider?
+            .fetchDescriptionsForObjectsThatFailedValidation()
+            .map { $0.truncated(length: 15) } ?? []
+
+        let invalidCredentialsObjects: [String] = (try? syncCredentialsAdapter.provider?.fetchDescriptionsForObjectsThatFailedValidation()) ?? []
+        invalidCredentialsTitles = invalidCredentialsObjects.map({ $0.truncated(length: 15) })
+    }
+
+    // swiftlint:disable:next function_body_length
     private func setUpObservables() {
         syncService.featureFlagsPublisher
             .dropFirst()
@@ -156,6 +171,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 self?.updateState()
             }
             .store(in: &cancellables)
+
+        if DDGSync.isFieldValidationEnabled {
+            syncService.isSyncInProgressPublisher
+                .removeDuplicates()
+                .filter { !$0 }
+                .asVoid()
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] in
+                    self?.updateInvalidObjects()
+                }
+                .store(in: &cancellables)
+        }
 
         $syncErrorMessage
             .map { $0 != nil }
@@ -351,6 +378,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private let syncService: DDGSyncing
     private let syncBookmarksAdapter: SyncBookmarksAdapter
+    private let syncCredentialsAdapter: SyncCredentialsAdapter
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
