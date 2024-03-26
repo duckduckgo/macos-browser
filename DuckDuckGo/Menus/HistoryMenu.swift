@@ -31,13 +31,10 @@ final class HistoryMenu: NSMenu {
     private let reopenLastClosedMenuItem = NSMenuItem(title: UserText.reopenLastClosedTab, action: #selector(AppDelegate.reopenLastClosedTab))
     private let reopenAllWindowsFromLastSessionMenuItem = NSMenuItem(title: UserText.mainMenuHistoryReopenAllWindowsFromLastSession,
                                                                      action: #selector(AppDelegate.reopenAllWindowsFromLastSession))
-    private let clearAllHistoryMenuItem: NSMenuItem = {
-        let item = NSMenuItem(title: UserText.mainMenuHistoryClearAllHistory,
-                   action: #selector(MainViewController.clearAllHistory),
-                   keyEquivalent: [.command, .shift, .backspace])
-        item.setAccessibilityIdentifier("HistoryMenu.clearAllHistory")
-        return item
-    }()
+    private let clearAllHistoryMenuItem = NSMenuItem(title: UserText.mainMenuHistoryClearAllHistory,
+                                                     action: #selector(MainViewController.clearAllHistory),
+                                                     keyEquivalent: [.command, .shift, .backspace])
+        .withAccessibilityIdentifier("HistoryMenu.clearAllHistory")
     private let clearAllHistorySeparator = NSMenuItem.separator()
 
     private let historyCoordinator: HistoryCoordinating
@@ -122,12 +119,13 @@ final class HistoryMenu: NSMenu {
     private func addRecentlyVisited() {
         recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
         let recentVisits = historyCoordinator.getRecentVisits(maxCount: 14)
-        recentlyVisitedMenuItems.append(contentsOf: recentVisits
-            .map {
-                VisitMenuItem(visitViewModel: VisitViewModel(visit: $0))
-                    // An accessibility identifier with a negative index will cause the relevant UI tests to fail, correctly
-                    .withAccessibilityIdentifier("HistoryMenu.recentlyVisitedMenuItem.\(recentVisits.firstIndex(of: $0) ?? -1)")
-            })
+        for (index, visit) in zip(
+            recentVisits.indices, recentVisits
+        ) {
+            let visitMenuItem = VisitMenuItem(visitViewModel: VisitViewModel(visit: visit))
+            visitMenuItem.setAccessibilityIdentifier("HistoryMenu.recentlyVisitedMenuItem.\(index)")
+            recentlyVisitedMenuItems.append(visitMenuItem)
+        }
         for recentlyVisitedMenuItem in recentlyVisitedMenuItems {
             addItem(recentlyVisitedMenuItem)
         }
@@ -202,12 +200,15 @@ final class HistoryMenu: NSMenu {
         let date = grouping.date
         let isToday = NSCalendar.current.isDateInToday(date)
         let visits = grouping.visits
-        return visits.map { visit in
-            VisitMenuItem(visitViewModel: VisitViewModel(visit: visit))
-                .withAccessibilityIdentifier( // An identifier with a negative index will cause the relevant UI tests to fail, correctly
-                    "HistoryMenu.historyMenuItem.\(isToday ? "Today" : "\(date)").\(visits.firstIndex(of: visit) ?? -1)"
-                )
+        var menuItems = [NSMenuItem]()
+        for (index, visit) in zip(
+            visits.indices, visits
+        ) {
+            let menuItem = VisitMenuItem(visitViewModel: VisitViewModel(visit: visit))
+            menuItem.setAccessibilityIdentifier("HistoryMenu.historyMenuItem.\(isToday ? "Today" : "\(date)").\(index)")
+            menuItems.append(menuItem)
         }
+        return menuItems
     }
 
     private func makeTitle(for grouping: HistoryGrouping) -> (String, String) {
