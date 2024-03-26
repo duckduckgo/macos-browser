@@ -47,9 +47,6 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY_RELEASE_S3:
         required: true
-  push:
-    branches:
-      - alessandro/installation-attribution-ci
 
 jobs:
 
@@ -112,8 +109,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
   
   mattermost:
-    if: false
-
+    
     name: Send Mattermost message
     needs: create-variants
     runs-on: ubuntu-latest
