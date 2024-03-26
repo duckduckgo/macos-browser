@@ -195,7 +195,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .weeklyReportScanning,
                     .weeklyReportRemovals,
                     .scanningEventNewMatch,
-                    .scanningEventReAppearance:
+                    .scanningEventReAppearance,
+                    .webUILoadingFailed,
+                    .webUILoadingStarted,
+                    .webUILoadingSuccess:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }

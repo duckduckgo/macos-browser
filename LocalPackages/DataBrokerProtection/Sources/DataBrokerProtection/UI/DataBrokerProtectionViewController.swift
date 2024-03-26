@@ -18,7 +18,9 @@
 
 import Cocoa
 import SwiftUI
+import Common
 import BrowserServicesKit
+import PixelKit
 import WebKit
 import Combine
 
@@ -29,6 +31,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private var loader: NSProgressIndicator!
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
     private let webUIViewModel: DBPUIViewModel
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     private let openURLHandler: (URL?) -> Void
     private var reloadObserver: NSObjectProtocol?
@@ -43,6 +46,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         self.dataManager = dataManager
         self.openURLHandler = openURLHandler
         self.webUISettings = webUISettings
+        self.pixelHandler = DataBrokerProtectionPixelsHandler()
         self.webUIViewModel = DBPUIViewModel(dataManager: dataManager,
                                              scheduler: scheduler,
                                              webUISettings: webUISettings,
@@ -82,6 +86,13 @@ final public class DataBrokerProtectionViewController: NSViewController {
         addLoadingIndicator()
 
         if let url = URL(string: webUISettings.selectedURL) {
+            switch webUISettings.selectedURLType {
+            case .production:
+                pixelHandler.fire(.webUILoadingStarted(environment: "production"))
+            case .custom:
+                pixelHandler.fire(.webUILoadingStarted(environment: "staging"))
+            }
+
             webView?.load(url)
         } else {
             removeLoadingIndicator()
@@ -126,11 +137,25 @@ extension DataBrokerProtectionViewController: WKUIDelegate {
 
 extension DataBrokerProtectionViewController: WKNavigationDelegate {
 
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {
+        pixelHandler.fire(.webUILoadingFailed(error: error.localizedDescription))
+    }
+
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {
+        pixelHandler.fire(.webUILoadingFailed(error: error.localizedDescription))
+    }
+
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         loader.startAnimation(nil)
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         removeLoadingIndicator()
+        switch webUISettings.selectedURLType {
+        case .production:
+            pixelHandler.fire(.webUILoadingSuccess(environment: "production"))
+        case .custom:
+            pixelHandler.fire(.webUILoadingSuccess(environment: "staging"))
+        }
     }
 }
