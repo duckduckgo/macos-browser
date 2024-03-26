@@ -36,7 +36,7 @@ protocol NetworkProtectionFeatureVisibility {
 
     func isFeatureEnabled() async throws -> Bool
     func isNetworkProtectionVisible() -> Bool
-    func shouldUninstallAutomatically() -> Bool
+    func shouldUninstallAutomatically() async -> Bool
     func disableForAllUsers() async
     func disableForWaitlistUsers()
     @discardableResult
@@ -108,13 +108,25 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
-    func shouldUninstallAutomatically() -> Bool {
+    func shouldUninstallAutomatically() async -> Bool {
 #if SUBSCRIPTION
-        return subscriptionFeatureAvailability.isFeatureAvailable && !AccountManager().isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
+        guard defaults.networkProtectionOnboardingStatus == .completed,
+              subscriptionFeatureAvailability.isFeatureAvailable,
+              LoginItem.vpnMenu.status.isInstalled else {
+            return false
+        }
+
+        switch await AccountManager().hasEntitlement(for: .networkProtection) {
+        case .success(let hasEntitlements):
+            return !hasEntitlements
+        case .failure:
+            // We can't uninstall if we don't know whether the user has entitlements
+            return false
+        }
 #else
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
-        let isOnboarded = UserDefaults.netP.networkProtectionOnboardingStatus != .default
+        let isOnboarded = defaults.networkProtectionOnboardingStatus != .default
 
         return isNotEasterEggUser && waitlistAccessEnded && isOnboarded
 #endif
@@ -214,7 +226,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     @discardableResult
     func disableIfUserHasNoAccess() async -> Bool {
-        if shouldUninstallAutomatically() {
+        if await shouldUninstallAutomatically() {
             await disableForAllUsers()
             return true
         }

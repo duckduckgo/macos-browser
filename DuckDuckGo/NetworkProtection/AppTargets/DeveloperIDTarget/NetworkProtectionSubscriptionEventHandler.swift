@@ -51,7 +51,9 @@ final class NetworkProtectionSubscriptionEventHandler {
         Task {
             switch await AccountManager().hasEntitlement(for: .networkProtection) {
             case .success(let hasEntitlements):
-                handleEntitlementsChange(hasEntitlements: hasEntitlements)
+                Task {
+                    await handleEntitlementsChange(hasEntitlements: hasEntitlements)
+                }
             case .failure:
                 break
             }
@@ -74,17 +76,19 @@ final class NetworkProtectionSubscriptionEventHandler {
                         entitlement.product == .networkProtection
                     }
 
-                    handleEntitlementsChange(hasEntitlements: hasEntitlements)
+                    Task {
+                        await self.handleEntitlementsChange(hasEntitlements: hasEntitlements)
+                    }
                 }
                 .store(in: &cancellables)
         }
     }
 
-    private func handleEntitlementsChange(hasEntitlements: Bool) {
+    private func handleEntitlementsChange(hasEntitlements: Bool) async {
         if hasEntitlements {
             UserDefaults.netP.networkProtectionEntitlementsExpired = false
         } else {
-            networkProtectionFeatureDisabler.stop()
+            await networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
             UserDefaults.netP.networkProtectionEntitlementsExpired = true
         }
     }
