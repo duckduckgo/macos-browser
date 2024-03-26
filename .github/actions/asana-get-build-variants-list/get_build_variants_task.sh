@@ -7,11 +7,6 @@ set -e -o pipefail
 
 asana_api_url="https://app.asana.com/api/1.0"
 
-# TODO: Pass these as Environment Variable
-ASANA_ACCESS_TOKEN="2/1206329551987270/1206904223324738:1c68ff7d9f9afcdb84089276681dbc47"
-ORIGIN_ASANA_SECTION_ID="1206716555947176"
-ATB_ASANA_TASK_ID="1205370183939342"
-
 # Create a JSON string with the `origin-variant` pairs from the list of .
 _create_origins_and_variants() {
     local response="$1"
@@ -81,19 +76,22 @@ _create_atb_variant_pairs() {
 }
 
 # Fetches all the ATB variants defined in the ATB_ASANA_TASK_ID at the Variants list (comma separated) section.
-_fetch_atb_variants() {
-    local url="${asana_api_url}/tasks/${ATB_ASANA_TASK_ID}?opt_fields=notes"
-    local atb_variants
+_fetch_atb_variants() { 
+    local atb_variants="${ATB_VARIANT_LIST}"
+    # if we call the workflow manually from GitHub `Run Workflow` use that input. Otherwise fetch it.
+    if [[ -z "${atb_variants}" ]]; then
+      local url="${asana_api_url}/tasks/${ATB_ASANA_TASK_ID}?opt_fields=notes"
 
-    # fetches the items
-    # read the response raw
-    # select only Variants list section
-    # output last line of the input to get all the list of variants.
-    atb_variants="$(curl -fSsL ${url} \
-    -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-    | jq -r .data.notes \
-    | grep -A1 '^Variants list' \
-    | tail -1)"
+      # fetches the items
+      # read the response raw
+      # select only Variants list section
+      # output last line of the input to get all the list of variants.
+      atb_variants="$(curl -fSsL ${url} \
+      -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+      | jq -r .data.notes \
+      | grep -A1 '^Variants list' \
+      | tail -1)"
+    fi
 
     variants_list=("$(_create_atb_variant_pairs "$atb_variants")")
 
