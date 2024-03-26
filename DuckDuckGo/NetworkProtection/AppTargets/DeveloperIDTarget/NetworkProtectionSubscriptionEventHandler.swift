@@ -52,7 +52,7 @@ final class NetworkProtectionSubscriptionEventHandler {
             switch await accountManager.hasEntitlement(for: .networkProtection) {
             case .success(let hasEntitlements):
                 handleEntitlementsChange(hasEntitlements: hasEntitlements)
-            case .failure(let error):
+            case .failure:
                 break
             }
 
@@ -84,10 +84,8 @@ final class NetworkProtectionSubscriptionEventHandler {
         if hasEntitlements {
             UserDefaults.netP.networkProtectionEntitlementsExpired = false
         } else {
-            Task {
-                await self.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
-                UserDefaults.netP.networkProtectionEntitlementsExpired = true
-            }
+            networkProtectionFeatureDisabler.stop()
+            UserDefaults.netP.networkProtectionEntitlementsExpired = true
         }
     }
 

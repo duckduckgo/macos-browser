@@ -31,6 +31,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var query: BrokerProfileQueryData { get }
     var emailService: EmailServiceProtocol { get }
     var captchaService: CaptchaServiceProtocol { get }
+    var cookieHandler: CookieHandler { get }
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
@@ -39,6 +40,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var extractedProfile: ExtractedProfile? { get set }
     var shouldRunNextStep: () -> Bool { get }
     var retriesCountOnError: Int { get set }
+    var clickAwaitTime: TimeInterval { get }
 
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
@@ -175,10 +177,16 @@ extension DataBrokerOperation {
 
     func loadURL(url: URL) async {
         do {
+            // https://app.asana.com/0/1204167627774280/1206912494469284/f
+            if query.dataBroker.url == "spokeo.com" {
+                if let cookies = await cookieHandler.getAllCookiesFromDomain(url) {
+                    await webViewHandler?.setCookies(cookies)
+                }
+            }
             try await webViewHandler?.load(url: url)
             await executeNextStep()
         } catch {
-           await onError(error: error)
+            await onError(error: error)
         }
     }
 
@@ -186,9 +194,8 @@ extension DataBrokerOperation {
         switch actionType {
         case .click:
             stageCalculator?.fireOptOutFillForm()
-            try? await webViewHandler?.waitForWebViewLoad()
-            // We wait 10 seconds before tapping
-            try? await Task.sleep(nanoseconds: UInt64(10) * 1_000_000_000)
+            // We wait 40 seconds before tapping
+            try? await Task.sleep(nanoseconds: UInt64(clickAwaitTime) * 1_000_000_000)
             await executeNextStep()
         case .fillForm:
             stageCalculator?.fireOptOutFillForm()
@@ -244,5 +251,35 @@ extension DataBrokerOperation {
             retriesCountOnError = 0
             await onError(error: DataBrokerProtectionError.unknown("No current action to execute"))
         }
+    }
+}
+
+protocol CookieHandler {
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]?
+}
+
+struct BrokerCookieHandler: CookieHandler {
+
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
+        guard let domainURL = extractSchemeAndHostAsURL(from: url.absoluteString) else { return nil }
+        do {
+            let (_, response) = try await URLSession.shared.data(from: domainURL)
+            guard let httpResponse = response as? HTTPURLResponse,
+                  let allHeaderFields = httpResponse.allHeaderFields as? [String: String] else { return nil }
+
+            let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeaderFields, for: domainURL)
+            return cookies
+        } catch {
+            print("Error fetching data: \(error)")
+        }
+
+        return nil
+    }
+
+    private func extractSchemeAndHostAsURL(from url: String) -> URL? {
+        if let urlComponents = URLComponents(string: url), let scheme = urlComponents.scheme, let host = urlComponents.host {
+            return URL(string: "\(scheme)://\(host)")
+        }
+        return nil
     }
 }

@@ -309,6 +309,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                         SubscriptionErrorReporter.report(subscriptionActivationError: .cancelledByUser)
                     case .missingEntitlements:
                         SubscriptionErrorReporter.report(subscriptionActivationError: .missingEntitlements)
+                        DispatchQueue.main.async {
+                            NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
+                        }
+                        return nil
                     }
 
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "completed"))
