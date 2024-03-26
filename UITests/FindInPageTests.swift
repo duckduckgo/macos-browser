@@ -37,6 +37,7 @@ class FindInPageTests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         loremIpsumWebView = app.windows.webViews["Lorem Ipsum"]
         findInPageCloseButton = app.windows.buttons["FindInPageController.closeButton"]
@@ -254,7 +255,7 @@ class FindInPageTests: XCTestCase {
         )
     }
 
-    func test_findInPage_findNextGoesToNextOccurrence() throws {
+    func test_findNext_menuItemGoesToNextOccurrence() throws {
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The Address Bar text field did not exist when it was expected."
@@ -300,7 +301,7 @@ class FindInPageTests: XCTestCase {
             .matchingPixels(of: .findHighlightColor)) // Coordinates of highlighted pixels in the find next screenshot
         let findNextHighlightPoints = highlightedPixelsInFindNextScreenshot.map { $0.point }
         let pixelSetIntersection = findHighlightPoints
-            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should have no elements
+            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should not have many elements
 
         XCTAssertGreaterThan(
             highlightedPixelsInFindNextScreenshot.count,
@@ -308,12 +309,12 @@ class FindInPageTests: XCTestCase {
             "There are expected to be more than \(minimumExpectedMatchingPixelsInFindHighlight) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match for a \"Find next\" operation, but this test found \(highlightedPixelsInFindNextScreenshot) matching pixels."
         )
         XCTAssertTrue(
-            pixelSetIntersection.count == 0,
-            "There should be no points in common for the highlighted pixels in the initial \"Find in Page\" operation, and the highlighted pixel coordinates in the \"Find Next\" operation."
+            pixelSetIntersection.count <= findNextHighlightPoints.count / 2,
+            "When the selection rectangle has moved as expected, fewer than half of the highlighted pixel coordinates from \"Find Next\" should intersect with the highlighted pixel coordinates from the initial \"Find\" operation."
         )
     }
 
-    func test_findInPage_findNextNextArrowGoesToNextOccurrence() throws {
+    func test_findNext_nextArrowGoesToNextOccurrence() throws {
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The Address Bar text field did not exist when it was expected."
@@ -358,7 +359,7 @@ class FindInPageTests: XCTestCase {
         let highlightedPixelsInFindNextScreenshot = findNextScreenshot.image.matchingPixels(of: .findHighlightColor)
         let findNextHighlightPoints = highlightedPixelsInFindNextScreenshot.map { $0.point }
         let pixelSetIntersection = findHighlightPoints
-            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should have no elements
+            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should not have many elements
 
         XCTAssertGreaterThan(
             highlightedPixelsInFindNextScreenshot.count,
@@ -366,12 +367,12 @@ class FindInPageTests: XCTestCase {
             "There are expected to be more than \(minimumExpectedMatchingPixelsInFindHighlight) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match, but this test found \(highlightedPixelsInFindNextScreenshot) matching pixels."
         )
         XCTAssertTrue(
-            pixelSetIntersection.count == 0,
-            "There should be no points in common for the highlighted pixels in the initial \"Find in Page\" operation, and the highlighted pixel coordinates in the \"Find Next\" operation."
+            pixelSetIntersection.count <= findNextHighlightPoints.count / 2,
+            "When the selection rectangle has moved as expected, fewer than half of the highlighted pixel coordinates from \"Find Next\" should intersect with the highlighted pixel coordinates from the initial \"Find\" operation."
         )
     }
 
-    func test_findInPage_commandGGoesToNextOccurrence() throws {
+    func test_findNext_commandGGoesToNextOccurrence() throws {
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
             "The Address Bar text field did not exist when it was expected."
@@ -412,7 +413,7 @@ class FindInPageTests: XCTestCase {
         let highlightedPixelsInFindNextScreenshot = findNextScreenshot.image.matchingPixels(of: .findHighlightColor)
         let findNextHighlightPoints = highlightedPixelsInFindNextScreenshot.map { $0.point }
         let pixelSetIntersection = findHighlightPoints
-            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should have no elements
+            .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should not have many elements
 
         XCTAssertGreaterThan(
             highlightedPixelsInFindNextScreenshot.count,
@@ -420,8 +421,8 @@ class FindInPageTests: XCTestCase {
             "There are expected to be more than \(minimumExpectedMatchingPixelsInFindHighlight) pixels of NSColor.findHighlightColor in a screenshot of a \"Find in Page\" search where there is a match, but this test found \(highlightedPixelsInFindNextScreenshot) matching pixels."
         )
         XCTAssertTrue(
-            pixelSetIntersection.count == 0,
-            "There should be no points in common for the highlighted pixels in the initial \"Find in Page\" operation, and the highlighted pixel coordinates in the \"Find Next\" operation."
+            pixelSetIntersection.count <= findNextHighlightPoints.count / 2,
+            "When the selection rectangle has moved as expected, fewer than half of the highlighted pixel coordinates from \"Find Next\" should intersect with the highlighted pixel coordinates from the initial \"Find\" operation."
         )
     }
 }

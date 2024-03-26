@@ -47,6 +47,10 @@ class WebsiteBreakageReportTests: XCTestCase {
             reportFlow: .appMenu,
             errors: nil,
             httpStatusCodes: nil,
+            openerContext: nil,
+            vpnOn: false,
+            jsPerformance: nil,
+            userRefreshCount: 0,
             didOpenReportInfo: false,
             toggleReportCounter: nil
         )
@@ -92,6 +96,10 @@ class WebsiteBreakageReportTests: XCTestCase {
             reportFlow: .appMenu,
             errors: nil,
             httpStatusCodes: nil,
+            openerContext: nil,
+            vpnOn: false,
+            jsPerformance: nil,
+            userRefreshCount: 0,
             didOpenReportInfo: false,
             toggleReportCounter: nil
         )

@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Common
 import XCTest
 
 class BrowsingHistoryTests: XCTestCase {
@@ -29,10 +28,11 @@ class BrowsingHistoryTests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         historyMenuBarItem = app.menuBarItems["History"]
         clearAllHistoryMenuItem = app.menuItems["HistoryMenu.clearAllHistory"]
         app.launch()
-        app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
+        app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Enforce a single window
         app.typeKey("n", modifierFlags: .command)
 
         XCTAssertTrue(
@@ -51,12 +51,12 @@ class BrowsingHistoryTests: XCTestCase {
             app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: elementExistenceTimeout),
             "Clear all history item didn't appear in a reasonable timeframe."
         )
-        app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // And manually remove the history
+        app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // Manually remove the history
     }
 
-    func test_visitedSiteIsAddedToRecentlyVisited() throws {
+    func test_recentlyVisited_showsLastVisitedSite() throws {
         let historyPageTitleExpectedToBeFirstInRecentlyVisited = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
-        let url = locallyServedURL(pageTitle: historyPageTitleExpectedToBeFirstInRecentlyVisited)
+        let url = URL.simpleServedPage(titled: historyPageTitleExpectedToBeFirstInRecentlyVisited)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         let firstSiteInRecentlyVisitedSection = app.menuItems["HistoryMenu.recentlyVisitedMenuItem.0"]
         XCTAssertTrue(
@@ -82,9 +82,9 @@ class BrowsingHistoryTests: XCTestCase {
         XCTAssertEqual(historyPageTitleExpectedToBeFirstInRecentlyVisited, firstSiteInRecentlyVisitedSection.title)
     }
 
-    func test_visitedSiteIsInHistoryAfterClosingAndReopeningWindow() throws {
+    func test_history_showsVisitedSiteAfterClosingAndReopeningWindow() throws {
         let historyPageTitleExpectedToBeFirstInTodayHistory = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
-        let url = locallyServedURL(pageTitle: historyPageTitleExpectedToBeFirstInTodayHistory)
+        let url = URL.simpleServedPage(titled: historyPageTitleExpectedToBeFirstInTodayHistory)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         let firstSiteInHistory = app.menuItems["HistoryMenu.historyMenuItem.Today.0"]
         XCTAssertTrue(
@@ -112,11 +112,11 @@ class BrowsingHistoryTests: XCTestCase {
         XCTAssertEqual(historyPageTitleExpectedToBeFirstInTodayHistory, firstSiteInHistory.title)
     }
 
-    func test_lastClosedWindowsTabsCanBeReopenedViaHistory() throws {
+    func test_reopenLastClosedWindowMenuItem_canReopenTabsOfLastClosedWindow() throws {
         let titleOfFirstTabWhichShouldRestore = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
         let titleOfSecondTabWhichShouldRestore = String(UUID().uuidString.prefix(lengthForRandomPageTitle))
-        let urlForFirstTab = locallyServedURL(pageTitle: titleOfFirstTabWhichShouldRestore)
-        let urlForSecondTab = locallyServedURL(pageTitle: titleOfSecondTabWhichShouldRestore)
+        let urlForFirstTab = URL.simpleServedPage(titled: titleOfFirstTabWhichShouldRestore)
+        let urlForSecondTab = URL.simpleServedPage(titled: titleOfSecondTabWhichShouldRestore)
         let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
@@ -157,21 +157,5 @@ class BrowsingHistoryTests: XCTestCase {
             app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: elementExistenceTimeout),
             "Restored visited tab 2 wasn't available with the expected title in a reasonable timeframe."
         )
-    }
-}
-
-private extension BrowsingHistoryTests {
-    func locallyServedURL(pageTitle: String) -> URL {
-        return URL.testsServer
-            .appendingTestParameters(data: """
-            <html>
-            <head>
-            <title>\(pageTitle)</title>
-            </head>
-            <body>
-            <p>Sample text</p>
-            </body>
-            </html>
-            """.utf8data)
     }
 }

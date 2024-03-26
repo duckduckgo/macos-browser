@@ -627,16 +627,21 @@ import SubscriptionUI
             let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
 
-            SubscriptionDebugMenu(currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
-                                  updateEnvironment: {
-                guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
-                currentEnvironmentWrapper.wrappedValue = newEnvironment
-                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment },
-                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
-                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
-                                  currentViewController: {
-                WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            }, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            SubscriptionDebugMenu(
+                currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
+                updateEnvironment: {
+                    guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
+                    currentEnvironmentWrapper.wrappedValue = newEnvironment
+                    SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment
+                    VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
+                },
+                isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                currentViewController: {
+                    WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+            },
+                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)
+            )
 #endif
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
