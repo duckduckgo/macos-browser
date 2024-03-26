@@ -91,7 +91,8 @@ jobs:
             echo "Neither ATB_VARIANT_NAME nor ORIGIN_VARIANT_NAME is set"
             exit 1
           fi
-          echo "variant_name=$name" >> $GITHUB_OUTPUT
+          
+          echo "variant-name=${name}" >> "$GITHUB_OUTPUT"
 
       - name: Print All
         run: |
@@ -225,7 +226,8 @@ jobs:
             echo "Neither ATB_VARIANT_NAME nor ORIGIN_VARIANT_NAME is set"
             exit 1
           fi
-          echo "variant_name=$name" >> $GITHUB_OUTPUT
+
+          echo "variant-name=${name}" >> "$GITHUB_OUTPUT"
 
       - name: Upload variant DMG
         env:
