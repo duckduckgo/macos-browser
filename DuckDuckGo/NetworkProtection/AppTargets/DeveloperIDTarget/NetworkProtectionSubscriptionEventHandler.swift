@@ -88,7 +88,7 @@ final class NetworkProtectionSubscriptionEventHandler {
         if hasEntitlements {
             UserDefaults.netP.networkProtectionEntitlementsExpired = false
         } else {
-            await networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+            networkProtectionFeatureDisabler.stop()
             UserDefaults.netP.networkProtectionEntitlementsExpired = true
         }
     }
