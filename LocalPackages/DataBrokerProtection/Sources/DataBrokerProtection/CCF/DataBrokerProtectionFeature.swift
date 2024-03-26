@@ -126,7 +126,8 @@ struct DataBrokerProtectionFeature: Subfeature {
 
     func pushAction(method: CCFSubscribeActionName, webView: WKWebView, params: Encodable) {
         guard let broker = broker else {
-            fatalError("Cannot continue without broker instance")
+            assertionFailure("Cannot continue without broker instance")
+            return
         }
         os_log("Pushing into WebView: %@ params %@", log: .action, method.rawValue, String(describing: params))
 
