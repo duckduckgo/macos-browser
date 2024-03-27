@@ -35,10 +35,11 @@ struct EmailData: Decodable {
 }
 
 protocol EmailServiceProtocol {
-    func getEmail(dataBrokerURL: String?) async throws -> EmailData
+    func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int,
                              pollingInterval: TimeInterval,
+                             attemptId: UUID,
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL
 }
 
@@ -59,13 +60,13 @@ struct EmailService: EmailServiceProtocol {
         self.settings = settings
     }
 
-    func getEmail(dataBrokerURL: String? = nil) async throws -> EmailData {
+    func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData {
         var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
         urlComponents?.path = "\(Constants.endpointSubPath)/generate"
-
-        if let dataBrokerValue = dataBrokerURL {
-            urlComponents?.queryItems = [URLQueryItem(name: "dataBroker", value: dataBrokerValue)]
-        }
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "dataBroker", value: dataBrokerURL),
+            URLQueryItem(name: "attemptId", value: attemptId.uuidString)
+        ]
 
         guard let url = urlComponents?.url else {
             throw EmailError.cantGenerateURL
@@ -87,10 +88,11 @@ struct EmailService: EmailServiceProtocol {
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int = 100,
                              pollingInterval: TimeInterval = 30,
+                             attemptId: UUID,
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
         let pollingTimeInNanoSecondsSeconds = UInt64(pollingInterval * 1000) * NSEC_PER_MSEC
 
-        guard let emailResult = try? await extractEmailLink(email: email) else {
+        guard let emailResult = try? await extractEmailLink(email: email, attemptId: attemptId) else {
             throw EmailError.cantFindEmail
         }
 
@@ -116,16 +118,20 @@ struct EmailService: EmailServiceProtocol {
             return try await getConfirmationLink(from: email,
                                                  numberOfRetries: numberOfRetries - 1,
                                                  pollingInterval: pollingInterval,
+                                                 attemptId: attemptId,
                                                  shouldRunNextStep: shouldRunNextStep)
         case .unknown:
             throw EmailError.unknownStatusReceived(email: email)
         }
     }
 
-    private func extractEmailLink(email: String) async throws -> EmailResponse {
+    private func extractEmailLink(email: String, attemptId: UUID) async throws -> EmailResponse {
         var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
         urlComponents?.path = "\(Constants.endpointSubPath)/links"
-        urlComponents?.queryItems = [URLQueryItem(name: "e", value: email)]
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "e", value: email),
+            URLQueryItem(name: "attemptId", value: attemptId.uuidString)
+        ]
 
         guard let url = urlComponents?.url else {
             throw EmailError.cantGenerateURL

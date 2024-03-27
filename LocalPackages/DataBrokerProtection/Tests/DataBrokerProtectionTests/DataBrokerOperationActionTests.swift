@@ -46,11 +46,12 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
 
         do {
-            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler)
             XCTAssertEqual(webViewHandler.wasLoadCalledWithURL?.absoluteString, "https://www.duckduckgo.com")
             XCTAssertTrue(webViewHandler.wasFinishCalled)
         } catch {
@@ -69,11 +70,12 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
 
         do {
-            _ = try await sut.run(inputValue: noEmailExtractedProfile, webViewHandler: webViewHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: noEmailExtractedProfile, webViewHandler: webViewHandler)
             XCTFail("Expected an error to be thrown")
         } catch {
             XCTAssertNil(webViewHandler.wasLoadCalledWithURL?.absoluteString)
@@ -99,11 +101,12 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
 
         do {
-            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler)
             XCTFail("Expected an error to be thrown")
         } catch {
             XCTAssertNil(webViewHandler.wasLoadCalledWithURL?.absoluteString)
@@ -127,6 +130,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -148,12 +152,13 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         emailService.shouldThrow = true
 
         do {
-            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler)
             XCTFail("Expected an error to be thrown")
         } catch {
             XCTAssertTrue(webViewHandler.wasFinishCalled)
@@ -175,6 +180,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             operationAwaitTime: 0,
             clickAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -193,6 +199,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -213,6 +220,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -234,6 +242,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         let actionsHandler = ActionsHandler(step: step)
@@ -241,7 +250,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
         captchaService.shouldThrow = true
 
         do {
-            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler, actionsHandler: actionsHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler, actionsHandler: actionsHandler)
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? DataBrokerProtectionError, case .captchaServiceError(.nilDataWhenFetchingCaptchaResult) = error {
@@ -262,6 +271,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -283,6 +293,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.retriesCountOnError = 0
@@ -305,6 +316,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -322,6 +334,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -341,10 +354,9 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: mockStageCalculator,
             shouldRunNextStep: { true }
         )
-
-        sut.stageCalculator = mockStageCalculator
 
         await sut.runNextAction(captchaAction)
 
@@ -361,10 +373,9 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: mockStageCalculator,
             shouldRunNextStep: { true }
         )
-
-        sut.stageCalculator = mockStageCalculator
 
         await sut.runNextAction(clickAction)
 
@@ -381,10 +392,9 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: mockStageCalculator,
             shouldRunNextStep: { true }
         )
-
-        sut.stageCalculator = mockStageCalculator
 
         await sut.runNextAction(expectationAction)
 
@@ -401,10 +411,9 @@ final class DataBrokerOperationActionTests: XCTestCase {
             emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: mockStageCalculator,
             shouldRunNextStep: { true }
         )
-
-        sut.stageCalculator = mockStageCalculator
 
         await sut.runNextAction(fillFormAction)
 
@@ -421,6 +430,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             cookieHandler: mockCookieHandler,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
 
@@ -441,6 +451,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             captchaService: captchaService,
             cookieHandler: mockCookieHandler,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
 

@@ -57,11 +57,11 @@ final class DebugScanOperation: DataBrokerOperation {
     let query: BrokerProfileQueryData
     let emailService: EmailServiceProtocol
     let captchaService: CaptchaServiceProtocol
+    let stageCalculator: StageDurationCalculator
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<DebugScanReturnValue, Error>?
     var extractedProfile: ExtractedProfile?
-    var stageCalculator: StageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
@@ -95,12 +95,12 @@ final class DebugScanOperation: DataBrokerOperation {
             self.debugScanContentPath = nil
         }
         self.cookieHandler = EmptyCookieHandler()
+        stageCalculator = FakeStageDurationCalculator()
     }
 
     func run(inputValue: Void,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
-             stageCalculator: StageDurationCalculator, // We do not need it for scans - for now.
              showWebView: Bool) async throws -> DebugScanReturnValue {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
