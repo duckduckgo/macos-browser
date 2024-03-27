@@ -184,7 +184,11 @@ final class MoreOptionsMenuTests: XCTestCase {
     @MainActor
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
 #if NETWORK_PROTECTION
-        moreOptionMenu.performActionForItem(at: 14)
+        if AccountManager().isUserAuthenticated {
+            moreOptionMenu.performActionForItem(at: 16)
+        } else {
+            moreOptionMenu.performActionForItem(at: 14)
+        }
 #else
         moreOptionsMenu.performActionForItem(at: 14)
 #endif
