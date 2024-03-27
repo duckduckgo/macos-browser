@@ -79,13 +79,13 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 ///
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     var broker: UserScriptMessageBroker?
-
     var featureName = "useSubscription"
-
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
         .exact(hostname: "duckduckgo.com"),
         .exact(hostname: "abrown.duckduckgo.com")
     ])
+
+    let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
     func with(broker: UserScriptMessageBroker) {
         self.broker = broker
@@ -143,7 +143,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let authToken = AccountManager().authToken, AccountManager().accessToken != nil {
+        if let authToken = accountManager.authToken, accountManager.accessToken != nil {
             return Subscription(token: authToken)
         } else {
             return Subscription(token: "")
@@ -160,7 +160,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
 
         let authToken = subscriptionValues.token
-        let accountManager = AccountManager()
         if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(authToken),
            case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
             accountManager.storeAuthToken(token: authToken)
@@ -171,7 +170,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let accountManager = AccountManager()
         if let accessToken = accountManager.accessToken,
            case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
             accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
@@ -207,6 +205,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         return SubscriptionOptions.empty
     }
+
+    let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -255,7 +255,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 let purchaseTransactionJWS: String
 
                 os_log(.info, log: .subscription, "[Purchase] Purchasing")
-                switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+                switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken, subscriptionAppGroup: subscriptionAppGroup) {
                 case .success(let transactionJWS):
                     purchaseTransactionJWS = transactionJWS
                 case .failure(let error):
@@ -287,7 +287,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
-                switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)) {
+                switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: subscriptionAppGroup) {
                 case .success(let purchaseUpdate):
                     os_log(.info, log: .subscription, "[Purchase] Purchase complete")
                     DailyPixel.fire(pixel: .privacyProPurchaseSuccess, frequency: .dailyAndCount)
@@ -321,7 +321,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         } else if SubscriptionPurchaseEnvironment.current == .stripe {
             let emailAccessToken = try? EmailManager().getToken()
 
-            let result = await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            let result = await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken, subscriptionAppGroup: subscriptionAppGroup)
 
             switch result {
             case .success(let success):
@@ -371,7 +371,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
         })
 
-        let vc = await SubscriptionAccessViewController(accountManager: AccountManager(), actionHandlers: actionHandlers, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        let vc = await SubscriptionAccessViewController(accountManager: accountManager, actionHandlers: actionHandlers, subscriptionAppGroup: subscriptionAppGroup)
         await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
 
         return nil
@@ -421,7 +421,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let progressViewController = await ProgressViewController(title: UserText.completingPurchaseTitle)
 
         await mainViewController?.presentAsSheet(progressViewController)
-        await StripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        await StripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: subscriptionAppGroup)
         await mainViewController?.dismiss(progressViewController)
 
         DailyPixel.fire(pixel: .privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)

@@ -221,26 +221,6 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
              and: .expect(pixelName: "m_mac_netp_backend_api_error_invalid_auth_token"),
              file: #filePath,
              line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionServerListStoreFailedToEncodeServerList,
-             and: .expect(pixelName: "m_mac_netp_storage_error_failed_to_encode_server_list"),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionServerListStoreFailedToDecodeServerList,
-             and: .expect(pixelName: "m_mac_netp_storage_error_failed_to_decode_server_list"),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionServerListStoreFailedToWriteServerList(TestError.testError),
-             and: .expect(pixelName: "m_mac_netp_storage_error_server_list_file_system_write_failed",
-                          error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionServerListStoreFailedToReadServerList(TestError.testError),
-             and: .expect(pixelName: "m_mac_netp_storage_error_server_list_file_system_read_failed",
-                          error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
-             file: #filePath,
-             line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: "field"),
              and: .expect(pixelName: "m_mac_netp_keychain_error_failed_to_cast_keychain_value_to_data",
                           customFields: [
