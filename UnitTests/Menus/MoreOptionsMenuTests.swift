@@ -183,16 +183,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     @MainActor
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
-#if NETWORK_PROTECTION
-        if AccountManager().isUserAuthenticated {
-            moreOptionMenu.performActionForItem(at: 16)
-        } else {
-            moreOptionMenu.performActionForItem(at: 14)
-        }
-#else
-        moreOptionsMenu.performActionForItem(at: 14)
-#endif
-
+        moreOptionMenu.performActionForItem(at: moreOptionMenu.items.count - 1)
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
     }
 
