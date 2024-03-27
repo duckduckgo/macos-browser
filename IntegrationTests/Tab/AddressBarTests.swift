@@ -57,7 +57,6 @@ class AddressBarTests: XCTestCase {
     var webViewConfiguration: WKWebViewConfiguration!
     var schemeHandler: TestSchemeHandler!
     static let testHtml = "<html><head><title>Title</title></head><body>test</body></html>"
-    let expectation = XCTestExpectation(description: "Load webpage and check certificate")
 
     @MainActor
     override func setUp() async throws {
@@ -849,12 +848,6 @@ struct OnMainActor: MainActorPerformer {
     }
 }
 
-@available(macOS 12.0, *)
-extension AddressBarTests: WKNavigationDelegate {
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        expectation.fulfill()
-    }
-}
 
 extension NSImage {
     func pngData() -> Data? {

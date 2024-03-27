@@ -68,7 +68,7 @@ final class ErrorPageTabExtenstionTest: XCTestCase {
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        XCTAssertTrue(mockWebView.capturedHTML.contains(ErrorPageTabExtension.SSLErrorType.expired.message(for: errorURLString)))
+        XCTAssertTrue(mockWebView.capturedHTML.contains(SSLErrorType.expired.specificMessage(for: errorURLString)))
     }
 
     @MainActor func testWhenCertificateSelfSigned_ThenExpectedErrorPageIsShown() {
@@ -82,7 +82,7 @@ final class ErrorPageTabExtenstionTest: XCTestCase {
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        XCTAssertTrue(mockWebView.capturedHTML.contains(ErrorPageTabExtension.SSLErrorType.selfSigned.message(for: errorURLString)))
+        XCTAssertTrue(mockWebView.capturedHTML.contains(SSLErrorType.selfSigned.specificMessage(for: errorURLString)))
     }
 
     @MainActor func testWhenCertificateWrongHost_ThenExpectedErrorPageIsShown() {
@@ -96,7 +96,7 @@ final class ErrorPageTabExtenstionTest: XCTestCase {
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        XCTAssertTrue(mockWebView.capturedHTML.contains(ErrorPageTabExtension.SSLErrorType.wrongHost.message(for: errorURLString)))
+        XCTAssertTrue(mockWebView.capturedHTML.contains(SSLErrorType.wrongHost.specificMessage(for: errorURLString)))
     }
 
     @MainActor func testWhenGenericError_ThenExpectedErrorPageIsShown() {
