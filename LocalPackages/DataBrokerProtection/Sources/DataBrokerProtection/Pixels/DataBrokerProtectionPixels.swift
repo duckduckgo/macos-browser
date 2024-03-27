@@ -131,7 +131,7 @@ public enum DataBrokerProtectionPixels {
 
     // Web UI - loading errors
     case webUILoadingStarted(environment: String)
-    case webUILoadingFailed(error: String)
+    case webUILoadingFailed(errorCategory: String)
     case webUILoadingSuccess(environment: String)
 }
 
@@ -285,7 +285,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .webUILoadingSuccess(let environment):
             return [Consts.environmentKey: environment]
         case .webUILoadingFailed(let error):
-            return [Consts.errorDetailsKey: error]
+            return [Consts.errorCategoryKey: error]
         case .backgroundAgentStarted,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,

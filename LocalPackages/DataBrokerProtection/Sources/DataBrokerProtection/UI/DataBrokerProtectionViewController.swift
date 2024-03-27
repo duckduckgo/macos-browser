@@ -32,6 +32,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
     private let webUIViewModel: DBPUIViewModel
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let webUIPixel: DataBrokerProtectionWebUIPixels
 
     private let openURLHandler: (URL?) -> Void
     private var reloadObserver: NSObjectProtocol?
@@ -47,6 +48,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         self.openURLHandler = openURLHandler
         self.webUISettings = webUISettings
         self.pixelHandler = DataBrokerProtectionPixelsHandler()
+        self.webUIPixel = DataBrokerProtectionWebUIPixels(pixelHandler: pixelHandler)
         self.webUIViewModel = DBPUIViewModel(dataManager: dataManager,
                                              scheduler: scheduler,
                                              webUISettings: webUISettings,
@@ -86,13 +88,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         addLoadingIndicator()
 
         if let url = URL(string: webUISettings.selectedURL) {
-            switch webUISettings.selectedURLType {
-            case .production:
-                pixelHandler.fire(.webUILoadingStarted(environment: "production"))
-            case .custom:
-                pixelHandler.fire(.webUILoadingStarted(environment: "staging"))
-            }
-
+            webUIPixel.firePixel(for: webUISettings.selectedURLType, type: .loading)
             webView?.load(url)
         } else {
             removeLoadingIndicator()
@@ -138,11 +134,26 @@ extension DataBrokerProtectionViewController: WKUIDelegate {
 extension DataBrokerProtectionViewController: WKNavigationDelegate {
 
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {
-        pixelHandler.fire(.webUILoadingFailed(error: error.localizedDescription))
+        webUIPixel.firePixel(for: error)
+        removeLoadingIndicator()
     }
 
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {
-        pixelHandler.fire(.webUILoadingFailed(error: error.localizedDescription))
+        webUIPixel.firePixel(for: error)
+        removeLoadingIndicator()
+    }
+
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+        guard let statusCode = (navigationResponse.response as? HTTPURLResponse)?.statusCode else {
+            // if there's no http status code to act on, exit and allow navigation
+            return .allow
+        }
+
+        if statusCode >= 400 {
+            webUIPixel.firePixel(for: NSError(domain: NSURLErrorDomain, code: statusCode))
+        }
+
+        return .allow
     }
 
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -151,11 +162,7 @@ extension DataBrokerProtectionViewController: WKNavigationDelegate {
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         removeLoadingIndicator()
-        switch webUISettings.selectedURLType {
-        case .production:
-            pixelHandler.fire(.webUILoadingSuccess(environment: "production"))
-        case .custom:
-            pixelHandler.fire(.webUILoadingSuccess(environment: "staging"))
-        }
+
+        webUIPixel.firePixel(for: webUISettings.selectedURLType, type: .success)
     }
 }
