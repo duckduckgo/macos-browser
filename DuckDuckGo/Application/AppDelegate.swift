@@ -71,6 +71,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let internalUserDecider: InternalUserDecider
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
+    private var burnOnQuitHandler: BurnOnQuitHandler!
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
@@ -307,6 +308,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if SUBSCRIPTION
 
 #endif
+
+        burnOnQuitHandler = BurnOnQuitHandler(preferences: .shared, fireCoordinator: FireCoordinator())
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -345,6 +348,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             DownloadListCoordinator.shared.sync()
         }
         stateRestorationManager?.applicationWillTerminate()
+
+        if burnOnQuitHandler.shouldBurnOnQuit {
+            burnOnQuitHandler.onBurnOnQuitCompleted = {
+                NSApplication.shared.reply(toApplicationShouldTerminate: true)
+            }
+            burnOnQuitHandler.burnOnQuit()
+
+            return .terminateLater
+        }
 
         return .terminateNow
     }
