@@ -27,7 +27,7 @@ class BrowsingHistoryTests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        // app.launchEnvironment["UITEST_MODE"] = "1"
+        app.launchEnvironment["UITEST_MODE"] = "1"
         historyMenuBarItem = app.menuBarItems["History"]
         clearAllHistoryMenuItem = app.menuItems["HistoryMenu.clearAllHistory"]
         app.launch()
@@ -51,7 +51,7 @@ class BrowsingHistoryTests: XCTestCase {
             "Clear all history item didn't appear in a reasonable timeframe."
         )
         app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // Manually remove the history
-        XCTAssertTrue(
+        XCTAssertTrue( // Let any ongoing fire animation or data processes complete
             app.buttons["FireViewController.fakeFireButton"].waitForNonExistence(timeout: UITests.Timeouts.fireAnimation),
             "Fire animation didn't finish and cease existing in a reasonable timeframe."
         )
