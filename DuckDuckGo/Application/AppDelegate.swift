@@ -68,7 +68,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let fileStore: FileStore
 
 #if APPSTORE
-    private let crashCollection = CrashCollection(platform: .macOS, log: .default)
+    private let crashCollection = CrashCollection(platform: .macOSAppStore, log: .default)
 #else
     private let crashReporter = CrashReporter()
 #endif
