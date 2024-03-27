@@ -119,6 +119,7 @@ final class FireViewController: NSViewController {
         fakeFireButton.wantsLayer = true
         fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDown.cgColor
 
+        fakeFireButton.setAccessibilityIdentifier("FireViewController.fakeFireButton")
         subscribeToIsBurning()
     }
 
