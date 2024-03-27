@@ -296,7 +296,7 @@ final class CriticalPathsTests: XCTestCase {
 
     private func addLogin() {
         let bookmarksWindow = app.windows["Bookmarks"]
-        bookmarksWindow.buttons["Options Button"].click()
+        bookmarksWindow.buttons["NavigationBarViewController.optionsButton"].click()
         bookmarksWindow.menuItems["Autofill"].click()
         bookmarksWindow.popovers.buttons["add item"].click()
         bookmarksWindow.popovers.menuItems["createNewLogin"].click()
@@ -361,7 +361,7 @@ final class CriticalPathsTests: XCTestCase {
 
     private func checkLogins() {
         let bookmarksWindow = app.windows["Bookmarks"]
-        bookmarksWindow.buttons["Options Button"].click()
+        bookmarksWindow.buttons["NavigationBarViewController.optionsButton"].click()
         bookmarksWindow.menuItems["Autofill"].click()
         let elementsQuery = bookmarksWindow.popovers.scrollViews.otherElements
         elementsQuery.buttons["Da, Dax Login, daxthetest"].click()

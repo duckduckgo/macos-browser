@@ -26,7 +26,12 @@ struct SyncView: View {
 
     var body: some View {
         if let syncService = NSApp.delegateTyped.syncService, let syncDataProviders = NSApp.delegateTyped.syncDataProviders {
-            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService, syncBookmarksAdapter: syncDataProviders.bookmarksAdapter))
+            let syncPreferences = SyncPreferences(
+                syncService: syncService,
+                syncBookmarksAdapter: syncDataProviders.bookmarksAdapter,
+                syncCredentialsAdapter: syncDataProviders.credentialsAdapter
+            )
+            SyncUI.ManagementView(model: syncPreferences)
                 .onAppear {
                     requestSync()
                 }

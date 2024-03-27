@@ -36,21 +36,9 @@ final class NetworkProtectionBouncer {
     func requireAuthTokenOrKillApp(controller: TunnelController) async {
 #if SUBSCRIPTION
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-        let result = await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
-        switch result {
-        case .success(true):
-            return
-        case .failure:
-            break
-        case .success(false):
-            os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing entitlement.")
-            await controller.stop()
 
-            // EXIT_SUCCESS ensures the login item won't relaunch
-            // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
-            // See where it mentions:
-            //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
-            exit(EXIT_SUCCESS)
+        guard !accountManager.isUserAuthenticated else {
+            return
         }
 #endif
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,

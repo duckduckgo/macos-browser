@@ -182,6 +182,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasExecuteCalledForUserData = false
     var wasExecuteCalledForSolveCaptcha = false
     var wasExecuteJavascriptCalled = false
+    var wasSetCookiesCalled = false
 
     func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
@@ -191,7 +192,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasLoadCalledWithURL = url
     }
 
-    func waitForWebViewLoad(timeoutInSeconds: Int) async throws {
+    func waitForWebViewLoad() async throws {
         wasWaitForWebViewLoadCalled = true
     }
 
@@ -222,6 +223,10 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
 
     }
 
+    func setCookies(_ cookies: [HTTPCookie]) async {
+        wasSetCookiesCalled = true
+    }
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil
@@ -230,6 +235,19 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasExecuteCalledForSolveCaptcha = false
         wasExecuteJavascriptCalled = false
         wasExecuteCalledForUserData = false
+        wasSetCookiesCalled = false
+    }
+}
+
+final class MockCookieHandler: CookieHandler {
+    var cookiesToReturn: [HTTPCookie]?
+
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
+        return cookiesToReturn
+    }
+
+    func clear() {
+        cookiesToReturn = nil
     }
 }
 

@@ -77,6 +77,12 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return accountID
     }
 
+    func updateLastUsedFor(accountId: Int64) throws {
+        if var account = storedAccounts.first(where: { $0.id == String(accountId) }) {
+            account.lastUsed = Date()
+        }
+    }
+
     func deleteWebsiteCredentialsFor(accountId: Int64) throws {
         storedCredentials[accountId] = nil
     }
@@ -171,6 +177,10 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
     func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {}
 
     func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func accountTitlesForSyncableCredentials(modifiedBefore date: Date) throws -> [String] {
         []
     }
 
@@ -298,6 +308,12 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
         return _accounts
     }
 
+    func updateLastUsedForAccountId(_ accountId: Int64) throws {
+        if var account = _accounts.first(where: { $0.id == String(accountId) }) {
+            account.lastUsed = Date()
+        }
+    }
+
     func deleteWebsiteCredentialsForAccountId(_ accountId: Int64) throws {
         self._accounts = self._accounts.filter { $0.id != String(accountId) }
     }
@@ -410,6 +426,10 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     }
 
     func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func modifiedSyncableCredentials(before date: Date) throws -> [SecureVaultModels.SyncableCredentials] {
         []
     }
 
