@@ -31,7 +31,7 @@ class FindInPageTests: XCTestCase {
     }
 
     override class func tearDown() {
-        //removeLocalHTML()
+        removeLocalHTML()
     }
 
     override func setUpWithError() throws {
