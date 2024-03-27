@@ -83,7 +83,7 @@ struct DataImportSummaryView: View {
                 case (.bookmarks, .failure(let error)):
                     if error.errorType == .noData {
                         HStack {
-                            failureImage()
+                            noDataImage()
                             Text("Bookmarks:",
                                  comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
                             + Text(" " as String)
@@ -100,7 +100,7 @@ struct DataImportSummaryView: View {
                 case (.passwords, .failure(let error)):
                     if error.errorType == .noData {
                         HStack {
-                            failureImage()
+                            noDataImage()
                             Text("Passwords:",
                                  comment: "Data import summary format of how many passwords (%lld) were successfully imported.")
                             + Text(" " as String)
@@ -145,6 +145,11 @@ private func successImage() -> some View {
 
 private func failureImage() -> some View {
     Image(.error)
+        .frame(width: 16, height: 16)
+}
+
+private func noDataImage() -> some View {
+    Image(.alertColor16)
         .frame(width: 16, height: 16)
 }
 
