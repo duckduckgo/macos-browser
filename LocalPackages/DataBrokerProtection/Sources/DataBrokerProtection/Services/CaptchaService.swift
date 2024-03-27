@@ -248,8 +248,7 @@ struct CaptchaService: CaptchaServiceProtocol {
         urlComponents?.path = "\(Constants.endpointSubPath)/result"
 
         urlComponents?.queryItems = [
-            URLQueryItem(name: "transactionId", value: transactionID),
-            URLQueryItem(name: "attemptId", value: attemptId.uuidString)
+            URLQueryItem(name: "transactionId", value: transactionID)
         ]
 
         guard let url = urlComponents?.url else {
