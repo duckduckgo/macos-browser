@@ -39,8 +39,11 @@ final class BurnOnQuitHandler {
     @MainActor
     func burnOnQuit() {
         //TODO: Refactor from static
+        //TODO: Without opening a new window
         FireCoordinator.fireViewModel.fire.burnAll { [weak self] in
-            self?.onBurnOnQuitCompleted?()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
+                self?.onBurnOnQuitCompleted?()
+            }
         }
     }
 
