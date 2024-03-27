@@ -11,11 +11,11 @@ inputs:
     required: false
     type: string
   atb-asana-task-id:
-    description: "GitHub Token"
+    description: "Asana Task id for the ATB list."
     required: true
     type: string
   origin-asana-section-id:
-    description: "GitHub Token"
+    description: "Asana Section id for the Origins list"
     required: true
     type: string
 outputs:
@@ -33,4 +33,4 @@ runs:
         ORIGIN_ASANA_SECTION_ID: ${{ inputs.origin-asana-section-id }}
         ATB_ASANA_TASK_ID: ${{ inputs.atb-asana-task-id }}
       run: |
-        ${{ github.action_path }}/get_build_variants_task.sh
+        ${{ github.action_path }}/get_build_variants_list.sh
