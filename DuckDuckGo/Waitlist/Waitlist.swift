@@ -299,7 +299,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
     }
 
     func redeemDataBrokerProtectionInviteCodeIfAvailable() async throws {
-        if DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
+        if DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist || DefaultDataBrokerProtectionFeatureVisibility().isPrivacyProEnabled() {
             return
         }
 
