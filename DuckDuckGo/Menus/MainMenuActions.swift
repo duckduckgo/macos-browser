@@ -23,6 +23,7 @@ import WebKit
 import Configuration
 import History
 import PixelKit
+import Subscription
 
 // Actions are sent to objects of responder chain
 
@@ -724,6 +725,7 @@ extension MainViewController {
     /// Clears the PrivacyPro state to make testing easier.
     ///
     private func clearPrivacyProState() {
+        AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).signOut()
         resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
 
