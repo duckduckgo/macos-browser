@@ -175,7 +175,7 @@ public struct TunnelControllerView: View {
                 .padding([.top], 8)
                 .multilineText()
 
-            Text(UserText.networkProtectionStatusViewFeatureDesc)
+            Text(model.isToggleOn.wrappedValue ? UserText.networkProtectionStatusHeaderMessageOn : UserText.networkProtectionStatusHeaderMessageOff)
                 .multilineText()
                 .multilineTextAlignment(.center)
                 .applyDescriptionAttributes(colorScheme: colorScheme)
@@ -227,6 +227,8 @@ public struct TunnelControllerView: View {
 
                 Spacer(minLength: 8)
 
+                statusBadge(isConnected: model.isToggleOn.wrappedValue)
+
                 Text(model.connectionStatusDescription)
                     .applyTimerAttributes(colorScheme: colorScheme)
                     .fixedSize()
@@ -258,5 +260,12 @@ public struct TunnelControllerView: View {
                 .fixedSize()
         }
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
+    }
+
+    @ViewBuilder
+    private func statusBadge(isConnected: Bool) -> some View {
+        Circle()
+            .fill(isConnected ? .green : .yellow)
+            .frame(width: 8, height: 8)
     }
 }
