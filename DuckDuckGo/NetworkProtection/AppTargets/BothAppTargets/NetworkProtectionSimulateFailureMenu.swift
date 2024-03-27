@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Foundation
 import NetworkProtection
@@ -98,5 +96,3 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
         simulateConnectionInterruptionMenuItem.state = simulationOptions.isEnabled(.connectionInterruption) ? .on : .off
     }
 }
-
-#endif

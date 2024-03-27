@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Foundation
 import NetworkProtection
@@ -80,6 +78,4 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
 #Preview {
     return MenuPreview(menu: NetworkProtectionOnboardingMenu())
 }
-#endif
-
 #endif

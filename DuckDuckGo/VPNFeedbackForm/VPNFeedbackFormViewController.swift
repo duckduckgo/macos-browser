@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import AppKit
 import SwiftUI
@@ -120,5 +118,3 @@ extension VPNFeedbackFormViewController: VPNFeedbackFormViewModelDelegate {
     }
 
 }
-
-#endif

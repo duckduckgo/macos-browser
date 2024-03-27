@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import NetworkProtection
 
@@ -54,5 +52,3 @@ final class NetworkProtectionControllerErrorStore {
         distributedNotificationCenter.post(.controllerErrorChanged, object: errorMessage)
     }
 }
-
-#endif

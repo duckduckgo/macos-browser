@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION || DBP
+#if DBP
 
 import Foundation
 import UserNotifications
@@ -28,8 +28,6 @@ protocol WaitlistTermsAndConditionsActionHandler {
 }
 
 #endif
-
-#if NETWORK_PROTECTION
 
 struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {
     @UserDefaultsWrapper(key: .networkProtectionTermsAndConditionsAccepted, defaultValue: false)
@@ -47,8 +45,6 @@ struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAn
         DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount)
     }
 }
-
-#endif
 
 #if DBP
 

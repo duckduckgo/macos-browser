@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import LoginItems
 
@@ -38,5 +36,3 @@ extension LoginItemsManager {
         return items
     }
 }
-
-#endif

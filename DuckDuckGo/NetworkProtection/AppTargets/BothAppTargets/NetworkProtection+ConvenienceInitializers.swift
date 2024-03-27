@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
@@ -95,5 +93,3 @@ extension TunnelControllerIPCClient {
         self.init(machServiceName: Bundle.main.vpnMenuAgentBundleId)
     }
 }
-
-#endif

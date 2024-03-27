@@ -20,7 +20,7 @@ import Foundation
 import UserNotifications
 import Subscription
 
-#if NETWORK_PROTECTION || DBP
+#if DBP
 
 protocol WaitlistViewControllerPresenter {
     static func show(completion: (() -> Void)?)
@@ -33,8 +33,6 @@ extension WaitlistViewControllerPresenter {
 }
 
 #endif
-
-#if NETWORK_PROTECTION
 
 struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
 
@@ -74,8 +72,6 @@ struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerP
         }
     }
 }
-
-#endif
 
 #if DBP
 

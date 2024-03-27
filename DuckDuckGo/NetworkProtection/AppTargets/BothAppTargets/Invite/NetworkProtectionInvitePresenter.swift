@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import SwiftUI
 import NetworkProtection
@@ -64,5 +62,3 @@ final class NetworkProtectionInvitePresenter: NetworkProtectionInvitePresenting,
         }
     }
 }
-
-#endif

@@ -20,10 +20,7 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
-
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
 
 #if SUBSCRIPTION
 import Subscription
@@ -63,15 +60,12 @@ final class MoreOptionsMenu: NSMenu {
     private let internalUserDecider: InternalUserDecider
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
 
-#if NETWORK_PROTECTION
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
-#endif
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
     }
 
-#if NETWORK_PROTECTION
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
@@ -94,28 +88,6 @@ final class MoreOptionsMenu: NSMenu {
 
         setupMenuItems()
     }
-#else
-    init(tabCollectionViewModel: TabCollectionViewModel,
-         emailManager: EmailManager = EmailManager(),
-         passwordManagerCoordinator: PasswordManagerCoordinator,
-         sharingMenu: NSMenu? = nil,
-         internalUserDecider: InternalUserDecider) {
-
-        self.tabCollectionViewModel = tabCollectionViewModel
-        self.emailManager = emailManager
-        self.passwordManagerCoordinator = passwordManagerCoordinator
-        self.internalUserDecider = internalUserDecider
-
-        super.init(title: "")
-
-        if let sharingMenu {
-            self.sharingMenu = sharingMenu
-        }
-        self.emailManager.requestDelegate = self
-
-        setupMenuItems()
-    }
-#endif
 
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
 
@@ -340,7 +312,6 @@ final class MoreOptionsMenu: NSMenu {
         let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
 #endif
 
-#if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
             let networkProtectionItem: NSMenuItem
 
@@ -368,7 +339,6 @@ final class MoreOptionsMenu: NSMenu {
         } else {
             networkProtectionFeatureVisibility.disableForWaitlistUsers()
         }
-#endif // NETWORK_PROTECTION
 
 #if DBP
         let dbpVisibility = DefaultDataBrokerProtectionFeatureVisibility()
@@ -483,7 +453,6 @@ final class MoreOptionsMenu: NSMenu {
 
     }
 
-#if NETWORK_PROTECTION
     private func makeNetworkProtectionItem() -> NSMenuItem {
         let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
             .targetting(self)
@@ -493,7 +462,6 @@ final class MoreOptionsMenu: NSMenu {
 
         return networkProtectionItem
     }
-#endif
 
 }
 

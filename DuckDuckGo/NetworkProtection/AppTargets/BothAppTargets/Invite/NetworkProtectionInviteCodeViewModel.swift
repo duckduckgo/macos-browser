@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Combine
 import NetworkProtection
 import SwiftUIExtensions
@@ -184,5 +182,3 @@ final class NetworkProtectionInviteSuccessViewModel: InviteCodeSuccessViewModel 
     }
 
 }
-
-#endif

@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import SwiftUI
 
 struct NetworkProtectionWaitlistRootView: View {
@@ -44,8 +42,6 @@ struct NetworkProtectionWaitlistRootView: View {
         .environmentObject(model)
     }
 }
-
-#endif
 
 #if DBP
 

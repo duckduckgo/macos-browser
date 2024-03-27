@@ -56,9 +56,7 @@ extension Preferences {
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                                 .onTapGesture(count: 12) {
-#if NETWORK_PROTECTION
                                     model.displayNetPInvite()
-#endif
                                 }
                                 .contextMenu(ContextMenu(menuItems: {
                                     Button(UserText.copy, action: {

@@ -31,10 +31,7 @@ import PixelKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
-
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
 
 #if SUBSCRIPTION
 import Subscription
@@ -81,7 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-#if NETWORK_PROTECTION && SUBSCRIPTION
+#if SUBSCRIPTION
     // Needs to be lazy as indirectly depends on AppDelegate
     private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
 #endif
@@ -287,14 +284,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-#if NETWORK_PROTECTION && SUBSCRIPTION
+#if SUBSCRIPTION
         networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 #endif
 
-#if NETWORK_PROTECTION
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
-#endif
 
 #if DBP && SUBSCRIPTION
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
@@ -315,13 +310,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-#if NETWORK_PROTECTION
         NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
             // Do nothing when code fetching fails, as the app will try again later
         }
 
         NetworkProtectionAppEvents().applicationDidBecomeActive()
-#endif
 
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidBecomeActive()
@@ -386,7 +379,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     private static func setUpPixelKit(dryRun: Bool) {
-#if NETWORK_PROTECTION
 #if APPSTORE
         let source = "browser-appstore"
 #else
@@ -409,7 +401,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 onComplete(error == nil, error)
             }
         }
-#endif
     }
 
     // MARK: - Sync
@@ -582,7 +573,7 @@ func updateSubscriptionStatus() {
 #endif
 }
 
-#if NETWORK_PROTECTION || DBP
+#if DBP
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
@@ -597,14 +588,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
 
-#if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
                     DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
                     NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }
-#endif
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {

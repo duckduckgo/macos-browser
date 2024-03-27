@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Combine
 import SwiftUI
@@ -100,5 +98,3 @@ final class VPNFeedbackFormViewModel: ObservableObject {
     }
 
 }
-
-#endif

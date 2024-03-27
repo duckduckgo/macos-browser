@@ -28,8 +28,6 @@ import NetworkProtectionUI
 import Subscription
 #endif
 
-#if NETWORK_PROTECTION
-
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
     var ipcServerInfoObserver: ConnectionServerInfoObserver { get }
@@ -57,11 +55,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     }
 
     var isShown: Bool {
-#if NETWORK_PROTECTION
         networkProtectionPopover?.isShown ?? false
-#else
-        return false
-#endif
     }
 
     // swiftlint:disable:next function_body_length
@@ -156,4 +150,3 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         networkProtectionPopover?.close()
     }
 }
-#endif

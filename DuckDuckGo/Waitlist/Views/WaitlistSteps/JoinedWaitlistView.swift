@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION || DBP
+#if DBP
 
 import SwiftUI
 import SwiftUIExtensions
@@ -89,8 +89,6 @@ struct JoinedWaitlistView: View {
 
 #endif
 
-#if NETWORK_PROTECTION
-
 struct NetworkProtectionJoinedWaitlistViewData: JoinedWaitlistViewData {
     let headerImageName = "JoinedWaitlistHeader"
     var title = UserText.networkProtectionWaitlistJoinedTitle
@@ -101,8 +99,6 @@ struct NetworkProtectionJoinedWaitlistViewData: JoinedWaitlistViewData {
     var buttonCancelLabel = UserText.networkProtectionWaitlistButtonNoThanks
     var buttonEnableNotificationLabel = UserText.networkProtectionWaitlistButtonEnableNotifications
 }
-
-#endif
 
 #if DBP
 

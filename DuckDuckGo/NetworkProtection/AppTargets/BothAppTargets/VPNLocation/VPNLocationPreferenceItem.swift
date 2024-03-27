@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import SwiftUI
 
@@ -63,5 +61,3 @@ struct VPNLocationPreferenceItem: View {
     }
 
 }
-
-#endif

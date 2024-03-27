@@ -19,8 +19,6 @@
 import Foundation
 import Networking
 
-#if NETWORK_PROTECTION
-
 protocol NetworkProtectionRemoteMessaging {
 
     func fetchRemoteMessages(completion: (() -> Void)?)
@@ -178,5 +176,3 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
 }
-
-#endif

@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import NetworkProtection
 
@@ -41,5 +39,3 @@ struct NetworkProtectionVPNCountryLabelsModel {
         return flag
     }
 }
-
-#endif

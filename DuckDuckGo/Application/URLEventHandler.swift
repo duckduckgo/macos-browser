@@ -20,9 +20,7 @@ import Common
 import Foundation
 import AppKit
 
-#if NETWORK_PROTECTION
 import NetworkProtectionUI
-#endif
 
 #if DBP
 import DataBrokerProtection
@@ -104,11 +102,9 @@ final class URLEventHandler {
     }
 
     private static func openURL(_ url: URL) {
-#if NETWORK_PROTECTION
         if url.scheme?.isNetworkProtectionScheme == true {
             handleNetworkProtectionURL(url)
         }
-#endif
 
 #if DBP
         if url.scheme?.isDataBrokerProtectionScheme == true {
@@ -116,7 +112,7 @@ final class URLEventHandler {
         }
 #endif
 
-#if NETWORK_PROTECTION || DBP
+#if DBP
         if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
             WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
             WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
@@ -125,8 +121,6 @@ final class URLEventHandler {
         WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
 #endif
     }
-
-#if NETWORK_PROTECTION
 
     /// Handles NetP URLs
     ///
@@ -157,8 +151,6 @@ final class URLEventHandler {
             return
         }
     }
-
-#endif
 
 #if DBP
     /// Handles DBP URLs

@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION || DBP
+#if DBP
 
 import SwiftUI
 import SwiftUIExtensions
@@ -85,8 +85,6 @@ private extension Text {
 }
 
 #endif
-
-#if NETWORK_PROTECTION
 
 struct NetworkProtectionTermsAndConditionsContentView: View {
     var body: some View {
@@ -157,8 +155,6 @@ struct NetworkProtectionWaitlistTermsAndConditionsViewData: WaitlistTermsAndCond
     let buttonCancelLabel = UserText.networkProtectionWaitlistButtonCancel
     let buttonAgreeAndContinueLabel = UserText.networkProtectionWaitlistButtonAgreeAndContinue
 }
-
-#endif
 
 #if DBP
 
