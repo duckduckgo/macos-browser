@@ -20,7 +20,6 @@ import XCTest
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
-
 final class MockNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
 
     var messages: [NetworkProtectionRemoteMessage] = []
