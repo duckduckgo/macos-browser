@@ -1,5 +1,5 @@
 //
-//  UITestsURLExtension.swift
+//  UITests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -15,11 +15,23 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
 import Foundation
 
-extension URL {
+/// Helper values for the UI tests
+enum UITests {
+    /// Timeout constants for different test requirements
+    enum Timeouts {
+        static let elementExistence: Double = 2.5
+        /// The fire animation time has environmental dependencies, so we want to wait for completion so we don't try to type into it
+        static let fireAnimation: Double = 30.0
+    }
+
+    /// A page simple enough to test favorite, bookmark, and history storage
+    /// - Parameter title: The title of the page to match
+    /// - Returns: A URL that can be served by `tests-server`
     static func simpleServedPage(titled title: String) -> URL {
-        return Self.testsServer
+        return URL.testsServer
             .appendingTestParameters(data: """
             <html>
             <head>
@@ -30,5 +42,9 @@ extension URL {
             </body>
             </html>
             """.utf8data)
+    }
+
+    static func randomPageTitle(length: Int) -> String {
+        return String(UUID().uuidString.prefix(length))
     }
 }
