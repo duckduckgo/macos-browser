@@ -24,6 +24,7 @@ import UserNotifications
 import NetworkProtection
 import BrowserServicesKit
 import Common
+import Subscription
 
 protocol WaitlistConstants {
     static var identifier: String { get }
@@ -206,6 +207,12 @@ struct NetworkProtectionWaitlist: Waitlist {
     }
 
     func fetchNetworkProtectionInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
+        // Never fetch the invite code if the Privacy Pro flag is enabled:
+        guard !DefaultSubscriptionFeatureAvailability().isFeatureAvailable else {
+            completion(nil)
+            return
+        }
+
         self.fetchInviteCodeIfAvailable { error in
             if let error {
                 // Do nothing if the app fails to fetch, as the waitlist is being phased out
