@@ -32,6 +32,12 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             if model.isSyncCredentialsPaused {
                 syncPaused(for: .credentials)
             }
+            if !model.invalidBookmarksTitles.isEmpty {
+                syncHasInvalidItems(for: .bookmarks)
+            }
+            if !model.invalidCredentialsTitles.isEmpty {
+                syncHasInvalidItems(for: .credentials)
+            }
         }
 
         // Sync Enabled
@@ -98,6 +104,47 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             }
         }
         SyncWarningMessage(title: UserText.syncLimitExceededTitle, message: description, buttonTitle: actionTitle) {
+            switch itemType {
+            case .bookmarks:
+                model.manageBookmarks()
+            case .credentials:
+                model.manageLogins()
+            }
+        }
+    }
+
+    @ViewBuilder
+    func syncHasInvalidItems(for itemType: LimitedItemType) -> some View {
+        var title: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.invalidBookmarksPresentTitle
+            case .credentials:
+                return UserText.invalidCredentialsPresentTitle
+            }
+        }
+        var description: String {
+            switch itemType {
+            case .bookmarks:
+                assert(!model.invalidBookmarksTitles.isEmpty)
+                let firstInvalidBookmarkTitle = model.invalidBookmarksTitles.first ?? ""
+                return UserText.invalidBookmarksPresentDescription(firstInvalidBookmarkTitle, numberOfInvalidItems: model.invalidBookmarksTitles.count)
+
+            case .credentials:
+                assert(!model.invalidCredentialsTitles.isEmpty)
+                let firstInvalidCredentialTitle = model.invalidCredentialsTitles.first ?? ""
+                return UserText.invalidCredentialsPresentDescription(firstInvalidCredentialTitle, numberOfInvalidItems: model.invalidCredentialsTitles.count)
+            }
+        }
+        var actionTitle: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.bookmarksLimitExceededAction
+            case .credentials:
+                return UserText.credentialsLimitExceededAction
+            }
+        }
+        SyncWarningMessage(title: title, message: description, buttonTitle: actionTitle) {
             switch itemType {
             case .bookmarks:
                 model.manageBookmarks()

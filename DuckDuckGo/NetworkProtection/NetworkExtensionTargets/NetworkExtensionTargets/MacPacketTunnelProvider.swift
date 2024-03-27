@@ -84,18 +84,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionClientInvalidAuthToken
             case .serverListInconsistency:
                 return
-            case .failedToEncodeServerList:
-                domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
-            case .failedToDecodeServerList:
-                domainEvent = .networkProtectionServerListStoreFailedToDecodeServerList
-            case .failedToWriteServerList(let eventError):
-                domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(eventError)
-            case .noServerListFound:
-                return
-            case .couldNotCreateServerListDirectory:
-                return
-            case .failedToReadServerList(let eventError):
-                domainEvent = .networkProtectionServerListStoreFailedToReadServerList(eventError)
             case .failedToCastKeychainValueToData(let field):
                 domainEvent = .networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: field)
             case .keychainReadError(let field, let status):
@@ -126,7 +114,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
             case .vpnAccessRevoked:
-                // todo
                 return
             }
 
@@ -289,7 +276,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         )
 #if SUBSCRIPTION
 
-        let accountManager = AccountManager(accessTokenStorage: tokenStore)
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs), accessTokenStorage: tokenStore)
 
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
         let entitlementsCheck = {

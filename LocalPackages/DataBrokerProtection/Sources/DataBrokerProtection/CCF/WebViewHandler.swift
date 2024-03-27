@@ -31,6 +31,7 @@ protocol WebViewHandler: NSObject {
     func finish() async
     func execute(action: Action, data: CCFRequestData) async
     func evaluateJavaScript(_ javaScript: String) async throws
+    func setCookies(_ cookies: [HTTPCookie]) async
 }
 
 @MainActor
@@ -83,6 +84,12 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
         webView?.load(url)
         os_log("Loading URL: %@", log: .action, String(describing: url.absoluteString))
         try await waitForWebViewLoad()
+    }
+
+    func setCookies(_ cookies: [HTTPCookie]) async {
+        for cookie in cookies {
+            await webView?.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+        }
     }
 
     func finish() {
