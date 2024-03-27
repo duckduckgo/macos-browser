@@ -112,6 +112,7 @@ final class SyncBookmarksAdapter {
             database: database,
             metadataStore: metadataStore,
             metricsEvents: metricsEventsHandler,
+            log: OSLog.sync,
             syncDidUpdateData: { [weak self] in
                 LocalBookmarkManager.shared.loadBookmarks()
                 self?.isSyncBookmarksPaused = false
@@ -132,7 +133,7 @@ final class SyncBookmarksAdapter {
 
         if !didMigrateToImprovedListsHandling {
             didMigrateToImprovedListsHandling = true
-            provider.lastSyncTimestamp = nil
+            provider.updateSyncTimestamps(server: nil, local: nil)
         }
 
         bindSyncErrorPublisher(provider)

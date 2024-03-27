@@ -79,7 +79,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 #if SUBSCRIPTION
     // MARK: - Subscriptions
 
-    private let accountManager = AccountManager()
+    private let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 #endif
 
     // MARK: - Debug Options Support
