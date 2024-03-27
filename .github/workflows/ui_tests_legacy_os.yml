@@ -3,7 +3,7 @@ name: UI Tests MacOS11/12
 on:
   workflow_dispatch:
   schedule:
-     - cron: '0 4 * * *' # 4 AM UTC
+     - cron: '0 4 * * 1-5' # 4 AM UTC
 
 jobs:
   create-notarized-app:
