@@ -109,7 +109,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
 
 #if NETWORK_PROTECTION
-        if AccountManager().isUserAuthenticated {
+        if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
             XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
             XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.networkProtection))
             XCTAssertTrue(moreOptionMenu.items[15].title.hasPrefix(UserText.identityTheftRestorationOptionsMenuItem))
@@ -158,7 +158,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if SUBSCRIPTION
         XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
 
-        if AccountManager().isUserAuthenticated {
+        if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
             XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.identityTheftRestorationOptionsMenuItem))
             XCTAssertTrue(moreOptionMenu.items[15].isSeparatorItem)
             XCTAssertEqual(moreOptionMenu.items[16].title, UserText.settings)
