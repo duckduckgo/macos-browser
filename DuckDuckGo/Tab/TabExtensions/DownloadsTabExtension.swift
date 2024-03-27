@@ -217,6 +217,12 @@ extension DownloadsTabExtension: NavigationResponder {
         // If the download has started from a popup Tab - close it after starting the download
         // e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
+        if navigationAction == nil,
+            let webView = download.webView {
+            self.closeWebView(webView, afterDownloadTaskHasStarted: task)
+            return
+        }
+
         guard let navigationAction,
               navigationAction.isForMainFrame,
               navigationAction.isTargetingNewWindow,
