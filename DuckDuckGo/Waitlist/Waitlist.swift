@@ -208,7 +208,7 @@ struct NetworkProtectionWaitlist: Waitlist {
 
     func fetchNetworkProtectionInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
         // Never fetch the invite code if the Privacy Pro flag is enabled:
-        guard !DefaultSubscriptionFeatureAvailability().isFeatureAvailable else {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             completion(nil)
             return
         }
