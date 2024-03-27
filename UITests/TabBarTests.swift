@@ -19,10 +19,13 @@
 import XCTest
 
 class TabBarTests: XCTestCase {
+    private var app: XCUIApplication!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        XCUIApplication().launch()
+        app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
+        app.launch()
     }
 
     func testWhenClickingAddTab_ThenTabsOpen() throws {
@@ -39,5 +42,4 @@ class TabBarTests: XCTestCase {
 //        XCTAssertEqual(tabs.count, 3)
         _ = XCTSkip("Test needs accessibility identifier debugging before usage")
     }
-
 }

@@ -904,6 +904,9 @@ extension MainViewController: NSMenuItemValidation {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        guard fireViewController.fireViewModel.fire.burningData == nil else {
+            return true
+        }
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):
