@@ -505,7 +505,6 @@
 		3706FBC7293F65D500E42796 /* EncryptedHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527B263B056C00B973F8 /* EncryptedHistoryStore.swift */; };
 		3706FBC8293F65D500E42796 /* FirePopoverCollectionViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE246F12709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift */; };
 		3706FBC9293F65D500E42796 /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA61C0D12727F59B00E6B681 /* ArrayExtension.swift */; };
-		3706FBCA293F65D500E42796 /* CrashReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A2B268F1ECD00D2D9CD /* CrashReportSender.swift */; };
 		3706FBCB293F65D500E42796 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
 		3706FBCC293F65D500E42796 /* CustomRoundedCornersShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */; };
 		3706FBCD293F65D500E42796 /* LocaleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8D9061276D1D880078DB17 /* LocaleExtension.swift */; };
@@ -1085,6 +1084,9 @@
 		37CD54D027F2FDD100F1F7B9 /* DefaultBrowserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54C827F2FDD100F1F7B9 /* DefaultBrowserPreferences.swift */; };
 		37CEFCA92A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */; };
 		37CEFCAA2A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */; };
+		37CF91592BB416A500BADCAE /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF91582BB416A500BADCAE /* Crashes */; };
+		37CF915B2BB416AC00BADCAE /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF915A2BB416AC00BADCAE /* Crashes */; };
+		37CF915D2BB416B300BADCAE /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF915C2BB416B300BADCAE /* Crashes */; };
 		37D2377A287EB8CA00BCE03B /* TabIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D23779287EB8CA00BCE03B /* TabIndex.swift */; };
 		37D2377C287EBDA300BCE03B /* TabIndexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377B287EBDA300BCE03B /* TabIndexTests.swift */; };
 		37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */; };
@@ -1703,7 +1705,6 @@
 		4B957AD22AC7AE700062CA31 /* FirePopoverCollectionViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE246F12709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift */; };
 		4B957AD32AC7AE700062CA31 /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA61C0D12727F59B00E6B681 /* ArrayExtension.swift */; };
 		4B957AD42AC7AE700062CA31 /* NetworkProtectionInviteCodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60702A0B29FA00BCD287 /* NetworkProtectionInviteCodeViewModel.swift */; };
-		4B957AD52AC7AE700062CA31 /* CrashReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A2B268F1ECD00D2D9CD /* CrashReportSender.swift */; };
 		4B957AD62AC7AE700062CA31 /* BookmarkHTMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AAF2842C4EA00586521 /* BookmarkHTMLImporter.swift */; };
 		4B957AD72AC7AE700062CA31 /* CustomRoundedCornersShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */; };
 		4B957AD82AC7AE700062CA31 /* LocaleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8D9061276D1D880078DB17 /* LocaleExtension.swift */; };
@@ -2659,7 +2660,6 @@
 		AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A25268DFEE200D2D9CD /* CrashReporter.swift */; };
 		AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A27268E045400D2D9CD /* CrashReportReader.swift */; };
 		AAC30A2A268E239100D2D9CD /* CrashReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A29268E239100D2D9CD /* CrashReport.swift */; };
-		AAC30A2C268F1ECD00D2D9CD /* CrashReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A2B268F1ECD00D2D9CD /* CrashReportSender.swift */; };
 		AAC30A2E268F1EE300D2D9CD /* CrashReportPromptPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC30A2D268F1EE300D2D9CD /* CrashReportPromptPresenter.swift */; };
 		AAC5E4C725D6A6E8007F5990 /* AddBookmarkPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4C425D6A6E8007F5990 /* AddBookmarkPopover.swift */; };
 		AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4CD25D6A709007F5990 /* Bookmark.swift */; };
@@ -4307,7 +4307,6 @@
 		AAC30A25268DFEE200D2D9CD /* CrashReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporter.swift; sourceTree = "<group>"; };
 		AAC30A27268E045400D2D9CD /* CrashReportReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportReader.swift; sourceTree = "<group>"; };
 		AAC30A29268E239100D2D9CD /* CrashReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReport.swift; sourceTree = "<group>"; };
-		AAC30A2B268F1ECD00D2D9CD /* CrashReportSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportSender.swift; sourceTree = "<group>"; };
 		AAC30A2D268F1EE300D2D9CD /* CrashReportPromptPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportPromptPresenter.swift; sourceTree = "<group>"; };
 		AAC5E4C425D6A6E8007F5990 /* AddBookmarkPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkPopover.swift; sourceTree = "<group>"; };
 		AAC5E4CD25D6A709007F5990 /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
@@ -4726,6 +4725,7 @@
 				B6EC37FF29B8D915001ACE79 /* Configuration in Frameworks */,
 				372217822B33380700B8E9C2 /* TestUtils in Frameworks */,
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
+				37CF915B2BB416AC00BADCAE /* Crashes in Frameworks */,
 				3706FCAB293F65D500E42796 /* TrackerRadarKit in Frameworks */,
 				85E2BBD02B8F534A00DBEC7A /* History in Frameworks */,
 				4BF97AD52B43C43F00EB4240 /* NetworkProtection in Frameworks */,
@@ -4844,6 +4844,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37CF915D2BB416B300BADCAE /* Crashes in Frameworks */,
 				4B957BD52AC7AE700062CA31 /* QuickLookUI.framework in Frameworks */,
 				3143C8792B0D1F3D00382627 /* DataBrokerProtection in Frameworks */,
 				372217842B33380E00B8E9C2 /* TestUtils in Frameworks */,
@@ -4931,6 +4932,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37CF91592BB416A500BADCAE /* Crashes in Frameworks */,
 				373FB4B12B4D6C42004C88D6 /* PreferencesViews in Frameworks */,
 				85E2BBCE2B8F534000DBEC7A /* History in Frameworks */,
 				1EA7B8D32B7E078C000330A4 /* SubscriptionUI in Frameworks */,
@@ -7748,7 +7750,6 @@
 			children = (
 				AAC30A25268DFEE200D2D9CD /* CrashReporter.swift */,
 				AAC30A27268E045400D2D9CD /* CrashReportReader.swift */,
-				AAC30A2B268F1ECD00D2D9CD /* CrashReportSender.swift */,
 				AAC30A2D268F1EE300D2D9CD /* CrashReportPromptPresenter.swift */,
 				AAC30A29268E239100D2D9CD /* CrashReport.swift */,
 			);
@@ -8763,6 +8764,7 @@
 				4BCBE4572BA7E17800FC75A1 /* SubscriptionUI */,
 				85D44B872BA08D30001B4AB5 /* Suggestions */,
 				4BCBE4592BA7E17800FC75A1 /* Subscription */,
+				37CF915A2BB416AC00BADCAE /* Crashes */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -9053,6 +9055,7 @@
 				85E2BBD12B8F536F00DBEC7A /* History */,
 				F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */,
 				85D44B892BA08D3B001B4AB5 /* Suggestions */,
+				37CF915C2BB416B300BADCAE /* Crashes */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -9225,6 +9228,7 @@
 				1EA7B8D42B7E078C000330A4 /* Subscription */,
 				F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */,
 				85D44B852BA08D29001B4AB5 /* Suggestions */,
+				37CF91582BB416A500BADCAE /* Crashes */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -10502,7 +10506,6 @@
 				3706FBC7293F65D500E42796 /* EncryptedHistoryStore.swift in Sources */,
 				3706FBC8293F65D500E42796 /* FirePopoverCollectionViewItem.swift in Sources */,
 				3706FBC9293F65D500E42796 /* ArrayExtension.swift in Sources */,
-				3706FBCA293F65D500E42796 /* CrashReportSender.swift in Sources */,
 				3706FBCB293F65D500E42796 /* BookmarkHTMLImporter.swift in Sources */,
 				4BF97ADC2B43C5E200EB4240 /* VPNFeedbackSender.swift in Sources */,
 				987799F72999996B005D8EB6 /* BookmarkDatabase.swift in Sources */,
@@ -11745,7 +11748,6 @@
 				4B957AD22AC7AE700062CA31 /* FirePopoverCollectionViewItem.swift in Sources */,
 				4B957AD32AC7AE700062CA31 /* ArrayExtension.swift in Sources */,
 				4B957AD42AC7AE700062CA31 /* NetworkProtectionInviteCodeViewModel.swift in Sources */,
-				4B957AD52AC7AE700062CA31 /* CrashReportSender.swift in Sources */,
 				B6BCC5212AFCD9ED002C5499 /* DataImportSourcePicker.swift in Sources */,
 				4B957AD62AC7AE700062CA31 /* BookmarkHTMLImporter.swift in Sources */,
 				4B957AD72AC7AE700062CA31 /* CustomRoundedCornersShape.swift in Sources */,
@@ -12559,7 +12561,6 @@
 				4B41EDA32B1543B9001EEDF4 /* VPNPreferencesModel.swift in Sources */,
 				AA61C0D22727F59B00E6B681 /* ArrayExtension.swift in Sources */,
 				4B4D60CC2A0C849600BCD287 /* NetworkProtectionInviteCodeViewModel.swift in Sources */,
-				AAC30A2C268F1ECD00D2D9CD /* CrashReportSender.swift in Sources */,
 				373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */,
 				B6B5F57F2B024105008DB58A /* DataImportSummaryView.swift in Sources */,
 				31C3CE0228EDC1E70002C24A /* CustomRoundedCornersShape.swift in Sources */,
@@ -14182,8 +14183,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 132.0.0;
+				branch = "dominik/sentry-appstore";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -14419,6 +14420,21 @@
 		37BA812E29B3CD6E0053F1A3 /* SyncUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SyncUI;
+		};
+		37CF91582BB416A500BADCAE /* Crashes */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Crashes;
+		};
+		37CF915A2BB416AC00BADCAE /* Crashes */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Crashes;
+		};
+		37CF915C2BB416B300BADCAE /* Crashes */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Crashes;
 		};
 		37DF000429F9C056002B7D3E /* SyncDataProviders */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -23,8 +23,10 @@ import Combine
 import Common
 import Configuration
 import CoreData
+import Crashes
 import DDGSync
 import History
+import MetricKit
 import Networking
 import Persistence
 import PixelKit
@@ -65,9 +67,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     let fileStore: FileStore
 
+#if APPSTORE
+    private let crashCollection = CrashCollection(platform: .macOS, log: .default)
+#else
+    private let crashReporter = CrashReporter()
+#endif
+
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
-    private let crashReporter = CrashReporter()
     let internalUserDecider: InternalUserDecider
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
@@ -278,7 +285,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         applyPreferredTheme()
 
+#if APPSTORE
+        crashCollection.start { pixelParameters, payloads, completion in
+            pixelParameters.forEach { _ in Pixel.fire(.crash) }
+            guard let lastPayload = payloads.last else {
+                return
+            }
+            DispatchQueue.main.async {
+                CrashReportPromptPresenter().showPrompt(for: lastPayload, userDidAllowToReport: completion)
+            }
+        }
+#else
         crashReporter.checkForNewReports()
+#endif
 
         urlEventHandler.applicationDidFinishLaunching()
 
