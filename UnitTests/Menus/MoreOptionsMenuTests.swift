@@ -169,7 +169,11 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     @MainActor
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
-        moreOptionMenu.performActionForItem(at: 14)
+#if NETWORK_PROTECTION
+        moreOptionMenu.performActionForItem(at: 16)
+#else
+        moreOptionsMenu.performActionForItem(at: 14)
+#endif
 
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
     }
