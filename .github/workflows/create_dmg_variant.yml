@@ -1,205 +1,205 @@
 on:
-    workflow_dispatch:
-      inputs:
-        atb-variant:
-          description: "ATB variant. Used for measuring attribution and retention."
-          required: false
-          type: string
-        origin-variant:
-          description: "Origin variant. Used for measuring attribution only."
-          required: false
-          type: string
-    workflow_call:
-      inputs:
-        atb-variant:
-          description: "Origin variant. Used for measuring attribution only. Passed by the caller workflow."
-          required: false
-          type: string
-        origin-variant:
-          description: "Origin variant. Used for measuring attribution only. Passed by the caller workflow."
-          required: false
-          type: string
-      secrets:
-        BUILD_CERTIFICATE_BASE64:
-          required: true
-        P12_PASSWORD:
-          required: true
-        KEYCHAIN_PASSWORD:
-          required: true
-        REVIEW_PROVISION_PROFILE_BASE64:
-          required: true
-        RELEASE_PROVISION_PROFILE_BASE64:
-          required: true
-        DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
-          required: true
-        DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
-          required: true
-        NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2:
-          required: true
-        NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2:
-          required: true
-        NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2:
-          required: true
-        NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2:
-          required: true
-        NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64:
-          required: true
-        NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
-          required: true
-        APPLE_API_KEY_BASE64:
-          required: true
-        APPLE_API_KEY_ID:
-          required: true
-        APPLE_API_KEY_ISSUER:
-          required: true
-        ASANA_ACCESS_TOKEN:
-          required: true
-        MM_HANDLES_BASE64:
-          required: true
-        MM_WEBHOOK_URL:
-          required: true
-        AWS_ACCESS_KEY_ID_RELEASE_S3:
-          required: true
-        AWS_SECRET_ACCESS_KEY_RELEASE_S3:
-          required: true
+  workflow_dispatch:
+    inputs:
+      atb-variant:
+        description: "ATB variant. Used for measuring attribution and retention."
+        required: false
+        type: string
+      origin-variant:
+        description: "Origin variant. Used for measuring attribution only."
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      atb-variant:
+        description: "Origin variant. Used for measuring attribution only. Passed by the caller workflow."
+        required: false
+        type: string
+      origin-variant:
+        description: "Origin variant. Used for measuring attribution only. Passed by the caller workflow."
+        required: false
+        type: string
+    secrets:
+      BUILD_CERTIFICATE_BASE64:
+        required: true
+      P12_PASSWORD:
+        required: true
+      KEYCHAIN_PASSWORD:
+        required: true
+      REVIEW_PROVISION_PROFILE_BASE64:
+        required: true
+      RELEASE_PROVISION_PROFILE_BASE64:
+        required: true
+      DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
+        required: true
+      DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
+        required: true
+      NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2:
+        required: true
+      NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2:
+        required: true
+      NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2:
+        required: true
+      NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2:
+        required: true
+      NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64:
+        required: true
+      NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
+        required: true
+      APPLE_API_KEY_BASE64:
+        required: true
+      APPLE_API_KEY_ID:
+        required: true
+      APPLE_API_KEY_ISSUER:
+        required: true
+      ASANA_ACCESS_TOKEN:
+        required: true
+      MM_HANDLES_BASE64:
+        required: true
+      MM_WEBHOOK_URL:
+        required: true
+      AWS_ACCESS_KEY_ID_RELEASE_S3:
+        required: true
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3:
+        required: true
 
 jobs:
-  
-    create-dmg-variant:
-      
-      name: Create DMG Variant
-  
+
+  create-dmg-variant:
+    
+    name: Create DMG Variant
+
+    env:
+      ATB_VARIANT_NAME: ${{ inputs.atb-variant || github.event.inputs.atb-variant }}
+      ORIGIN_VARIANT_NAME: ${{ inputs.origin-variant || github.event.inputs.origin-variant }}
+
+    runs-on: macos-12
+    timeout-minutes: 15
+
+    steps:
+
+    - name: Download release app
+      run: |
+        curl -fLSs "${{ vars.RELEASE_DMG_URL }}" --output duckduckgo.dmg
+        hdiutil attach duckduckgo.dmg -mountpoint vanilla
+        mkdir -p dmg
+        cp -R vanilla/DuckDuckGo.app dmg/DuckDuckGo.app
+        hdiutil detach vanilla
+        rm -f duckduckgo.dmg
+
+    - name: Install create-dmg
+      run: brew install create-dmg
+
+    - name: Fetch install-certs-and-profiles action
       env:
-        ATB_VARIANT_NAME: ${{ inputs.atb-variant || github.event.inputs.atb-variant }}
-        ORIGIN_VARIANT_NAME: ${{ inputs.origin-variant || github.event.inputs.origin-variant }}
+        GH_TOKEN: ${{ github.token }}
+        DEST_DIR: ".github/actions/install-certs-and-profiles"
+      run: |
+        mkdir -p "${{ env.DEST_DIR }}"
+        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/${{ env.DEST_DIR }}/action.yml?ref=${{ github.ref }} --jq .download_url) \
+          --output ${{ env.DEST_DIR }}/action.yml
 
-      runs-on: macos-12
-      timeout-minutes: 15
-  
-      steps:
-  
-      - name: Download release app
-        run: |
-          curl -fLSs "${{ vars.RELEASE_DMG_URL }}" --output duckduckgo.dmg
-          hdiutil attach duckduckgo.dmg -mountpoint vanilla
-          mkdir -p dmg
-          cp -R vanilla/DuckDuckGo.app dmg/DuckDuckGo.app
-          hdiutil detach vanilla
-          rm -f duckduckgo.dmg
-  
-      - name: Install create-dmg
-        run: brew install create-dmg
-  
-      - name: Fetch install-certs-and-profiles action
-        env:
-          GH_TOKEN: ${{ github.token }}
-          DEST_DIR: ".github/actions/install-certs-and-profiles"
-        run: |
-          mkdir -p "${{ env.DEST_DIR }}"
-          curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/${{ env.DEST_DIR }}/action.yml?ref=${{ github.ref }} --jq .download_url) \
-            --output ${{ env.DEST_DIR }}/action.yml
-  
-      - name: Install Apple Developer ID Application certificate
-        uses: ./.github/actions/install-certs-and-profiles
-        with:
-          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-          REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.REVIEW_PROVISION_PROFILE_BASE64 }}
-          RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.RELEASE_PROVISION_PROFILE_BASE64 }}
-          DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}
-          DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}
-          NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
-          NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
-          NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
-          NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
-          NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}
-          NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
-  
-      - name: Set up variant
-        working-directory: ${{ github.workspace }}/dmg
-        run: |
-          codesign -d --entitlements :- DuckDuckGo.app > entitlements.plist
-          echo "${{ env.ATB_VARIANT_NAME }}" > "DuckDuckGo.app/Contents/Resources/variant.txt"
-          echo "${{ env.ORIGIN_VARIANT_NAME }}" > "DuckDuckGo.app/Contents/Resources/origin.txt"
-          sign_identity="$(security find-certificate -a -c "Developer ID Application" -Z | grep ^SHA-1 | cut -d " " -f3 | uniq)"
-  
-          /usr/bin/codesign \
-            --force \
-            --sign ${sign_identity} \
-            --options runtime \
-            --entitlements entitlements.plist \
-            --generate-entitlement-der "DuckDuckGo.app"
-          rm -f entitlements.plist
-  
-      - name: Notarize the app
-        env:
-          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
-          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-          APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
-        working-directory: ${{ github.workspace }}/dmg
-        run: |
-          # import API Key from secrets
-          export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
-          echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
-  
-          notarization_zip_path="DuckDuckGo-for-notarization.zip"
-  
-          ditto -c -k --keepParent "DuckDuckGo.app" "${notarization_zip_path}"
-          xcrun notarytool submit \
-            --key "${APPLE_API_KEY_PATH}" \
-            --key-id "${{ env.APPLE_API_KEY_ID }}" \
-            --issuer "${{ env.APPLE_API_KEY_ISSUER }}" \
-            --wait \
-            "${notarization_zip_path}"
-          xcrun stapler staple "DuckDuckGo.app"
-          rm -rf "${notarization_zip_path}"
-  
-      - name: Create variant DMG
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/dmg-background.png?ref=${{ github.ref }} --jq .download_url) \
-            --output dmg-background.png
-  
-          retries=3
-  
-          while [[ $retries -gt 0 ]]; do
-            if create-dmg --volname "DuckDuckGo" \
-              --icon "DuckDuckGo.app" 140 160 \
-              --background "dmg-background.png" \
-              --window-size 600 400 \
-              --icon-size 120 \
-              --app-drop-link 430 160 "duckduckgo.dmg" \
-              "dmg"
-            then
-              break
-            fi
-            retries=$((retries-1))
-          done
-  
-      - name: Set variant name
-        id: set-variant-name
-        run: |
-          if [ -z "$ORIGIN_VARIANT_NAME" ] && [ -n "$ATB_VARIANT_NAME" ]; then
-            name=$ATB_VARIANT_NAME
-          elif [ -n "$ORIGIN_VARIANT_NAME" ] && [ -z "$ATB_VARIANT_NAME" ]; then
-            name=$ORIGIN_VARIANT_NAME
-          elif [ -n "$ORIGIN_VARIANT_NAME" ] && [ -n "$ATB_VARIANT_NAME" ]; then
-            name="${ORIGIN_VARIANT_NAME}-${ATB_VARIANT_NAME}"
-          else
-            echo "Neither ATB_VARIANT_NAME nor ORIGIN_VARIANT_NAME is set"
-            exit 1
+    - name: Install Apple Developer ID Application certificate
+      uses: ./.github/actions/install-certs-and-profiles
+      with:
+        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.REVIEW_PROVISION_PROFILE_BASE64 }}
+        RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.RELEASE_PROVISION_PROFILE_BASE64 }}
+        DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}
+        DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}
+        NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
+        NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
+        NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64_V2 }}
+        NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
+        NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}
+        NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
+
+    - name: Set up variant
+      working-directory: ${{ github.workspace }}/dmg
+      run: |
+        codesign -d --entitlements :- DuckDuckGo.app > entitlements.plist
+        echo "${{ env.ATB_VARIANT_NAME }}" > "DuckDuckGo.app/Contents/Resources/variant.txt"
+        echo "${{ env.ORIGIN_VARIANT_NAME }}" > "DuckDuckGo.app/Contents/Resources/origin.txt"
+        sign_identity="$(security find-certificate -a -c "Developer ID Application" -Z | grep ^SHA-1 | cut -d " " -f3 | uniq)"
+
+        /usr/bin/codesign \
+          --force \
+          --sign ${sign_identity} \
+          --options runtime \
+          --entitlements entitlements.plist \
+          --generate-entitlement-der "DuckDuckGo.app"
+        rm -f entitlements.plist
+
+    - name: Notarize the app
+      env:
+        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+      working-directory: ${{ github.workspace }}/dmg
+      run: |
+        # import API Key from secrets
+        export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
+        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
+
+        notarization_zip_path="DuckDuckGo-for-notarization.zip"
+
+        ditto -c -k --keepParent "DuckDuckGo.app" "${notarization_zip_path}"
+        xcrun notarytool submit \
+          --key "${APPLE_API_KEY_PATH}" \
+          --key-id "${{ env.APPLE_API_KEY_ID }}" \
+          --issuer "${{ env.APPLE_API_KEY_ISSUER }}" \
+          --wait \
+          "${notarization_zip_path}"
+        xcrun stapler staple "DuckDuckGo.app"
+        rm -rf "${notarization_zip_path}"
+
+    - name: Create variant DMG
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/dmg-background.png?ref=${{ github.ref }} --jq .download_url) \
+          --output dmg-background.png
+
+        retries=3
+
+        while [[ $retries -gt 0 ]]; do
+          if create-dmg --volname "DuckDuckGo" \
+            --icon "DuckDuckGo.app" 140 160 \
+            --background "dmg-background.png" \
+            --window-size 600 400 \
+            --icon-size 120 \
+            --app-drop-link 430 160 "duckduckgo.dmg" \
+            "dmg"
+          then
+            break
           fi
+          retries=$((retries-1))
+        done
 
-          echo "variant-name=${name}" >> "$GITHUB_OUTPUT"
+    - name: Set variant name
+      id: set-variant-name
+      run: |
+        if [ -z "$ORIGIN_VARIANT_NAME" ] && [ -n "$ATB_VARIANT_NAME" ]; then
+          name=$ATB_VARIANT_NAME
+        elif [ -n "$ORIGIN_VARIANT_NAME" ] && [ -z "$ATB_VARIANT_NAME" ]; then
+          name=$ORIGIN_VARIANT_NAME
+        elif [ -n "$ORIGIN_VARIANT_NAME" ] && [ -n "$ATB_VARIANT_NAME" ]; then
+          name="${ORIGIN_VARIANT_NAME}-${ATB_VARIANT_NAME}"
+        else
+          echo "Neither ATB_VARIANT_NAME nor ORIGIN_VARIANT_NAME is set"
+          exit 1
+        fi
 
-      - name: Upload variant DMG
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
-          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-        run: |
-          aws s3 cp duckduckgo.dmg \
-            s3://${{ vars.RELEASE_BUCKET_NAME }}/${{ vars.RELEASE_BUCKET_PREFIX }}/${{ steps.set-variant-name.outputs.variant-name }}/duckduckgo.dmg \
-            --acl public-read
+        echo "variant-name=${name}" >> "$GITHUB_OUTPUT"
+
+    - name: Upload variant DMG
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+      run: |
+        aws s3 cp duckduckgo.dmg \
+          s3://${{ vars.RELEASE_BUCKET_NAME }}/${{ vars.RELEASE_BUCKET_PREFIX }}/${{ steps.set-variant-name.outputs.variant-name }}/duckduckgo.dmg \
+          --acl public-read
