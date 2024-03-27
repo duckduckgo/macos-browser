@@ -33,9 +33,11 @@ import Subscription
 
 protocol NetworkProtectionFeatureVisibility {
     var isEligibleForThankYouMessage: Bool { get }
+    var isInstalled: Bool { get }
 
-    func isFeatureEnabled() async throws -> Bool
-    func isNetworkProtectionVisible() -> Bool
+    func canStartVPN() async throws -> Bool
+    func isVPNVisible() -> Bool
+    func isNetworkProtectionBetaVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
     func disableForAllUsers() async
     func disableForWaitlistUsers()
@@ -77,19 +79,22 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// 2. If no auth token is found, the feature is visible if the waitlist feature flag is enabled
     ///
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding the VPN from the user.
-    func isNetworkProtectionVisible() -> Bool {
+    func isNetworkProtectionBetaVisible() -> Bool {
         return isEasterEggUser || waitlistIsOngoing
     }
 
     var isInstalled: Bool {
-        LoginItem.vpnMenu.status.isInstalled && isOnboarded
+        LoginItem.vpnMenu.status.isInstalled
     }
 
-    /// Replaces `isNetworkProtectionVisible` to add subscriptions support
+    /// Whether the user can start the VPN.
     ///
-    func isFeatureEnabled() async throws -> Bool {
+    /// For beta users this means they have an auth token.
+    /// For subscription users this means they have entitlements.
+    ///
+    func canStartVPN() async throws -> Bool {
         guard subscriptionFeatureAvailability.isFeatureAvailable else {
-            return isNetworkProtectionVisible()
+            return isNetworkProtectionBetaVisible()
         }
 
         switch await AccountManager().hasEntitlement(for: .networkProtection) {
@@ -98,6 +103,19 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         case .failure(let error):
             throw error
         }
+    }
+
+    /// Whether the user can see the VPN entry points in the UI.
+    ///
+    /// For beta users this means they have an auth token.
+    /// For subscription users this means they are authenticated.
+    ///
+    func isVPNVisible() -> Bool {
+        guard subscriptionFeatureAvailability.isFeatureAvailable else {
+            return isNetworkProtectionBetaVisible()
+        }
+
+        return AccountManager().isUserAuthenticated
     }
 
     /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
