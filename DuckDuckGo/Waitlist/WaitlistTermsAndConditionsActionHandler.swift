@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import Foundation
 import UserNotifications
 
@@ -26,8 +24,6 @@ protocol WaitlistTermsAndConditionsActionHandler {
     func didShow()
     mutating func didAccept()
 }
-
-#endif
 
 struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {
     @UserDefaultsWrapper(key: .networkProtectionTermsAndConditionsAccepted, defaultValue: false)

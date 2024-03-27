@@ -573,8 +573,6 @@ func updateSubscriptionStatus() {
 #endif
 }
 
-#if DBP
-
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,
@@ -606,5 +604,3 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 
 }
-
-#endif

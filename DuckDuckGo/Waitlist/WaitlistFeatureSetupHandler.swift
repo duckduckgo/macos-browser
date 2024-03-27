@@ -16,15 +16,11 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import Foundation
 
 protocol WaitlistFeatureSetupHandler {
     func confirmFeature()
 }
-
-#endif
 
 struct NetworkProtectionWaitlistFeatureSetupHandler: WaitlistFeatureSetupHandler {
     func confirmFeature() {

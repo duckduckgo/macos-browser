@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import SwiftUI
 import SwiftUIExtensions
 
@@ -86,8 +84,6 @@ struct JoinedWaitlistView: View {
         .environmentObject(model)
     }
 }
-
-#endif
 
 struct NetworkProtectionJoinedWaitlistViewData: JoinedWaitlistViewData {
     let headerImageName = "JoinedWaitlistHeader"

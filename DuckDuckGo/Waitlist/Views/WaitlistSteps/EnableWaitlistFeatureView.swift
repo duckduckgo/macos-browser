@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import SwiftUI
 import SwiftUIExtensions
 
@@ -61,8 +59,6 @@ struct EnableWaitlistFeatureView: View {
         .environmentObject(model)
     }
 }
-
-#endif
 
 struct EnableNetworkProtectionViewData: EnableWaitlistFeatureViewData {
     var headerImageName: String = "Network-Protection-256"

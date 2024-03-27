@@ -112,14 +112,10 @@ final class URLEventHandler {
         }
 #endif
 
-#if DBP
         if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
             WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
             WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
         }
-#else
-        WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
-#endif
     }
 
     /// Handles NetP URLs

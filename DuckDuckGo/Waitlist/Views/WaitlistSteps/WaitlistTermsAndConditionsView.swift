@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if DBP
-
 import SwiftUI
 import SwiftUIExtensions
 
@@ -83,8 +81,6 @@ private extension Text {
     }
 
 }
-
-#endif
 
 struct NetworkProtectionTermsAndConditionsContentView: View {
     var body: some View {
