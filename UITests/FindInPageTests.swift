@@ -53,7 +53,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
 
         app.typeKey("f", modifierFlags: .command)
@@ -72,7 +72,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         let findInPageMenuBarItem = app.menuItems["MainMenu.findInPage"]
         XCTAssertTrue(
@@ -96,7 +96,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         let optionsButton = app.windows.buttons["NavigationBarViewController.optionsButton"]
         XCTAssertTrue(optionsButton.waitForExistence(timeout: UITests.Timeouts.elementExistence), "Couldn't find options item in a reasonable timeframe.")
@@ -123,7 +123,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
@@ -147,7 +147,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
@@ -171,7 +171,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
@@ -200,7 +200,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
 
         app.typeKey("f", modifierFlags: .command)
@@ -227,7 +227,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
@@ -262,7 +262,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
@@ -321,7 +321,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
@@ -379,7 +379,7 @@ class FindInPageTests: XCTestCase {
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
