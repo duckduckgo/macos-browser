@@ -2,9 +2,6 @@ name: UI Tests
 
 on:
   workflow_dispatch:
-  push:
-    branches: 
-      - "kieran/ui-test-workflows"
       
 jobs:
   ui-tests:

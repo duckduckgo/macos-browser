@@ -153,7 +153,7 @@ jobs:
  #          --header "Accept: application/json" \
  #          --header "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
  #          --header "Content-Type: application/json" \
- #          --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
+ #          --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests Legacy", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
 
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v3
