@@ -115,7 +115,7 @@ jobs:
   appstore-release:
     name: Prepare AppStore Release
 
-    if: inputs.skip-appstore != 'true'
+    if: inputs.skip-appstore != true
 
     uses: ./.github/workflows/build_appstore.yml
     with:
