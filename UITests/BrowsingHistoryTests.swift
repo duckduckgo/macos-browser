@@ -25,7 +25,6 @@ class BrowsingHistoryTests: XCTestCase {
     private var clearAllHistoryAlertClearButton: XCUIElement!
     private var fakeFireButton: XCUIElement!
     private var addressBarTextField: XCUIElement!
-    private var reopenLastClosedWindowMenuItem: XCUIElement!
     private let lengthForRandomPageTitle = 8
 
     override func setUpWithError() throws {
@@ -37,7 +36,6 @@ class BrowsingHistoryTests: XCTestCase {
         clearAllHistoryAlertClearButton = app.buttons["ClearAllHistoryAndDataAlert.clearButton"]
         fakeFireButton = app.buttons["FireViewController.fakeFireButton"]
         addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
-        reopenLastClosedWindowMenuItem = app.menuItems["HistoryMenu.reopenLastClosedWindow"]
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Enforce a single window
         app.typeKey("n", modifierFlags: .command)
@@ -150,6 +148,7 @@ class BrowsingHistoryTests: XCTestCase {
             "History menu bar item didn't appear in a reasonable timeframe."
         )
         historyMenuBarItem.click() // The visited sites identifiers will not be available until after the History menu has been accessed.
+        let reopenLastClosedWindowMenuItem = app.menuItems["HistoryMenu.reopenLastClosedWindow"]
         XCTAssertTrue(
             reopenLastClosedWindowMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The \"Reopen Last Closed Window\" menu item didn't appear in a reasonable timeframe."
