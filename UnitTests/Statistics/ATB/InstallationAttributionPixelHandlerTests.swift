@@ -83,7 +83,7 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(capturedParams.includeAppVersion, true)
-        XCTAssertEqual(capturedParams.frequency, .justOnce)
+        XCTAssertEqual(capturedParams.frequency, .standard)
     }
 
 }
