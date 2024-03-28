@@ -60,7 +60,8 @@ public extension NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.subscriptionAppleIDSyncFailedAlertTitle
         alert.informativeText = text
-        alert.addButton(withTitle: UserText.okButtonTitle)
+        alert.addButton(withTitle: UserText.continueButtonTitle)
+        alert.addButton(withTitle: UserText.cancelButtonTitle)
         return alert
     }
 

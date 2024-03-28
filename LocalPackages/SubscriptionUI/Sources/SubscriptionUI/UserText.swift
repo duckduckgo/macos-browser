@@ -137,6 +137,7 @@ enum UserText {
     // MARK: - Alerts
     static let okButtonTitle = NSLocalizedString("subscription.alert.button.ok", value: "OK", comment: "Alert button for confirming it")
     static let cancelButtonTitle = NSLocalizedString("subscription.alert.button.cancel", value: "Cancel", comment: "Alert button for dismissing it")
+    static let continueButtonTitle = NSLocalizedString("subscription.alert.button.retry", value: "Continue", comment: "Alert button for continue action")
     static let viewPlansButtonTitle = NSLocalizedString("subscription.alert.button.view.plans", value: "View Plans", comment: "Alert button for viewing subscription plans")
     static let restoreButtonTitle = NSLocalizedString("subscription.alert.button.restore", value: "Restore", comment: "Alert button for restoring past subscription purchases")
 
@@ -152,5 +153,5 @@ enum UserText {
     static let subscriptionFoundAlertTitle = NSLocalizedString("subscription.alert.subscription.found.title", value: "Subscription Found", comment: "Alert title when subscription was found")
     static let subscriptionFoundAlertDescription = NSLocalizedString("subscription.alert.subscription.found.description", value: "We found a subscription associated with this Apple ID.", comment: "Alert message when subscription was found")
 
-    static let subscriptionAppleIDSyncFailedAlertTitle = NSLocalizedString("subscription.alert.subscription.apple-id.sync-failed.title", value: "Subscription Restoration Failed", comment: "Alert message when the subscription failed to restore")
+    static let subscriptionAppleIDSyncFailedAlertTitle = NSLocalizedString("subscription.alert.subscription.apple-id.sync-failed.title", value: "Something Went Wrong When Syncing Your Apple ID", comment: "Alert message when the subscription failed to restore")
 }

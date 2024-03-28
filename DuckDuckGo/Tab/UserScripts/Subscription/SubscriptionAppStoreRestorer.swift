@@ -19,6 +19,7 @@
 import Foundation
 import Subscription
 import SubscriptionUI
+import enum StoreKit.StoreKitError
 
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
@@ -42,8 +43,22 @@ struct SubscriptionAppStoreRestorer {
         case .success:
             break
         case .failure(let error):
-            await windowController.showAppleIDSyncFailureAlert(text: error.localizedDescription)
-            return
+            switch error as? StoreKitError {
+            case .some(.userCancelled):
+                return
+            default:
+                break
+            }
+
+            let alert = await NSAlert.appleIDSyncFailedAlert(text: error.localizedDescription)
+
+            switch await alert.runModal() {
+            case .alertFirstButtonReturn:
+                // Continue button
+                break
+            default:
+                return
+            }
         }
 
         let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
