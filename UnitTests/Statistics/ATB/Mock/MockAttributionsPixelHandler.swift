@@ -20,9 +20,11 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MockAttributionsPixelHandler: AttributionsPixelHandler {
+    private(set) var fireInstallationAttributionPixelCount = 0
     private(set) var didCallFireInstallationAttributionPixel = false
 
     func fireInstallationAttributionPixel() {
+        fireInstallationAttributionPixelCount += 1
         didCallFireInstallationAttributionPixel = true
     }
 }

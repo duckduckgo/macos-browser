@@ -74,7 +74,7 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
         XCTAssertEqual(capturedParams.event?.parameters?[PixelKit.Parameters.locale], "en-US")
     }
 
-    func testWhenPixelFiresShouldAddAppVersionIsTrueAndFrequencyIsJustOnce() {
+    func testWhenPixelFiresShouldAddAppVersionIsTrueAndFrequencyIsStandard() {
         // GIVEN
         sut = .init(fireRequest: fireRequest, originProvider: MockAttributionOriginProvider(), locale: .current)
 

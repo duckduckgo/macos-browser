@@ -30,12 +30,14 @@ class StatisticsLoaderTests: XCTestCase {
     override func setUp() {
         mockAttributionsPixelHandler = MockAttributionsPixelHandler()
         mockStatisticsStore = MockStatisticsStore()
-        testee = StatisticsLoader(statisticsStore: mockStatisticsStore)
+        testee = StatisticsLoader(statisticsStore: mockStatisticsStore, attributionPixelHandler: mockAttributionsPixelHandler)
     }
 
     override func tearDown() {
         HTTPStubs.removeAllStubs()
+        mockStatisticsStore = nil
         mockAttributionsPixelHandler = nil
+        testee = nil
         super.tearDown()
     }
 
@@ -312,7 +314,7 @@ class StatisticsLoaderTests: XCTestCase {
 
         // THEN
         waitForExpectations(timeout: 1, handler: nil)
-        XCTAssertFalse(self.mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+        XCTAssertTrue(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
     }
 
     func testWhenLoadHasUnsuccessfulAtbThenAttributionPixelShouldNotFire() {
@@ -328,6 +330,24 @@ class StatisticsLoaderTests: XCTestCase {
         // THEN
         waitForExpectations(timeout: 1, handler: nil)
         XCTAssertFalse(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+    }
+
+    func testWhenLoadHasSuccessfulAtbSubsequentlyThenAttributionPixelShouldNotFire() {
+        // GIVEN
+        loadSuccessfulAtbStub()
+        let firstATBCallExpectation = XCTestExpectation(description: "First ATB call")
+        let secondATBCallExpectation = XCTestExpectation(description: "Second ATB call")
+        testee.load { firstATBCallExpectation.fulfill() }
+        wait(for: [firstATBCallExpectation], timeout: 1.0)
+        XCTAssertTrue(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+        XCTAssertEqual(mockAttributionsPixelHandler.fireInstallationAttributionPixelCount, 1)
+
+        // WHEN
+        testee.load { secondATBCallExpectation.fulfill() }
+
+        // THEN
+        wait(for: [secondATBCallExpectation], timeout: 1.0)
+        XCTAssertEqual(mockAttributionsPixelHandler.fireInstallationAttributionPixelCount, 1)
     }
 
     func loadSuccessfulAtbStub() {

@@ -30,7 +30,7 @@ final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
     private let originProvider: AttributionOriginProvider
     private let locale: Locale
 
-    /// Creates an instance with the specified fire request, origin provider  and locale.
+    /// Creates an instance with the specified fire request, origin provider and locale.
     /// - Parameters:
     ///   - fireRequest: A function for sending the Pixel request.
     ///   - originProvider: A provider for the origin used to track the acquisition funnel.

@@ -54,7 +54,6 @@ final class DiskAttributionOriginProviderTests: XCTestCase {
         // THEN
         XCTAssertNil(result)
     }
-
 }
 
 private extension Bundle {
