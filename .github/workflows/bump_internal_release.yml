@@ -193,7 +193,7 @@ jobs:
     with:
       asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
       branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
-      skip-appstore: ${{ needs.validate_input_conditions.outputs.skip-appstore }}
+      skip-appstore: ${{ needs.validate_input_conditions.outputs.skip-appstore == 'true' }}
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
