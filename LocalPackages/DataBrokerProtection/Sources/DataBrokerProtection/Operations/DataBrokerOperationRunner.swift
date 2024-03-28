@@ -86,9 +86,10 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             query: profileQuery,
             emailService: emailService,
             captchaService: captchaService,
+            stageDurationCalculator: stageCalculator,
             shouldRunNextStep: shouldRunNextStep
         )
-        return try await scan.run(inputValue: (), stageCalculator: stageCalculator, showWebView: showWebView)
+        return try await scan.run(inputValue: (), showWebView: showWebView)
     }
 
     func optOut(profileQuery: BrokerProfileQueryData,
@@ -102,9 +103,10 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             query: profileQuery,
             emailService: emailService,
             captchaService: captchaService,
+            stageCalculator: stageCalculator,
             shouldRunNextStep: shouldRunNextStep
         )
-        try await optOut.run(inputValue: extractedProfile, stageCalculator: stageCalculator, showWebView: showWebView)
+        try await optOut.run(inputValue: extractedProfile, showWebView: showWebView)
     }
 
     deinit {

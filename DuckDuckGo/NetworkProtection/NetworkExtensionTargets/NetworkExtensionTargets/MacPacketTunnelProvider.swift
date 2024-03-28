@@ -276,7 +276,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         )
 #if SUBSCRIPTION
 
-        let accountManager = AccountManager(accessTokenStorage: tokenStore)
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs), accessTokenStorage: tokenStore)
 
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
         let entitlementsCheck = {

@@ -197,7 +197,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                             semaphore.signal()
                         }
                         do {
-                            return try await debugScanOperation.run(inputValue: (), stageCalculator: FakeStageDurationCalculator(), showWebView: false)
+                            return try await debugScanOperation.run(inputValue: (), showWebView: false)
                         } catch {
                             return DebugScanReturnValue(brokerURL: "ERROR - with broker: \(queryData.dataBroker.name)", extractedProfiles: [ExtractedProfile](), brokerProfileQueryData: queryData)
                         }
@@ -466,6 +466,8 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 }
 
 final class FakeStageDurationCalculator: StageDurationCalculator {
+    var attemptId: UUID = UUID()
+
     func durationSinceLastStage() -> Double {
         0.0
     }

@@ -19,19 +19,15 @@
 import Foundation
 
 extension UserDefaults {
-    static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
+    static let dbp = UserDefaults(suiteName: Bundle.main.dbpAppGroup)!
 }
 
 extension Bundle {
-    func appGroup(bundle: BundleGroup) -> String {
 
-        guard let appGroup = object(forInfoDictionaryKey: "DBP_APP_GROUP") as? String else {
+    var dbpAppGroup: String {
+        guard let appGroup = object(forInfoDictionaryKey: Bundle.dbpAppGroupName) as? String else {
             fatalError("Info.plist is missing \(appGroupName)")
         }
         return appGroup
     }
-}
-
-enum BundleGroup {
-    case dbp
 }
