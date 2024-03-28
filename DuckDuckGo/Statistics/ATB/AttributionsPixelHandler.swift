@@ -19,7 +19,9 @@
 import Foundation
 import PixelKit
 
+/// A type that handles Pixels for acquisition attributions.
 protocol AttributionsPixelHandler: AnyObject {
+    /// Fire the Pixel to track the App install.
     func fireInstallationAttributionPixel()
 }
 
@@ -28,6 +30,11 @@ final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
     private let originProvider: AttributionOriginProvider
     private let locale: Locale
 
+    /// Creates an instance with the specified fire request, origin provider  and locale.
+    /// - Parameters:
+    ///   - fireRequest: A function for sending the Pixel request.
+    ///   - originProvider: A provider for the origin used to track the acquisition funnel.
+    ///   - locale: The locale of the device.
     init(
         fireRequest: @escaping FireRequest = PixelKit.fire,
         originProvider: AttributionOriginProvider = DiskAttributionOriginProvider(),
@@ -39,7 +46,16 @@ final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
     }
 
     func fireInstallationAttributionPixel() {
-        fireRequest(AttributionsPixel.installation(origin: originProvider.origin, locale: locale.identifier), .standard, [:], nil, nil, nil, true, {_, _ in })
+        fireRequest(
+            AttributionsPixel.installation(origin: originProvider.origin, locale: locale.identifier),
+            .standard,
+            [:],
+            nil,
+            nil,
+            nil,
+            true,
+            {_, _ in }
+        )
     }
 }
 
