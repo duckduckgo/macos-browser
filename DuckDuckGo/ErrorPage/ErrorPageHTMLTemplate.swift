@@ -62,15 +62,33 @@ struct SSLErrorPageHTMLTemplate {
             assertionFailure("Should be able to load template")
             return ""
         }
-        return html.replacingOccurrences(of: "$HEADER$", with: sslError.header, options: .literal)
-            .replacingOccurrences(of: "$BODY$", with: sslError.body(for: domain), options: .literal)
-            .replacingOccurrences(of: "$ADVANCED_BUTTON$", with: sslError.advancedButton, options: .literal)
-            .replacingOccurrences(of: "$LEAVE_SITE_BUTTON$", with: sslError.leaveSiteButton, options: .literal)
-            .replacingOccurrences(of: "$ADVANCED_INFO_HEADER$", with: sslError.advancedInfoTitle, options: .literal)
-            .replacingOccurrences(of: "$SPECIFIC_MESSAGE$", with: sslError.specificMessage(for: domain), options: .literal)
-            .replacingOccurrences(of: "$ADVANCED_INFO_BODY$", with: sslError.advancedInfoBody, options: .literal)
-            .replacingOccurrences(of: "$VISIT_SITE_BUTTON$", with: sslError.visitSiteButton, options: .literal)
-            .replacingOccurrences(of: "$ERROR_CODE$", with: String(errorCode), options: .literal)
+        let loadTimeData = createJSONString(header: sslError.header, body: sslError.body(for: domain), advancedButton: sslError.advancedButton, leaveSiteButton: sslError.leaveSiteButton, advancedInfoHeader: sslError.advancedInfoTitle, specificMessage: sslError.specificMessage(for: domain), advancedInfoBody: sslError.advancedInfoBody, visitSiteButton: sslError.visitSiteButton, errorCode: String(errorCode))
+        return html.replacingOccurrences(of: "$LOAD_TIME_DATA$", with: loadTimeData, options: .literal)
+    }
+
+    private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, specificMessage: String, advancedInfoBody: String, visitSiteButton: String, errorCode: String) -> String {
+        let dictionary: [String: Any] = [
+            "header": header,
+            "body": body,
+            "advancedButton": advancedButton,
+            "leaveSiteButton": leaveSiteButton,
+            "advancedInfoHeader": advancedInfoHeader,
+            "specificMessage": specificMessage,
+            "advancedInfoBody": advancedInfoBody,
+            "visitSiteButton": visitSiteButton,
+            "errorCode": errorCode
+        ]
+
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            } else {
+                return "Error: Could not encode jsonData to String."
+            }
+        } catch {
+            return "Error: \(error.localizedDescription)"
+        }
     }
 
 }
