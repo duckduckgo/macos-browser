@@ -24,13 +24,36 @@ import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
 
-#if NETWORK_PROTECTION
-final class NetworkProtectionNavBarPopoverManager {
-    private var networkProtectionPopover: NetworkProtectionPopover?
-    let ipcClient: TunnelControllerIPCClient
+#if SUBSCRIPTION
+import Subscription
+#endif
 
-    init(ipcClient: TunnelControllerIPCClient) {
+#if NETWORK_PROTECTION
+
+protocol NetworkProtectionIPCClient {
+    var ipcStatusObserver: ConnectionStatusObserver { get }
+    var ipcServerInfoObserver: ConnectionServerInfoObserver { get }
+    var ipcConnectionErrorObserver: ConnectionErrorObserver { get }
+
+    func start()
+    func stop()
+}
+
+extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
+    public var ipcStatusObserver: any NetworkProtection.ConnectionStatusObserver { connectionStatusObserver }
+    public var ipcServerInfoObserver: any NetworkProtection.ConnectionServerInfoObserver { serverInfoObserver }
+    public var ipcConnectionErrorObserver: any NetworkProtection.ConnectionErrorObserver { connectionErrorObserver }
+}
+
+final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
+    private var networkProtectionPopover: NetworkProtectionPopover?
+    let ipcClient: NetworkProtectionIPCClient
+    let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
+
+    init(ipcClient: TunnelControllerIPCClient,
+         networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling) {
         self.ipcClient = ipcClient
+        self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
     }
 
     var isShown: Bool {
@@ -41,22 +64,16 @@ final class NetworkProtectionNavBarPopoverManager {
 #endif
     }
 
-    private func show(_ popover: NSPopover, positionedBelow view: NSView) {
-        view.isHidden = false
-
-        popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
-    }
-
+    // swiftlint:disable:next function_body_length
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
-
         let popover = networkProtectionPopover ?? {
 
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
             let statusReporter = DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.connectionStatusObserver,
-                serverInfoObserver: ipcClient.serverInfoObserver,
-                connectionErrorObserver: ipcClient.connectionErrorObserver,
+                statusObserver: ipcClient.ipcStatusObserver,
+                serverInfoObserver: ipcClient.ipcServerInfoObserver,
+                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
             )
@@ -77,6 +94,10 @@ final class NetworkProtectionNavBarPopoverManager {
                                 await appLauncher.launchApp(withCommand: .showSettings)
                             }),
                         NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                                await appLauncher.launchApp(withCommand: .showFAQ)
+                            }),
+                        NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {
                                 await appLauncher.launchApp(withCommand: .shareFeedback)
@@ -84,6 +105,10 @@ final class NetworkProtectionNavBarPopoverManager {
                     ]
                 } else {
                     return [
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuFAQ, action: {
+                                await appLauncher.launchApp(withCommand: .showFAQ)
+                            }),
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                             action: {
@@ -93,8 +118,11 @@ final class NetworkProtectionNavBarPopoverManager {
                 }
             },
                                                    agentLoginItem: LoginItem.vpnMenu,
-                                                   isMenuBarStatusView: false
-            )
+                                                   isMenuBarStatusView: false,
+                                                   userDefaults: .netP,
+                                                   uninstallHandler: { [weak self] in
+                _ = await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
+            })
             popover.delegate = delegate
 
             networkProtectionPopover = popover
@@ -104,13 +132,19 @@ final class NetworkProtectionNavBarPopoverManager {
         show(popover, positionedBelow: view)
     }
 
+    private func show(_ popover: NSPopover, positionedBelow view: NSView) {
+        view.isHidden = false
+
+        popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
+    }
+
     func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
         if let networkProtectionPopover, networkProtectionPopover.isShown {
             networkProtectionPopover.close()
         } else {
             let featureVisibility = DefaultNetworkProtectionVisibility()
 
-            if featureVisibility.isNetworkProtectionVisible() {
+            if featureVisibility.isNetworkProtectionBetaVisible() {
                 show(positionedBelow: view, withDelegate: delegate)
             } else {
                 featureVisibility.disableForWaitlistUsers()

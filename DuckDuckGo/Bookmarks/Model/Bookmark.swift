@@ -19,29 +19,36 @@
 import Cocoa
 import Bookmarks
 
-internal class BaseBookmarkEntity: Identifiable {
+internal class BaseBookmarkEntity: Identifiable, Equatable, Hashable {
 
     static func singleEntity(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@ AND %K == NO", #keyPath(BookmarkEntity.uuid), uuid, #keyPath(BookmarkEntity.isPendingDeletion))
+        request.predicate = NSPredicate(format: "%K == %@ AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.uuid), uuid,
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
     static func favorite(with uuid: String, favoritesFolder: BookmarkEntity) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@ AND %K CONTAINS %@ AND %K == NO AND %K == NO",
+        request.predicate = NSPredicate(format: "%K == %@ AND %K CONTAINS %@ AND %K == NO AND %K == NO AND (%K == NO OR %K == nil)",
                                         #keyPath(BookmarkEntity.uuid),
                                         uuid as CVarArg,
                                         #keyPath(BookmarkEntity.favoriteFolders),
                                         favoritesFolder,
                                         #keyPath(BookmarkEntity.isFolder),
-                                        #keyPath(BookmarkEntity.isPendingDeletion))
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
     static func entities(with identifiers: [String]) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K IN %@ AND %K == NO", #keyPath(BookmarkEntity.uuid), identifiers, #keyPath(BookmarkEntity.isPendingDeletion))
+        request.predicate = NSPredicate(format: "%K IN %@ AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.uuid), identifiers,
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
@@ -92,13 +99,33 @@ internal class BaseBookmarkEntity: Identifiable {
         }
     }
 
+    // Subclasses needs to override to check equality on their properties
+    func isEqual(to instance: BaseBookmarkEntity) -> Bool {
+        id == instance.id &&
+        title == instance.title &&
+        isFolder == instance.isFolder
+    }
+
+    static func == (lhs: BaseBookmarkEntity, rhs: BaseBookmarkEntity) -> Bool {
+        return type(of: lhs) == type(of: rhs) && lhs.isEqual(to: rhs)
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(isFolder)
+    }
+
 }
 
 final class BookmarkFolder: BaseBookmarkEntity {
 
     static func bookmarkFoldersFetchRequest() -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == YES AND %K == NO", #keyPath(BookmarkEntity.isFolder), #keyPath(BookmarkEntity.isPendingDeletion))
+        request.predicate = NSPredicate(format: "%K == YES AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.isFolder),
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
@@ -129,13 +156,48 @@ final class BookmarkFolder: BaseBookmarkEntity {
 
         super.init(id: id, title: title, isFolder: true)
     }
+
+    override func isEqual(to instance: BaseBookmarkEntity) -> Bool {
+        guard let folder = instance as? BookmarkFolder else {
+            return false
+        }
+        return id == folder.id &&
+        title == folder.title &&
+        isFolder == folder.isFolder &&
+        isParentFolderEqual(lhs: parentFolderUUID, rhs: folder.parentFolderUUID) &&
+        children == folder.children
+    }
+
+    override func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(isFolder)
+        hasher.combine(parentFolderUUID)
+        hasher.combine(children)
+    }
+
+    // In some cases a bookmark folder that is child of the root folder has its `parentFolderUUID` set to `bookmarks_root`. In some other cases is nil. Making sure that comparing a `nil` and a `bookmarks_root` does not return false. Probably would be good idea to remove the optionality of `parentFolderUUID` in the future and set it to `bookmarks_root` when needed.
+    private func isParentFolderEqual(lhs: String?, rhs: String?) -> Bool {
+        switch (lhs, rhs) {
+        case (.none, .none):
+            return true
+        case (.some(let lhsValue), .some(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.some(let value), .none), (.none, .some(let value)):
+            return value == "bookmarks_root"
+        }
+    }
+
 }
 
 final class Bookmark: BaseBookmarkEntity {
 
     static func bookmarksFetchRequest() -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == NO AND %K == NO", #keyPath(BookmarkEntity.isFolder), #keyPath(BookmarkEntity.isPendingDeletion))
+        request.predicate = NSPredicate(format: "%K == NO AND %K == NO AND (%K == NO OR %K == nil)",
+                                        #keyPath(BookmarkEntity.isFolder),
+                                        #keyPath(BookmarkEntity.isPendingDeletion),
+                                        #keyPath(BookmarkEntity.isStub), #keyPath(BookmarkEntity.isStub))
         return request
     }
 
@@ -183,12 +245,33 @@ final class Bookmark: BaseBookmarkEntity {
                   parentFolderUUID: bookmark.parentFolderUUID)
     }
 
-}
+    convenience init(from bookmark: Bookmark, withNewUrl url: String, title: String, isFavorite: Bool) {
+        self.init(id: bookmark.id,
+                  url: url,
+                  title: title,
+                  isFavorite: isFavorite,
+                  parentFolderUUID: bookmark.parentFolderUUID)
+    }
 
-extension BaseBookmarkEntity: Equatable {
+    override func isEqual(to instance: BaseBookmarkEntity) -> Bool {
+        guard let bookmark = instance as? Bookmark else {
+            return false
+        }
+        return id == bookmark.id &&
+        title == bookmark.title &&
+        isFolder == bookmark.isFolder &&
+        url == bookmark.url &&
+        isFavorite == bookmark.isFavorite &&
+        parentFolderUUID == bookmark.parentFolderUUID
+    }
 
-    static func == (lhs: BaseBookmarkEntity, rhs: BaseBookmarkEntity) -> Bool {
-        return lhs.id == rhs.id
+    override func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(isFolder)
+        hasher.combine(url)
+        hasher.combine(isFavorite)
+        hasher.combine(parentFolderUUID)
     }
 
 }

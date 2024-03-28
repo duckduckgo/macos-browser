@@ -48,11 +48,11 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
         notificationCenter.post(.showVPNSupersededNotification)
     }
 
-    func showTestNotification() {
-        notificationCenter.post(.showTestNotification)
+    func showEntitlementNotification() {
+        notificationCenter.post(.showExpiredEntitlementNotification)
     }
 
-    func showEntitlementNotification() {
-        // todo
+    func showTestNotification() {
+        notificationCenter.post(.showTestNotification)
     }
 }

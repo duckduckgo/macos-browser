@@ -117,6 +117,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
 
+        let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
         let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
 
         do {
@@ -141,6 +142,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     if doesProfileExistsInDatabase, let alreadyInDatabaseProfile = extractedProfilesForBroker.first(where: { $0.identifier == extractedProfile.identifier }), let id = alreadyInDatabaseProfile.id {
                         // If it was removed in the past but was found again when scanning, it means it appearead again, so we reset the remove date.
                         if alreadyInDatabaseProfile.removedDate != nil {
+                            let reAppereanceEvent = HistoryEvent(extractedProfileId: extractedProfile.id, brokerId: brokerId, profileQueryId: profileQueryId, type: .reAppearence)
+                            eventPixels.fireReAppereanceEventPixel()
+                            try database.add(reAppereanceEvent)
                             try database.updateRemovedDate(nil, on: id)
                         }
 
@@ -148,6 +152,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     } else {
                         // If it's a new found profile, we'd like to opt-out ASAP
                         // If this broker has a parent opt out, we set the preferred date to nil, as we will only perform the operation within the parent.
+                        eventPixels.fireNewMatchEventPixel()
                         let broker = brokerProfileQueryData.dataBroker
                         let preferredRunOperation: Date? = broker.performsOptOutWithinParent() ? nil : Date()
 
@@ -280,7 +285,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         let retriesCalculatorUseCase = OperationRetriesCalculatorUseCase()
-        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.url, handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 

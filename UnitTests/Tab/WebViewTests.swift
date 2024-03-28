@@ -134,7 +134,7 @@ final class WebViewTests: XCTestCase {
         let tabVM = TabViewModel(tab: Tab())
         let randomZoomLevel = DefaultZoomValue.percent300
         // Select Default zoom
-        AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
+        AccessibilityPreferences.shared.defaultPageZoom = randomZoomLevel
 
         // Zooming out
         tabVM.tab.webView.zoomOut()
@@ -147,7 +147,7 @@ final class WebViewTests: XCTestCase {
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
 
         // Set new default zoom
-        AppearancePreferences.shared.defaultPageZoom = .percent75
+        AccessibilityPreferences.shared.defaultPageZoom = .percent75
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, .percent75)
     }
 

@@ -33,6 +33,7 @@ final class DataBrokerProtectionProcessor {
     private var pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userNotificationService: DataBrokerProtectionUserNotificationService
     private let engagementPixels: DataBrokerProtectionEngagementPixels
+    private let eventPixels: DataBrokerProtectionEventPixels
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
@@ -50,6 +51,7 @@ final class DataBrokerProtectionProcessor {
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
         self.userNotificationService = userNotificationService
         self.engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
+        self.eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
     }
 
     // MARK: - Public functions
@@ -115,6 +117,8 @@ final class DataBrokerProtectionProcessor {
 
         // This will fire the DAU/WAU/MAU pixels,
         engagementPixels.fireEngagementPixel()
+        // This will try to fire the event weekly report pixels
+        eventPixels.tryToFireWeeklyPixels()
 
         do {
             let brokersProfileData = try database.fetchAllBrokerProfileQueryData()

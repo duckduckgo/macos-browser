@@ -30,6 +30,7 @@ runs:
         task-url: ${{ inputs.task-url }}
 
     - id: get-asana-user-id
+      if: github.event_name != 'schedule'
       uses: duckduckgo/apple-infra/actions/asana-get-user-id-for-github-handle@main
       with:
         access-token: ${{ inputs.access-token }}

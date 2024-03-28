@@ -22,6 +22,7 @@ import Combine
 import Common
 import SwiftUI
 import WebKit
+import Subscription
 
 // swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
@@ -162,6 +163,10 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onSubscriptionAccountDidSignOut),
                                                name: .accountDidSignOut,
                                                object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onSubscriptionDidChange),
+                                               name: .subscriptionDidChange,
+                                               object: nil)
 #endif
     }
 
@@ -199,7 +204,9 @@ final class BrowserTabViewController: NSViewController {
 #if DBP
     @objc
     private func onDBPFeatureDisabled(_ notification: Notification) {
-        tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
+        Task { @MainActor in
+            tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
+        }
     }
 
     @objc
@@ -243,6 +250,25 @@ final class BrowserTabViewController: NSViewController {
                 if case .subscription = tabContent {
                     return true
                 } else if case .identityTheftRestoration = tabContent {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+    }
+
+    @objc
+    private func onSubscriptionDidChange(_ notification: Notification) {
+        guard let subscription = (notification.userInfo?[UserDefaultsCacheKey.subscription] as? DDGSubscription), !subscription.isActive else { return }
+
+        Task { @MainActor in
+            tabCollectionViewModel.removeAll { tabContent in
+                if case .subscription = tabContent {
+                    return true
+                } else if case .identityTheftRestoration = tabContent {
+                    return true
+                } else if case .dataBrokerProtection = tabContent {
                     return true
                 } else {
                     return false
@@ -1092,12 +1118,13 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
-        let defaultBrowserPreferences = DefaultBrowserPreferences()
+        let defaultBrowserPreferences = DefaultBrowserPreferences.shared
         if defaultBrowserPreferences.isDefault {
             completion()
             return
         }
 
+        Pixel.fire(.defaultRequestedFromOnboarding)
         defaultBrowserPreferences.becomeDefault { _ in
             _ = defaultBrowserPreferences
             withAnimation {

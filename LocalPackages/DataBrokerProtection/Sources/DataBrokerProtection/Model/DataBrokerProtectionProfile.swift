@@ -69,7 +69,7 @@ public struct DataBrokerProtectionProfile: Codable {
     }
 }
 
-internal extension DataBrokerProtectionProfile {
+extension DataBrokerProtectionProfile {
     var profileQueries: [ProfileQuery] {
         return addresses.flatMap { address in
             names.map { name in

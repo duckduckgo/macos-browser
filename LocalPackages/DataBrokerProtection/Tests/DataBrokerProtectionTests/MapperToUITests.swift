@@ -139,10 +139,15 @@ final class MapperToUITests: XCTestCase {
     }
 
     func testLastScans_areMappedCorrectly() {
+        var dateComponent = DateComponents()
+        dateComponent.day = -10
+        let date10daysAgo = Calendar.current.date(byAdding: dateComponent, to: Date())!
+
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(dataBrokerName: "Broker #1", url: "broker1.com", lastRunDate: Date().yesterday),
             .mock(dataBrokerName: "Broker #2", url: "broker2.com", lastRunDate: Date().yesterday),
-            .mock(dataBrokerName: "Broker #3", url: "broker3.com")
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com", lastRunDate: date10daysAgo),
+            .mock(dataBrokerName: "Broker #4", url: "broker4.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)
@@ -152,10 +157,15 @@ final class MapperToUITests: XCTestCase {
     }
 
     func testNextScans_areMappedCorrectly() {
+        var dateComponent = DateComponents()
+        dateComponent.day = 10
+        let date10daysFromNow = Calendar.current.date(byAdding: dateComponent, to: Date())!
+
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(dataBrokerName: "Broker #1", url: "broker1.com", preferredRunDate: Date().tomorrow),
             .mock(dataBrokerName: "Broker #2", url: "broker2.com", preferredRunDate: Date().tomorrow),
-            .mock(dataBrokerName: "Broker #3", url: "broker3.com")
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com", preferredRunDate: date10daysFromNow),
+            .mock(dataBrokerName: "Broker #4", url: "broker4.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)

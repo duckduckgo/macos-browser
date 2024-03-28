@@ -22,18 +22,33 @@ import NetworkProtection
 import ServiceManagement
 import AppKit
 
-/// Class that implements the necessary logic to ensure Network Protection is enabled, or prevent the app from running otherwise.
+#if SUBSCRIPTION
+import Subscription
+#endif
+
+/// Class that implements the necessary logic to ensure the VPN is enabled, or prevent the app from running otherwise.
 ///
 final class NetworkProtectionBouncer {
 
-    /// Simply verifies that the Network Protection feature is enabled and if not, takes care of killing the
+    /// Simply verifies that the VPN feature is enabled and if not, takes care of killing the
     /// current app.
     ///
-    func requireAuthTokenOrKillApp() {
-        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil, isSubscriptionEnabled: false)
+    func requireAuthTokenOrKillApp(controller: TunnelController) async {
+#if SUBSCRIPTION
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
+        guard !accountManager.isUserAuthenticated else {
+            return
+        }
+#endif
+        let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
+                                                                errorEvents: nil,
+                                                                isSubscriptionEnabled: false,
+                                                                accessTokenProvider: { nil })
         guard keychainStore.isFeatureActivated else {
-            os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
+            os_log(.error, log: .networkProtection, "🔴 Stopping: DuckDuckGo VPN not authorized. Missing token.")
+
+            await controller.stop()
 
             // EXIT_SUCCESS ensures the login item won't relaunch
             // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
