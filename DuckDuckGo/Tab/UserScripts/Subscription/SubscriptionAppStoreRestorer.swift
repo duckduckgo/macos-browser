@@ -36,7 +36,13 @@ struct SubscriptionAppStoreRestorer {
             mainViewController.presentAsSheet(progressViewController)
         }
 
-        guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else {
+        let syncResult = await PurchaseManager.shared.syncAppleIDAccount()
+
+        switch syncResult {
+        case .success:
+            break
+        case .failure(let error):
+            await windowController.showAppleIDSyncFailureAlert(text: error.localizedDescription)
             return
         }
 

@@ -521,6 +521,14 @@ extension MainWindowController {
             }
         })
     }
+
+    @MainActor
+    func showAppleIDSyncFailureAlert(text: String) {
+        guard let window else { return }
+        
+        window.show(.appleIDSyncFailedAlert(text: text))
+    }
+
 }
 
 #endif
