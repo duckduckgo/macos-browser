@@ -6447,8 +6447,8 @@
 				EEBCE6802BA444FA00B9DF00 /* Common */,
 				EED735352BB46B6000F173D6 /* AutocompleteTests.swift */,
 				EE02D41B2BB460A600DBE6B3 /* BrowsingHistoryTests.swift */,
-				7B4CE8E626F02134009134B1 /* TabBarTests.swift */,
 				EE0429DF2BA31D2F009EB20F /* FindInPageTests.swift */,
+				7B4CE8E626F02134009134B1 /* TabBarTests.swift */,
 			);
 			path = UITests;
 			sourceTree = "<group>";

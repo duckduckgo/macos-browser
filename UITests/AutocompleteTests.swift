@@ -27,18 +27,23 @@ class AutocompleteTests: XCTestCase {
     private var clearAllHistoryMenuItem: XCUIElement!
     private var addressBarTextField: XCUIElement!
     private var suggestionsTableView: XCUIElement!
+    private var clearAllHistoryAlertClearButton: XCUIElement!
+    private var fakeFireButton: XCUIElement!
     private var siteTitleForBookmarkedSite: String!
     private var siteTitleForHistorySite: String!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         addBookmarkButton = app.buttons["BookmarkDialogButtonsView.defaultButton"]
         resetBookMarksMenuItem = app.menuItems["MainMenu.resetBookmarks"]
         historyMenuBarItem = app.menuBarItems["History"]
         clearAllHistoryMenuItem = app.menuItems["HistoryMenu.clearAllHistory"]
         addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         suggestionsTableView = app.tables["SuggestionViewController.tableView"]
+        clearAllHistoryAlertClearButton = app.buttons["ClearAllHistoryAndDataAlert.clearButton"]
+        fakeFireButton = app.buttons["FireViewController.fakeFireButton"]
         let siteTitleLength = 12
         siteTitleForBookmarkedSite = UITests.randomPageTitle(length: siteTitleLength)
         siteTitleForHistorySite = UITests.randomPageTitle(length: siteTitleLength)
@@ -181,12 +186,12 @@ private extension AutocompleteTests {
         clearAllHistoryMenuItem.click()
 
         XCTAssertTrue(
-            app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            clearAllHistoryAlertClearButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Clear all history item didn't appear in a reasonable timeframe."
         )
-        app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // Manually remove the history
+        clearAllHistoryAlertClearButton.click() // Manually remove the history
         XCTAssertTrue( // Let any ongoing fire animation or data processes complete
-            app.buttons["FireViewController.fakeFireButton"].waitForNonExistence(timeout: UITests.Timeouts.fireAnimation),
+            fakeFireButton.waitForNonExistence(timeout: UITests.Timeouts.fireAnimation),
             "Fire animation didn't finish and cease existing in a reasonable timeframe."
         )
 

@@ -22,6 +22,10 @@ class BrowsingHistoryTests: XCTestCase {
     private var app: XCUIApplication!
     private var historyMenuBarItem: XCUIElement!
     private var clearAllHistoryMenuItem: XCUIElement!
+    private var clearAllHistoryAlertClearButton: XCUIElement!
+    private var fakeFireButton: XCUIElement!
+    private var addressBarTextField: XCUIElement!
+    private var reopenLastClosedWindowMenuItem: XCUIElement!
     private let lengthForRandomPageTitle = 8
 
     override func setUpWithError() throws {
@@ -30,6 +34,10 @@ class BrowsingHistoryTests: XCTestCase {
         app.launchEnvironment["UITEST_MODE"] = "1"
         historyMenuBarItem = app.menuBarItems["History"]
         clearAllHistoryMenuItem = app.menuItems["HistoryMenu.clearAllHistory"]
+        clearAllHistoryAlertClearButton = app.buttons["ClearAllHistoryAndDataAlert.clearButton"]
+        fakeFireButton = app.buttons["FireViewController.fakeFireButton"]
+        addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
+        reopenLastClosedWindowMenuItem = app.menuItems["HistoryMenu.reopenLastClosedWindow"]
         app.launch()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Enforce a single window
         app.typeKey("n", modifierFlags: .command)
@@ -47,12 +55,12 @@ class BrowsingHistoryTests: XCTestCase {
         clearAllHistoryMenuItem.click()
 
         XCTAssertTrue(
-            app.buttons["ClearAllHistoryAndDataAlert.clearButton"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            clearAllHistoryAlertClearButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Clear all history item didn't appear in a reasonable timeframe."
         )
-        app.buttons["ClearAllHistoryAndDataAlert.clearButton"].click() // Manually remove the history
+        clearAllHistoryAlertClearButton.click() // Manually remove the history
         XCTAssertTrue( // Let any ongoing fire animation or data processes complete
-            app.buttons["FireViewController.fakeFireButton"].waitForNonExistence(timeout: UITests.Timeouts.fireAnimation),
+            fakeFireButton.waitForNonExistence(timeout: UITests.Timeouts.fireAnimation),
             "Fire animation didn't finish and cease existing in a reasonable timeframe."
         )
     }
@@ -60,7 +68,6 @@ class BrowsingHistoryTests: XCTestCase {
     func test_recentlyVisited_showsLastVisitedSite() throws {
         let historyPageTitleExpectedToBeFirstInRecentlyVisited = UITests.randomPageTitle(length: lengthForRandomPageTitle)
         let url = UITests.simpleServedPage(titled: historyPageTitleExpectedToBeFirstInRecentlyVisited)
-        let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         let firstSiteInRecentlyVisitedSection = app.menuItems["HistoryMenu.recentlyVisitedMenuItem.0"]
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -89,7 +96,6 @@ class BrowsingHistoryTests: XCTestCase {
     func test_history_showsVisitedSiteAfterClosingAndReopeningWindow() throws {
         let historyPageTitleExpectedToBeFirstInTodayHistory = UITests.randomPageTitle(length: lengthForRandomPageTitle)
         let url = UITests.simpleServedPage(titled: historyPageTitleExpectedToBeFirstInTodayHistory)
-        let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         let firstSiteInHistory = app.menuItems["HistoryMenu.historyMenuItem.Today.0"]
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -121,7 +127,6 @@ class BrowsingHistoryTests: XCTestCase {
         let titleOfSecondTabWhichShouldRestore = UITests.randomPageTitle(length: lengthForRandomPageTitle)
         let urlForFirstTab = UITests.simpleServedPage(titled: titleOfFirstTabWhichShouldRestore)
         let urlForSecondTab = UITests.simpleServedPage(titled: titleOfSecondTabWhichShouldRestore)
-        let addressBarTextField = app.windows.textFields["AddressBarViewController.addressBarTextField"]
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The address bar text field didn't become available in a reasonable timeframe."
@@ -138,7 +143,6 @@ class BrowsingHistoryTests: XCTestCase {
             app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
-        let reopenLastClosedWindowMenuItem = app.menuItems["HistoryMenu.reopenLastClosedWindow"]
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close all windows
         app.typeKey("n", modifierFlags: .command) // New window
         XCTAssertTrue(
