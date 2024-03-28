@@ -201,16 +201,6 @@
                ReferencedContainer = "container:LocalPackages/DataBrokerProtection">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "VPNPrivacyProTests"
-               BuildableName = "VPNPrivacyProTests"
-               BlueprintName = "VPNPrivacyProTests"
-               ReferencedContainer = "container:LocalPackages/NetworkProtectionMac">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

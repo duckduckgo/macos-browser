@@ -255,7 +255,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
 
         Task {
-            let accountManager = AccountManager()
+            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             if let token = accountManager.accessToken {
                 _ = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
                 _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
@@ -567,7 +567,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 func updateSubscriptionStatus() {
 #if SUBSCRIPTION
     Task {
-        let accountManager = AccountManager()
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
         guard let token = accountManager.accessToken else { return }
 

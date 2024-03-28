@@ -45,6 +45,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private var signInObserver: Any?
     private var signOutObserver: Any?
+    private var subscriptionChangeObserver: Any?
 
     public enum UserEvent {
         case openVPN,
@@ -111,6 +112,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         signOutObserver = NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: .main) { [weak self] _ in
             self?.updateUserAuthenticatedState(false)
         }
+
+        subscriptionChangeObserver = NotificationCenter.default.addObserver(forName: .subscriptionDidChange, object: nil, queue: .main) { _ in
+            Task { [weak self] in
+                await self?.updateSubscription(with: .returnCacheDataDontLoad)
+            }
+        }
     }
 
     deinit {
@@ -120,6 +127,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         if let signOutObserver {
             NotificationCenter.default.removeObserver(signOutObserver)
+        }
+
+        if let subscriptionChangeObserver {
+            NotificationCenter.default.removeObserver(subscriptionChangeObserver)
         }
     }
 

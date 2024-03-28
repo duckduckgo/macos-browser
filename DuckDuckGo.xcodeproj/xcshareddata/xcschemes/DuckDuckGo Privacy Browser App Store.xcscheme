@@ -171,16 +171,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "VPNPrivacyProTests"
-               BuildableName = "VPNPrivacyProTests"
-               BlueprintName = "VPNPrivacyProTests"
-               ReferencedContainer = "container:LocalPackages/NetworkProtectionMac">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "NetworkProtectionUITests"
                BuildableName = "NetworkProtectionUITests"
                BlueprintName = "NetworkProtectionUITests"

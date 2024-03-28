@@ -20,7 +20,6 @@ import XCTest
 
 class FindInPageTests: XCTestCase {
     private var app: XCUIApplication!
-    private let elementExistenceTimeout = 0.3
     private var addressBarTextField: XCUIElement!
     private var loremIpsumWebView: XCUIElement!
     private var findInPageCloseButton: XCUIElement!
@@ -48,172 +47,172 @@ class FindInPageTests: XCTestCase {
 
     func test_findInPage_canBeOpenedWithKeyCommand() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
 
         app.typeKey("f", modifierFlags: .command)
 
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
         )
     }
 
     func test_findInPage_canBeOpenedWithMenuBarItem() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         let findInPageMenuBarItem = app.menuItems["MainMenu.findInPage"]
         XCTAssertTrue(
-            findInPageMenuBarItem.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageMenuBarItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find \"Find in Page\" main menu bar item in a reasonable timeframe."
         )
 
         findInPageMenuBarItem.click()
 
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" via the menu items Edit->Find->\"Find in Page\", the elements of the \"Find in Page\" interface should exist."
         )
     }
 
     func test_findInPage_canBeOpenedWithMoreOptionsMenuItem() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         let optionsButton = app.windows.buttons["NavigationBarViewController.optionsButton"]
-        XCTAssertTrue(optionsButton.waitForExistence(timeout: elementExistenceTimeout), "Couldn't find options item in a reasonable timeframe.")
+        XCTAssertTrue(optionsButton.waitForExistence(timeout: UITests.Timeouts.elementExistence), "Couldn't find options item in a reasonable timeframe.")
         optionsButton.click()
 
         let findInPageMoreOptionsMenuItem = app.menuItems["MoreOptionsMenu.findInPage"]
         XCTAssertTrue(
-            findInPageMoreOptionsMenuItem.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageMoreOptionsMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find More Options \"Find in Page\" menu item in a reasonable timeframe."
         )
         findInPageMoreOptionsMenuItem.click()
 
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" via the More Options \"Find in Page\" menu item, the elements of the \"Find in Page\" interface should exist."
         )
     }
 
     func test_findInPage_canBeClosedWithEscape() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
         )
 
         app.typeKey(.escape, modifierFlags: [])
 
         XCTAssertTrue(
-            findInPageCloseButton.waitForNonExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "After closing \"Find in Page\" with escape, the elements of the \"Find in Page\" interface should no longer exist."
         )
     }
 
     func test_findInPage_canBeClosedWithShiftCommandF() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
         )
 
         app.typeKey("f", modifierFlags: [.command, .shift])
 
         XCTAssertTrue(
-            findInPageCloseButton.waitForNonExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "After closing \"Find in Page\" with escape, the elements of the \"Find in Page\" interface should no longer exist."
         )
     }
 
     func test_findInPage_canBeClosedWithHideFindMenuItem() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
         )
 
         let findInPageDoneMenuBarItem = app.menuItems["MainMenu.findInPageDone"]
         XCTAssertTrue(
-            findInPageDoneMenuBarItem.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageDoneMenuBarItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find \"Find in Page\" done main menu item in a reasonable timeframe."
         )
         findInPageDoneMenuBarItem.click()
 
         XCTAssertTrue(
-            findInPageCloseButton.waitForNonExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "After closing \"Find in Page\" with escape, the elements of the \"Find in Page\" interface should no longer exist."
         )
     }
 
     func test_findInPage_showsCorrectNumberOfOccurrences() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
 
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
         )
 
         app.typeText("maximus\r")
         let statusField = app.textFields["FindInPageController.statusField"]
         XCTAssertTrue(
-            statusField.waitForExistence(timeout: elementExistenceTimeout),
+            statusField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find \"Find in Page\" statusField in a reasonable timeframe."
         )
         let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
@@ -222,24 +221,24 @@ class FindInPageTests: XCTestCase {
 
     func test_findInPage_showsFocusAndOccurrenceHighlighting() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
         )
 
         app.typeText("maximus\r")
         let statusField = app.textFields["FindInPageController.statusField"]
         XCTAssertTrue(
-            statusField.waitForExistence(timeout: elementExistenceTimeout),
+            statusField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find \"Find in Page\" statusField in a reasonable timeframe."
         )
         let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
@@ -257,23 +256,23 @@ class FindInPageTests: XCTestCase {
 
     func test_findNext_menuItemGoesToNextOccurrence() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
         )
         app.typeText("maximus\r")
         let statusField = app.textFields["FindInPageController.statusField"]
         XCTAssertTrue(
-            statusField.waitForExistence(timeout: elementExistenceTimeout),
+            statusField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find \"Find in Page\" statusField in a reasonable timeframe."
         )
         let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
@@ -285,14 +284,14 @@ class FindInPageTests: XCTestCase {
 
         let findNextMenuBarItem = app.menuItems["MainMenu.findNext"]
         XCTAssertTrue(
-            findNextMenuBarItem.waitForExistence(timeout: elementExistenceTimeout),
+            findNextMenuBarItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find \"Find Next\" main menu bar item in a reasonable timeframe."
         )
         findNextMenuBarItem.click()
         let updatedStatusField = app.textFields["FindInPageController.statusField"]
         let updatedStatusFieldTextContent = updatedStatusField.value as! String
         XCTAssertTrue(
-            updatedStatusField.waitForExistence(timeout: elementExistenceTimeout),
+            updatedStatusField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find the updated \"Find in Page\" statusField in a reasonable timeframe."
         )
         XCTAssertEqual(updatedStatusFieldTextContent, "2 of 4", "Unexpected status field text content after a \"Find Next\" operation.")
@@ -316,23 +315,23 @@ class FindInPageTests: XCTestCase {
 
     func test_findNext_nextArrowGoesToNextOccurrence() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
         )
         app.typeText("maximus\r")
         let statusField = app.textFields["FindInPageController.statusField"]
         XCTAssertTrue(
-            statusField.waitForExistence(timeout: elementExistenceTimeout),
+            statusField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find \"Find in Page\" statusField in a reasonable timeframe."
         )
         let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
@@ -343,7 +342,7 @@ class FindInPageTests: XCTestCase {
         let findHighlightPoints = Set(highlightedPixelsInFindScreenshot.map { $0.point }) // Coordinates of highlighted pixels in the find screenshot
         let findInPageNextButton = app.windows.buttons["FindInPageController.nextButton"]
         XCTAssertTrue(
-            findInPageNextButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageNextButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find \"Find Next\" main menu bar item in a reasonable timeframe."
         )
 
@@ -351,7 +350,7 @@ class FindInPageTests: XCTestCase {
         let updatedStatusField = app.textFields["FindInPageController.statusField"]
         let updatedStatusFieldTextContent = updatedStatusField.value as! String
         XCTAssertTrue(
-            updatedStatusField.waitForExistence(timeout: elementExistenceTimeout),
+            updatedStatusField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find the updated \"Find in Page\" statusField in a reasonable timeframe."
         )
         XCTAssertEqual(updatedStatusFieldTextContent, "2 of 4", "Unexpected status field text content after a \"Find Next\" operation.")
@@ -374,23 +373,23 @@ class FindInPageTests: XCTestCase {
 
     func test_findNext_commandGGoesToNextOccurrence() throws {
         XCTAssertTrue(
-            addressBarTextField.waitForExistence(timeout: elementExistenceTimeout),
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
         addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
         XCTAssertTrue(
-            loremIpsumWebView.waitForExistence(timeout: elementExistenceTimeout),
-            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe."
+            loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         app.typeKey("f", modifierFlags: .command)
         XCTAssertTrue(
-            findInPageCloseButton.waitForExistence(timeout: elementExistenceTimeout),
+            findInPageCloseButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "After invoking \"Find in Page\" with command-f, the elements of the \"Find in Page\" interface should exist."
         )
         app.typeText("maximus\r")
         let statusField = app.textFields["FindInPageController.statusField"]
         XCTAssertTrue(
-            statusField.waitForExistence(timeout: elementExistenceTimeout),
+            statusField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find \"Find in Page\" statusField in a reasonable timeframe."
         )
         let statusFieldTextContent = try XCTUnwrap(statusField.value as? String)
@@ -404,7 +403,7 @@ class FindInPageTests: XCTestCase {
         let updatedStatusField = app.textFields["FindInPageController.statusField"]
         let updatedStatusFieldTextContent = updatedStatusField.value as! String
         XCTAssertTrue(
-            updatedStatusField.waitForExistence(timeout: elementExistenceTimeout),
+            updatedStatusField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Couldn't find the updated \"Find in Page\" statusField in a reasonable timeframe."
         )
 

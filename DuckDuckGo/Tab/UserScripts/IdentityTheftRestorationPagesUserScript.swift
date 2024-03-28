@@ -94,7 +94,7 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
     }
 
     func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let accessToken = AccountManager().accessToken {
+        if let accessToken = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).accessToken {
             return ["token": accessToken]
         } else {
             return [String: String]()
