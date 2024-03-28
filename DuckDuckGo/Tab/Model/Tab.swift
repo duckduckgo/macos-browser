@@ -429,7 +429,7 @@ protocol NewWindowPolicyDecisionMaker {
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
                   webViewSize: webViewSize,
-                  startupPreferences: startupPreferences, 
+                  startupPreferences: startupPreferences,
                   certificateTustEvaluator: certificateTustEvaluator)
     }
 
