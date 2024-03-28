@@ -13,6 +13,10 @@ on:
         description: "Base branch (defaults to main, only override for testing)"
         required: false
         type: string
+      skip-appstore:
+        description: "Skip App Store release and only make a DMG build"
+        default: false
+        type: boolean
 
 jobs:
 
@@ -29,6 +33,7 @@ jobs:
       skip-release: ${{ steps.check-for-changes.outputs.skip-release }}
       asana-task-url: ${{ steps.set-parameters.outputs.asana-task-url }}
       release-branch: ${{ steps.set-parameters.outputs.release-branch }}
+      skip-appstore: ${{ steps.set-parameters.outputs.skip-appstore }}
 
     steps:
 
@@ -94,6 +99,7 @@ jobs:
           ASANA_TASK_URL: ${{ steps.find-asana-task.outputs.task-url || github.event.inputs.asana-task-url }}
           RELEASE_BRANCH: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
           TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.task-id }}
+          SKIP_APPSTORE: ${{ github.event.inputs.skip-appstore || false }} # make sure this is set to false on scheduled runs
         run: |
           if [[ "${RELEASE_BRANCH}" == "main" ]]; then
             echo "::error::Workflow run from main branch and release branch wasn't found. Please re-run the workflow and specify a release branch."
@@ -102,6 +108,7 @@ jobs:
           echo "release-branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
           echo "task-id=${TASK_ID}" >> $GITHUB_OUTPUT
           echo "asana-task-url=${ASANA_TASK_URL}" >> $GITHUB_OUTPUT
+          echo "skip-appstore=${SKIP_APPSTORE}" >> $GITHUB_OUTPUT
 
       - name: Validate release notes
         env:
@@ -186,6 +193,7 @@ jobs:
     with:
       asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
       branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
+      skip-appstore: ${{ needs.validate_input_conditions.outputs.skip-appstore }}
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}

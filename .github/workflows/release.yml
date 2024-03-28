@@ -7,6 +7,10 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
+      skip-appstore:
+        description: "Skip App Store release and only make a DMG build"
+        default: false
+        type: boolean
   workflow_call:
     inputs:
       asana-task-url:
@@ -17,6 +21,10 @@ on:
         description: "Branch name"
         required: false
         type: string
+      skip-appstore:
+        description: "Skip App Store release and only make a DMG build"
+        default: false
+        type: boolean
     secrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
@@ -106,6 +114,9 @@ jobs:
 
   appstore-release:
     name: Prepare AppStore Release
+
+    if: github.event.inputs.skip-appstore != 'true' && inputs.skip-appstore != 'true'
+
     uses: ./.github/workflows/build_appstore.yml
     with:
       destination: appstore
