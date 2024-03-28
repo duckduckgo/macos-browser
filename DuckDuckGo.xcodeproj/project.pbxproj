@@ -3978,6 +3978,8 @@
 		566B196029CDB7C9007E38F4 /* CapturingOptionsButtonMenuDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingOptionsButtonMenuDelegate.swift; sourceTree = "<group>"; };
 		567DA93E29E8045D008AC5EE /* MockEmailStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEmailStorage.swift; sourceTree = "<group>"; };
 		567DA94429E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeOverlayUserScriptTests.swift; sourceTree = "<group>"; };
+		5687E1082BB57EC000B95D49 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../../../code/content-scope-scripts"; sourceTree = "<group>"; };
+		5687E1092BB57ECB00B95D49 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../../code/BrowserServicesKit; sourceTree = "<group>"; };
 		569277C029DDCBB500B633EF /* HomePageContinueSetUpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageContinueSetUpModel.swift; sourceTree = "<group>"; };
 		569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueSetUpModelTests.swift; sourceTree = "<group>"; };
 		56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarUrlExtensionsTests.swift; sourceTree = "<group>"; };
@@ -5401,6 +5403,8 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
+				5687E1092BB57ECB00B95D49 /* BrowserServicesKit */,
+				5687E1082BB57EC000B95D49 /* content-scope-scripts */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
