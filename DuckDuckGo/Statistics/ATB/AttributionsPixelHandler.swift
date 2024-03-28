@@ -24,27 +24,27 @@ protocol AttributionsPixelHandler: AnyObject {
 }
 
 final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
-    private let pixelExecutor: PixelExecutor
+    private let fireRequest: FireRequest
     private let originProvider: AttributionOriginProvider
     private let locale: Locale
 
     init(
-        pixelExecutor: @escaping PixelExecutor = PixelKit.fire,
+        fireRequest: @escaping FireRequest = PixelKit.fire,
         originProvider: AttributionOriginProvider = DiskAttributionOriginProvider(),
         locale: Locale = .current
     ) {
-        self.pixelExecutor = pixelExecutor
+        self.fireRequest = fireRequest
         self.originProvider = originProvider
         self.locale = locale
     }
 
     func fireInstallationAttributionPixel() {
-        pixelExecutor(AttributionsPixel.installation(origin: originProvider.origin, locale: locale.identifier), .justOnce, [:], nil, nil, nil, true, {_, _ in })
+        fireRequest(AttributionsPixel.installation(origin: originProvider.origin, locale: locale.identifier), .justOnce, [:], nil, nil, nil, true, {_, _ in })
     }
 }
 
 extension InstallationAttributionPixelHandler {
-    typealias PixelExecutor = (
+    typealias FireRequest = (
         _ event: PixelKit.Event,
         _ frequency: PixelKit.Frequency,
         _ headers: [String: String],

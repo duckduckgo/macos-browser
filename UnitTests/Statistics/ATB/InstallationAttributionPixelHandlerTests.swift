@@ -23,12 +23,12 @@ import PixelKit
 final class InstallationAttributionPixelHandlerTests: XCTestCase {
     private var sut: InstallationAttributionPixelHandler!
     private var capturedParams: CapturedParameters!
-    private var executor: InstallationAttributionPixelHandler.PixelExecutor!
+    private var fireRequest: InstallationAttributionPixelHandler.FireRequest!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         capturedParams = CapturedParameters()
-        executor = { event, frequency, headers, parameters, error, reservedCharacters, includeAppVersion, onComplete in
+        fireRequest = { event, frequency, headers, parameters, error, reservedCharacters, includeAppVersion, onComplete in
             self.capturedParams.event = event
             self.capturedParams.frequency = frequency
             self.capturedParams.headers = headers
@@ -42,7 +42,7 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
 
     override func tearDownWithError() throws {
         capturedParams = nil
-        executor = nil
+        fireRequest = nil
         sut = nil
         try super.tearDownWithError()
     }
@@ -50,7 +50,7 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
     func testWhenPixelFireLanguageCodeShouldBeSet() {
         // GIVEN
         let locale = Locale(identifier: "hu-HU")
-        sut = .init(pixelExecutor: executor, originProvider: MockAttributionOriginProvider(), locale: locale)
+        sut = .init(fireRequest: fireRequest, originProvider: MockAttributionOriginProvider(), locale: locale)
 
         // WHEN
         sut.fireInstallationAttributionPixel()
@@ -64,7 +64,7 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
         let origin = "app_search"
         let locale = Locale(identifier: "en-US")
         let originProvider = MockAttributionOriginProvider(origin: origin)
-        sut = .init(pixelExecutor: executor, originProvider: originProvider, locale: locale)
+        sut = .init(fireRequest: fireRequest, originProvider: originProvider, locale: locale)
 
         // WHEN
         sut.fireInstallationAttributionPixel()
@@ -76,7 +76,7 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
 
     func testWhenPixelFiresShouldAddAppVersionIsTrueAndFrequencyIsJustOnce() {
         // GIVEN
-        sut = .init(pixelExecutor: executor, originProvider: MockAttributionOriginProvider(), locale: .current)
+        sut = .init(fireRequest: fireRequest, originProvider: MockAttributionOriginProvider(), locale: .current)
 
         // WHEN
         sut.fireInstallationAttributionPixel()
