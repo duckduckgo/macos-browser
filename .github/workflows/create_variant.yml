@@ -90,11 +90,14 @@ jobs:
     - name: Install create-dmg
       run: brew install create-dmg
 
-    - name: Check out the code
-      uses: actions/checkout@v4
-      with:
-        ref: main
-        sparse-checkout: .github
+    - name: Fetch install-certs-and-profiles action
+      env:
+        GH_TOKEN: ${{ github.token }}
+        DEST_DIR: ".github/actions/install-certs-and-profiles"
+      run: |
+        mkdir -p "${{ env.DEST_DIR }}"
+        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/${{ env.DEST_DIR }}/action.yml?ref=${{ github.ref }} --jq .download_url) \
+          --output ${{ env.DEST_DIR }}/action.yml
 
     - name: Install Apple Developer ID Application certificate
       uses: ./.github/actions/install-certs-and-profiles
