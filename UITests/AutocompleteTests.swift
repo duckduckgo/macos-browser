@@ -61,7 +61,7 @@ class AutocompleteTests: XCTestCase {
             "Suggestions tableView didn't become available in a reasonable timeframe."
         )
 
-        let suggestionCellWithBookmarkedSite = suggestionsTableView.tableRows.cells.staticTexts["\(siteTitleForBookmarkedSite)"].firstMatch
+        let suggestionCellWithBookmarkedSite = suggestionsTableView.tableRows.cells.staticTexts[siteTitleForBookmarkedSite].firstMatch
         XCTAssertTrue( // It should match something in suggestions
             suggestionCellWithBookmarkedSite.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The expected table view cell with the suggestion for the bookmarked site didn't become available in a reasonable timeframe."
@@ -89,7 +89,7 @@ class AutocompleteTests: XCTestCase {
             "Suggestions tableView didn't become available in a reasonable timeframe."
         )
 
-        let suggestionCellWithHistorySite = suggestionsTableView.tableRows.cells.staticTexts["\(siteTitleForHistorySite)"].firstMatch
+        let suggestionCellWithHistorySite = suggestionsTableView.tableRows.cells.staticTexts[siteTitleForHistorySite].firstMatch
         XCTAssertTrue( // It should match something in suggestions
             suggestionCellWithHistorySite.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The expected table view cell with the suggestion for the history site didn't become available in a reasonable timeframe."
@@ -121,7 +121,7 @@ class AutocompleteTests: XCTestCase {
             "Suggestions tableView didn't become available in a reasonable timeframe."
         )
 
-        let suggestionCellWithWebsite = suggestionsTableView.tableRows.cells.staticTexts["\(websiteURLString)"].firstMatch
+        let suggestionCellWithWebsite = suggestionsTableView.tableRows.cells.staticTexts[websiteURLString].firstMatch
         XCTAssertTrue( // It should match something in suggestions
             suggestionCellWithWebsite.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The expected table view cell with the suggestion for the website didn't become available in a reasonable timeframe."
@@ -162,7 +162,7 @@ private extension AutocompleteTests {
 
         addressBarTextField.typeText("\(urlForBookmarks.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(siteTitleForBookmarkedSite)"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            app.windows.webViews[siteTitleForBookmarkedSite].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
 
@@ -204,7 +204,7 @@ private extension AutocompleteTests {
 
         addressBarTextField.typeText("\(urlForHistory.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(siteTitleForHistorySite)"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            app.windows.webViews[siteTitleForHistorySite].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         app.typeKey("w", modifierFlags: [.command, .option, .shift])

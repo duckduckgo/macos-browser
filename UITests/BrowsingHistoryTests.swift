@@ -74,7 +74,7 @@ class BrowsingHistoryTests: XCTestCase {
 
         addressBarTextField.typeText("\(url.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(historyPageTitleExpectedToBeFirstInRecentlyVisited)"]
+            app.windows.webViews[historyPageTitleExpectedToBeFirstInRecentlyVisited]
                 .waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
@@ -102,7 +102,7 @@ class BrowsingHistoryTests: XCTestCase {
 
         addressBarTextField.typeText("\(url.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(historyPageTitleExpectedToBeFirstInTodayHistory)"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            app.windows.webViews[historyPageTitleExpectedToBeFirstInTodayHistory].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close all windows
@@ -131,14 +131,14 @@ class BrowsingHistoryTests: XCTestCase {
         )
         addressBarTextField.typeText("\(urlForFirstTab.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(titleOfFirstTabWhichShouldRestore)"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            app.windows.webViews[titleOfFirstTabWhichShouldRestore].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         app.typeKey("t", modifierFlags: .command)
 
         addressBarTextField.typeText("\(urlForSecondTab.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            app.windows.webViews[titleOfSecondTabWhichShouldRestore].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close all windows
@@ -156,12 +156,12 @@ class BrowsingHistoryTests: XCTestCase {
         reopenLastClosedWindowMenuItem.click()
 
         XCTAssertTrue(
-            app.windows.webViews["\(titleOfFirstTabWhichShouldRestore)"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            app.windows.webViews[titleOfFirstTabWhichShouldRestore].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Restored visited tab 1 wasn't available with the expected title in a reasonable timeframe."
         )
         app.typeKey("w", modifierFlags: [.command])
         XCTAssertTrue(
-            app.windows.webViews["\(titleOfSecondTabWhichShouldRestore)"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            app.windows.webViews[titleOfSecondTabWhichShouldRestore].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Restored visited tab 2 wasn't available with the expected title in a reasonable timeframe."
         )
     }
