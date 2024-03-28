@@ -90,13 +90,19 @@ public final class DataBrokerProtectionBackgroundManager {
             return
         }
 
-        scheduler.runQueuedOperations(showWebView: false) { [weak self] error in
-            if let error = error {
-                os_log("Error during BackgroundManager runOperationsAndStartSchedulerIfPossible in scheduler.runQueuedOperations(), error: %{public}@",
-                       log: .dataBrokerProtection,
-                       error.localizedDescription)
-                self?.pixelHandler.fire(.generalError(error: error,
-                                                      functionOccurredIn: "DataBrokerProtectionBackgroundManager.runOperationsAndStartSchedulerIfPossible"))
+        scheduler.runQueuedOperations(showWebView: false) { [weak self] errors in
+            if let errors = errors {
+                if let oneTimeError = errors.oneTimeError {
+                    os_log("Error during BackgroundManager runOperationsAndStartSchedulerIfPossible in scheduler.runQueuedOperations(), error: %{public}@",
+                           log: .dataBrokerProtection,
+                           oneTimeError.localizedDescription)
+                    self?.pixelHandler.fire(.generalError(error: oneTimeError,
+                                                          functionOccurredIn: "DataBrokerProtectionBackgroundManager.runOperationsAndStartSchedulerIfPossible"))
+                }
+                if let operationErrors = errors.operationErrors,
+                          operationErrors.count != 0 {
+                    os_log("Operation error(s) during  BackgroundManager runOperationsAndStartSchedulerIfPossible in scheduler.runQueuedOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                }
                 return
             }
 

@@ -27,6 +27,23 @@ public enum DataBrokerProtectionSchedulerStatus: Codable {
     case running
 }
 
+@objc
+public class DataBrokerProtectionSchedulerErrorCollection: NSObject {
+    /*
+     This needs to be an NSObject (rather than a struct) so it can be represented in Objective C
+     for the IPC layer
+     */
+
+    public let oneTimeError: Error?
+    public let operationErrors: [Error]?
+
+    public init(oneTimeError: Error? = nil, operationErrors: [Error]? = nil) {
+        self.oneTimeError = oneTimeError
+        self.operationErrors = operationErrors
+        super.init()
+    }
+}
+
 public protocol DataBrokerProtectionScheduler {
 
     var status: DataBrokerProtectionSchedulerStatus { get }
@@ -35,9 +52,9 @@ public protocol DataBrokerProtectionScheduler {
     func startScheduler(showWebView: Bool)
     func stopScheduler()
 
-    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
-    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
-    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?)
+    func optOutAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func scanAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func runQueuedOperations(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runAllOperations(showWebView: Bool)
 }
 
@@ -138,10 +155,16 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
             }
             self.status = .running
             os_log("Scheduler running...", log: .dataBrokerProtection)
-            self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] error in
-                if let error = error {
-                    os_log("Error during startScheduler in dataBrokerProcessor.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-                    self?.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.startScheduler"))
+            self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] errors in
+                if let errors = errors {
+                    if let oneTimeError = errors.oneTimeError {
+                        os_log("Error during startScheduler in dataBrokerProcessor.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.startScheduler"))
+                    }
+                    if let operationErrors = errors.operationErrors,
+                              operationErrors.count != 0 {
+                        os_log("Operation error(s) during startScheduler in dataBrokerProcessor.runQueuedOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                    }
                 }
                 self?.status = .idle
                 completion(.finished)
@@ -158,34 +181,48 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public func runAllOperations(showWebView: Bool = false) {
         os_log("Running all operations...", log: .dataBrokerProtection)
-        self.dataBrokerProcessor.runAllOperations(showWebView: showWebView) { [weak self] error in
-            if let error = error {
-                os_log("Error during DefaultDataBrokerProtectionScheduler.runAllOperations in dataBrokerProcessor.runAllOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-                self?.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.runAllOperations"))
+        self.dataBrokerProcessor.runAllOperations(showWebView: showWebView) { [weak self] errors in
+            if let errors = errors {
+                if let oneTimeError = errors.oneTimeError {
+                    os_log("Error during DefaultDataBrokerProtectionScheduler.runAllOperations in dataBrokerProcessor.runAllOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.runAllOperations"))
+                }
+                if let operationErrors = errors.operationErrors,
+                          operationErrors.count != 0 {
+                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.runAllOperations in dataBrokerProcessor.runAllOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                }
             }
         }
     }
 
-    public func runQueuedOperations(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
+    public func runQueuedOperations(showWebView: Bool = false,
+                                    completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
         dataBrokerProcessor.runQueuedOperations(showWebView: showWebView,
-                                                completion: { [weak self] error in
-            if let error = error {
-                os_log("Error during DefaultDataBrokerProtectionScheduler.runQueuedOperations in dataBrokerProcessor.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-                self?.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.runQueuedOperations"))
+                                                completion: { [weak self] errors in
+            if let errors = errors {
+                if let oneTimeError = errors.oneTimeError {
+                    os_log("Error during DefaultDataBrokerProtectionScheduler.runQueuedOperations in dataBrokerProcessor.runQueuedOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.runQueuedOperations"))
+                }
+                if let operationErrors = errors.operationErrors,
+                          operationErrors.count != 0 {
+                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.runQueuedOperations in dataBrokerProcessor.runQueuedOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                }
             }
-            completion?(error)
+            completion?(errors)
         })
 
     }
 
-    public func scanAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
+    public func scanAllBrokers(showWebView: Bool = false,
+                               completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         stopScheduler()
 
         userNotificationService.requestNotificationPermission()
 
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] error in
+        dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] errors in
             guard let self = self else { return }
 
             self.startScheduler(showWebView: showWebView)
@@ -197,25 +234,38 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
-            if let error = error {
-                os_log("Error during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-                self.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.scanAllBrokers"))
+            if let errors = errors {
+                if let oneTimeError = errors.oneTimeError {
+                    os_log("Error during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.scanAllBrokers"))
+                }
+                if let operationErrors = errors.operationErrors,
+                          operationErrors.count != 0 {
+                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                }
             }
 
-            completion?(error)
+            completion?(errors)
         }
     }
 
-    public func optOutAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)?) {
+    public func optOutAllBrokers(showWebView: Bool = false,
+                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runAllOptOutOperations(showWebView: showWebView,
-                                                        completion: { [weak self] error in
-            if let error = error {
-                os_log("Error during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-                self?.pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.optOutAllBrokers"))
+                                                        completion: { [weak self] errors in
+            if let errors = errors {
+                if let oneTimeError = errors.oneTimeError {
+                    os_log("Error during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    self?.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.optOutAllBrokers"))
+                }
+                if let operationErrors = errors.operationErrors,
+                          operationErrors.count != 0 {
+                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                }
             }
 
-            completion?(error)
+            completion?(errors)
         })
     }
 }

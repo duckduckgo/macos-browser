@@ -27,6 +27,8 @@ final class DataBrokerOperationsCollection: Operation {
         case all
     }
 
+    public var error: Error?
+
     private let dataBrokerID: Int64
     private let database: DataBrokerProtectionRepository
     private let id = UUID()
@@ -183,6 +185,7 @@ final class DataBrokerOperationsCollection: Operation {
 
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                self.error = error
                 if let error = error as? DataBrokerProtectionError,
                    let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
                     pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
