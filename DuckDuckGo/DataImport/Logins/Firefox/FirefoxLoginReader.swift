@@ -95,7 +95,7 @@ final class FirefoxLoginReader {
     func readLogins(dataFormat: DataFormat?) -> DataImportResult<[ImportedLoginCredential]> {
         var currentOperationType: ImportError.OperationType = .couldNotFindLoginsFile
         do {
-            let dataFormat = try dataFormat ?? detectLoginFormat() ?? { throw ImportError(type: .couldNotDetermineFormat, underlyingError: nil) }()
+            let dataFormat = try dataFormat ?? detectLoginFormat() ?? { throw ImportError(type: .couldNotFindKeyDB, underlyingError: nil) }()
             let keyData = try getEncryptionKey(dataFormat: dataFormat)
             let result = try reallyReadLogins(dataFormat: dataFormat, keyData: keyData, currentOperationType: &currentOperationType)
             return .success(result)
@@ -107,7 +107,7 @@ final class FirefoxLoginReader {
     }
 
     func getEncryptionKey() throws -> Data {
-        let dataFormat = try detectLoginFormat() ?? { throw ImportError(type: .couldNotDetermineFormat, underlyingError: nil) }()
+        let dataFormat = try detectLoginFormat() ?? { throw ImportError(type: .couldNotFindKeyDB, underlyingError: nil) }()
         return try getEncryptionKey(dataFormat: dataFormat)
     }
 
@@ -137,15 +137,12 @@ final class FirefoxLoginReader {
             let databaseURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.databaseName)
             let loginsURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginsFileName)
 
-            guard FileManager.default.fileExists(atPath: databaseURL.path) else {
-                throw ImportError(type: .couldNotFindKeyDB, underlyingError: nil)
+            if FileManager.default.fileExists(atPath: databaseURL.path) {
+                guard FileManager.default.fileExists(atPath: loginsURL.path) else {
+                    throw ImportError(type: .couldNotFindLoginsFile, underlyingError: nil)
+                }
+                return potentialFormat
             }
-
-            guard FileManager.default.fileExists(atPath: loginsURL.path) else {
-                throw ImportError(type: .couldNotFindLoginsFile, underlyingError: nil)
-            }
-
-            return potentialFormat
         }
 
         return nil
