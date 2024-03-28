@@ -63,7 +63,7 @@ struct DataImportSummaryView: View {
                     }
                     if summary.duplicate > 0 {
                         HStack {
-                            failureImage()
+                            skippedImage()
                             Text("Duplicate Bookmarks Skipped:",
                                  comment: "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.")
                             + Text(" " as String)
@@ -83,7 +83,7 @@ struct DataImportSummaryView: View {
                 case (.bookmarks, .failure(let error)):
                     if error.errorType == .noData {
                         HStack {
-                            noDataImage()
+                            skippedImage()
                             Text("Bookmarks:",
                                  comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
                             + Text(" " as String)
@@ -100,7 +100,7 @@ struct DataImportSummaryView: View {
                 case (.passwords, .failure(let error)):
                     if error.errorType == .noData {
                         HStack {
-                            noDataImage()
+                            skippedImage()
                             Text("Passwords:",
                                  comment: "Data import summary format of how many passwords (%lld) were successfully imported.")
                             + Text(" " as String)
@@ -148,8 +148,8 @@ private func failureImage() -> some View {
         .frame(width: 16, height: 16)
 }
 
-private func noDataImage() -> some View {
-    Image(.alertColor16)
+private func skippedImage() -> some View {
+    Image(.skipped)
         .frame(width: 16, height: 16)
 }
 
