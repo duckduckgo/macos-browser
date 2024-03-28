@@ -55,7 +55,7 @@ final class CrashReporter {
                 return
             }
             Task {
-                await sender.send(contentData)
+                await self.sender.send(contentData)
             }
         }
 
