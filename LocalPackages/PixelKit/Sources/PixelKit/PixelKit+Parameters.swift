@@ -66,6 +66,10 @@ public extension PixelKit {
         public static let vpnBreakageMetadata = "breakageMetadata"
 
         public static let reason = "reason"
+
+        // Installation Attribution
+        public static let origin = "origin"
+        public static let locale = "locale"
     }
 
     enum Values {
