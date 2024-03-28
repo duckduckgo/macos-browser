@@ -26,7 +26,7 @@ protocol AttributionOriginProvider: AnyObject {
 
 final class DiskAttributionOriginProvider: AttributionOriginProvider {
     let origin: String?
-    
+
     /// Creates an instance with the given file name and `Bundle`.
     /// - Parameters:
     ///   - name: The name of the Txt file to extract the origin from.
