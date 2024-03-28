@@ -78,6 +78,14 @@ jobs:
 
     steps:
 
+    - name: Check out the code
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        sparse-checkout: |
+          .github
+          scripts
+
     - name: Download release app
       run: |
         curl -fLSs "${{ vars.RELEASE_DMG_URL }}" --output duckduckgo.dmg
@@ -89,15 +97,6 @@ jobs:
 
     - name: Install create-dmg
       run: brew install create-dmg
-
-    - name: Fetch install-certs-and-profiles action
-      env:
-        GH_TOKEN: ${{ github.token }}
-        DEST_DIR: ".github/actions/install-certs-and-profiles"
-      run: |
-        mkdir -p "${{ env.DEST_DIR }}"
-        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/${{ env.DEST_DIR }}/action.yml?ref=${{ github.ref }} --jq .download_url) \
-          --output ${{ env.DEST_DIR }}/action.yml
 
     - name: Install Apple Developer ID Application certificate
       uses: ./.github/actions/install-certs-and-profiles
@@ -159,15 +158,12 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/dmg-background.png --jq .download_url) \
-          --output dmg-background.png
-
         retries=3
 
         while [[ $retries -gt 0 ]]; do
           if create-dmg --volname "DuckDuckGo" \
             --icon "DuckDuckGo.app" 140 160 \
-            --background "dmg-background.png" \
+            --background "scripts/assets/dmg-background.png" \
             --window-size 600 400 \
             --icon-size 120 \
             --app-drop-link 430 160 "duckduckgo.dmg" \
