@@ -23,16 +23,19 @@ import OHHTTPStubsSwift
 
 class StatisticsLoaderTests: XCTestCase {
 
-    var mockStatisticsStore: StatisticsStore!
-    var testee: StatisticsLoader!
+    private var mockAttributionsPixelHandler: MockAttributionsPixelHandler!
+    private var mockStatisticsStore: StatisticsStore!
+    private var testee: StatisticsLoader!
 
     override func setUp() {
+        mockAttributionsPixelHandler = MockAttributionsPixelHandler()
         mockStatisticsStore = MockStatisticsStore()
         testee = StatisticsLoader(statisticsStore: mockStatisticsStore)
     }
 
     override func tearDown() {
         HTTPStubs.removeAllStubs()
+        mockAttributionsPixelHandler = nil
         super.tearDown()
     }
 
@@ -294,6 +297,37 @@ class StatisticsLoaderTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWhenLoadHasSuccessfulAtbThenAttributionPixelShouldFire() {
+        // GIVEN
+        loadSuccessfulAtbStub()
+        let expect = expectation(description: #function)
+        XCTAssertFalse(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+
+        // WHEN
+        testee.load {
+            expect.fulfill()
+        }
+
+        // THEN
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertFalse(self.mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+    }
+
+    func testWhenLoadHasUnsuccessfulAtbThenAttributionPixelShouldNotFire() {
+        // GIVEN
+        loadUnsuccessfulAtbStub()
+        let expect = expectation(description: #function)
+        XCTAssertFalse(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+
+        testee.load {
+            expect.fulfill()
+        }
+
+        // THEN
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertFalse(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
     }
 
     func loadSuccessfulAtbStub() {
