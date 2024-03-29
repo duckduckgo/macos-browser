@@ -272,7 +272,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updateBookmarkButtonVisibility() {
         guard view.window?.isPopUpWindow == false else { return }
-        bookmarkButton.setAccessibilityIdentifier("Bookmarks Button")
+        bookmarkButton.setAccessibilityIdentifier("AddressBarButtonsViewController.bookmarkButton")
         let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
         var showBookmarkButton: Bool {
             guard let tabViewModel, tabViewModel.canBeBookmarked else { return false }
@@ -723,15 +723,18 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
         if let url = tabViewModel?.tab.content.url,
-           isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
+           isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url)
+        {
             bookmarkButton.image = .bookmarkFilled
             bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
             bookmarkButton.toolTip = UserText.editBookmarkTooltip
+            bookmarkButton.setAccessibilityValue("Bookmarked")
         } else {
             bookmarkButton.mouseOverTintColor = nil
             bookmarkButton.image = .bookmark
             bookmarkButton.contentTintColor = nil
             bookmarkButton.toolTip = UserText.addBookmarkTooltip
+            bookmarkButton.setAccessibilityValue("Unbookmarked")
         }
     }
 
