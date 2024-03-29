@@ -470,12 +470,12 @@ private extension FindInPageTests {
 }
 
 private extension UInt8 {
-    func isCloseTo(_ integer: UInt8) -> Bool {
+    func isCloseTo(_ colorValue: UInt8) -> Bool {
         // Overflow-safe creation of range +/- 1 around value
         let lowerBound: UInt8 = self != 0 ? self &- 1 : 0
         let upperBound: UInt8 = self != 255 ? self &+ 1 : 255
 
-        switch integer {
+        switch colorValue {
         case lowerBound ... upperBound:
             return true
         default:
