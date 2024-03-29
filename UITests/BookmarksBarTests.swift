@@ -69,7 +69,7 @@ class BookmarksBarTests: XCTestCase {
             showBookmarksBarAlways.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The \"Show Bookmarks Bar Always\" button didn't become available in a reasonable timeframe."
         )
-        
+
         showBookmarksBarAlways.click()
         app.typeKey("`", modifierFlags: [.command]) // Swap windows
 
@@ -120,7 +120,7 @@ class BookmarksBarTests: XCTestCase {
             bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "The bookmarksBarCollectionView should not exist on a new window when we have unchecked \"Show Bookmarks Bar\" in the settings"
         )
-        
+
         app.typeKey("t", modifierFlags: [.command]) // Open new tab
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
@@ -128,7 +128,7 @@ class BookmarksBarTests: XCTestCase {
         )
         app.typeKey("l", modifierFlags: [.command]) // Get address bar focus
         app.typeText("\(urlForBookmarksBar.absoluteString)\r")
-        
+
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "The bookmarksBarCollectionView should not exist on a new tab that has been directed to a site when we have unchecked \"Show Bookmarks Bar\" in the settings"
