@@ -469,6 +469,21 @@ private extension FindInPageTests {
     }
 }
 
+private extension UInt8 {
+    func isCloseTo(_ integer: UInt8) -> Bool {
+        // Overflow-safe creation of range +/- 1 around value
+        let lowerBound: UInt8 = self != 0 ? self &- 1 : 0
+        let upperBound: UInt8 = self != 255 ? self &+ 1 : 255
+
+        switch integer {
+        case lowerBound ... upperBound:
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 private extension NSImage {
     /// Find matching pixels in an NSImage for a specific NSColor
     /// - Parameter colorToMatch: the NSColor to match
@@ -506,7 +521,9 @@ private extension NSImage {
                 bitmapData = bitmapData.advanced(by: 1)
                 alphaInImage = bitmapData.pointee
                 bitmapData = bitmapData.advanced(by: 1)
-                if redInImage == redToMatch, greenInImage == greenToMatch, blueInImage == blueToMatch { // We aren't matching alpha
+                if redInImage.isCloseTo(redToMatch), greenInImage.isCloseTo(greenToMatch),
+                   blueInImage.isCloseTo(blueToMatch)
+                { // We aren't matching alpha
                     pixels.append(Pixel(
                         red: redInImage,
                         green: greenInImage,
