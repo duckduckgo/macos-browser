@@ -58,7 +58,15 @@ class BookmarksBarTests: XCTestCase {
 
     func test_bookmarksBar_whenShowBookmarksBarAlwaysIsSelected_alwaysDynamicallyAppearsOnWindow() throws {
         app.typeKey("`", modifierFlags: [.command]) // Swap windows
-        let showBookmarksBarIsChecked = showBookmarksBarPreferenceToggle.value as? Bool
+        XCTAssertTrue(
+            showBookmarksBarPreferenceToggle.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The toggle for showing the bookmarks bar didn't become available in a reasonable timeframe."
+        )
+
+        let showBookmarksBarIsChecked = try? XCTUnwrap(
+            showBookmarksBarPreferenceToggle.value as? Bool,
+            "It wasn't possible to get the \"Show bookmarks bar\" value as a Bool"
+        )
         if showBookmarksBarIsChecked == false {
             showBookmarksBarPreferenceToggle.click()
         }
@@ -83,7 +91,15 @@ class BookmarksBarTests: XCTestCase {
 
     func test_bookmarksBar_whenShowBookmarksNewTabOnlyIsSelected_onlyAppearsOnANewTabUntilASiteIsLoaded() throws {
         app.typeKey("`", modifierFlags: [.command]) // Swap windows
-        let showBookmarksBarIsChecked = showBookmarksBarPreferenceToggle.value as? Bool
+        XCTAssertTrue(
+            showBookmarksBarPreferenceToggle.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The toggle for showing the bookmarks bar didn't become available in a reasonable timeframe."
+        )
+
+        let showBookmarksBarIsChecked = try? XCTUnwrap(
+            showBookmarksBarPreferenceToggle.value as? Bool,
+            "It wasn't possible to get the \"Show bookmarks bar\" value as a Bool"
+        )
         if showBookmarksBarIsChecked == false {
             showBookmarksBarPreferenceToggle.click()
         }
