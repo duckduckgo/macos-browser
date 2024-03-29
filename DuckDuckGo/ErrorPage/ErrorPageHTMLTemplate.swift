@@ -133,7 +133,7 @@ public enum SSLErrorType {
     }
 
     func specificMessage(for domain: String) -> String {
-        let boldDomain = " <b>\(domain)</b> "
+        let boldDomain = "<b>\(domain)</b>"
         switch self {
         case .expired:
             return UserText.sslErrorCertificateExpiredMessage(boldDomain)
