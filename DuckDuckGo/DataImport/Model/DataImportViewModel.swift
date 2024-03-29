@@ -328,7 +328,7 @@ struct DataImportViewModel {
     }
 
     /// Skip button press
-    @MainActor mutating func skipImport() {
+    @MainActor mutating func skipImportOrDismiss(using dismiss: @escaping () -> Void) {
         if let screen = screenForNextDataTypeRemainingToImport(after: screen.fileImportDataType) {
             // skip to next non-imported data type
             self.screen = screen
@@ -339,8 +339,8 @@ struct DataImportViewModel {
             // errors occurred during import: show feedback screen
             self.screen = .feedback
         } else {
-            // display total summary
-            self.screen = .summary(selectedDataTypes)
+            // When we skip a manual import, and there are no next non-imported data types, we dismiss
+            self.dismiss(using: dismiss)
         }
     }
 
@@ -680,7 +680,7 @@ extension DataImportViewModel {
             initiateImport()
 
         case .skip:
-            skipImport()
+            skipImportOrDismiss(using: dismiss)
 
         case .cancel:
             importTask?.cancel()
