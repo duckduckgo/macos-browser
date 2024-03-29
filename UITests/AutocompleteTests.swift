@@ -54,7 +54,6 @@ class AutocompleteTests: XCTestCase {
     }
 
     func test_suggestions_showsTypedTitleOfBookmarkedPageAsBookmark() throws {
-        let siteTitleForBookmarkedSite = try XCTUnwrap(siteTitleForBookmarkedSite)
         app.typeText(siteTitleForBookmarkedSite)
         XCTAssertTrue(
             suggestionsTableView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -82,7 +81,6 @@ class AutocompleteTests: XCTestCase {
     }
 
     func test_suggestions_showsTypedTitleOfHistoryPageAsHistory() throws {
-        let siteTitleForHistorySite = try XCTUnwrap(siteTitleForHistorySite)
         app.typeText(siteTitleForHistorySite)
         XCTAssertTrue(
             suggestionsTableView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -145,9 +143,6 @@ class AutocompleteTests: XCTestCase {
 private extension AutocompleteTests {
     /// Make sure there is exactly one site in the history, and exactly one site in the bookmarks, and they aren't the same site.
     func resetAndArrangeBookmarksAndHistory() throws {
-        let siteTitleForHistorySite = try XCTUnwrap(siteTitleForHistorySite)
-        let siteTitleForBookmarkedSite = try XCTUnwrap(siteTitleForBookmarkedSite)
-
         XCTAssertTrue(
             resetBookMarksMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Reset bookmarks menu item didn't become available in a reasonable timeframe."
