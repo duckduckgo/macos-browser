@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 
 final class BurnOnQuitHandler {
 
@@ -29,6 +30,8 @@ final class BurnOnQuitHandler {
     private let preferences: DataClearingPreferences
     private let fireCoordinator: FireCoordinator
 
+    // MARK: - Burn On Quit
+
     var shouldBurnOnQuit: Bool {
         return preferences.isBurnDataOnQuitEnabled
     }
@@ -38,13 +41,33 @@ final class BurnOnQuitHandler {
 
     @MainActor
     func burnOnQuit() {
-        //TODO: Refactor from static
-        //TODO: Without opening a new window
+        guard shouldBurnOnQuit else { return }
+        // TODO: Refactor from static
         FireCoordinator.fireViewModel.fire.burnAll { [weak self] in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
-                self?.onBurnOnQuitCompleted?()
-            }
+            self?.burnPerformedSuccessfullyOnQuit = true
+            self?.onBurnOnQuitCompleted?()
         }
+    }
+
+    // MARK: - Burn On Start
+    // In case the burn on quit wasn't successfull
+
+    @UserDefaultsWrapper(key: .burnPerformedSuccessfullyOnQuit, defaultValue: false)
+    private var burnPerformedSuccessfullyOnQuit: Bool
+
+    var shouldBurnOnStart: Bool {
+        return !burnPerformedSuccessfullyOnQuit
+    }
+
+    func resetTheFlag() {
+        burnPerformedSuccessfullyOnQuit = false
+    }
+
+    @MainActor
+    func burnOnStartIfNeeded() {
+        guard preferences.isBurnDataOnQuitEnabled, shouldBurnOnStart else { return }
+
+        FireCoordinator.fireViewModel.fire.burnAll()
     }
 
 }

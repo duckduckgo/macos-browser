@@ -310,6 +310,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         burnOnQuitHandler = BurnOnQuitHandler(preferences: .shared, fireCoordinator: FireCoordinator())
+        burnOnQuitHandler.burnOnStartIfNeeded()
+        burnOnQuitHandler.resetTheFlag()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
