@@ -21,7 +21,7 @@ import XCTest
 
 class BookmarksBarTests: XCTestCase {
     private var app: XCUIApplication!
-    private let pageTitle = String(UUID().uuidString.prefix(12))
+    private var pageTitle: String!
     private var urlForBookmarksBar: URL!
     private var settingsWindow: XCUIElement!
     private var siteWindow: XCUIElement!
@@ -32,6 +32,7 @@ class BookmarksBarTests: XCTestCase {
     private var showBookmarksBarAlways: XCUIElement!
     private var showBookmarksBarNewTabOnly: XCUIElement!
     private var bookmarksBarCollectionView: XCUIElement!
+    private let titleStringLength = 12
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -44,6 +45,7 @@ class BookmarksBarTests: XCTestCase {
         showBookmarksBarAlways = app.menuItems["Preferences.AppearanceView.showBookmarksBarAlways"]
         showBookmarksBarNewTabOnly = app.menuItems["Preferences.AppearanceView.showBookmarksBarNewTabOnly"]
         bookmarksBarCollectionView = app.collectionViews["BookmarksBarViewController.bookmarksBarCollectionView"]
+        pageTitle = UITests.randomPageTitle(length: titleStringLength)
         urlForBookmarksBar = UITests.simpleServedPage(titled: pageTitle)
         app.launch()
         resetBookmarksAndAddOneBookmark()
