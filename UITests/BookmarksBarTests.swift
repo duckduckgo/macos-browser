@@ -21,7 +21,6 @@ import XCTest
 
 class BookmarksBarTests: XCTestCase {
     private var app: XCUIApplication!
-    private let elementExistenceTimeout = 2.0
     private let pageTitle = String(UUID().uuidString.prefix(12))
     private var urlForBookmarksBar: URL!
     private var settingsWindow: XCUIElement!
@@ -37,11 +36,11 @@ class BookmarksBarTests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         defaultBookmarkDialogButton = app.buttons["BookmarkDialogButtonsView.defaultButton"]
-
         showBookmarksBarPreferenceToggle = app.checkBoxes["Preferences.AppearanceView.showBookmarksBarPreferenceToggle"]
         resetBookMarksMenuItem = app.menuItems["MainMenu.resetBookmarks"]
-        urlForBookmarksBar = locallyServedURL(pageTitle: pageTitle)
+        urlForBookmarksBar = UITests.simpleServedPage(titled: pageTitle)
         app.launch()
         resetBookmarksAndAddOneBookmark()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
@@ -64,22 +63,22 @@ class BookmarksBarTests: XCTestCase {
         }
 
         XCTAssertTrue(
-            showBookmarksBarPopup.waitForExistence(timeout: elementExistenceTimeout),
-            "The \"show bookmarks bar\" popup button didn't become available in a reasonable timeframe."
+            showBookmarksBarPopup.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The \"Show Bookmarks Bar\" popup button didn't become available in a reasonable timeframe."
         )
         showBookmarksBarPopup.click()
 
         XCTAssertTrue(
-            showBookmarksBarAlways.waitForExistence(timeout: elementExistenceTimeout),
-            "The \"show bookmarks bar always\" button didn't become available in a reasonable timeframe."
+            showBookmarksBarAlways.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The \"Show Bookmarks Bar Always\" button didn't become available in a reasonable timeframe."
         )
         showBookmarksBarAlways.click()
 
         app.typeKey("`", modifierFlags: [.command]) // Swap windows
 
         XCTAssertTrue(
-            bookmarksBarCollectionView.waitForExistence(timeout: elementExistenceTimeout),
-            "The bookmarksBarCollectionView should exist on a website window when we have selected always show bookmarks bar in the settings"
+            bookmarksBarCollectionView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The bookmarksBarCollectionView should exist on a website window when we have selected \"Always Show Bookmarks Bar\" in the settings"
         )
     }
 
@@ -92,29 +91,29 @@ class BookmarksBarTests: XCTestCase {
         }
 
         XCTAssertTrue(
-            showBookmarksBarPopup.waitForExistence(timeout: elementExistenceTimeout),
-            "The \"show bookmarks bar\" popup button didn't become available in a reasonable timeframe."
+            showBookmarksBarPopup.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The \"Show Bookmarks Bar\" popup button didn't become available in a reasonable timeframe."
         )
         showBookmarksBarPopup.click()
 
         XCTAssertTrue(
-            showBookmarksBarNewTabOnly.waitForExistence(timeout: elementExistenceTimeout),
-            "The \"show bookmarks bar always\" button didn't become available in a reasonable timeframe."
+            showBookmarksBarNewTabOnly.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The \"Show Bookmarks Bar Always\" button didn't become available in a reasonable timeframe."
         )
         showBookmarksBarNewTabOnly.click()
 
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
         app.typeKey("n", modifierFlags: [.command]) // open one new window
         XCTAssertTrue(
-            bookmarksBarCollectionView.waitForExistence(timeout: elementExistenceTimeout),
-            "The bookmarksBarCollectionView should exist on a new tab into which no site has been typed yet."
+            bookmarksBarCollectionView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The bookmarksBarCollectionView should exist on a new tab into which no site name or location has been typed yet."
         )
         app.typeKey("l", modifierFlags: [.command]) // Get address bar focus without addressing multiple address bars by identifier
         app.typeText("\(urlForBookmarksBar.absoluteString)\r")
 
         XCTAssertTrue(
-            bookmarksBarCollectionView.waitForNonExistence(timeout: elementExistenceTimeout),
-            "The bookmarksBarCollectionView should not exist on a tab that has been directed to a site, and is no longer new, when we have selected show bookmarks bar \"new tab only\" in the settings"
+            bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
+            "The bookmarksBarCollectionView should not exist on a tab that has been directed to a site, and is no longer new, when we have selected show bookmarks bar \"New Tab Only\" in the settings"
         )
     }
 
@@ -125,19 +124,19 @@ class BookmarksBarTests: XCTestCase {
         app.typeKey("n", modifierFlags: [.command]) // Open new window
 
         XCTAssertTrue(
-            bookmarksBarCollectionView.waitForNonExistence(timeout: elementExistenceTimeout),
-            "The bookmarksBarCollectionView should not exist on a new window when we have unchecked \"show bookmarks bar\" in the settings"
+            bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
+            "The bookmarksBarCollectionView should not exist on a new window when we have unchecked \"Show Bookmarks Bar\" in the settings"
         )
         app.typeKey("t", modifierFlags: [.command]) // Open new tab
         XCTAssertTrue(
-            bookmarksBarCollectionView.waitForNonExistence(timeout: elementExistenceTimeout),
-            "The bookmarksBarCollectionView should not exist on a new tab when we have unchecked \"show bookmarks bar\" in the settings"
+            bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
+            "The bookmarksBarCollectionView should not exist on a new tab when we have unchecked \"Show Bookmarks Bar\" in the settings"
         )
         app.typeKey("l", modifierFlags: [.command]) // Get address bar focus
         app.typeText("\(urlForBookmarksBar.absoluteString)\r")
         XCTAssertTrue(
-            bookmarksBarCollectionView.waitForNonExistence(timeout: elementExistenceTimeout),
-            "The bookmarksBarCollectionView should not exist on a new tab that has been directed to a site when we have unchecked \"show bookmarks bar\" in the settings"
+            bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
+            "The bookmarksBarCollectionView should not exist on a new tab that has been directed to a site when we have unchecked \"Show Bookmarks Bar\" in the settings"
         )
     }
 }
@@ -148,14 +147,14 @@ private extension BookmarksBarTests {
 
         let settingsAppearanceButton = app.buttons["PreferencesSidebar.appearanceButton"]
         XCTAssertTrue(
-            settingsAppearanceButton.waitForExistence(timeout: elementExistenceTimeout),
+            settingsAppearanceButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The user settings appearance section button didn't become available in a reasonable timeframe."
         )
-        // TODO: this should just be a click() but there are states for this test where the first few clicks don't register here.
-        settingsAppearanceButton.click(forDuration: elementExistenceTimeout, thenDragTo: settingsAppearanceButton)
+        // This should just be a click(), but there are states for this test where the first few clicks don't register here.
+        settingsAppearanceButton.click(forDuration: UITests.Timeouts.elementExistence, thenDragTo: settingsAppearanceButton)
 
         XCTAssertTrue(
-            showBookmarksBarPreferenceToggle.waitForExistence(timeout: elementExistenceTimeout),
+            showBookmarksBarPreferenceToggle.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The toggle for showing the bookmarks bar didn't become available in a reasonable timeframe."
         )
 
@@ -171,23 +170,10 @@ private extension BookmarksBarTests {
         app.typeText("\(urlForBookmarksBar.absoluteString)\r")
     }
 
-    func locallyServedURL(pageTitle: String) -> URL {
-        return URL.testsServer
-            .appendingTestParameters(data: """
-            <html>
-            <head>
-            <title>\(pageTitle)</title>
-            </head>
-            <body>
-            <p>Sample text</p>
-            </body>
-            </html>
-            """.utf8data)
-    }
-
     func resetBookmarksAndAddOneBookmark() {
+        app.typeKey("n", modifierFlags: [.command]) // Can't use debug menu without a window
         XCTAssertTrue(
-            resetBookMarksMenuItem.waitForExistence(timeout: elementExistenceTimeout),
+            resetBookMarksMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Reset bookmarks menu item didn't become available in a reasonable timeframe."
         )
 
@@ -195,14 +181,14 @@ private extension BookmarksBarTests {
         app.typeKey("l", modifierFlags: [.command]) // Get address bar focus without addressing multiple address bars by identifier
         app.typeText("\(urlForBookmarksBar.absoluteString)\r")
         XCTAssertTrue(
-            app.windows.webViews["\(pageTitle)"].waitForExistence(timeout: elementExistenceTimeout),
+            app.windows.webViews[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
 
         app.typeKey("d", modifierFlags: [.command]) // Bookmark the page
 
         XCTAssertTrue(
-            defaultBookmarkDialogButton.waitForExistence(timeout: elementExistenceTimeout),
+            defaultBookmarkDialogButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Bookmark button didn't appear with the expected title in a reasonable timeframe."
         )
 
