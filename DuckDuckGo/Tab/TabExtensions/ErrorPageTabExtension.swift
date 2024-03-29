@@ -115,6 +115,10 @@ extension ErrorPageTabExtension: NavigationResponder {
 
 extension ErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
     func leaveSite() {
+        guard webView?.canGoBack == true else {
+            webView?.close()
+            return
+        }
         _ = webView?.goBack()
     }
 
@@ -139,9 +143,11 @@ extension TabExtensions {
 
 protocol ErrorPageTabExtensionNavigationDelegate: AnyObject {
     var url: URL? { get }
+    var canGoBack: Bool { get }
     func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL)
     func setDocumentHtml(_ html: String)
     func goBack() -> WKNavigation?
+    func close()
     func reloadPage() -> WKNavigation?
 }
 
@@ -155,7 +161,7 @@ extension ErrorPageTabExtensionNavigationDelegate {
     }
 }
 
-extension WKWebView: ErrorPageTabExtensionNavigationDelegate {}
+extension WKWebView: ErrorPageTabExtensionNavigationDelegate { }
 
 protocol URLCredentialCreating {
     func urlCredentialFrom(trust: SecTrust?) -> URLCredential?

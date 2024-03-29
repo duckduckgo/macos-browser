@@ -1,5 +1,5 @@
 //
-//  CertificateTustEvaluator.swift
+//  CertificateTrustEvaluator.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,11 +18,11 @@
 
 import Foundation
 
-protocol CertificateTustEvaluating {
+protocol CertificateTrustEvaluating {
     func evaluateCertificateTrust(trust: SecTrust?) -> Bool?
 }
 
-struct CertificateTustEvaluator: CertificateTustEvaluating {
+struct CertificateTrustEvaluator: CertificateTrustEvaluating {
     func evaluateCertificateTrust(trust: SecTrust?) -> Bool? {
         var error: CFError?
         guard let trust else { return nil }

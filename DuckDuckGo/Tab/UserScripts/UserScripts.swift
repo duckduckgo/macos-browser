@@ -67,14 +67,14 @@ final class UserScripts: UserScriptsProvider {
 
         sslErrorPageUserScript = SSLErrorPageUserScript()
 
+        specialPages = SpecialPagesUserScript()
+
         if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
             youtubePlayerUserScript = YoutubePlayerUserScript()
-            specialPages = SpecialPagesUserScript()
         } else {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil
-            specialPages = nil
         }
 
         userScripts.append(autoconsentUserScript)

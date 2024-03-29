@@ -784,7 +784,7 @@ class AddressBarTests: XCTestCase {
         // GIVEN
         let expectedImage = NSImage(named: "Shield")!
         let evaluator = MockCertificateEvaluator()
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTustEvaluator: evaluator)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
@@ -802,7 +802,7 @@ class AddressBarTests: XCTestCase {
         let expectedImage = NSImage(named: "Shield")!
         let evaluator = MockCertificateEvaluator()
         evaluator.isValidCertificate = true
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTustEvaluator: evaluator)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
@@ -820,7 +820,7 @@ class AddressBarTests: XCTestCase {
         let expectedImage = NSImage(named: "ShieldDot")!
         let evaluator = MockCertificateEvaluator()
         evaluator.isValidCertificate = false
-        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTustEvaluator: evaluator)
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
@@ -848,7 +848,6 @@ struct OnMainActor: MainActorPerformer {
     }
 }
 
-
 extension NSImage {
     func pngData() -> Data? {
         guard let tiffRepresentation = self.tiffRepresentation,
@@ -867,7 +866,7 @@ extension NSImage {
     }
 }
 
-class MockCertificateEvaluator: CertificateTustEvaluating {
+class MockCertificateEvaluator: CertificateTrustEvaluating {
     var isValidCertificate: Bool?
 
     func evaluateCertificateTrust(trust: SecTrust?) -> Bool? {

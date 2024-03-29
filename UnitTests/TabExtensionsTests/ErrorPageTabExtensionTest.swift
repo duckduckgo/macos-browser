@@ -1,5 +1,5 @@
 //
-//  ErrorPageTabExtenstionTest.swift
+//  ErrorPageTabExtensionTest.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -24,7 +24,7 @@ import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
-final class ErrorPageTabExtenstionTest: XCTestCase {
+final class ErrorPageTabExtensionTest: XCTestCase {
 
     var mockWebViewPublisher: PassthroughSubject<WKWebView, Never>!
     var scriptPublisher: PassthroughSubject<MockSSLErrorPageScriptProvider, Never>!

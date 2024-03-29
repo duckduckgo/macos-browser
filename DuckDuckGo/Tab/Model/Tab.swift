@@ -343,7 +343,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
-    private let certificateTustEvaluator: CertificateTustEvaluating
+    private let certificateTrustEvaluator: CertificateTrustEvaluating
     var isCertificateValid: Bool?
 
 #if NETWORK_PROTECTION
@@ -390,7 +390,7 @@ protocol NewWindowPolicyDecisionMaker {
                      lastSelectedAt: Date? = nil,
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
                      startupPreferences: StartupPreferences = StartupPreferences.shared,
-                     certificateTustEvaluator: CertificateTustEvaluating = CertificateTustEvaluator()
+                     certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator()
     ) {
 
         let duckPlayer = duckPlayer
@@ -430,7 +430,7 @@ protocol NewWindowPolicyDecisionMaker {
                   lastSelectedAt: lastSelectedAt,
                   webViewSize: webViewSize,
                   startupPreferences: startupPreferences,
-                  certificateTustEvaluator: certificateTustEvaluator)
+                  certificateTrustEvaluator: certificateTrustEvaluator)
     }
 
     @MainActor
@@ -461,7 +461,7 @@ protocol NewWindowPolicyDecisionMaker {
          lastSelectedAt: Date?,
          webViewSize: CGSize,
          startupPreferences: StartupPreferences,
-         certificateTustEvaluator: CertificateTustEvaluating
+         certificateTrustEvaluator: CertificateTrustEvaluating
     ) {
 
         self.content = content
@@ -477,7 +477,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.interactionState = interactionStateData.map(InteractionState.loadCachedFromTabContent) ?? .none
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
-        self.certificateTustEvaluator = certificateTustEvaluator
+        self.certificateTrustEvaluator = certificateTrustEvaluator
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
@@ -1235,7 +1235,7 @@ protocol NewWindowPolicyDecisionMaker {
         webView.publisher(for: \.serverTrust)
             .sink { [weak self] serverTrust in
                 guard let self else { return }
-                self.isCertificateValid = self.certificateTustEvaluator.evaluateCertificateTrust(trust: serverTrust)
+                self.isCertificateValid = self.certificateTrustEvaluator.evaluateCertificateTrust(trust: serverTrust)
                 if self.isCertificateValid == true {
                     self.privacyInfo?.serverTrust = serverTrust
                 } else {

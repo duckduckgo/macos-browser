@@ -67,7 +67,7 @@ struct SSLErrorPageHTMLTemplate {
     }
 
     private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, specificMessage: String, advancedInfoBody: String, visitSiteButton: String, errorCode: String) -> String {
-        let dictionary: [String: Any] = [
+        let innerDictionary: [String: Any] = [
             "header": header,
             "body": body,
             "advancedButton": advancedButton,
@@ -79,8 +79,12 @@ struct SSLErrorPageHTMLTemplate {
             "errorCode": errorCode
         ]
 
+        let outerDictionary: [String: Any] = [
+            "strings": innerDictionary
+        ]
+
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted)
+            let jsonData = try JSONSerialization.data(withJSONObject: outerDictionary, options: .prettyPrinted)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
                 return jsonString
             } else {
@@ -143,12 +147,12 @@ public enum SSLErrorType {
     }
 
     static func forErrorCode(_ errorCode: Int) -> Self {
-        switch errorCode {
-        case -9814:
+        switch Int32(errorCode) {
+        case errSSLCertExpired:
             return .expired
-        case -9843:
+        case errSSLHostNameMismatch:
             return .wrongHost
-        case -9807:
+        case errSSLXCertChainInvalid:
             return .selfSigned
         default:
             return .invalid
