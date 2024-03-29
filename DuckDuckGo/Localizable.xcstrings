@@ -24083,6 +24083,30 @@
         }
       }
     },
+    "import.nodata.bookmarks.subtitle" : {
+      "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If you have %@ bookmarks, try importing them manually instead."
+          }
+        }
+      }
+    },
+    "import.nodata.passwords.subtitle" : {
+      "comment" : "Data import error subtitle: suggestion to import passwords manually by selecting a CSV or HTML file.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If you have %@ passwords, try importing them manually instead."
+          }
+        }
+      }
+    },
     "import.onePassword.app.version.info" : {
       "comment" : "Instructions how to find an installed 1Password password manager app version.\n%1$s, %2$s - app name (1Password)",
       "extractionState" : "extracted_with_value",
@@ -50184,6 +50208,7 @@
     },
     "Try importing bookmarks manually instead." : {
       "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -50237,6 +50262,7 @@
     },
     "Try importing passwords manually instead." : {
       "comment" : "Data import error subtitle: suggestion to import Passwords manually by selecting a CSV or HTML file.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
