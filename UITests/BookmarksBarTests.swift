@@ -40,6 +40,10 @@ class BookmarksBarTests: XCTestCase {
         defaultBookmarkDialogButton = app.buttons["BookmarkDialogButtonsView.defaultButton"]
         showBookmarksBarPreferenceToggle = app.checkBoxes["Preferences.AppearanceView.showBookmarksBarPreferenceToggle"]
         resetBookMarksMenuItem = app.menuItems["MainMenu.resetBookmarks"]
+        showBookmarksBarPopup = app.popUpButtons["Preferences.AppearanceView.showBookmarksBarPopUp"]
+        showBookmarksBarAlways = app.menuItems["Preferences.AppearanceView.showBookmarksBarAlways"]
+        showBookmarksBarNewTabOnly = app.menuItems["Preferences.AppearanceView.showBookmarksBarNewTabOnly"]
+        bookmarksBarCollectionView = app.collectionViews["BookmarksBarViewController.bookmarksBarCollectionView"]
         urlForBookmarksBar = UITests.simpleServedPage(titled: pageTitle)
         app.launch()
         resetBookmarksAndAddOneBookmark()
@@ -48,32 +52,25 @@ class BookmarksBarTests: XCTestCase {
         settingsWindow = app.windows.containing(.checkBox, identifier: "Preferences.AppearanceView.showBookmarksBarPreferenceToggle").firstMatch
         openSecondWindowAndVisitSite()
         siteWindow = app.windows.containing(.webView, identifier: pageTitle).firstMatch
-        showBookmarksBarPopup = app.popUpButtons["Preferences.AppearanceView.showBookmarksBarPopUp"]
-        showBookmarksBarAlways = app.menuItems["Preferences.AppearanceView.showBookmarksBarAlways"]
-        showBookmarksBarNewTabOnly = app.menuItems["Preferences.AppearanceView.showBookmarksBarNewTabOnly"]
-        bookmarksBarCollectionView = app.collectionViews["BookmarksBarViewController.bookmarksBarCollectionView"]
     }
 
     func test_bookmarksBar_whenShowBookmarksBarAlwaysIsSelected_alwaysDynamicallyAppearsOnWindow() throws {
         app.typeKey("`", modifierFlags: [.command]) // Swap windows
-
         let showBookmarksBarIsChecked = showBookmarksBarPreferenceToggle.value as? Bool
         if showBookmarksBarIsChecked == false {
             showBookmarksBarPreferenceToggle.click()
         }
-
         XCTAssertTrue(
             showBookmarksBarPopup.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The \"Show Bookmarks Bar\" popup button didn't become available in a reasonable timeframe."
         )
         showBookmarksBarPopup.click()
-
         XCTAssertTrue(
             showBookmarksBarAlways.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The \"Show Bookmarks Bar Always\" button didn't become available in a reasonable timeframe."
         )
+        
         showBookmarksBarAlways.click()
-
         app.typeKey("`", modifierFlags: [.command]) // Swap windows
 
         XCTAssertTrue(
@@ -84,12 +81,10 @@ class BookmarksBarTests: XCTestCase {
 
     func test_bookmarksBar_whenShowBookmarksNewTabOnlyIsSelected_onlyAppearsOnANewTabUntilASiteIsLoaded() throws {
         app.typeKey("`", modifierFlags: [.command]) // Swap windows
-
         let showBookmarksBarIsChecked = showBookmarksBarPreferenceToggle.value as? Bool
         if showBookmarksBarIsChecked == false {
             showBookmarksBarPreferenceToggle.click()
         }
-
         XCTAssertTrue(
             showBookmarksBarPopup.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The \"Show Bookmarks Bar\" popup button didn't become available in a reasonable timeframe."
@@ -101,7 +96,6 @@ class BookmarksBarTests: XCTestCase {
             "The \"Show Bookmarks Bar Always\" button didn't become available in a reasonable timeframe."
         )
         showBookmarksBarNewTabOnly.click()
-
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
         app.typeKey("n", modifierFlags: [.command]) // open one new window
         XCTAssertTrue(
@@ -122,11 +116,11 @@ class BookmarksBarTests: XCTestCase {
 
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
         app.typeKey("n", modifierFlags: [.command]) // Open new window
-
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "The bookmarksBarCollectionView should not exist on a new window when we have unchecked \"Show Bookmarks Bar\" in the settings"
         )
+        
         app.typeKey("t", modifierFlags: [.command]) // Open new tab
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
@@ -134,6 +128,7 @@ class BookmarksBarTests: XCTestCase {
         )
         app.typeKey("l", modifierFlags: [.command]) // Get address bar focus
         app.typeText("\(urlForBookmarksBar.absoluteString)\r")
+        
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "The bookmarksBarCollectionView should not exist on a new tab that has been directed to a site when we have unchecked \"Show Bookmarks Bar\" in the settings"
