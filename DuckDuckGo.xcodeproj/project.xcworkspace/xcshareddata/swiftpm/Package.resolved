@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sam/improve-sub-library-error-reporting",
-        "revision" : "a2a029628d0c275bb6e506eec3e810171094137b"
+        "revision" : "7cc8a8ecbdc2ace1c580b04adf84636da0b44a6e"
       }
     },
     {
