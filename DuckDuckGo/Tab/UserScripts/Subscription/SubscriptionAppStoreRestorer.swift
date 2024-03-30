@@ -24,6 +24,7 @@ import enum StoreKit.StoreKitError
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
 
+    // swiftlint:disable:next cyclomatic_complexity
     static func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
 
         let progressViewController = await ProgressViewController(title: UserText.restoringSubscriptionTitle)
