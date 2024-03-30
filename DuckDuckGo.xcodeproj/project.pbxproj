@@ -14186,7 +14186,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "sam/improve-sub-library-error-reporting";
+				branch = 132.0.1;
 				kind = branch;
 			};
 		};

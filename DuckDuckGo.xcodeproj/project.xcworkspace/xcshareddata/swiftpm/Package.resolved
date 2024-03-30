@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sam/improve-sub-library-error-reporting",
-        "revision" : "7cc8a8ecbdc2ace1c580b04adf84636da0b44a6e"
+        "branch" : "132.0.1",
+        "revision" : "73f68ee1c0dda3cd4a0b0cc3cc38a6cc7e605829"
       }
     },
     {
@@ -165,7 +165,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
         "revision" : "a6b7ba151d9dc6684484f3785293875ec01cc1ff",
         "version" : "1.2.2"
