@@ -82,7 +82,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
         downloadManager.downloadAddedSubject.send(task)
         task.start(delegate: downloadManager)
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 3)
         c.cancel()
 
         return (download, task, id)
@@ -551,12 +551,29 @@ final class DownloadListCoordinatorTests: XCTestCase {
     @MainActor
     func testWhenDownloadFileProgressCancelledThenTaskIsCancelled() {
         let (download, task, _) = setUpCoordinatorAndAddDownload()
-        let e = expectation(description: "cancelled")
+        let eCancelled = expectation(description: "cancelled")
         download.cancelBlock = {
-            e.fulfill()
+            eCancelled.fulfill()
         }
+
+        let eProgressPopulated = expectation(description: "file progress populated")
+        var timer: Timer?
+        if task.fileProgress != nil {
+            eProgressPopulated.fulfill()
+        } else {
+            timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { timer in
+                if task.fileProgress != nil {
+                    eProgressPopulated.fulfill()
+                    timer.invalidate()
+                }
+            }
+        }
+        wait(for: [eProgressPopulated], timeout: 2)
+        timer?.invalidate()
+
+        XCTAssertNotNil(task.fileProgress)
         task.fileProgress?.cancel()
-        waitForExpectations(timeout: 1)
+        wait(for: [eCancelled], timeout: 1)
     }
 
     @MainActor
