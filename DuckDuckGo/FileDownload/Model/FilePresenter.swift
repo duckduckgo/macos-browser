@@ -184,6 +184,22 @@ internal class FilePresenter {
         dispatchSource.setEventHandler { [weak self] in
             guard let self, let url = self.url else { return }
             self.logger.log("🗄️⚠️ file delete event handler: \"\(url.path)\"")
+            var resolvedBookmarkData: URL? {
+                var isStale = false
+                guard let presenter = self as? SandboxFilePresenter,
+                      let bookmarkData = presenter.fileBookmarkData,
+                      let url = try? URL(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale) else {
+                    if FileManager().fileExists(atPath: url.path) { return url } // file still exists but with different letter case ?
+                    return nil
+                }
+                return url
+            }
+            if let existingUrl = resolvedBookmarkData {
+                self.logger.log("🗄️⚠️ ignoring file delete event handler as file exists: \"\(url.path)\"")
+                presentedItemDidMove(to: existingUrl)
+                return
+            }
+
             try? self.accommodatePresentedItemDeletion()
             self.dispatchSourceCancellable = nil
         }
