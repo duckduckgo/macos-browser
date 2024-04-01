@@ -157,7 +157,19 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
     @MainActor
     private func requestDestinationFromUser(for task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType fileType: UTType?) async -> (URL?, UTType?) {
-        guard let delegate = self.downloadTaskDelegates[task]?() else { return (nil, nil) }
+        return await withCheckedContinuation { continuation in
+            requestDestinationFromUser(for: task, suggestedFilename: suggestedFilename, suggestedFileType: fileType) { (url, fileType) in
+                continuation.resume(returning: (url, fileType))
+            }
+        }
+    }
+
+    @MainActor
+    private func requestDestinationFromUser(for task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType fileType: UTType?, completionHandler: @escaping (URL?, UTType?) -> Void) {
+        guard let delegate = self.downloadTaskDelegates[task]?() else {
+            completionHandler(nil, nil)
+            return
+        }
 
         var fileTypes = [UTType]()
         let fileExtension = suggestedFilename.pathExtension
@@ -175,16 +187,17 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
 
         os_log(log: log, "FileDownloadManager: requesting download location \"\(suggestedFilename)\"/\(fileTypes.map(\.description).joined(separator: ", "))")
-        return await withCheckedContinuation { continuation in
-            delegate.chooseDestination(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { url, fileType in
-                guard let url else { return continuation.resume(returning: (nil, nil)) }
-
-                let folderUrl = url.deletingLastPathComponent()
-                self.preferences.lastUsedCustomDownloadLocation = folderUrl
-
-                // we shouldn‘t validate directory access here as we won‘t have it in sandboxed builds - only to the destination URL
-                continuation.resume(returning: (url, fileType))
+        delegate.chooseDestination(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { url, fileType in
+            guard let url else {
+                completionHandler(nil, nil)
+                return
             }
+
+            let folderUrl = url.deletingLastPathComponent()
+            self.preferences.lastUsedCustomDownloadLocation = folderUrl
+
+            // we shouldn‘t validate directory access here as we won‘t have it in sandboxed builds - only to the destination URL
+            completionHandler(url, fileType)
         }
     }
 

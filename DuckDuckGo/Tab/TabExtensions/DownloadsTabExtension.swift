@@ -95,7 +95,11 @@ final class DownloadsTabExtension: NSObject {
             }
             if url.isFileURL {
                 self.nextSaveDataRequestDownloadLocation = location
-                _=try? await self.saveDownloadedData(nil, suggestedFilename: url.lastPathComponent, mimeType: mimeType ?? "text/html", originatingURL: url)
+                do {
+                    _=try await self.saveDownloadedData(nil, suggestedFilename: url.lastPathComponent, mimeType: mimeType ?? "text/html", originatingURL: url)
+                } catch {
+                    assertionFailure("Save web content failed with \(error)")
+                }
                 return
             }
 
