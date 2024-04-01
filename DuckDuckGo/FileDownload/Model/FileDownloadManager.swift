@@ -118,7 +118,9 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
             task.cancel()
         }
         if let dispatchGroup = dispatchGroup {
-            RunLoop.main.run(until: RunLoop.ResumeCondition(dispatchGroup: dispatchGroup))
+            withExtendedLifetime(cancellables) {
+                RunLoop.main.run(until: RunLoop.ResumeCondition(dispatchGroup: dispatchGroup))
+            }
         }
     }
 
