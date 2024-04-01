@@ -29,7 +29,6 @@ final class FirefoxLoginReader {
             case couldNotDetermineFormat = -2
 
             case couldNotFindLoginsFile = 0
-            case couldNotFindKeyDB
             case couldNotReadLoginsFile
 
             case key3readerStage1
@@ -42,6 +41,8 @@ final class FirefoxLoginReader {
 
             case decryptUsername
             case decryptPassword
+
+            case couldNotFindKeyDB
         }
 
         var action: DataImportAction { .passwords }

@@ -80,21 +80,20 @@ struct DataImportSummaryView: View {
                         }
                     }
 
+                case (.bookmarks, .failure(let error)) where error.errorType == .noData:
+                    HStack {
+                        skippedImage()
+                        Text("Bookmarks:",
+                             comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
+                        + Text(" " as String)
+                        + Text(zeroString).bold()
+                    }
+
                 case (.bookmarks, .failure(let error)):
-                    if error.errorType == .noData {
-                        HStack {
-                            skippedImage()
-                            Text("Bookmarks:",
-                                 comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
-                            + Text(" " as String)
-                            + Text(zeroString).bold()
-                        }
-                    } else {
-                        HStack {
-                            failureImage()
-                            Text("Bookmark import failed.",
-                                 comment: "Data import summary message of failed bookmarks import.")
-                        }
+                    HStack {
+                        failureImage()
+                        Text("Bookmark import failed.",
+                             comment: "Data import summary message of failed bookmarks import.")
                     }
 
                 case (.passwords, .failure(let error)):

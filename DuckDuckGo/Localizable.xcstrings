@@ -24096,7 +24096,7 @@
       }
     },
     "import.nodata.passwords.subtitle" : {
-      "comment" : "Data import error subtitle: suggestion to import passwords manually by selecting a CSV or HTML file.",
+      "comment" : "Data import error subtitle: suggestion to import passwords manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
