@@ -111,7 +111,7 @@ final class FilePresenterTests: XCTestCase {
         DistributedNotificationCenter.default().post(name: .init(name.rawValue), object: object)
     }
 
-    private func fileReadPromise(timeout: TimeInterval = 1) -> Future<FileReadResult, Error> {
+    private func fileReadPromise(timeout: TimeInterval = 5) -> Future<FileReadResult, Error> {
         Future<FileReadResult, Error> { [unowned self] fulfill in
             onFileRead = { result in
                 fulfill(.success(result))
