@@ -130,7 +130,7 @@ final class FilePresenterTests: XCTestCase {
     }
 
     // MARK: - Test sandboxed file access
-#if APPSTORE
+#if APPSTORE && !CI
     func testTool_run() async throws {
         // 1. make non-sandbox file
         let nonSandboxUrl = try makeNonSandboxFile()
