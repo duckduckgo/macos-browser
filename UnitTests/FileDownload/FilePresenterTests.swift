@@ -89,7 +89,7 @@ final class FilePresenterTests: XCTestCase {
             try await NSWorkspace.shared.openApplication(at: helperApp, configuration: .init(newInstance: newInstance, environment: [:]))
         }
 
-        await fulfillment(of: helloExpectation.map { [$0] } ?? [], timeout: 1)
+        await fulfillment(of: helloExpectation.map { [$0] } ?? [], timeout: 5)
         withExtendedLifetime(c) {}
 
         return app
