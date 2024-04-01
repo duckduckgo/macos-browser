@@ -24,6 +24,7 @@ import NetworkProtection
 import NetworkProtectionUI
 import NetworkProtectionIPC
 import NetworkExtension
+import Subscription
 
 /// Implements the sequence of steps that the VPN needs to execute when the App starts up.
 ///
@@ -81,6 +82,10 @@ final class NetworkProtectionAppEvents {
     func applicationDidBecomeActive() {
         Task { @MainActor in
             await featureVisibility.disableIfUserHasNoAccess()
+
+#if SUBSCRIPTION
+            await AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).refreshSubscriptionAndEntitlements()
+#endif
         }
     }
 

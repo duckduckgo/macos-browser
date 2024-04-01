@@ -18,6 +18,10 @@
 
 import XCTest
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 #if NETWORK_PROTECTION
 import NetworkProtection
 #endif
@@ -62,7 +66,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         internalUserDecider = InternalUserDeciderMock()
 
 #if NETWORK_PROTECTION
-        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(visible: false)
+        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
 #endif
     }
 
@@ -80,7 +84,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if NETWORK_PROTECTION
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
-                                         networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(visible: true),
+                                         networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
                                          sharingMenu: NSMenu(),
                                          internalUserDecider: internalUserDecider)
 #else
@@ -105,10 +109,18 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
 
 #if NETWORK_PROTECTION
-        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
-        XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.networkProtection))
-        XCTAssertTrue(moreOptionMenu.items[15].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[16].title, UserText.settings)
+        if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
+            XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
+            XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.networkProtection))
+            XCTAssertTrue(moreOptionMenu.items[15].title.hasPrefix(UserText.identityTheftRestorationOptionsMenuItem))
+            XCTAssertTrue(moreOptionMenu.items[16].isSeparatorItem)
+            XCTAssertEqual(moreOptionMenu.items[17].title, UserText.settings)
+        } else {
+            XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
+            XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.networkProtection))
+            XCTAssertTrue(moreOptionMenu.items[15].isSeparatorItem)
+            XCTAssertEqual(moreOptionMenu.items[16].title, UserText.settings)
+        }
 #else
         XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
@@ -120,7 +132,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if NETWORK_PROTECTION
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
-                                         networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(visible: false),
+                                         networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: false),
                                          sharingMenu: NSMenu(),
                                          internalUserDecider: internalUserDecider)
 #else
@@ -143,8 +155,20 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagement)
         XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
+#if SUBSCRIPTION
+        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
+
+        if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
+            XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.identityTheftRestorationOptionsMenuItem))
+            XCTAssertTrue(moreOptionMenu.items[15].isSeparatorItem)
+            XCTAssertEqual(moreOptionMenu.items[16].title, UserText.settings)
+        } else {
+            XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
+        }
+#else
         XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
+#endif
     }
 
     // MARK: Zoom
@@ -166,8 +190,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     @MainActor
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
-        moreOptionMenu.performActionForItem(at: 14)
-
+        moreOptionMenu.performActionForItem(at: moreOptionMenu.items.count - 1)
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
     }
 
@@ -176,18 +199,28 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if NETWORK_PROTECTION
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
 
+    var isInstalled: Bool
     var visible: Bool
 
-    init(visible: Bool) {
+    init(isInstalled: Bool, visible: Bool) {
+        self.isInstalled = isInstalled
         self.visible = visible
+    }
+
+    func isVPNVisible() -> Bool {
+        return visible
     }
 
     func shouldUninstallAutomatically() -> Bool {
         return !visible
     }
 
-    func isNetworkProtectionVisible() -> Bool {
+    func isNetworkProtectionBetaVisible() -> Bool {
         return visible
+    }
+
+    func canStartVPN() async throws -> Bool {
+        return false
     }
 
     func disableForAllUsers() async {

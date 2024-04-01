@@ -25,6 +25,7 @@ import Navigation
 import UserScript
 import WebKit
 import History
+import PrivacyDashboard
 
 #if SUBSCRIPTION
 import Subscription
@@ -344,7 +345,7 @@ protocol NewWindowPolicyDecisionMaker {
     let pinnedTabsManager: PinnedTabsManager
 
 #if NETWORK_PROTECTION
-    private var tunnelController: NetworkProtectionIPCTunnelController?
+    private(set) var tunnelController: NetworkProtectionIPCTunnelController?
 #endif
 
     private let webViewConfiguration: WKWebViewConfiguration
@@ -539,8 +540,7 @@ protocol NewWindowPolicyDecisionMaker {
             .sink { [weak self] onboardingStatus in
                 guard onboardingStatus == .completed else { return }
 
-                let machServiceName = Bundle.main.vpnMenuAgentBundleId
-                let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+                let ipcClient = TunnelControllerIPCClient()
                 ipcClient.register()
 
                 self?.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
@@ -778,6 +778,10 @@ protocol NewWindowPolicyDecisionMaker {
 
     @Published private(set) var lastWebError: Error?
     @Published private(set) var lastHttpStatusCode: Int?
+
+    @Published private(set) var inferredOpenerContext: BrokenSiteReport.OpenerContext?
+    @Published private(set) var refreshCountSinceLoad: Int = 0
+    private (set) var performanceMetrics: PerformanceMetricsSubfeature?
 
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var loadingProgress: Double = 0.0
@@ -1027,6 +1031,8 @@ protocol NewWindowPolicyDecisionMaker {
             webView.load(URLRequest(url: redirectUrl))
             return nil
         }
+
+        refreshCountSinceLoad += 1
 
         self.content = content.forceReload()
         if webView.url == nil, content.isUrl {
@@ -1287,6 +1293,9 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
+
+        performanceMetrics = PerformanceMetricsSubfeature(targetWebview: webView)
+        userScripts.contentScopeUserScriptIsolated.registerSubfeature(delegate: performanceMetrics!)
     }
 
 }
@@ -1357,10 +1366,31 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         committedURL = navigation.url
     }
 
+    func resetRefreshCountIfNeeded(action: NavigationAction) {
+        switch action.navigationType {
+        case .reload, .other:
+            break
+        default:
+            refreshCountSinceLoad = 0
+        }
+    }
+
+    func setOpenerContextIfNeeded(action: NavigationAction) {
+        switch action.navigationType {
+        case .linkActivated, .formSubmitted:
+            inferredOpenerContext = .navigation
+        default:
+            break
+        }
+    }
+
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // allow local file navigations
         if navigationAction.url.isFileURL { return .allow }
+
+        resetRefreshCountIfNeeded(action: navigationAction)
+        setOpenerContextIfNeeded(action: navigationAction)
 
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if let mainFrame = navigationAction.mainFrameTarget,
@@ -1416,6 +1446,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             error = nil
         }
 
+        if inferredOpenerContext != .external {
+            inferredOpenerContext = nil
+        }
+
         invalidateInteractionStateData()
     }
 
@@ -1424,6 +1458,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+
+        Task { @MainActor in
+            if await webView.isCurrentSiteReferredFromDuckDuckGo {
+                inferredOpenerContext = .serp
+            }
+        }
 
 #if NETWORK_PROTECTION
         if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {

@@ -144,7 +144,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
         } else {
             let featureVisibility = DefaultNetworkProtectionVisibility()
 
-            if featureVisibility.isNetworkProtectionVisible() {
+            if featureVisibility.isNetworkProtectionBetaVisible() {
                 show(positionedBelow: view, withDelegate: delegate)
             } else {
                 featureVisibility.disableForWaitlistUsers()

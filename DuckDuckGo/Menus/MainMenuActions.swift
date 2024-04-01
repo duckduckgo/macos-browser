@@ -22,6 +22,8 @@ import Common
 import WebKit
 import Configuration
 import History
+import PixelKit
+import Subscription
 
 // Actions are sent to objects of responder chain
 
@@ -717,11 +719,26 @@ extension MainViewController {
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
 
-        // Aid to transition VPN from waitlist to subscription
-        // by resetting this we allow users to go back to waitlist
-        // and re-test.
+        if !DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            // We only clear PPro state when it's not available, as otherwise
+            // there should be no state to clear.  Clearing PPro state can
+            // trigger notifications which we want to avoid unless
+            // necessary.
+            clearPrivacyProState()
+        }
+    }
+
+    /// Clears the PrivacyPro state to make testing easier.
+    ///
+    private func clearPrivacyProState() {
+        AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).signOut()
         resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
+
+        // Clear pixel data
+        DailyPixel.clearLastFireDate(pixel: .privacyProFeatureEnabled)
+        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouDBP)
+        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouVPN)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
@@ -887,6 +904,9 @@ extension MainViewController: NSMenuItemValidation {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        guard fireViewController.fireViewModel.fire.burningData == nil else {
+            return true
+        }
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):

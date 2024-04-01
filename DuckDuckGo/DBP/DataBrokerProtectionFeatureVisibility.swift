@@ -22,6 +22,7 @@ import Foundation
 import BrowserServicesKit
 import Common
 import DataBrokerProtection
+import Subscription
 
 protocol DataBrokerProtectionFeatureVisibility {
     func isFeatureVisible() -> Bool
@@ -36,9 +37,18 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
+    private let waitlistStorage: WaitlistStorage
+    private let subscriptionAvailability: SubscriptionFeatureAvailability
 
-    @UserDefaultsWrapper(key: .dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro, defaultValue: false)
-    var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool
+    private let dataBrokerProtectionKey = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
+    private var dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro: Bool {
+        get {
+            return userDefaults.bool(forKey: dataBrokerProtectionKey)
+        }
+        nonmutating set {
+            userDefaults.set(newValue, forKey: dataBrokerProtectionKey)
+        }
+    }
 
     /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
     static var bypassWaitlist = false
@@ -46,11 +56,15 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler(),
          pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
-         userDefaults: UserDefaults = .standard) {
+         userDefaults: UserDefaults = .standard,
+         waitlistStorage: WaitlistStorage = DataBrokerProtectionWaitlist().waitlistStorage,
+         subscriptionAvailability: SubscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()) {
         self.privacyConfigurationManager = privacyConfigurationManager
         self.featureDisabler = featureDisabler
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
+        self.waitlistStorage = waitlistStorage
+        self.subscriptionAvailability = subscriptionAvailability
     }
 
     var waitlistIsOngoing: Bool {
@@ -69,10 +83,9 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
             regionCode = "US"
         }
 
-        #if DEBUG // Always assume US for debug builds
+#if DEBUG // Always assume US for debug builds
         regionCode = "US"
-        #endif
-
+#endif
         return (regionCode ?? "US") == "US"
     }
 
@@ -89,20 +102,15 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     }
 
     private var isWaitlistUser: Bool {
-        DataBrokerProtectionWaitlist().waitlistStorage.isWaitlistUser
+        waitlistStorage.isWaitlistUser
     }
 
     private var wasWaitlistUser: Bool {
-        DataBrokerProtectionWaitlist().waitlistStorage.getWaitlistInviteCode() != nil
+        waitlistStorage.getWaitlistInviteCode() != nil
     }
 
     func isPrivacyProEnabled() -> Bool {
-#if SUBSCRIPTION
-        return NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable
-#else
-        return false
-#endif
-
+        return subscriptionAvailability.isFeatureAvailable
     }
 
     func isEligibleForThankYouMessage() -> Bool {
@@ -152,5 +160,4 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         }
     }
 }
-
 #endif

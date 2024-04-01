@@ -36,6 +36,8 @@ enum Stage: String {
 }
 
 protocol StageDurationCalculator {
+    var attemptId: UUID { get }
+
     func durationSinceLastStage() -> Double
     func durationSinceStartTime() -> Double
     func fireOptOutStart()

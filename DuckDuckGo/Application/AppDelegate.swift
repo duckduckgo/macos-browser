@@ -81,10 +81,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-#if SUBSCRIPTION
-    let subscriptionFeatureAvailability: SubscriptionFeatureAvailability
-#endif
-
 #if NETWORK_PROTECTION && SUBSCRIPTION
     // Needs to be lazy as indirectly depends on AppDelegate
     private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
@@ -193,7 +189,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     #else
         SubscriptionPurchaseEnvironment.current = .stripe
     #endif
-        subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
 #endif
     }
 
@@ -259,20 +254,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
 
         Task {
-            let accountManager = AccountManager()
-            do {
-                try accountManager.migrateAccessTokenToNewStore()
-            } catch {
-                if let error = error as? AccountManager.MigrationError {
-                    switch error {
-                    case AccountManager.MigrationError.migrationFailed:
-                        os_log(.default, log: .subscription, "Access token migration failed")
-                    case AccountManager.MigrationError.noMigrationNeeded:
-                        os_log(.default, log: .subscription, "No access token migration needed")
-                    }
-                }
+            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            if let token = accountManager.accessToken {
+                _ = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
+                _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
             }
-            await accountManager.checkSubscriptionState()
         }
 #endif
 
@@ -566,18 +552,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 func updateSubscriptionStatus() {
 #if SUBSCRIPTION
     Task {
-        guard let token = AccountManager().accessToken else {
-            return
-        }
-        let result = await SubscriptionService.getSubscription(accessToken: token)
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
-        switch result {
-        case .success(let success):
-            if success.isActive {
+        guard let token = accountManager.accessToken else { return }
+
+        if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+            if subscription.isActive {
                 DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
             }
-        case .failure: break
         }
+
+        _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
     }
 #endif
 }

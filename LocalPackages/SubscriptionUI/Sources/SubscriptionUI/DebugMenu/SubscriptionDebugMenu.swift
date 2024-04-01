@@ -75,6 +75,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(NSMenuItem(title: "Get Subscription Info", action: #selector(getSubscriptionDetails), target: self))
         menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
         menu.addItem(NSMenuItem(title: "Post didSignIn notification", action: #selector(postDidSignInNotification), target: self))
+        menu.addItem(NSMenuItem(title: "Post subscriptionDidChange notification", action: #selector(postSubscriptionDidChangeNotification), target: self))
         menu.addItem(.separator())
         if #available(macOS 12.0, *) {
             menu.addItem(NSMenuItem(title: "Sync App Store AppleID Account (re- sign-in)", action: #selector(syncAppleIDAccount), target: self))
@@ -202,7 +203,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
             let entitlements: [Entitlement.ProductName] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
             for entitlement in entitlements {
-                if case let .success(result) = await accountManager.hasEntitlement(for: entitlement) {
+                if case let .success(result) = await accountManager.hasEntitlement(for: entitlement, cachePolicy: .reloadIgnoringLocalCacheData) {
                     let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
                     results.append(resultSummary)
                     print(resultSummary)
@@ -217,7 +218,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func getSubscriptionDetails() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await SubscriptionService.getSubscription(accessToken: token) {
+            switch await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")
             case .failure(let error):
@@ -284,6 +285,11 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func postDidSignInNotification(_ sender: Any?) {
         NotificationCenter.default.post(name: .accountDidSignIn, object: self, userInfo: nil)
+    }
+
+    @objc
+    func postSubscriptionDidChangeNotification(_ sender: Any?) {
+        NotificationCenter.default.post(name: .subscriptionDidChange, object: self, userInfo: nil)
     }
 
     @objc

@@ -161,6 +161,7 @@ final class URLEventHandler {
 #if SUBSCRIPTION
         case AppLaunchCommand.showPrivacyPro.launchURL:
             WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            Pixel.fire(.privacyProOfferScreenImpression)
 #endif
 #if !APPSTORE && !DEBUG
         case AppLaunchCommand.moveAppToApplications.launchURL:

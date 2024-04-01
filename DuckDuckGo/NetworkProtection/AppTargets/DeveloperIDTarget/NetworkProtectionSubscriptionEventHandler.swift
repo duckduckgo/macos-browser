@@ -18,6 +18,7 @@
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
 
+import Combine
 import Foundation
 import Subscription
 import NetworkProtection
@@ -25,13 +26,14 @@ import NetworkProtectionUI
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
     private let networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
     private let userDefaults: UserDefaults
+    private var cancellables = Set<AnyCancellable>()
 
-    init(accountManager: AccountManaging = AccountManager(),
+    init(accountManager: AccountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)),
          networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming = NetworkProtectionCodeRedemptionCoordinator(),
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
@@ -41,34 +43,59 @@ final class NetworkProtectionSubscriptionEventHandler {
         self.networkProtectionTokenStorage = networkProtectionTokenStorage
         self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
         self.userDefaults = userDefaults
+
+        subscribeToEntitlementChanges()
     }
 
-    private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
-
-    private func setUpEntitlementMonitoring() {
-        guard AccountManager().isUserAuthenticated else { return }
-        let entitlementsCheck = {
-            await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
-        }
-
+    private func subscribeToEntitlementChanges() {
         Task {
-            await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { result in
-                switch result {
-                case .validEntitlement:
-                    UserDefaults.netP.networkProtectionEntitlementsExpired = false
-                case .invalidEntitlement:
-                    UserDefaults.netP.networkProtectionEntitlementsExpired = true
-                case .error:
-                    break
+            switch await accountManager.hasEntitlement(for: .networkProtection) {
+            case .success(let hasEntitlements):
+                Task {
+                    await handleEntitlementsChange(hasEntitlements: hasEntitlements)
                 }
+            case .failure:
+                break
             }
+
+            NotificationCenter.default
+                .publisher(for: .entitlementsDidChange)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] notification in
+                    guard let self else {
+                        return
+                    }
+
+                    guard let entitlements = notification.userInfo?[UserDefaultsCacheKey.subscriptionEntitlements] as? [Entitlement] else {
+
+                        assertionFailure("Missing entitlements are truly unexpected")
+                        return
+                    }
+
+                    let hasEntitlements = entitlements.contains { entitlement in
+                        entitlement.product == .networkProtection
+                    }
+
+                    Task {
+                        await self.handleEntitlementsChange(hasEntitlements: hasEntitlements)
+                    }
+                }
+                .store(in: &cancellables)
+        }
+    }
+
+    private func handleEntitlementsChange(hasEntitlements: Bool) async {
+        if hasEntitlements {
+            UserDefaults.netP.networkProtectionEntitlementsExpired = false
+        } else {
+            networkProtectionFeatureDisabler.stop()
+            UserDefaults.netP.networkProtectionEntitlementsExpired = true
         }
     }
 
     func registerForSubscriptionAccountManagerEvents() {
         NotificationCenter.default.addObserver(self, selector: #selector(handleAccountDidSignIn), name: .accountDidSignIn, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleAccountDidSignOut), name: .accountDidSignOut, object: nil)
-        setUpEntitlementMonitoring()
     }
 
     @objc private func handleAccountDidSignIn() {
@@ -77,12 +104,10 @@ final class NetworkProtectionSubscriptionEventHandler {
             return
         }
         userDefaults.networkProtectionEntitlementsExpired = false
-        setUpEntitlementMonitoring()
     }
 
     @objc private func handleAccountDidSignOut() {
         print("[NetP Subscription] Deleted NetP auth token after signing out from Privacy Pro")
-        userDefaults.networkProtectionEntitlementsExpired = true
 
         Task {
             await networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)

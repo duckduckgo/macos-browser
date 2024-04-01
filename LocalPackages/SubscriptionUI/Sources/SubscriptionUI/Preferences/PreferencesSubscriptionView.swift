@@ -125,7 +125,6 @@ public struct PreferencesSubscriptionView: View {
                     }
                 })
                 Button(UserText.removeFromThisDeviceButton, action: {
-                    model.userEventHandler(.removeSubscriptionClick)
                     showingRemoveConfirmationDialog.toggle()
                 })
             } label: {
@@ -185,11 +184,11 @@ public struct PreferencesSubscriptionView: View {
             TextMenuItemHeader(model.subscriptionDetails ?? UserText.preferencesSubscriptionInactiveHeader)
             TextMenuItemCaption(UserText.preferencesSubscriptionExpiredCaption)
         } buttons: {
-            Button(UserText.viewPlansButtonTitle) { model.purchaseAction() }
-                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+            // We need to improve re-purchase flow
+            /* Button(UserText.viewPlansButtonTitle) { model.purchaseAction() }
+                .buttonStyle(DefaultActionButtonStyle(enabled: true)) */
             Menu {
                 Button(UserText.removeFromThisDeviceButton, action: {
-                    model.userEventHandler(.removeSubscriptionClick)
                     showingRemoveConfirmationDialog.toggle()
                 })
             } label: {

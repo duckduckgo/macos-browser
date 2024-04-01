@@ -41,6 +41,7 @@ final class SyncPreferencesTests: XCTestCase {
     let managementDialogModel = ManagementDialogModel()
     var ddgSyncing: MockDDGSyncing!
     var syncBookmarksAdapter: SyncBookmarksAdapter!
+    var syncCredentialsAdapter: SyncCredentialsAdapter!
     var appearancePersistor = MockPersistor()
     var appearancePreferences: AppearancePreferences!
     var syncPreferences: SyncPreferences!
@@ -55,10 +56,12 @@ final class SyncPreferencesTests: XCTestCase {
         ddgSyncing = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
 
         syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences)
+        syncCredentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: AutofillSecureVaultFactory)
 
         syncPreferences = SyncPreferences(
             syncService: ddgSyncing,
             syncBookmarksAdapter: syncBookmarksAdapter,
+            syncCredentialsAdapter: syncCredentialsAdapter,
             appearancePreferences: appearancePreferences,
             managementDialogModel: managementDialogModel,
             userAuthenticator: MockUserAuthenticator()

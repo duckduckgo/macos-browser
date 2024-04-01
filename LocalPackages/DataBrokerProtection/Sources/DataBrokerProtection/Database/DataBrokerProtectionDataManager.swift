@@ -109,6 +109,7 @@ extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
 
     public func removeAllData() {
         database.deleteProfileData()
+        cache.invalidate()
 
         delegate?.dataBrokerProtectionDataManagerDidDeleteData()
     }

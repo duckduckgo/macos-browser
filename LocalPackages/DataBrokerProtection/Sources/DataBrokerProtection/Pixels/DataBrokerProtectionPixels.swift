@@ -123,7 +123,7 @@ public enum DataBrokerProtectionPixels {
     case monthlyActiveUser
 
     // KPIs - events
-    case weeklyReportScanning(hadNewMatch: Bool, hadReAppereance: Bool, scanCoverage: Int)
+    case weeklyReportScanning(hadNewMatch: Bool, hadReAppereance: Bool, scanCoverage: String)
     case weeklyReportRemovals(removals: Int)
     case scanningEventNewMatch
     case scanningEventReAppearance
@@ -267,7 +267,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
             return params
         case .weeklyReportScanning(let hadNewMatch, let hadReAppereance, let scanCoverage):
-            return [Consts.hadNewMatch: hadNewMatch.description, Consts.hadReAppereance: hadReAppereance.description, Consts.scanCoverage: scanCoverage.description]
+            return [Consts.hadNewMatch: hadNewMatch ? "1" : "0", Consts.hadReAppereance: hadReAppereance ? "1" : "0", Consts.scanCoverage: scanCoverage.description]
         case .weeklyReportRemovals(let removals):
             return [Consts.removals: String(removals)]
         case .backgroundAgentStarted,

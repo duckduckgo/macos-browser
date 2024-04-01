@@ -60,9 +60,18 @@ struct PreferencesSection: Hashable, Identifiable {
         ]
 
 #if SUBSCRIPTION
-        if NSApp.delegateTyped.subscriptionFeatureAvailability.isFeatureAvailable {
-            let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
-            sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+
+            var shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+
+            if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
+                shouldHidePrivacyProDueToNoProducts = false
+            }
+
+            if !shouldHidePrivacyProDueToNoProducts {
+                let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+                sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
+            }
         }
 #endif
 
