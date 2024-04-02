@@ -961,14 +961,14 @@ extension BrowserTabViewController: TabDelegate {
 
         let alert = AuthenticationAlert(host: request.parameters.host,
                                         isEncrypted: request.parameters.receivesCredentialSecurely)
-        alert.beginSheetModal(for: window) { [request] response in
+        alert.beginSheetModal(for: window) { [weak request] response in
             // don‘t submit the query when tab is switched
             if case .abort = response { return }
             guard case .OK = response else {
-                request.submit(nil)
+                request?.submit(nil)
                 return
             }
-            request.submit(.credential(URLCredential(user: alert.usernameTextField.stringValue,
+            request?.submit(.credential(URLCredential(user: alert.usernameTextField.stringValue,
                                                      password: alert.passwordTextField.stringValue,
                                                      persistence: .forSession)))
         }
@@ -987,14 +987,16 @@ extension BrowserTabViewController: TabDelegate {
                                                                  suggestedFilename: request.parameters.suggestedFilename,
                                                                  directoryURL: directoryURL)
 
-        savePanel.beginSheetModal(for: window) { [request] response in
-            if case .abort = response {
+        savePanel.beginSheetModal(for: window) { [weak request] response in
+            switch response {
+            case .abort:
                 // panel not closed by user but by a tab switching
                 return
-            } else if case .OK = response, let url = savePanel.url {
-                request.submit( (url, savePanel.selectedFileType) )
-            } else {
-                request.submit(nil)
+            case .OK:
+                guard let url = savePanel.url else { fallthrough }
+                request?.submit( (url, savePanel.selectedFileType) )
+            default:
+                request?.submit(nil)
             }
         }
 
@@ -1008,14 +1010,16 @@ extension BrowserTabViewController: TabDelegate {
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = request.parameters.allowsMultipleSelection
 
-        openPanel.beginSheetModal(for: window) { [request] response in
-            // don‘t submit the query when tab is switched
-            if case .abort = response { return }
-            guard case .OK = response else {
-                request.submit(nil)
+        openPanel.beginSheetModal(for: window) { [weak request] response in
+            switch response {
+            case .abort:
+                // don‘t submit the query when tab is switched
                 return
+            case .OK:
+                request?.submit(openPanel.urls)
+            default:
+                request?.submit(nil)
             }
-            request.submit(openPanel.urls)
         }
 
         // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit

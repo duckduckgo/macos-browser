@@ -95,22 +95,23 @@ final class DownloadsTabExtension: NSObject {
             }
             if url.isFileURL {
                 self.nextSaveDataRequestDownloadLocation = location
-                _=try? await self.saveDownloadedData(nil, suggestedFilename: url.lastPathComponent, mimeType: mimeType ?? "text/html", originatingURL: url)
+                do {
+                    _=try await self.saveDownloadedData(nil, suggestedFilename: url.lastPathComponent, mimeType: mimeType ?? "text/html", originatingURL: url)
+                } catch {
+                    assertionFailure("Save web content failed with \(error)")
+                }
                 return
             }
 
+            let destination = self.downloadDestination(for: location, suggestedFilename: webView.suggestedFilename ?? "")
             let download = await webView.startDownload(using: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad))
 
-            let location = self.downloadLocation(for: location, suggestedFilename: download.webView?.suggestedFilename ?? "")
-            self.downloadManager.add(download,
-                                     fromBurnerWindow: self.isBurner,
-                                     delegate: self,
-                                     location: location)
+            self.downloadManager.add(download, fromBurnerWindow: self.isBurner, delegate: self, destination: destination)
         }
 
     }
 
-    private func downloadLocation(for location: DownloadLocation, suggestedFilename: String) -> FileDownloadManager.DownloadLocationPreference {
+    private func downloadDestination(for location: DownloadLocation, suggestedFilename: String) -> WebKitDownloadTask.DownloadDestination {
         switch location {
         case .auto:
             return .auto
@@ -121,7 +122,7 @@ final class DownloadsTabExtension: NSObject {
             let fm = FileManager.default
             let dirURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
             try? fm.createDirectory(at: dirURL, withIntermediateDirectories: true)
-            return .preset(destinationURL: dirURL.appendingPathComponent(suggestedFilename), tempURL: nil)
+            return .preset(dirURL.appendingPathComponent(suggestedFilename))
         }
     }
 
@@ -208,11 +209,9 @@ extension DownloadsTabExtension: NavigationResponder {
         enqueueDownload(download, withNavigationAction: navigationResponse.mainFrameNavigation?.navigationAction)
     }
 
+    @MainActor
     func enqueueDownload(_ download: WebKitDownload, withNavigationAction navigationAction: NavigationAction?) {
-        let task = downloadManager.add(download,
-                                       fromBurnerWindow: self.isBurner,
-                                       delegate: self,
-                                       location: .auto)
+        let task = downloadManager.add(download, fromBurnerWindow: self.isBurner, delegate: self, destination: .auto)
 
         // If the download has started from a popup Tab - close it after starting the download
         // e.g. download button on this page:
@@ -245,13 +244,11 @@ extension DownloadsTabExtension: NavigationResponder {
 
 extension DownloadsTabExtension: WKNavigationDelegate {
 
+    @MainActor
     @objc(_webView:contextMenuDidCreateDownload:)
     func webView(_ webView: WKWebView, contextMenuDidCreate download: WebKitDownload) {
         // to do: url should be cleaned up before launching download
-        downloadManager.add(download,
-                            fromBurnerWindow: isBurner,
-                            delegate: self,
-                            location: .prompt)
+        downloadManager.add(download, fromBurnerWindow: isBurner, delegate: self, destination: .prompt)
     }
 
 }
@@ -298,7 +295,7 @@ extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
         defer {
             self.nextSaveDataRequestDownloadLocation = .auto
         }
-        switch downloadLocation(for: nextSaveDataRequestDownloadLocation, suggestedFilename: suggestedFilename) {
+        switch downloadDestination(for: nextSaveDataRequestDownloadLocation, suggestedFilename: suggestedFilename) {
         case .auto:
             guard !downloadsPreferences.alwaysRequestDownloadLocation,
                   let location = downloadsPreferences.effectiveDownloadLocation else { fallthrough /* prompt */ }
@@ -320,9 +317,12 @@ extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
             try saveDownloadedData(data, to: url, originatingURL: originatingURL)
             return url
 
-        case .preset(destinationURL: let destinationURL, tempURL: _):
+        case .preset(let destinationURL):
             try saveDownloadedData(data, to: destinationURL, originatingURL: originatingURL)
             return destinationURL
+
+        case .resume:
+            fatalError("Unexpected resume download location")
         }
     }
 }
