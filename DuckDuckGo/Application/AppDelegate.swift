@@ -31,6 +31,7 @@ import PixelKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
+import Lottie
 
 #if NETWORK_PROTECTION
 import NetworkProtection
