@@ -36,7 +36,7 @@ public final class DataBrokerProtectionBackgroundManager {
     private lazy var ipcServiceManager = IPCServiceManager(scheduler: scheduler, pixelHandler: pixelHandler)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
-        DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
+        DataBrokerProtectionDataManager(pixelHandler: pixelHandler, fakeBrokerFlag: fakeBrokerFlag)
     }()
 
     lazy var scheduler: DataBrokerProtectionScheduler = {
@@ -78,19 +78,36 @@ public final class DataBrokerProtectionBackgroundManager {
     public func runOperationsAndStartSchedulerIfPossible() {
         pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossible)
 
-        // If there's no saved profile we don't need to start the scheduler
-        if (try? dataManager.fetchProfile()) != nil {
-            scheduler.runQueuedOperations(showWebView: false) { [weak self] error in
-                guard error == nil else {
-                    // Ideally we'd fire a pixel here, however at the moment the scheduler never ever returns an error
-                    return
-                }
-
-                self?.pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler)
-                self?.scheduler.startScheduler()
+        do {
+            // If there's no saved profile we don't need to start the scheduler
+            guard (try dataManager.fetchProfile()) != nil else {
+                pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile)
+                return
             }
-        } else {
-            pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile)
+        } catch {
+            pixelHandler.fire(.generalError(error: error,
+                                            functionOccurredIn: "DataBrokerProtectionBackgroundManager.runOperationsAndStartSchedulerIfPossible"))
+            return
+        }
+
+        scheduler.runQueuedOperations(showWebView: false) { [weak self] errors in
+            if let errors = errors {
+                if let oneTimeError = errors.oneTimeError {
+                    os_log("Error during BackgroundManager runOperationsAndStartSchedulerIfPossible in scheduler.runQueuedOperations(), error: %{public}@",
+                           log: .dataBrokerProtection,
+                           oneTimeError.localizedDescription)
+                    self?.pixelHandler.fire(.generalError(error: oneTimeError,
+                                                          functionOccurredIn: "DataBrokerProtectionBackgroundManager.runOperationsAndStartSchedulerIfPossible"))
+                }
+                if let operationErrors = errors.operationErrors,
+                          operationErrors.count != 0 {
+                    os_log("Operation error(s) during  BackgroundManager runOperationsAndStartSchedulerIfPossible in scheduler.runQueuedOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                }
+                return
+            }
+
+            self?.pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler)
+            self?.scheduler.startScheduler()
         }
     }
 }

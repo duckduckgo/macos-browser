@@ -102,42 +102,45 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-    public func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+    public func optOutAllBrokers(showWebView: Bool,
+                                 completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         self.pixelHandler.fire(.ipcServerOptOutAllBrokers)
         xpc.execute(call: { server in
-            server.optOutAllBrokers(showWebView: showWebView) { error in
-                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
-                completion(error)
+            server.optOutAllBrokers(showWebView: showWebView) { errors in
+                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: errors?.oneTimeError))
+                completion(errors)
             }
         }, xpcReplyErrorHandler: { error in
             self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
-            completion(error)
+            completion(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: error))
         })
     }
 
-    public func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+    public func scanAllBrokers(showWebView: Bool,
+                               completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         self.pixelHandler.fire(.ipcServerScanAllBrokers)
         xpc.execute(call: { server in
-            server.scanAllBrokers(showWebView: showWebView) { error in
-                self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error))
-                completion(error)
+            server.scanAllBrokers(showWebView: showWebView) { errors in
+                self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: errors?.oneTimeError))
+                completion(errors)
             }
         }, xpcReplyErrorHandler: { error in
             self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error))
-            completion(error)
+            completion(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: error))
         })
     }
 
-    public func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+    public func runQueuedOperations(showWebView: Bool,
+                                    completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         self.pixelHandler.fire(.ipcServerRunQueuedOperations)
         xpc.execute(call: { server in
-            server.runQueuedOperations(showWebView: showWebView) { error in
-                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
-                completion(error)
+            server.runQueuedOperations(showWebView: showWebView) { errors in
+                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: errors?.oneTimeError))
+                completion(errors)
             }
         }, xpcReplyErrorHandler: { error in
             self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
-            completion(error)
+            completion(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: error))
         })
     }
 

@@ -31,12 +31,14 @@ final class DataBrokerProtectionSecureVaultErrorReporter: SecureVaultErrorReport
     }
 
     func secureVaultInitFailed(_ error: SecureStorageError) {
-// Actual pixels to follow once privacy triage is done
-//        switch error {
-//        case .initFailed, .failedToOpenDatabase:
-//            pixelHandler.fire(.debug(event: .secureVaultInitError, error: error))
-//        default:
-//            Pixel.fire(.debug(event: .secureVaultError, error: error))
-//        }
+        switch error {
+        case .initFailed, .failedToOpenDatabase:
+            pixelHandler.fire(.secureVaultInitError(error: error))
+        default:
+            pixelHandler.fire(.secureVaultError(error: error))
+        }
+
+        // Also fire the general pixel, since for now all errors are kept under one pixel
+        pixelHandler.fire(.generalError(error: error, functionOccurredIn: "secureVaultErrorReporter"))
     }
 }

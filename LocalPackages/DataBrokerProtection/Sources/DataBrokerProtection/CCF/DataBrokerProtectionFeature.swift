@@ -24,7 +24,7 @@ import Common
 
 protocol CCFCommunicationDelegate: AnyObject {
     func loadURL(url: URL) async
-    func extractedProfiles(profiles: [ExtractedProfile]) async
+    func extractedProfiles(profiles: [ExtractedProfile], meta: [String: Any]?) async
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async
     func solveCaptcha(with response: SolveCaptchaResponse) async
     func success(actionId: String, actionType: ActionType) async
@@ -101,7 +101,7 @@ struct DataBrokerProtectionFeature: Subfeature {
                 await delegate?.onError(error: DataBrokerProtectionError.malformedURL)
             }
         case .extract(let profiles):
-            await delegate?.extractedProfiles(profiles: profiles)
+            await delegate?.extractedProfiles(profiles: profiles, meta: success.meta)
         case .getCaptchaInfo(let captchaInfo):
             await delegate?.captchaInformation(captchaInfo: captchaInfo)
         case .solveCaptcha(let response):

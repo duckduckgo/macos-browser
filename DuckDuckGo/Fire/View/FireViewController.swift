@@ -27,7 +27,7 @@ final class FireViewController: NSViewController {
         static let animationName = "01_Fire_really_small"
     }
 
-    private var fireViewModel: FireViewModel
+    private(set) var fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
 
@@ -119,6 +119,7 @@ final class FireViewController: NSViewController {
         fakeFireButton.wantsLayer = true
         fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDown.cgColor
 
+        fakeFireButton.setAccessibilityIdentifier("FireViewController.fakeFireButton")
         subscribeToIsBurning()
     }
 

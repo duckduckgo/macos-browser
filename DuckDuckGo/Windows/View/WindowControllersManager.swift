@@ -198,7 +198,7 @@ extension WindowControllersManager {
         windowController.window?.orderFront(nil)
     }
 
-    // MARK: - Network Protection
+    // MARK: - VPN
 
 #if NETWORK_PROTECTION
     @MainActor

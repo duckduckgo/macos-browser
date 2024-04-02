@@ -31,7 +31,7 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
             self.selectedTable = tables.first
             self.dataManager = nil
         } else {
-            self.dataManager = DataBrokerProtectionDataManager()
+            self.dataManager = DataBrokerProtectionDataManager(pixelHandler: DataBrokerProtectionPixelsHandler())
             self.tables = [DataBrokerDatabaseBrowserData.Table]()
             self.selectedTable = nil
             updateTables()

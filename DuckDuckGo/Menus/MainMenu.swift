@@ -43,7 +43,7 @@ import SubscriptionUI
 
     // MARK: DuckDuckGo
     let servicesMenu = NSMenu(title: UserText.mainMenuAppServices)
-    let preferencesMenuItem = NSMenuItem(title: UserText.mainMenuAppPreferences, action: #selector(AppDelegate.openPreferences), keyEquivalent: ",")
+    let preferencesMenuItem = NSMenuItem(title: UserText.mainMenuAppPreferences, action: #selector(AppDelegate.openPreferences), keyEquivalent: ",").withAccessibilityIdentifier("MainMenu.preferencesMenuItem")
 
     // MARK: File
     let newWindowMenuItem = NSMenuItem(title: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "n")
@@ -207,12 +207,12 @@ import SubscriptionUI
             NSMenuItem.separator()
 
             NSMenuItem(title: UserText.mainMenuEditFind) {
-                NSMenuItem(title: UserText.findInPageMenuItem, action: #selector(MainViewController.findInPage), keyEquivalent: "f")
-                NSMenuItem(title: UserText.mainMenuEditFindFindNext, action: #selector(MainViewController.findInPageNext), keyEquivalent: "g")
-                NSMenuItem(title: UserText.mainMenuEditFindFindPrevious, action: #selector(MainViewController.findInPagePrevious), keyEquivalent: "G")
+                NSMenuItem(title: UserText.findInPageMenuItem, action: #selector(MainViewController.findInPage), keyEquivalent: "f").withAccessibilityIdentifier("MainMenu.findInPage")
+                NSMenuItem(title: UserText.mainMenuEditFindFindNext, action: #selector(MainViewController.findInPageNext), keyEquivalent: "g").withAccessibilityIdentifier("MainMenu.findNext")
+                NSMenuItem(title: UserText.mainMenuEditFindFindPrevious, action: #selector(MainViewController.findInPagePrevious), keyEquivalent: "G").withAccessibilityIdentifier("MainMenu.findPrevious")
                 NSMenuItem.separator()
 
-                NSMenuItem(title: UserText.mainMenuEditFindHideFind, action: #selector(MainViewController.findInPageDone), keyEquivalent: "F")
+                NSMenuItem(title: UserText.mainMenuEditFindHideFind, action: #selector(MainViewController.findInPageDone), keyEquivalent: "F").withAccessibilityIdentifier("MainMenu.findInPageDone")
             }
 
             NSMenuItem(title: UserText.mainMenuEditSpellingandGrammar) {
@@ -544,18 +544,20 @@ import SubscriptionUI
     }
 
     private func updateShortcutMenuItems() {
-        toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
-        toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
-        toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
+        Task { @MainActor in
+            toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
+            toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
+            toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
 #if NETWORK_PROTECTION
-        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            toggleNetworkProtectionShortcutMenuItem.isHidden = false
-            toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
-        } else {
-            toggleNetworkProtectionShortcutMenuItem.isHidden = true
-        }
+            if await DefaultNetworkProtectionVisibility().isVPNVisible() {
+                toggleNetworkProtectionShortcutMenuItem.isHidden = false
+                toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
+            } else {
+                toggleNetworkProtectionShortcutMenuItem.isHidden = true
+            }
 #endif
+        }
     }
 
     // MARK: - Debug
@@ -570,24 +572,30 @@ import SubscriptionUI
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
-                NSMenuItem(title: "Reset Autofill Data", action: #selector(MainViewController.resetSecureVaultData))
-                NSMenuItem(title: "Reset Bookmarks", action: #selector(MainViewController.resetBookmarks))
+                NSMenuItem(title: "Reset Autofill Data", action: #selector(MainViewController.resetSecureVaultData)).withAccessibilityIdentifier("MainMenu.resetSecureVaultData")
+                NSMenuItem(title: "Reset Bookmarks", action: #selector(MainViewController.resetBookmarks)).withAccessibilityIdentifier("MainMenu.resetBookmarks")
                 NSMenuItem(title: "Reset Pinned Tabs", action: #selector(MainViewController.resetPinnedTabs))
                 NSMenuItem(title: "Reset YouTube Overlay Interactions", action: #selector(MainViewController.resetDuckPlayerOverlayInteractions))
                 NSMenuItem(title: "Reset MakeDuckDuckYours user settings", action: #selector(MainViewController.resetMakeDuckDuckGoYoursUserSettings))
+                NSMenuItem(title: "Survey 10% on", action: #selector(MainViewController.in10PercentSurveyOn))
+                NSMenuItem(title: "Survey 10% off", action: #selector(MainViewController.in10PercentSurveyOff))
                 NSMenuItem(title: "Change Activation Date") {
                     NSMenuItem(title: "Today", action: #selector(MainViewController.changeInstallDateToToday), keyEquivalent: "N")
-                    NSMenuItem(title: "Less Than a 21 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan21DaysAgo))
-                    NSMenuItem(title: "More Than 21 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan21DaysAgoButLessThan27))
-                    NSMenuItem(title: "More Than 27 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan27DaysAgo))
+                    NSMenuItem(title: "Less Than a 1 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan1DayAgo(_:)))
+                    NSMenuItem(title: "More Than 1 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan1DayAgoButLessThan14(_:)))
+                    NSMenuItem(title: "More Than 14 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan14DaysAgoButLessThan15(_:)))
+                    NSMenuItem(title: "More Than 15 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan15DaysAgo(_:)))
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Daily Pixels", action: #selector(MainViewController.resetDailyPixels))
-            }
+            }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
                 NSMenuItem(title: "Show Credentials Saved Popover", action: #selector(MainViewController.showCredentialsSavedPopover))
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
+                NSMenuItem(title: "Show VPN Thank You Modal", action: #selector(MainViewController.showVPNThankYouModal))
+                NSMenuItem(title: "Show PIR Thank You Modal", action: #selector(MainViewController.showPIRThankYouModal))
+                NSMenuItem(title: "Reset Thank You Modal Checks", action: #selector(MainViewController.resetThankYouModalChecks))
             }
             NSMenuItem(title: "Remote Configuration") {
                 customConfigurationUrlMenuItem
@@ -609,8 +617,10 @@ import SubscriptionUI
 #endif
 
 #if NETWORK_PROTECTION
-            NSMenuItem(title: "Network Protection")
-                .submenu(NetworkProtectionDebugMenu())
+            if case .normal = NSApp.runType {
+                NSMenuItem(title: "VPN")
+                    .submenu(NetworkProtectionDebugMenu())
+            }
 #endif
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
@@ -619,16 +629,21 @@ import SubscriptionUI
             let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
 
-            SubscriptionDebugMenu(currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
-                                  updateEnvironment: {
-                guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
-                currentEnvironmentWrapper.wrappedValue = newEnvironment
-                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment },
-                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
-                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
-                                  currentViewController: {
-                WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            }, subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            SubscriptionDebugMenu(
+                currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
+                updateEnvironment: {
+                    guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
+                    currentEnvironmentWrapper.wrappedValue = newEnvironment
+                    SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment
+                    VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
+                },
+                isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                currentViewController: {
+                    WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+            },
+                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)
+            )
 #endif
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())

@@ -22,7 +22,9 @@ import XCTest
 
 private struct ChromiumLoginStore {
     static let legacy: Self = .init(directory: "Legacy", decryptionKey: "0geUdf5dTuZmIrtd8Omf/Q==")
+    static let legacyExcluded: Self = .init(directory: "Legacy Excluded", decryptionKey: "0geUdf5dTuZmIrtd8Omf/Q==")
     static let v32: Self = .init(directory: "v32", decryptionKey: "IcBAbGhvYp70AP+5W5ojcw==")
+    static let v32Excluded: Self = .init(directory: "v32 Excluded", decryptionKey: "IcBAbGhvYp70AP+5W5ojcw==")
 
     let directory: String
     let decryptionKey: String
@@ -64,6 +66,22 @@ class ChromiumLoginReaderTests: XCTestCase {
         XCTAssertEqual(logins[2].password, "password")
     }
 
+    func testImportFromVersion32_WithOnlyExcludedSites_IgnoresExcludedCredentials() throws {
+        // Given
+        let expectedResult: DataImportResult<[ImportedLoginCredential]> = .success([])
+        let reader = ChromiumLoginReader(
+            chromiumDataDirectoryURL: ChromiumLoginStore.v32Excluded.databaseDirectoryURL,
+            source: .chrome,
+            decryptionKey: ChromiumLoginStore.v32Excluded.decryptionKey
+        )
+
+        // When
+        let actualResult = reader.readLogins()
+
+        // Then
+        XCTAssertEqual(expectedResult, actualResult)
+    }
+
     func testImportFromLegacyVersion() throws {
 
         let reader = ChromiumLoginReader(
@@ -81,6 +99,22 @@ class ChromiumLoginReaderTests: XCTestCase {
         XCTAssertEqual(logins[0].url, "news.ycombinator.com")
         XCTAssertEqual(logins[0].username, "username")
         XCTAssertEqual(logins[0].password, "password")
+    }
+
+    func testImportFromLegacyVersion_WithOnlyExcludedSites_IgnoresExcludedCredentials() {
+        // Given
+        let expectedResult: DataImportResult<[ImportedLoginCredential]> = .success([])
+        let reader = ChromiumLoginReader(
+            chromiumDataDirectoryURL: ChromiumLoginStore.legacyExcluded.databaseDirectoryURL,
+            source: .chrome,
+            decryptionKey: ChromiumLoginStore.legacyExcluded.decryptionKey
+        )
+
+        // When
+        let actualResult = reader.readLogins()
+
+        // Then
+        XCTAssertEqual(expectedResult, actualResult)
     }
 
     func testWhenImportingChromiumData_AndTheUserCancelsTheKeychainPrompt_ThenAnErrorIsReturned() {

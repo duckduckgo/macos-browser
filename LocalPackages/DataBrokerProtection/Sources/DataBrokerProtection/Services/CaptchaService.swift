@@ -81,11 +81,14 @@ protocol CaptchaServiceProtocol {
     ///
     /// - Parameters:
     ///   - captchaInfo: A struct that containers a `siteKey`, `url` and `type`
+    ///   - pollingInterval: The time between each poll in seconds. Defaults to 1 second
+    ///   - attemptId: Identifies the scan or the opt-out attempt
     ///   - shouldRunNextStep: A closure that defines if the retry should keep happening
     /// - Returns: `CaptchaTransactionId` an identifier so we can later use to fetch the resolved captcha information
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
                                   retries: Int,
                                   pollingInterval: TimeInterval,
+                                  attemptId: UUID,
                                   shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId
 
     /// Fetches the resolved captcha information with the passed transaction ID.
@@ -94,21 +97,23 @@ protocol CaptchaServiceProtocol {
     ///   - transactionID: The transaction ID of the previous submitted captcha information
     ///   - retries: The number of retries until we timed out. Defaults to 100
     ///   - pollingInterval: The time between each poll in seconds. Defaults to 40 seconds
+    ///   - attemptId: Identifies the scan or the opt-out attempt
     ///   - shouldRunNextStep: A closure that defines if the retry should keep happening
     /// - Returns: `CaptchaResolveData` a string containing the data to resolve the captcha
     func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
                                    retries: Int,
                                    pollingInterval: TimeInterval,
+                                   attemptId: UUID,
                                    shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData
 }
 
 extension CaptchaServiceProtocol {
-    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
-        try await submitCaptchaInformation(captchaInfo, retries: 5, pollingInterval: 1, shouldRunNextStep: shouldRunNextStep)
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, attemptId: UUID, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
+        try await submitCaptchaInformation(captchaInfo, retries: 5, pollingInterval: 1, attemptId: attemptId, shouldRunNextStep: shouldRunNextStep)
     }
 
-    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
-        try await submitCaptchaToBeResolved(for: transactionID, retries: 100, pollingInterval: 40, shouldRunNextStep: shouldRunNextStep)
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, attemptId: UUID, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
+        try await submitCaptchaToBeResolved(for: transactionID, retries: 100, pollingInterval: 40, attemptId: attemptId, shouldRunNextStep: shouldRunNextStep)
     }
 }
 
@@ -132,8 +137,9 @@ struct CaptchaService: CaptchaServiceProtocol {
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
                                   retries: Int = 5,
                                   pollingInterval: TimeInterval = 1,
+                                  attemptId: UUID,
                                   shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
-        guard let captchaSubmitResult = try? await submitCaptchaInformationRequest(captchaInfo) else {
+        guard let captchaSubmitResult = try? await submitCaptchaInformationRequest(captchaInfo, attemptId: attemptId) else {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
         }
 
@@ -156,6 +162,7 @@ struct CaptchaService: CaptchaServiceProtocol {
             return try await submitCaptchaInformation(captchaInfo,
                                                       retries: retries - 1,
                                                       pollingInterval: pollingInterval,
+                                                      attemptId: attemptId,
                                                       shouldRunNextStep: shouldRunNextStep)
         case .failureCritical:
             throw CaptchaServiceError.criticalFailureWhenSubmittingCaptcha
@@ -164,9 +171,10 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
     }
 
-    private func submitCaptchaInformationRequest(_ captchaInfo: GetCaptchaInfoResponse) async throws -> CaptchaTransaction {
+    private func submitCaptchaInformationRequest(_ captchaInfo: GetCaptchaInfoResponse, attemptId: UUID) async throws -> CaptchaTransaction {
         var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
         urlComponents?.path = "\(Constants.endpointSubPath)/submit"
+        urlComponents?.queryItems = [URLQueryItem(name: "attemptId", value: attemptId.uuidString)]
 
         guard let url = urlComponents?.url else {
             throw CaptchaServiceError.cantGenerateCaptchaServiceURL
@@ -196,8 +204,9 @@ struct CaptchaService: CaptchaServiceProtocol {
     func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
                                    retries: Int = 100,
                                    pollingInterval: TimeInterval = 50,
+                                   attemptId: UUID,
                                    shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
-        guard let captchaResolveResult = try? await submitCaptchaToBeResolvedRequest(transactionID) else {
+        guard let captchaResolveResult = try? await submitCaptchaToBeResolvedRequest(transactionID, attemptId: attemptId) else {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
         }
 
@@ -222,6 +231,7 @@ struct CaptchaService: CaptchaServiceProtocol {
             return try await submitCaptchaToBeResolved(for: transactionID,
                                                        retries: retries - 1,
                                                        pollingInterval: pollingInterval,
+                                                       attemptId: attemptId,
                                                        shouldRunNextStep: shouldRunNextStep)
         case .failure:
             os_log("Captcha failure ...", log: .service)
@@ -232,12 +242,14 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
     }
 
-    private func submitCaptchaToBeResolvedRequest(_ transactionID: CaptchaTransactionId) async throws -> CaptchaResult {
+    private func submitCaptchaToBeResolvedRequest(_ transactionID: CaptchaTransactionId, attemptId: UUID) async throws -> CaptchaResult {
 
         var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
         urlComponents?.path = "\(Constants.endpointSubPath)/result"
 
-        urlComponents?.queryItems = [URLQueryItem(name: "transactionId", value: transactionID)]
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "transactionId", value: transactionID)
+        ]
 
         guard let url = urlComponents?.url else {
             throw CaptchaServiceError.cantGenerateCaptchaServiceURL

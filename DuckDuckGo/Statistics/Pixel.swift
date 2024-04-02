@@ -154,6 +154,9 @@ final class Pixel {
                           onComplete: onComplete)
     }
 
+    func clearRepetitions(for event: Pixel.Event) {
+        store().removeValue(forKey: event.name)
+    }
 }
 
 public func pixelAssertionFailure(_ message: @autoclosure () -> String = String(), file: StaticString = #fileID, line: UInt = #line) {

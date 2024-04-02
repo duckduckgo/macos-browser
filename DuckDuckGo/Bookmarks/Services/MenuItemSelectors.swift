@@ -18,7 +18,13 @@
 
 import AppKit
 
-@objc protocol BookmarkMenuItemSelectors {
+@objc protocol BookmarksMenuItemSelectors {
+    func newFolder(_ sender: NSMenuItem)
+    func moveToEnd(_ sender: NSMenuItem)
+    @objc optional func manageBookmarks(_ sender: NSMenuItem)
+}
+
+@objc protocol BookmarkMenuItemSelectors: BookmarksMenuItemSelectors {
 
     func openBookmarkInNewTab(_ sender: NSMenuItem)
     func openBookmarkInNewWindow(_ sender: NSMenuItem)
@@ -30,11 +36,11 @@ import AppKit
 
 }
 
-@objc protocol FolderMenuItemSelectors {
+@objc protocol FolderMenuItemSelectors: BookmarksMenuItemSelectors {
 
-    func newFolder(_ sender: NSMenuItem)
-    func renameFolder(_ sender: NSMenuItem)
+    func editFolder(_ sender: NSMenuItem)
     func deleteFolder(_ sender: NSMenuItem)
     func openInNewTabs(_ sender: NSMenuItem)
+    func openAllInNewWindow(_ sender: NSMenuItem)
 
 }

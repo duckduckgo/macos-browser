@@ -22,7 +22,7 @@ import Foundation
 final class PseudoFolder: Equatable {
 
     static let favorites = PseudoFolder(id: UUID().uuidString, name: UserText.favorites, icon: .favoriteFilledBorder)
-    static let bookmarks = PseudoFolder(id: UUID().uuidString, name: UserText.bookmarks, icon: .folder)
+    static let bookmarks = PseudoFolder(id: UUID().uuidString, name: UserText.bookmarks, icon: .bookmarksFolder)
 
     let id: String
     let name: String

@@ -25,7 +25,7 @@ extension TransparentProxyProvider.StartError: ErrorWithPixelParameters {
         case .failedToUpdateNetworkSettings(let underlyingError):
             return [
                 PixelKit.Parameters.underlyingErrorCode: "\((underlyingError as NSError).code)",
-                PixelKit.Parameters.underlyingErrorDesc: (underlyingError as NSError).domain,
+                PixelKit.Parameters.underlyingErrorDomain: (underlyingError as NSError).domain,
             ]
         default:
             return [:]

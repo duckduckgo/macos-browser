@@ -23,7 +23,7 @@ public protocol DataBrokerProtectionDataManaging {
     var cache: InMemoryDataCache { get }
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
-    init(fakeBrokerFlag: DataBrokerDebugFlag)
+    init(pixelHandler: EventMapping<DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerDebugFlag)
     func saveProfile(_ profile: DataBrokerProtectionProfile) async throws
     func fetchProfile(ignoresCache: Bool) throws -> DataBrokerProtectionProfile?
     func fetchBrokerProfileQueryData(ignoresCache: Bool) async throws -> [BrokerProfileQueryData]
@@ -52,8 +52,8 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     internal let database: DataBrokerProtectionRepository
 
-    required public init(fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()) {
-        self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag)
+    required public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()) {
+        self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag, pixelHandler: pixelHandler)
 
         cache.delegate = self
     }
@@ -111,6 +111,7 @@ extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
 
     public func removeAllData() throws {
         try database.deleteProfileData()
+        cache.invalidate()
 
         delegate?.dataBrokerProtectionDataManagerDidDeleteData()
     }

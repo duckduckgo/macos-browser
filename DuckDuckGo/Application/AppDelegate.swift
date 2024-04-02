@@ -82,7 +82,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     var privacyDashboardWindow: NSWindow?
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
-    private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+    // Needs to be lazy as indirectly depends on AppDelegate
+    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
 #endif
 
 #if DBP && SUBSCRIPTION
@@ -182,6 +183,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
 
+#if SUBSCRIPTION
+    #if APPSTORE || !STRIPE
+        SubscriptionPurchaseEnvironment.current = .appStore
+    #else
+        SubscriptionPurchaseEnvironment.current = .stripe
+    #endif
+#endif
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -246,27 +254,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                      defaultValue: defaultEnvironment).wrappedValue
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
 
-    #if APPSTORE || !STRIPE
-        SubscriptionPurchaseEnvironment.current = .appStore
-    #else
-        SubscriptionPurchaseEnvironment.current = .stripe
-    #endif
-
         Task {
-            let accountManager = AccountManager()
-            do {
-                try accountManager.migrateAccessTokenToNewStore()
-            } catch {
-                if let error = error as? AccountManager.MigrationError {
-                    switch error {
-                    case AccountManager.MigrationError.migrationFailed:
-                        os_log(.default, log: .subscription, "Access token migration failed")
-                    case AccountManager.MigrationError.noMigrationNeeded:
-                        os_log(.default, log: .subscription, "No access token migration needed")
-                    }
-                }
+            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            if let token = accountManager.accessToken {
+                _ = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
+                _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
             }
-            await accountManager.checkSubscriptionState()
         }
 #endif
 
@@ -574,18 +567,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 func updateSubscriptionStatus() {
 #if SUBSCRIPTION
     Task {
-        guard let token = AccountManager().accessToken else {
-            return
-        }
-        let result = await SubscriptionService.getSubscription(accessToken: token)
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
-        switch result {
-        case .success(let success):
-            if success.isActive {
+        guard let token = accountManager.accessToken else { return }
+
+        if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+            if subscription.isActive {
                 DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
             }
-        case .failure: break
         }
+
+        _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
     }
 #endif
 }

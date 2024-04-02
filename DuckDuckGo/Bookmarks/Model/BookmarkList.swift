@@ -19,10 +19,11 @@
 import Foundation
 import BrowserServicesKit
 import Common
+import Suggestions
 
 struct BookmarkList {
 
-    struct IdentifiableBookmark: Equatable, BrowserServicesKit.Bookmark {
+    struct IdentifiableBookmark: Equatable, Suggestions.Bookmark {
         let id: String
         let url: String
         let urlObject: URL?
@@ -124,6 +125,13 @@ struct BookmarkList {
         }
     }
 
+    mutating func update(bookmark: Bookmark, newURL: String, newTitle: String, newIsFavorite: Bool) -> Bookmark? {
+        guard !bookmark.isFolder else { return nil }
+
+        let newBookmark = Bookmark(from: bookmark, withNewUrl: newURL, title: newTitle, isFavorite: newIsFavorite)
+        return updateBookmarkList(newBookmark: newBookmark, oldBookmark: bookmark)
+    }
+
     mutating func updateUrl(of bookmark: Bookmark, to newURL: String) -> Bookmark? {
         guard !bookmark.isFolder else { return nil }
 
@@ -131,12 +139,25 @@ struct BookmarkList {
             os_log("BookmarkList: Update failed, new url already in bookmark list")
             return nil
         }
+
+        let newBookmark = Bookmark(from: bookmark, with: newURL)
+        return updateBookmarkList(newBookmark: newBookmark, oldBookmark: bookmark)
+    }
+
+    func bookmarks() -> [IdentifiableBookmark] {
+        return allBookmarkURLsOrdered
+    }
+
+}
+
+private extension BookmarkList {
+
+    mutating private func updateBookmarkList(newBookmark: Bookmark, oldBookmark bookmark: Bookmark) -> Bookmark? {
         guard itemsDict[bookmark.url] != nil, let index = allBookmarkURLsOrdered.firstIndex(of: IdentifiableBookmark(from: bookmark)) else {
             os_log("BookmarkList: Update failed, no such item in bookmark list")
             return nil
         }
 
-        let newBookmark = Bookmark(from: bookmark, with: newURL)
         let newIdentifiableBookmark = IdentifiableBookmark(from: newBookmark)
 
         allBookmarkURLsOrdered.remove(at: index)
@@ -146,13 +167,8 @@ struct BookmarkList {
         let updatedBookmarks = existingBookmarks.filter { $0.id != bookmark.id }
 
         itemsDict[bookmark.url] = updatedBookmarks
-        itemsDict[newURL] = (itemsDict[newURL] ?? []) + [bookmark]
+        itemsDict[newBookmark.url] = (itemsDict[newBookmark.url] ?? []) + [newBookmark]
 
         return newBookmark
     }
-
-    func bookmarks() -> [IdentifiableBookmark] {
-        return allBookmarkURLsOrdered
-    }
-
 }
