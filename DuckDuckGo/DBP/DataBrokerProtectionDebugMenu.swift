@@ -233,7 +233,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                     os_log("scan operations finished, operation errors count: %{public}@", log: .dataBrokerProtection, operationErrors.count)
                 }
             } else {
-                os_log("scan operations finished", log: .dataBrokerProtection)
+                os_log("Scan operations finished", log: .dataBrokerProtection)
             }
         }
     }
