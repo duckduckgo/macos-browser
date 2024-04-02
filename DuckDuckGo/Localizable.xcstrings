@@ -34073,7 +34073,7 @@
       }
     },
     "Passwords:" : {
-      "comment" : "Data import summary format of how many passwords (%lld) were successfully imported.",
+      "comment" : "Data import summary format of how many passwords were successfully imported.",
       "localizations" : {
         "de" : {
           "stringUnit" : {

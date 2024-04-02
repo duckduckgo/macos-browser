@@ -84,12 +84,12 @@ struct DataImportSummaryView: View {
                     HStack {
                         skippedImage()
                         Text("Bookmarks:",
-                             comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
+                             comment: "Data import summary format of how many bookmarks were successfully imported.")
                         + Text(" " as String)
                         + Text(zeroString).bold()
                     }
 
-                case (.bookmarks, .failure(let error)):
+                case (.bookmarks, .failure):
                     HStack {
                         failureImage()
                         Text("Bookmark import failed.",
@@ -101,7 +101,7 @@ struct DataImportSummaryView: View {
                         HStack {
                             skippedImage()
                             Text("Passwords:",
-                                 comment: "Data import summary format of how many passwords (%lld) were successfully imported.")
+                                 comment: "Data import summary format of how many passwords were successfully imported.")
                             + Text(" " as String)
                             + Text(zeroString).bold()
                         }
