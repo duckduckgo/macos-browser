@@ -341,7 +341,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         os_log(.debug, log: log, "🧙‍♂️ magique.start: \"\(destinationURL.path)\" (\"\(duckloadURL.path)\") directory writable: \(fm.isWritableFile(atPath: destinationURL.deletingLastPathComponent().path))")
         // 1. create our final destination file (let‘s say myfile.zip) and setup a File Presenter for it
         //    doing this we preserve access to the file until it‘s actually downloaded
-        var destinationFilePresenter = try SandboxFilePresenter(url: destinationURL, consumeUnbalancedStartAccessingResource: true, logger: log) { url in
+        let destinationFilePresenter = try SandboxFilePresenter(url: destinationURL, consumeUnbalancedStartAccessingResource: true, logger: log) { url in
             try fm.createFile(atPath: url.path, contents: nil) ? url : {
                 throw CocoaError(.fileWriteNoPermission, userInfo: [NSFilePathErrorKey: url.path])
             }()

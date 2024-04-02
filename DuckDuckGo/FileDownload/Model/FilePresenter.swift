@@ -51,6 +51,7 @@ internal class FilePresenter {
         return queue
     }()
 
+    /// NSFilePresenter needs to be removed from NSFileCoordinator before its deallocation, that‘s why we‘re using the wrapper
     private class DelegatingFilePresenter: NSObject, NSFilePresenter {
 
         final let presentedItemOperationQueue: OperationQueue
@@ -75,7 +76,7 @@ internal class FilePresenter {
             delegate?.presentedItemDidMove(to: newURL)
         }
 
-        func accommodatePresentedSubitemDeletion(at url: URL, completionHandler: @escaping ((any Error)?) -> Void) {
+        func accommodatePresentedItemDeletion(completionHandler: @escaping @Sendable ((any Error)?) -> Void) {
             assert(delegate != nil)
             do {
                 try delegate?.accommodatePresentedItemDeletion()
@@ -85,7 +86,7 @@ internal class FilePresenter {
             }
         }
 
-        func accommodatePresentedItemEviction(completionHandler: @escaping ((any Error)?) -> Void) {
+        func accommodatePresentedItemEviction(completionHandler: @escaping @Sendable ((any Error)?) -> Void) {
             assert(delegate != nil)
             do {
             try delegate?.accommodatePresentedItemEviction()
@@ -200,7 +201,7 @@ internal class FilePresenter {
                 return
             }
 
-            try? self.accommodatePresentedItemDeletion()
+            try? accommodatePresentedItemDeletion()
             self.dispatchSourceCancellable = nil
         }
 
@@ -250,6 +251,9 @@ extension FilePresenter: FilePresenterDelegate {
 
 }
 
+/// Maintains File Bookmark Data for presented resource URL
+/// and manages its sandbox security scope access calling `stopAccessingSecurityScopedResource` on deinit
+/// balanced with preceding `startAccessingSecurityScopedResource`
 final class SandboxFilePresenter: FilePresenter {
 
     private let securityScopedURL: URL?

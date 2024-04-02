@@ -114,6 +114,7 @@ final class WindowsManager {
                              popUp: popUp)
     }
 
+    @discardableResult
     class func openNewWindow(with initialUrl: URL, source: Tab.TabContent.URLSource, isBurner: Bool, parentTab: Tab? = nil) -> MainWindow? {
         openNewWindow(with: Tab(content: .contentFromURL(initialUrl, source: source), parentTab: parentTab, shouldLoadInBackground: true, burnerMode: BurnerMode(isBurner: isBurner)))
     }

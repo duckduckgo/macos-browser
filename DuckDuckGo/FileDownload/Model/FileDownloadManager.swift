@@ -117,7 +117,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
             task.cancel()
         }
-        if let dispatchGroup = dispatchGroup {
+        if let dispatchGroup {
             withExtendedLifetime(cancellables) {
                 RunLoop.main.run(until: RunLoop.ResumeCondition(dispatchGroup: dispatchGroup))
             }
@@ -168,6 +168,9 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
     @MainActor
     private func requestDestinationFromUser(for task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType fileType: UTType?, completionHandler: @escaping (URL?, UTType?) -> Void) {
+        // !!!
+        // don‘t refactor this to `async` style as it will make the `delegate` retained for the scope of the async func
+        // leading to a retain cycle when a background Tab presenting Save Dialog is closed
         guard let delegate = self.downloadTaskDelegates[task]?() else {
             completionHandler(nil, nil)
             return
