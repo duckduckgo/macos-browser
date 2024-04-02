@@ -38,8 +38,10 @@ extension NSAlert {
         alert.informativeText = UserText.clearAllDataDescription
         alert.alertStyle = .warning
         alert.icon = .burnAlert
-        alert.addButton(withTitle: UserText.clear)
-        alert.addButton(withTitle: UserText.cancel)
+        let clearButton = alert.addButton(withTitle: UserText.clear)
+        let cancelButton = alert.addButton(withTitle: UserText.cancel)
+        clearButton.setAccessibilityIdentifier("ClearAllHistoryAndDataAlert.clearButton")
+        cancelButton.setAccessibilityIdentifier("ClearAllHistoryAndDataAlert.cancelButton")
         return alert
     }
 
@@ -88,11 +90,11 @@ extension NSAlert {
 
     static func resetNetworkProtectionAlert() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Reset Network Protection?"
+        alert.messageText = "Reset VPN?"
         alert.informativeText = """
         This will remove your stored network configuration (including private key) and disable the VPN.
 
-        You can re-enable the VPN from the Network Protection view.
+        You can re-enable the VPN from the status view.
         """
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Reset")
@@ -108,7 +110,7 @@ extension NSAlert {
         let sysExText = ""
 #endif
         alert.messageText = "Uninstall \(sysExText)Login Items?"
-        alert.informativeText = "This will remove the Network Protection \(sysExText)Status Menu icon and disable the VPN."
+        alert.informativeText = "This will remove the VPN \(sysExText)Status Menu icon and disable the VPN."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Uninstall")
         alert.addButton(withTitle: UserText.cancel)

@@ -20,8 +20,8 @@ import Common
 import Foundation
 import LoginItems
 
-/// Class to manage the login items for Network Protection and DBP
-/// 
+/// Class to manage the login items for the VPN and DBP
+///
 final class LoginItemsManager {
     private enum Action: String {
         case enable
@@ -57,6 +57,12 @@ final class LoginItemsManager {
         for item in items {
             try? item.disable()
         }
+    }
+
+    func isAnyEnabled(_ items: Set<LoginItem>) -> Bool {
+        return items.contains(where: { item in
+            item.status == .enabled
+        })
     }
 
     private func handleError(for item: LoginItem, action: Action, error: NSError) {

@@ -2,7 +2,7 @@ name: Bump Internal Release
 
 on:
   schedule:
-    - cron: '0 7 * * 2-5' # Run at 07:00 UTC, Tuesday through Friday
+    - cron: '0 5 * * 2-5' # Run at 05:00 UTC, Tuesday through Friday
   workflow_dispatch:
     inputs:
       asana-task-url:
@@ -13,6 +13,10 @@ on:
         description: "Base branch (defaults to main, only override for testing)"
         required: false
         type: string
+      skip-appstore:
+        description: "Skip App Store release and only make a DMG build"
+        default: false
+        type: boolean
 
 jobs:
 
@@ -29,6 +33,7 @@ jobs:
       skip-release: ${{ steps.check-for-changes.outputs.skip-release }}
       asana-task-url: ${{ steps.set-parameters.outputs.asana-task-url }}
       release-branch: ${{ steps.set-parameters.outputs.release-branch }}
+      skip-appstore: ${{ steps.set-parameters.outputs.skip-appstore }}
 
     steps:
 
@@ -63,13 +68,21 @@ jobs:
             echo "skip-release=false" >> $GITHUB_OUTPUT
           else
             latest_tag="$(git describe --tags --abbrev=0)"
-            changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}" | grep -v -E '.github|scripts')"
+            latest_tag_sha="$(git rev-parse "$latest_tag")"
+            release_branch_sha="$(git rev-parse "origin/${release_branch}")"
 
-            if [[ ${#changed_files} == 0 ]]; then
-              echo "::warning::No changes to the release branch (or only scripts and workflows). Skipping automatic release."
+            if [[ "${latest_tag_sha}" == "${release_branch_sha}" ]]; then
+              echo "::warning::Release branch's HEAD is already tagged. Skipping automatic release."
               echo "skip-release=true" >> $GITHUB_OUTPUT
             else
-              echo "skip-release=false" >> $GITHUB_OUTPUT
+              changed_files="$(git diff --name-only "$latest_tag".."origin/${release_branch}")"
+              if grep -q -v -e '.github' -e 'scripts' <<< "$changed_files"; then
+                echo "::warning::New code changes found in the release branch since the last release. Will bump internal release now."
+                echo "skip-release=false" >> $GITHUB_OUTPUT
+              else
+                echo "::warning::No changes to the release branch (or only changes to scripts and workflows). Skipping automatic release."
+                echo "skip-release=true" >> $GITHUB_OUTPUT
+              fi
             fi
           fi
 
@@ -86,6 +99,7 @@ jobs:
           ASANA_TASK_URL: ${{ steps.find-asana-task.outputs.task-url || github.event.inputs.asana-task-url }}
           RELEASE_BRANCH: ${{ steps.find-asana-task.outputs.release-branch || github.ref_name }}
           TASK_ID: ${{ steps.find-asana-task.outputs.task-id || steps.task-id.outputs.task-id }}
+          SKIP_APPSTORE: ${{ github.event.inputs.skip-appstore || false }} # make sure this is set to false on scheduled runs
         run: |
           if [[ "${RELEASE_BRANCH}" == "main" ]]; then
             echo "::error::Workflow run from main branch and release branch wasn't found. Please re-run the workflow and specify a release branch."
@@ -94,6 +108,7 @@ jobs:
           echo "release-branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
           echo "task-id=${TASK_ID}" >> $GITHUB_OUTPUT
           echo "asana-task-url=${ASANA_TASK_URL}" >> $GITHUB_OUTPUT
+          echo "skip-appstore=${SKIP_APPSTORE}" >> $GITHUB_OUTPUT
 
       - name: Validate release notes
         env:
@@ -178,6 +193,7 @@ jobs:
     with:
       asana-task-url: ${{ needs.validate_input_conditions.outputs.asana-task-url }}
       branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
+      skip-appstore: ${{ needs.validate_input_conditions.outputs.skip-appstore == 'true' }}
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}

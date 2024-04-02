@@ -22,19 +22,106 @@ import SwiftUIExtensions
 
 extension Preferences {
 
-    struct SidebarItem: View {
+    struct SidebarSectionHeader: View {
+        let section: PreferencesSectionIdentifier
+
+        var body: some View {
+            Group {
+                if let name = section.displayName {
+                    Text(name)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 3)
+                        .font(PreferencesViews.Const.Fonts.sideBarHeader)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, minHeight: 31, alignment: .leading)
+                }
+            }
+        }
+    }
+
+    struct PaneSidebarItem: View {
         let pane: PreferencePaneIdentifier
         let isSelected: Bool
         let action: () -> Void
+        @ObservedObject var protectionStatus: PrivacyProtectionStatus
+
+        init(pane: PreferencePaneIdentifier, isSelected: Bool, action: @escaping () -> Void) {
+            self.pane = pane
+            self.isSelected = isSelected
+            self.action = action
+            self.protectionStatus = PrivacyProtectionStatus.status(for: pane)
+        }
 
         var body: some View {
             Button(action: action) {
                 HStack(spacing: 6) {
                     Image(pane.preferenceIconName).frame(width: 16, height: 16)
                     Text(pane.displayName).font(PreferencesViews.Const.Fonts.sideBarItem)
+
+                    Spacer()
+
+                    if let status = protectionStatus.status {
+                        StatusIndicatorView(status: status)
+                    }
                 }
             }
             .buttonStyle(SidebarItemButtonStyle(isSelected: isSelected))
+        }
+    }
+
+    enum StatusIndicator: Equatable {
+        case alwaysOn
+        case on
+        case off
+        case custom(String)
+
+        var text: String {
+            switch self {
+            case .alwaysOn:
+                return UserText.preferencesAlwaysOn
+            case .on:
+                return UserText.preferencesOn
+            case .off:
+                return UserText.preferencesOff
+            case .custom(let customText):
+                return customText
+            }
+        }
+    }
+
+    struct StatusIndicatorView: View {
+        var status: StatusIndicator
+        var isLarge: Bool = false
+
+        private var fontSize: CGFloat {
+            isLarge ? 13 : 10
+        }
+
+        private var circleSize: CGFloat {
+            isLarge ? 7 : 5
+        }
+
+        var body: some View {
+            HStack(spacing: isLarge ? 6 : 4) {
+                Circle()
+                    .frame(width: circleSize, height: circleSize)
+                    .foregroundColor(colorForStatus(status))
+
+                Text(status.text)
+                    .font(.system(size: fontSize))
+                    .foregroundColor(.secondary)
+            }
+        }
+
+        private func colorForStatus(_ status: StatusIndicator) -> Color {
+            switch status {
+            case .on, .alwaysOn:
+                return .alertGreen
+            case .off:
+                return Color.secondary.opacity(0.33)
+            case .custom:
+                return .orange
+            }
         }
     }
 
@@ -61,7 +148,7 @@ extension Preferences {
                 return button
             })
             .padding(.horizontal, 3)
-            .frame(height: 60)
+            .frame(height: 51)
             .onAppear(perform: model.resetTabSelectionIfNeeded)
         }
     }
@@ -77,20 +164,22 @@ extension Preferences {
                 ScrollView {
                     VStack(spacing: 0) {
                         ForEach(model.sections) { section in
+                            SidebarSectionHeader(section: section.id)
                             sidebarSection(section)
                         }
-                    }
+                    }.padding(.bottom, 16)
                 }
 
             }
             .padding(.top, 18)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 10)
         }
 
         @ViewBuilder
         private func sidebarSection(_ section: PreferencesSection) -> some View {
             ForEach(section.panes) { pane in
-                SidebarItem(pane: pane, isSelected: model.selectedPane == pane) {
+                PaneSidebarItem(pane: pane,
+                                isSelected: model.selectedPane == pane) {
                     model.selectPane(pane)
                 }
             }

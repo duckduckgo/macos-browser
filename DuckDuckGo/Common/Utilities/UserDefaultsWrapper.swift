@@ -23,6 +23,7 @@ extension UserDefaults {
     /// The app group's shared UserDefaults
     static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
     static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
+    static let subs = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .subs))!
 }
 
 @propertyWrapper
@@ -111,8 +112,10 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
         case homePageShowSurveyDay0 = "home.page.show.survey.0"
+        case homePageShowSurveyDay0in10Percent = "home.page.show.survey.0.in.10.pervent"
+        case homePageShowSurveyDay14in10Percent = "home.page.show.survey.0.in.14.pervent"
         case homePageUserInteractedWithSurveyDay0 = "home.page.user.interacted.with.survey.0"
-        case homePageShowSurveyDay7 = "home.page.show.survey.7"
+        case homePageShowSurveyDay14 = "home.page.show.survey.14"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
@@ -146,13 +149,13 @@ public struct UserDefaultsWrapper<T> {
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
         case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
 
-        // Network Protection
+        // VPN
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
         case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
-        // Network Protection: Shared Defaults
+        // VPN: Shared Defaults
         // ---
         // Please note that shared defaults MUST have a name that matches exactly their value,
         // or else KVO will just not work as of 2023-08-07

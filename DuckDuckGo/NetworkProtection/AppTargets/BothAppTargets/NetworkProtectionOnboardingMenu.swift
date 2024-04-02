@@ -24,7 +24,7 @@ import NetworkProtection
 import NetworkProtectionUI
 import SwiftUI
 
-/// Implements the logic for Network Protection's onboarding menu.
+/// Implements the logic for the VPN's onboarding menu.
 ///
 @MainActor
 final class NetworkProtectionOnboardingMenu: NSMenu {

@@ -171,14 +171,14 @@ struct DBPUIInitialScanState: DBPUISendableMessage {
     let scanProgress: DBPUIScanProgress
 }
 
-struct DBUIScanDate: DBPUISendableMessage {
+struct DBPUIScanDate: DBPUISendableMessage {
     let date: Double
     let dataBrokers: [DBPUIDataBroker]
 }
 
 struct DBPUIScanSchedule: DBPUISendableMessage {
-    let lastScan: DBUIScanDate
-    let nextScan: DBUIScanDate
+    let lastScan: DBPUIScanDate
+    let nextScan: DBPUIScanDate
 }
 
 struct DBPUIScanHistory: DBPUISendableMessage {

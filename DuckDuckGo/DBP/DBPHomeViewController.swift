@@ -47,9 +47,9 @@ final class DBPHomeViewController: NSViewController {
                                                   inlineIconCredentials: false,
                                                   thirdPartyCredentialsProvider: false)
 
-        let privacySettings = PrivacySecurityPreferences.shared
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
+        let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                            sessionKey: sessionKey,
                                            featureToggles: features)
 
@@ -174,6 +174,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutValidate,
                     .optOutFinish,
                     .optOutSubmitSuccess,
+                    .optOutFillForm,
                     .optOutSuccess,
                     .optOutFailure,
                     .backgroundAgentStarted,
@@ -201,7 +202,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                     .dailyActiveUser,
                     .weeklyActiveUser,
-                    .monthlyActiveUser:
+                    .monthlyActiveUser,
+                    .weeklyReportScanning,
+                    .weeklyReportRemovals,
+                    .scanningEventNewMatch,
+                    .scanningEventReAppearance:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }

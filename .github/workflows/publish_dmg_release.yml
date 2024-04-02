@@ -110,12 +110,24 @@ jobs:
           fi
           echo "release-version=${TAG//-/.}" >> $GITHUB_OUTPUT
 
+      # Always check out main first, because the release branch might have been deleted (for public releases)
       - name: Check out the code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
           submodules: recursive
-          ref: ${{ inputs.branch || github.ref_name }}
+          ref: main
+
+      - name: Check out the branch if it exists
+        env:
+          branch: ${{ inputs.branch || github.ref_name }}
+        run: |
+          if [[ -z "${branch}" ]] || git ls-remote --exit-code --heads origin "${branch}"; then
+            echo "::notice::Checking out ${branch} branch."
+            git checkout "${branch}"
+          else
+            echo "::notice::Branch ${branch} doesn't exist on the remote repository, staying on main."
+          fi
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer

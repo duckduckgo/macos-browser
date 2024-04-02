@@ -196,8 +196,13 @@ final class GeolocationServiceTests: XCTestCase {
     }
 
     func testWhenLastSubscriberUnsubscribedThenLocationManagerStopped() {
+        let eAuthRequested = expectation(description: "Authorization requested")
+        locationManagerMock.whenInUseAuthorizationRequested = { eAuthRequested.fulfill() }
+
         let c1 = service.locationPublisher.sink { _ in }
         _=service.locationPublisher.sink { _ in }
+        waitForExpectations(timeout: 0)
+
         let c3 = service.locationPublisher.sink { [locationManagerMock] _ in
             XCTAssertTrue(locationManagerMock!.isUpdatingLocation)
         }
@@ -211,6 +216,8 @@ final class GeolocationServiceTests: XCTestCase {
         let loc1 = CLLocation(latitude: 51.1, longitude: 23.4)
         let loc2 = CLLocation(latitude: 11.1, longitude: -12.2)
 
+        let eAuthRequested = expectation(description: "Authorization requested")
+        locationManagerMock.whenInUseAuthorizationRequested = { eAuthRequested.fulfill() }
         let c1 = service.locationPublisher.sink { _ in }
         var c2: AnyCancellable! = service.locationPublisher.sink { _ in }
         let e = expectation(description: "expect still receiving location")
@@ -235,6 +242,7 @@ final class GeolocationServiceTests: XCTestCase {
 
     func testWhenResubscribedThenLastLocationIsPublished() {
         let location = CLLocation(latitude: 51.1, longitude: 23.4)
+        locationManagerMock.whenInUseAuthorizationRequested = { }
         let c1 = service.locationPublisher.sink { _ in }
         locationManagerMock.currentLocation = location
         c1.cancel()
@@ -248,8 +256,9 @@ final class GeolocationServiceTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testWhenAtoppedThenNoErrorIsPublished() {
+    func testWhenStoppedThenNoErrorIsPublished() {
         let location = CLLocation(latitude: 51.1, longitude: 23.4)
+        locationManagerMock.whenInUseAuthorizationRequested = { }
         let c1 = service.locationPublisher.sink { _ in }
         locationManagerMock.currentLocation = location
         c1.cancel()
@@ -267,6 +276,8 @@ final class GeolocationServiceTests: XCTestCase {
     }
 
     func testWhenHighAccuracyRequestedThenAccuracyIsSetToBest() {
+        let eAuthRequested = expectation(description: "Authorization requested")
+        locationManagerMock.whenInUseAuthorizationRequested = { eAuthRequested.fulfill() }
         let c1 = service.locationPublisher.sink { _ in }
         XCTAssertEqual(locationManagerMock.desiredAccuracy, kCLLocationAccuracyHundredMeters)
 
@@ -276,6 +287,7 @@ final class GeolocationServiceTests: XCTestCase {
         c2.cancel()
         XCTAssertEqual(locationManagerMock.desiredAccuracy, kCLLocationAccuracyHundredMeters)
         withExtendedLifetime(c1) {}
+        waitForExpectations(timeout: 0)
     }
 
 }

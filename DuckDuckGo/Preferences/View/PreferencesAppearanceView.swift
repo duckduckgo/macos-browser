@@ -98,7 +98,6 @@ extension Preferences {
                 // SECTION 2: Address Bar
                 PreferencePaneSection(UserText.addressBar) {
                     ToggleMenuItem(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
-                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
 
                 // SECTION 3: New Tab Page
@@ -129,24 +128,6 @@ extension Preferences {
                             return button
                         }
                         .disabled(!model.showBookmarksBar)
-                    }
-                }
-
-                // SECTION 5: Zoom Setting
-                PreferencePaneSection(UserText.zoomSettingTitle) {
-
-                    HStack {
-                        Text(UserText.zoomPickerTitle)
-                        NSPopUpButtonView(selection: $model.defaultPageZoom) {
-                            let button = NSPopUpButton()
-                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-
-                            for value in DefaultZoomValue.allCases {
-                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
-                                item?.representedObject = value
-                            }
-                            return button
-                        }
                     }
                 }
             }

@@ -20,7 +20,8 @@ import AppKit
 import Carbon.HIToolbox
 import Combine
 import Common
-import BrowserServicesKit
+import Suggestions
+import Subscription
 
 final class AddressBarTextField: NSTextField {
 
@@ -56,6 +57,8 @@ final class AddressBarTextField: NSTextField {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var addressBarStringCancellable: AnyCancellable?
     private var contentTypeCancellable: AnyCancellable?
+
+    private let searchPreferences: SearchPreferences = SearchPreferences.shared
 
     private enum TextDidChangeEventType {
         case none
@@ -345,7 +348,7 @@ final class AddressBarTextField: NSTextField {
 #endif
 
 #if SUBSCRIPTION
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             if providedUrl.isChild(of: URL.subscriptionBaseURL) || providedUrl.isChild(of: URL.identityTheftRestoration) {
                 self.updateValue(selectedTabViewModel: nil, addressBarString: nil) // reset
                 self.window?.makeFirstResponder(nil)
@@ -624,9 +627,9 @@ final class AddressBarTextField: NSTextField {
     }
 
     @objc func toggleAutocomplete(_ menuItem: NSMenuItem) {
-        AppearancePreferences.shared.showAutocompleteSuggestions.toggle()
+        searchPreferences.showAutocompleteSuggestions.toggle()
 
-        let shouldShowAutocomplete = AppearancePreferences.shared.showAutocompleteSuggestions
+        let shouldShowAutocomplete = searchPreferences.showAutocompleteSuggestions
 
         menuItem.state = shouldShowAutocomplete ? .on : .off
 
@@ -1084,7 +1087,7 @@ private extension NSMenuItem {
             action: #selector(AddressBarTextField.toggleAutocomplete(_:)),
             keyEquivalent: ""
         )
-        menuItem.state = AppearancePreferences.shared.showAutocompleteSuggestions ? .on : .off
+        menuItem.state = SearchPreferences.shared.showAutocompleteSuggestions ? .on : .off
 
         return menuItem
     }

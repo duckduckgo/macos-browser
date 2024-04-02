@@ -29,14 +29,6 @@ public extension NSAlert {
         return alert
     }
 
-    static func somethingWentWrongStripeAlert() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.somethingWentWrongAlertTitle
-        alert.informativeText = UserText.somethingWentWrongStripeAlertDescription
-        alert.addButton(withTitle: UserText.okButtonTitle)
-        return alert
-    }
-
     static func subscriptionNotFoundAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.subscriptionNotFoundAlertTitle

@@ -44,7 +44,7 @@ public final class PixelRequestValidator {
 
         if let error = expectedError as? NSError {
             XCTAssertEqual(parameters[PixelKit.Parameters.errorCode], "\(error.code)")
-            XCTAssertEqual(parameters[PixelKit.Parameters.errorDesc], error.domain)
+            XCTAssertEqual(parameters[PixelKit.Parameters.errorDomain], error.domain)
         }
     }
 }

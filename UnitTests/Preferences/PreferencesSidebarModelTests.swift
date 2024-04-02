@@ -40,7 +40,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
     }
 
     func testWhenInitializedThenFirstPaneInFirstSectionIsSelected() throws {
-        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads, .autofill])]
+        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .autofill])]
         let model = PreferencesSidebarModel(loadSections: sections)
 
         XCTAssertEqual(model.selectedPane, .appearance)
@@ -72,7 +72,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
     }
 
     func testWhenSelectPaneIsCalledWithNonexistentPaneThenItHasNoEffect() throws {
-        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .downloads])]
+        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.appearance, .autofill])]
         let model = PreferencesSidebarModel(loadSections: sections)
 
         model.selectPane(.general)
@@ -80,7 +80,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
     }
 
     func testWhenSelectedTabIndexIsChangedThenSelectedPaneIsNotAffected() throws {
-        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.general, .appearance, .downloads, .autofill])]
+        let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.general, .appearance, .autofill])]
         let tabs: [Tab.TabContent] = [.anySettingsPane, .bookmarks]
         let model = PreferencesSidebarModel(loadSections: sections, tabSwitcherTabs: tabs)
 

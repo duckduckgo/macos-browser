@@ -90,6 +90,10 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                             reportFlow: .appMenu,
                                             errors: errors,
                                             httpStatusCodes: test.httpErrorCodes ?? [],
+                                            openerContext: nil,
+                                            vpnOn: false,
+                                            jsPerformance: nil,
+                                            userRefreshCount: 0,
                                             didOpenReportInfo: false,
                                             toggleReportCounter: nil)
 

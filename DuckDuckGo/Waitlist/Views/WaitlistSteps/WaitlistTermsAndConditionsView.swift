@@ -153,7 +153,7 @@ struct NetworkProtectionTermsAndConditionsContentView: View {
 }
 
 struct NetworkProtectionWaitlistTermsAndConditionsViewData: WaitlistTermsAndConditionsViewData {
-    let title = "Network Protection Beta\nService Terms and Privacy Policy"
+    let title = "VPN Beta\nService Terms and Privacy Policy"
     let buttonCancelLabel = UserText.networkProtectionWaitlistButtonCancel
     let buttonAgreeAndContinueLabel = UserText.networkProtectionWaitlistButtonAgreeAndContinue
 }

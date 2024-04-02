@@ -185,18 +185,6 @@ extension VPNCityItemModel {
     }
 }
 
-extension NetworkProtectionLocationListCompositeRepository {
-    convenience init() {
-        let settings = VPNSettings(defaults: .netP)
-        self.init(
-            environment: settings.selectedEnvironment,
-            tokenStore: NetworkProtectionKeychainTokenStore(),
-            errorEvents: .networkProtectionAppDebugEvents,
-            isSubscriptionEnabled: false
-        )
-    }
-}
-
 extension VPNLocationViewModel {
     convenience init() {
         let locationListRepository = NetworkProtectionLocationListCompositeRepository()

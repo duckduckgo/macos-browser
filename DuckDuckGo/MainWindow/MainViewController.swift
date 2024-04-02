@@ -23,6 +23,7 @@ import Common
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionIPC
 #endif
 
 final class MainViewController: NSViewController {
@@ -56,14 +57,53 @@ final class MainViewController: NSViewController {
         fatalError("MainViewController: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel? = nil,
-         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(tabCollectionViewModel: TabCollectionViewModel? = nil, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, autofillPopoverPresenter: AutofillPopoverPresenter) {
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
-        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner)
+
+#if NETWORK_PROTECTION
+        let networkProtectionPopoverManager: NetPPopoverManager = {
+#if DEBUG
+            guard case .normal = NSApp.runType else {
+                return NetPPopoverManagerMock()
+            }
+#endif
+
+            let ipcClient = TunnelControllerIPCClient()
+            ipcClient.register()
+
+            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient, networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler())
+        }()
+        let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
+            var connectivityIssuesObserver: ConnectivityIssueObserver!
+            var controllerErrorMessageObserver: ControllerErrorMesssageObserver!
+#if DEBUG
+            if ![.normal, .integrationTests].contains(NSApp.runType) {
+                connectivityIssuesObserver = ConnectivityIssueObserverMock()
+                controllerErrorMessageObserver = ControllerErrorMesssageObserverMock()
+            }
+#endif
+            connectivityIssuesObserver = connectivityIssuesObserver ?? DisabledConnectivityIssueObserver()
+            controllerErrorMessageObserver = controllerErrorMessageObserver ?? ControllerErrorMesssageObserverThroughDistributedNotifications()
+
+            let ipcClient = networkProtectionPopoverManager.ipcClient
+            return DefaultNetworkProtectionStatusReporter(
+                statusObserver: ipcClient.ipcStatusObserver,
+                serverInfoObserver: ipcClient.ipcServerInfoObserver,
+                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
+                connectivityIssuesObserver: connectivityIssuesObserver,
+                controllerErrorMessageObserver: controllerErrorMessageObserver
+            )
+        }()
+
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter)
+#else
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, autofillPopoverPresenter: AutofillPopoverPresenter)
+#endif
+
         browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
         fireViewController = FireViewController.create(tabCollectionViewModel: tabCollectionViewModel)
@@ -156,6 +196,7 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
+        presentWaitlistThankYouPromptIfNecessary()
 
 #if NETWORK_PROTECTION
         sendActiveNetworkProtectionWaitlistUserPixel()
@@ -417,6 +458,16 @@ final class MainViewController: NSViewController {
     }
 #endif
 
+    func presentWaitlistThankYouPromptIfNecessary() {
+        guard let window = self.view.window else {
+            assertionFailure("Couldn't get main view controller's window")
+            return
+        }
+
+        let presenter = WaitlistThankYouPromptPresenter()
+        presenter.presentThankYouPromptIfNecessary(in: window)
+    }
+
     // MARK: - First responder
 
     func adjustFirstResponder(selectedTabViewModel: TabViewModel? = nil, tabContent: Tab.TabContent? = nil, force: Bool = false) {
@@ -560,7 +611,7 @@ extension MainViewController {
     ]))
     bkman.loadBookmarks()
 
-    let vc = MainViewController(bookmarkManager: bkman)
+    let vc = MainViewController(bookmarkManager: bkman, autofillPopoverPresenter: DefaultAutofillPopoverPresenter())
     var c: AnyCancellable!
     c = vc.publisher(for: \.view.window).sink { window in
         window?.titlebarAppearsTransparent = true

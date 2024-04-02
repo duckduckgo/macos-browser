@@ -101,9 +101,10 @@ extension NavigationProtectionTabExtension: NavigationResponder {
             request = newRequest
         }
 
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         if let newRequest = GPCRequestFactory().requestForGPC(basedOn: request,
                                                               config: contentBlocking.privacyConfigurationManager.privacyConfig,
-                                                              gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
+                                                              gpcEnabled: isGPCEnabled) {
             request = newRequest
         }
 

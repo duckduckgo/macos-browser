@@ -38,16 +38,14 @@ public extension XCTestCase {
     ///
     private static var errorPixelParameters = [
         PixelKit.Parameters.errorCode,
-        PixelKit.Parameters.errorDomain,
-        PixelKit.Parameters.errorDesc
+        PixelKit.Parameters.errorDomain
     ]
 
     /// List of underlying error pixel parameters
     ///
     private static var underlyingErrorPixelParameters = [
         PixelKit.Parameters.underlyingErrorCode,
-        PixelKit.Parameters.underlyingErrorDomain,
-        PixelKit.Parameters.underlyingErrorDesc
+        PixelKit.Parameters.underlyingErrorDomain
     ]
 
     /// Filter out the standard parameters.
@@ -68,20 +66,23 @@ public extension XCTestCase {
 #endif
     }
 
-    func expectedParameters(for event: PixelKitEventV2) -> [String: String] {
+    /// These parameters are known to be expected just based on the event definition.
+    ///
+    /// They're not a complete list of parameters for the event, as the fire call may contain extra information
+    /// that results in additional parameters.  Ideally we want most (if not all) that information to eventually
+    /// make part of the pixel definition.
+    ///
+    func knownExpectedParameters(for event: PixelKitEventV2) -> [String: String] {
         var expectedParameters = [String: String]()
 
         if let error = event.error {
             let nsError = error as NSError
             expectedParameters[PixelKit.Parameters.errorCode] = "\(nsError.code)"
             expectedParameters[PixelKit.Parameters.errorDomain] = nsError.domain
-            expectedParameters[PixelKit.Parameters.errorDesc] = nsError.localizedDescription
 
-            if let underlyingError = (error as? PixelKitEventErrorDetails)?.underlyingError {
-                let underlyingNSError = underlyingError as NSError
-                expectedParameters[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingNSError.code)"
-                expectedParameters[PixelKit.Parameters.underlyingErrorDomain] = underlyingNSError.domain
-                expectedParameters[PixelKit.Parameters.underlyingErrorDesc] = underlyingNSError.localizedDescription
+            if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
+                expectedParameters[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+                expectedParameters[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
             }
         }
 
@@ -96,15 +97,22 @@ public extension XCTestCase {
 
     // MARK: - Pixel Firing Expectations
 
+    func fire(_ event: PixelKitEventV2, and expectations: PixelFireExpectations, file: StaticString, line: UInt) {
+        verifyThat(event, meets: expectations, file: file, line: line)
+    }
+
     /// Provides some snapshot of a fired pixel so that external libraries can validate all the expected info is included.
     ///
     /// This method also checks that there is internal consistency in the expected fields.
     ///
     func verifyThat(_ event: PixelKitEventV2, meets expectations: PixelFireExpectations, file: StaticString, line: UInt) {
 
-        let expectedPixelName = Self.pixelPlatformPrefix + event.name
-        let expectedParameters = expectedParameters(for: event)
+        let expectedPixelName = event.name.hasPrefix(Self.pixelPlatformPrefix) ? event.name : Self.pixelPlatformPrefix + event.name
+        let knownExpectedParameters = knownExpectedParameters(for: event)
         let callbackExecutedExpectation = expectation(description: "The PixelKit callback has been executed")
+
+        // Ensure PixelKit is torn down before setting it back up, avoiding unit test race conditions:
+        PixelKit.tearDown()
 
         PixelKit.setUp(dryRun: false,
                        appVersion: "1.0.5",
@@ -119,25 +127,14 @@ public extension XCTestCase {
             // Internal validations
 
             XCTAssertEqual(firedPixelName, expectedPixelName, file: file, line: line)
-            XCTAssertEqual(firedParameters, expectedParameters, file: file, line: line)
+
+            XCTAssertTrue(knownExpectedParameters.allSatisfy { (key, value) in
+                firedParameters[key] == value
+            })
 
             // Expectations
-
             XCTAssertEqual(firedPixelName, expectations.pixelName)
-
-            if let error = expectations.error {
-                let nsError = error as NSError
-                XCTAssertEqual(firedParameters[PixelKit.Parameters.errorCode], String(nsError.code), file: file, line: line)
-                XCTAssertEqual(firedParameters[PixelKit.Parameters.errorDomain], nsError.domain, file: file, line: line)
-                XCTAssertEqual(firedParameters[PixelKit.Parameters.errorDesc], nsError.localizedDescription, file: file, line: line)
-            }
-
-            if let underlyingError = expectations.underlyingError {
-                let nsError = underlyingError as NSError
-                XCTAssertEqual(firedParameters[PixelKit.Parameters.underlyingErrorCode], String(nsError.code), file: file, line: line)
-                XCTAssertEqual(firedParameters[PixelKit.Parameters.underlyingErrorDomain], nsError.domain, file: file, line: line)
-                XCTAssertEqual(firedParameters[PixelKit.Parameters.underlyingErrorDesc], nsError.localizedDescription, file: file, line: line)
-            }
+            XCTAssertEqual(firedParameters, expectations.parameters)
 
             completion(true, nil)
         }

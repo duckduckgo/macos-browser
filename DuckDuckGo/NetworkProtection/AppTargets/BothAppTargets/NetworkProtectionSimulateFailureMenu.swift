@@ -23,7 +23,7 @@ import Foundation
 import NetworkProtection
 import SwiftUI
 
-/// Implements the logic for Network Protection's simulate failures menu.
+/// Implements the logic for the VPN's simulate failures menu.
 ///
 @MainActor
 final class NetworkProtectionSimulateFailureMenu: NSMenu {
@@ -56,20 +56,20 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
         NetworkProtectionSimulationOptions()
     }
 
-    /// Simulates a controller failure the next time Network Protection is started.
+    /// Simulates a controller failure the next time the VPN is started.
     ///
     @objc func simulateControllerFailure(_ menuItem: NSMenuItem) {
         simulationOptions.setEnabled(menuItem.state == .off, option: .controllerFailure)
     }
 
-    /// Simulates a tunnel failure the next time Network Protection is started.
+    /// Simulates a tunnel failure the next time the VPN is started.
     ///
     @objc func simulateTunnelFailure(_ menuItem: NSMenuItem) {
         // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
         // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure)
     }
 
-    /// Simulates a fatal error on the tunnel the next time Network Protection is started.
+    /// Simulates a fatal error on the tunnel the next time the VPN is started.
     ///
     @objc func simulateTunnelCrash(_ menuItem: NSMenuItem) {
         // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
