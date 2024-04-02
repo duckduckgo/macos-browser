@@ -26,6 +26,7 @@ enum ErrorCategory: Equatable {
     case validationError
     case clientError(httpCode: Int)
     case serverError(httpCode: Int)
+    case databaseError(domain: String, code: Int)
     case unclassified
 
     var toString: String {
@@ -35,6 +36,7 @@ enum ErrorCategory: Equatable {
         case .unclassified: return "unclassified"
         case .clientError(let httpCode): return "client-error-\(httpCode)"
         case .serverError(let httpCode): return "server-error-\(httpCode)"
+        case .databaseError(let domain, let code): return "database-error-\(domain)-\(code)"
         }
     }
 }
