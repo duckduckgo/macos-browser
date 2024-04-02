@@ -38,11 +38,6 @@ extension Preferences {
                         }
                     }
 
-                    PreferencePaneSubSection {
-                        Button(UserText.manageFireproofSites) {
-                            model.presentManageFireproofSitesDialog()
-                        }
-                    }
                 }
 
                 // SECTION 2: Fireproof Site
