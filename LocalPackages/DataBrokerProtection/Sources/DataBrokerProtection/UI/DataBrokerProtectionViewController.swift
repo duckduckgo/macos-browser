@@ -36,6 +36,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
     private let openURLHandler: (URL?) -> Void
     private var reloadObserver: NSObjectProtocol?
+    private var wasHTTPErrorPixelFired = false
 
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
@@ -134,12 +135,19 @@ extension DataBrokerProtectionViewController: WKUIDelegate {
 extension DataBrokerProtectionViewController: WKNavigationDelegate {
 
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: any Error) {
-        webUIPixel.firePixel(for: error)
-        removeLoadingIndicator()
+        fireWebViewError(error)
     }
 
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: any Error) {
-        webUIPixel.firePixel(for: error)
+        fireWebViewError(error)
+    }
+
+    private func fireWebViewError(_ error: Error) {
+        if !wasHTTPErrorPixelFired {
+            webUIPixel.firePixel(for: error)
+        }
+
+        wasHTTPErrorPixelFired = false
         removeLoadingIndicator()
     }
 
@@ -151,6 +159,8 @@ extension DataBrokerProtectionViewController: WKNavigationDelegate {
 
         if statusCode >= 400 {
             webUIPixel.firePixel(for: NSError(domain: NSURLErrorDomain, code: statusCode))
+            wasHTTPErrorPixelFired = true
+            return .cancel
         }
 
         return .allow
