@@ -14102,14 +14102,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		3706FA6C293F65D500E42796 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/duckduckgo/TrackerRadarKit.git";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.1;
-			};
-		};
 		3706FA6E293F65D500E42796 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-ios";
