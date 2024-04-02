@@ -347,7 +347,7 @@ final class DataBrokerProtectionEventPixelsTests: XCTestCase {
             return
         }
 
-        let eventOne = HistoryEvent(brokerId: 1, profileQueryId: 1, type: .scanStarted, date: eighDaysSinceToday)
+        let _/*eventOne*/ = HistoryEvent(brokerId: 1, profileQueryId: 1, type: .scanStarted, date: eighDaysSinceToday)
         let eventTwo = HistoryEvent(brokerId: 1, profileQueryId: 1, type: .scanStarted, date: sixDaysSinceToday)
         let dataBrokerProfileQueries: [BrokerProfileQueryData] = [
             .init(dataBroker: .mockWithURL("www.brokerone.com"),

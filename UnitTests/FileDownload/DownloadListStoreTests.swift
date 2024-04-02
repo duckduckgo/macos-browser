@@ -65,29 +65,6 @@ final class DownloadListStoreTests: XCTestCase {
         XCTAssertEqual(items.count, 1)
     }
 
-//    func testWhenFetchClearingItemsOlderThanIsCalled_ThenOlderItemsThanDateAreCleaned() {
-//        let oldItem = DownloadListItem.oldItem
-//
-//        let notSoOldItem = DownloadListItem.olderItem
-//        let newItem = DownloadListItem.testItem
-//
-//        save(oldItem, expectation: self.expectation(description: "Saving 1"))
-//        save(notSoOldItem, expectation: self.expectation(description: "Saving 2"))
-//        save(newItem, expectation: self.expectation(description: "Saving 3"))
-//
-//        let loadingExpectation = self.expectation(description: "Loading")
-//        store.fetch(clearingItemsOlderThan: Date.daysAgo(2)) { result in
-//            loadingExpectation.fulfill()
-//            guard case .success(let items) = result else { XCTFail("unexpected failure \(result)"); return }
-//
-//            XCTAssertEqual(items.count, 2)
-//            XCTAssertTrue(items.contains(notSoOldItem))
-//            XCTAssertTrue(items.contains(newItem))
-//        }
-//
-//        waitForExpectations(timeout: 1, handler: nil)
-//    }
-
     func testWhenDownloadIsRemoved_ThenItShouldntBeLoadedFromStore() throws {
         let item1 = DownloadListItem.testItem
         let item2 = DownloadListItem.olderItem
