@@ -1,5 +1,5 @@
 //
-//  AttributionsPixelHandler.swift
+//  InstallationAttributionPixelHandler.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import PixelKit
 
 /// A type that handles Pixels for acquisition attributions.
 protocol AttributionsPixelHandler: AnyObject {
@@ -26,6 +25,11 @@ protocol AttributionsPixelHandler: AnyObject {
 }
 
 final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
+    enum Parameters {
+        static let origin = "origin"
+        static let locale = "locale"
+    }
+
     private let fireRequest: FireRequest
     private let originProvider: AttributionOriginProvider
     private let locale: Locale
@@ -36,8 +40,8 @@ final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
     ///   - originProvider: A provider for the origin used to track the acquisition funnel.
     ///   - locale: The locale of the device.
     init(
-        fireRequest: @escaping FireRequest = PixelKit.fire,
-        originProvider: AttributionOriginProvider = DiskAttributionOriginProvider(),
+        fireRequest: @escaping FireRequest = Pixel.fire,
+        originProvider: AttributionOriginProvider = AttributionOriginFileProvider(),
         locale: Locale = .current
     ) {
         self.fireRequest = fireRequest
@@ -47,27 +51,37 @@ final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
 
     func fireInstallationAttributionPixel() {
         fireRequest(
-            AttributionsPixel.installation(origin: originProvider.origin, locale: locale.identifier),
-            .standard,
-            [:],
-            nil,
-            nil,
+            .installationAttribution,
+            .initial,
+            additionalParameters(origin: originProvider.origin, locale: locale.identifier),
             nil,
             true,
-            {_, _ in }
+            { _ in }
         )
     }
 }
 
+// MARK: - Parameter
+
+private extension InstallationAttributionPixelHandler {
+    func additionalParameters(origin: String?, locale: String) -> [String: String] {
+        var dictionary = [Self.Parameters.locale: locale]
+        if let origin {
+            dictionary[Self.Parameters.origin] = origin
+        }
+        return dictionary
+    }
+}
+
+// MARK: - FireRequest
+
 extension InstallationAttributionPixelHandler {
     typealias FireRequest = (
-        _ event: PixelKit.Event,
-        _ frequency: PixelKit.Frequency,
-        _ headers: [String: String],
+        _ event: Pixel.Event,
+        _ repetition: Pixel.Event.Repetition,
         _ parameters: [String: String]?,
-        _ error: Error?,
         _ allowedQueryReservedCharacters: CharacterSet?,
         _ includeAppVersionParameter: Bool,
-        _ onComplete: @escaping PixelKit.CompletionBlock
+        _ onComplete: @escaping (Error?) -> Void
     ) -> Void
 }

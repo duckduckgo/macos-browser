@@ -17,7 +17,6 @@
 //
 
 import XCTest
-import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class InstallationAttributionPixelHandlerTests: XCTestCase {
@@ -28,12 +27,10 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         capturedParams = CapturedParameters()
-        fireRequest = { event, frequency, headers, parameters, error, reservedCharacters, includeAppVersion, onComplete in
+        fireRequest = { event, repetition, parameters, reservedCharacters, includeAppVersion, onComplete in
             self.capturedParams.event = event
-            self.capturedParams.frequency = frequency
-            self.capturedParams.headers = headers
+            self.capturedParams.repetition = repetition
             self.capturedParams.parameters = parameters
-            self.capturedParams.error = error
             self.capturedParams.reservedCharacters = reservedCharacters
             self.capturedParams.includeAppVersion = includeAppVersion
             self.capturedParams.onComplete = onComplete
@@ -47,7 +44,18 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func testWhenPixelFireLanguageCodeShouldBeSet() {
+    func testWhenPixelFiresThenNameIsSetToM_Mac_Install() {
+        // GIVEN
+        sut = .init(fireRequest: fireRequest, originProvider: MockAttributionOriginProvider(), locale: .current)
+
+        // WHEN
+        sut.fireInstallationAttributionPixel()
+
+        // THEN
+        XCTAssertEqual(capturedParams.event?.name, "m_mac_install")
+    }
+
+    func testWhenPixelFiresThenLanguageCodeIsSet() {
         // GIVEN
         let locale = Locale(identifier: "hu-HU")
         sut = .init(fireRequest: fireRequest, originProvider: MockAttributionOriginProvider(), locale: locale)
@@ -56,10 +64,10 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
         sut.fireInstallationAttributionPixel()
 
         // THEN
-        XCTAssertEqual(capturedParams.event?.parameters?[PixelKit.Parameters.locale], "hu-HU")
+        XCTAssertEqual(capturedParams?.parameters?[InstallationAttributionPixelHandler.Parameters.locale], "hu-HU")
     }
 
-    func testWhenPixelFireOriginShouldBeSet() {
+    func testWhenPixelFiresAndOriginIsNotNilThenOriginIsSet() {
         // GIVEN
         let origin = "app_search"
         let locale = Locale(identifier: "en-US")
@@ -70,11 +78,26 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
         sut.fireInstallationAttributionPixel()
 
         // THEN
-        XCTAssertEqual(capturedParams.event?.parameters?[PixelKit.Parameters.origin], origin)
-        XCTAssertEqual(capturedParams.event?.parameters?[PixelKit.Parameters.locale], "en-US")
+        XCTAssertEqual(capturedParams?.parameters?[InstallationAttributionPixelHandler.Parameters.origin], origin)
+        XCTAssertEqual(capturedParams?.parameters?[InstallationAttributionPixelHandler.Parameters.locale], "en-US")
     }
 
-    func testWhenPixelFiresShouldAddAppVersionIsTrueAndFrequencyIsStandard() {
+    func testWhenPixelFiresAndOriginIsNilThenOnlyLocaleIsSet() {
+        // GIVEN
+        let origin: String? = nil
+        let locale = Locale(identifier: "en-US")
+        let originProvider = MockAttributionOriginProvider(origin: origin)
+        sut = .init(fireRequest: fireRequest, originProvider: originProvider, locale: locale)
+
+        // WHEN
+        sut.fireInstallationAttributionPixel()
+
+        // THEN
+        XCTAssertNil(capturedParams?.parameters?[InstallationAttributionPixelHandler.Parameters.origin])
+        XCTAssertEqual(capturedParams?.parameters?[InstallationAttributionPixelHandler.Parameters.locale], "en-US")
+    }
+
+    func testWhenPixelFiresThenAddAppVersionIsTrueAndRepetitionIsInitial() {
         // GIVEN
         sut = .init(fireRequest: fireRequest, originProvider: MockAttributionOriginProvider(), locale: .current)
 
@@ -83,22 +106,19 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(capturedParams.includeAppVersion, true)
-        XCTAssertEqual(capturedParams.frequency, .standard)
+        XCTAssertEqual(capturedParams.repetition, .initial)
     }
-
 }
 
 extension InstallationAttributionPixelHandlerTests {
 
     struct CapturedParameters {
-        var event: PixelKit.Event?
-        var frequency: PixelKit.Frequency = .standard
-        var headers: [String: String] = [:]
+        var event: Pixel.Event?
+        var repetition: Pixel.Event.Repetition = .repetitive
         var parameters: [String: String]?
-        var error: Error?
         var reservedCharacters: CharacterSet?
         var includeAppVersion: Bool?
-        var onComplete: PixelKit.CompletionBlock?
+        var onComplete: (Error?) -> Void = { _ in }
     }
 
 }

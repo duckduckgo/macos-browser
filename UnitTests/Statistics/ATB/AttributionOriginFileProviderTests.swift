@@ -1,5 +1,5 @@
 //
-//  DiskAttributionOriginProviderTests.swift
+//  AttributionOriginFileProviderTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,12 +19,12 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class DiskAttributionOriginProviderTests: XCTestCase {
-    private var sut: DiskAttributionOriginProvider!
+final class AttributionOriginFileProviderTests: XCTestCase {
+    private var sut: AttributionOriginFileProvider!
 
-    func testShouldReturnValueWhenFileExistAndValueIsSet() {
+    func testWhenFileAndValueExistThenReturnOriginValue() {
         // GIVEN
-        sut = DiskAttributionOriginProvider(bundle: .test)
+        sut = AttributionOriginFileProvider(bundle: .test)
 
         // WHEN
         let result = sut.origin
@@ -33,9 +33,9 @@ final class DiskAttributionOriginProviderTests: XCTestCase {
         XCTAssertEqual(result, "app_search")
     }
 
-    func testShouldReturnNilWhenFileDoesNotExist() {
+    func testWhenFileDoesNotExistThenReturnNil() {
         // GIVEN
-        sut = DiskAttributionOriginProvider(resourceName: #function, bundle: .test)
+        sut = AttributionOriginFileProvider(resourceName: #function, bundle: .test)
 
         // WHEN
         let result = sut.origin
@@ -44,9 +44,9 @@ final class DiskAttributionOriginProviderTests: XCTestCase {
         XCTAssertNil(result)
     }
 
-    func testShouldReturnNilWhenFileExistAndIsEmpty() {
+    func testWhenFileExistAndIsEmptyThenReturnNil() {
         // GIVEN
-        sut = DiskAttributionOriginProvider(resourceName: "Origin-empty", bundle: .test)
+        sut = AttributionOriginFileProvider(resourceName: "Origin-empty", bundle: .test)
 
         // WHEN
         let result = sut.origin
@@ -57,5 +57,5 @@ final class DiskAttributionOriginProviderTests: XCTestCase {
 }
 
 private extension Bundle {
-    static let test = Bundle(for: DiskAttributionOriginProviderTests.self)
+    static let test = Bundle(for: AttributionOriginFileProviderTests.self)
 }

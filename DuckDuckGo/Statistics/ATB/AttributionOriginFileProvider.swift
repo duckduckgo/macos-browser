@@ -1,5 +1,5 @@
 //
-//  AttributionOriginProvider.swift
+//  AttributionOriginFileProvider.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -24,7 +24,7 @@ protocol AttributionOriginProvider: AnyObject {
     var origin: String? { get }
 }
 
-final class DiskAttributionOriginProvider: AttributionOriginProvider {
+final class AttributionOriginFileProvider: AttributionOriginProvider {
     let origin: String?
 
     /// Creates an instance with the given file name and `Bundle`.
