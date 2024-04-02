@@ -295,7 +295,7 @@ final class TabViewModel {
         // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
         case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
             if tab.error?.errorCode == NSURLErrorServerCertificateUntrusted {
-                title = UserText.sslErrorPageHeader
+                title = UserText.sslErrorPageTabTitle
             } else {
                 title = UserText.tabErrorTitle
             }

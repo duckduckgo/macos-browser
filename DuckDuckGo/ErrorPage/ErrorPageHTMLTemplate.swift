@@ -19,6 +19,7 @@
 import Foundation
 import ContentScopeScripts
 import WebKit
+import Common
 
 struct ErrorPageHTMLTemplate {
 
@@ -47,6 +48,7 @@ struct ErrorPageHTMLTemplate {
 struct SSLErrorPageHTMLTemplate {
     let domain: String
     let errorCode: Int
+    let tld = TLD()
 
     static var htmlTemplatePath: String {
         guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/sslerrorpage") else {
@@ -62,7 +64,8 @@ struct SSLErrorPageHTMLTemplate {
             assertionFailure("Should be able to load template")
             return ""
         }
-        let loadTimeData = createJSONString(header: sslError.header, body: sslError.body(for: domain), advancedButton: sslError.advancedButton, leaveSiteButton: sslError.leaveSiteButton, advancedInfoHeader: sslError.advancedInfoTitle, specificMessage: sslError.specificMessage(for: domain), advancedInfoBody: sslError.advancedInfoBody, visitSiteButton: sslError.visitSiteButton, errorCode: String(errorCode))
+        let eTldPlus1 = tld.eTLDplus1(domain) ?? domain
+        let loadTimeData = createJSONString(header: sslError.header, body: sslError.body(for: domain), advancedButton: sslError.advancedButton, leaveSiteButton: sslError.leaveSiteButton, advancedInfoHeader: sslError.advancedInfoTitle, specificMessage: sslError.specificMessage(for: domain, eTldPlus1: eTldPlus1), advancedInfoBody: sslError.advancedInfoBody, visitSiteButton: sslError.visitSiteButton, errorCode: String(errorCode))
         return html.replacingOccurrences(of: "$LOAD_TIME_DATA$", with: loadTimeData, options: .literal)
     }
 
@@ -129,16 +132,27 @@ public enum SSLErrorType {
     }
 
     var advancedInfoBody: String {
-        return UserText.sslErrorAdvancedInfoBody
+        switch self {
+        case .expired:
+            return UserText.sslErrorAdvancedInfoBodyExpired
+        case .wrongHost:
+            return UserText.sslErrorAdvancedInfoBodyWrongHost
+        case .selfSigned:
+            return UserText.sslErrorAdvancedInfoBodyWrongHost
+        case .invalid:
+            return UserText.sslErrorAdvancedInfoBodyWrongHost
+        }
     }
 
-    func specificMessage(for domain: String) -> String {
+    func specificMessage(for domain: String, eTldPlus1: String) -> String {
+        let tld = TLD()
         let boldDomain = "<b>\(domain)</b>"
+        let boldETldPlus1 = "<b>\(eTldPlus1)</b>"
         switch self {
         case .expired:
             return UserText.sslErrorCertificateExpiredMessage(boldDomain)
         case .wrongHost:
-            return UserText.sslErrorCertificateWrongHostMessage(boldDomain)
+            return UserText.sslErrorCertificateWrongHostMessage(boldDomain, eTldPlus1: boldETldPlus1)
         case .selfSigned:
             return UserText.sslErrorCertificateSelfSignedMessage(boldDomain)
         case .invalid:

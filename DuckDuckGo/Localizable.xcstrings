@@ -47742,7 +47742,19 @@
         }
       }
     },
-    "ssl.error.page.advanced.info.body" : {
+    "ssl.error.page.advanced.info.body.expired" : {
+      "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.info.body.wrong.host" : {
       "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -47802,6 +47814,18 @@
         }
       }
     },
+    "ssl.error.page.tab.title" : {
+      "comment" : "Title shown in an error page tab that warn users of security risks on a website due to SSL issues",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: Site May Be Insecure"
+          }
+        }
+      }
+    },
     "ssl.error.page.visit.site.button" : {
       "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to visit the website anyway despite the risks.",
       "extractionState" : "extracted_with_value",
@@ -47821,7 +47845,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The security certificate for %1$@ is not trusted by your computer's operating system."
+            "value" : "The security certificate for %1$@ is not trusted by your device's operating system."
           }
         }
       }
@@ -47833,7 +47857,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The security certificate for %1$@ does not match *.%1$@."
+            "value" : "The security certificate for %1$@ does not match *.%2$@."
           }
         }
       }
