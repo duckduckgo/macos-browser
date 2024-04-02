@@ -56,7 +56,7 @@ enum UITests {
     /// and sometimes it isn't possible to simply swap to another window while testing with a window click, because the two windows have been drawn
     /// with identical coordinates and size.
     static func moveWindowSoOccludedWindowHasHitzone(topWindow: XCUIElement, bottomWindow: XCUIElement) {
-        let pressDuration = 0.5
+        let clickDuration = 0.5
 
         XCTAssertTrue(
             topWindow.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -67,8 +67,8 @@ enum UITests {
             "The bottom window didn't become available in a reasonable timeframe."
         )
 
-        var fromCoordinate = topWindow.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0))
-        var toCoordinate = topWindow.coordinate(withNormalizedOffset: CGVector(dx: 0.0125, dy: 0.0125))
-        fromCoordinate.press(forDuration: pressDuration, thenDragTo: toCoordinate)
+        let fromCoordinate = topWindow.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.01))
+        let toCoordinate = topWindow.coordinate(withNormalizedOffset: CGVector(dx: 0.81, dy: 0.02))
+        fromCoordinate.click(forDuration: clickDuration, thenDragTo: toCoordinate)
     }
 }
