@@ -22,7 +22,10 @@ import Common
 protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
     func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
                                         didError error: Error,
+                                        whileRunningBrokerOperationData: BrokerOperationData,
                                         withDataBrokerName dataBrokerName: String?)
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didErrorBeforeStartingBrokerOperations error: Error)
 }
 
 final class DataBrokerOperationsCollection: Operation {
@@ -143,6 +146,7 @@ final class DataBrokerOperationsCollection: Operation {
             allBrokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
         } catch {
             os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
+            errorDelegate?.dataBrokerOperationsCollection(self, didErrorBeforeStartingBrokerOperations: error)
             return
         }
 
@@ -195,6 +199,7 @@ final class DataBrokerOperationsCollection: Operation {
                 self.error = error
                 errorDelegate?.dataBrokerOperationsCollection(self,
                                                               didError: error,
+                                                              whileRunningBrokerOperationData: operationData,
                                                               withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }

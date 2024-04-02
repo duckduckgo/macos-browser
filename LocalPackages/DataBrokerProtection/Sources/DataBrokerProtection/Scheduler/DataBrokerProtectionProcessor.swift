@@ -190,7 +190,14 @@ final class DataBrokerProtectionProcessor {
 
 extension DataBrokerProtectionProcessor: DataBrokerOperationsCollectionErrorDelegate {
 
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection, didError error: Error, withDataBrokerName dataBrokerName: String?) {
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection, didErrorBeforeStartingBrokerOperations error: Error) {
+
+    }
+
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didError error: Error,
+                                        whileRunningBrokerOperationData: BrokerOperationData,
+                                        withDataBrokerName dataBrokerName: String?) {
         if let error = error as? DataBrokerProtectionError,
            let dataBrokerName = dataBrokerName {
             pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
