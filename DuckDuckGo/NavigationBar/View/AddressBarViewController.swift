@@ -521,7 +521,7 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 fileprivate extension NSView {
 
     var shouldShowArrowCursor: Bool {
-        self is NSButton || self is AnimationView
+        self is NSButton || self is LottieAnimationView
     }
 
 }

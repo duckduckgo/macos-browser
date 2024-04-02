@@ -28,4 +28,42 @@ extension DispatchQueue {
         }
     }
 
+    /// executes the work item synchronously when running on the main thread, otherwise - schedules asynchronous dispatch
+    func asyncOrNow(execute workItem: @escaping @MainActor () -> Void) {
+        assert(self == .main)
+        if Thread.isMainThread {
+            MainActor.assumeIsolated(workItem)
+        } else {
+            DispatchQueue.main.async {
+                workItem()
+            }
+        }
+    }
+
 }
+
+#if swift(<5.10)
+private protocol MainActorPerformer {
+    func perform<T>(_ operation: @MainActor () throws -> T) rethrows -> T
+}
+private struct OnMainActor: MainActorPerformer {
+    private init() {}
+    static func instance() -> MainActorPerformer { OnMainActor() }
+
+    @MainActor(unsafe)
+    func perform<T>(_ operation: @MainActor () throws -> T) rethrows -> T {
+        try operation()
+    }
+}
+extension MainActor {
+    static func assumeIsolated<T>(_ operation: @MainActor () throws -> T) rethrows -> T {
+        if #available(macOS 14.0, *) {
+            return try assumeIsolated(operation, file: #fileID, line: #line)
+        }
+        dispatchPrecondition(condition: .onQueue(.main))
+        return try OnMainActor.instance().perform(operation)
+    }
+}
+#else
+    #warning("This needs to be removed as it‘s no longer necessary.")
+#endif

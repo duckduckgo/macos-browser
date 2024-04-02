@@ -183,7 +183,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
 
         // wait for the download to complete
         let fileUrl = try await downloadTaskPromise.value.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError(description: "failed to download") as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError(description: "failed to download") as NSError) }.first().promise().get()
 
         // print(try! String(contentsOf: fileUrl))
         let results = try JSONDecoder().decode(Results.self, from: Data(contentsOf: fileUrl)).results
@@ -259,7 +259,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
 
             let fileUrl = try await downloadTaskFuture.value.output
-                .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+                .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
 
             // print(try! String(contentsOf: fileUrl))
             results = try JSONDecoder().decode(Results.self, from: Data(contentsOf: fileUrl))

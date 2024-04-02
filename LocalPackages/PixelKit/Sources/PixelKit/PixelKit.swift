@@ -47,6 +47,7 @@ public final class PixelKit {
         public static let userAgent = "User-Agent"
         public static let ifNoneMatch = "If-None-Match"
         public static let moreInfo = "X-DuckDuckGo-MoreInfo"
+        public static let client = "X-DuckDuckGo-Client"
     }
 
     /// A closure typealias to request sending pixels through the network.
@@ -168,6 +169,7 @@ public final class PixelKit {
 
         var headers = headers ?? defaultHeaders
         headers[Header.moreInfo] = "See " + Self.duckDuckGoMorePrivacyInfo.absoluteString
+        headers[Header.client] = "macOS"
 
         switch frequency {
         case .standard:

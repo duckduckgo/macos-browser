@@ -1,7 +1,7 @@
 //
-//  AnimationView.swift
+//  FileReadResult.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,18 +17,22 @@
 //
 
 import Foundation
-import Lottie
-import AppKit
 
-extension LottieAnimationView {
+struct FileReadResult: Codable {
 
-    convenience init?(named animationName: String, imageProvider: AnimationImageProvider? = nil) {
-        guard let animation = LottieAnimation.named(animationName, animationCache: LottieAnimationCache.shared) else {
-            return nil
-        }
+    let path: String
+    let data: String
+    let bookmark: Data?
 
-        self.init(animation: animation, imageProvider: imageProvider)
-        identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
+    static func decode(from string: String) throws -> FileReadResult {
+        try JSONDecoder().decode(Self.self, from: string.data(using: .utf8)!)
+    }
+
+    func encoded() -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let json = try? encoder.encode(self)
+        return String(data: json!, encoding: .utf8)!
     }
 
 }
