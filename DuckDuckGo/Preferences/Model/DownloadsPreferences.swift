@@ -65,17 +65,19 @@ final class DownloadsPreferences: ObservableObject {
 
     static let shared = DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor())
 
-    private func validatedDownloadLocation(_ location: String?) -> URL? {
-        if let selectedLocation = location,
-           let selectedLocationURL = URL(string: selectedLocation),
-           Self.isDownloadLocationValid(selectedLocationURL) {
-            return selectedLocationURL
+    private func validatedDownloadLocation(_ selectedLocation: URL?) -> URL? {
+        if let selectedLocation, Self.isDownloadLocationValid(selectedLocation) {
+            return selectedLocation
         }
         return nil
     }
 
     var effectiveDownloadLocation: URL? {
-        if let selectedLocationURL = alwaysRequestDownloadLocation ? validatedDownloadLocation(persistor.lastUsedCustomDownloadLocation) : validatedDownloadLocation(persistor.selectedDownloadLocation) {
+        if alwaysRequestDownloadLocation {
+            if let lastUsedCustomDownloadLocation = validatedDownloadLocation(persistor.lastUsedCustomDownloadLocation.flatMap(URL.init(string:))) {
+                return lastUsedCustomDownloadLocation
+            }
+        } else if let selectedLocationURL = validatedDownloadLocation(selectedDownloadLocation) {
             return selectedLocationURL
         }
         return Self.defaultDownloadLocation()
@@ -94,35 +96,62 @@ final class DownloadsPreferences: ObservableObject {
             defer {
                 objectWillChange.send()
             }
-            guard let newDownloadLocation = newValue else {
-                persistor.lastUsedCustomDownloadLocation = nil
-                return
-            }
 
-            if Self.isDownloadLocationValid(newDownloadLocation) {
-                persistor.lastUsedCustomDownloadLocation = newDownloadLocation.absoluteString
-            }
+            persistor.lastUsedCustomDownloadLocation = newValue?.absoluteString
         }
     }
 
+    private var _selectedDownloadLocation: URL?
+    private var isUsingSecurityScopedResource = false
     var selectedDownloadLocation: URL? {
         get {
-            persistor.selectedDownloadLocation?.url
-        }
+            if let selectedDownloadLocation = _selectedDownloadLocation {
+                return selectedDownloadLocation
+            }
+#if APPSTORE
+            var isStale = false
+            if let bookmarkData = persistor.selectedDownloadLocation.flatMap({ Data(base64Encoded: $0) }),
+               let url = try? URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale) {
+                if isStale {
+                    setSelectedDownloadLocation(url) // update bookmark data
+                }
+                if !isUsingSecurityScopedResource {
+                    isUsingSecurityScopedResource = url.startAccessingSecurityScopedResource()
+                }
 
+                _selectedDownloadLocation = url
+                return url
+            }
+#endif
+            guard let url = persistor.selectedDownloadLocation.flatMap(URL.init(string:)),
+                  url.isFileURL else { return nil }
+            return url
+        }
         set {
             defer {
                 objectWillChange.send()
             }
-            guard let newDownloadLocation = newValue else {
-                persistor.selectedDownloadLocation = nil
-                return
-            }
 
-            if Self.isDownloadLocationValid(newDownloadLocation) {
-                persistor.selectedDownloadLocation = newDownloadLocation.absoluteString
+            if isUsingSecurityScopedResource,
+               let newValue, _selectedDownloadLocation /* oldValue */ != newValue {
+                selectedDownloadLocation?.stopAccessingSecurityScopedResource()
             }
+            // the setter is called for already selected directory,
+            // so consume the unbalanced startAccessingSecurityScopedResource
+            isUsingSecurityScopedResource = true
+
+            setSelectedDownloadLocation(validatedDownloadLocation(newValue))
         }
+    }
+    private func setSelectedDownloadLocation(_ url: URL?) {
+        _selectedDownloadLocation = url
+        let locationString: String?
+#if APPSTORE
+        locationString = (try? url?.bookmarkData(options: .withSecurityScope).base64EncodedString()) ?? url?.absoluteString
+#else
+        locationString = url?.absoluteString
+#endif
+        persistor.selectedDownloadLocation = locationString
     }
 
     var alwaysRequestDownloadLocation: Bool {
