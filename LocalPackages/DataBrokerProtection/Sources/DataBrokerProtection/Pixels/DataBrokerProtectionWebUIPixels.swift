@@ -29,18 +29,25 @@ final class DataBrokerProtectionWebUIPixels {
     }
 
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private var wasHTTPErrorPixelFired = false
 
     init(pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
         self.pixelHandler = pixelHandler
     }
 
     func firePixel(for error: Error) {
+        if wasHTTPErrorPixelFired {
+            wasHTTPErrorPixelFired = false // We reset the flag
+            return
+        }
+
         let nsError = error as NSError
 
         if nsError.domain == NSURLErrorDomain {
             let statusCode = nsError.code
             if statusCode >= 400 && statusCode < 600 {
                 pixelHandler.fire(.webUILoadingFailed(errorCategory: "httpError-\(statusCode)"))
+                wasHTTPErrorPixelFired = true
             } else {
                 pixelHandler.fire(.webUILoadingFailed(errorCategory: "other-\(nsError.code)"))
             }

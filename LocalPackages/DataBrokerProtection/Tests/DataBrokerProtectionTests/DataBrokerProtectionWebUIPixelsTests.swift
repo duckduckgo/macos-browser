@@ -134,4 +134,35 @@ final class DataBrokerProtectionWebUIPixelsTests: XCTestCase {
             "production"
         )
     }
+
+    func testWhenHTTPPixelIsFired_weDoNotFireAnotherPixelRightAway() {
+        let sut = DataBrokerProtectionWebUIPixels(pixelHandler: handler)
+
+        sut.firePixel(for: NSError(domain: NSURLErrorDomain, code: 404))
+        sut.firePixel(for: NSError(domain: NSCocoaErrorDomain, code: 500))
+
+        let httpPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
+
+        XCTAssertEqual(
+            httpPixel.params!["error_category"],
+            "httpError-404"
+        )
+        XCTAssertEqual(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.count, 1) // We only fire one pixel
+    }
+
+    func testWhenHTTPPixelIsFired_weFireTheNextErrorPixelOnTheSecondTry() {
+        let sut = DataBrokerProtectionWebUIPixels(pixelHandler: handler)
+
+        sut.firePixel(for: NSError(domain: NSURLErrorDomain, code: 404))
+        sut.firePixel(for: NSError(domain: NSCocoaErrorDomain, code: 500))
+        sut.firePixel(for: NSError(domain: NSCocoaErrorDomain, code: 500))
+
+        let httpPixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.first!
+
+        XCTAssertEqual(
+            httpPixel.params!["error_category"],
+            "httpError-404"
+        )
+        XCTAssertEqual(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.count, 2) // We fire the HTTP pixel and the second cocoa error pixel
+    }
 }
