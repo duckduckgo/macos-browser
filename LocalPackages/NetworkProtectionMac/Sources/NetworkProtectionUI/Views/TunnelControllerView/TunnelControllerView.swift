@@ -184,6 +184,13 @@ public struct TunnelControllerView: View {
         }
     }
 
+    @ViewBuilder
+    private func statusBadge(isConnected: Bool) -> some View {
+        Circle()
+            .fill(isConnected ? .green : .yellow)
+            .frame(width: 8, height: 8)
+    }
+
     /// Connection status: server IP address and location
     ///
     private func connectionStatusView() -> some View {
@@ -261,11 +268,5 @@ public struct TunnelControllerView: View {
         }
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
     }
-
-    @ViewBuilder
-    private func statusBadge(isConnected: Bool) -> some View {
-        Circle()
-            .fill(isConnected ? .green : .yellow)
-            .frame(width: 8, height: 8)
-    }
 }
+
