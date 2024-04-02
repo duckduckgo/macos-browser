@@ -52,7 +52,7 @@ struct PasswordManagementCreditCardItemView: View {
 
                     EditableCreditCardField(textFieldValue: $model.cardNumber, title: UserText.pmCardNumber)
                     EditableCreditCardField(textFieldValue: $model.cardholderName, title: UserText.pmCardholderName)
-                    EditableCreditCardField(textFieldValue: $model.cardSecurityCode, title: UserText.pmCardVerificationValue)
+                    SecureEditableCreditCardField(textFieldValue: $model.cardSecurityCode, title: UserText.pmCardVerificationValue)
 
                     // Expiration:
 
@@ -237,5 +237,68 @@ private struct EditableCreditCardField: View {
 
         }
     }
+}
 
+private struct SecureEditableCreditCardField: View {
+
+    @EnvironmentObject var model: PasswordManagementCreditCardModel
+
+    @State var isHovering = false
+    @State var isVisible = false
+
+    @Binding var textFieldValue: String
+
+    let title: String
+
+    var body: some View {
+
+        if model.isInEditMode || !textFieldValue.isEmpty {
+
+            VStack(alignment: .leading, spacing: 0) {
+
+                Text(title)
+                    .bold()
+                    .padding(.bottom, 5)
+
+                if model.isEditing || model.isNew {
+
+                    HStack {
+
+                        SecureTextField(textValue: $textFieldValue, isVisible: isVisible, bottomPadding: interItemSpacing)
+
+                        SecureTextFieldButton(isVisible: $isVisible, toolTipHideText: UserText.hideCardCvvTooltip, toolTipShowText: UserText.showCardCvvTooltip)
+                        .padding(.bottom, 20)
+                        .padding(.trailing, 10)
+
+                    }
+                    .padding(.bottom, interItemSpacing)
+
+                } else {
+
+                    HStack(spacing: 6) {
+
+                        HiddenText(isVisible: isVisible, text: textFieldValue, hiddenTextLength: 3)
+
+                        if (isHovering || isVisible) && textFieldValue != "" {
+                            SecureTextFieldButton(isVisible: $isVisible, toolTipHideText: UserText.hideCardCvvTooltip, toolTipShowText: UserText.showCardCvvTooltip)
+                        }
+
+                        if isHovering {
+                            CopyButton {
+                                model.copy(textFieldValue)
+                            }
+                        }
+
+                        Spacer()
+                    }
+                    .padding(.bottom, interItemSpacing)
+                }
+
+            }
+            .onHover {
+                isHovering = $0
+            }
+
+        }
+    }
 }
