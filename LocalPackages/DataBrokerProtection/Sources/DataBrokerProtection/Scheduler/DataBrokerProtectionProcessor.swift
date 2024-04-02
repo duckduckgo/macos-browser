@@ -123,6 +123,7 @@ final class DataBrokerProtectionProcessor {
         engagementPixels.fireEngagementPixel()
         // This will try to fire the event weekly report pixels
         eventPixels.tryToFireWeeklyPixels()
+
         let dataBrokerOperationCollections: [DataBrokerOperationsCollection]
 
         do {

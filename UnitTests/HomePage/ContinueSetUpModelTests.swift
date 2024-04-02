@@ -200,7 +200,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     @MainActor func testWhenInstallDateIsLessThanADayAgoButUserNotIn10PercentNoSurveyCardIsShown() {
         let aDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
         userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        var randomGenerator = MockRandomNumberGenerator()
+        let randomGenerator = MockRandomNumberGenerator()
         randomGenerator.numberToReturn = 10
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, randomNumberGenerator: randomGenerator)
         vm.shouldShowAllFeatures = true

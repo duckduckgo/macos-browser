@@ -91,7 +91,10 @@ final class Pixel {
         self.sendRequest = requestSender
     }
 
-    private static let moreInfoHeader: HTTPHeaders = [APIRequest.HTTPHeaderField.moreInfo: "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString]
+    private static let pixelRequestHeaders: HTTPHeaders = [
+        APIRequest.HTTPHeaderField.moreInfo: "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString,
+        "X-DuckDuckGo-Client": "macOS"
+    ]
 
     // Temporary for activation pixels
     static private var aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
@@ -103,7 +106,7 @@ final class Pixel {
               withAdditionalParameters parameters: [String: String]? = nil,
               allowedQueryReservedCharacters: CharacterSet? = nil,
               includeAppVersionParameter: Bool = true,
-              withHeaders headers: APIRequest.Headers = APIRequest.Headers(additionalHeaders: moreInfoHeader),
+              withHeaders headers: APIRequest.Headers = APIRequest.Headers(additionalHeaders: pixelRequestHeaders),
               onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         func repetition() -> Event.Repetition {
