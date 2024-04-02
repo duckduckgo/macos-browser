@@ -317,6 +317,7 @@
       }
     },
     "••••••••••••" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3678,6 +3679,18 @@
         }
       }
     },
+    "autofill.hide-card-cvv" : {
+      "comment" : "Tooltip for the Autofill panel's Hide CVV button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide CVV"
+          }
+        }
+      }
+    },
     "autofill.hide-password" : {
       "comment" : "Tooltip for the Autofill panel's Hide Password button",
       "extractionState" : "extracted_with_value",
@@ -5294,6 +5307,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки"
+          }
+        }
+      }
+    },
+    "autofill.show-card-cvv" : {
+      "comment" : "Tooltip for the Autofill panel's Show CVV button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show CVV"
           }
         }
       }
