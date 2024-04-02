@@ -163,10 +163,6 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onSubscriptionAccountDidSignOut),
                                                name: .accountDidSignOut,
                                                object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onSubscriptionDidChange),
-                                               name: .subscriptionDidChange,
-                                               object: nil)
 #endif
     }
 
@@ -250,25 +246,6 @@ final class BrowserTabViewController: NSViewController {
                 if case .subscription = tabContent {
                     return true
                 } else if case .identityTheftRestoration = tabContent {
-                    return true
-                } else {
-                    return false
-                }
-            }
-        }
-    }
-
-    @objc
-    private func onSubscriptionDidChange(_ notification: Notification) {
-        guard let subscription = (notification.userInfo?[UserDefaultsCacheKey.subscription] as? DDGSubscription), !subscription.isActive else { return }
-
-        Task { @MainActor in
-            tabCollectionViewModel.removeAll { tabContent in
-                if case .subscription = tabContent {
-                    return true
-                } else if case .identityTheftRestoration = tabContent {
-                    return true
-                } else if case .dataBrokerProtection = tabContent {
                     return true
                 } else {
                     return false
