@@ -263,6 +263,7 @@ extension Pixel.Event.Debug {
                 .historyCleanEntriesFailed,
                 .historyCleanVisitsFailed,
                 .historySaveFailed,
+                .historySaveFailedDaily,
                 .historyInsertVisitFailed,
                 .historyRemoveVisitsFailed,
                 .emailAutofillKeychainError,

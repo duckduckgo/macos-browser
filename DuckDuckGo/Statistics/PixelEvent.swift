@@ -331,6 +331,7 @@ extension Pixel {
             case historyCleanEntriesFailed
             case historyCleanVisitsFailed
             case historySaveFailed
+            case historySaveFailedDaily
             case historyInsertVisitFailed
             case historyRemoveVisitsFailed
 
@@ -834,6 +835,8 @@ extension Pixel.Event.Debug {
             return "history_clean_visits_failed"
         case .historySaveFailed:
             return "history_save_failed"
+        case .historySaveFailedDaily:
+            return "history_save_failed_daily"
         case .historyInsertVisitFailed:
             return "history_insert_visit_failed"
         case .historyRemoveVisitsFailed:
