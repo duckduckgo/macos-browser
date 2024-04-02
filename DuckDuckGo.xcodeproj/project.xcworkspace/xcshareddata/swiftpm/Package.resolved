@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sabrina/ssl-error",
-        "revision" : "ea342e2dcfbcf5bdd26d0ea3cac4cf715b2ea0a9"
+        "revision" : "3c63845fb29ccaf8865e72a66b0e6e3ca092601f"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
         "branch" : "03-28-built_assets_for_sslerror",
-        "revision" : "d3a2dd13ad00fad175701a5b9223d885938496ff"
+        "revision" : "c847899fe503a1019a63f7c3f1474d5e47cb6ac7"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "43a6e1c1864846679a254e60c91332c3fbd922ee",
-        "version" : "3.3.0"
+        "branch" : "03-29-support_invalid_certs",
+        "revision" : "953b9eeb92d9d6b83b7a61984dd224e399f349ce"
       }
     },
     {
