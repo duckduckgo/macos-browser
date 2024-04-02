@@ -19,6 +19,12 @@
 import Foundation
 import Common
 
+protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didError error: Error,
+                                        withDataBrokerName dataBrokerName: String?)
+}
+
 final class DataBrokerOperationsCollection: Operation {
 
     enum OperationType {
@@ -28,6 +34,7 @@ final class DataBrokerOperationsCollection: Operation {
     }
 
     public var error: Error?
+    public weak var errorDelegate: DataBrokerOperationsCollectionErrorDelegate?
 
     private let dataBrokerID: Int64
     private let database: DataBrokerProtectionRepository
@@ -186,12 +193,9 @@ final class DataBrokerOperationsCollection: Operation {
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 self.error = error
-                if let error = error as? DataBrokerProtectionError,
-                   let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
-                    pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
-                } else {
-                    os_log("Cant handle error", log: .dataBrokerProtection)
-                }
+                errorDelegate?.dataBrokerOperationsCollection(self,
+                                                              didError: error,
+                                                              withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }
     }

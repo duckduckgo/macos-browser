@@ -172,6 +172,7 @@ final class DataBrokerProtectionProcessor {
                                                                 pixelHandler: pixelHandler,
                                                                 userNotificationService: userNotificationService,
                                                                 showWebView: showWebView)
+                collection.errorDelegate = self
                 collections.append(collection)
 
                 visitedDataBrokerIDs.insert(dataBrokerID)
@@ -183,5 +184,17 @@ final class DataBrokerProtectionProcessor {
 
     deinit {
         os_log("Deinit DataBrokerProtectionProcessor", log: .dataBrokerProtection)
+    }
+}
+
+extension DataBrokerProtectionProcessor: DataBrokerOperationsCollectionErrorDelegate {
+
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection, didError error: Error, withDataBrokerName dataBrokerName: String?) {
+        if let error = error as? DataBrokerProtectionError,
+           let dataBrokerName = dataBrokerName {
+            pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
+        } else {
+            os_log("Cant handle error", log: .dataBrokerProtection)
+        }
     }
 }
