@@ -128,7 +128,7 @@ class BookmarksBarTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(urlForBookmarksBar.absoluteString)\r")
+        addressBarTextField.typeURL(urlForBookmarksBar)
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "The bookmarksBarCollectionView should not exist on a tab that has been directed to a site, and is no longer new, when we have selected show bookmarks bar \"New Tab Only\" in the settings"
@@ -152,7 +152,7 @@ class BookmarksBarTests: XCTestCase {
         )
         app.typeKey("l", modifierFlags: [.command]) // Get address bar focus
         sleep(1) // The rarest of cases, in which this is the least-indirect thing we could do here, because we have two tabs open.
-        app.typeText("\(urlForBookmarksBar.absoluteString)\r")
+        app.typeURL(urlForBookmarksBar)
 
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
@@ -191,8 +191,8 @@ private extension BookmarksBarTests {
             app.images["HomePageLogo"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Home Page Logo did not exist when it was expected."
         )
-
-        app.typeText("\(urlForBookmarksBar.absoluteString)\r")
+        sleep(1)
+        app.typeURL(urlForBookmarksBar)
     }
 
     func resetBookmarksAndAddOneBookmark() {
@@ -206,7 +206,7 @@ private extension BookmarksBarTests {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(urlForBookmarksBar.absoluteString)\r")
+        addressBarTextField.typeURL(urlForBookmarksBar)
         XCTAssertTrue(
             app.windows.webViews[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
