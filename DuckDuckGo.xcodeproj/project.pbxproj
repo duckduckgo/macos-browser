@@ -3213,6 +3213,7 @@
 		BD384ACC2BBC821B00EF3735 /* vpn-light-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC72BBC821100EF3735 /* vpn-light-mode.json */; };
 		BD384ACD2BBC821D00EF3735 /* vpn-dark-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */; };
 		BD384ACE2BBC821D00EF3735 /* vpn-light-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC72BBC821100EF3735 /* vpn-light-mode.json */; };
+		BDE981D82BBCE4C700645880 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = BDE981D72BBCE4C700645880 /* Lottie */; };
 		C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
 		C13909F02B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
 		C13909F12B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
@@ -4861,6 +4862,7 @@
 				7BEEA5122AD1235B00A9E72B /* NetworkProtectionIPC in Frameworks */,
 				7BA7CC5F2AD1210C0042E5CE /* Networking in Frameworks */,
 				7BEEA5162AD1236E00A9E72B /* NetworkProtectionUI in Frameworks */,
+				BDE981D82BBCE4C700645880 /* Lottie in Frameworks */,
 				7BFCB74E2ADE7E1A00DA3EA7 /* PixelKit in Frameworks */,
 				EE7295ED2A545C0A008C0991 /* NetworkProtection in Frameworks */,
 				EE2F9C5B2B90F2FF00D45FC9 /* Subscription in Frameworks */,
@@ -9014,6 +9016,7 @@
 				4B41EDAA2B1544B2001EEDF4 /* LoginItems */,
 				7B00997C2B6508B700FE7C31 /* NetworkProtectionProxy */,
 				EE2F9C5A2B90F2FF00D45FC9 /* Subscription */,
+				BDE981D72BBCE4C700645880 /* Lottie */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo VPN.app */;
@@ -15103,6 +15106,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
 			productName = "plugin:SwiftLintPlugin";
+		};
+		BDE981D72BBCE4C700645880 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
 		};
 		CBC83E3529B63D380008E19C /* Configuration */ = {
 			isa = XCSwiftPackageProductDependency;
