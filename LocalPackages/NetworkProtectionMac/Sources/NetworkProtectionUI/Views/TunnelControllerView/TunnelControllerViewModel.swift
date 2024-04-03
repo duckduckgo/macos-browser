@@ -33,6 +33,9 @@ public final class TunnelControllerViewModel: ObservableObject {
     @Published
     public var isVPNEnabled = false
 
+    @Published
+    public var isToggleUserInitiated = false
+
     /// The type of extension that's being used for NetP
     ///
     @Published
@@ -228,6 +231,14 @@ public final class TunnelControllerViewModel: ObservableObject {
             }
 
             self.internalIsRunning = newValue
+            switch self.toggleTransition {
+            case .switchingOff(let locallyInitiated) where locallyInitiated:
+                self.isToggleUserInitiated = true
+            case .switchingOn(let locallyInitiated) where locallyInitiated:
+                self.isToggleUserInitiated = true
+            default:
+                self.isToggleUserInitiated = false
+            }
 
             if newValue {
                 self.startNetworkProtection()

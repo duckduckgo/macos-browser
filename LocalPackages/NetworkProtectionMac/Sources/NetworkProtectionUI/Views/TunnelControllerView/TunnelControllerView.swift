@@ -199,8 +199,7 @@ public struct TunnelControllerView: View {
                 animationView.clipsToBounds = false
             }
             .playing(withIntro: .init(
-                    // Skip the intro if NetP is enabled, but the user didn't manually trigger it
-                    skipIntro: model.isVPNEnabled && !model.isToggleDisabled,
+                    skipIntro: model.isVPNEnabled && !model.isToggleDisabled && !model.isToggleUserInitiated,
                     introStartFrame: 0,
                     introEndFrame: 100,
                     loopStartFrame: 130,
