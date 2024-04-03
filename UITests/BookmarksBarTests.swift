@@ -83,7 +83,6 @@ class BookmarksBarTests: XCTestCase {
             showBookmarksBarAlways.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The \"Show Bookmarks Bar Always\" button didn't become available in a reasonable timeframe."
         )
-
         showBookmarksBarAlways.click()
 
         XCTAssertTrue(
@@ -119,11 +118,11 @@ class BookmarksBarTests: XCTestCase {
         showBookmarksBarNewTabOnly.click()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
         app.typeKey("n", modifierFlags: [.command]) // open one new window
+
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The bookmarksBarCollectionView should exist on a new tab into which no site name or location has been typed yet."
         )
-
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
