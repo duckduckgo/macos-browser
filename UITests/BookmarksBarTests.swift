@@ -151,7 +151,6 @@ class BookmarksBarTests: XCTestCase {
             "The bookmarksBarCollectionView should not exist on a new tab when we have unchecked \"Show Bookmarks Bar\" in the settings"
         )
         app.typeKey("l", modifierFlags: [.command]) // Get address bar focus
-        sleep(1) // The rarest of cases, in which this is the least-indirect thing we could do here, because we have two tabs open.
         app.typeURL(urlForBookmarksBar)
 
         XCTAssertTrue(
@@ -191,7 +190,6 @@ private extension BookmarksBarTests {
             app.images["HomePageLogo"].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Home Page Logo did not exist when it was expected."
         )
-        sleep(1)
         app.typeURL(urlForBookmarksBar)
     }
 
