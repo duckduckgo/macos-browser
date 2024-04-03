@@ -82,7 +82,7 @@ public struct NetworkProtectionStatusView: View {
             bottomMenuView()
         }
         .padding(5)
-        .frame(minWidth: 350, maxWidth: 350, alignment: .top)
+        .frame(width: 350, alignment: .top)
         .transition(.slide)
     }
 

@@ -28,6 +28,8 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let tunnelController: TunnelController
 
+    /// Whether the VPN is enabled
+    /// This is determined based on the connection status, same as the iOS version
     @Published
     public var isVPNEnabled = false
 

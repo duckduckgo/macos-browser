@@ -165,11 +165,8 @@ public struct TunnelControllerView: View {
     ///
     private func headerView() -> some View {
         VStack(spacing: 0) {
-            if colorScheme == .light {
-                headerAnimationView("vpn-light-mode")
-            } else {
-                headerAnimationView("vpn-dark-mode")
-            }
+            headerAnimationView()
+                .frame(width: 100, height: 75)
 
             Text(model.featureStatusDescription)
                 .applyTitleAttributes(colorScheme: colorScheme)
@@ -182,6 +179,15 @@ public struct TunnelControllerView: View {
                 .applyDescriptionAttributes(colorScheme: colorScheme)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
+        }
+    }
+
+    @ViewBuilder
+    private func headerAnimationView() -> some View {
+        if colorScheme == .light {
+            headerAnimationView("vpn-light-mode")
+        } else {
+            headerAnimationView("vpn-dark-mode")
         }
     }
 
@@ -287,4 +293,3 @@ public struct TunnelControllerView: View {
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
     }
 }
-
