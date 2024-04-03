@@ -3207,6 +3207,12 @@
 		BBDFDC5A2B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
 		BBDFDC5C2B2B8D7000F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
 		BBDFDC5D2B2B8E2100F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
+		BD384AC92BBC821A00EF3735 /* vpn-dark-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */; };
+		BD384ACA2BBC821A00EF3735 /* vpn-light-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC72BBC821100EF3735 /* vpn-light-mode.json */; };
+		BD384ACB2BBC821B00EF3735 /* vpn-dark-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */; };
+		BD384ACC2BBC821B00EF3735 /* vpn-light-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC72BBC821100EF3735 /* vpn-light-mode.json */; };
+		BD384ACD2BBC821D00EF3735 /* vpn-dark-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */; };
+		BD384ACE2BBC821D00EF3735 /* vpn-light-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC72BBC821100EF3735 /* vpn-light-mode.json */; };
 		C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
 		C13909F02B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
 		C13909F12B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
@@ -4700,6 +4706,8 @@
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
 		BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
 		BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionExternalWaitlistPixels.swift; sourceTree = "<group>"; };
+		BD384AC72BBC821100EF3735 /* vpn-light-mode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "vpn-light-mode.json"; sourceTree = "<group>"; };
+		BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "vpn-dark-mode.json"; sourceTree = "<group>"; };
 		C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionExecutor.swift; sourceTree = "<group>"; };
 		C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillDeleteAllPasswordsExecutorTests.swift; sourceTree = "<group>"; };
 		C13909FA2B861039001626ED /* AutofillActionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionPresenter.swift; sourceTree = "<group>"; };
@@ -7165,6 +7173,8 @@
 			children = (
 				AA4D700525545EDE00C3411E /* Application */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
+				BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */,
+				BD384AC72BBC821100EF3735 /* vpn-light-mode.json */,
 				B31055BB27A1BA0E001AC618 /* Autoconsent */,
 				7B1E819A27C8874900FF0E60 /* Autofill */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
@@ -9555,7 +9565,9 @@
 				3706FCE6293F65D500E42796 /* social_images in Resources */,
 				3706FCE7293F65D500E42796 /* shield-dot-mouse-over.json in Resources */,
 				3706FCE9293F65D500E42796 /* fb-sdk.js in Resources */,
+				BD384ACB2BBC821B00EF3735 /* vpn-dark-mode.json in Resources */,
 				3706FCEA293F65D500E42796 /* PasswordManager.storyboard in Resources */,
+				BD384ACC2BBC821B00EF3735 /* vpn-light-mode.json in Resources */,
 				3706FCEB293F65D500E42796 /* dark-flame-mouse-over.json in Resources */,
 				3706FCEC293F65D500E42796 /* flame-mouse-over.json in Resources */,
 				3706FCED293F65D500E42796 /* httpsMobileV2Bloom.bin in Resources */,
@@ -9682,7 +9694,9 @@
 				4B957C1F2AC7AE700062CA31 /* social_images in Resources */,
 				4B957C202AC7AE700062CA31 /* shield-dot-mouse-over.json in Resources */,
 				4B957C222AC7AE700062CA31 /* fb-sdk.js in Resources */,
+				BD384ACD2BBC821D00EF3735 /* vpn-dark-mode.json in Resources */,
 				4B957C232AC7AE700062CA31 /* PasswordManager.storyboard in Resources */,
+				BD384ACE2BBC821D00EF3735 /* vpn-light-mode.json in Resources */,
 				4B957C242AC7AE700062CA31 /* dark-flame-mouse-over.json in Resources */,
 				4B957C252AC7AE700062CA31 /* flame-mouse-over.json in Resources */,
 				4B957C262AC7AE700062CA31 /* httpsMobileV2Bloom.bin in Resources */,
@@ -9798,7 +9812,9 @@
 				EA18D1CA272F0DC8006DC101 /* social_images in Resources */,
 				AA7EB6E927E880A600036718 /* shield-dot-mouse-over.json in Resources */,
 				EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */,
+				BD384AC92BBC821A00EF3735 /* vpn-dark-mode.json in Resources */,
 				85625994269C8F9600EE44BC /* PasswordManager.storyboard in Resources */,
+				BD384ACA2BBC821A00EF3735 /* vpn-light-mode.json in Resources */,
 				AA7EB6E327E7D05500036718 /* dark-flame-mouse-over.json in Resources */,
 				AA7EB6E227E7D05500036718 /* flame-mouse-over.json in Resources */,
 				4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */,
@@ -14476,7 +14492,6 @@
 		};
 		3706FA6B293F65D500E42796 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3706FA6C293F65D500E42796 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
 			productName = TrackerRadarKit;
 		};
 		3706FA71293F65D500E42796 /* BrowserServicesKit */ = {

@@ -20,6 +20,7 @@ import SwiftUI
 import SwiftUIExtensions
 import Combine
 import NetworkProtection
+import Lottie
 
 fileprivate extension Font {
     enum NetworkProtection {
@@ -164,10 +165,10 @@ public struct TunnelControllerView: View {
     ///
     private func headerView() -> some View {
         VStack(spacing: 0) {
-            HStack {
-                Spacer()
-                Image(model.mainImageAsset)
-                Spacer()
+            if colorScheme == .light {
+                headerAnimationView("vpn-light-mode")
+            } else {
+                headerAnimationView("vpn-dark-mode")
             }
 
             Text(model.featureStatusDescription)
@@ -182,6 +183,12 @@ public struct TunnelControllerView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
         }
+    }
+
+    @ViewBuilder
+    private func headerAnimationView(_ animationName: String) -> some View {
+        LottieView(animation: .named(animationName))
+            .playing(loopMode: .loop)
     }
 
     @ViewBuilder

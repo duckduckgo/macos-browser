@@ -21,8 +21,8 @@ import Foundation
 public enum NetworkProtectionAsset: String, CaseIterable {
     case ipAddressIcon = "IP-16"
     case serverLocationIcon = "Server-Location-16"
-    case vpnDisabledImage = "VPN-Disabled-128"
-    case vpnEnabledImage = "VPN-128"
+    case vpnDisabledImage = "VPNDisabled"
+    case vpnEnabledImage = "VPN"
     case vpnIcon = "VPN-16"
 
     // Apple Icons
