@@ -70,7 +70,7 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenShouldDownloadResponse_downloadStarts() async throws {
-        let preferences = DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor())
+        let preferences = DownloadsPreferences.shared
         preferences.alwaysRequestDownloadLocation = false
         preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
 
@@ -235,7 +235,7 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigationActionIsData_downloadStarts() async throws {
-        let preferences = DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor())
+        let preferences = DownloadsPreferences.shared
         preferences.alwaysRequestDownloadLocation = false
         preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
 
@@ -268,7 +268,7 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigationActionIsBlob_downloadStarts() async throws {
-        let preferences = DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor())
+        let preferences = DownloadsPreferences.shared
         preferences.alwaysRequestDownloadLocation = false
         preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
 
