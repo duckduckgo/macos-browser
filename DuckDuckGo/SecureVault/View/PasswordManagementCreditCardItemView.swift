@@ -250,8 +250,7 @@ private struct SecureEditableCreditCardField: View {
     @Binding var textFieldValue: String
 
     @State private var isHovering = false
-    @State private var isVisibleEditing = true
-    @State private var isVisibleViewing = false
+    @State private var isVisible = false
 
     let title: String
     let hiddenTextLength: Int
@@ -272,11 +271,9 @@ private struct SecureEditableCreditCardField: View {
 
                     HStack {
 
-                        SecureTextField(textValue: $textFieldValue, isVisible: isVisibleEditing, bottomPadding: interItemSpacing)
-
-                        SecureTextFieldButton(isVisible: $isVisibleEditing, toolTipHideText: toolTipHideText, toolTipShowText: toolTipShowText)
-                        .padding(.bottom, 20)
-                        .padding(.trailing, 10)
+                        TextField("", text: $textFieldValue)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding(.bottom, interItemSpacing)
 
                     }
                     .padding(.bottom, interItemSpacing)
@@ -285,10 +282,10 @@ private struct SecureEditableCreditCardField: View {
 
                     HStack(spacing: 6) {
 
-                        HiddenText(isVisible: isVisibleViewing, text: textFieldValue, hiddenTextLength: hiddenTextLength)
+                        HiddenText(isVisible: isVisible, text: textFieldValue, hiddenTextLength: hiddenTextLength)
 
-                        if (isHovering || isVisibleViewing) && textFieldValue != "" {
-                            SecureTextFieldButton(isVisible: $isVisibleViewing, toolTipHideText: toolTipHideText, toolTipShowText: toolTipShowText)
+                        if (isHovering || isVisible) && textFieldValue != "" {
+                            SecureTextFieldButton(isVisible: $isVisible, toolTipHideText: toolTipHideText, toolTipShowText: toolTipShowText)
                         }
 
                         if isHovering {
