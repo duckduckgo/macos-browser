@@ -18,14 +18,16 @@
 
 import Navigation
 import Foundation
+import Subscription
 
 struct NavigationRedirectResponder: NavigationResponder {
 
-    static let redirectMapping = [URL.privacyPro: URL.subscriptionPurchase]
+    private let urlsToRedirect = Set([URL.privacyPro])
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        guard let mainFrame = navigationAction.mainFrameTarget, shouldRedirect(url: navigationAction.url) else { return .next }
 
-        if let mainFrame = navigationAction.mainFrameTarget, let redirectURL = Self.redirectMapping[navigationAction.url] {
+        if let redirectURL = redirectURL(for: navigationAction.url) {
             return .redirect(mainFrame) { navigator in
                 var request = navigationAction.request
                 request.url = redirectURL
@@ -34,5 +36,18 @@ struct NavigationRedirectResponder: NavigationResponder {
         }
 
         return .next
+    }
+
+    private func shouldRedirect(url: URL) -> Bool {
+        return urlsToRedirect.contains(url)
+    }
+
+    private func redirectURL(for url: URL) -> URL? {
+        switch url {
+        case URL.privacyPro:
+            return DefaultSubscriptionFeatureAvailability().isFeatureAvailable ? URL.subscriptionPurchase : nil
+        default:
+            return nil
+        }
     }
 }
