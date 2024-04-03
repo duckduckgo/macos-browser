@@ -188,8 +188,19 @@ public struct TunnelControllerView: View {
     @ViewBuilder
     private func headerAnimationView(_ animationName: String) -> some View {
         LottieView(animation: .named(animationName))
-            .playing(loopMode: .loop)
-    }
+            .configure { animationView in
+                animationView.contentMode = .scaleAspectFit
+                animationView.clipsToBounds = false
+            }
+            .playing(withIntro: .init(
+                    // Skip the intro if NetP is enabled, but the user didn't manually trigger it
+                    skipIntro: model.isVPNEnabled && !model.isToggleDisabled,
+                    introStartFrame: 0,
+                    introEndFrame: 100,
+                    loopStartFrame: 130,
+                    loopEndFrame: 370
+                ), isAnimating: $model.isVPNEnabled)
+}
 
     @ViewBuilder
     private func statusBadge(isConnected: Bool) -> some View {

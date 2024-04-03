@@ -28,6 +28,9 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let tunnelController: TunnelController
 
+    @Published
+    public var isVPNEnabled = false
+
     /// The type of extension that's being used for NetP
     ///
     @Published
@@ -61,23 +64,6 @@ public final class TunnelControllerViewModel: ObservableObject {
     private static let statusDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.statusDispatchQueue", qos: .userInteractive)
     private static let connectivityIssuesDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.connectivityIssuesDispatchQueue", qos: .userInteractive)
     private static let serverInfoDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.serverInfoDispatchQueue", qos: .userInteractive)
-
-    // MARK: - Feature Image
-
-    var mainImageAsset: NetworkProtectionAsset {
-        switch connectionStatus {
-        case .connected:
-            return .vpnEnabledImage
-        case .disconnecting:
-            if case .connected = previousConnectionStatus {
-                return .vpnEnabledImage
-            } else {
-                return .vpnDisabledImage
-            }
-        default:
-            return .vpnDisabledImage
-        }
-    }
 
     // MARK: - Initialization & Deinitialization
 
@@ -130,6 +116,12 @@ public final class TunnelControllerViewModel: ObservableObject {
 
             Task { @MainActor in
                 self.connectionStatus = status
+                switch status {
+                case .connected, .connecting:
+                    self.isVPNEnabled = true
+                default:
+                    self.isVPNEnabled = false
+                }
             }
         }
             .store(in: &cancellables)
