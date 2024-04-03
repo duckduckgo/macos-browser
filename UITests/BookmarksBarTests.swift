@@ -93,7 +93,6 @@ class BookmarksBarTests: XCTestCase {
     }
 
     func test_bookmarksBar_whenShowBookmarksNewTabOnlyIsSelected_onlyAppearsOnANewTabUntilASiteIsLoaded() throws {
-
         app.typeKey("w", modifierFlags: [.command]) // Close site window
         XCTAssertTrue(
             showBookmarksBarPreferenceToggle.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -152,7 +151,7 @@ class BookmarksBarTests: XCTestCase {
             "The bookmarksBarCollectionView should not exist on a new tab when we have unchecked \"Show Bookmarks Bar\" in the settings"
         )
         app.typeKey("l", modifierFlags: [.command]) // Get address bar focus
-        sleep(1) // The rarest of cases, in which this is the least-indirect thing we could do here.
+        sleep(1) // The rarest of cases, in which this is the least-indirect thing we could do here, because we have two tabs open.
         app.typeText("\(urlForBookmarksBar.absoluteString)\r")
 
         XCTAssertTrue(
