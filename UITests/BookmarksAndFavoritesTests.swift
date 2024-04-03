@@ -31,6 +31,12 @@ class BookmarksAndFavoritesTests: XCTestCase {
     private var addressBarBookmarkButton: XCUIElement!
     private var optionsButton: XCUIElement!
     private var bookmarkDialogBookmarkFolderDropdown: XCUIElement!
+    private var favoriteThisPageMenuItem: XCUIElement!
+    private var addBookmarksToFavoritesMenuItem: XCUIElement!
+    private var bookmarksDialogAddToFavoritesCheckbox: XCUIElement!
+    private var manageBookmarksMenuItem: XCUIElement!
+    private var settingsAppearanceButton: XCUIElement!
+    private var showFavoritesPreferenceToggle: XCUIElement!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -46,7 +52,16 @@ class BookmarksAndFavoritesTests: XCTestCase {
         addressBarBookmarkButton = app.buttons["AddressBarButtonsViewController.bookmarkButton"]
         optionsButton = app.buttons["NavigationBarViewController.optionsButton"]
         bookmarkDialogBookmarkFolderDropdown = app.popUpButtons["bookmark.add.folder.dropdown"]
+        favoriteThisPageMenuItem = app.menuItems["MainMenu.favoriteThisPage"]
+        addBookmarksToFavoritesMenuItem = app.menuItems["ContextualMenu.addBookmarksToFavoritesMenuItem"]
+        bookmarksDialogAddToFavoritesCheckbox = app.checkBoxes["bookmark.add.add.to.favorites.button"]
+        manageBookmarksMenuItem = app.menuItems["MainMenu.manageBookmarksMenuItem"]
+        settingsAppearanceButton = app.buttons["PreferencesSidebar.appearanceButton"]
+        showFavoritesPreferenceToggle = app.checkBoxes["Preferences.AppearanceView.showFavoritesToggle"]
         app.launch()
+        resetBookmarks()
+        app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Let's enforce a single window
+        app.typeKey("n", modifierFlags: .command)
     }
 
     func resetBookmarks() {
@@ -59,7 +74,6 @@ class BookmarksAndFavoritesTests: XCTestCase {
     }
 
     func test_bookmarks_canBeAddedTo_withContextClickBookmarkThisPage() {
-        resetBookmarks()
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The address bar text field didn't become available in a reasonable timeframe."
@@ -121,7 +135,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
     func test_bookmarks_canBeAddedTo_withSettingsItemBookmarkThisPage() {
         let openBookmarksMenuItem = app.menuItems["MoreOptionsMenu.openBookmarks"]
         let bookmarkPageMenuItem = app.menuItems["MoreOptionsMenu.bookmarkPage"]
-        resetBookmarks()
+
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The address bar text field didn't become available in a reasonable timeframe."
@@ -190,7 +204,6 @@ class BookmarksAndFavoritesTests: XCTestCase {
     }
 
     func test_bookmarks_canBeAddedTo_byClickingBookmarksButtonInAddressBar() {
-        resetBookmarks()
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The address bar text field didn't become available in a reasonable timeframe."
@@ -248,5 +261,165 @@ class BookmarksAndFavoritesTests: XCTestCase {
             app.menuItems[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The bookmark in the \"Bookmarks\" menu with the title of the test page didn't appear with the expected title in a reasonable timeframe."
         )
+    }
+
+    func test_favorites_canBeAddedTo_byClickingFavoriteThisPageMenuBarItem() {
+        XCTAssertTrue(
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The address bar text field didn't become available in a reasonable timeframe."
+        )
+        addressBarTextField.typeText("\(urlForBookmarksBar.absoluteString)\r")
+        XCTAssertTrue(
+            app.windows.webViews[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Visited site didn't load with the expected title in a reasonable timeframe."
+        )
+        XCTAssertTrue(
+            bookmarksMenu.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Bookmarks menu didn't load with the expected title in a reasonable timeframe."
+        )
+        bookmarksMenu.click()
+
+        XCTAssertTrue(
+            favoriteThisPageMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Favorite this page menu item didn't load with the expected title in a reasonable timeframe."
+        )
+        favoriteThisPageMenuItem.click()
+
+        XCTAssertTrue( // Check Add Bookmark dialog for existence but don't click on it
+            defaultBookmarkDialogButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The \"Add bookmark\" dialog option button didn't appear with the expected title in a reasonable timeframe."
+        )
+        let addressBarBookmarkButtonValue = try? XCTUnwrap(
+            addressBarBookmarkButton.value as? String,
+            "It wasn't possible to get the value of the address bar bookmark button as String"
+        )
+        XCTAssertEqual( // The bookmark icon is already in a filled state and it isn't necessary to click the add button
+            addressBarBookmarkButtonValue,
+            "Bookmarked",
+            "The accessibility value of the address bar bookmark button must be \"Bookmarked\", which indicates the icon in the filled state."
+        )
+        XCTAssertTrue( // Check Add Bookmark dialog for existence but don't click on it
+            defaultBookmarkDialogButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The \"Add bookmark\" dialog option button didn't appear with the expected title in a reasonable timeframe."
+        )
+        XCTAssertTrue(
+            bookmarksDialogAddToFavoritesCheckbox.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The add to favorites checkbox in the add bookmark dialog didn't appear with the expected title in a reasonable timeframe."
+        )
+        let bookmarksDialogAddToFavoritesCheckboxValue = try? XCTUnwrap(
+            bookmarksDialogAddToFavoritesCheckbox.value as? Bool,
+            "It wasn't possible to get the value of the bookmarks dialog's add to favorites checkbox as Bool"
+        )
+        XCTAssertEqual( // The favorite checkbox in the dialog is already checked
+            bookmarksDialogAddToFavoritesCheckboxValue,
+            true,
+            "The the value of the bookmarks dialog's add to favorites checkbox must be checked, which indicates that the item has been favorited."
+        )
+    }
+
+    func test_favorites_canBeAddedTo_byClickingAddFavoriteInAddBookmarkPopover() {
+        XCTAssertTrue(
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The address bar text field didn't become available in a reasonable timeframe."
+        )
+        addressBarTextField.typeText("\(urlForBookmarksBar.absoluteString)\r")
+        XCTAssertTrue(
+            app.windows.webViews[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Visited site didn't load with the expected title in a reasonable timeframe."
+        )
+
+        // In order to directly click the bookmark button in the address bar, we need to hover over something in the bar area
+        XCTAssertTrue( // We already have access to the optionsButton so it is OK to use for this hover
+            optionsButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The options button didn't appear with the expected title in a reasonable timeframe."
+        )
+        optionsButton.hover()
+        XCTAssertTrue( // Now the button will exist so we can check for it and use it
+            addressBarBookmarkButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The address bar bookmark button didn't appear with the expected title in a reasonable timeframe."
+        )
+        addressBarBookmarkButton.click()
+        XCTAssertTrue( // Check Add Bookmark dialog for existence before adding to favorites
+            defaultBookmarkDialogButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The \"Add bookmark\" dialog option button didn't appear with the expected title in a reasonable timeframe."
+        )
+
+        XCTAssertTrue(
+            bookmarksDialogAddToFavoritesCheckbox.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The add to favorites checkbox in the add bookmark dialog didn't appear with the expected title in a reasonable timeframe."
+        )
+        bookmarksDialogAddToFavoritesCheckbox.click()
+        let bookmarksDialogAddToFavoritesCheckboxValue = try? XCTUnwrap(
+            bookmarksDialogAddToFavoritesCheckbox.value as? Bool,
+            "It wasn't possible to get the value of the bookmarks dialog's add to favorites checkbox as Bool"
+        )
+        XCTAssertEqual( // The favorite checkbox in the dialog is already checked
+            bookmarksDialogAddToFavoritesCheckboxValue,
+            true,
+            "The the value of the bookmarks dialog's add to favorites checkbox must be checked, which indicates that the item has been favorited."
+        )
+    }
+
+    func test_favorites_canBeManuallyAddedTo_byClickingAddFavoriteInNewTabPage() throws {
+        app.typeKey(",", modifierFlags: [.command]) // Open settings
+
+        XCTAssertTrue(
+            settingsAppearanceButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The user settings appearance section button didn't become available in a reasonable timeframe."
+        )
+        settingsAppearanceButton.click(forDuration: 0.5, thenDragTo: settingsAppearanceButton)
+
+        XCTAssertTrue(
+            showFavoritesPreferenceToggle.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The user settings appearance section show favorites toggle didn't become available in a reasonable timeframe."
+        )
+        let showFavoritesPreferenceToggleIsChecked = showFavoritesPreferenceToggle.value as? Bool
+        if showFavoritesPreferenceToggleIsChecked == false { // If untoggled,
+            showFavoritesPreferenceToggle.click() // Toggle "show favorites"
+        }
+
+        app.typeKey("n", modifierFlags: [.command])
+        let addFavoriteInNewTabButton = app.staticTexts["Add Favorite"]
+        XCTAssertTrue(
+            addFavoriteInNewTabButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The add favorite button in the new tab webview did not become available in a reasonable timeframe."
+        )
+        addFavoriteInNewTabButton.click()
+        let pageTitleForAddFavoriteDialog: String = try XCTUnwrap(pageTitle, "Couldn't unwrap page title")
+        let urlForAddFavoriteDialog = try XCTUnwrap(urlForBookmarksBar, "Couldn't unwrap page url")
+        app.typeText("\(pageTitleForAddFavoriteDialog)\t")
+        app.typeText("\(urlForAddFavoriteDialog)\r")
+        let newFavorite = app.otherElements.staticTexts[pageTitleForAddFavoriteDialog]
+
+        XCTAssertTrue(
+            newFavorite.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The new favorite on the new tab page did not become available in a reasonable timeframe."
+        )
+    }
+
+    func test_favorites_canBeAddedToFromManageBookmarksView() {
+        XCTAssertTrue(
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The address bar text field didn't become available in a reasonable timeframe."
+        )
+        addressBarTextField.typeText("\(urlForBookmarksBar.absoluteString)\r")
+        XCTAssertTrue(
+            app.windows.webViews[pageTitle].waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Visited site didn't load with the expected title in a reasonable timeframe."
+        )
+        app.typeKey("d", modifierFlags: [.command]) // Add bookmark
+        app.typeKey(.escape, modifierFlags: []) // Exit dialog
+        XCTAssertTrue(
+            bookmarksMenu.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Bookmarks menu didn't load with the expected title in a reasonable timeframe."
+        )
+        bookmarksMenu.click()
+        XCTAssertTrue(
+            manageBookmarksMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Manage bookmarks menu item didn't load with the expected title in a reasonable timeframe."
+        )
+        manageBookmarksMenuItem.click()
+        app.staticTexts[pageTitle].hover()
+        
     }
 }
