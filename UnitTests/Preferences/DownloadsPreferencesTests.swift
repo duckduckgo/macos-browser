@@ -213,12 +213,11 @@ class DownloadsPreferencesTests: XCTestCase {
         XCTAssertNil(preferences.lastUsedCustomDownloadLocation)
     }
 
-    func testWhenInvalidLastUsedCustomDownloadLocationIsSet_oldValueIsPreserved() {
+    func testWhenInvalidLastUsedCustomDownloadLocationIsSet_lastUsedCustomLocationIsNil() {
         let testDirectory = createTemporaryTestDirectory()
         let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil)
         let preferences = DownloadsPreferences(persistor: persistor)
 
-        let valuesBeforeChange = persistor.values()
         preferences.lastUsedCustomDownloadLocation = testDirectory
         preferences.lastUsedCustomDownloadLocation = testDirectory.appendingPathComponent("non-existent-dir")
 
