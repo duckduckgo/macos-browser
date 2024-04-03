@@ -23,7 +23,6 @@ import Foundation
 private protocol FilePresenterDelegate: AnyObject {
     var logger: FilePresenterLogger { get }
     var url: URL? { get }
-    var primaryPresentedItemURL: URL? { get }
     func presentedItemDidMove(to newURL: URL)
     func accommodatePresentedItemDeletion() throws
     func accommodatePresentedItemEviction() throws
@@ -56,13 +55,15 @@ internal class FilePresenter {
 
         final let presentedItemOperationQueue: OperationQueue
         fileprivate final weak var delegate: FilePresenterDelegate?
+        final var shouldBeRemovedTwice = false
 
         init(presentedItemOperationQueue: OperationQueue) {
             self.presentedItemOperationQueue = presentedItemOperationQueue
         }
 
+        final var fallbackPresentedItemURL: URL?
         final var presentedItemURL: URL? {
-            guard let delegate else { return nil }
+            guard let delegate else { return fallbackPresentedItemURL }
             FilePresenter.dispatchSourceQueue.async {
                 // prevent owning FilePresenter deallocation inside the presentedItemURL getter
                 withExtendedLifetime(delegate) {}
@@ -100,9 +101,11 @@ internal class FilePresenter {
 
     final private class DelegatingRelatedFilePresenter: DelegatingFilePresenter {
 
-        var primaryPresentedItemURL: URL? {
-            let url = delegate?.primaryPresentedItemURL
-            return url
+        let primaryPresentedItemURL: URL?
+
+        init(primaryPresentedItemURL: URL?, presentedItemOperationQueue: OperationQueue) {
+            self.primaryPresentedItemURL = primaryPresentedItemURL
+            super.init(presentedItemOperationQueue: presentedItemOperationQueue)
         }
 
     }
@@ -112,8 +115,6 @@ internal class FilePresenter {
     private var dispatchSourceCancellable: AnyCancellable?
 
     fileprivate let logger: any FilePresenterLogger
-
-    let primaryPresentedItemURL: URL?
 
     private var _url: URL?
     final var url: URL? {
@@ -139,35 +140,46 @@ internal class FilePresenter {
 
     init(url: URL, primaryItemURL: URL? = nil, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
         self._url = url
-        self.primaryPresentedItemURL = primaryItemURL
         self.logger = logger
 
-        let innerPresenter: DelegatingFilePresenter
-        if primaryItemURL != nil {
-            innerPresenter = DelegatingRelatedFilePresenter(presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue)
-        } else {
-            innerPresenter = DelegatingFilePresenter(presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue)
+        do {
+            try setupInnerPresenter(for: url, primaryItemURL: primaryItemURL, createIfNeededCallback: createIfNeededCallback)
+            logger.log("🗄️  added file presenter for \"\(url.path)\"\(primaryItemURL != nil ? " primary item: \"\(primaryItemURL!.path)\"" : "")")
+        } catch {
+            removeFilePresenter()
+            throw error
         }
-        self.innerPresenter = innerPresenter
+    }
+
+    private func setupInnerPresenter(for url: URL, primaryItemURL: URL?, createIfNeededCallback: ((URL) throws -> URL)?) throws {
+        var innerPresenter = if let primaryItemURL {
+            DelegatingRelatedFilePresenter(primaryPresentedItemURL: primaryItemURL, presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue)
+        } else {
+            DelegatingFilePresenter(presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue)
+        }
         innerPresenter.delegate = self
+        self.innerPresenter = innerPresenter
+
+        // even though we will call `addFilePresenter` again for a non-existent file,
+        // we still must call this `addFilePresenter` to get access to the secondary item
+        // (when primaryPresentedItemURL is provided).
         NSFileCoordinator.addFilePresenter(innerPresenter)
 
         if !FileManager.default.fileExists(atPath: url.path) {
-            if let createFile = createIfNeededCallback {
-                logger.log("🗄️💥 creating file for presenter at \"\(url.path)\"")
-                self._url = try coordinateWrite(at: url, using: createFile)
-
-                // re-add File Presenter for the updated URL
-                NSFileCoordinator.removeFilePresenter(innerPresenter)
-                NSFileCoordinator.addFilePresenter(innerPresenter)
-
-            } else {
+            guard let createFile = createIfNeededCallback else {
                 throw CocoaError(.fileReadNoSuchFile, userInfo: [NSFilePathErrorKey: url.path])
             }
+            logger.log("🗄️💥 creating file for presenter at \"\(url.path)\"")
+            self._url = try coordinateWrite(at: url, using: createFile)
+            // add the File Presenter once again after the file was created.
+            // otherwise, file move events may not be received (looks like an API bug).
+            NSFileCoordinator.addFilePresenter(innerPresenter)
+            // need to balance sandbox extension release for secondary item presenters added twice
+            innerPresenter.shouldBeRemovedTwice = (primaryItemURL != nil)
         }
-        addFSODispatchSource(for: url)
-
-        logger.log("🗄️  added file presenter for \"\(url.path)\"\(primaryPresentedItemURL != nil ? " primary item: \"\(primaryPresentedItemURL!.path)\"" : "")")
+        try coordinateRead(at: url, with: .withoutChanges) { url in
+            addFSODispatchSource(for: url)
+        }
     }
 
     private func addFSODispatchSource(for url: URL) {
@@ -215,7 +227,9 @@ internal class FilePresenter {
     private func removeFilePresenter() {
         if let innerPresenter {
             logger.log("🗄️  removing file presenter for \"\(url?.path ?? "<nil>")\"")
-            NSFileCoordinator.removeFilePresenter(innerPresenter)
+            for i in 1...(innerPresenter.shouldBeRemovedTwice ? 2 : 1) { // if secondary item presenter was added twice - remove it twice
+                NSFileCoordinator.removeFilePresenter(innerPresenter)
+            }
             self.innerPresenter = nil
         }
     }
@@ -227,6 +241,8 @@ internal class FilePresenter {
     }
 
     deinit {
+        // innerPresenter delegate won‘t be available at this point, so set the final url here to remove the presenter
+        innerPresenter?.fallbackPresentedItemURL = _url
         removeFilePresenter()
     }
 
