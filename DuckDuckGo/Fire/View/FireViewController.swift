@@ -41,7 +41,7 @@ final class FireViewController: NSViewController {
     @IBOutlet weak var progressIndicatorWrapper: NSView!
     @IBOutlet weak var progressIndicator: NSProgressIndicator!
     @IBOutlet weak var progressIndicatorWrapperBG: NSView!
-    private var fireAnimationView: AnimationView?
+    private var fireAnimationView: LottieAnimationView?
     private var fireAnimationViewLoadingTask: Task<(), Never>?
 
     static func create(tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel? = nil) -> FireViewController {
@@ -226,11 +226,11 @@ private actor FireAnimationViewLoader {
     static let shared: FireAnimationViewLoader = .init(animationName: FireViewController.Const.animationName)
 
     @MainActor
-    func createAnimationView() async -> AnimationView? {
+    func createAnimationView() async -> LottieAnimationView? {
         guard let animation = await animation else {
             return nil
         }
-        let view = AnimationView(animation: animation)
+        let view = LottieAnimationView(animation: animation)
         view.identifier = .init(rawValue: animationName)
         return view
     }
@@ -241,7 +241,7 @@ private actor FireAnimationViewLoader {
 
     private let animationName: String
 
-    private var animation: Animation? {
-        Animation.named(animationName, animationCache: LottieAnimationCache.shared)
+    private var animation: LottieAnimation? {
+        LottieAnimation.named(animationName, animationCache: LottieAnimationCache.shared)
     }
 }

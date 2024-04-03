@@ -79,6 +79,7 @@ extension URL {
 
     // MARK: - Factory
 
+#if !SANDBOX_TEST_TOOL
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -124,6 +125,7 @@ extension URL {
 
         return url
     }
+#endif
 
     static let blankPage = URL(string: "about:blank")!
 
@@ -136,9 +138,11 @@ extension URL {
 
     static let dataBrokerProtection = URL(string: "duck://dbp")!
 
+#if !SANDBOX_TEST_TOOL
     static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
         return settings.appendingPathComponent(pane.rawValue)
     }
+#endif
 
     enum Invalid {
         static let aboutNewtab = URL(string: "about:newtab")!
@@ -274,6 +278,7 @@ extension URL {
         return string
     }
 
+#if !SANDBOX_TEST_TOOL
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
         let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
         let hasInputWww = input.dropping(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
@@ -284,6 +289,7 @@ extension URL {
                              needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
+#endif
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
     var suggestedFilename: String? {

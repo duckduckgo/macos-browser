@@ -16,26 +16,22 @@
 //  limitations under the License.
 //
 
-import Foundation
-import CoreData
 import Combine
+import Common
+import CoreData
+import Foundation
 import UniformTypeIdentifiers
 
 protocol DownloadListStoring {
 
-    func fetch(clearingItemsOlderThan date: Date, completionHandler: @escaping (Result<[DownloadListItem], Error>) -> Void)
+    func fetch(completionHandler: @escaping @MainActor (Result<[DownloadListItem], Error>) -> Void)
     func save(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?)
     func remove(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?)
-    func clear(itemsOlderThan date: Date, completionHandler: ((Error?) -> Void)?)
     func sync()
 
 }
 
 extension DownloadListStoring {
-
-    func clear() {
-        clear(itemsOlderThan: .distantFuture, completionHandler: nil)
-    }
 
     func remove(_ item: DownloadListItem) {
         remove(item, completionHandler: nil)
@@ -105,17 +101,12 @@ final class DownloadListStore: DownloadListStoring {
         }
     }
 
-    func clear(itemsOlderThan date: Date, completionHandler: ((Error?) -> Void)?) {
-        remove(itemsWithPredicate: NSPredicate(format: (\DownloadManagedObject.modified)._kvcKeyPathString! + " < %@", date as NSDate),
-               completionHandler: completionHandler)
-    }
-
     func remove(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?) {
         remove(itemsWithPredicate: NSPredicate(format: (\DownloadManagedObject.identifier)._kvcKeyPathString! + " == %@", item.identifier as CVarArg),
                completionHandler: completionHandler)
     }
 
-    func fetch(completionHandler: @escaping (Result<[DownloadListItem], Error>) -> Void) {
+    func fetch(completionHandler: @escaping @MainActor (Result<[DownloadListItem], Error>) -> Void) {
         guard let context = self.context else { return }
 
         func mainQueueCompletion(_ result: Result<[DownloadListItem], Error>) {
@@ -134,12 +125,6 @@ final class DownloadListStore: DownloadListStoring {
             } catch {
                 mainQueueCompletion(.failure(error))
             }
-        }
-    }
-
-    func fetch(clearingItemsOlderThan date: Date, completionHandler: @escaping (Result<[DownloadListItem], Error>) -> Void) {
-        clear(itemsOlderThan: date) { _ in
-            self.fetch(completionHandler: completionHandler)
         }
     }
 
@@ -212,17 +197,20 @@ extension DownloadListItem {
         }
 
         let error = (managedObject.errorEncrypted as? NSError).map { nsError in
-            FileDownloadError(nsError, isRetryable: managedObject.destinationURLEncrypted as? URL != nil)
+            FileDownloadError(nsError)
         }
+        let destinationURL = managedObject.destinationURLEncrypted as? URL
         self.init(identifier: identifier,
                   added: added,
                   modified: modified,
-                  url: url,
+                  downloadURL: url,
                   websiteURL: managedObject.websiteURLEncrypted as? URL,
+                  fileName: managedObject.filenameEncrypted as? String ?? destinationURL?.lastPathComponent ?? "",
                   isBurner: false,
-                  fileType: managedObject.fileType.flatMap(UTType.init(_:)),
-                  destinationURL: managedObject.destinationURLEncrypted as? URL,
+                  destinationURL: destinationURL,
+                  destinationFileBookmarkData: managedObject.destinationFileBookmarkDataEncrypted as? Data,
                   tempURL: managedObject.tempURLEncrypted as? URL,
+                  tempFileBookmarkData: managedObject.tempFileBookmarkDataEncrypted as? Data,
                   error: error)
     }
 
@@ -239,13 +227,15 @@ extension DownloadManagedObject {
         assert(identifier == item.identifier)
         assert(added == item.added)
 
-        urlEncrypted = item.url as NSURL
+        urlEncrypted = item.downloadURL as NSURL
         websiteURLEncrypted = item.websiteURL as NSURL?
         modified = item.modified
-        fileType = item.fileType?.identifier
         destinationURLEncrypted = item.destinationURL as NSURL?
+        destinationFileBookmarkDataEncrypted = item.destinationFileBookmarkData as NSData?
         tempURLEncrypted = item.tempURL as NSURL?
+        tempFileBookmarkDataEncrypted = item.tempFileBookmarkData as NSData?
         errorEncrypted = item.error as NSError?
+        filenameEncrypted = item.fileName as NSString
     }
 
 }
