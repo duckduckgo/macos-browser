@@ -49,26 +49,4 @@ enum UITests {
     static func randomPageTitle(length: Int) -> String {
         return String(UUID().uuidString.prefix(length))
     }
-
-    /// This slightly changes the placement of the top window until the window underneath is clickable, to window-swap to it. This is necessary
-    /// because the "swap through windows" key command is language-bound and dependent on **Spaces** state:
-    /// https://apple.stackexchange.com/questions/193937/shortcut-for-toggling-between-different-windows-of-same-app/
-    /// and sometimes it isn't possible to simply swap to another window while testing with a window click, because the two windows have been drawn
-    /// with identical coordinates and size.
-    static func moveWindowSoOccludedWindowHasHitzone(topWindow: XCUIElement, bottomWindow: XCUIElement) {
-        let clickDuration = 0.5
-
-        XCTAssertTrue(
-            topWindow.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "The top window didn't become available in a reasonable timeframe."
-        )
-        XCTAssertTrue(
-            bottomWindow.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "The bottom window didn't become available in a reasonable timeframe."
-        )
-
-        let fromCoordinate = topWindow.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.01))
-        let toCoordinate = topWindow.coordinate(withNormalizedOffset: CGVector(dx: 0.81, dy: 0.02))
-        fromCoordinate.click(forDuration: clickDuration, thenDragTo: toCoordinate)
-    }
 }

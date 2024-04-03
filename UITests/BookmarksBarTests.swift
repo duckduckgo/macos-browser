@@ -61,8 +61,7 @@ class BookmarksBarTests: XCTestCase {
     }
 
     func test_bookmarksBar_whenShowBookmarksBarAlwaysIsSelected_alwaysDynamicallyAppearsOnWindow() throws {
-        UITests.moveWindowSoOccludedWindowHasHitzone(topWindow: siteWindow, bottomWindow: settingsWindow)
-        settingsWindow.click()
+        app.typeKey("w", modifierFlags: [.command])
         XCTAssertTrue(
             showBookmarksBarPreferenceToggle.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The toggle for showing the bookmarks bar didn't become available in a reasonable timeframe."
@@ -86,7 +85,6 @@ class BookmarksBarTests: XCTestCase {
         )
 
         showBookmarksBarAlways.click()
-        app.typeKey("`", modifierFlags: [.command]) // Swap windows
 
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -95,8 +93,8 @@ class BookmarksBarTests: XCTestCase {
     }
 
     func test_bookmarksBar_whenShowBookmarksNewTabOnlyIsSelected_onlyAppearsOnANewTabUntilASiteIsLoaded() throws {
-        UITests.moveWindowSoOccludedWindowHasHitzone(topWindow: siteWindow, bottomWindow: settingsWindow)
-        settingsWindow.click()
+
+        app.typeKey("w", modifierFlags: [.command]) // Close site window
         XCTAssertTrue(
             showBookmarksBarPreferenceToggle.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The toggle for showing the bookmarks bar didn't become available in a reasonable timeframe."
