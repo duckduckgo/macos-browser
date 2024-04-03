@@ -58,6 +58,7 @@ public enum DataBrokerProtectionPixels {
         static let hadReAppereance = "had_re-appearance"
         static let scanCoverage = "scan_coverage"
         static let removals = "removals"
+        static let environmentKey = "environment"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -127,6 +128,11 @@ public enum DataBrokerProtectionPixels {
     case weeklyReportRemovals(removals: Int)
     case scanningEventNewMatch
     case scanningEventReAppearance
+
+    // Web UI - loading errors
+    case webUILoadingStarted(environment: String)
+    case webUILoadingFailed(errorCategory: String)
+    case webUILoadingSuccess(environment: String)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -205,6 +211,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .weeklyReportRemovals: return "m_mac_dbp_event_weekly-report_removals"
         case .scanningEventNewMatch: return "m_mac_dbp_event_scanning-events_new-match"
         case .scanningEventReAppearance: return "m_mac_dbp_event_scanning-events_re-appearance"
+
+        case .webUILoadingStarted: return "m_mac_dbp_web_ui_loading_started"
+        case .webUILoadingSuccess: return "m_mac_dbp_web_ui_loading_success"
+        case .webUILoadingFailed: return "m_mac_dbp_web_ui_loading_failed"
         }
     }
 
@@ -270,6 +280,12 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.hadNewMatch: hadNewMatch ? "1" : "0", Consts.hadReAppereance: hadReAppereance ? "1" : "0", Consts.scanCoverage: scanCoverage.description]
         case .weeklyReportRemovals(let removals):
             return [Consts.removals: String(removals)]
+        case .webUILoadingStarted(let environment):
+            return [Consts.environmentKey: environment]
+        case .webUILoadingSuccess(let environment):
+            return [Consts.environmentKey: environment]
+        case .webUILoadingFailed(let error):
+            return [Consts.errorCategoryKey: error]
         case .backgroundAgentStarted,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
@@ -366,7 +382,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .weeklyReportScanning,
                     .weeklyReportRemovals,
                     .scanningEventNewMatch,
-                    .scanningEventReAppearance:
+                    .scanningEventReAppearance,
+                    .webUILoadingFailed,
+                    .webUILoadingStarted,
+                    .webUILoadingSuccess:
 
                 PixelKit.fire(event)
             }
