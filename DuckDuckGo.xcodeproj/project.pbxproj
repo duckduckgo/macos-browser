@@ -3214,6 +3214,8 @@
 		BD384ACD2BBC821D00EF3735 /* vpn-dark-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */; };
 		BD384ACE2BBC821D00EF3735 /* vpn-light-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC72BBC821100EF3735 /* vpn-light-mode.json */; };
 		BDE981D82BBCE4C700645880 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = BDE981D72BBCE4C700645880 /* Lottie */; };
+		BDE981D92BBD10D600645880 /* vpn-dark-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */; };
+		BDE981DA2BBD10D600645880 /* vpn-light-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC72BBC821100EF3735 /* vpn-light-mode.json */; };
 		C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
 		C13909F02B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
 		C13909F12B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
@@ -5819,6 +5821,7 @@
 		4B4D60632A0B29FA00BCD287 /* BothAppTargets */ = {
 			isa = PBXGroup;
 			children = (
+				BDE981DB2BBD110800645880 /* Assets */,
 				EEA3EEAF2B24EB5100E8333A /* VPNLocation */,
 				9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */,
 				7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */,
@@ -7175,8 +7178,6 @@
 			children = (
 				AA4D700525545EDE00C3411E /* Application */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
-				BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */,
-				BD384AC72BBC821100EF3735 /* vpn-light-mode.json */,
 				B31055BB27A1BA0E001AC618 /* Autoconsent */,
 				7B1E819A27C8874900FF0E60 /* Autofill */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
@@ -8680,6 +8681,15 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		BDE981DB2BBD110800645880 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */,
+				BD384AC72BBC821100EF3735 /* vpn-light-mode.json */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
 		C13909F22B85FD60001626ED /* Autofill */ = {
 			isa = PBXGroup;
 			children = (
@@ -9630,7 +9640,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDE981DA2BBD10D600645880 /* vpn-light-mode.json in Resources */,
 				7BA7CC482AD11E5C0042E5CE /* Assets.xcassets in Resources */,
+				BDE981D92BBD10D600645880 /* vpn-dark-mode.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
