@@ -18,7 +18,6 @@
 
 @implementation LetsMove
 + (NSBundle *)bundle {
-
 	return [NSBundle bundleForClass:self];
 }
 @end
