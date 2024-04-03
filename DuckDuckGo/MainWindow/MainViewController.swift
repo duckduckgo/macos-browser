@@ -71,11 +71,11 @@ final class MainViewController: NSViewController {
                 return NetPPopoverManagerMock()
             }
 #endif
-            let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
-            let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
+
+            let ipcClient = TunnelControllerIPCClient()
             ipcClient.register()
 
-            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
+            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient, networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler())
         }()
         let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
             var connectivityIssuesObserver: ConnectivityIssueObserver!
@@ -196,6 +196,7 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
+        presentWaitlistThankYouPromptIfNecessary()
 
 #if NETWORK_PROTECTION
         sendActiveNetworkProtectionWaitlistUserPixel()
@@ -456,6 +457,16 @@ final class MainViewController: NSViewController {
         }
     }
 #endif
+
+    func presentWaitlistThankYouPromptIfNecessary() {
+        guard let window = self.view.window else {
+            assertionFailure("Couldn't get main view controller's window")
+            return
+        }
+
+        let presenter = WaitlistThankYouPromptPresenter()
+        presenter.presentThankYouPromptIfNecessary(in: window)
+    }
 
     // MARK: - First responder
 

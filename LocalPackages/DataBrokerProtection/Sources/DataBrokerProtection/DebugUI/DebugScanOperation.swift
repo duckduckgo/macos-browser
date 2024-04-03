@@ -42,6 +42,12 @@ struct DebugScanReturnValue {
     }
 }
 
+struct EmptyCookieHandler: CookieHandler {
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
+        return nil
+    }
+}
+
 final class DebugScanOperation: DataBrokerOperation {
     typealias ReturnValue = DebugScanReturnValue
     typealias InputValue = Void
@@ -51,15 +57,17 @@ final class DebugScanOperation: DataBrokerOperation {
     let query: BrokerProfileQueryData
     let emailService: EmailServiceProtocol
     let captchaService: CaptchaServiceProtocol
+    let stageCalculator: StageDurationCalculator
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<DebugScanReturnValue, Error>?
     var extractedProfile: ExtractedProfile?
-    var stageCalculator: StageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
     var scanURL: String?
+    let clickAwaitTime: TimeInterval
+    let cookieHandler: CookieHandler
 
     private let fileManager = FileManager.default
     private let debugScanContentPath: String?
@@ -70,6 +78,7 @@ final class DebugScanOperation: DataBrokerOperation {
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
          operationAwaitTime: TimeInterval = 3,
+         clickAwaitTime: TimeInterval = 0,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -79,17 +88,19 @@ final class DebugScanOperation: DataBrokerOperation {
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
         self.shouldRunNextStep = shouldRunNextStep
+        self.clickAwaitTime = clickAwaitTime
         if let desktopPath = fileManager.urls(for: .desktopDirectory, in: .userDomainMask).first?.relativePath {
             self.debugScanContentPath = desktopPath + "/PIR-Debug"
         } else {
             self.debugScanContentPath = nil
         }
+        self.cookieHandler = EmptyCookieHandler()
+        stageCalculator = FakeStageDurationCalculator()
     }
 
     func run(inputValue: Void,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
-             stageCalculator: StageDurationCalculator, // We do not need it for scans - for now.
              showWebView: Bool) async throws -> DebugScanReturnValue {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
@@ -166,6 +177,8 @@ final class DebugScanOperation: DataBrokerOperation {
         } else {
             os_log("Releasing the web view", log: .action)
             await webViewHandler?.finish() // If we executed all steps we release the web view
+            continuation = nil
+            webViewHandler = nil
         }
     }
 
@@ -177,5 +190,9 @@ final class DebugScanOperation: DataBrokerOperation {
         } catch {
             await completeWith(error: error)
         }
+    }
+
+    deinit {
+        os_log("DebugScanOperation Deinit", log: .action)
     }
 }

@@ -46,6 +46,11 @@ public final class BookmarkStoreMock: BookmarkStore {
         self.updateFavoriteIndexCalled = updateFavoriteIndexCalled
     }
 
+    var capturedFolder: BookmarkFolder?
+    var capturedParentFolder: BookmarkFolder?
+    var capturedParentFolderType: ParentFolderType?
+    var capturedBookmark: Bookmark?
+
     var loadAllCalled = false
     var bookmarks: [BaseBookmarkEntity]?
     var loadError: Error?
@@ -60,6 +65,8 @@ public final class BookmarkStoreMock: BookmarkStore {
     func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void) {
         saveBookmarkCalled = true
         bookmarks?.append(bookmark)
+        capturedParentFolder = parent
+        capturedBookmark = bookmark
         completion(saveBookmarkSuccess, saveBookmarkError)
     }
 
@@ -68,6 +75,8 @@ public final class BookmarkStoreMock: BookmarkStore {
     var saveFolderError: Error?
     func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
         saveFolderCalled = true
+        capturedFolder = folder
+        capturedParentFolder = parent
         completion(saveFolderSuccess, saveFolderError)
     }
 
@@ -92,11 +101,20 @@ public final class BookmarkStoreMock: BookmarkStore {
         }
 
         updateBookmarkCalled = true
+        capturedBookmark = bookmark
     }
 
     var updateFolderCalled = false
     func update(folder: BookmarkFolder) {
         updateFolderCalled = true
+        capturedFolder = folder
+    }
+
+    var updateFolderAndMoveToParentCalled = false
+    func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType) {
+        updateFolderAndMoveToParentCalled = true
+        capturedFolder = folder
+        capturedParentFolderType = parent
     }
 
     var addChildCalled = false
@@ -122,8 +140,11 @@ public final class BookmarkStoreMock: BookmarkStore {
     }
 
     var moveObjectUUIDCalled = false
+    var capturedObjectUUIDs: [String]?
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void) {
         moveObjectUUIDCalled = true
+        capturedObjectUUIDs = objectUUIDs
+        capturedParentFolderType = withinParentFolder
     }
 
     var updateFavoriteIndexCalled = false
@@ -133,6 +154,19 @@ public final class BookmarkStoreMock: BookmarkStore {
 
     func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode) {}
     func handleFavoritesAfterDisablingSync() {}
+}
+
+extension ParentFolderType: Equatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (.root, .root):
+            return true
+        case (.parent(let lhsValue), .parent(let rhsValue)):
+            return lhsValue == rhsValue
+        default:
+            return false
+        }
+    }
 }
 
 #endif

@@ -31,19 +31,20 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var query: BrokerProfileQueryData { get }
     var emailService: EmailServiceProtocol { get }
     var captchaService: CaptchaServiceProtocol { get }
+    var cookieHandler: CookieHandler { get }
+    var stageCalculator: StageDurationCalculator { get }
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
-    var stageCalculator: StageDurationCalculator? { get }
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
     var extractedProfile: ExtractedProfile? { get set }
     var shouldRunNextStep: () -> Bool { get }
     var retriesCountOnError: Int { get set }
+    var clickAwaitTime: TimeInterval { get }
 
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
-             stageCalculator: StageDurationCalculator,
              showWebView: Bool) async throws -> ReturnValue
 
     func executeNextStep() async
@@ -54,13 +55,11 @@ extension DataBrokerOperation {
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
-             stageCalculator: StageDurationCalculator,
              shouldRunNextStep: @escaping () -> Bool) async throws -> ReturnValue {
 
         try await run(inputValue: inputValue,
                       webViewHandler: webViewHandler,
                       actionsHandler: actionsHandler,
-                      stageCalculator: stageCalculator,
                       showWebView: false)
     }
 }
@@ -73,19 +72,19 @@ extension DataBrokerOperation {
     func runNextAction(_ action: Action) async {
         switch action {
         case is GetCaptchaInfoAction:
-            stageCalculator?.setStage(.captchaParse)
+            stageCalculator.setStage(.captchaParse)
         case is ClickAction:
-            stageCalculator?.setStage(.fillForm)
+            stageCalculator.setStage(.fillForm)
         case is FillFormAction:
-            stageCalculator?.setStage(.fillForm)
+            stageCalculator.setStage(.fillForm)
         case is ExpectationAction:
-            stageCalculator?.setStage(.submit)
+            stageCalculator.setStage(.submit)
         default: ()
         }
 
         if let emailConfirmationAction = action as? EmailConfirmationAction {
             do {
-                stageCalculator?.fireOptOutSubmit()
+                stageCalculator.fireOptOutSubmit()
                 try await runEmailConfirmationAction(action: emailConfirmationAction)
                 await executeNextStep()
             } catch {
@@ -97,10 +96,11 @@ extension DataBrokerOperation {
 
         if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId {
             actionsHandler?.captchaTransactionId = nil
-            stageCalculator?.setStage(.captchaSolve)
+            stageCalculator.setStage(.captchaSolve)
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
+                                                                                     attemptId: stageCalculator.attemptId,
                                                                                      shouldRunNextStep: shouldRunNextStep) {
-                stageCalculator?.fireOptOutCaptchaSolve()
+                stageCalculator.fireOptOutCaptchaSolve()
                 await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
                 await onError(error: DataBrokerProtectionError.captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
@@ -111,11 +111,11 @@ extension DataBrokerOperation {
 
         if action.needsEmail {
             do {
-                stageCalculator?.setStage(.emailGenerate)
-                let emailData = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url)
+                stageCalculator.setStage(.emailGenerate)
+                let emailData = try await emailService.getEmail(dataBrokerURL: query.dataBroker.url, attemptId: stageCalculator.attemptId)
                 extractedProfile?.email = emailData.emailAddress
-                stageCalculator?.setEmailPattern(emailData.pattern)
-                stageCalculator?.fireOptOutEmailGenerate()
+                stageCalculator.setEmailPattern(emailData.pattern)
+                stageCalculator.fireOptOutEmailGenerate()
             } catch {
                 await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
                 return
@@ -127,15 +127,16 @@ extension DataBrokerOperation {
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
         if let email = extractedProfile?.email {
-            stageCalculator?.setStage(.emailReceive)
+            stageCalculator.setStage(.emailReceive)
             let url =  try await emailService.getConfirmationLink(
                 from: email,
                 numberOfRetries: 100, // Move to constant
                 pollingInterval: action.pollingTime,
+                attemptId: stageCalculator.attemptId,
                 shouldRunNextStep: shouldRunNextStep
             )
-            stageCalculator?.fireOptOutEmailReceive()
-            stageCalculator?.setStage(.emailReceive)
+            stageCalculator.fireOptOutEmailReceive()
+            stageCalculator.setStage(.emailReceive)
             do {
                 try await webViewHandler?.load(url: url)
             } catch {
@@ -143,7 +144,7 @@ extension DataBrokerOperation {
                 return
             }
 
-            stageCalculator?.fireOptOutEmailConfirm()
+            stageCalculator.fireOptOutEmailConfirm()
         } else {
             throw EmailError.cantFindEmail
         }
@@ -175,21 +176,28 @@ extension DataBrokerOperation {
 
     func loadURL(url: URL) async {
         do {
+            // https://app.asana.com/0/1204167627774280/1206912494469284/f
+            if query.dataBroker.url == "spokeo.com" {
+                if let cookies = await cookieHandler.getAllCookiesFromDomain(url) {
+                    await webViewHandler?.setCookies(cookies)
+                }
+            }
             try await webViewHandler?.load(url: url)
             await executeNextStep()
         } catch {
-           await onError(error: error)
+            await onError(error: error)
         }
     }
 
     func success(actionId: String, actionType: ActionType) async {
         switch actionType {
         case .click:
-            stageCalculator?.fireOptOutFillForm()
-            try? await webViewHandler?.waitForWebViewLoad(timeoutInSeconds: 30)
+            stageCalculator.fireOptOutFillForm()
+            // We wait 40 seconds before tapping
+            try? await Task.sleep(nanoseconds: UInt64(clickAwaitTime) * 1_000_000_000)
             await executeNextStep()
         case .fillForm:
-            stageCalculator?.fireOptOutFillForm()
+            stageCalculator.fireOptOutFillForm()
             await executeNextStep()
         default: await executeNextStep()
         }
@@ -197,11 +205,13 @@ extension DataBrokerOperation {
 
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async {
         do {
-            stageCalculator?.fireOptOutCaptchaParse()
-            stageCalculator?.setStage(.captchaSend)
-            actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo,
-                                                                                                     shouldRunNextStep: shouldRunNextStep)
-            stageCalculator?.fireOptOutCaptchaSend()
+            stageCalculator.fireOptOutCaptchaParse()
+            stageCalculator.setStage(.captchaSend)
+            actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(
+                captchaInfo,
+                attemptId: stageCalculator.attemptId,
+                shouldRunNextStep: shouldRunNextStep)
+            stageCalculator.fireOptOutCaptchaSend()
             await executeNextStep()
         } catch {
             if let captchaError = error as? CaptchaServiceError {
@@ -242,5 +252,35 @@ extension DataBrokerOperation {
             retriesCountOnError = 0
             await onError(error: DataBrokerProtectionError.unknown("No current action to execute"))
         }
+    }
+}
+
+protocol CookieHandler {
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]?
+}
+
+struct BrokerCookieHandler: CookieHandler {
+
+    func getAllCookiesFromDomain(_ url: URL) async -> [HTTPCookie]? {
+        guard let domainURL = extractSchemeAndHostAsURL(from: url.absoluteString) else { return nil }
+        do {
+            let (_, response) = try await URLSession.shared.data(from: domainURL)
+            guard let httpResponse = response as? HTTPURLResponse,
+                  let allHeaderFields = httpResponse.allHeaderFields as? [String: String] else { return nil }
+
+            let cookies = HTTPCookie.cookies(withResponseHeaderFields: allHeaderFields, for: domainURL)
+            return cookies
+        } catch {
+            print("Error fetching data: \(error)")
+        }
+
+        return nil
+    }
+
+    private func extractSchemeAndHostAsURL(from url: String) -> URL? {
+        if let urlComponents = URLComponents(string: url), let scheme = urlComponents.scheme, let host = urlComponents.host {
+            return URL(string: "\(scheme)://\(host)")
+        }
+        return nil
     }
 }

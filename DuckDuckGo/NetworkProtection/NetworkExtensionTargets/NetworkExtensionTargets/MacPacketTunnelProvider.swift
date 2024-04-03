@@ -24,7 +24,23 @@ import NetworkExtension
 import Networking
 import PixelKit
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 final class MacPacketTunnelProvider: PacketTunnelProvider {
+
+    static var isAppex: Bool {
+#if NETP_SYSTEM_EXTENSION
+        false
+#else
+        true
+#endif
+    }
+
+    static var subscriptionsAppGroup: String? {
+        isAppex ? Bundle.main.appGroup(bundle: .subs) : nil
+    }
 
     // MARK: - Additional Status Info
 
@@ -80,18 +96,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionClientInvalidAuthToken
             case .serverListInconsistency:
                 return
-            case .failedToEncodeServerList:
-                domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
-            case .failedToDecodeServerList:
-                domainEvent = .networkProtectionServerListStoreFailedToDecodeServerList
-            case .failedToWriteServerList(let eventError):
-                domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(eventError)
-            case .noServerListFound:
-                return
-            case .couldNotCreateServerListDirectory:
-                return
-            case .failedToReadServerList(let eventError):
-                domainEvent = .networkProtectionServerListStoreFailedToReadServerList(eventError)
             case .failedToCastKeychainValueToData(let field):
                 domainEvent = .networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: field)
             case .keychainReadError(let field, let status):
@@ -122,7 +126,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
             case .vpnAccessRevoked:
-                // todo
                 return
             }
 
@@ -265,6 +268,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - Initialization
 
     @objc public init() {
+        let isSubscriptionEnabled = false
+
 #if NETP_SYSTEM_EXTENSION
         let defaults = UserDefaults.standard
 #else
@@ -274,12 +279,24 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
-        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
-                                                             serviceName: Self.tokenServiceName,
-                                                             errorEvents: debugEvents,
-                                                             isSubscriptionEnabled: false,
-                                                             accessTokenProvider: { nil })
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
+        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
+                                                                           serviceName: Self.tokenServiceName,
+                                                                           errorEvents: debugEvents,
+                                                                           isSubscriptionEnabled: isSubscriptionEnabled,
+                                                                           accessTokenProvider: { nil }
+        )
+#if SUBSCRIPTION
+
+        let accountManager = AccountManager(subscriptionAppGroup: Self.subscriptionsAppGroup, accessTokenStorage: tokenStore)
+
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
+        let entitlementsCheck = {
+            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        }
+#else
+        let entitlementsCheck: (() async -> Result<Bool, Error>)? = nil
+#endif
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
@@ -290,8 +307,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
                    defaults: defaults,
-                   isSubscriptionEnabled: false,
-                   entitlementCheck: nil)
+                   isSubscriptionEnabled: isSubscriptionEnabled,
+                   entitlementCheck: entitlementsCheck)
 
         setupPixels()
         observeServerChanges()
@@ -367,7 +384,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
 
         let serverStatusInfo = NetworkProtectionStatusServerInfo(
-            serverLocation: serverInfo.serverLocation,
+            serverLocation: serverInfo.attributes,
             serverAddress: serverInfo.endpoint?.host.hostWithoutPort
         )
         let payload = ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)

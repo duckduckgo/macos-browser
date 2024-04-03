@@ -22,15 +22,30 @@ import Foundation
 final class AddBookmarkFolderPopoverViewModel: ObservableObject {
 
     private let bookmarkManager: BookmarkManager
-
     let folders: [FolderViewModel]
+    private let completionHandler: (BookmarkFolder?) -> Void
+
     @Published var parent: BookmarkFolder?
-
     @Published var folderName: String = ""
-
     @Published private(set) var isDisabled = false
 
-    private let completionHandler: (BookmarkFolder?) -> Void
+    var title: String {
+        UserText.Bookmarks.Dialog.Title.addFolder
+    }
+
+    var cancelActionTitle: String {
+        UserText.cancel
+    }
+
+    var defaultActionTitle: String {
+        UserText.Bookmarks.Dialog.Action.addFolder
+    }
+
+    let isCancelActionDisabled = false
+
+    var isDefaultActionButtonDisabled: Bool {
+        folderName.trimmingWhitespace().isEmpty || isDisabled
+    }
 
     init(bookmark: Bookmark? = nil,
          folderName: String = "",

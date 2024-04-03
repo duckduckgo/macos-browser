@@ -16,12 +16,14 @@
 //  limitations under the License.
 //
 
-import Navigation
-import Foundation
 import Combine
+import Foundation
+import Navigation
+import UniformTypeIdentifiers
+
 @testable import DuckDuckGo_Privacy_Browser
 
-final class FileDownloadManagerMock: FileDownloadManagerProtocol {
+final class FileDownloadManagerMock: FileDownloadManagerProtocol, WebKitDownloadTaskDelegate {
 
     var downloads = Set<WebKitDownloadTask>()
 
@@ -32,14 +34,23 @@ final class FileDownloadManagerMock: FileDownloadManagerProtocol {
 
     var addDownloadBlock: ((WebKitDownload,
                             DownloadTaskDelegate?,
-                            FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask)?
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask {
-        addDownloadBlock!(download, delegate, location)
+                            WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask)?
+    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
+        addDownloadBlock!(download, delegate, destination)
     }
 
     var cancelAllBlock: ((Bool) -> Void)?
     func cancelAll(waitUntilDone: Bool) {
         cancelAllBlock?(waitUntilDone)
+    }
+
+    func fileDownloadTaskNeedsDestinationURL(_ task: DuckDuckGo_Privacy_Browser.WebKitDownloadTask, suggestedFilename: String, suggestedFileType: UTType?) async -> (URL?, UTType?) {
+        (nil, nil)
+    }
+
+    var downloadTaskDidFinishSubject = PassthroughSubject<(WebKitDownloadTask, Result<Void, FileDownloadError>), Never>()
+    func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<Void, FileDownloadError>) {
+        downloadTaskDidFinishSubject.send((task, result))
     }
 
 }

@@ -20,10 +20,16 @@
 
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import Common
+
+#if SUBSCRIPTION
+import Subscription
+#endif
 
 extension NetworkProtectionDeviceManager {
 
+    @MainActor
     static func create() -> NetworkProtectionDeviceManager {
         let settings = VPNSettings(defaults: .netP)
         let keyStore = NetworkProtectionKeychainKeyStore()
@@ -32,7 +38,7 @@ extension NetworkProtectionDeviceManager {
                                               tokenStore: tokenStore,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents,
-                                              isSubscriptionEnabled: false)
+                                              isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
     }
 }
 
@@ -42,16 +48,25 @@ extension NetworkProtectionCodeRedemptionCoordinator {
         self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false)
+                  isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
     }
 }
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
+        self.init(isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
+    }
+
+    convenience init(isSubscriptionEnabled: Bool) {
+#if SUBSCRIPTION
+        let accessTokenProvider: () -> String? = { AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).accessToken }
+#else
+        let accessTokenProvider: () -> String? = { return nil }
+#endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false,
-                  accessTokenProvider: { nil })
+                  isSubscriptionEnabled: isSubscriptionEnabled,
+                  accessTokenProvider: accessTokenProvider)
     }
 }
 
@@ -59,6 +74,25 @@ extension NetworkProtectionKeychainKeyStore {
     convenience init() {
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents)
+    }
+}
+
+extension NetworkProtectionLocationListCompositeRepository {
+    convenience init() {
+        let settings = VPNSettings(defaults: .netP)
+        self.init(
+            environment: settings.selectedEnvironment,
+            tokenStore: NetworkProtectionKeychainTokenStore(),
+            errorEvents: .networkProtectionAppDebugEvents,
+            isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable
+        )
+    }
+}
+
+extension TunnelControllerIPCClient {
+
+    convenience init() {
+        self.init(machServiceName: Bundle.main.vpnMenuAgentBundleId)
     }
 }
 

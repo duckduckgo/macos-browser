@@ -41,7 +41,7 @@ NETP_APP_GROUP[config=Review][sdk=macos*] = $(NETP_BASE_APP_GROUP).review
 NETP_APP_GROUP[config=Debug][sdk=macos*] = $(NETP_BASE_APP_GROUP).debug
 NETP_APP_GROUP[config=Release][sdk=macos*] = $(NETP_BASE_APP_GROUP)
 
-SUBSCRIPTION_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.subscription
+SUBSCRIPTION_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).$(MAIN_BUNDLE_IDENTIFIER_PREFIX).subscription
 SUBSCRIPTION_APP_GROUP[config=CI][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).debug
 SUBSCRIPTION_APP_GROUP[config=Review][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).review
 SUBSCRIPTION_APP_GROUP[config=Debug][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).debug

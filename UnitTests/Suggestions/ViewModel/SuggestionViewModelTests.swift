@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
+import Suggestions
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser

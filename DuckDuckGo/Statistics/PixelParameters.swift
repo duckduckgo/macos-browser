@@ -166,6 +166,13 @@ extension Pixel.Event {
              .dataBrokerEnableLoginItemDaily,
              .dataBrokerDisableLoginItemDaily,
              .dataBrokerResetLoginItemDaily,
+             .defaultRequestedFromHomepage,
+             .defaultRequestedFromHomepageSetupView,
+             .defaultRequestedFromSettings,
+             .defaultRequestedFromOnboarding,
+             .privacyProFeatureEnabled,
+             .privacyProBetaUserThankYouVPN,
+             .privacyProBetaUserThankYouDBP,
              .privacyProSubscriptionActive,
              .privacyProOfferScreenImpression,
              .privacyProPurchaseAttempt,
@@ -201,7 +208,14 @@ extension Pixel.Event {
              .protectionToggledOffBreakageReport,
              .toggleProtectionsDailyCount,
              .toggleReportDoNotSend,
-             .toggleReportDismiss:
+             .toggleReportDismiss,
+             .privacyProOfferMonthlyPriceClick,
+             .privacyProOfferYearlyPriceClick,
+             .privacyProAddEmailSuccess,
+             .privacyProWelcomeFAQClick,
+             .privacyProPurchaseStripeSuccess,
+             .passwordImportKeychainPrompt,
+             .passwordImportKeychainPromptDenied:
             return nil
         }
     }
@@ -231,6 +245,9 @@ extension Pixel.Event.Debug {
                 .fileStoreWriteFailed,
                 .fileMoveToDownloadsFailed,
                 .fileGetDownloadLocationFailed,
+                .fileAccessRelatedItemFailed,
+                .fileDownloadCreatePresentersFailed,
+                .downloadResumeDataCodingFailed,
                 .suggestionsFetchFailed,
                 .appOpenURLFailed,
                 .appStateRestorationFailed,

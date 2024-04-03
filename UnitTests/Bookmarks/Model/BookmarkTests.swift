@@ -90,7 +90,7 @@ class BookmarkTests: XCTestCase {
         XCTAssertEqual(folder.childFolders.count, 0)
         XCTAssertEqual(folder.childBookmarks.count, 1)
         XCTAssertEqual(folder.children, [
-            BaseBookmarkEntity.from(managedObject: bookmarkManagedObject, favoritesDisplayMode: .displayNative(.desktop))
+            BaseBookmarkEntity.from(managedObject: bookmarkManagedObject, parentFolderUUID: folder.id, favoritesDisplayMode: .displayNative(.desktop))
         ])
         XCTAssertNil(folder.parentFolderUUID)
 

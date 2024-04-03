@@ -29,52 +29,88 @@ struct PreferencesSection: Hashable, Identifiable {
 
     @MainActor
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
-        let regularPanes: [PreferencePaneIdentifier] = {
+        var privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
 
-            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
-
-            if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
-#if SUBSCRIPTION
-                panes = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
+#if NETWORK_PROTECTION
+        if includingVPN {
+            privacyPanes.append(.vpn)
+        }
 #endif
-            }
+
+        let regularPanes: [PreferencePaneIdentifier] = {
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .dataClearing]
 
             if includingSync {
-                if let generalIndex = panes.firstIndex(of: .general) {
-                    panes.insert(.sync, at: generalIndex + 1)
-                }
+                panes.insert(.sync, at: 1)
             }
 
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
             }
 
-#if NETWORK_PROTECTION
-            if includingVPN {
-                panes.append(.vpn)
-            }
-#endif
-
             return panes
         }()
 
-        return [
+        let otherPanes: [PreferencePaneIdentifier] = [.about, .otherPlatforms]
+
+        var sections: [PreferencesSection] = [
+            .init(id: .privacyProtections, panes: privacyPanes),
             .init(id: .regularPreferencePanes, panes: regularPanes),
-            .init(id: .about, panes: [.about])
+            .init(id: .about, panes: otherPanes)
         ]
+
+#if SUBSCRIPTION
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+
+            var shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+
+            if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
+                shouldHidePrivacyProDueToNoProducts = false
+            }
+
+            if !shouldHidePrivacyProDueToNoProducts {
+                let subscriptionPanes: [PreferencePaneIdentifier] = [.subscription]
+                sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
+            }
+        }
+#endif
+
+        return sections
     }
 }
 
 enum PreferencesSectionIdentifier: Hashable, CaseIterable {
+    case privacyProtections
+    case privacyPro
     case regularPreferencePanes
     case about
+
+    var displayName: String? {
+        switch self {
+        case .privacyProtections:
+            return UserText.privacyProtections
+        case .privacyPro:
+            return nil
+        case .regularPreferencePanes:
+            return UserText.mainSettings
+        case .about:
+            return nil
+        }
+    }
+
 }
 
 enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
+    case defaultBrowser
+    case privateSearch
+    case webTrackingProtection
+    case cookiePopupProtection
+    case emailProtection
+
     case general
     case sync
     case appearance
-    case privacy
+    case dataClearing
 #if NETWORK_PROTECTION
     case vpn
 #endif
@@ -82,8 +118,9 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case subscription
 #endif
     case autofill
-    case downloads
+    case accessibility
     case duckPlayer = "duckplayer"
+    case otherPlatforms = "https://duckduckgo.com/app"
     case about
 
     var id: Self {
@@ -106,6 +143,16 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     @MainActor
     var displayName: String {
         switch self {
+        case .defaultBrowser:
+            return UserText.defaultBrowser
+        case .privateSearch:
+            return UserText.privateSearch
+        case .webTrackingProtection:
+            return UserText.webTrackingProtection
+        case .cookiePopupProtection:
+            return UserText.cookiePopUpProtection
+        case .emailProtection:
+            return UserText.emailProtectionPreferences
         case .general:
             return UserText.general
         case .sync:
@@ -119,8 +166,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.sync
         case .appearance:
             return UserText.appearance
-        case .privacy:
-            return UserText.privacy
+        case .dataClearing:
+            return UserText.dataClearing
 #if NETWORK_PROTECTION
         case .vpn:
             return UserText.vpn
@@ -131,25 +178,37 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
 #endif
         case .autofill:
             return UserText.autofill
-        case .downloads:
-            return UserText.downloads
+        case .accessibility:
+            return UserText.accessibility
         case .duckPlayer:
             return UserText.duckPlayer
         case .about:
             return UserText.about
+        case .otherPlatforms:
+            return UserText.duckduckgoOnOtherPlatforms
         }
     }
 
     var preferenceIconName: String {
         switch self {
+        case .defaultBrowser:
+            return "DefaultBrowser"
+        case .privateSearch:
+            return "PrivateSearchIcon"
+        case .webTrackingProtection:
+            return "WebTrackingProtectionIcon"
+        case .cookiePopupProtection:
+            return "CookieProtectionIcon"
+        case .emailProtection:
+            return "EmailProtectionIcon"
         case .general:
-            return "Rocket"
+            return "GeneralIcon"
         case .sync:
             return "Sync"
         case .appearance:
             return "Appearance"
-        case .privacy:
-            return "Privacy"
+        case .dataClearing:
+            return "FireSettings"
 #if NETWORK_PROTECTION
         case .vpn:
             return "VPN"
@@ -160,12 +219,14 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
 #endif
         case .autofill:
             return "Autofill"
-        case .downloads:
-            return "DownloadsPreferences"
+        case .accessibility:
+            return "Accessibility"
         case .duckPlayer:
             return "DuckPlayerSettings"
         case .about:
             return "About"
+        case .otherPlatforms:
+            return "OtherPlatformsPreferences"
         }
     }
 }

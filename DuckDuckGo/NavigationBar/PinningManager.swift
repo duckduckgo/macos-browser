@@ -104,6 +104,7 @@ final class LocalPinningManager: PinningManager {
             return
         }
 
+        manuallyToggledPinnedViewsStrings.removeAll(where: { $0 == view.rawValue })
         pinnedViewStrings.removeAll(where: { $0 == view.rawValue })
 
         NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [

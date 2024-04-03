@@ -68,8 +68,8 @@ final class ContinueSetUpModelTests: XCTestCase {
     var tabCollectionVM: TabCollectionViewModel!
     var emailManager: EmailManager!
     var emailStorage: MockEmailStorage!
-    var privacyPreferences: PrivacySecurityPreferences!
     var duckPlayerPreferences: DuckPlayerPreferencesPersistor!
+    var coookiePopupProtectionPreferences: MockCookiePopupProtectionPreferencesPersistor!
     var privacyConfigManager: MockPrivacyConfigurationManager!
     var randomNumberGenerator: MockRandomNumberGenerator!
     let userDefaults = UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
@@ -86,7 +86,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         tabCollectionVM = TabCollectionViewModel()
         emailStorage = MockEmailStorage()
         emailManager = EmailManager(storage: emailStorage)
-        privacyPreferences = PrivacySecurityPreferences.shared
         duckPlayerPreferences = DuckPlayerPreferencesPersistorMock()
         privacyConfigManager = MockPrivacyConfigurationManager()
         let config = MockPrivacyConfiguration()
@@ -123,7 +122,6 @@ final class ContinueSetUpModelTests: XCTestCase {
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
-            privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
             homePageRemoteMessaging: messaging,
             privacyConfigurationManager: privacyConfigManager,
@@ -138,7 +136,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         tabCollectionVM = nil
         emailManager = nil
         emailStorage = nil
-        privacyPreferences = nil
         vm = nil
     }
 
@@ -162,14 +159,12 @@ final class ContinueSetUpModelTests: XCTestCase {
         capturingDefaultBrowserProvider.isDefault = true
         capturingDataImportProvider.didImport = true
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
-        privacyPreferences.autoconsentEnabled = true
 
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
-            privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
             homePageRemoteMessaging: createMessaging()
         )
@@ -205,7 +200,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     @MainActor func testWhenInstallDateIsLessThanADayAgoButUserNotIn10PercentNoSurveyCardIsShown() {
         let aDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
         userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        var randomGenerator = MockRandomNumberGenerator()
+        let randomGenerator = MockRandomNumberGenerator()
         randomGenerator.numberToReturn = 10
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, randomNumberGenerator: randomGenerator)
         vm.shouldShowAllFeatures = true
@@ -406,22 +401,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
-    @MainActor func testWhenUserHasCookieConsentEnabledThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay14])
-
-        privacyPreferences.autoconsentEnabled = true
-        vm = HomePage.Models.ContinueSetUpModel.fixture(privacyPreferences: privacyPreferences, appGroupUserDefaults: userDefaults)
-
-        vm.shouldShowAllFeatures = true
-
-        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
-
-        vm.shouldShowAllFeatures = false
-
-        XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
-    }
-
     @MainActor func testWhenAskedToPerformActionForDuckPlayerThenItOpensYoutubeVideo() {
         vm.performAction(for: .duckplayer)
 
@@ -519,7 +498,6 @@ final class ContinueSetUpModelTests: XCTestCase {
     @MainActor func testThatWhenIfAllFeatureActiveThenVisibleMatrixIsEmpty() {
         capturingDefaultBrowserProvider.isDefault = true
         emailStorage.isEmailProtectionEnabled = true
-        privacyPreferences.autoconsentEnabled = true
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         capturingDataImportProvider.didImport = true
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowSurveyDay0.rawValue)
@@ -530,7 +508,6 @@ final class ContinueSetUpModelTests: XCTestCase {
             dataImportProvider: capturingDataImportProvider,
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
-            privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
             homePageRemoteMessaging: createMessaging()
         )
@@ -627,7 +604,6 @@ extension HomePage.Models.ContinueSetUpModel {
         defaultBrowserProvider: DefaultBrowserProvider = CapturingDefaultBrowserProvider(),
         dataImportProvider: DataImportStatusProviding = CapturingDataImportProvider(),
         emailManager: EmailManager = EmailManager(storage: MockEmailStorage()),
-        privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
         duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesPersistorMock(),
         privacyConfig: MockPrivacyConfiguration = MockPrivacyConfiguration(),
         appGroupUserDefaults: UserDefaults,
@@ -667,7 +643,6 @@ extension HomePage.Models.ContinueSetUpModel {
             dataImportProvider: dataImportProvider,
             tabCollectionViewModel: TabCollectionViewModel(),
             emailManager: emailManager,
-            privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
             homePageRemoteMessaging: messaging,
             privacyConfigurationManager: manager,

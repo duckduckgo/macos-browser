@@ -79,6 +79,7 @@ extension URL {
 
     // MARK: - Factory
 
+#if !SANDBOX_TEST_TOOL
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -124,6 +125,7 @@ extension URL {
 
         return url
     }
+#endif
 
     static let blankPage = URL(string: "about:blank")!
 
@@ -136,9 +138,11 @@ extension URL {
 
     static let dataBrokerProtection = URL(string: "duck://dbp")!
 
+#if !SANDBOX_TEST_TOOL
     static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
         return settings.appendingPathComponent(pane.rawValue)
     }
+#endif
 
     enum Invalid {
         static let aboutNewtab = URL(string: "about:newtab")!
@@ -274,6 +278,7 @@ extension URL {
         return string
     }
 
+#if !SANDBOX_TEST_TOOL
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
         let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
         let hasInputWww = input.dropping(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
@@ -284,6 +289,7 @@ extension URL {
                              needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
+#endif
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
     var suggestedFilename: String? {
@@ -340,11 +346,19 @@ extension URL {
     }
 
     static var cookieConsentPopUpManagement: URL {
-        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-consent-pop-up-management")!
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-pop-up-management")!
     }
 
     static var gpcLearnMore: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+    }
+
+    static var privateSearchLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/search-privacy/")!
+    }
+
+    static var searchSettings: URL {
+        return URL(string: "https://duckduckgo.com/settings/")!
     }
 
     static var ddgLearnMore: URL {
@@ -362,6 +376,7 @@ extension URL {
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
     static var duckDuckGoEmailLogin = URL(string: "https://duckduckgo.com/email")!
 
+    static var duckDuckGoEmailInfo = URL(string: "https://duckduckgo.com/duckduckgo-help-pages/email-protection/what-is-duckduckgo-email-protection/")!
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
     var isDuckDuckGo: Bool {

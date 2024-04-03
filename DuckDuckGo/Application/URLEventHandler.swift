@@ -116,6 +116,21 @@ final class URLEventHandler {
         }
 #endif
 
+        if url.isFileURL && url.pathExtension == WebKitDownloadTask.downloadExtension {
+            guard let mainViewController = {
+                if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
+                    return mainWindowController.mainViewController
+                }
+                return WindowsManager.openNewWindow(with: .newtab, source: .ui, isBurner: false)?.contentViewController as? MainViewController
+            }() else { return }
+
+            if !mainViewController.navigationBarViewController.isDownloadsPopoverShown {
+                mainViewController.navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
+            }
+
+            return
+        }
+
 #if NETWORK_PROTECTION || DBP
         if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
             WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
@@ -143,8 +158,13 @@ final class URLEventHandler {
         case AppLaunchCommand.showVPNLocations.launchURL:
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
             WindowControllersManager.shared.showLocationPickerSheet()
-        case AppLaunchCommand.moveAppToApplications.launchURL:
+#if SUBSCRIPTION
+        case AppLaunchCommand.showPrivacyPro.launchURL:
+            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            Pixel.fire(.privacyProOfferScreenImpression)
+#endif
 #if !APPSTORE && !DEBUG
+        case AppLaunchCommand.moveAppToApplications.launchURL:
             // this should be run after NSApplication.shared is set
             PFMoveToApplicationsFolderIfNecessary(false)
 #endif

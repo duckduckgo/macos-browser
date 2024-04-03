@@ -1,0 +1,38 @@
+
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+#include "../Common.xcconfig"
+#include "../App/AppTargetsBase.xcconfig"
+#include "../AppStore.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.sandbox-test-tool
+
+CODE_SIGN_ENTITLEMENTS = sandbox-test-tool/sandbox_test_tool.entitlements
+
+CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
+CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+
+PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] =
+
+ENABLE_APP_SANDBOX = YES
+PRODUCT_NAME = $(TARGET_NAME);
+
+INFOPLIST_FILE = sandbox-test-tool/Info.plist
+INFOPLIST_KEY_NSPrincipalClass = SandboxTestToolApp
+
+SWIFT_OPTIMIZATION_LEVEL[config=*][arch=*][sdk=*] = -Onone
+FEATURE_FLAGS[arch=*][sdk=*] = SANDBOX_TEST_TOOL

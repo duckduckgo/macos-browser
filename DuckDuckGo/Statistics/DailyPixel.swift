@@ -66,6 +66,10 @@ final class DailyPixel {
         storage.set(Date(), forKey: pixel.name)
     }
 
+    static func clearLastFireDate(pixel: Pixel.Event) {
+        storage.removeObject(forKey: pixel.name)
+    }
+
 }
 
 private extension Pixel.Event {

@@ -38,7 +38,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
     @MainActor
     override func setUp() async throws {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         window = WindowsManager.openNewWindow(with: .none)!
 
@@ -51,7 +51,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         window.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
@@ -100,7 +100,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
 
         let fileUrl = try await downloadTaskFuture.value.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
 
         struct Results: Decodable {
             struct Result: Decodable {
@@ -178,7 +178,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
 
         let fileUrl = try await downloadTaskFuture.value.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
 
         struct Results: Decodable {
             struct Result: Decodable {

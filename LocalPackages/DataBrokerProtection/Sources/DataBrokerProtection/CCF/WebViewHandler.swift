@@ -27,10 +27,11 @@ protocol WebViewHandler: NSObject {
     func load(url: URL) async throws
     func takeSnaphost(path: String, fileName: String) async throws
     func saveHTML(path: String, fileName: String) async throws
-    func waitForWebViewLoad(timeoutInSeconds: Int) async throws
+    func waitForWebViewLoad() async throws
     func finish() async
     func execute(action: Action, data: CCFRequestData) async
     func evaluateJavaScript(_ javaScript: String) async throws
+    func setCookies(_ cookies: [HTTPCookie]) async
 }
 
 @MainActor
@@ -38,7 +39,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     private var activeContinuation: CheckedContinuation<Void, Error>?
 
     private let isFakeBroker: Bool
-    private let webViewConfiguration: WKWebViewConfiguration
+    private var webViewConfiguration: WKWebViewConfiguration?
     private var userContentController: DataBrokerUserContentController?
 
     private var webView: WebView?
@@ -48,6 +49,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
         let configuration = WKWebViewConfiguration()
         configuration.applyDataBrokerConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: delegate)
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+        configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
 
         self.webViewConfiguration = configuration
         self.isFakeBroker = isFakeBroker
@@ -58,7 +60,11 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     func initializeWebView(showWebView: Bool) async {
-        webView = WebView(frame: CGRect(origin: .zero, size: CGSize(width: 1024, height: 1024)), configuration: webViewConfiguration)
+        guard let configuration = self.webViewConfiguration else {
+            return
+        }
+
+        webView = WebView(frame: CGRect(origin: .zero, size: CGSize(width: 1024, height: 1024)), configuration: configuration)
         webView?.navigationDelegate = self
 
         if showWebView {
@@ -77,37 +83,36 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     func load(url: URL) async throws {
         webView?.load(url)
         os_log("Loading URL: %@", log: .action, String(describing: url.absoluteString))
-        try await waitForWebViewLoad(timeoutInSeconds: 120)
+        try await waitForWebViewLoad()
+    }
+
+    func setCookies(_ cookies: [HTTPCookie]) async {
+        for cookie in cookies {
+            await webView?.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+        }
     }
 
     func finish() {
         os_log("WebViewHandler finished", log: .action)
-
         webView?.stopLoading()
         userContentController?.cleanUpBeforeClosing()
+        WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache], modifiedSince: Date(timeIntervalSince1970: 0)) {
+            os_log("WKWebView data store deleted correctly", log: .action)
+        }
 
+        webViewConfiguration = nil
         userContentController = nil
         webView?.navigationDelegate = nil
         webView = nil
     }
 
     deinit {
-        print("WebViewHandler Deinit")
+        os_log("WebViewHandler Deinit", log: .action)
     }
 
-    func waitForWebViewLoad(timeoutInSeconds: Int = 0) async throws {
+    func waitForWebViewLoad() async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.activeContinuation = continuation
-
-            if timeoutInSeconds > 0 {
-                Task {
-                    try await Task.sleep(nanoseconds: UInt64(timeoutInSeconds) * NSEC_PER_SEC)
-                    if self.activeContinuation != nil {
-                        self.activeContinuation?.resume()
-                        self.activeContinuation = nil
-                    }
-                }
-            }
         }
     }
 

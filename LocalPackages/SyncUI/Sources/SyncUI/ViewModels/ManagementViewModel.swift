@@ -33,6 +33,9 @@ public protocol ManagementViewModel: ObservableObject {
     var isSyncBookmarksPaused: Bool { get }
     var isSyncCredentialsPaused: Bool { get }
 
+    var invalidBookmarksTitles: [String] { get }
+    var invalidCredentialsTitles: [String] { get }
+
     var recoveryCode: String? { get }
     var codeToDisplay: String? { get }
     var devices: [SyncDevice] { get }

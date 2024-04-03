@@ -21,13 +21,17 @@ import Combine
 import DDGSync
 import SwiftUI
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 final class PreferencesSidebarModel: ObservableObject {
 
     let tabSwitcherTabs: [Tab.TabContent]
 
     @Published private(set) var sections: [PreferencesSection] = []
     @Published var selectedTabIndex: Int = 0
-    @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
+    @Published private(set) var selectedPane: PreferencePaneIdentifier = .defaultBrowser
 
     var selectedTabContent: AnyPublisher<Tab.TabContent, Never> {
         $selectedTabIndex.map { [tabSwitcherTabs] in tabSwitcherTabs[$0] }.eraseToAnyPublisher()
@@ -75,11 +79,12 @@ final class PreferencesSidebarModel: ObservableObject {
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
         syncService: DDGSyncing,
-        includeDuckPlayer: Bool
+        includeDuckPlayer: Bool,
+        userDefaults: UserDefaults = .netP
     ) {
         let loadSections = {
 #if NETWORK_PROTECTION
-            let includingVPN = DefaultNetworkProtectionVisibility().isOnboarded
+            let includingVPN = DefaultNetworkProtectionVisibility().isInstalled
 #else
             let includingVPN = false
 #endif
@@ -103,12 +108,8 @@ final class PreferencesSidebarModel: ObservableObject {
     private func setupVPNPaneVisibility() {
         DefaultNetworkProtectionVisibility().onboardStatusPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] onboardingStatus in
+            .sink { [weak self] _ in
                 guard let self else { return }
-
-                if onboardingStatus != .completed && self.selectedPane == .vpn {
-                    self.selectedPane = .general
-                }
 
                 self.refreshSections()
             }
@@ -125,7 +126,16 @@ final class PreferencesSidebarModel: ObservableObject {
         }
     }
 
+    @MainActor
     func selectPane(_ identifier: PreferencePaneIdentifier) {
+        // Open a new tab in case of special panes
+        if identifier.rawValue.hasPrefix(URL.NavigationalScheme.https.rawValue),
+            let url = URL(string: identifier.rawValue) {
+            WindowControllersManager.shared.show(url: url,
+                                                 source: .ui,
+                                                 newTab: true)
+        }
+
         if sections.flatMap(\.panes).contains(identifier), identifier != selectedPane {
             selectedPane = identifier
         }
