@@ -224,21 +224,13 @@ extension DownloadsTabExtension: NavigationResponder {
             return true
         }
 
+        // If the download has started from a popup Tab - close it after starting the download
+        // e.g. download button on this page:
+        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
         guard let webView = download.webView,
               isMainFrameNavigationActionWithNoHistory
                 // if converted from navigation response but no page was loaded
                 || navigationAction == nil && webView.backForwardList.currentItem == nil else { return }
-
-        // If the download has started from a popup Tab - close it after starting the download
-        // e.g. download button on this page:
-        // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-        guard let navigationAction,
-              navigationAction.isForMainFrame,
-              navigationAction.isTargetingNewWindow,
-              let webView = download.webView,
-              // webView has no navigation history (downloaded navigationAction has started from an empty state)
-              (navigationAction.redirectHistory?.first ?? navigationAction).fromHistoryItemIdentity == nil
-        else { return }
 
         self.closeWebView(webView, afterDownloadTaskHasStarted: task)
     }
