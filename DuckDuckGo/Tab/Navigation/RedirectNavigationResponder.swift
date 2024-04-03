@@ -45,7 +45,11 @@ struct RedirectNavigationResponder: NavigationResponder {
     private func redirectURL(for url: URL) -> URL? {
         switch url {
         case URL.privacyPro:
-            return DefaultSubscriptionFeatureAvailability().isFeatureAvailable ? URL.subscriptionPurchase : nil
+            let isFeatureAvailable = DefaultSubscriptionFeatureAvailability().isFeatureAvailable
+            let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+            let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
+
+            return isPurchasePageRedirectActive ? URL.subscriptionPurchase : nil
         default:
             return nil
         }
