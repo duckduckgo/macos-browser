@@ -114,6 +114,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                                    agentLoginItem: LoginItem.vpnMenu,
                                                    isMenuBarStatusView: false,
                                                    userDefaults: .netP,
+                                                   locationFormatter: DefaultVPNLocationFormatter(),
                                                    uninstallHandler: { [weak self] in
                 _ = await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
             })

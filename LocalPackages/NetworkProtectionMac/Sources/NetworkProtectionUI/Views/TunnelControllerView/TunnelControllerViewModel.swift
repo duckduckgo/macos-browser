@@ -52,6 +52,10 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let statusReporter: NetworkProtectionStatusReporter
 
+    private let vpnSettings: VPNSettings
+
+    private let locationFormatter: VPNLocationFormatting
+
     private let appLauncher: AppLaunching
 
     // MARK: - Misc
@@ -73,12 +77,16 @@ public final class TunnelControllerViewModel: ObservableObject {
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
                 runLoopMode: RunLoop.Mode? = nil,
+                vpnSettings: VPNSettings,
+                locationFormatter: VPNLocationFormatting,
                 appLauncher: AppLaunching) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher
         self.statusReporter = statusReporter
         self.runLoopMode = runLoopMode
+        self.vpnSettings = vpnSettings
+        self.locationFormatter = locationFormatter
         self.appLauncher = appLauncher
 
         connectionStatus = statusReporter.statusObserver.recentValue
@@ -429,6 +437,18 @@ public final class TunnelControllerViewModel: ObservableObject {
         default:
             return UserText.networkProtectionServerLocationUnknown
         }
+    }
+
+    var plainLocation: String {
+        locationFormatter.string(from: internalServerLocation, preferredLocation: vpnSettings.selectedLocation)
+    }
+
+    @available(macOS 12, *)
+    var formattedLocation: AttributedString {
+        locationFormatter.string(from: internalServerLocation,
+                                 preferredLocation: vpnSettings.selectedLocation,
+                                 locationTextColor: Color(.defaultText),
+                                 preferredLocationTextColor: Color(.gray))
     }
 
     // MARK: - Toggling VPN

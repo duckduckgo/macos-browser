@@ -152,6 +152,8 @@ public struct TunnelControllerView: View {
             Divider()
                 .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 
+            locationView()
+
             if model.showServerDetails {
                 connectionStatusView()
                     .disabled(on: !isEnabled)
@@ -214,6 +216,45 @@ public struct TunnelControllerView: View {
             .frame(width: 8, height: 8)
     }
 
+    /// Connected/Selected location
+    ///
+    private func locationView() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(model.isVPNEnabled ? UserText.vpnLocationConnected : UserText.vpnLocationSelected)
+                .applySectionHeaderAttributes(colorScheme: colorScheme)
+                .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
+
+            MenuItemCustomButton {
+                model.showLocationSettings()
+                dismiss()
+            } label: { isHovered in
+                HStack(alignment: .center, spacing: 10) {
+                    Text("🇻🇳")
+                        .font(.system(size: 13))
+                        .frame(width: 26, height: 26)
+                        .background(Color(hex: "B2B2B2").opacity(0.3))
+                        .clipShape(Circle())
+                    if #available(macOS 12, *) {
+                        if isHovered {
+                            Text(model.plainLocation)
+                                .font(.system(size: 13))
+                                .foregroundColor(.white)
+                        } else {
+                            Text(model.formattedLocation)
+                                .font(.system(size: 13))
+                        }
+                    } else {
+                        Text(model.plainLocation)
+                            .font(.system(size: 13))
+                            .foregroundColor(isHovered ? .white: Color(.defaultText))
+                    }
+                }
+            }
+
+            dividerRow()
+        }
+    }
+
     /// Connection status: server IP address and location
     ///
     private func connectionStatusView() -> some View {
@@ -221,15 +262,6 @@ public struct TunnelControllerView: View {
             Text(UserText.networkProtectionStatusViewConnDetails)
                 .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
-
-            MenuItemButton(
-                iconName: .serverLocationIcon,
-                title: UserText.networkProtectionStatusViewLocation,
-                detailTitle: model.serverLocation,
-                textColor: Color(.defaultText)) {
-                    model.showLocationSettings()
-                    dismiss()
-            }.applyMenuAttributes()
 
             connectionStatusRow(icon: .ipAddressIcon,
                                 title: UserText.networkProtectionStatusViewIPAddress,
