@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1711567148287,
+    "version": 1712071688011,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -271,6 +271,21 @@
                     "domain": "www.ffbb.com"
                 },
                 {
+                    "domain": "hello-hossy.com"
+                },
+                {
+                    "domain": "bitsofwar.com"
+                },
+                {
+                    "domain": "mitglieder.franzspitzer.de"
+                },
+                {
+                    "domain": "disneyplus.com"
+                },
+                {
+                    "domain": "condell-ltd.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -291,7 +306,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "d5b59105cdef6fcc34e8697940e42762"
+            "hash": "98e57a3eb872c9dfb4a019b90dc6c0ec"
         },
         "autofill": {
             "exceptions": [
@@ -1399,6 +1414,10 @@
                         "type": "hide-empty"
                     },
                     {
+                        "selector": "#topAd",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": ".ad-banner-container",
                         "type": "hide-empty"
                     },
@@ -1477,6 +1496,10 @@
                     {
                         "selector": ".adcontainer",
                         "type": "closest-empty"
+                    },
+                    {
+                        "selector": ".adContainer",
+                        "type": "hide-empty"
                     },
                     {
                         "selector": ".ad-current",
@@ -1964,6 +1987,14 @@
                         ]
                     },
                     {
+                        "domain": "blackhatworld.com",
+                        "rules": [
+                            {
+                                "type": "disable-default"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "bleacherreport.com",
                         "rules": [
                             {
@@ -2068,6 +2099,10 @@
                             },
                             {
                                 "selector": ".skybox-top-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".fixed-skybox-placeholder",
                                 "type": "hide-empty"
                             }
                         ]
@@ -2536,6 +2571,19 @@
                             {
                                 "selector": "[class*='Advert']",
                                 "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "gap.com",
+                        "rules": [
+                            {
+                                "selector": ".ONhome1-recs",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".ONhome1-recs",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -4174,7 +4222,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "f5eedb77e30d600d3cd81f92ceebee36"
+            "hash": "10545dae34a5b5f2cc26c91976be5809"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -6213,8 +6261,7 @@
                             {
                                 "rule": "v.fwmrm.net/ad",
                                 "domains": [
-                                    "6play.fr",
-                                    "channel4.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6384,6 +6431,7 @@
                                 "domains": [
                                     "arkadium.com",
                                     "bloomberg.com",
+                                    "cbssports.com",
                                     "crunchyroll.com",
                                     "gamak.tv",
                                     "games.washingtonpost.com",
@@ -6464,7 +6512,8 @@
                                     "cosmicbook.news",
                                     "eatroyo.com",
                                     "thesimsresource.com",
-                                    "tradersync.com"
+                                    "tradersync.com",
+                                    "vanguardplan.com"
                                 ]
                             }
                         ]
@@ -8160,7 +8209,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "653d70e261a24982bd23a0b107608d13"
+            "hash": "adf596be88e8975a3cdcaaef3d24990d"
         },
         "trackingCookies1p": {
             "settings": {
