@@ -22,36 +22,27 @@ import Subscription
 
 struct RedirectNavigationResponder: NavigationResponder {
 
-    private let urlsToRedirect = Set([URL.privacyPro])
-
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard let mainFrame = navigationAction.mainFrameTarget, shouldRedirect(url: navigationAction.url) else { return .next }
+        guard let mainFrame = navigationAction.mainFrameTarget, let redirectURL = redirectURL(for: navigationAction.url) else { return .next }
 
-        if let redirectURL = redirectURL(for: navigationAction.url) {
-            return .redirect(mainFrame) { navigator in
-                var request = navigationAction.request
-                request.url = redirectURL
-                navigator.load(request)
-            }
+        return .redirect(mainFrame) { navigator in
+            var request = navigationAction.request
+            request.url = redirectURL
+            navigator.load(request)
         }
-
-        return .next
-    }
-
-    private func shouldRedirect(url: URL) -> Bool {
-        return urlsToRedirect.contains(url)
     }
 
     private func redirectURL(for url: URL) -> URL? {
-        switch url {
-        case URL.privacyPro:
+        guard url.isPart(ofDomain: "duckduckgo.com") else { return nil }
+
+        if url.pathComponents == URL.privacyPro.pathComponents {
             let isFeatureAvailable = DefaultSubscriptionFeatureAvailability().isFeatureAvailable
             let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
 
             return isPurchasePageRedirectActive ? URL.subscriptionPurchase : nil
-        default:
-            return nil
         }
+
+        return nil
     }
 }
