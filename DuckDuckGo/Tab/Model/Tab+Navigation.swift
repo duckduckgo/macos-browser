@@ -70,7 +70,7 @@ extension Tab: NavigationResponder {
             // add extra headers to SERP requests
             .struct(SerpHeadersNavigationResponder()),
 
-            .struct(NavigationRedirectResponder()),
+            .struct(RedirectNavigationResponder()),
 
             // ensure Content Blocking Rules are applied before navigation
             .weak(nullable: self.contentBlockingAndSurrogates),

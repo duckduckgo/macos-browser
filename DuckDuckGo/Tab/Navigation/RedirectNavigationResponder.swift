@@ -1,5 +1,5 @@
 //
-//  NavigationRedirectResponder.swift
+//  RedirectNavigationResponder.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Navigation
 import Foundation
 import Subscription
 
-struct NavigationRedirectResponder: NavigationResponder {
+struct RedirectNavigationResponder: NavigationResponder {
 
     private let urlsToRedirect = Set([URL.privacyPro])
 
