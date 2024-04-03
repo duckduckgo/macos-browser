@@ -50,9 +50,17 @@ struct PasswordManagementCreditCardItemView: View {
                         .padding(.top, 16)
                         .padding(.bottom, model.isInEditMode ? 20 : 30)
 
-                    EditableCreditCardField(textFieldValue: $model.cardNumber, title: UserText.pmCardNumber)
+                    SecureEditableCreditCardField(textFieldValue: $model.cardNumber,
+                                                  title: UserText.pmCardNumber,
+                                                  hiddenTextLength: 12,
+                                                  toolTipHideText: UserText.autofillHideCardNumberTooltip,
+                                                  toolTipShowText: UserText.autofillShowCardNumberTooltip)
                     EditableCreditCardField(textFieldValue: $model.cardholderName, title: UserText.pmCardholderName)
-                    SecureEditableCreditCardField(textFieldValue: $model.cardSecurityCode, title: UserText.pmCardVerificationValue)
+                    SecureEditableCreditCardField(textFieldValue: $model.cardSecurityCode,
+                                                  title: UserText.pmCardVerificationValue,
+                                                  hiddenTextLength: 3,
+                                                  toolTipHideText: UserText.autofillHideCardCvvTooltip,
+                                                  toolTipShowText: UserText.autofillShowCardCvvTooltip)
 
                     // Expiration:
 
@@ -249,6 +257,9 @@ private struct SecureEditableCreditCardField: View {
     @Binding var textFieldValue: String
 
     let title: String
+    let hiddenTextLength: Int
+    let toolTipHideText: String
+    let toolTipShowText: String
 
     var body: some View {
 
@@ -266,7 +277,7 @@ private struct SecureEditableCreditCardField: View {
 
                         SecureTextField(textValue: $textFieldValue, isVisible: isVisible, bottomPadding: interItemSpacing)
 
-                        SecureTextFieldButton(isVisible: $isVisible, toolTipHideText: UserText.hideCardCvvTooltip, toolTipShowText: UserText.showCardCvvTooltip)
+                        SecureTextFieldButton(isVisible: $isVisible, toolTipHideText: toolTipHideText, toolTipShowText: toolTipShowText)
                         .padding(.bottom, 20)
                         .padding(.trailing, 10)
 
@@ -277,10 +288,10 @@ private struct SecureEditableCreditCardField: View {
 
                     HStack(spacing: 6) {
 
-                        HiddenText(isVisible: isVisible, text: textFieldValue, hiddenTextLength: 3)
+                        HiddenText(isVisible: isVisible, text: textFieldValue, hiddenTextLength: hiddenTextLength)
 
                         if (isHovering || isVisible) && textFieldValue != "" {
-                            SecureTextFieldButton(isVisible: $isVisible, toolTipHideText: UserText.hideCardCvvTooltip, toolTipShowText: UserText.showCardCvvTooltip)
+                            SecureTextFieldButton(isVisible: $isVisible, toolTipHideText: toolTipHideText, toolTipShowText: toolTipShowText)
                         }
 
                         if isHovering {

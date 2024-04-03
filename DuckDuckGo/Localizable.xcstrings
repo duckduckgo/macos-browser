@@ -3691,6 +3691,18 @@
         }
       }
     },
+    "autofill.hide-card-number" : {
+      "comment" : "Tooltip for the Autofill panel's Hide card number button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide card number"
+          }
+        }
+      }
+    },
     "autofill.hide-password" : {
       "comment" : "Tooltip for the Autofill panel's Hide Password button",
       "extractionState" : "extracted_with_value",
@@ -5319,6 +5331,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Show CVV"
+          }
+        }
+      }
+    },
+    "autofill.show-card-number" : {
+      "comment" : "Tooltip for the Autofill panel's Show card number button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show card number"
           }
         }
       }

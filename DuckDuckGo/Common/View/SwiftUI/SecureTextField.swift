@@ -22,7 +22,7 @@ import SwiftUI
 struct SecureTextField: View {
 
     @Binding var textValue: String
-    var isVisible: Bool
+    let isVisible: Bool
     var bottomPadding: CGFloat = 0
 
     var body: some View {
@@ -44,8 +44,8 @@ struct SecureTextField: View {
 struct SecureTextFieldButton: View {
 
     @Binding var isVisible: Bool
-    var toolTipHideText: String
-    var toolTipShowText: String
+    let toolTipHideText: String
+    let toolTipShowText: String
 
     var body: some View {
         Button {
@@ -61,9 +61,9 @@ struct SecureTextFieldButton: View {
 /// View which uses the provided `isVisible` property to display either the provided `text` or a string of `•`
 struct HiddenText: View {
 
-    var isVisible: Bool
-    var text: String
-    var hiddenTextLength: Int
+    let isVisible: Bool
+    let text: String
+    let hiddenTextLength: Int
 
     var body: some View {
         if isVisible {
@@ -77,7 +77,7 @@ struct HiddenText: View {
 /// View which provides a Button styled to copy text which executes the provided `copyAction`
 struct CopyButton: View {
 
-    var copyAction: () -> Void
+    let copyAction: () -> Void
 
     var body: some View {
         Button {
