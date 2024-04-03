@@ -214,15 +214,24 @@ extension DownloadsTabExtension: NavigationResponder {
                                        delegate: self,
                                        location: .auto)
 
+        var isMainFrameNavigationActionWithNoHistory: Bool {
+            guard let navigationAction,
+                  navigationAction.isForMainFrame,
+                  navigationAction.isTargetingNewWindow,
+                  // webView has no navigation history (downloaded navigationAction has started from an empty state)
+                  (navigationAction.redirectHistory?.first ?? navigationAction).fromHistoryItemIdentity == nil
+            else { return false }
+            return true
+        }
+
+        guard let webView = download.webView,
+              isMainFrameNavigationActionWithNoHistory
+                // if converted from navigation response but no page was loaded
+                || navigationAction == nil && webView.backForwardList.currentItem == nil else { return }
+
         // If the download has started from a popup Tab - close it after starting the download
         // e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-        if navigationAction == nil,
-            let webView = download.webView {
-            self.closeWebView(webView, afterDownloadTaskHasStarted: task)
-            return
-        }
-
         guard let navigationAction,
               navigationAction.isForMainFrame,
               navigationAction.isTargetingNewWindow,
