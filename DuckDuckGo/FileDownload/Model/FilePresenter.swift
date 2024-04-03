@@ -152,7 +152,7 @@ internal class FilePresenter {
     }
 
     private func setupInnerPresenter(for url: URL, primaryItemURL: URL?, createIfNeededCallback: ((URL) throws -> URL)?) throws {
-        var innerPresenter = if let primaryItemURL {
+        let innerPresenter = if let primaryItemURL {
             DelegatingRelatedFilePresenter(primaryPresentedItemURL: primaryItemURL, presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue)
         } else {
             DelegatingFilePresenter(presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue)
@@ -227,7 +227,7 @@ internal class FilePresenter {
     private func removeFilePresenter() {
         if let innerPresenter {
             logger.log("🗄️  removing file presenter for \"\(url?.path ?? "<nil>")\"")
-            for i in 1...(innerPresenter.shouldBeRemovedTwice ? 2 : 1) { // if secondary item presenter was added twice - remove it twice
+            for _ in 1...(innerPresenter.shouldBeRemovedTwice ? 2 : 1) { // if secondary item presenter was added twice - remove it twice
                 NSFileCoordinator.removeFilePresenter(innerPresenter)
             }
             self.innerPresenter = nil

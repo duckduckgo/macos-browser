@@ -70,9 +70,9 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenShouldDownloadResponse_downloadStarts() async throws {
-        let persistor = DownloadsPreferencesUserDefaultsPersistor()
-        persistor.alwaysRequestDownloadLocation = false
-        persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
+        let preferences = DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor())
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
         let suffix = Int.random(in: 0..<Int.max)
@@ -235,9 +235,9 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigationActionIsData_downloadStarts() async throws {
-        let persistor = DownloadsPreferencesUserDefaultsPersistor()
-        persistor.alwaysRequestDownloadLocation = false
-        persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
+        let preferences = DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor())
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
 
         let tab = tabViewModel.tab
         // load empty page
@@ -268,9 +268,9 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigationActionIsBlob_downloadStarts() async throws {
-        let persistor = DownloadsPreferencesUserDefaultsPersistor()
-        persistor.alwaysRequestDownloadLocation = false
-        persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
+        let preferences = DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor())
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
 
         let tab = tabViewModel.tab
         // load empty page
