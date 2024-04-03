@@ -318,6 +318,25 @@ final class PixelKitTests: XCTestCase {
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
     }
+
+    func testVPNCohort() {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.locale = Locale(identifier: "en_US_POSIX")
+
+        PixelKit.setUp(appVersion: "test",
+                       defaultHeaders: [:],
+                       log: .disabled,
+                       dailyPixelCalendar: calendar,
+                       defaults: userDefaults()) { _, _, _, _, _, _ in }
+
+        XCTAssertEqual(PixelKit.cohort(from: nil), "")
+        XCTAssertEqual(PixelKit.cohort(from: calendar.date(from: .init(year: 2023, month: 1, day: 1))), "week-1")
+        XCTAssertEqual(PixelKit.cohort(from: calendar.date(from: .init(year: 2023, month: 1, day: 7))), "week-1")
+        XCTAssertEqual(PixelKit.cohort(from: calendar.date(from: .init(year: 2023, month: 1, day: 8))), "week-2")
+        XCTAssertEqual(PixelKit.cohort(from: calendar.date(from: .init(year: 2024, month: 2, day: 24))), "week-60")
+        XCTAssertEqual(PixelKit.cohort(from: calendar.date(from: .init(year: 2024, month: 2, day: 25))), "week-61")
+    }
 }
 
 private class TimeMachine {

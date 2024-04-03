@@ -72,14 +72,6 @@ public final class PixelKit {
         return calendar
     }()
 
-    private var dateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.calendar = defaultDailyPixelCalendar
-        dateFormatter.timeZone = defaultDailyPixelCalendar.timeZone
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        return dateFormatter
-    }()
-
     private let dateGenerator: () -> Date
 
     public private(set) static var shared: PixelKit?
@@ -99,6 +91,7 @@ public final class PixelKit {
                              source: String? = nil,
                              defaultHeaders: [String: String],
                              log: OSLog,
+                             dailyPixelCalendar: Calendar? = nil,
                              defaults: UserDefaults,
                              fireRequest: @escaping FireRequest) {
         shared = PixelKit(dryRun: dryRun,
@@ -106,6 +99,7 @@ public final class PixelKit {
                           source: source,
                           defaultHeaders: defaultHeaders,
                           log: log,
+                          dailyPixelCalendar: dailyPixelCalendar,
                           defaults: defaults,
                           fireRequest: fireRequest)
     }
@@ -318,13 +312,19 @@ public final class PixelKit {
                           onComplete: onComplete)
     }
 
-    private func dateString(for date: Date?) -> String? {
-        guard let date else { return nil }
-        return dateFormatter.string(from: date)
+    private func cohort(from date: Date?) -> String? {
+        guard let date,
+              let referenceDate = pixelCalendar.date(from: .init(year: 2023, month: 1, day: 1)),
+              let weekOfYear = pixelCalendar.dateComponents([.weekOfYear], from: referenceDate, to: date).weekOfYear,
+              weekOfYear >= 0 else {
+            return nil
+        }
+
+        return "week-" + String(weekOfYear + 1)
     }
 
-    public static func dateString(for date: Date?) -> String {
-        Self.shared?.dateString(for: date) ?? ""
+    public static func cohort(from date: Date?) -> String {
+        Self.shared?.cohort(from: date) ?? ""
     }
 
     public static func pixelLastFireDate(event: Event) -> Date? {
