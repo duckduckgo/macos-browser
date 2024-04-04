@@ -54,7 +54,6 @@ class AutocompleteTests: XCTestCase {
     }
 
     func test_suggestions_showsTypedTitleOfBookmarkedPageAsBookmark() throws {
-        let siteTitleForBookmarkedSite = try XCTUnwrap(siteTitleForBookmarkedSite)
         app.typeText(siteTitleForBookmarkedSite)
         XCTAssertTrue(
             suggestionsTableView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -82,7 +81,6 @@ class AutocompleteTests: XCTestCase {
     }
 
     func test_suggestions_showsTypedTitleOfHistoryPageAsHistory() throws {
-        let siteTitleForHistorySite = try XCTUnwrap(siteTitleForHistorySite)
         app.typeText(siteTitleForHistorySite)
         XCTAssertTrue(
             suggestionsTableView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -110,18 +108,20 @@ class AutocompleteTests: XCTestCase {
     }
 
     func test_suggestions_showsTypedTitleOfWebsiteNotInBookmarksOrHistoryAsWebsite() throws {
-        let websiteURLString = "https://www.duckduckgo.com"
+        let websiteString = "https://www.duckduckgo.com"
+        let websiteURL = try XCTUnwrap(URL(string: websiteString), "Couldn't create URL from string \(websiteString)")
         XCTAssertTrue(
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The address bar text field didn't become available in a reasonable timeframe."
         )
-        addressBarTextField.typeText(websiteURLString)
+
+        addressBarTextField.typeURL(websiteURL, pressingEnter: false)
         XCTAssertTrue(
             suggestionsTableView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Suggestions tableView didn't become available in a reasonable timeframe."
         )
 
-        let suggestionCellWithWebsite = suggestionsTableView.tableRows.cells.staticTexts[websiteURLString].firstMatch
+        let suggestionCellWithWebsite = suggestionsTableView.tableRows.cells.staticTexts[websiteURL.absoluteString].firstMatch
         XCTAssertTrue( // It should match something in suggestions
             suggestionCellWithWebsite.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The expected table view cell with the suggestion for the website didn't become available in a reasonable timeframe."
@@ -145,9 +145,6 @@ class AutocompleteTests: XCTestCase {
 private extension AutocompleteTests {
     /// Make sure there is exactly one site in the history, and exactly one site in the bookmarks, and they aren't the same site.
     func resetAndArrangeBookmarksAndHistory() throws {
-        let siteTitleForHistorySite = try XCTUnwrap(siteTitleForHistorySite)
-        let siteTitleForBookmarkedSite = try XCTUnwrap(siteTitleForBookmarkedSite)
-
         XCTAssertTrue(
             resetBookMarksMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Reset bookmarks menu item didn't become available in a reasonable timeframe."
@@ -160,7 +157,7 @@ private extension AutocompleteTests {
             "The address bar text field didn't become available in a reasonable timeframe."
         )
 
-        addressBarTextField.typeText("\(urlForBookmarks.absoluteString)\r")
+        addressBarTextField.typeURL(urlForBookmarks)
         XCTAssertTrue(
             app.windows.webViews[siteTitleForBookmarkedSite].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
@@ -202,7 +199,7 @@ private extension AutocompleteTests {
             "The address bar text field didn't become available in a reasonable timeframe."
         )
 
-        addressBarTextField.typeText("\(urlForHistory.absoluteString)\r")
+        addressBarTextField.typeURL(urlForHistory)
         XCTAssertTrue(
             app.windows.webViews[siteTitleForHistorySite].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
