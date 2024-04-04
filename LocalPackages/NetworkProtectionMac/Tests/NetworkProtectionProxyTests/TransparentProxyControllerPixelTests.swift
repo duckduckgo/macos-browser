@@ -60,7 +60,7 @@ final class TransparentProxyControllerPixelTests: XCTestCase {
 
         static let underlyingError = NSError(domain: "test", code: 1)
 
-        public var errorUserInfo: [String : Any] {
+        public var errorUserInfo: [String: Any] {
             switch self {
             case .testError(let underlyingError):
                 return [
