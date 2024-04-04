@@ -111,7 +111,7 @@ public enum SSLErrorType {
     }
 
     func body(for domain: String) -> String {
-        let boldDomain = " <b>\(domain)</b> "
+        let boldDomain = "<span style=\"font-weight: 600;\">\(domain)</span>"
         return UserText.sslErrorPageBody(boldDomain)
     }
 
@@ -146,8 +146,8 @@ public enum SSLErrorType {
 
     func specificMessage(for domain: String, eTldPlus1: String) -> String {
         let tld = TLD()
-        let boldDomain = "<b>\(domain)</b>"
-        let boldETldPlus1 = "<b>\(eTldPlus1)</b>"
+        let boldDomain = "<span style=\"font-weight: 600;\">\(domain)</span>"
+        let boldETldPlus1 = "<span style=\"font-weight: 600;\">\(eTldPlus1)</span>"
         switch self {
         case .expired:
             return UserText.sslErrorCertificateExpiredMessage(boldDomain)
