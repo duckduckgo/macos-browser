@@ -170,7 +170,7 @@ extension BrokerProfileQueryData {
                 steps: [Step](),
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,
-                parent: "parent"
+                parent: "parent.com"
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
             scanOperationData: ScanOperationData(brokerId: 2, profileQueryId: 1, historyEvents: historyEvents)

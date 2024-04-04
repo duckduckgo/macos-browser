@@ -47,7 +47,7 @@ struct MismatchCalculatorUseCase {
         for parent in parentBrokerProfileQueryData {
             guard let parentMatches = parent.scanOperationData.historyEvents.matchesForLastEvent() else { continue }
             let children = brokerProfileQueryData.filter {
-                $0.dataBroker.parent == parent.dataBroker.name &&
+                $0.dataBroker.parent == parent.dataBroker.url &&
                 $0.profileQuery.id == parent.profileQuery.id
             }
 
