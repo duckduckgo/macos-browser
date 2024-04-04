@@ -107,6 +107,11 @@ struct DataImportViewModel {
             self.dataType = dataType
             self.result = result
         }
+
+        static func == (lhs: DataTypeImportResult, rhs: DataTypeImportResult) -> Bool {
+            lhs.dataType == rhs.dataType &&
+            lhs.result.description == rhs.result.description
+        }
     }
 
     /// collected import summary for current import operation per selected import source
@@ -248,6 +253,7 @@ struct DataImportViewModel {
                     // switch to file import of the failed data type displaying successful import results
                     nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
+
                 Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
             }
         }
@@ -322,16 +328,19 @@ struct DataImportViewModel {
     }
 
     /// Skip button press
-    @MainActor mutating func skipImport() {
+    @MainActor mutating func skipImportOrDismiss(using dismiss: @escaping () -> Void) {
         if let screen = screenForNextDataTypeRemainingToImport(after: screen.fileImportDataType) {
             // skip to next non-imported data type
             self.screen = screen
-        } else if selectedDataTypes.first(where: { error(for: $0) != nil }) != nil {
+        } else if selectedDataTypes.first(where: {
+            let error = error(for: $0)
+            return error != nil && error?.errorType != .noData
+        }) != nil {
             // errors occurred during import: show feedback screen
             self.screen = .feedback
         } else {
-            // display total summary
-            self.screen = .summary(selectedDataTypes)
+            // When we skip a manual import, and there are no next non-imported data types, we dismiss
+            self.dismiss(using: dismiss)
         }
     }
 
@@ -671,7 +680,7 @@ extension DataImportViewModel {
             initiateImport()
 
         case .skip:
-            skipImport()
+            skipImportOrDismiss(using: dismiss)
 
         case .cancel:
             importTask?.cancel()
