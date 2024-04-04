@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
+import PixelKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -365,7 +366,7 @@ final class MoreOptionsMenu: NSMenu {
             }
 #endif
 
-            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            PixelKit.fire(GeneralPixel.networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
         } else {
             networkProtectionFeatureVisibility.disableForWaitlistUsers()
         }

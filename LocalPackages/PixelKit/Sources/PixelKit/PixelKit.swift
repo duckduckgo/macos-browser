@@ -30,15 +30,15 @@ public final class PixelKit {
         case standard
 
         /// Sent only once ever. The timestamp for this pixel is stored. Name for pixels of this type must end with `_u`.
-        case justOnce
+        case justOnce // TODO: Rename unique
 
         /// Sent once per day. The last timestamp for this pixel is stored and compared to the current date. Pixels of this type will have `_d` appended to their name.
-        case dailyOnly
+        case dailyOnly // TODO: Rename daily
 
         /// Sent once per day with a `_d` suffix, in addition to every time it is called with a `_c` suffix.
         /// This means a pixel will get sent twice the first time it is called per-day, and subsequent calls that day will only send the `_c` variant.
         /// This is useful in situations where pixels receive spikes in volume, as the daily pixel can be used to determine how many users are actually affected.
-        case dailyAndContinuous
+        case dailyAndContinuous // TODO: Rename dailyAndCount
     }
 
     public enum Header {
@@ -204,7 +204,7 @@ public final class PixelKit {
         }
     }
 
-    private func printDebugInfo(pixelName: String, parameters: [String: String], skipped: Bool = false) {
+    private func printDebugInfo(pixelName: String, parameters: [String: String], skipped: Bool = false) { // TODO: re-do all logging with Logger
 #if DEBUG
         let params = parameters.filter { key, _ in !["test"].contains(key) }
         os_log(.debug, log: log, "👾 [%{public}@] %{public}@ %{public}@", skipped ? "SKIPPED" : "FIRED", pixelName.replacingOccurrences(of: "_", with: "."), params)

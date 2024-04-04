@@ -20,6 +20,7 @@ import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
+import PixelKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -250,20 +251,13 @@ extension HomePage.Models {
 
             for message in homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.dataBrokerProtectionRemoteMessage(message))
-                DailyPixel.fire(
-                    pixel: .dataBrokerProtectionRemoteMessageDisplayed(messageID: message.id),
-                    frequency: .dailyOnly
-                )
+                PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .dailyOnly)
             }
 #endif
 
 #if NETWORK_PROTECTION
             for message in homePageRemoteMessaging.networkProtectionRemoteMessaging.presentableRemoteMessages() {
-                features.append(.networkProtectionRemoteMessage(message))
-                DailyPixel.fire(
-                    pixel: .networkProtectionRemoteMessageDisplayed(messageID: message.id),
-                    frequency: .dailyOnly
-                )
+                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .dailyOnly)
             }
 #endif
 

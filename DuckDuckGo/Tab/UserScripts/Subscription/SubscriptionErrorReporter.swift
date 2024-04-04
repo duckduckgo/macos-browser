@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import PixelKit
 
 enum SubscriptionError: Error {
     case purchaseFailed,
@@ -60,7 +61,7 @@ struct SubscriptionErrorReporter {
         case .failedToRestorePastPurchase:
             isStoreError = true
         case .subscriptionNotFound:
-            DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreFailureNotFound, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureNotFound, frequency: .dailyAndContinuous)
             isStoreError = true
         case .subscriptionExpired:
             isStoreError = true
@@ -69,17 +70,17 @@ struct SubscriptionErrorReporter {
             isBackendError = true
         case .cancelledByUser: break
         case .accountCreationFailed:
-            DailyPixel.fire(pixel: .privacyProPurchaseFailureAccountNotCreated, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureAccountNotCreated, frequency: .dailyAndContinuous)
         case .activeSubscriptionAlreadyPresent: break
         case .generalError: break
         }
 
         if isStoreError {
-            DailyPixel.fire(pixel: .privacyProPurchaseFailureStoreError, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureStoreError, frequency: .dailyAndContinuous)
         }
 
         if isBackendError {
-            DailyPixel.fire(pixel: .privacyProPurchaseFailureBackendError, frequency: .dailyAndCount)
+            PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailureBackendError, frequency: .dailyAndContinuous)
         }
     }
 }

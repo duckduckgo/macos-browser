@@ -22,6 +22,7 @@ import SwiftUI
 import SwiftUIExtensions
 import SyncUI
 import BrowserServicesKit
+import PixelKit
 
 #if SUBSCRIPTION
 import Subscription
@@ -147,32 +148,32 @@ enum Preferences {
                 DispatchQueue.main.async {
                     switch event {
                     case .openVPN:
-                        Pixel.fire(.privacyProVPNSettings)
+                        PixelKit.fire(PrivacyProPixel.privacyProVPNSettings)
                         NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
                     case .openDB:
-                        Pixel.fire(.privacyProPersonalInformationRemovalSettings)
+                        PixelKit.fire(PrivacyProPixel.privacyProPersonalInformationRemovalSettings)
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
                     case .openITR:
-                        Pixel.fire(.privacyProIdentityRestorationSettings)
+                        PixelKit.fire(PrivacyProPixel.privacyProIdentityRestorationSettings)
                         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
                     case .iHaveASubscriptionClick:
-                        Pixel.fire(.privacyProRestorePurchaseClick)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
                     case .activateAddEmailClick:
-                        DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndContinuous)
                     case .postSubscriptionAddEmailClick:
-                        Pixel.fire(.privacyProWelcomeAddDevice, limitTo: .initial)
+                        PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .justOnce)
                     case .restorePurchaseStoreClick:
-                        DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndContinuous)
                     case .addToAnotherDeviceClick:
-                        Pixel.fire(.privacyProSettingsAddDevice)
+                        PixelKit.fire(PrivacyProPixel.privacyProSettingsAddDevice)
                     case .addDeviceEnterEmail:
-                        Pixel.fire(.privacyProAddDeviceEnterEmail)
+                        PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                     case .activeSubscriptionSettingsClick:
-                        Pixel.fire(.privacyProSubscriptionSettings)
+                        PixelKit.fire(PrivacyProPixel.privacyProSubscriptionSettings)
                     case .changePlanOrBillingClick:
-                        Pixel.fire(.privacyProSubscriptionManagementPlanBilling)
+                        PixelKit.fire(PrivacyProPixel.privacyProSubscriptionManagementPlanBilling)
                     case .removeSubscriptionClick:
-                        Pixel.fire(.privacyProSubscriptionManagementRemoval)
+                        PixelKit.fire(PrivacyProPixel.privacyProSubscriptionManagementRemoval)
                     }
                 }
             }

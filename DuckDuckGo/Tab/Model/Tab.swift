@@ -26,6 +26,7 @@ import UserScript
 import WebKit
 import History
 import PrivacyDashboard
+import PixelKit
 
 #if SUBSCRIPTION
 import Subscription
@@ -1467,7 +1468,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
 #if NETWORK_PROTECTION
         if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {
-            DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount)
+            PixelKit.fire(GeneralPixel.networkProtectionEnabledOnSearch, frequency: .dailyAndContinuous)
         }
 #endif
     }

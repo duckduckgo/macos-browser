@@ -106,9 +106,9 @@ final class HomePageViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
-        if OnboardingViewModel.isOnboardingFinished && Pixel.isNewUser {
-            Pixel.fire(.newTabInitial, limitTo: .initial)
-        }
+//        if OnboardingViewModel.isOnboardingFinished && Pixel.isNewUser {
+//            Pixel.fire(.newTabInitial, limitTo: .initial)
+//        } // TODO: reimplement Pixel.isNewUser
         subscribeToHistory()
     }
 

@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
+import PixelKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -344,12 +345,12 @@ final class NavigationBarViewController: NSViewController {
 
         if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
             NetworkProtectionWaitlistViewControllerPresenter.show()
-            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
+            PixelKit.fire(GeneralPixel.networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndContinuous)
         } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
         } else {
             NetworkProtectionWaitlistViewControllerPresenter.show()
-            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
+            PixelKit.fire(GeneralPixel.networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndContinuous)
         }
     }
 #endif

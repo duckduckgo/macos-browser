@@ -79,9 +79,9 @@ final class DefaultBrowserPreferences: ObservableObject {
 #if DEBUG
             guard NSApp.runType.requiresEnvironment else { return }
 #endif
-            if Pixel.isNewUser && isDefault {
-                Pixel.fire(.setAsDefaultInitial, limitTo: .initial)
-            }
+//            if Pixel.isNewUser && isDefault { // TODO: reimplement Pixel.isNewUser
+//                Pixel.fire(.setAsDefaultInitial, limitTo: .initial)
+//            }
         }
     }
     @Published private(set) var restorePreviousSession: Bool = false

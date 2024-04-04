@@ -112,10 +112,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if NSApplication.runType.requiresEnvironment {
 #if DEBUG
-            Pixel.setUp(dryRun: true)
             Self.setUpPixelKit(dryRun: true)
 #else
-            Pixel.setUp()
             Self.setUpPixelKit(dryRun: false)
 #endif
 
@@ -124,9 +122,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
                 switch error {
                 case CoreDataDatabase.Error.containerLocationCouldNotBePrepared(let underlyingError):
-                    Pixel.fire(.debug(event: .dbContainerInitializationError, error: underlyingError))
+                    PixelKit.fire(DebugEvent(GeneralPixel.dbContainerInitializationError(error: underlyingError)))
                 default:
-                    Pixel.fire(.debug(event: .dbInitializationError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.dbInitializationError(error: error)))
                 }
 
                 // Give Pixel a chance to be sent, but not too long
@@ -135,12 +133,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
 
             let preMigrationErrorHandling = EventMapping<BookmarkFormFactorFavoritesMigration.MigrationErrors> { _, error, _, _ in
-                if let error = error {
-                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase, error: error))
-                } else {
-                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase))
-                }
-
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksCouldNotLoadDatabase(error: error)))
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
             }
@@ -154,12 +147,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             BookmarkDatabase.shared.db.loadStore { context, error in
                 guard let context = context else {
-                    if let error = error {
-                        Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase, error: error))
-                    } else {
-                        Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase))
-                    }
-
+                    PixelKit.fire(DebugEvent(GeneralPixel.bookmarksCouldNotLoadDatabase(error: error)))
                     Thread.sleep(forTimeInterval: 1)
                     fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
                 }
@@ -233,10 +221,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts {
             PixelExperiment.cleanup()
         }
-        if LocalStatisticsStore().atb == nil {
-            Pixel.firstLaunchDate = Date()
-            // MARK: Enable pixel experiments here
-        }
+//        if LocalStatisticsStore().atb == nil {
+//            Pixel.firstLaunchDate = Date() // TODO: WTF is this? reimplement?
+//            // MARK: Enable pixel experiments here
+//        }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here
@@ -442,9 +430,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .filter { $0 }
             .asVoid()
             .sink { [weak syncService] in
-                Pixel.fire(.syncDaily, limitTo: .dailyFirst)
+                PixelKit.fire(GeneralPixel.syncDaily, frequency: .dailyOnly)
                 syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
-                    Pixel.fire(.syncSuccessRateDaily, withAdditionalParameters: params)
+                    PixelKit.fire(GeneralPixel.syncSuccessRateDaily, withAdditionalParameters: params)
                 })
             }
 
@@ -525,10 +513,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignInNotification(_ notification: Notification) {
-        Pixel.fire(.emailEnabled)
-        if Pixel.isNewUser {
-            Pixel.fire(.emailEnabledInitial, limitTo: .initial)
-        }
+        PixelKit.fire(GeneralPixel.emailEnabled)
+//        if Pixel.isNewUser { // TODO: reimplement Pixel.isNewUser
+//            PixelKit.fire(GeneralPixel.emailEnabledInitial, frequency: .justOnce)
+//        }
 
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
             syncService?.scheduler.notifyDataChanged()
@@ -536,16 +524,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignOutNotification(_ notification: Notification) {
-        Pixel.fire(.emailDisabled)
+        PixelKit.fire(GeneralPixel.emailDisabled)
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
             syncService?.scheduler.notifyDataChanged()
         }
     }
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
-        if Pixel.isNewUser {
-            Pixel.fire(.importDataInitial, limitTo: .initial)
-        }
+//        if Pixel.isNewUser { // TODO: reimplement Pixel.isNewUser
+//            PixelKit.fire(GeneralPixel.importDataInitial, frequency: .justOnce)
+//        }
     }
 
 }
@@ -559,7 +547,7 @@ func updateSubscriptionStatus() {
 
         if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             if subscription.isActive {
-                DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
+                PixelKit.fire(GeneralPixel.privacyProSubscriptionActive, frequency: .dailyOnly)
             }
         }
 
@@ -586,7 +574,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 #if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
+                    PixelKit.fire(GeneralPixel.networkProtectionWaitlistNotificationTapped, frequency: .dailyAndContinuous)
                     NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }

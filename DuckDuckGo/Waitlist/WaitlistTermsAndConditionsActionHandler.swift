@@ -20,6 +20,7 @@
 
 import Foundation
 import UserNotifications
+import PixelKit
 
 protocol WaitlistTermsAndConditionsActionHandler {
     var acceptedTermsAndConditions: Bool { get }
@@ -36,7 +37,7 @@ struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAn
     var acceptedTermsAndConditions: Bool
 
     func didShow() {
-        DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndCount)
+        PixelKit.fire(GeneralPixel.networkProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndContinuous)
     }
 
     mutating func didAccept() {
@@ -44,7 +45,7 @@ struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAn
         // Remove delivered NetP notifications in case the user didn't click them.
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NetworkProtectionWaitlist.notificationIdentifier])
 
-        DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount)
+        PixelKit.fire(GeneralPixel.networkProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndContinuous)
     }
 }
 
@@ -57,15 +58,14 @@ struct DataBrokerProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTerm
     var acceptedTermsAndConditions: Bool
 
     func didShow() {
-        DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndCount)
+        PixelKit.fire(GeneralPixel.dataBrokerProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndContinuous)
     }
 
     mutating func didAccept() {
         acceptedTermsAndConditions = true
         // Remove delivered NetP notifications in case the user didn't click them.
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [DataBrokerProtectionWaitlist.notificationIdentifier])
-
-        DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount)
+        PixelKit.fire(GeneralPixel.dataBrokerProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndContinuous)
     }
 }
 

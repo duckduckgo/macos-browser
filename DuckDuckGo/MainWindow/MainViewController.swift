@@ -24,6 +24,7 @@ import Common
 #if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionIPC
+import PixelKit
 #endif
 
 final class MainViewController: NSViewController {
@@ -453,7 +454,7 @@ final class MainViewController: NSViewController {
 #if NETWORK_PROTECTION
     private func sendActiveNetworkProtectionWaitlistUserPixel() {
         if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
-            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly)
+            PixelKit.fire(GeneralPixel.networkProtectionWaitlistUserActive, frequency: .dailyOnly)
         }
     }
 #endif

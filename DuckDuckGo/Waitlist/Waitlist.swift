@@ -25,6 +25,7 @@ import NetworkProtection
 import BrowserServicesKit
 import Common
 import Subscription
+import PixelKit
 
 protocol WaitlistConstants {
     static var identifier: String { get }
@@ -223,7 +224,7 @@ struct NetworkProtectionWaitlist: Waitlist {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
                         sendInviteCodeAvailableNotification {
-                            DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
+                            PixelKit.fire(GeneralPixel.networkProtectionWaitlistNotificationShown, frequency: .dailyAndContinuous)
                         }
                         completion(nil)
                     } catch {

@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import LoginItems
+import PixelKit
 
 /// Class to manage the login items for the VPN and DBP
 ///
@@ -66,17 +67,12 @@ final class LoginItemsManager {
     }
 
     private func handleError(for item: LoginItem, action: Action, error: NSError) {
-        let event = Pixel.Event.Debug.loginItemUpdateError(
-            loginItemBundleID: item.agentBundleID,
-            action: "enable",
-            buildType: AppVersion.shared.buildType,
-            osVersion: AppVersion.shared.osVersion
-        )
-        DailyPixel.fire(pixel: .debug(event: event, error: error), frequency: .dailyAndCount)
-
-        os_log("🔴 Could not enable %{public}@: %{public}@",
-               item.debugDescription,
-               error.debugDescription)
+        let event = GeneralPixel.loginItemUpdateError(loginItemBundleID: item.agentBundleID,
+                                                      action: "enable",
+                                                      buildType: AppVersion.shared.buildType,
+                                                      osVersion: AppVersion.shared.osVersion)
+        PixelKit.fire(DebugEvent(event, error: error) , frequency: .dailyAndContinuous)
+        os_log("🔴 Could not enable %{public}@: %{public}@", item.debugDescription, error.debugDescription)
     }
 
     // MARK: - Debug Interactions
