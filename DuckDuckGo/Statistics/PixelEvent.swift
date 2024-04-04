@@ -277,6 +277,9 @@ extension Pixel {
         case passwordImportKeychainPrompt
         case passwordImportKeychainPromptDenied
 
+        // Tracks installation without tracking retention.
+        case installationAttribution
+
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
             /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
@@ -710,6 +713,9 @@ extension Pixel.Event {
         // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
         case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
+
+        // Installation Attribution
+        case .installationAttribution: return "m_mac_install"
         }
     }
 }
