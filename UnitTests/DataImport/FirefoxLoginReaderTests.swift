@@ -132,7 +132,7 @@ class FirefoxLoginReaderTests: XCTestCase {
 
         switch result {
         case .failure(let error as FirefoxLoginReader.ImportError):
-            XCTAssertEqual(error.type, .couldNotDetermineFormat)
+            XCTAssertEqual(error.type, .couldNotFindKeyDB)
         default:
             XCTFail("Received unexpected \(result)")
         }
@@ -272,6 +272,26 @@ class FirefoxLoginReaderTests: XCTestCase {
         default:
             XCTFail("Received unexpected \(result)")
         }
+    }
+
+    func testWhenImportingLogins_AndNoKeysDBExists_ThenImportFailsWithNoDBError() throws {
+        // Given
+        let logins = resourcesURLWithoutPassword().appendingPathComponent("logins.json")
+
+        let structure = FileSystem(rootDirectoryName: rootDirectoryName) {
+            File("logins.json", contents: .copy(logins))
+        }
+
+        try structure.writeToTemporaryDirectory()
+        let profileDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(rootDirectoryName)
+
+        let firefoxLoginReader = FirefoxLoginReader(firefoxProfileURL: profileDirectoryURL)
+
+        // When
+        let result = firefoxLoginReader.readLogins(dataFormat: nil)
+
+        // Then
+        XCTAssertEqual(result, .failure(FirefoxLoginReader.ImportError(type: .couldNotFindKeyDB, underlyingError: nil)))
     }
 
     private func resourcesURLWithPassword() -> URL {

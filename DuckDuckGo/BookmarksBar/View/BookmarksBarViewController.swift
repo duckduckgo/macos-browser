@@ -82,6 +82,7 @@ final class BookmarksBarViewController: NSViewController {
         bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
 
         view.postsFrameChangedNotifications = true
+        bookmarksBarCollectionView.setAccessibilityIdentifier("BookmarksBarViewController.bookmarksBarCollectionView")
     }
 
     private func addContextMenu() {

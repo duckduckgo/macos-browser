@@ -115,15 +115,19 @@ extension Preferences {
 
                     HStack {
                         ToggleMenuItem(UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
+                            .accessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarPreferenceToggle")
                         NSPopUpButtonView(selection: $model.bookmarksBarAppearance) {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+                            button.setAccessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarPopUp")
 
                             let alwaysOn = button.menu?.addItem(withTitle: UserText.showBookmarksBarAlways, action: nil, keyEquivalent: "")
                             alwaysOn?.representedObject = BookmarksBarAppearance.alwaysOn
+                            alwaysOn?.setAccessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarAlways")
 
                             let newTabOnly = button.menu?.addItem(withTitle: UserText.showBookmarksBarNewTabOnly, action: nil, keyEquivalent: "")
                             newTabOnly?.representedObject = BookmarksBarAppearance.newTabOnly
+                            newTabOnly?.setAccessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarNewTabOnly")
 
                             return button
                         }
