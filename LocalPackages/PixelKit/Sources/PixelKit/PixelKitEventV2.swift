@@ -18,23 +18,6 @@
 
 import Foundation
 
-public protocol PixelKitEventErrorDetails: Error {
-    var underlyingError: Error? { get }
-}
-
-extension PixelKitEventErrorDetails {
-    var underlyingErrorParameters: [String: String] {
-        guard let nsError = underlyingError as? NSError else {
-            return [:]
-        }
-
-        return [
-            PixelKit.Parameters.underlyingErrorCode: "\(nsError.code)",
-            PixelKit.Parameters.underlyingErrorDomain: nsError.domain
-        ]
-    }
-}
-
 /// New version of this protocol that allows us to maintain backwards-compatibility with PixelKitEvent
 ///
 /// This new implementation seeks to unify the handling of standard pixel parameters inside PixelKit.
