@@ -24087,10 +24087,58 @@
       "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du %@ Lesezeichen hast, versuche stattdessen, sie manuell zu importieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "If you have %@ bookmarks, try importing them manually instead."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si tienes %@ marcadores, intenta importarlos manualmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous avez %@ signets, essayez plutôt de les importer manuellement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se hai %@ segnalibri, prova a importarli manualmente."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je %@ bladwijzers hebt, probeer ze dan handmatig te importeren."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli masz zakładki %@, spróbuj zaimportować je ręcznie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se tens favoritos do %@, tenta importá-los manualmente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если у вас есть %@-файл с закладками, попробуйте импортировать его вручную."
           }
         }
       }
@@ -24099,10 +24147,58 @@
       "comment" : "Data import error subtitle: suggestion to import passwords manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du %@ Passwörter hast, versuche stattdessen, sie manuell zu importieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "If you have %@ passwords, try importing them manually instead."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si tiene %@ contraseñas, intenta importarlas manualmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous avez %@ mots de passe, essayez plutôt de les importer manuellement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se hai %@ password, prova a importarle manualmente."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je %@ wachtwoorden hebt, probeer ze dan handmatig te importeren."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli masz hasła %@, spróbuj zaimportować je ręcznie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se tens palavras-passe do %@, tenta importá-las manualmente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если у вас есть %@-файл с паролями, попробуйте импортировать его вручную."
           }
         }
       }
