@@ -24084,7 +24084,7 @@
       }
     },
     "import.nodata.bookmarks.subtitle" : {
-      "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file.",
+      "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -24138,13 +24138,13 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Если у вас есть %@-файл с закладками, попробуйте импортировать его вручную."
+            "value" : "Если у вас есть закладки в %@, попробуйте импортировать их вручную."
           }
         }
       }
     },
     "import.nodata.passwords.subtitle" : {
-      "comment" : "Data import error subtitle: suggestion to import passwords manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox",
+      "comment" : "Data import error subtitle: suggestion to import passwords manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -24198,7 +24198,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Если у вас есть %@-файл с паролями, попробуйте импортировать его вручную."
+            "value" : "Если у вас есть пароли в %@, попробуйте импортировать их вручную."
           }
         }
       }
