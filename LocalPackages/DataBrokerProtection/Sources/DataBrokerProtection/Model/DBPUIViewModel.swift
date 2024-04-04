@@ -80,7 +80,7 @@ extension DBPUIViewModel: DBPUIScanOps {
 
     func updateCacheWithCurrentScans() async {
         do {
-            _ = try await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+            try dataManager.prepareBrokerProfileQueryDataCache()
         } catch {
             os_log("DBPUIViewModel error: updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPUIViewModel.updateCacheWithCurrentScans"))

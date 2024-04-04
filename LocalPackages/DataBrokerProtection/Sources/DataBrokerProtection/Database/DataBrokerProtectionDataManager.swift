@@ -28,6 +28,7 @@ public protocol DataBrokerProtectionDataManaging {
     func fetchProfile() throws -> DataBrokerProtectionProfile?
     func prepareProfileCache() throws
     func fetchBrokerProfileQueryData(ignoresCache: Bool) throws -> [BrokerProfileQueryData]
+    func prepareBrokerProfileQueryDataCache() throws
     func hasMatches() throws -> Bool
 }
 
@@ -99,6 +100,10 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         let queryData = try database.fetchAllBrokerProfileQueryData()
         cache.brokerProfileQueryData = queryData
         return queryData
+    }
+
+    public func prepareBrokerProfileQueryDataCache() throws {
+        cache.brokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
     }
 
     public func hasMatches() throws -> Bool {
