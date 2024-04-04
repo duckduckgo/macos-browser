@@ -34,7 +34,7 @@ final class PixelKitParametersTests: XCTestCase {
             }
         }
 
-        var parameters: [String : String]? {
+        var parameters: [String: String]? {
             nil
         }
 
@@ -48,7 +48,7 @@ final class PixelKitParametersTests: XCTestCase {
 
     /// Test that when firing pixels that include multiple levels of underlying error information, all levels
     /// are properly included in the pixel.
-    /// 
+    ///
     func testUnderlyingErrorInformationParameters() {
         let underlyingError3 = NSError(domain: "test", code: 3)
         let underlyingError2 = NSError(
