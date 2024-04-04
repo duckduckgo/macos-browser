@@ -75,7 +75,7 @@ final class SaveIdentityViewController: NSViewController {
             PixelKit.fire(GeneralPixel.autofillItemSaved(kind: .identity))
         } catch {
             os_log("%s:%s: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
-            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }
 

@@ -30,9 +30,9 @@ final class SecureVaultErrorReporter: SecureVaultErrorReporting {
 
         switch error {
         case .initFailed, .failedToOpenDatabase:
-            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultInitError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultInitError(error: error)))
         default:
-            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }
 

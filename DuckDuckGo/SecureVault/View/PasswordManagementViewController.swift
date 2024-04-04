@@ -635,7 +635,7 @@ final class PasswordManagementViewController: NSViewController {
                     self.requestSync()
                     self.refreshData()
                 } catch {
-                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
 
             default:
@@ -658,7 +658,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteIdentityFor(identityId: id)
                     self.refreshData()
                 } catch {
-                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
 
             default:
@@ -700,7 +700,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteCreditCardFor(cardId: id)
                     self.refreshData()
                 } catch {
-                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
 
             default:
@@ -754,7 +754,7 @@ final class PasswordManagementViewController: NSViewController {
                         self?.syncModelsOnNote(note)
                     }
                 } catch {
-                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
             }
 
@@ -858,7 +858,7 @@ final class PasswordManagementViewController: NSViewController {
                     items = cards.map(SecureVaultItem.card)
                 }
             } catch {
-                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             }
 
             DispatchQueue.main.async {

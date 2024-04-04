@@ -79,7 +79,7 @@ final class LocalStatisticsStore: StatisticsStore {
 
     private let pixelDataStore: PixelDataStore
 
-    init(pixelDataStore: PixelDataStore = LocalPixelDataStore.shared) {
+    init(pixelDataStore: PixelDataStore = LocalPixelDataStore.shared) { // TODO: not used? investigate
         self.pixelDataStore = pixelDataStore
 
         var legacyStatisticsStore = LegacyStatisticsStore()

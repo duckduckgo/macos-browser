@@ -905,7 +905,6 @@ enum GeneralPixel: PixelKitEventV2 {
                 self = .button
 
             default:
-                assertionFailure("AccessPoint: Unexpected type of sender: \(type(of: sender))")
                 self = `default`
             }
         }
