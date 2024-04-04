@@ -43,11 +43,8 @@ final class SuggestionContainer {
     }
 
     convenience init () {
-        let urlFactory = { urlString in
-            return URL.makeURL(fromSuggestionPhrase: urlString)
-        }
 
-        self.init(suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
+        self.init(suggestionLoading: SuggestionLoader(urlFactory: URL.makeURL(fromSuggestionPhrase:)),
                   historyCoordinating: HistoryCoordinator.shared,
                   bookmarkManager: LocalBookmarkManager.shared)
     }

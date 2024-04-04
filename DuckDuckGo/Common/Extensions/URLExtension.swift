@@ -114,17 +114,6 @@ extension URL {
         os_log("URL extension: Making URL from %s failed", type: .error, addressBarString)
         return nil
     }
-
-    static func makeURL(fromSuggestionPhrase phrase: String) -> URL? {
-        guard let url = URL(trimmedAddressBarString: phrase),
-              let scheme = url.scheme.map(NavigationalScheme.init),
-              NavigationalScheme.hypertextSchemes.contains(scheme),
-              url.isValid else {
-            return nil
-        }
-
-        return url
-    }
 #endif
 
     static let blankPage = URL(string: "about:blank")!
