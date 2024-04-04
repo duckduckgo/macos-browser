@@ -19,13 +19,8 @@
 import XCTest
 @testable import PixelKit
 import PixelKitTestingUtilities
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 final class PixelKitParametersTests: XCTestCase {
-
-    private func userDefaults() -> UserDefaults {
-        UserDefaults(suiteName: "testing_\(UUID().uuidString)")!
-    }
 
     /// Test events for convenience
     ///
