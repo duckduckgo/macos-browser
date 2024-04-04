@@ -375,24 +375,8 @@ public final class PixelKit {
 extension Dictionary where Key == String, Value == String {
 
     mutating func appendErrorPixelParams(error: Error) {
-        let nsError = error as NSError
-
-        self[PixelKit.Parameters.errorCode] = "\(nsError.code)"
-        self[PixelKit.Parameters.errorDomain] = nsError.domain
-
-        if let error = error as? PixelKitEventErrorDetails,
-           let underlyingError = error.underlyingError {
-
-            let underlyingNSError = underlyingError as NSError
-            self[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingNSError.code)"
-            self[PixelKit.Parameters.underlyingErrorDomain] = underlyingNSError.domain
-        } else if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
-            self[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            self[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
-        } else if let sqlErrorCode = nsError.userInfo["NSSQLiteErrorDomain"] as? NSNumber {
-            self[PixelKit.Parameters.underlyingErrorCode] = "\(sqlErrorCode.intValue)"
-            self[PixelKit.Parameters.underlyingErrorDomain] = "NSSQLiteErrorDomain"
+        self.merge(error.pixelParameters) { _, second in
+            return second
         }
     }
-
 }

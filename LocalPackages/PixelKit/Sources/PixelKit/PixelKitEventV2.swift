@@ -47,23 +47,3 @@ extension PixelKitEventErrorDetails {
 public protocol PixelKitEventV2: PixelKitEvent {
     var error: Error? { get }
 }
-
-extension PixelKitEventV2 {
-    var pixelParameters: [String: String] {
-        guard let error else {
-            return [:]
-        }
-
-        let nsError = error as NSError
-        var parameters = [
-            PixelKit.Parameters.errorCode: "\(nsError.code)",
-            PixelKit.Parameters.errorDomain: nsError.domain,
-        ]
-
-        if let error = error as? PixelKitEventErrorDetails {
-            parameters.merge(error.underlyingErrorParameters, uniquingKeysWith: { $1 })
-        }
-
-        return parameters
-    }
-}
