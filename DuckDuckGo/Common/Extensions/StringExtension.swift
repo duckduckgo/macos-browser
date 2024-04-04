@@ -109,15 +109,6 @@ extension String {
         (self as NSString).pathExtension
     }
 
-    func appendingPathComponent(_ component: String) -> String {
-        (self as NSString).appendingPathComponent(component)
-    }
-
-    func appendingPathExtension(_ pathExtension: String?) -> String {
-        guard let pathExtension, !pathExtension.isEmpty else { return self }
-        return self + "." + pathExtension
-    }
-
     // MARK: - Mutating
 
     @inlinable mutating func prepend(_ string: String) {

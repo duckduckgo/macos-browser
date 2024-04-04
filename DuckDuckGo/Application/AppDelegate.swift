@@ -42,7 +42,7 @@ import Subscription
 #endif
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
@@ -226,6 +226,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             FaviconManager.shared.loadFavicons()
         }
         ConfigurationManager.shared.start()
+        FileDownloadManager.shared.delegate = self
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
@@ -335,7 +336,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
             // if there‘re downloads without location chosen yet (save dialog should display) - ignore them
-            if FileDownloadManager.shared.downloads.contains(where: { $0.state.isDownloading }) {
+            if FileDownloadManager.shared.downloads.contains(where: { $0.location.destinationURL != nil }) {
                 let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
                 if alert.runModal() == .cancel {
                     return .terminateCancel
@@ -347,6 +348,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
+    }
+
+    func askUserToGrantAccessToDestination(_ folderUrl: URL) {
+        if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
+            let alert = NSAlert.noAccessToDownloads()
+            if alert.runModal() != .cancel {
+                let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")!
+                NSWorkspace.shared.open(preferencesLink)
+                return
+            }
+        } else {
+            let alert = NSAlert.noAccessToSelectedFolder()
+            alert.runModal()
+        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

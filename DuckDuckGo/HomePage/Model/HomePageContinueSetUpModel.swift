@@ -195,12 +195,10 @@ extension HomePage.Models {
                 DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
 #endif
             case .vpnThankYou:
-                guard let window = NSApp.keyWindow,
-                      case .normal = NSApp.runType else { return }
+                guard let window = NSApp.keyWindow else { return }
                 waitlistBetaThankYouPresenter.presentVPNThankYouPrompt(in: window)
             case .pirThankYou:
-                guard let window = NSApp.keyWindow,
-                      case .normal = NSApp.runType else { return }
+                guard let window = NSApp.keyWindow else { return }
                 waitlistBetaThankYouPresenter.presentPIRThankYouPrompt(in: window)
             }
         }

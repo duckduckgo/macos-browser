@@ -86,15 +86,13 @@ extension FileDownloadError: CustomNSError {
             var userInfo = [String: Any]()
             userInfo[UserInfoKeys.underlyingError.rawValue] = error
             userInfo[UserInfoKeys.resumeData.rawValue] = data
+            userInfo[UserInfoKeys.resumeData.rawValue] = data
             userInfo[UserInfoKeys.isRetryable.rawValue] = NSNumber(value: isRetryable)
             return userInfo
         }
     }
 
-    init(_ error: NSError) {
-        var isRetryable: Bool {
-            (error.userInfo[UserInfoKeys.isRetryable.rawValue] as? NSNumber)?.boolValue ?? false
-        }
+    init(_ error: NSError, isRetryable: Bool) {
         switch ErrorCode(rawValue: error.domain == Self.errorDomain ? error.code : -1) {
         case .failedToMoveFileToDownloads:
             self = .failedToMoveFileToDownloads

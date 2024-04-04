@@ -23,8 +23,8 @@ extension NSAlert {
     static func activeDownloadsTerminationAlert(for downloads: Set<WebKitDownloadTask>) -> NSAlert {
         assert(!downloads.isEmpty)
 
-        let activeDownload = downloads.first(where: { $0.state.isDownloading })
-        let firstFileName = activeDownload?.state.destinationFilePresenter?.url?.lastPathComponent ?? ""
+        let activeDownload = downloads.first(where: { $0.location.destinationURL != nil })
+        let firstFileName = activeDownload?.location.destinationURL?.lastPathComponent ?? activeDownload?.suggestedFilename ?? ""
         let andOthers = downloads.count > 1 ? UserText.downloadsActiveAlertMessageAndOthers : ""
 
         let alert = NSAlert()

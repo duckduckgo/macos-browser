@@ -21,34 +21,18 @@ import Foundation
 extension Progress {
 
     convenience init(totalUnitCount: Int64,
-                     completedUnitCount: Int64 = 0,
-                     fileOperationKind: FileOperationKind? = nil,
-                     kind: ProgressKind? = nil,
-                     isPausable: Bool = false,
-                     isCancellable: Bool = false,
-                     fileURL: URL? = nil,
-                     sourceURL: URL? = nil) {
+                     fileOperationKind: FileOperationKind,
+                     kind: ProgressKind,
+                     isPausable: Bool,
+                     isCancellable: Bool,
+                     fileURL: URL) {
         self.init(totalUnitCount: totalUnitCount)
 
-        self.completedUnitCount = completedUnitCount
         self.fileOperationKind = fileOperationKind
         self.kind = kind
         self.isPausable = isPausable
         self.isCancellable = isCancellable
         self.fileURL = fileURL
-        self.fileDownloadingSourceURL = sourceURL
-    }
-
-    convenience init(copy progress: Progress) {
-        self.init(totalUnitCount: progress.totalUnitCount)
-
-        self.completedUnitCount = progress.completedUnitCount
-        self.fileOperationKind = progress.fileOperationKind
-        self.kind = progress.kind
-        self.isPausable = progress.isPausable
-        self.isCancellable = progress.isCancellable
-        self.fileURL = progress.fileURL
-        self.fileDownloadingSourceURL = progress.fileDownloadingSourceURL
     }
 
     var fileDownloadingSourceURL: URL? {
@@ -80,15 +64,6 @@ extension Progress {
         }
     }
 
-    var fileIcon: NSImage? {
-        get {
-            self.userInfo[.fileIconKey] as? NSImage
-        }
-        set {
-            self.setUserInfoObject(newValue, forKey: .fileIconKey)
-        }
-    }
-
     var fileIconOriginalRect: NSRect? {
         get {
             (self.userInfo[.fileIconOriginalRectKey] as? NSValue)?.rectValue
@@ -98,13 +73,39 @@ extension Progress {
         }
     }
 
-    var startTime: Date? {
+    var isPublished: Bool {
         get {
-            self.userInfo[.startTimeKey] as? Date
+            self.userInfo[.isPublishedKey] as? Bool ?? false
         }
         set {
-            self.setUserInfoObject(newValue, forKey: .startTimeKey)
+            self.setUserInfoObject(newValue, forKey: .isPublishedKey)
         }
+    }
+
+    var isUnpublished: Bool {
+        get {
+            self.userInfo[.isUnpublishedKey] as? Bool ?? false
+        }
+        set {
+            self.setUserInfoObject(newValue, forKey: .isUnpublishedKey)
+        }
+    }
+
+    func publishIfNotPublished() {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard !self.isPublished else { return }
+        self.isPublished = true
+
+        self.publish()
+    }
+
+    func unpublishIfNeeded() {
+        guard self.isPublished,
+              !self.isUnpublished
+        else { return }
+        self.isUnpublished = true
+
+        self.unpublish()
     }
 
     /// Initialize a new Progress that publishes the progress of a file operation.
@@ -140,8 +141,8 @@ extension ProgressUserInfoKey {
     static let fileDownloadingSourceURLKey = ProgressUserInfoKey(rawValue: "NSProgressFileDownloadingSourceURL")
     static let fileLocationCanChangeKey = ProgressUserInfoKey(rawValue: "NSProgressFileLocationCanChangeKey")
     static let flyToImageKey = ProgressUserInfoKey(rawValue: "NSProgressFlyToImageKey")
-    static let fileIconKey = ProgressUserInfoKey(rawValue: "NSProgressFileIconKey")
     static let fileIconOriginalRectKey = ProgressUserInfoKey(rawValue: "NSProgressFileAnimationImageOriginalRectKey")
 
-    fileprivate static let startTimeKey = ProgressUserInfoKey(rawValue: "startTimeKey")
+    fileprivate static let isPublishedKey = ProgressUserInfoKey(rawValue: "isPublishedKey")
+    fileprivate static let isUnpublishedKey = ProgressUserInfoKey(rawValue: "isUnpublishedKey")
 }

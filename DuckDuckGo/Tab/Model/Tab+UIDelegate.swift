@@ -48,12 +48,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
         Task {
-            var result: URL?
-            do {
-                result = try await saveDownloadedData(data, suggestedFilename: suggestedFilename, mimeType: mimeType, originatingURL: originatingURL)
-            } catch {
-                assertionFailure("Save web content failed with \(error)")
-            }
+            let result = try? await saveDownloadedData(data, suggestedFilename: suggestedFilename, mimeType: mimeType, originatingURL: originatingURL)
             // when print function saves a PDF setting the callback, return the saved temporary file to it
             await Self.consumeExpectedSaveDataToFileCallback()?(result)
         }

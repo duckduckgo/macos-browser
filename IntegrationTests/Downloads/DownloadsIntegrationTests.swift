@@ -85,7 +85,7 @@ class DownloadsIntegrationTests: XCTestCase {
         _=await tab.setUrl(url, source: .link)?.result
 
         let fileUrl = try await downloadTaskFuture.get().output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("fname_\(suffix).dat"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.html)
@@ -135,7 +135,7 @@ class DownloadsIntegrationTests: XCTestCase {
         withExtendedLifetime(c) {}
 
         let downloadTaskOutputPromise = downloadTask.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise()
 
         // now close the background download tab
         XCTAssertEqual(tabCollectionViewModel.allTabsCount, 2)
@@ -212,7 +212,7 @@ class DownloadsIntegrationTests: XCTestCase {
             withExtendedLifetime((c, c2)) {}
 
             let downloadTaskOutputPromise = downloadTask.output
-                .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise()
+                .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise()
 
             // now close the window
             tabCollectionViewModel = nil
@@ -260,7 +260,7 @@ class DownloadsIntegrationTests: XCTestCase {
         try! await tab.webView.evaluateJavaScript(js)
 
         let fileUrl = try await downloadTaskFuture.get().output
-            .timeout(5, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
+            .timeout(5, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("helloWorld_\(suffix).txt"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
@@ -294,7 +294,7 @@ class DownloadsIntegrationTests: XCTestCase {
         try! await tab.webView.evaluateJavaScript(js)
 
         let fileUrl = try await downloadTaskFuture.get().output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("blobdload_\(suffix).json"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
@@ -312,24 +312,4 @@ private extension DownloadsIntegrationTests {
         window.sendEvent(mouseDown)
         window.sendEvent(mouseUp)
     }
-}
-
-extension WebKitDownloadTask {
-
-    var output: AnyPublisher<URL, FileDownloadError> {
-        $state.tryCompactMap { state in
-            switch state {
-            case .initial, .downloading:
-                return nil
-            case .downloaded(let destinationFile):
-                return destinationFile.url
-            case .failed(_, _, resumeData: _, error: let error):
-                throw error
-            }
-        }
-        .mapError { $0 as! FileDownloadError } // swiftlint:disable:this force_cast
-        .first()
-        .eraseToAnyPublisher()
-    }
-
 }

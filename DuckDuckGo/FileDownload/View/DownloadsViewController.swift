@@ -75,6 +75,7 @@ final class DownloadsViewController: NSViewController {
     }
 
     override func viewWillAppear() {
+        viewModel.filterRemovedDownloads()
 
         downloadsCancellable = viewModel.$items
             .throttle(for: 0.1, scheduler: DispatchQueue.main, latest: true)
