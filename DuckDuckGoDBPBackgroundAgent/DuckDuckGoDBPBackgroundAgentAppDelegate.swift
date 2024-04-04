@@ -28,6 +28,7 @@ import Networking
 @objc(Application)
 final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate()
+    private var statusBarMenu: StatusBarMenu?
 
     override init() {
         os_log(.error, log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
@@ -68,10 +69,19 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
+
+        setupStatusBarMenu()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    private func setupStatusBarMenu() {
+        // TODO: only display if show status menu flag is on
+        DispatchQueue.main.async {
+            self.statusBarMenu = StatusBarMenu()
+        }
     }
 }
 
