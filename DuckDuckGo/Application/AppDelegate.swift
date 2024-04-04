@@ -111,11 +111,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
         if NSApplication.runType.requiresEnvironment {
-#if DEBUG
-            Self.setUpPixelKit(dryRun: true)
-#else
-            Self.setUpPixelKit(dryRun: false)
-#endif
+            Self.configurePixelKit()
 
             Database.shared.loadStore { _, error in
                 guard let error = error else { return }
@@ -178,6 +174,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     #else
         SubscriptionPurchaseEnvironment.current = .stripe
     #endif
+#endif
+    }
+
+    static func configurePixelKit() {
+#if DEBUG
+            Self.setUpPixelKit(dryRun: true)
+#else
+            Self.setUpPixelKit(dryRun: false)
 #endif
     }
 
@@ -547,7 +551,7 @@ func updateSubscriptionStatus() {
 
         if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             if subscription.isActive {
-                PixelKit.fire(GeneralPixel.privacyProSubscriptionActive, frequency: .dailyOnly)
+                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .dailyOnly)
             }
         }
 

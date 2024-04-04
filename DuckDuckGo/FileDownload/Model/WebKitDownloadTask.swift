@@ -22,6 +22,7 @@ import Foundation
 import Navigation
 import UniformTypeIdentifiers
 import WebKit
+import PixelKit
 
 protocol WebKitDownloadTaskDelegate: AnyObject {
     func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType: UTType?) async -> (URL?, UTType?)
@@ -266,7 +267,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
                 self.download.cancel()
                 self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
-                Pixel.fire(.debug(event: .fileGetDownloadLocationFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.fileGetDownloadLocationFailed, error: error))
             }
             return nil
         }
@@ -326,7 +327,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             self.download.cancel()
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
 
-            Pixel.fire(.debug(event: .fileDownloadCreatePresentersFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.fileDownloadCreatePresentersFailed, error: error))
         }
     }
 
@@ -382,7 +383,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             } catch {
                 // fallback: move failed, keep the temp file in the original location
                 os_log(.error, log: log, "🙁 fallback with \(error), will use \(tempURL.path)")
-                Pixel.fire(.debug(event: .fileAccessRelatedItemFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.fileAccessRelatedItemFailed, error: error))
                 return tempURL
             }
             return duckloadURL
@@ -646,7 +647,7 @@ extension WebKitDownloadTask: WKDownloadDelegate {
             self.finish(with: .success(destinationFile))
 
         } catch {
-            Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.fileMoveToDownloadsFailed, error: error))
             os_log(.error, log: log, "fileMoveToDownloadsFailed: \(error)")
             self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
         }

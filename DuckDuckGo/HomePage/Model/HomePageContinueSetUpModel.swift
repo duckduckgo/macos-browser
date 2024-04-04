@@ -168,7 +168,7 @@ extension HomePage.Models {
             switch featureType {
             case .defaultBrowser:
                 do {
-                    Pixel.fire(.defaultRequestedFromHomepageSetupView)
+                    PixelKit.fire(GeneralPixel.defaultRequestedFromHomepageSetupView)
                     try defaultBrowserProvider.presentDefaultBrowserPrompt()
                 } catch {
                     defaultBrowserProvider.openSystemPreferences()
@@ -224,12 +224,12 @@ extension HomePage.Models {
             case .networkProtectionRemoteMessage(let message):
 #if NETWORK_PROTECTION
                 homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: message)
-                Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
+                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDismissed(messageID: message.id))
 #endif
             case .dataBrokerProtectionRemoteMessage(let message):
 #if DBP
                 homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.dismiss(message: message)
-                Pixel.fire(.dataBrokerProtectionRemoteMessageDismissed(messageID: message.id))
+                PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageDismissed(messageID: message.id))
 #endif
             case .dataBrokerProtectionWaitlistInvited:
                 shouldShowDBPWaitlistInvitedCardUI = false
@@ -441,7 +441,7 @@ extension HomePage.Models {
         @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
 #if NETWORK_PROTECTION
             guard let actionType = remoteMessage.action.actionType else {
-                Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
                 homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
                 refreshFeaturesMatrix()
                 return
@@ -454,7 +454,7 @@ extension HomePage.Models {
                 if let surveyURL = remoteMessage.presentableSurveyURL() {
                     let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
                     tabCollectionViewModel.append(tab: tab)
-                    Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+                    PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
 
                     // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
                     homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
@@ -467,7 +467,7 @@ extension HomePage.Models {
         @MainActor private func handle(remoteMessage: DataBrokerProtectionRemoteMessage) {
 #if DBP
             guard let actionType = remoteMessage.action.actionType else {
-                Pixel.fire(.dataBrokerProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
                 homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)
                 refreshFeaturesMatrix()
                 return
@@ -480,7 +480,7 @@ extension HomePage.Models {
                 if let surveyURL = remoteMessage.presentableSurveyURL() {
                     let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
                     tabCollectionViewModel.append(tab: tab)
-                    Pixel.fire(.dataBrokerProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+                    PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageOpened(messageID: remoteMessage.id))
 
                     // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
                     homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)

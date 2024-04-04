@@ -22,6 +22,7 @@ import BrowserServicesKit
 import DDGSync
 import Configuration
 
+// swiftlint:disable:next type_body_length
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
@@ -168,7 +169,7 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case assertionFailure(message: String, file: StaticString, line: UInt)
 
-    case dbMakeDatabaseError(error: Error)
+    case dbMakeDatabaseError(error: Error?)
     case dbContainerInitializationError(error: Error)
     case dbInitializationError(error: Error)
     case dbSaveExcludedHTTPSDomainsError(error: Error?)
@@ -216,7 +217,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case historyInsertVisitFailed
     case historyRemoveVisitsFailed
 
-    case emailAutofillKeychainError(error: Error)
+    case emailAutofillKeychainError
 
     case bookmarksStoreRootFolderMigrationFailed
     case bookmarksStoreFavoritesFolderMigrationFailed
@@ -237,14 +238,14 @@ enum GeneralPixel: PixelKitEventV2 {
     case removedInvalidBookmarkManagedObjects
 
     case bitwardenNotResponding
-    //    case bitwardenRespondedCannotDecryptUnique(repetition: Repetition = .init(key: "bitwardenRespondedCannotDecryptUnique")) // TODO: REIMPLEMENTATION??
+    case bitwardenRespondedCannotDecryptUnique //(repetition: Repetition = .init(key: "bitwardenRespondedCannotDecryptUnique")) // TODO: REIMPLEMENTATION??
     case bitwardenHandshakeFailed
     case bitwardenDecryptionOfSharedKeyFailed
     case bitwardenStoringOfTheSharedKeyFailed
     case bitwardenCredentialRetrievalFailed
     case bitwardenCredentialCreationFailed
     case bitwardenCredentialUpdateFailed
-    case bitwardenRespondedWithError(error: Error)
+    case bitwardenRespondedWithError
     case bitwardenNoActiveVault
     case bitwardenParsingFailed
     case bitwardenStatusParsingFailed
@@ -677,8 +678,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .bitwardenNotResponding:
             return "bitwarden_not_responding"
-            //        case .bitwardenRespondedCannotDecryptUnique:
-            //            return "bitwarden_responded_cannot_decrypt_unique"
+        case .bitwardenRespondedCannotDecryptUnique:
+            return "bitwarden_responded_cannot_decrypt_unique"
         case .bitwardenHandshakeFailed:
             return "bitwarden_handshake_failed"
         case .bitwardenDecryptionOfSharedKeyFailed:
@@ -783,7 +784,7 @@ enum GeneralPixel: PixelKitEventV2 {
 
     var error: (any Error)? {
         switch self {
-        case .dbMakeDatabaseError(let error),
+        case .dbMakeDatabaseError(let error?),
                 .dbContainerInitializationError(let error),
                 .dbInitializationError(let error),
                 .dbSaveExcludedHTTPSDomainsError(let error?),
@@ -791,8 +792,6 @@ enum GeneralPixel: PixelKitEventV2 {
                 .configurationFetchError(let error),
                 .secureVaultInitError(let error),
                 .secureVaultError(let error),
-                .emailAutofillKeychainError(let error),
-                .bitwardenRespondedWithError(let error),
                 .syncSignupError(let error),
                 .syncLoginError(let error),
                 .syncLogoutError(let error),
@@ -807,68 +806,109 @@ enum GeneralPixel: PixelKitEventV2 {
     }
 
     var parameters: [String: String]? {
-        return nil
-    }
-}
-
-public enum CompileRulesListType: String, CustomStringConvertible {
-
-    public var description: String { rawValue }
-
-    case tds = "tracker_data"
-    case clickToLoad = "click_to_load"
-    case blockingAttribution = "blocking_attribution"
-    case attributed = "attributed"
-    case unknown = "unknown"
-
-}
-
-enum OnboardingShown: String, CustomStringConvertible {
-    var description: String { rawValue }
-
-    init(_ value: Bool) {
-        if value {
-            self = .onboardingShown
-        } else {
-            self = .regularNavigation
+        switch self {
+        case .loginItemUpdateError(let loginItemBundleID, let action, let buildType, let osVersion):
+            return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType, "macosVersion": osVersion]
+        default: return nil
         }
     }
-    case onboardingShown = "onboarding-shown"
-    case regularNavigation = "regular-nav"
-}
 
-enum WaitResult: String, CustomStringConvertible {
-    var description: String { rawValue }
+    public enum CompileRulesListType: String, CustomStringConvertible {
 
-    case closed
-    case quit
-    case success
-}
+        public var description: String { rawValue }
 
-enum CompileRulesWaitTime: String, CustomStringConvertible {
-    var description: String { rawValue }
+        case tds = "tracker_data"
+        case clickToLoad = "click_to_load"
+        case blockingAttribution = "blocking_attribution"
+        case attributed = "attributed"
+        case unknown = "unknown"
 
-    case noWait = "0"
-    case lessThan1s = "1"
-    case lessThan5s = "5"
-    case lessThan10s = "10"
-    case lessThan20s = "20"
-    case lessThan40s = "40"
-    case more = "more"
-}
+    }
 
-enum FormAutofillKind: String, CustomStringConvertible {
-    var description: String { rawValue }
+    enum OnboardingShown: String, CustomStringConvertible {
+        var description: String { rawValue }
 
-    case password
-    case card
-    case identity
-}
+        init(_ value: Bool) {
+            if value {
+                self = .onboardingShown
+            } else {
+                self = .regularNavigation
+            }
+        }
+        case onboardingShown = "onboarding-shown"
+        case regularNavigation = "regular-nav"
+    }
 
-enum FireButtonOption: String, CustomStringConvertible {
-    var description: String { rawValue }
+    enum WaitResult: String, CustomStringConvertible {
+        var description: String { rawValue }
 
-    case tab
-    case window
-    case allSites = "all-sites"
+        case closed
+        case quit
+        case success
+    }
+
+    enum CompileRulesWaitTime: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case noWait = "0"
+        case lessThan1s = "1"
+        case lessThan5s = "5"
+        case lessThan10s = "10"
+        case lessThan20s = "20"
+        case lessThan40s = "40"
+        case more = "more"
+    }
+
+    enum FormAutofillKind: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case password
+        case card
+        case identity
+    }
+
+    enum FireButtonOption: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case tab
+        case window
+        case allSites = "all-sites"
+    }
+
+    enum AccessPoint: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case button = "source-button"
+        case mainMenu = "source-menu"
+        case tabMenu = "source-tab-menu"
+        case hotKey = "source-keyboard"
+        case moreMenu = "source-more-menu"
+        case newTab = "source-new-tab"
+
+        init(sender: Any, default: AccessPoint, mainMenuCheck: (NSMenu?) -> Bool = { $0 is MainMenu }) {
+            switch sender {
+            case let menuItem as NSMenuItem:
+                if mainMenuCheck(menuItem.topMenu) {
+                    if let event = NSApp.currentEvent,
+                       case .keyDown = event.type,
+                       event.characters == menuItem.keyEquivalent {
+
+                        self = .hotKey
+                    } else {
+                        self = .mainMenu
+                    }
+                } else {
+                    self = `default`
+                }
+
+            case is NSButton:
+                self = .button
+
+            default:
+                assertionFailure("AccessPoint: Unexpected type of sender: \(type(of: sender))")
+                self = `default`
+            }
+        }
+
+    }
 }

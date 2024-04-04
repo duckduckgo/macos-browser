@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import SecureStorage
+import PixelKit
 
 final class SecureVaultErrorReporter: SecureVaultErrorReporting {
     static let shared = SecureVaultErrorReporter()
@@ -29,9 +30,9 @@ final class SecureVaultErrorReporter: SecureVaultErrorReporting {
 
         switch error {
         case .initFailed, .failedToOpenDatabase:
-            Pixel.fire(.debug(event: .secureVaultInitError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultInitError, error: error))
         default:
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError, error: error))
         }
     }
 

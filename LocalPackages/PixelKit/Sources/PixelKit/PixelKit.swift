@@ -110,7 +110,7 @@ public final class PixelKit {
                           fireRequest: fireRequest)
     }
 
-    static func tearDown() {
+    public static func tearDown() {
         shared = nil
     }
 
@@ -332,7 +332,11 @@ public final class PixelKit {
     }
 
     public func pixelLastFireDate(pixelName: String) -> Date? {
-        defaults.object(forKey: userDefaultsKeyName(forPixelName: pixelName)) as? Date
+        var date = defaults.object(forKey: userDefaultsKeyName(forPixelName: pixelName)) as? Date
+        if date == nil {
+            date = defaults.object(forKey: legacyUserDefaultsKeyName(forPixelName: pixelName)) as? Date
+        }
+        return date
     }
 
     public func pixelLastFireDate(event: Event) -> Date? {
@@ -364,12 +368,28 @@ public final class PixelKit {
         pixelLastFireDate(pixelName: name) != nil
     }
 
-    private func userDefaultsKeyName(forPixelName pixelName: String) -> String {
+    public static func clearFrequencyHistoryFor(pixel: PixelKitEventV2) {
+        guard let name = Self.shared?.userDefaultsKeyName(forPixelName: pixel.name) else {
+            return
+        }
+        Self.shared?.defaults.removeObject(forKey: name)
+    }
+
+    public static func clearFrequencyHistoryForAllPixels() {
+        //TODO: Implement changing storage approach
+    }
+
+    /// Initially PixelKit was configured only for serving netP so these very specific keys were used, now PixelKit serves the entire app so we need to move away from them.
+    /// NOTE: I would remove this 6 months after release
+    private func legacyUserDefaultsKeyName(forPixelName pixelName: String) -> String {
         dryRun
             ? "com.duckduckgo.network-protection.pixel.\(pixelName).dry-run"
             : "com.duckduckgo.network-protection.pixel.\(pixelName)"
     }
 
+    private func userDefaultsKeyName(forPixelName pixelName: String) -> String {
+        return "com.duckduckgo.pixel-date.\(pixelName)\( dryRun ? ".dry-run" : "" )"
+    }
 }
 
 extension Dictionary where Key == String, Value == String {

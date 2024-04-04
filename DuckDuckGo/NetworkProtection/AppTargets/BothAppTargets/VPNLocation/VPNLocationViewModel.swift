@@ -66,7 +66,7 @@ final class VPNLocationViewModel: ObservableObject {
     }
 
     func onViewAppeared() async {
-        Pixel.fire(.networkProtectionGeoswitchingOpened)
+        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingOpened)
         await reloadList()
     }
 

@@ -342,7 +342,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
 
-        Pixel.fire(.privacyProRestorePurchaseOfferPageEntry)
+        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseOfferPageEntry)
         guard let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
               let windowControllerManager = await WindowControllersManager.shared.lastKeyMainWindowController else {
             return nil
@@ -400,14 +400,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .appTrackingProtection:
             NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
         case .vpn:
-            Pixel.fire(.privacyProWelcomeVPN, limitTo: .initial)
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .justOnce)
             NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
         case .personalInformationRemoval:
-            Pixel.fire(.privacyProWelcomePersonalInformationRemoval, limitTo: .initial)
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .justOnce)
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
-            Pixel.fire(.privacyProWelcomeIdentityRestoration, limitTo: .initial)
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .justOnce)
             await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
         }
 

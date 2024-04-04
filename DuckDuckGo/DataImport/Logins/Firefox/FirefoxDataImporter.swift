@@ -18,6 +18,7 @@
 
 import Foundation
 import SecureStorage
+import PixelKit
 
 internal class FirefoxDataImporter: DataImporter {
 
@@ -139,7 +140,7 @@ internal class FirefoxDataImporter: DataImporter {
             await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
         case .failure(let error):
-            Pixel.fire(.dataImportFailed(source: source, sourceVersion: profile.installedAppsMajorVersionDescription(), error: error))
+            PixelKit.fire(GeneralPixel.dataImportFailed(source: source, sourceVersion: profile.installedAppsMajorVersionDescription(), error: error))
         }
     }
 

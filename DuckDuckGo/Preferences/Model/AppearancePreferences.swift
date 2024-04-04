@@ -20,6 +20,7 @@ import Foundation
 import AppKit
 import Bookmarks
 import Common
+import PixelKit
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
@@ -163,7 +164,7 @@ final class AppearancePreferences: ObservableObject {
             persistor.isFavoriteVisible = isFavoriteVisible
             // Temporary Pixel
             if !isFavoriteVisible {
-                Pixel.fire(.favoriteSectionHidden)
+                PixelKit.fire(GeneralPixel.favoriteSectionHidden)
             }
         }
     }
@@ -173,7 +174,7 @@ final class AppearancePreferences: ObservableObject {
             persistor.isContinueSetUpVisible = isContinueSetUpVisible
             // Temporary Pixel
             if !isContinueSetUpVisible {
-                Pixel.fire(.continueSetUpSectionHidden)
+                PixelKit.fire(GeneralPixel.continueSetUpSectionHidden)
             }
         }
     }
@@ -183,7 +184,7 @@ final class AppearancePreferences: ObservableObject {
             persistor.isRecentActivityVisible = isRecentActivityVisible
             // Temporary Pixel
             if !isRecentActivityVisible {
-                Pixel.fire(.recentActivitySectionHidden)
+                PixelKit.fire(GeneralPixel.recentActivitySectionHidden)
             }
         }
     }

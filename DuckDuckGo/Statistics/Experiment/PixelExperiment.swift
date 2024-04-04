@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import PixelKit
 
 enum PixelExperiment: String, CaseIterable {
 
@@ -136,16 +137,16 @@ final internal class PixelExperimentLogic {
     // Often used
     func fireFirstSerpPixel() {
         guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.serpInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
+        PixelKit.fire(GeneralPixel.serpInitial(cohort: cohort.rawValue), frequency: .justOnce, includeAppVersionParameter: false)
     }
 
     // Often used for retention experiments
     func fireDay21To27SerpPixel() {
         guard allocatedCohort != nil, let cohort else { return }
 
-        if now() >= Pixel.firstLaunchDate.adding(.days(21)) && now() <= Pixel.firstLaunchDate.adding(.days(27)) {
-            Pixel.fire(.serpDay21to27(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
-        }
+//        if now() >= Pixel.firstLaunchDate.adding(.days(21)) && now() <= Pixel.firstLaunchDate.adding(.days(27)) { // TODO: reimplement
+//            PixelKit.fire(GeneralPixel.serpDay21to27(cohort: cohort.rawValue), frequency: .justOnce, includeAppVersionParameter: false)
+//        }
     }
 
     func cleanup() {

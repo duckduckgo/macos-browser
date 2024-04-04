@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import SwiftUI
 import History
+import PixelKit
 
 @MainActor
 final class HomePageViewController: NSViewController {
@@ -107,7 +108,7 @@ final class HomePageViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 //        if OnboardingViewModel.isOnboardingFinished && Pixel.isNewUser {
-//            Pixel.fire(.newTabInitial, limitTo: .initial)
+//            PixelKit.fire(GeneralPixel.newTabInitial, limitTo: .initial)
 //        } // TODO: reimplement Pixel.isNewUser
         subscribeToHistory()
     }
@@ -158,7 +159,7 @@ final class HomePageViewController: NSViewController {
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
         return .init(isDefault: DefaultBrowserPreferences.shared.isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
-            Pixel.fire(.defaultRequestedFromHomepage)
+            PixelKit.fire(GeneralPixel.defaultRequestedFromHomepage)
             let defaultBrowserPreferencesModel = DefaultBrowserPreferences.shared
             defaultBrowserPreferencesModel.becomeDefault { [weak self] isDefault in
                 _ = defaultBrowserPreferencesModel

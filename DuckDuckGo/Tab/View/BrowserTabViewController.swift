@@ -23,6 +23,7 @@ import Common
 import SwiftUI
 import WebKit
 import Subscription
+import PixelKit
 
 // swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
@@ -1105,7 +1106,7 @@ extension BrowserTabViewController: OnboardingDelegate {
             return
         }
 
-        Pixel.fire(.defaultRequestedFromOnboarding)
+        PixelKit.fire(GeneralPixel.defaultRequestedFromOnboarding)
         defaultBrowserPreferences.becomeDefault { _ in
             _ = defaultBrowserPreferences
             withAnimation {

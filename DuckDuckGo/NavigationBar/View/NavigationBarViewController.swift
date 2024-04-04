@@ -1095,7 +1095,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 #if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
-        Pixel.fire(.privacyProOfferScreenImpression)
+        PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {

@@ -80,7 +80,7 @@ final class DefaultBrowserPreferences: ObservableObject {
             guard NSApp.runType.requiresEnvironment else { return }
 #endif
 //            if Pixel.isNewUser && isDefault { // TODO: reimplement Pixel.isNewUser
-//                Pixel.fire(.setAsDefaultInitial, limitTo: .initial)
+//                PixelKit.fire(GeneralPixel.setAsDefaultInitial, limitTo: .initial)
 //            }
         }
     }

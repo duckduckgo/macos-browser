@@ -20,18 +20,19 @@ import Foundation
 import BrowserServicesKit
 import Common
 import Persistence
+import PixelKit
 
 public class CredentialsCleanupErrorHandling: EventMapping<CredentialsCleanupError> {
 
     public init() {
         super.init { event, _, _, _ in
             if event.cleanupError is CredentialsCleanupCancelledError {
-                Pixel.fire(.debug(event: .credentialsCleanupAttemptedWhileSyncWasEnabled))
+                PixelKit.fire(DebugEvent(GeneralPixel.credentialsCleanupAttemptedWhileSyncWasEnabled))
             } else {
                 let processedErrors = CoreDataErrorsParser.parse(error: event.cleanupError as NSError)
                 let params = processedErrors.errorPixelParameters
 
-                Pixel.fire(.debug(event: .credentialsDatabaseCleanupFailed, error: event.cleanupError), withAdditionalParameters: params)
+                PixelKit.fire(DebugEvent(GeneralPixel.credentialsDatabaseCleanupFailed, error: event.cleanupError), withAdditionalParameters: params)
             }
         }
     }

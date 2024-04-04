@@ -353,7 +353,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
 
         sendInviteCodeAvailableNotification {
             DispatchQueue.main.async {
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndContinuous)
             }
         }
     }

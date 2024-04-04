@@ -21,6 +21,7 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
+import PixelKit
 
 protocol YoutubeScriptsProvider {
     var youtubeOverlayScript: YoutubeOverlayUserScript? { get }
@@ -111,9 +112,9 @@ extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
 
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView) {
         if duckPlayer.mode == .enabled {
-            Pixel.fire(.duckPlayerViewFromYoutubeAutomatic)
+            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeAutomatic)
         } else {
-            Pixel.fire(.duckPlayerViewFromYoutubeViaHoverButton)
+            PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaHoverButton)
         }
         // to be standardised across the app
         let isRequestingNewTab = NSApp.isCommandPressed
@@ -191,7 +192,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // Always allow loading Private Player URLs (local HTML)
         if navigationAction.url.isDuckURLScheme || navigationAction.url.isDuckPlayer {
             if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
-                Pixel.fire(.duckPlayerViewFromSERP)
+                PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
             }
             return .allow
         }
@@ -278,10 +279,10 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
             switch navigationAction.navigationType {
             case .custom, .redirect(.server):
-                Pixel.fire(.duckPlayerViewFromOther)
+                PixelKit.fire(GeneralPixel.duckPlayerViewFromOther)
             case .other:
                 if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
-                    Pixel.fire(.duckPlayerViewFromSERP)
+                    PixelKit.fire(GeneralPixel.duckPlayerViewFromSERP)
                 }
             default:
                 break
@@ -300,7 +301,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return
         }
         if navigation.url.isDuckPlayer {
-            Pixel.fire(.duckPlayerDailyUniqueView, limitTo: .dailyFirst)
+            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView, frequency: .dailyOnly)
         }
     }
 

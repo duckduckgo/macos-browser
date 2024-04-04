@@ -47,7 +47,7 @@ final class CrashReporter {
             return
         }
 
-        Pixel.fire(.crash)
+        PixelKit.fire(GeneralPixel.crash)
 
         latestCrashReport = latest
         promptPresenter.showPrompt(self, for: latest)

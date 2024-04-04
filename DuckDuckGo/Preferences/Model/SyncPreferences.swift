@@ -244,7 +244,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncLogoutError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncLogoutError(error: error)))
             }
         }
     }
@@ -396,7 +396,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncDeleteAccountError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncDeleteAccountError(error: error)))
             }
         }
     }
@@ -411,7 +411,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 mapDevices(devices)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToUpdateDeviceName, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncUpdateDeviceError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncUpdateDeviceError(error: error)))
             }
             syncService.scheduler.resumeSyncQueue()
         }
@@ -427,7 +427,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         let device = deviceInfo()
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
         mapDevices(devices)
-        Pixel.fire(.syncLogin)
+        PixelKit.fire(GeneralPixel.syncLogin)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if isRecovery {
                 self.showDevicesSynced()
@@ -449,11 +449,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 let device = deviceInfo()
                 presentDialog(for: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                Pixel.fire(.syncSignupDirect)
+                PixelKit.fire(GeneralPixel.syncSignupDirect)
                 presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToSyncToServer, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncSignupError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncSignupError(error: error)))
             }
         }
     }
@@ -489,7 +489,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                             description: error.localizedDescription
                         )
                     }
-                    firePixelIfNeeded(event: .debug(event: .syncLoginError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncLoginError(error: error)))
                 }
             }
         }
@@ -512,14 +512,14 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: fromRecoveryScreen)
                 } catch {
                     managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToMergeTwoAccounts, description: "")
-                    firePixelIfNeeded(event: .debug(event: .syncLoginExistingAccountError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncLoginExistingAccountError(error: error)))
                 }
             } else if let connectKey = syncCode.connect {
                 do {
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                        Pixel.fire(.syncSignupConnect)
+                        PixelKit.fire(GeneralPixel.syncSignupConnect)
                         presentDialog(for: .saveRecoveryCode(recoveryCode))
                     }
 
@@ -538,7 +538,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                         type: .unableToSyncToOtherDevice,
                         description: error.localizedDescription
                     )
-                    firePixelIfNeeded(event: .debug(event: .syncLoginError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncLoginError(error: error)))
                 }
             } else {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .invalidCode, description: "")
@@ -580,7 +580,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 }
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableCreateRecoveryPDF, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncCannotCreateRecoveryPDF, error: nil))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncCannotCreateRecoveryPDF))
             }
         }
 
@@ -595,7 +595,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToRemoveDevice, description: error.localizedDescription)
-                firePixelIfNeeded(event: .debug(event: .syncRemoveDeviceError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.syncRemoveDeviceError(error: error)))
             }
         }
     }
@@ -664,16 +664,4 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool) {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
     }
-
-    private func firePixelIfNeeded(event: Pixel.Event) {
-        if case let .debug(_, debugError) = event {
-            if debugError == nil {
-                Pixel.fire(event)
-            }
-            if let syncError = debugError as? SyncError, !syncError.isServerError {
-                Pixel.fire(event, withAdditionalParameters: syncError.errorParameters)
-            }
-        }
-    }
-
 }

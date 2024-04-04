@@ -22,6 +22,7 @@ import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
+import PixelKit
 
 final class SyncCredentialsAdapter {
 
@@ -85,17 +86,17 @@ final class SyncCredentialsAdapter {
                 .sink { [weak self] error in
                     switch error {
                     case let syncError as SyncError:
-                        Pixel.fire(.debug(event: .syncCredentialsFailed, error: syncError))
+                        PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsFailed, error: syncError))
                         switch syncError {
                         case .unexpectedStatusCode(409):
                             // If credentials count limit has been exceeded
                             self?.isSyncCredentialsPaused = true
-                            Pixel.fire(.syncCredentialsCountLimitExceededDaily, limitTo: .dailyFirst)
+                            PixelKit.fire(GeneralPixel.syncCredentialsCountLimitExceededDaily, frequency: .dailyOnly)
                             self?.showSyncPausedAlert()
                         case .unexpectedStatusCode(413):
                             // If credentials request size limit has been exceeded
                             self?.isSyncCredentialsPaused = true
-                            Pixel.fire(.syncCredentialsRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
+                            PixelKit.fire(GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .dailyOnly)
                             self?.showSyncPausedAlert()
                         default:
                             break
@@ -105,7 +106,7 @@ final class SyncCredentialsAdapter {
                         if nsError.domain != NSURLErrorDomain {
                             let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
                             let params = processedErrors.errorPixelParameters
-                            Pixel.fire(.debug(event: .syncCredentialsFailed, error: error), withAdditionalParameters: params)
+                            PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsFailed, error: error), withAdditionalParameters: params)
                         }
                     }
                     os_log(.error, log: OSLog.sync, "Credentials Sync error: %{public}s", String(reflecting: error))
@@ -116,7 +117,7 @@ final class SyncCredentialsAdapter {
         } catch let error as NSError {
             let processedErrors = CoreDataErrorsParser.parse(error: error)
             let params = processedErrors.errorPixelParameters
-            Pixel.fire(.debug(event: .syncCredentialsProviderInitializationFailed, error: error), withAdditionalParameters: params)
+            PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsProviderInitializationFailed, error: error), withAdditionalParameters: params)
         }
     }
 

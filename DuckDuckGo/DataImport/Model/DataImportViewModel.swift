@@ -18,8 +18,8 @@
 
 import AppKit
 import Common
-import Foundation
 import UniformTypeIdentifiers
+import PixelKit
 
 struct DataImportViewModel {
 
@@ -248,7 +248,7 @@ struct DataImportViewModel {
                     // switch to file import of the failed data type displaying successful import results
                     nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
-                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
+                PixelKit.fire(GeneralPixel.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
             }
         }
 
@@ -286,7 +286,7 @@ struct DataImportViewModel {
             switch error {
             // chromium user denied keychain prompt error
             case let error as ChromiumLoginReader.ImportError where error.type == .userDeniedKeychainPrompt:
-                Pixel.fire(.passwordImportKeychainPromptDenied)
+                PixelKit.fire(GeneralPixel.passwordImportKeychainPromptDenied)
                 // stay on the same screen
                 return true
 
@@ -310,7 +310,7 @@ struct DataImportViewModel {
                 log("file read no permission for \(url.path)")
 
                 if url != selectedProfile?.profileURL.appendingPathComponent(SafariDataImporter.bookmarksFileName) {
-                    Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
+                    PixelKit.fire(GeneralPixel.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
                 }
                 screen = .getReadPermission(url)
                 return true

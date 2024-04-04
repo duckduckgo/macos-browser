@@ -21,6 +21,7 @@ import Common
 import CoreData
 import Foundation
 import UniformTypeIdentifiers
+import PixelKit
 
 protocol DownloadListStoring {
 
@@ -191,7 +192,7 @@ extension DownloadListItem {
               let modified = managedObject.modified,
               let url = managedObject.urlEncrypted as? URL
         else {
-            Pixel.fire(.debug(event: .downloadListItemDecryptionFailedUnique), limitTo: .dailyFirst)
+            PixelKit.fire(DebugEvent(GeneralPixel.downloadListItemDecryptionFailedUnique), frequency: .dailyOnly)
             assertionFailure("DownloadListItem: Failed to init from ManagedObject")
             return nil
         }

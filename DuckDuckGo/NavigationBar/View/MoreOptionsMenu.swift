@@ -399,7 +399,7 @@ final class MoreOptionsMenu: NSMenu {
             }
 #endif
 
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndContinuous)
 
         } else {
             DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
@@ -571,7 +571,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
             let pixelParameters = self.emailManager.emailPixelParameters
             self.emailManager.updateLastUseDate()
 
-            Pixel.fire(.emailUserCreatedAlias, withAdditionalParameters: pixelParameters)
+            PixelKit.fire(GeneralPixel.emailUserCreatedAlias, withAdditionalParameters: pixelParameters)
 
             NSPasteboard.general.copy(address)
             NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)

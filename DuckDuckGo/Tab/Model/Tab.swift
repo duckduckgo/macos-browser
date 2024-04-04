@@ -1520,7 +1520,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
         }
 
-        Pixel.fire(.debug(event: .webKitDidTerminate, error: error))
+        PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error))
     }
 
     @MainActor
