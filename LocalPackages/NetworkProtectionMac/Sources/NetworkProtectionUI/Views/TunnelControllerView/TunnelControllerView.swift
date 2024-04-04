@@ -196,7 +196,7 @@ public struct TunnelControllerView: View {
         LottieView(animation: .named(animationName))
             .configure { animationView in
                 animationView.contentMode = .scaleAspectFit
-                animationView.clipsToBounds = false
+                animationView.clipsToBounds = true
             }
             .playing(withIntro: .init(
                     skipIntro: model.isVPNEnabled && !model.isToggleDisabled && !model.isToggleUserInitiated,

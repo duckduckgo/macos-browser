@@ -1,5 +1,5 @@
 //
-//  Lottie+withIntro.swift
+//  LottieView+withIntro.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //

@@ -30,8 +30,8 @@ final class NetworkProtectionAssetTests: XCTestCase {
         let assetsAndExpectedRawValues: [NetworkProtectionAsset: String] = [
             .ipAddressIcon: "IP-16",
             .serverLocationIcon: "Server-Location-16",
-            .vpnDisabledImage: "VPN-Disabled-128",
-            .vpnEnabledImage: "VPN-128",
+            .vpnDisabledImage: "VPN-Disabled",
+            .vpnEnabledImage: "VPN",
             .vpnIcon: "VPN-16",
             .appleVaultIcon: "apple-vault-icon",
             .appleVPNIcon: "apple-vpn-icon",
