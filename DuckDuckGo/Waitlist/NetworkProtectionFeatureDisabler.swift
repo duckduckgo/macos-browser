@@ -102,7 +102,18 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
             }
         }
 
-        try? await removeVPNConfiguration()
+        var attemptNumber = 1
+        while attemptNumber <= 3 {
+            do {
+                try await removeVPNConfiguration()
+                break // Removal succeeded, break out of the while loop and continue with the rest of uninstallation
+            } catch {
+                print("Failed to remove VPN configuration, with error: \(error.localizedDescription)")
+            }
+
+            attemptNumber += 1
+        }
+
         // We want to give some time for the login item to reset state before disabling it
         try? await Task.sleep(interval: 0.5)
         disableLoginItems()
