@@ -162,7 +162,8 @@ private extension ContextualMenu {
 
     static func addBookmarkToFavoritesMenuItem(isFavorite: Bool, bookmark: Bookmark?) -> NSMenuItem {
         let title = isFavorite ? UserText.removeFromFavorites : UserText.addToFavorites
-        return menuItem(title, #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), bookmark)
+        let accessibilityValue = isFavorite ? "Favorited" : "Unfavorited"
+        return menuItem(title, #selector(BookmarkMenuItemSelectors.toggleBookmarkAsFavorite(_:)), bookmark).withAccessibilityIdentifier("ContextualMenu.addBookmarkToFavoritesMenuItem").withAccessibilityValue(accessibilityValue)
     }
 
     static func addBookmarksToFavoritesMenuItem(bookmarks: [Bookmark], allFavorites: Bool) -> NSMenuItem {

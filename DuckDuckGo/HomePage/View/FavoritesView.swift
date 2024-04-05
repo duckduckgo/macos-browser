@@ -344,13 +344,13 @@ extension HomePage.Models.FavoriteModel {
     var favoriteView: some View {
         switch favoriteType {
         case .bookmark(let bookmark):
-            HomePage.Views.Favorite(bookmark: bookmark)
+            HomePage.Views.Favorite(bookmark: bookmark)?.accessibilityIdentifier("HomePage.Models.FavoriteModel.\(bookmark.title)")
 
         case .addButton:
-            HomePage.Views.FavoritesGridAddButton()
+            HomePage.Views.FavoritesGridAddButton().accessibilityIdentifier("HomePage.Models.FavoriteModel.addButton")
 
         case .ghostButton:
-            HomePage.Views.FavoritesGridGhostButton()
+            HomePage.Views.FavoritesGridGhostButton().accessibilityIdentifier("HomePage.Models.FavoriteModel.ghostButton")
         }
     }
 }
