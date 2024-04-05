@@ -17,12 +17,12 @@
 //
 
 import Foundation
-@testable import DuckDuckGo_Privacy_Browser
 
+#if DEBUG
 final class DownloadListStoreMock: DownloadListStoring {
 
     var fetchBlock: ((@escaping @MainActor (Result<[DownloadListItem], Error>) -> Void) -> Void)?
-    func fetch(completionHandler: @escaping @MainActor (Result<[DuckDuckGo_Privacy_Browser.DownloadListItem], any Error>) -> Void) {
+    func fetch(completionHandler: @escaping @MainActor (Result<[DownloadListItem], any Error>) -> Void) {
         fetchBlock?(completionHandler)
     }
 
@@ -42,3 +42,4 @@ final class DownloadListStoreMock: DownloadListStoring {
     }
 
 }
+#endif

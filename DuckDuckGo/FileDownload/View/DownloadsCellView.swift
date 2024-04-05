@@ -22,6 +22,11 @@ import UniformTypeIdentifiers
 
 final class DownloadsCellView: NSTableCellView {
 
+    fileprivate enum Constants {
+        static let width: CGFloat = 420
+        static let height: CGFloat = 60
+    }
+
     enum DownloadError: Error {
         case urlNotSet
         case fileRemoved
@@ -38,13 +43,22 @@ final class DownloadsCellView: NSTableCellView {
         }
     }
 
-    @IBOutlet var titleLabel: NSTextField!
-    @IBOutlet var detailLabel: NSTextField!
-    @IBOutlet var progressView: CircularProgressView!
-    @IBOutlet var cancelButton: MouseOverButton!
-    @IBOutlet var revealButton: MouseOverButton!
-    @IBOutlet var restartButton: MouseOverButton!
-    @IBOutlet var separator: NSBox!
+    private let fileIconView = NSImageView()
+    private let titleLabel = NSTextField()
+    private let detailLabel = NSTextField()
+
+    private let progressView = CircularProgressView()
+    private let cancelButton = MouseOverButton(image: .cancelDownload,
+                                               target: nil,
+                                               action: #selector(DownloadsViewController.cancelDownloadAction))
+    private let revealButton = MouseOverButton(image: .revealDownload,
+                                               target: nil,
+                                               action: #selector(DownloadsViewController.revealDownloadAction))
+    private let restartButton = MouseOverButton(image: .restartDownload,
+                                                target: nil,
+                                                action: #selector(DownloadsViewController.restartDownloadAction))
+
+    private let separator = NSBox()
 
     private var buttonOverCancellables = Set<AnyCancellable>()
     private var cancellables = Set<AnyCancellable>()
@@ -82,7 +96,149 @@ final class DownloadsCellView: NSTableCellView {
         }
     }
 
-    override func awakeFromNib() {
+    init(identifier: NSUserInterfaceItemIdentifier) {
+        super.init(frame: CGRect(x: 0, y: 0, width: Constants.width, height: Constants.height))
+        self.identifier = identifier
+
+        setupUI()
+        subscribeToMouseOverEvents()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
+    // swiftlint:disable:next function_body_length
+    private func setupUI() {
+        self.imageView = fileIconView
+        self.wantsLayer = true
+
+        addSubview(fileIconView)
+        addSubview(titleLabel)
+        addSubview(detailLabel)
+        addSubview(cancelButton)
+        addSubview(revealButton)
+        addSubview(restartButton)
+        addSubview(progressView)
+        addSubview(separator)
+
+        fileIconView.translatesAutoresizingMaskIntoConstraints = false
+        fileIconView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        fileIconView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
+        fileIconView.imageScaling = .scaleProportionallyDown
+
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.isEditable = false
+        titleLabel.isBordered = false
+        titleLabel.isSelectable = false
+        titleLabel.drawsBackground = false
+        titleLabel.font = .systemFont(ofSize: 13)
+        titleLabel.textColor = .controlTextColor
+        titleLabel.lineBreakMode = .byTruncatingMiddle
+        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        titleLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        titleLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+
+        detailLabel.translatesAutoresizingMaskIntoConstraints = false
+        detailLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        detailLabel.isEditable = false
+        detailLabel.isBordered = false
+        detailLabel.isSelectable = false
+        detailLabel.drawsBackground = false
+        detailLabel.font = .systemFont(ofSize: 13)
+        detailLabel.textColor = .secondaryLabelColor
+        detailLabel.lineBreakMode = .byClipping
+        detailLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        detailLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+
+        cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        cancelButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        cancelButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        cancelButton.bezelStyle = .shadowlessSquare
+        cancelButton.isBordered = false
+        cancelButton.imagePosition = .imageOnly
+        cancelButton.imageScaling = .scaleProportionallyDown
+        cancelButton.cornerRadius = 4
+        cancelButton.backgroundInset = CGPoint(x: 2, y: 2)
+        cancelButton.mouseDownColor = .buttonMouseDown
+        cancelButton.mouseOverColor = .buttonMouseOver
+
+        revealButton.translatesAutoresizingMaskIntoConstraints = false
+        revealButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        revealButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        revealButton.alignment = .center
+        revealButton.bezelStyle = .shadowlessSquare
+        cancelButton.isBordered = false
+        revealButton.imagePosition = .imageOnly
+        revealButton.imageScaling = .scaleProportionallyDown
+        revealButton.cornerRadius = 4
+        revealButton.backgroundInset = CGPoint(x: 2, y: 2)
+        revealButton.mouseDownColor = .buttonMouseDown
+        revealButton.mouseOverColor = .buttonMouseOver
+
+        restartButton.translatesAutoresizingMaskIntoConstraints = false
+        restartButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        restartButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        restartButton.alignment = .center
+        restartButton.bezelStyle = .shadowlessSquare
+        restartButton.isBordered = false
+        restartButton.imagePosition = .imageOnly
+        restartButton.imageScaling = .scaleProportionallyDown
+        restartButton.cornerRadius = 4
+        restartButton.backgroundInset = CGPoint(x: 2, y: 2)
+        restartButton.mouseDownColor = .buttonMouseDown
+        restartButton.mouseOverColor = .buttonMouseOver
+
+        separator.boxType = .separator
+        separator.translatesAutoresizingMaskIntoConstraints = false
+
+        setupLayout()
+    }
+
+    private func setupLayout() {
+        NSLayoutConstraint.activate([
+            fileIconView.heightAnchor.constraint(equalToConstant: 32),
+            fileIconView.widthAnchor.constraint(equalToConstant: 32),
+            fileIconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 7),
+            fileIconView.centerYAnchor.constraint(equalTo: centerYAnchor),
+
+            titleLabel.heightAnchor.constraint(equalToConstant: 16),
+            titleLabel.leadingAnchor.constraint(equalTo: fileIconView.trailingAnchor, constant: 6),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 12),
+            detailLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+
+            cancelButton.heightAnchor.constraint(equalToConstant: 32),
+            cancelButton.widthAnchor.constraint(equalToConstant: 32),
+            cancelButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 8),
+            cancelButton.leadingAnchor.constraint(equalTo: detailLabel.trailingAnchor, constant: 8),
+            cancelButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+            trailingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 4),
+
+            revealButton.widthAnchor.constraint(equalToConstant: 32),
+            revealButton.heightAnchor.constraint(equalToConstant: 32),
+            revealButton.centerYAnchor.constraint(equalTo: cancelButton.centerYAnchor),
+            revealButton.centerXAnchor.constraint(equalTo: cancelButton.centerXAnchor),
+
+            restartButton.widthAnchor.constraint(equalToConstant: 32),
+            restartButton.heightAnchor.constraint(equalToConstant: 32),
+            restartButton.centerXAnchor.constraint(equalTo: revealButton.centerXAnchor),
+            restartButton.centerYAnchor.constraint(equalTo: revealButton.centerYAnchor),
+
+            progressView.widthAnchor.constraint(equalToConstant: 27),
+            progressView.heightAnchor.constraint(equalToConstant: 27),
+            progressView.centerXAnchor.constraint(equalTo: cancelButton.centerXAnchor),
+            progressView.centerYAnchor.constraint(equalTo: cancelButton.centerYAnchor),
+
+            separator.topAnchor.constraint(equalTo: detailLabel.bottomAnchor, constant: 12),
+            separator.leadingAnchor.constraint(equalTo: leadingAnchor),
+            trailingAnchor.constraint(equalTo: separator.trailingAnchor),
+            bottomAnchor.constraint(equalTo: separator.bottomAnchor),
+        ])
+    }
+
+    private func subscribeToMouseOverEvents() {
         cancelButton.$isMouseOver.sink { [weak self] isMouseOver in
             self?.onButtonMouseOverChange?(isMouseOver)
         }.store(in: &buttonOverCancellables)
@@ -163,8 +319,10 @@ final class DownloadsCellView: NSTableCellView {
             .store(in: &cancellables)
     }
 
-    private static let fileRemovedTitleAttributes: [NSAttributedString.Key: Any] = [.strikethroughStyle: 1,
-                                                                                    .foregroundColor: NSColor.disabledControlTextColor]
+    private static let fileRemovedTitleAttributes: [NSAttributedString.Key: Any] = [
+        .strikethroughStyle: 1,
+        .foregroundColor: NSColor.disabledControlTextColor
+    ]
 
     private func updateFilename(_ filename: String, state: DownloadViewModel.State) {
         // hide progress with animation on completion/failure
@@ -357,3 +515,56 @@ extension DownloadsCellView.DownloadError: LocalizedError {
     }
 
 }
+
+#if DEBUG
+@available(macOS 14.0, *)
+#Preview {
+    DownloadsCellView.PreviewView()
+}
+@available(macOS 14.0, *)
+let previewDownloadListItems = [
+    DownloadListItem(identifier: .init(), added: .now, modified: .now, downloadURL: .empty, websiteURL: nil, fileName: "Indefinite progress download with long filename for clipping.zip", progress: Progress(totalUnitCount: -1), isBurner: false, destinationURL: URL(fileURLWithPath: "\(#file)"), destinationFileBookmarkData: nil, tempURL: URL(fileURLWithPath: "\(#file)"), tempFileBookmarkData: nil, error: nil),
+    DownloadListItem(identifier: .init(), added: .now, modified: .now, downloadURL: .empty, websiteURL: nil, fileName: "Active download.pdf", progress: Progress(totalUnitCount: 100, completedUnitCount: 42), isBurner: false, destinationURL: URL(fileURLWithPath: "\(#file)"), destinationFileBookmarkData: nil, tempURL: URL(fileURLWithPath: "\(#file)"), tempFileBookmarkData: nil, error: nil),
+    DownloadListItem(identifier: .init(), added: .now, modified: .now, downloadURL: .empty, websiteURL: nil, fileName: "Completed download.dmg", progress: nil, isBurner: false, destinationURL: URL(fileURLWithPath: "\(#file)"), destinationFileBookmarkData: nil, tempURL: nil, tempFileBookmarkData: nil, error: nil),
+    DownloadListItem(identifier: .init(), added: .now, modified: .now, downloadURL: .empty, websiteURL: nil, fileName: "Non-retryable download.txt", progress: nil, isBurner: false, destinationURL: URL(fileURLWithPath: "\(#file)"), destinationFileBookmarkData: nil, tempURL: URL(fileURLWithPath: "\(#file)"), tempFileBookmarkData: nil, error: nil),
+    DownloadListItem(identifier: .init(), added: .now, modified: .now, downloadURL: .empty, websiteURL: nil, fileName: "Retryable download.rtf", progress: nil, isBurner: false, destinationURL: URL(fileURLWithPath: "\(#file)"), destinationFileBookmarkData: nil, tempURL: URL(fileURLWithPath: "\(#file)"), tempFileBookmarkData: nil, error: FileDownloadError(URLError(.networkConnectionLost, userInfo: ["isRetryable": true]) as NSError)),
+]
+@available(macOS 14.0, *)
+extension DownloadsCellView {
+    final class PreviewView: NSView {
+
+        init() {
+            super.init(frame: .zero)
+            translatesAutoresizingMaskIntoConstraints = true
+
+            let cells = [
+                DownloadsCellView(identifier: .init("")),
+                DownloadsCellView(identifier: .init("")),
+                DownloadsCellView(identifier: .init("")),
+                DownloadsCellView(identifier: .init("")),
+                DownloadsCellView(identifier: .init("")),
+            ]
+
+            for (idx, cell) in cells.enumerated() {
+                cell.widthAnchor.constraint(equalToConstant: 420).isActive = true
+                cell.heightAnchor.constraint(equalToConstant: 60).isActive = true
+                let item = previewDownloadListItems[idx]
+                cell.objectValue = DownloadViewModel(item: item)
+            }
+
+            let stackView = NSStackView(views: cells as [NSView])
+            stackView.orientation = .vertical
+            stackView.spacing = 1
+            addAndLayout(stackView)
+
+            widthAnchor.constraint(equalToConstant: 420).isActive = true
+            heightAnchor.constraint(equalToConstant: CGFloat((60 + 1) * cells.count)).isActive = true
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+    }
+}
+#endif
