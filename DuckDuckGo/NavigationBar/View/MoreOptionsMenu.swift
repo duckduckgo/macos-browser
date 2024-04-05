@@ -364,8 +364,6 @@ final class MoreOptionsMenu: NSMenu {
                 }
             }
 #endif
-
-            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else {
             networkProtectionFeatureVisibility.disableForWaitlistUsers()
         }
