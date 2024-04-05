@@ -33,7 +33,7 @@ struct DefaultVPNFeedbackSender: VPNFeedbackSender {
         let pixelEvent = GeneralPixel.vpnBreakageReport(category: category.rawValue, description: encodedUserText, metadata: metadata.toBase64())
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            PixelKit.fire(pixelEvent) { succes, error in
+            PixelKit.fire(pixelEvent) { _, error in
                 if let error {
                     continuation.resume(throwing: error)
                 } else {

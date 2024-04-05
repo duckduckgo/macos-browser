@@ -122,7 +122,7 @@ enum PrivacyProPixel: PixelKitEventV2 {
         return nil
     }
 
-    var parameters: [String : String]? {
+    var parameters: [String: String]? {
         return nil
     }
 }

@@ -378,7 +378,7 @@ public final class PixelKit {
     }
 
     public static func clearFrequencyHistoryForAllPixels() {
-        //TODO: Implement
+        // TODO: Implement
         assertionFailure("To be implemented")
     }
 

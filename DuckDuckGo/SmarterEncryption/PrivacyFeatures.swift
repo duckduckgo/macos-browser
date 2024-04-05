@@ -56,16 +56,16 @@ final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
         }
 
         if dailyAndCount {
-            PixelKit.fire(DebugEvent(domainEvent, error: error), 
+            PixelKit.fire(DebugEvent(domainEvent, error: error),
                           frequency: .dailyAndCount,
                           withAdditionalParameters: parameters ?? [:],
-                          includeAppVersionParameter: true) { success, error in
+                          includeAppVersionParameter: true) { _, error in
                 onComplete(error)
             }
         } else {
             PixelKit.fire(DebugEvent(domainEvent, error: error),
                           frequency: .dailyAndCount,
-                          withAdditionalParameters: parameters ?? [:]) { success, error in
+                          withAdditionalParameters: parameters ?? [:]) { _, error in
                 onComplete(error)
             }
         }

@@ -234,7 +234,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 //        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts { // Re-implement https://app.asana.com/0/0/1207002879349166/f
 //            PixelExperiment.cleanup()
 //        }
-        
+
         if LocalStatisticsStore().atb == nil {
             AppDelegate.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here

@@ -71,7 +71,7 @@ final class LoginItemsManager {
                                                       action: "enable",
                                                       buildType: AppVersion.shared.buildType,
                                                       osVersion: AppVersion.shared.osVersion)
-        PixelKit.fire(DebugEvent(event, error: error) , frequency: .dailyAndCount)
+        PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
         os_log("🔴 Could not enable %{public}@: %{public}@", item.debugDescription, error.debugDescription)
     }
 
