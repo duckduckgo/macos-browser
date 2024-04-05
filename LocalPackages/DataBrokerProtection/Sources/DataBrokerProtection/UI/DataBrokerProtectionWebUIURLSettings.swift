@@ -37,7 +37,7 @@ public protocol DataBrokerProtectionWebUIURLSettingsRepresentable {
 
 public final class DataBrokerProtectionWebUIURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable {
 
-    public let productionURL = "https://duckduckgo.com/dbp"
+    public let productionURL = "https://use-devtesting19.duckduckgo.com/dbp"
     private let userDefault: UserDefaults
 
     public var selectedURLType: DataBrokerProtectionWebUIURLType {
