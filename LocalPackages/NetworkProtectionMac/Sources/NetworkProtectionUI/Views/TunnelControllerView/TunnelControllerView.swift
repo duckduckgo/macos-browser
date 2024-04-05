@@ -199,7 +199,7 @@ public struct TunnelControllerView: View {
                 animationView.clipsToBounds = true
             }
             .playing(withIntro: .init(
-                    skipIntro: model.isVPNEnabled && !model.isToggleDisabled && !model.isToggleUserInitiated,
+                    skipIntro: model.isVPNEnabled && !model.isToggleDisabled,
                     introStartFrame: 0,
                     introEndFrame: 100,
                     loopStartFrame: 130,
