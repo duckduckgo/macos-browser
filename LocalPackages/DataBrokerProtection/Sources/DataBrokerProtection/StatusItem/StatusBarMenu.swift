@@ -44,7 +44,6 @@ public final class StatusBarMenu: NSObject {
         statusItem.button?.sendAction(on: [.leftMouseUp])
     }
 
-
     // MARK: - Popover
 
     private func togglePopover() {
@@ -58,5 +57,15 @@ public final class StatusBarMenu: NSObject {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
             popover.contentViewController?.view.window?.makeKey()
         }
+    }
+
+    // MARK: - Showing & Hiding the menu
+
+    public func show() {
+        statusItem.isVisible = true
+    }
+
+    public func hide() {
+        statusItem.isVisible = false
     }
 }

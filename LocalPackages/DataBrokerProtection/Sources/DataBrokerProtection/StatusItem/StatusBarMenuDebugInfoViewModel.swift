@@ -23,8 +23,6 @@ public final class StatusBarMenuDebugInfoViewModel: ObservableObject {
     var bundlePath: String
     var version: String
 
-    // MARK: - Initialization & Deinitialization
-
     public init(bundle: Bundle = .main) {
         bundlePath = bundle.bundlePath
 
