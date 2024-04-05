@@ -40,7 +40,7 @@ typealias AlertDialogRequest = UserDialogRequest<JSAlertParameters, Void>
 typealias BasicAuthDialogRequest = UserDialogRequest<URLProtectionSpace, AuthChallengeDisposition?>
 typealias PrintDialogRequest = UserDialogRequest<NSPrintOperation, Bool>
 
-enum JSAlertQuery {
+enum JSAlertQuery: Equatable {
     case confirm(ConfirmDialogRequest)
     case textInput(TextInputDialogRequest)
     case alert(AlertDialogRequest)
@@ -55,16 +55,35 @@ enum JSAlertQuery {
             return request.submit(nil)
         }
     }
+
+    static func == (lhs: JSAlertQuery, rhs: JSAlertQuery) -> Bool {
+        switch lhs {
+        case .confirm(let r1): if case .confirm(let r2) = rhs { r1 === r2 } else { false }
+        case .textInput(let r1): if case .textInput(let r2) = rhs { r1 === r2 } else { false }
+        case .alert(let r1): if case .alert(let r2) = rhs { r1 === r2 } else { false }
+        }
+    }
 }
 
 extension Tab {
 
-    enum UserDialogType {
+    enum UserDialogType: Equatable {
         case openPanel(OpenPanelDialogRequest)
         case savePanel(SavePanelDialogRequest)
         case jsDialog(JSAlertQuery)
         case basicAuthenticationChallenge(BasicAuthDialogRequest)
         case print(PrintDialogRequest)
+
+        static func == (lhs: Tab.UserDialogType, rhs: Tab.UserDialogType) -> Bool {
+            switch lhs {
+            case .openPanel(let r1): if case .openPanel(let r2) = rhs { r1 === r2 } else { false }
+            case .savePanel(let r1): if case .savePanel(let r2) = rhs { r1 === r2 } else { false }
+            case .jsDialog(let r1): if case .jsDialog(let r2) = rhs { r1 == r2 } else { false }
+            case .basicAuthenticationChallenge(let r1): if case .basicAuthenticationChallenge(let r2) = rhs { r1 === r2 } else { false }
+            case .print(let r1): if case .print(let r2) = rhs { r1 === r2 } else { false }
+            }
+        }
+
     }
 
     enum UserDialogSender: Equatable {
@@ -72,7 +91,7 @@ extension Tab {
         case page(domain: String)
     }
 
-    struct UserDialog {
+    struct UserDialog: Equatable {
         let sender: UserDialogSender
         let dialog: UserDialogType
 
@@ -87,6 +106,11 @@ extension Tab {
             case .print(let request): return request
             }
         }
+
+        static func == (lhs: Tab.UserDialog, rhs: Tab.UserDialog) -> Bool {
+            lhs.sender == rhs.sender && rhs.dialog == rhs.dialog
+        }
+
     }
 
 }
