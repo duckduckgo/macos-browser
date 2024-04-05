@@ -123,7 +123,7 @@ extension YoutubeOverlayUserScript {
             return nil
         }
         if pixelName == "play.use" {
-            PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .unique)
+            PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)
         }
         return nil
     }

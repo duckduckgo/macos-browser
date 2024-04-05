@@ -3284,15 +3284,15 @@
 		F18826842BBEE31700D9AC4F /* PixelKit+Assertion.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */; };
 		F18826852BBEE31700D9AC4F /* PixelKit+Assertion.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */; };
 		F18826862BBEE31700D9AC4F /* PixelKit+Assertion.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */; };
-		F18826872BBF01B600D9AC4F /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
-		F18826882BBF01B600D9AC4F /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
-		F18826892BBF01B800D9AC4F /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
-		F188268A2BBF01BE00D9AC4F /* PixelDataRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */; };
-		F188268B2BBF01BE00D9AC4F /* PixelDataRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */; };
-		F188268C2BBF01C000D9AC4F /* PixelDataRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */; };
 		F188268D2BBF01C300D9AC4F /* PixelDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */; };
 		F188268E2BBF01C400D9AC4F /* PixelDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */; };
 		F188268F2BBF01C500D9AC4F /* PixelDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */; };
+		F18826902BC0105800D9AC4F /* PixelDataRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */; };
+		F18826912BC0105800D9AC4F /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
+		F18826922BC0105900D9AC4F /* PixelDataRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */; };
+		F18826932BC0105900D9AC4F /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
+		F18826942BC0105A00D9AC4F /* PixelDataRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */; };
+		F18826952BC0105A00D9AC4F /* PixelDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */; };
 		F1B33DF22BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */; };
 		F1B33DF32BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */; };
 		F1B33DF42BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B33DF12BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift */; };
@@ -10322,7 +10322,6 @@
 				B6CC26692BAD959500F53F8D /* DownloadProgress.swift in Sources */,
 				3706FAE8293F65D500E42796 /* RecentlyClosedTab.swift in Sources */,
 				1D36E65C298ACD2900AA485D /* AppIconChanger.swift in Sources */,
-				F188268B2BBF01BE00D9AC4F /* PixelDataRecord.swift in Sources */,
 				3706FAE9293F65D500E42796 /* PDFSearchTextMenuItemHandler.swift in Sources */,
 				3706FAEB293F65D500E42796 /* HistoryMenu.swift in Sources */,
 				3706FAEC293F65D500E42796 /* ContentScopeFeatureFlagging.swift in Sources */,
@@ -10539,6 +10538,8 @@
 				37197EA42942441D00394917 /* NewWindowPolicy.swift in Sources */,
 				3706FB84293F65D500E42796 /* NSWindowExtension.swift in Sources */,
 				3706FB85293F65D500E42796 /* AddBookmarkPopover.swift in Sources */,
+				F18826922BC0105900D9AC4F /* PixelDataRecord.swift in Sources */,
+				F18826932BC0105900D9AC4F /* PixelDataStore.swift in Sources */,
 				7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */,
 				3706FB87293F65D500E42796 /* ProcessExtension.swift in Sources */,
 				F18826812BBEB58100D9AC4F /* PrivacyProPixel.swift in Sources */,
@@ -10665,7 +10666,6 @@
 				3706FBDD293F65D500E42796 /* PaddedImageButton.swift in Sources */,
 				37CEFCAA2A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */,
 				3706FBDE293F65D500E42796 /* EncryptionKeyStoring.swift in Sources */,
-				F18826882BBF01B600D9AC4F /* PixelDataStore.swift in Sources */,
 				4B4D60E32A0C883A00BCD287 /* AppMain.swift in Sources */,
 				37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */,
 				56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */,
@@ -11433,7 +11433,6 @@
 				4B9579552AC7AE700062CA31 /* Logging.swift in Sources */,
 				4B9579562AC7AE700062CA31 /* CrashReportPromptPresenter.swift in Sources */,
 				1DDC84F92B83558F00670238 /* PreferencesPrivateSearchView.swift in Sources */,
-				F18826892BBF01B800D9AC4F /* PixelDataStore.swift in Sources */,
 				B6B4D1CD2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */,
 				9FA173ED2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift in Sources */,
 				4B9579572AC7AE700062CA31 /* BWCredential.swift in Sources */,
@@ -11676,6 +11675,8 @@
 				4B957A272AC7AE700062CA31 /* PrivacyDashboardPopover.swift in Sources */,
 				4B957A282AC7AE700062CA31 /* TestsClosureNavigationResponder.swift in Sources */,
 				4B957A292AC7AE700062CA31 /* RootView.swift in Sources */,
+				F18826942BC0105A00D9AC4F /* PixelDataRecord.swift in Sources */,
+				F18826952BC0105A00D9AC4F /* PixelDataStore.swift in Sources */,
 				4B37EE7C2B4CFF8000A89A61 /* HomePageRemoteMessagingRequest.swift in Sources */,
 				4B957A2A2AC7AE700062CA31 /* AddressBarTextField.swift in Sources */,
 				4B957A2B2AC7AE700062CA31 /* FocusRingView.swift in Sources */,
@@ -11841,7 +11842,6 @@
 				B6F9BDE62B45CD1900677B33 /* ModalView.swift in Sources */,
 				4B957AB32AC7AE700062CA31 /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				4B957AB42AC7AE700062CA31 /* DataImport.swift in Sources */,
-				F188268C2BBF01C000D9AC4F /* PixelDataRecord.swift in Sources */,
 				4B957AB52AC7AE700062CA31 /* NetworkProtectionDebugMenu.swift in Sources */,
 				4B957AB62AC7AE700062CA31 /* FireproofDomains.xcdatamodeld in Sources */,
 				3158B14F2B0BF74F00AF130C /* DataBrokerProtectionManager.swift in Sources */,
@@ -12310,7 +12310,6 @@
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
 				B60D64492AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */,
 				3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */,
-				F18826872BBF01B600D9AC4F /* PixelDataStore.swift in Sources */,
 				857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */,
 				B65E5DAF2B74DE6D00480415 /* TrackerNetwork.swift in Sources */,
 				37445F992A1566420029F789 /* SyncDataProviders.swift in Sources */,
@@ -12366,6 +12365,8 @@
 				858A798326A8B75F00A75A42 /* CopyHandler.swift in Sources */,
 				1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */,
 				4B8AC93926B48A5100879451 /* FirefoxLoginReader.swift in Sources */,
+				F18826902BC0105800D9AC4F /* PixelDataRecord.swift in Sources */,
+				F18826912BC0105800D9AC4F /* PixelDataStore.swift in Sources */,
 				B69B503E2726A12500758A2B /* AtbParser.swift in Sources */,
 				37F19A6528E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift in Sources */,
 				4B92929E26670D2A00AD2C21 /* BookmarkSidebarTreeController.swift in Sources */,
@@ -12918,7 +12919,6 @@
 				31F28C5328C8EECA00119F70 /* DuckURLSchemeHandler.swift in Sources */,
 				AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */,
 				1DDC84F72B83558F00670238 /* PreferencesPrivateSearchView.swift in Sources */,
-				F188268A2BBF01BE00D9AC4F /* PixelDataRecord.swift in Sources */,
 				1D43EB38292B636E0065E5D6 /* BWCommand.swift in Sources */,
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,
 				AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */,

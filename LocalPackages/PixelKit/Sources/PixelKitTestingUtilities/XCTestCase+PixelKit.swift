@@ -25,9 +25,7 @@ public extension XCTestCase {
     // MARK: - Parameters
 
     /// List of standard pixel parameters.
-    ///
     /// This is useful to support filtering these parameters out if needed.
-    ///
     private static var standardPixelParameters = [
         PixelKit.Parameters.appVersion,
         PixelKit.Parameters.pixelSource,
@@ -35,21 +33,18 @@ public extension XCTestCase {
     ]
 
     /// List of errror pixel parameters
-    ///
     private static var errorPixelParameters = [
         PixelKit.Parameters.errorCode,
         PixelKit.Parameters.errorDomain
     ]
 
     /// List of underlying error pixel parameters
-    ///
     private static var underlyingErrorPixelParameters = [
         PixelKit.Parameters.underlyingErrorCode,
         PixelKit.Parameters.underlyingErrorDomain
     ]
 
     /// Filter out the standard parameters.
-    ///
     private static func filterStandardPixelParameters(from parameters: [String: String]) -> [String: String] {
         parameters.filter { element in
             !standardPixelParameters.contains(element.key)
@@ -59,10 +54,8 @@ public extension XCTestCase {
     static var pixelPlatformPrefix: String {
 #if os(macOS)
         return "m_mac_"
-#else
-        // Intentionally left blank for now because PixelKit currently doesn't support
-        // other platforms, but if we decide to implement another platform this'll fail
-        // and indicate that we need a value here.
+#elseif os(iOS)
+        return "m_"
 #endif
     }
 
@@ -71,7 +64,6 @@ public extension XCTestCase {
     /// They're not a complete list of parameters for the event, as the fire call may contain extra information
     /// that results in additional parameters.  Ideally we want most (if not all) that information to eventually
     /// make part of the pixel definition.
-    ///
     func knownExpectedParameters(for event: PixelKitEventV2) -> [String: String] {
         var expectedParameters = [String: String]()
 
@@ -104,7 +96,6 @@ public extension XCTestCase {
     /// Provides some snapshot of a fired pixel so that external libraries can validate all the expected info is included.
     ///
     /// This method also checks that there is internal consistency in the expected fields.
-    ///
     func verifyThat(_ event: PixelKitEventV2, meets expectations: PixelFireExpectations, file: StaticString, line: UInt) {
 
         let expectedPixelName = event.name.hasPrefix(Self.pixelPlatformPrefix) ? event.name : Self.pixelPlatformPrefix + event.name

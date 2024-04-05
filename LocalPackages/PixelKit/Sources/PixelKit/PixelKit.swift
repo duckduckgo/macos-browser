@@ -83,7 +83,7 @@ public final class PixelKit {
 
     private let dateGenerator: () -> Date
 
-    public private(set) static var shared: PixelKit?
+    public static var shared: PixelKit?
     private let appVersion: String
     private let defaultHeaders: [String: String]
     private let fireRequest: FireRequest
@@ -116,14 +116,14 @@ public final class PixelKit {
     private let source: String?
     private let pixelCalendar: Calendar
 
-    init(dryRun: Bool,
-         appVersion: String,
-         source: String? = nil,
-         defaultHeaders: [String: String],
-         dailyPixelCalendar: Calendar? = nil,
-         dateGenerator: @escaping () -> Date = Date.init,
-         defaults: UserDefaults,
-         fireRequest: @escaping FireRequest) {
+    public init(dryRun: Bool,
+                appVersion: String,
+                source: String? = nil,
+                defaultHeaders: [String: String],
+                dailyPixelCalendar: Calendar? = nil,
+                dateGenerator: @escaping () -> Date = Date.init,
+                defaults: UserDefaults,
+                fireRequest: @escaping FireRequest) {
 
         self.dryRun = dryRun
         self.appVersion = appVersion

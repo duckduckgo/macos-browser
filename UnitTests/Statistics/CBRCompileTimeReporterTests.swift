@@ -19,7 +19,7 @@
 import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
-import PixelKit
+@testable import PixelKit
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -29,11 +29,16 @@ class CBRCompileTimeReporterTests: XCTestCase {
     let host = "improving.duckduckgo.com"
     var tab: NSObject! = NSObject()
     var time = CACurrentMediaTime()
+    let pixelKit = PixelKit(dryRun: false,
+                            appVersion: "1.0.0",
+                            defaultHeaders: [:],
+                            defaults: UserDefaults(),
+                            fireRequest: { _, _, _, _, _, _ in
+
+    })
 
     override func setUp() {
-        PixelKit.setUp(appVersion: "",
-                       defaultHeaders: [:],
-                       defaults: UserDefaults()) { _, _, _, _, _, _ in }
+        PixelKit.shared = pixelKit
         UserDefaultsWrapper<Any>.clearAll()
     }
 

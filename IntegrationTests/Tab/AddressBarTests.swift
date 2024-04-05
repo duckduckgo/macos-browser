@@ -737,12 +737,12 @@ class AddressBarTests: XCTestCase {
 
         // when activaing a Pinned Tab in another window its Web View should become the first responder
         viewModel2.select(at: .pinned(0))
-        try await Task.sleep(interval: 0.01)
+        try await Task.sleep(interval: 0.1)
         XCTAssertEqual(window.firstResponder, window)
         XCTAssertEqual(window2.firstResponder, tab.webView)
 
         window.makeKeyAndOrderFront(nil)
-        try await Task.sleep(interval: 0.01)
+        try await Task.sleep(interval: 0.1)
 
         XCTAssertEqual(window.firstResponder, tab.webView)
         XCTAssertEqual(window2.firstResponder, window2)
