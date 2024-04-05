@@ -3823,7 +3823,6 @@
 		4B67742A255DBEB800025BD8 /* httpsMobileV2FalsePositives.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = httpsMobileV2FalsePositives.json; sourceTree = "<group>"; };
 		4B677440255DBEEA00025BD8 /* Database.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		4B677454255DC18000025BD8 /* Bridging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bridging.h; sourceTree = "<group>"; };
-		4B67853E2AA7C726008A5004 /* DailyPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPixel.swift; sourceTree = "<group>"; };
 		4B6785432AA8DE1F008A5004 /* NetworkProtectionFeatureDisabler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureDisabler.swift; sourceTree = "<group>"; };
 		4B6B64832BA930420009FF9F /* WaitlistThankYouPromptPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistThankYouPromptPresenter.swift; sourceTree = "<group>"; };
 		4B70BFFF27B0793D000386ED /* DuckDuckGo-ExampleCrash.ips */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "DuckDuckGo-ExampleCrash.ips"; sourceTree = "<group>"; };
@@ -4577,11 +4576,7 @@
 		B6A60E4F2B73C3B800FD4968 /* WKURLSchemeTask+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WKURLSchemeTask+Private.h"; sourceTree = "<group>"; };
 		B6A60E502B73C46B00FD4968 /* IntegrationTestsBridging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IntegrationTestsBridging.h; sourceTree = "<group>"; };
 		B6A924D82664C72D001A28CA /* WebKitDownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitDownloadTask.swift; sourceTree = "<group>"; };
-		B6A9E45226142B070067D1B9 /* Pixel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pixel.swift; sourceTree = "<group>"; };
 		B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatingSystemVersionExtension.swift; sourceTree = "<group>"; };
-		B6A9E47626146A570067D1B9 /* PixelEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelEvent.swift; sourceTree = "<group>"; };
-		B6A9E47E26146A800067D1B9 /* PixelArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelArguments.swift; sourceTree = "<group>"; };
-		B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelParameters.swift; sourceTree = "<group>"; };
 		B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureExtensionTests.swift; sourceTree = "<group>"; };
 		B6AAAC2C260330580029438D /* PublishedAfter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishedAfter.swift; sourceTree = "<group>"; };
 		B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomAccessCollectionExtension.swift; sourceTree = "<group>"; };
@@ -8479,7 +8474,6 @@
 			children = (
 				B69B50332726A10700758A2B /* ATB */,
 				857E5AF32A79044900FC0FB4 /* Experiment */,
-				F18826712BBEAF9200D9AC4F /* Pixel Legacy */,
 				B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */,
 				F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */,
 				F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */,
@@ -8765,18 +8759,6 @@
 				EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */,
 			);
 			path = JSAlert;
-			sourceTree = "<group>";
-		};
-		F18826712BBEAF9200D9AC4F /* Pixel Legacy */ = {
-			isa = PBXGroup;
-			children = (
-				B6A9E45226142B070067D1B9 /* Pixel.swift */,
-				4B67853E2AA7C726008A5004 /* DailyPixel.swift */,
-				B6A9E47626146A570067D1B9 /* PixelEvent.swift */,
-				B6A9E47E26146A800067D1B9 /* PixelArguments.swift */,
-				B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */,
-			);
-			path = "Pixel Legacy";
 			sourceTree = "<group>";
 		};
 		F1B33DF92BAD9C83001128B3 /* Subscription */ = {

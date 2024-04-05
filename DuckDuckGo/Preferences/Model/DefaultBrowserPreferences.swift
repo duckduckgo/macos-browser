@@ -81,7 +81,7 @@ final class DefaultBrowserPreferences: ObservableObject {
 #if DEBUG
                 guard NSApp.runType.requiresEnvironment else { return }
 #endif
-                if AppDelegate.isNewUser && self.isDefault { // TODO: reimplement Pixel.isNewUser
+                if AppDelegate.isNewUser && self.isDefault {
                     PixelKit.fire(GeneralPixel.setAsDefaultInitial, frequency: .legacyInitial)
                 }
             }

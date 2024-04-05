@@ -31,7 +31,8 @@ public final class PixelKit {
         /// Used in Pixel.fire(...) as unique but without the `_u` requirement in the name
         case legacyInitial
 
-        /// Sent only once ever. The timestamp for this pixel is stored. Name for pixels of this type must end with `_u`.
+        /// Sent only once ever. The timestamp for this pixel is stored. 
+        /// Note: This is the only pixel that MUST end with `_u`, Name for pixels of this type must end with if it doesn't an assertion is fired.
         case unique
 
         /// Sent once per day. The last timestamp for this pixel is stored and compared to the current date. Pixels of this type will have `_d` appended to their name.
@@ -41,6 +42,21 @@ public final class PixelKit {
         /// This means a pixel will get sent twice the first time it is called per-day, and subsequent calls that day will only send the `_c` variant.
         /// This is useful in situations where pixels receive spikes in volume, as the daily pixel can be used to determine how many users are actually affected.
         case dailyAndCount
+
+        fileprivate var description: String {
+            switch self {
+            case .standard:
+                "Standard"
+            case .legacyInitial:
+                "Legacy Initial"
+            case .unique:
+                "Unique"
+            case .daily:
+                "Daily"
+            case .dailyAndCount:
+                "Daily and Count"
+            }
+        }
     }
 
     public enum Header {
@@ -133,9 +149,18 @@ public final class PixelKit {
         self.dateGenerator = dateGenerator
         self.defaults = defaults
         self.fireRequest = fireRequest
+
+        logger.debug("""
+        PixelKit initialised:
+                      dryRun: \(self.dryRun)
+                  appVersion: \(self.appVersion)
+                      source: \(self.source ?? "-")
+              defaultHeaders: \(self.defaultHeaders)
+               pixelCalendar: \(self.pixelCalendar)
+        """)
     }
 
-    // swiftlint:disable:next cyclomatic_complexity, function_body_length
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
     private func fire(pixelNamed pixelName: String,
                       frequency: Frequency,
                       withHeaders headers: [String: String]?,
@@ -146,18 +171,9 @@ public final class PixelKit {
                       onComplete: @escaping CompletionBlock) {
 
         var newParams = params ?? [:]
-
-        if includeAppVersionParameter {
-            newParams[Parameters.appVersion] = appVersion
-        }
-
-        if let source {
-            newParams[Parameters.pixelSource] = source
-        }
-
-        if let error {
-            newParams.appendErrorPixelParams(error: error)
-        }
+        if includeAppVersionParameter { newParams[Parameters.appVersion] = appVersion }
+        if let source { newParams[Parameters.pixelSource] = source }
+        if let error { newParams.appendErrorPixelParams(error: error) }
 
         #if DEBUG
             newParams[Parameters.test] = Values.test
@@ -169,13 +185,13 @@ public final class PixelKit {
 
         switch frequency {
         case .standard:
-            fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+            fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
         case .legacyInitial:
             if !pixelHasBeenFiredEver(pixelName) {
-                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
-                printDebugInfo(pixelName: pixelName, parameters: newParams, skipped: true)
+                printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
             }
         case .unique:
             guard pixelName.hasSuffix("_u") else {
@@ -183,34 +199,42 @@ public final class PixelKit {
                 return
             }
             if !pixelHasBeenFiredEver(pixelName) {
-                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
-                printDebugInfo(pixelName: pixelName, parameters: newParams, skipped: true)
+                printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
             }
         case .daily:
+            assertIf(name: pixelName, endsWith: "_d")
             if !pixelHasBeenFiredToday(pixelName) {
-                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
-                printDebugInfo(pixelName: pixelName + "_d", parameters: newParams, skipped: true)
+                printDebugInfo(pixelName: pixelName + "_d", frequency: frequency, parameters: newParams, skipped: true)
             }
         case .dailyAndCount:
+            assertIf(name: pixelName, endsWith: "_c")
+            assertIf(name: pixelName, endsWith: "_d")
             if !pixelHasBeenFiredToday(pixelName) {
-                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
-                printDebugInfo(pixelName: pixelName + "_d", parameters: newParams, skipped: true)
+                printDebugInfo(pixelName: pixelName + "_d", frequency: frequency, parameters: newParams, skipped: true)
             }
 
-            fireRequestWrapper(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+            fireRequestWrapper(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
         }
     }
 
-    private func printDebugInfo(pixelName: String, parameters: [String: String], skipped: Bool = false) {
+    func assertIf(name: String, endsWith forbiddenString: String) {
+        if name.hasSuffix(forbiddenString) {
+            assertionFailure("Pixel \(name) must not end with \(forbiddenString)")
+        }
+    }
+
+    private func printDebugInfo(pixelName: String, frequency: Frequency, parameters: [String: String], skipped: Bool = false) {
         let params = parameters.filter { key, _ in !["test"].contains(key) }
-        let pixelName = pixelName.replacingOccurrences(of: "_", with: ".")
-        logger.debug("👾 [\(skipped ? "SKIPPED" : "FIRED")] \(pixelName) \(params)")
+        logger.debug("👾[\(frequency.description)-\(skipped ? "Skipped" : "Fired")] \(pixelName) \(params)")
     }
 
     private func fireRequestWrapper(
@@ -219,18 +243,16 @@ public final class PixelKit {
         _ parameters: [String: String],
         _ allowedQueryReservedCharacters: CharacterSet?,
         _ callBackOnMainThread: Bool,
-        _ onComplete: @escaping CompletionBlock) {
+        _ onComplete: @escaping CompletionBlock,
+        _ frequency: Frequency) {
         guard !dryRun else {
-            printDebugInfo(pixelName: pixelName, parameters: parameters)
-
+            printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: parameters, skipped: false)
             // simulate server response time for Dry Run mode
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 onComplete(true, nil)
             }
-
             return
         }
-
         fireRequest(pixelName, headers, parameters, allowedQueryReservedCharacters, callBackOnMainThread, onComplete)
     }
 
