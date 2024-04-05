@@ -20,29 +20,34 @@ import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
 @testable import DuckDuckGo_Privacy_Browser
-import PixelKit
 
 class StatisticsLoaderTests: XCTestCase {
 
-    var mockStatisticsStore: StatisticsStore!
-    var testee: StatisticsLoader!
+    private var mockAttributionsPixelHandler: MockAttributionsPixelHandler!
+    private var mockStatisticsStore: StatisticsStore!
+    private var testee: StatisticsLoader!
     let pixelKit = PixelKit(dryRun: false,
-                                appVersion: "1.0.0",
-                                defaultHeaders: [:],
-                                defaults: UserDefaults(),
-                                fireRequest: { _, _, _, _, _, _ in
+                                    appVersion: "1.0.0",
+                                    defaultHeaders: [:],
+                                    defaults: UserDefaults(),
+                                    fireRequest: { _, _, _, _, _, _ in
 
-        })
+            })
 
     override func setUp() {
         PixelKit.shared = pixelKit
+
+        mockAttributionsPixelHandler = MockAttributionsPixelHandler()
         mockStatisticsStore = MockStatisticsStore()
-        testee = StatisticsLoader(statisticsStore: mockStatisticsStore)
+        testee = StatisticsLoader(statisticsStore: mockStatisticsStore, attributionPixelHandler: mockAttributionsPixelHandler)
     }
 
     override func tearDown() {
         PixelKit.tearDown()
         HTTPStubs.removeAllStubs()
+        mockStatisticsStore = nil
+        mockAttributionsPixelHandler = nil
+        testee = nil
         super.tearDown()
     }
 
@@ -304,6 +309,55 @@ class StatisticsLoaderTests: XCTestCase {
         }
 
         waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWhenLoadHasSuccessfulAtbThenAttributionPixelShouldFire() {
+        // GIVEN
+        loadSuccessfulAtbStub()
+        let expect = expectation(description: #function)
+        XCTAssertFalse(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+
+        // WHEN
+        testee.load {
+            expect.fulfill()
+        }
+
+        // THEN
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertTrue(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+    }
+
+    func testWhenLoadHasUnsuccessfulAtbThenAttributionPixelShouldNotFire() {
+        // GIVEN
+        loadUnsuccessfulAtbStub()
+        let expect = expectation(description: #function)
+        XCTAssertFalse(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+
+        testee.load {
+            expect.fulfill()
+        }
+
+        // THEN
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertFalse(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+    }
+
+    func testWhenLoadHasSuccessfulAtbSubsequentlyThenAttributionPixelShouldNotFire() {
+        // GIVEN
+        loadSuccessfulAtbStub()
+        let firstATBCallExpectation = XCTestExpectation(description: "First ATB call")
+        let secondATBCallExpectation = XCTestExpectation(description: "Second ATB call")
+        testee.load { firstATBCallExpectation.fulfill() }
+        wait(for: [firstATBCallExpectation], timeout: 1.0)
+        XCTAssertTrue(mockAttributionsPixelHandler.didCallFireInstallationAttributionPixel)
+        XCTAssertEqual(mockAttributionsPixelHandler.fireInstallationAttributionPixelCount, 1)
+
+        // WHEN
+        testee.load { secondATBCallExpectation.fulfill() }
+
+        // THEN
+        wait(for: [secondATBCallExpectation], timeout: 1.0)
+        XCTAssertEqual(mockAttributionsPixelHandler.fireInstallationAttributionPixelCount, 1)
     }
 
     func loadSuccessfulAtbStub() {

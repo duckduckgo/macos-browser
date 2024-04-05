@@ -373,6 +373,10 @@ extension URL {
         return URL(string: "https://duckduckgo.com/privacy")!
     }
 
+    static var privacyPro: URL {
+        return URL(string: "https://duckduckgo.com/pro")!
+    }
+
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
     static var duckDuckGoEmailLogin = URL(string: "https://duckduckgo.com/email")!
 

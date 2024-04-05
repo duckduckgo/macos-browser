@@ -426,6 +426,7 @@ final class BrowserTabViewController: NSViewController {
             tabViewModel.tab.downloads?.savePanelDialogPublisher ?? Just(nil).eraseToAnyPublisher()
         )
         .map { $1 ?? $0 }
+        .removeDuplicates()
         .sink { [weak self] dialog in
             self?.show(dialog)
         }
@@ -917,6 +918,15 @@ extension BrowserTabViewController: TabDelegate {
     // MARK: - Dialogs
 
     fileprivate func show(_ dialog: Tab.UserDialog?) {
+        guard activeUserDialogCancellable == nil || dialog == nil else {
+            // first hide a displayed dialog before showing another one
+            activeUserDialogCancellable = nil
+            DispatchQueue.main.async { [weak self] in
+                self?.show(dialog)
+            }
+            return
+        }
+
         switch dialog?.dialog {
         case .basicAuthenticationChallenge(let query):
             activeUserDialogCancellable = showBasicAuthenticationChallenge(with: query)

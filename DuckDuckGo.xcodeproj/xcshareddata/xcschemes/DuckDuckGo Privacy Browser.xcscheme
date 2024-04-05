@@ -130,6 +130,9 @@
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
                <Test
+                  Identifier = "TabSnapshotExtensionTests/testWhenSnapshotIsRestored_ThenRenderingIsSkippedAfterLoading()">
+               </Test>
+               <Test
                   Identifier = "WindowManagerStateRestorationTests/testWindowManagerStateRestoration()">
                </Test>
             </SkippedTests>

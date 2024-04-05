@@ -315,6 +315,9 @@ enum GeneralPixel: PixelKitEventV2 {
 
     case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
 
+    // Tracks installation without tracking retention.
+    case installationAttribution
+
     var name: String {
         switch self {
 
@@ -779,6 +782,9 @@ enum GeneralPixel: PixelKitEventV2 {
         case .dataBrokerProtectionRemoteMessageStorageFailed: return "dbp_remote_message_storage_failed"
 
         case .loginItemUpdateError: return "login-item_update-error"
+
+            // Installation Attribution
+        case .installationAttribution: return "m_mac_install"
         }
     }
 
