@@ -142,17 +142,26 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
         let tdsIndex = contentBlockingManager.currentRules.firstIndex(where: { $0.name == tdsName})
 
-        // copy main TDS, to retain cnames (also, perf)
-        var combinedTrackerData = rules[tdsIndex!].trackerData
-        for index in 0...rules.count-1 {
-            print("\(rules[index].name): \(rules[index].trackerData.trackers.count) trackers, \(rules[index].trackerData.entities.count) entities, \(rules[index].trackerData.domains.count) domains")
-            if index != tdsIndex {
-                combinedTrackerData.trackers.merge(rules[index].trackerData.trackers) { (current, _) in current }
-                combinedTrackerData.entities.merge(rules[index].trackerData.entities) { (current, _) in current }
-                combinedTrackerData.domains.merge(rules[index].trackerData.domains) { (current, _) in current }
+        let cnames = rules[tdsIndex!].trackerData.cnames
+        var combinedTrackers: [String: KnownTracker] = [:]
+        var combinedEntities: [String: Entity] = [:]
+        var combinedDomains: [String: String] = [:]
+        rules.forEach { ruleSet in
+            ruleSet.trackerData.trackers.forEach { key, value in
+                combinedTrackers[key] = value
+            }
+            ruleSet.trackerData.entities.forEach { key, value in
+                combinedEntities[key] = value
+            }
+            ruleSet.trackerData.domains.forEach { key, value in
+                combinedDomains[key] = value
             }
         }
-        print("COMBINED: \(combinedTrackerData.trackers.count) trackers, \(combinedTrackerData.entities.count) entities, \(combinedTrackerData.domains.count) domains")
+
+        let combinedTrackerData = TrackerData(trackers: combinedTrackers,
+                            entities: combinedEntities,
+                            domains: combinedDomains,
+                            cnames: cnames)
 
         let surrogateTDS = ContentBlockerRulesManager.extractSurrogates(from: combinedTrackerData)
         let encodedData = try? JSONEncoder().encode(surrogateTDS)
@@ -160,19 +169,4 @@ struct ScriptSourceProvider: ScriptSourceProviding {
 
         return (trackerData: combinedTrackerData, encodedTrackerData: encodedTrackerData)
     }
-
-    private func loadFont(_ fileName: String, _ fileExt: String) -> String? {
-        let url = Bundle.main.url(
-            forResource: fileName,
-            withExtension: fileExt
-        )
-        guard let base64String = try? Data(contentsOf: url!).base64EncodedString() else {
-            assertionFailure("Failed to load font")
-            return nil
-        }
-
-        let font = "data:application/octet-stream;base64," + base64String
-        return font
-    }
-
 }

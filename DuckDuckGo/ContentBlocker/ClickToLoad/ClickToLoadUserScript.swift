@@ -100,7 +100,6 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
         return nil
     }
 
-    // swiftlint:disable function_body_length
     public func displayClickToLoadPlaceholders() {
         print("displayClickToLoadPlaceholders for url \(String(describing: webView?.url)) for broker \(broker)")
         if let webView = webView {

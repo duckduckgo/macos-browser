@@ -1,6 +1,5 @@
 //
 //  ClickToLoadRulesSplitter.swift
-//  DuckDuckGo
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -53,20 +52,20 @@ struct ClickToLoadRulesSplitter {
     }
 
     private func split(trackerData: TrackerDataManager.DataSet) -> (withoutBlockCTL: TrackerDataManager.DataSet, withBlockCTL: TrackerDataManager.DataSet)? {
-           let trackersWithBlockCTL = filterTrackersWithCTLAction(trackerData.tds.trackers)
+        let trackersWithBlockCTL = filterTrackersWithCTLAction(trackerData.tds.trackers)
 
-           if !trackersWithBlockCTL.isEmpty {
-               let trackersWithoutBlockCTL = filterTrackersWithoutCTLAction(trackerData.tds.trackers)
-               let trackerDataWithoutBlockCTL = makeTrackerData(using: trackersWithoutBlockCTL, originalTDS: trackerData.tds)
-               let trackerDataWithBlockCTL = makeTrackerData(using: trackersWithBlockCTL, originalTDS: trackerData.tds)
+        if !trackersWithBlockCTL.isEmpty {
+           let trackersWithoutBlockCTL = filterTrackersWithoutCTLAction(trackerData.tds.trackers)
+           let trackerDataWithoutBlockCTL = makeTrackerData(using: trackersWithoutBlockCTL, originalTDS: trackerData.tds)
+           let trackerDataWithBlockCTL = makeTrackerData(using: trackersWithBlockCTL, originalTDS: trackerData.tds)
 
-               return (
-                   (tds: trackerDataWithoutBlockCTL, etag: Constants.tdsRuleListPrefix + trackerData.etag),
-                   (tds: trackerDataWithBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag)
-               )
-           }
-           return nil
-       }
+           return (
+               (tds: trackerDataWithoutBlockCTL, etag: Constants.tdsRuleListPrefix + trackerData.etag),
+               (tds: trackerDataWithBlockCTL, etag: Constants.clickToLoadRuleListPrefix + trackerData.etag)
+           )
+        }
+        return nil
+    }
 
     private func makeTrackerData(using trackers: [String: KnownTracker], originalTDS: TrackerData) -> TrackerData {
         let entities = originalTDS.extractEntities(for: trackers)
@@ -77,40 +76,40 @@ struct ClickToLoadRulesSplitter {
                            cnames: originalTDS.cnames)
     }
 
-    private func processCTLActions(_ trackers: [String: KnownTracker]) -> (mainTDS: [String: KnownTracker], ctlOverrides: [String: KnownTracker]) {
-        var mainTDSTrackers = trackers
-        var ctlTrackers: [String: KnownTracker] = [:]
-
-        for (key, tracker) in mainTDSTrackers {
-            if let rules = tracker.rules as [KnownTracker.Rule]? {
-                var ctlRules: [KnownTracker.Rule] = []
-
-                for ruleIndex in rules.indices.reversed() {
-                    if let action = rules[ruleIndex].action, action == .blockCtlFB {
-                        var newRule = rules[ruleIndex]
-                        if newRule.surrogate != nil {
-                            // if rule includes a surroate, the action should be nil, as it gets converted to a redirect
-                            newRule.action = nil
-                        } else {
-                            newRule.action = .block
-                        }
-
-                        mainTDSTrackers[key]?.rules?.remove(at: ruleIndex)
-                        ctlRules.insert(newRule, at: 0)
-                    }
-                }
-
-                if !ctlRules.isEmpty {
-                    var ctlTracker = tracker
-                    ctlTracker.defaultAction = .ignore
-                    ctlTracker.rules = ctlRules
-                    ctlTrackers[key] = ctlTracker
-                }
-            }
-        }
-
-        return (mainTDSTrackers, ctlTrackers)
-    }
+//    private func processCTLActions(_ trackers: [String: KnownTracker]) -> (mainTDS: [String: KnownTracker], ctlOverrides: [String: KnownTracker]) {
+//        var mainTDSTrackers = trackers
+//        var ctlTrackers: [String: KnownTracker] = [:]
+//
+//        for (key, tracker) in mainTDSTrackers {
+//            if let rules = tracker.rules as [KnownTracker.Rule]? {
+//                var ctlRules: [KnownTracker.Rule] = []
+//
+//                for ruleIndex in rules.indices.reversed() {
+//                    if let action = rules[ruleIndex].action, action == .blockCtlFB {
+//                        var newRule = rules[ruleIndex]
+//                        if newRule.surrogate != nil {
+//                            // if rule includes a surroate, the action should be nil, as it gets converted to a redirect
+//                            newRule.action = nil
+//                        } else {
+//                            newRule.action = .block
+//                        }
+//
+//                        mainTDSTrackers[key]?.rules?.remove(at: ruleIndex)
+//                        ctlRules.insert(newRule, at: 0)
+//                    }
+//                }
+//
+//                if !ctlRules.isEmpty {
+//                    var ctlTracker = tracker
+//                    ctlTracker.defaultAction = .ignore
+//                    ctlTracker.rules = ctlRules
+//                    ctlTrackers[key] = ctlTracker
+//                }
+//            }
+//        }
+//
+//        return (mainTDSTrackers, ctlTrackers)
+//    }
 
     private func filterTrackersWithoutCTLAction(_ trackers: [String: KnownTracker]) -> [String: KnownTracker] {
         trackers.filter { (_, tracker) in tracker.containsCTLActions == false }
@@ -119,23 +118,37 @@ struct ClickToLoadRulesSplitter {
     private func filterTrackersWithCTLAction(_ trackers: [String: KnownTracker]) -> [String: KnownTracker] {
         return Dictionary(uniqueKeysWithValues: trackers.filter { (_, tracker) in
             return tracker.containsCTLActions == true
-        }.map { (key, value) in
-            var modifiedTracker = value
-
+        }.map { (trackerKey, trackerValue) in
             // Modify the tracker here
-            if let rules = modifiedTracker.rules as [KnownTracker.Rule]? {
-                for ruleIndex in rules.indices {
-                    if let action = rules[ruleIndex].action, action == .blockCtlFB {
-                        if rules[ruleIndex].surrogate != nil {
-                            modifiedTracker.rules?[ruleIndex].action = nil
+            if let rules = trackerValue.rules as [KnownTracker.Rule]? {
+                let updatedRules = rules.map { (ruleValue) in
+                    var action = ruleValue.action
+                    if action == .blockCtlFB {
+                        if ruleValue.surrogate != nil {
+                            action = nil
                         } else {
-                            modifiedTracker.rules?[ruleIndex].action = .block
+                            action = .block
                         }
                     }
+                    let newRule = KnownTracker.Rule(rule: ruleValue.rule,
+                                       surrogate: ruleValue.surrogate,
+                                        action: action,
+                                       options: ruleValue.options,
+                                       exceptions: ruleValue.exceptions)
+                    return newRule
                 }
+                let updatedTracker = KnownTracker(domain: trackerValue.domain,
+                    defaultAction: trackerValue.defaultAction,
+                    owner: trackerValue.owner,
+                    prevalence: trackerValue.prevalence,
+                    subdomains: trackerValue.subdomains,
+                    categories: trackerValue.categories,
+                    rules: updatedRules)
+
+                return (trackerKey, updatedTracker)
             }
 
-            return (key, modifiedTracker)
+            return (trackerKey, trackerValue)
         })
     }
 
