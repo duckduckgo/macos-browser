@@ -50,7 +50,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -69,7 +69,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -93,7 +93,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -120,7 +120,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -144,7 +144,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -168,7 +168,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -197,7 +197,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -224,7 +224,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -259,7 +259,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -318,7 +318,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
@@ -376,7 +376,7 @@ class FindInPageTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The Address Bar text field did not exist when it was expected."
         )
-        addressBarTextField.typeText("\(Self.loremIpsumFileURL.absoluteString)\r")
+        addressBarTextField.typeURL(Self.loremIpsumFileURL)
         XCTAssertTrue(
             loremIpsumWebView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."

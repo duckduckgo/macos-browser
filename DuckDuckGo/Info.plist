@@ -43,6 +43,8 @@
 			<string>Editor</string>
 			<key>NSIsRelatedItemType</key>
 			<true/>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
