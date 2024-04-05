@@ -185,8 +185,12 @@ public final class PixelKit {
 
         switch frequency {
         case .standard:
+            assertIf(name: pixelName, endsWith: "_u")
+            assertIf(name: pixelName, endsWith: "_d")
             fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
         case .legacyInitial:
+            assertIf(name: pixelName, endsWith: "_u")
+            assertIf(name: pixelName, endsWith: "_d")
             if !pixelHasBeenFiredEver(pixelName) {
                 fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
@@ -194,6 +198,7 @@ public final class PixelKit {
                 printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
             }
         case .unique:
+            assertIf(name: pixelName, endsWith: "_d")
             guard pixelName.hasSuffix("_u") else {
                 assertionFailure("Unique pixel: must end with _u")
                 return
@@ -205,7 +210,8 @@ public final class PixelKit {
                 printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
             }
         case .daily:
-            assertIf(name: pixelName, endsWith: "_d")
+            assertIf(name: pixelName, endsWith: "_u")
+            assertIf(name: pixelName, endsWith: "_d") // Because is added automatically
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
@@ -213,8 +219,9 @@ public final class PixelKit {
                 printDebugInfo(pixelName: pixelName + "_d", frequency: frequency, parameters: newParams, skipped: true)
             }
         case .dailyAndCount:
-            assertIf(name: pixelName, endsWith: "_c")
-            assertIf(name: pixelName, endsWith: "_d")
+            assertIf(name: pixelName, endsWith: "_u")
+            assertIf(name: pixelName, endsWith: "_d") // Because is added automatically
+            assertIf(name: pixelName, endsWith: "_c") // Because is added automatically
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
