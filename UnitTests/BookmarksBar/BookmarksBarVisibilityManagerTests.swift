@@ -199,6 +199,61 @@ final class BookmarksBarVisibilityManagerTests: XCTestCase {
         }
     }
 
+    func testWhenBookmarksBarAppearanceChangesToAlwaysVisibleThenIsBookmarkBarVisibleIsTrue() throws {
+        // GIVEN
+        appearance.showBookmarksBar = true
+        appearance.bookmarksBarAppearance = .newTabOnly
+
+        for content in tabContents {
+            var capturedValue: Bool?
+            let sut = makeSUT()
+            XCTAssertFalse(sut.isBookmarksBarVisible)
+            sut.$isBookmarksBarVisible
+                .dropFirst() // Not interested in the value when subscribing
+                .sink { value in
+                    capturedValue = value
+                }
+                .store(in: &cancellables)
+            selectedTabSubject.send(TabViewModel(tab: Tab(content: content)))
+
+            // WHEN
+            appearance.bookmarksBarAppearance = .alwaysOn
+
+            // THEN
+            try assertTrue(capturedValue)
+        }
+    }
+
+    func testWhenBookmarksBarAppearanceChangesToOnlyOnNewTabThenIsBookmarkBarVisibleIsTrueForNoneAndNewTab() throws {
+        // GIVEN
+        appearance.showBookmarksBar = true
+        appearance.bookmarksBarAppearance = .alwaysOn
+
+        for content in tabContents {
+            var capturedValue: Bool?
+            let sut = makeSUT()
+            XCTAssertFalse(sut.isBookmarksBarVisible)
+            sut.$isBookmarksBarVisible
+                .dropFirst() // Not interested in the value when subscribing
+                .sink { value in
+                    capturedValue = value
+                }
+                .store(in: &cancellables)
+            selectedTabSubject.send(TabViewModel(tab: Tab(content: content)))
+
+            // WHEN
+            appearance.bookmarksBarAppearance = .newTabOnly
+
+            // THEN
+            switch content {
+            case .none, .newtab:
+                try assertTrue(capturedValue)
+            default:
+                try assertFalse(capturedValue)
+            }
+        }
+    }
+
     // MARK: - New Tab becoming URL
 
     func testWhenBookmarksBarAppeareanceIsNewTabOnlyAndTabContentBecomesURLThenIsBookmarkBarVisibleIsFalse() throws {

@@ -50,12 +50,17 @@ private extension BookmarksBarVisibilityManager {
     func bind() {
         let bookmarksBarVisibilityPublisher = NotificationCenter.default
             .publisher(for: AppearancePreferences.Notifications.showBookmarksBarSettingChanged)
+
+        let bookmarksBarAppearancePublisher = NotificationCenter.default
+            .publisher(for: AppearancePreferences.Notifications.bookmarksBarSettingAppearanceChanged)
+
+        let bookmarksBarNotificationsPublisher = Publishers.Merge(bookmarksBarVisibilityPublisher, bookmarksBarAppearancePublisher)
             .map { _ in () } // Map To Void, we're not interested in the notification itself
             .prepend(()) // Start with a value so combineLatest can fire
 
         // Every time the user select a tab or the Appeareance preference changes check if bookmarks bar should be visible or not.
         // For the selected Tab we should also check if the Tab content changes as it can switch from empty to url if the user loads a web page.
-        bookmarkBarVisibilityCancellable = bookmarksBarVisibilityPublisher
+        bookmarkBarVisibilityCancellable = bookmarksBarNotificationsPublisher
             .combineLatest(selectedTabPublisher)
             .compactMap { _, selectedTab -> TabViewModel? in
                 guard let selectedTab else { return nil }
