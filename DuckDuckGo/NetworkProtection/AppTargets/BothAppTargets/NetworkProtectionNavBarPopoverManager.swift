@@ -66,7 +66,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
     // swiftlint:disable:next function_body_length
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = networkProtectionPopover ?? {
+        let popover = {
 
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
@@ -141,6 +141,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
         if let networkProtectionPopover, networkProtectionPopover.isShown {
             networkProtectionPopover.close()
+            self.networkProtectionPopover = nil
         } else {
             let featureVisibility = DefaultNetworkProtectionVisibility()
 
@@ -154,6 +155,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
     func close() {
         networkProtectionPopover?.close()
+        networkProtectionPopover = nil
     }
 }
 #endif
