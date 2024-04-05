@@ -251,13 +251,13 @@ extension HomePage.Models {
 
             for message in homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.dataBrokerProtectionRemoteMessage(message))
-                PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .dailyOnly)
+                PixelKit.fire(GeneralPixel.dataBrokerProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
             }
 #endif
 
 #if NETWORK_PROTECTION
             for message in homePageRemoteMessaging.networkProtectionRemoteMessaging.presentableRemoteMessages() {
-                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .dailyOnly)
+                PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
             }
 #endif
 

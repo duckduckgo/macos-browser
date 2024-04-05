@@ -303,7 +303,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                            appVersion: AppVersion.shared.versionNumber,
                            source: pixelSource,
                            defaultHeaders: [:],
-                           log: .networkProtectionPixel,
                            defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
                 let url = URL.pixelUrl(forPixelNamed: pixelName)
@@ -372,7 +371,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     UserDefaults.netP.networkProtectionEntitlementsExpired = false
                 case .invalidEntitlement:
                     UserDefaults.netP.networkProtectionEntitlementsExpired = true
-                    PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndContinuous)
+                    PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndCount)
 
                     guard let self else { return }
                     Task {

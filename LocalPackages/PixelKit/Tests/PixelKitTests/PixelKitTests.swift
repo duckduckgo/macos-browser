@@ -63,11 +63,11 @@ final class PixelKitTests: XCTestCase {
             case .testEvent, .testEventWithoutParameters:
                 return .standard
             case .uniqueEvent:
-                return .justOnce
+                return .unique
             case .dailyEvent, .dailyEventWithoutParameters:
-                return .dailyOnly
+                return .daily
             case .dailyAndContinuousEvent, .dailyAndContinuousEventWithoutParameters:
-                return .dailyAndContinuous
+                return .dailyAndCount
             }
         }
     }
@@ -77,9 +77,8 @@ final class PixelKitTests: XCTestCase {
     func testDryRunWontExecuteCallback() async {
         let appVersion = "1.0.5"
         let headers: [String: String] = [:]
-        let log = OSLog.disabled
 
-        let pixelKit = PixelKit(dryRun: true, appVersion: appVersion, defaultHeaders: headers, log: log, dailyPixelCalendar: nil, defaults: userDefaults()) { _, _, _, _, _, _ in
+        let pixelKit = PixelKit(dryRun: true, appVersion: appVersion, defaultHeaders: headers, dailyPixelCalendar: nil, defaults: userDefaults()) { _, _, _, _, _, _ in
 
             XCTFail("This callback should not be executed when doing a dry run")
         }
@@ -93,7 +92,6 @@ final class PixelKitTests: XCTestCase {
         // Prepare test parameters
         let appVersion = "1.0.5"
         let headers = ["a": "2", "b": "3", "c": "2000"]
-        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
         let event = TestEvent.testEvent
         let userDefaults = userDefaults()
 
@@ -105,7 +103,6 @@ final class PixelKitTests: XCTestCase {
         let pixelKit = PixelKit(dryRun: false,
                                 appVersion: appVersion,
                                 defaultHeaders: headers,
-                                log: log,
                                 dailyPixelCalendar: nil,
                                 defaults: userDefaults) { firedPixelName, firedHeaders, parameters, _, _, _ in
 
@@ -139,7 +136,6 @@ final class PixelKitTests: XCTestCase {
         // Prepare test parameters
         let appVersion = "1.0.5"
         let headers = ["a": "2", "b": "3", "c": "2000"]
-        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
         let event = TestEvent.dailyEvent
         let userDefaults = userDefaults()
 
@@ -152,7 +148,6 @@ final class PixelKitTests: XCTestCase {
         let pixelKit = PixelKit(dryRun: false,
                                 appVersion: appVersion,
                                 defaultHeaders: headers,
-                                log: log,
                                 dailyPixelCalendar: nil,
                                 defaults: userDefaults) { firedPixelName, firedHeaders, parameters, _, _, _ in
 
@@ -173,7 +168,7 @@ final class PixelKitTests: XCTestCase {
         }
 
         // Run test
-        pixelKit.fire(event, frequency: .dailyOnly)
+        pixelKit.fire(event, frequency: .daily)
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
@@ -185,7 +180,6 @@ final class PixelKitTests: XCTestCase {
         // Prepare test parameters
         let appVersion = "1.0.5"
         let headers = ["a": "2", "b": "3", "c": "2000"]
-        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
         let event = TestEvent.dailyEvent
         let userDefaults = userDefaults()
 
@@ -200,7 +194,6 @@ final class PixelKitTests: XCTestCase {
         let pixelKit = PixelKit(dryRun: false,
                                 appVersion: appVersion,
                                 defaultHeaders: headers,
-                                log: log,
                                 dailyPixelCalendar: nil,
                                 defaults: userDefaults) { firedPixelName, firedHeaders, parameters, _, _, _ in
 
@@ -221,8 +214,8 @@ final class PixelKitTests: XCTestCase {
         }
 
         // Run test
-        pixelKit.fire(event, frequency: .dailyOnly)
-        pixelKit.fire(event, frequency: .dailyOnly)
+        pixelKit.fire(event, frequency: .daily)
+        pixelKit.fire(event, frequency: .daily)
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
@@ -233,7 +226,6 @@ final class PixelKitTests: XCTestCase {
         // Prepare test parameters
         let appVersion = "1.0.5"
         let headers = ["a": "2", "b": "3", "c": "2000"]
-        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
         let event = TestEvent.dailyEvent
         let userDefaults = userDefaults()
 
@@ -248,7 +240,6 @@ final class PixelKitTests: XCTestCase {
         let pixelKit = PixelKit(dryRun: false,
                                 appVersion: appVersion,
                                 defaultHeaders: headers,
-                                log: log,
                                 dailyPixelCalendar: nil,
                                 dateGenerator: timeMachine.now,
                                 defaults: userDefaults) { _, _, _, _, _, _ in
@@ -256,19 +247,19 @@ final class PixelKitTests: XCTestCase {
         }
 
         // Run test
-        pixelKit.fire(event, frequency: .dailyOnly) // Fired
+        pixelKit.fire(event, frequency: .daily) // Fired
 
         timeMachine.travel(by: 60 * 60 * 2)
-        pixelKit.fire(event, frequency: .dailyOnly) // Skipped (2 hours since last fire)
+        pixelKit.fire(event, frequency: .daily) // Skipped (2 hours since last fire)
 
         timeMachine.travel(by: 60 * 60 * 24 + 1000)
-        pixelKit.fire(event, frequency: .dailyOnly) // Fired (24 hours + 1000 seconds since last fire)
+        pixelKit.fire(event, frequency: .daily) // Fired (24 hours + 1000 seconds since last fire)
 
         timeMachine.travel(by: 60 * 60 * 10)
-        pixelKit.fire(event, frequency: .dailyOnly) // Skipped (10 hours since last fire)
+        pixelKit.fire(event, frequency: .daily) // Skipped (10 hours since last fire)
 
         timeMachine.travel(by: 60 * 60 * 14)
-        pixelKit.fire(event, frequency: .dailyOnly) // Fired (24 hours since last fire)
+        pixelKit.fire(event, frequency: .daily) // Fired (24 hours since last fire)
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
@@ -279,7 +270,6 @@ final class PixelKitTests: XCTestCase {
         // Prepare test parameters
         let appVersion = "1.0.5"
         let headers = ["a": "2", "b": "3", "c": "2000"]
-        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
         let event = TestEvent.uniqueEvent
         let userDefaults = userDefaults()
 
@@ -293,7 +283,6 @@ final class PixelKitTests: XCTestCase {
         let pixelKit = PixelKit(dryRun: false,
                                 appVersion: appVersion,
                                 defaultHeaders: headers,
-                                log: log,
                                 dailyPixelCalendar: nil,
                                 dateGenerator: timeMachine.now,
                                 defaults: userDefaults) { _, _, _, _, _, _ in
@@ -301,19 +290,19 @@ final class PixelKitTests: XCTestCase {
         }
 
         // Run test
-        pixelKit.fire(event, frequency: .justOnce) // Fired
+        pixelKit.fire(event, frequency: .unique) // Fired
 
         timeMachine.travel(by: 60 * 60 * 2)
-        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+        pixelKit.fire(event, frequency: .unique) // Skipped (already fired)
 
         timeMachine.travel(by: 60 * 60 * 24 + 1000)
-        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+        pixelKit.fire(event, frequency: .unique) // Skipped (already fired)
 
         timeMachine.travel(by: 60 * 60 * 10)
-        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+        pixelKit.fire(event, frequency: .unique) // Skipped (already fired)
 
         timeMachine.travel(by: 60 * 60 * 14)
-        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+        pixelKit.fire(event, frequency: .unique) // Skipped (already fired)
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)

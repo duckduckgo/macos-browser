@@ -97,6 +97,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var updateController: UpdateController!
 #endif
 
+    static private var aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date())! // Temporary for init
+    @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: aMonthAgo)
+    static var firstLaunchDate: Date
+
+    static var isNewUser: Bool {
+        let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
+        return firstLaunchDate >= oneWeekAgo
+    }
+
     // swiftlint:disable:next function_body_length
     override init() {
         do {
@@ -225,10 +234,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts {
             PixelExperiment.cleanup()
         }
-//        if LocalStatisticsStore().atb == nil {
-//            Pixel.firstLaunchDate = Date() // TODO: WTF is this? reimplement?
-//            // MARK: Enable pixel experiments here
-//        }
+        
+        if LocalStatisticsStore().atb == nil {
+            AppDelegate.firstLaunchDate = Date()
+            // MARK: Enable pixel experiments here
+        }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here
@@ -375,7 +385,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                        appVersion: AppVersion.shared.versionNumber,
                        source: source,
                        defaultHeaders: [:],
-                       log: .networkProtectionPixel,
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
@@ -434,7 +443,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .filter { $0 }
             .asVoid()
             .sink { [weak syncService] in
-                PixelKit.fire(GeneralPixel.syncDaily, frequency: .dailyOnly)
+                PixelKit.fire(GeneralPixel.syncDaily, frequency: .daily)
                 syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
                     PixelKit.fire(GeneralPixel.syncSuccessRateDaily, withAdditionalParameters: params)
                 })
@@ -518,9 +527,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func emailDidSignInNotification(_ notification: Notification) {
         PixelKit.fire(GeneralPixel.emailEnabled)
-//        if Pixel.isNewUser { // TODO: reimplement Pixel.isNewUser
-//            PixelKit.fire(GeneralPixel.emailEnabledInitial, frequency: .justOnce)
-//        }
+        if AppDelegate.isNewUser {
+            PixelKit.fire(GeneralPixel.emailEnabledInitial, frequency: .legacyInitial)
+        }
 
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
             syncService?.scheduler.notifyDataChanged()
@@ -535,11 +544,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
-//        if Pixel.isNewUser { // TODO: reimplement Pixel.isNewUser
-//            PixelKit.fire(GeneralPixel.importDataInitial, frequency: .justOnce)
-//        }
+        if AppDelegate.isNewUser {
+            PixelKit.fire(GeneralPixel.importDataInitial, frequency: .legacyInitial)
+        }
     }
-
 }
 
 func updateSubscriptionStatus() {
@@ -551,7 +559,7 @@ func updateSubscriptionStatus() {
 
         if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             if subscription.isActive {
-                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .dailyOnly)
+                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
             }
         }
 
@@ -578,7 +586,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 #if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                    PixelKit.fire(GeneralPixel.networkProtectionWaitlistNotificationTapped, frequency: .dailyAndContinuous)
+                    PixelKit.fire(GeneralPixel.networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
                     NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }

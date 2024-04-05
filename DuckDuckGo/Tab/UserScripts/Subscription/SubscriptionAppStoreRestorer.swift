@@ -67,12 +67,12 @@ struct SubscriptionAppStoreRestorer {
 
         switch result {
         case .success:
-            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndContinuous)
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
         case .failure(let error):
             switch error {
             case .missingAccountOrTransactions: break
             default:
-                PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureOther, frequency: .dailyAndContinuous)
+                PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureOther, frequency: .dailyAndCount)
             }
 
             switch error {

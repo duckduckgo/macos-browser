@@ -181,7 +181,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
         if networkProtectionVisibility.isNetworkProtectionBetaVisible() {
             if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                PixelKit.fire(GeneralPixel.networkProtectionWaitlistEntryPointToolbarButtonDisplayed, frequency: .dailyOnly, includeAppVersionParameter: true)
+                PixelKit.fire(GeneralPixel.networkProtectionWaitlistEntryPointToolbarButtonDisplayed, frequency: .daily, includeAppVersionParameter: true)
                 showButton = true
                 return
             }

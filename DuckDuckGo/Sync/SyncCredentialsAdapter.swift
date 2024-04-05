@@ -91,12 +91,12 @@ final class SyncCredentialsAdapter {
                         case .unexpectedStatusCode(409):
                             // If credentials count limit has been exceeded
                             self?.isSyncCredentialsPaused = true
-                            PixelKit.fire(GeneralPixel.syncCredentialsCountLimitExceededDaily, frequency: .dailyOnly)
+                            PixelKit.fire(GeneralPixel.syncCredentialsCountLimitExceededDaily, frequency: .daily)
                             self?.showSyncPausedAlert()
                         case .unexpectedStatusCode(413):
                             // If credentials request size limit has been exceeded
                             self?.isSyncCredentialsPaused = true
-                            PixelKit.fire(GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .dailyOnly)
+                            PixelKit.fire(GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .daily)
                             self?.showSyncPausedAlert()
                         default:
                             break

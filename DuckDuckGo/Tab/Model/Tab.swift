@@ -1468,7 +1468,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
 #if NETWORK_PROTECTION
         if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {
-            PixelKit.fire(GeneralPixel.networkProtectionEnabledOnSearch, frequency: .dailyAndContinuous)
+            PixelKit.fire(GeneralPixel.networkProtectionEnabledOnSearch, frequency: .dailyAndCount)
         }
 #endif
     }

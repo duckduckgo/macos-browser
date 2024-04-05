@@ -366,7 +366,7 @@ final class MoreOptionsMenu: NSMenu {
             }
 #endif
 
-            PixelKit.fire(GeneralPixel.networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+            PixelKit.fire(GeneralPixel.networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else {
             networkProtectionFeatureVisibility.disableForWaitlistUsers()
         }
@@ -399,7 +399,7 @@ final class MoreOptionsMenu: NSMenu {
             }
 #endif
 
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndContinuous)
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
 
         } else {
             DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()

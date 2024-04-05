@@ -487,7 +487,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     func start() async {
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
-                      frequency: .dailyAndContinuous)
+                      frequency: .dailyAndCount)
         controllerErrorStore.lastErrorMessage = nil
 
         do {
@@ -528,11 +528,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 // in the packet tunnel provider side that can be used to debug additional logic.
                 //
                 PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartSuccess,
-                              frequency: .dailyAndContinuous)
+                              frequency: .dailyAndCount)
             }
         } catch {
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndContinuous, includeAppVersionParameter: true
+                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndCount, includeAppVersionParameter: true
             )
 
             await stop()
@@ -584,7 +584,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
         PixelKit.fire(
             NetworkProtectionPixelEvent.networkProtectionNewUser,
-            frequency: .justOnce,
+            frequency: .unique,
             includeAppVersionParameter: true) { [weak self] fired, error in
                 guard let self, error == nil, fired else { return }
                 self.defaults.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)

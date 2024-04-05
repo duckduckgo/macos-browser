@@ -22,7 +22,7 @@ extension URL {
 
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
 
-    public static func pixelUrl(forPixelNamed pixelName: String) -> URL { // TODO: make private or remove URL extension
+    public static func pixelUrl(forPixelNamed pixelName: String) -> URL {
         let urlString = "\(Self.pixelBase)/t/\(pixelName)"
         return URL(string: urlString)!
     }

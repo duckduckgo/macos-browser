@@ -118,7 +118,6 @@ public extension XCTestCase {
                        appVersion: "1.0.5",
                        source: "test-app",
                        defaultHeaders: [:],
-                       log: .disabled,
                        defaults: userDefaults) { firedPixelName, _, firedParameters, _, _, completion in
             callbackExecutedExpectation.fulfill()
 

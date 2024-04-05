@@ -48,7 +48,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
 
             dataManager.removeAllData()
 
-            DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableAndDeleteDaily, frequency: .dailyOnly)
+            DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableAndDeleteDaily, frequency: .daily)
             NotificationCenter.default.post(name: .dbpWasDisabled, object: nil)
         }
     }

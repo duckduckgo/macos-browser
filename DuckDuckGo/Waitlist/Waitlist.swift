@@ -224,7 +224,7 @@ struct NetworkProtectionWaitlist: Waitlist {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
                         sendInviteCodeAvailableNotification {
-                            PixelKit.fire(GeneralPixel.networkProtectionWaitlistNotificationShown, frequency: .dailyAndContinuous)
+                            PixelKit.fire(GeneralPixel.networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
                         }
                         completion(nil)
                     } catch {
@@ -353,7 +353,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
 
         sendInviteCodeAvailableNotification {
             DispatchQueue.main.async {
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndContinuous)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
             }
         }
     }

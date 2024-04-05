@@ -65,7 +65,7 @@ struct PermissionEntity: Equatable {
         guard let domain = managedObject.domainEncrypted as? String,
               let permissionTypeString = managedObject.permissionType,
               let permissionType = PermissionType(rawValue: permissionTypeString) else {
-            PixelKit.fire(DebugEvent(GeneralPixel.permissionDecryptionFailedUnique), frequency: .dailyOnly)
+            PixelKit.fire(DebugEvent(GeneralPixel.permissionDecryptionFailedUnique), frequency: .daily)
             assertionFailure("\(#file): Failed to create PermissionEntity from PermissionManagedObject")
             return nil
         }

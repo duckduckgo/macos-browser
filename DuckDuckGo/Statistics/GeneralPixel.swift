@@ -809,6 +809,44 @@ enum GeneralPixel: PixelKitEventV2 {
         switch self {
         case .loginItemUpdateError(let loginItemBundleID, let action, let buildType, let osVersion):
             return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType, "macosVersion": osVersion]
+
+        case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
+            var params = error.pixelParameters
+
+            if let version {
+                params[PixelKit.Parameters.sourceBrowserVersion] = version
+            }
+            return params
+
+        case .launchInitial(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+
+        case .serpInitial(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+
+        case .serpDay21to27(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+
+        case .dailyOsVersionCounter:
+            return [PixelKit.Parameters.osMajorVersion: "\(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)"]
+
+        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
+        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
+        case .syncSuccessRateDaily:
+            return nil
+
+        case .vpnBreakageReport(let category, let description, let metadata):
+            return [
+                PixelKit.Parameters.vpnBreakageCategory: category,
+                PixelKit.Parameters.vpnBreakageDescription: description,
+                PixelKit.Parameters.vpnBreakageMetadata: metadata
+            ]
         default: return nil
         }
     }

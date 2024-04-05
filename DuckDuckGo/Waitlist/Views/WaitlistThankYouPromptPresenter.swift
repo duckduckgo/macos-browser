@@ -56,7 +56,7 @@ final class WaitlistThankYouPromptPresenter {
         // Wiring this here since it's mostly useful for rolling out PrivacyPro, and should
         // go away once PPro is fully rolled out.
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            PixelKit.fire(PrivacyProPixel.privacyProFeatureEnabled, frequency: .dailyOnly)
+            PixelKit.fire(PrivacyProPixel.privacyProFeatureEnabled, frequency: .daily)
         }
 
         guard canShowPromptCheck() else {
@@ -65,11 +65,11 @@ final class WaitlistThankYouPromptPresenter {
 
         if isPIRBetaTester() {
             saveDidShowPromptCheck()
-            PixelKit.fire(PrivacyProPixel.privacyProBetaUserThankYouDBP, frequency: .dailyAndContinuous)
+            PixelKit.fire(PrivacyProPixel.privacyProBetaUserThankYouDBP, frequency: .dailyAndCount)
             presentPIRThankYouPrompt(in: window)
         } else if isVPNBetaTester() {
             saveDidShowPromptCheck()
-            PixelKit.fire(PrivacyProPixel.privacyProBetaUserThankYouVPN, frequency: .dailyAndContinuous)
+            PixelKit.fire(PrivacyProPixel.privacyProBetaUserThankYouVPN, frequency: .dailyAndCount)
             presentVPNThankYouPrompt(in: window)
         }
     }

@@ -19,7 +19,8 @@
 import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
-//import PixelKit
+import PixelKit
+
 @testable import DuckDuckGo_Privacy_Browser
 
 class CBRCompileTimeReporterTests: XCTestCase {
@@ -30,13 +31,15 @@ class CBRCompileTimeReporterTests: XCTestCase {
     var time = CACurrentMediaTime()
 
     override func setUp() {
-//        PixelKit.setUp() //TODO: errors?
+        PixelKit.setUp(appVersion: "",
+                       defaultHeaders: [:],
+                       defaults: UserDefaults()) { _, _, _, _, _, _ in }
         UserDefaultsWrapper<Any>.clearAll()
     }
 
     override func tearDown() {
         HTTPStubs.removeAllStubs()
-//        PixelKit.tearDown()
+        PixelKit.tearDown()
         super.tearDown()
     }
 

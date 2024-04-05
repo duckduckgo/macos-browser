@@ -173,12 +173,12 @@ final class SyncBookmarksAdapter {
                     case .unexpectedStatusCode(409):
                         // If bookmarks count limit has been exceeded
                         self?.isSyncBookmarksPaused = true
-                        PixelKit.fire(GeneralPixel.syncBookmarksCountLimitExceededDaily, frequency: .dailyOnly)
+                        PixelKit.fire(GeneralPixel.syncBookmarksCountLimitExceededDaily, frequency: .daily)
                         self?.showSyncPausedAlert()
                     case .unexpectedStatusCode(413):
                         // If bookmarks request size limit has been exceeded
                         self?.isSyncBookmarksPaused = true
-                        PixelKit.fire(GeneralPixel.syncBookmarksRequestSizeLimitExceededDaily, frequency: .dailyOnly)
+                        PixelKit.fire(GeneralPixel.syncBookmarksRequestSizeLimitExceededDaily, frequency: .daily)
                         self?.showSyncPausedAlert()
                     default:
                         break

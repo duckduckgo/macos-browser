@@ -119,11 +119,11 @@ extension YoutubeOverlayUserScript {
         }
 
         // Temporary pixel for first time user uses Duck Player
-//        if !Pixel.isNewUser { // TODO: reimplement Pixel.isNewUser
-//            return nil
-//        }
+        if !AppDelegate.isNewUser {
+            return nil
+        }
         if pixelName == "play.use" {
-            PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .justOnce)
+            PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .unique)
         }
         return nil
     }

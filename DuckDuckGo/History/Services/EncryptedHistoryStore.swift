@@ -344,7 +344,7 @@ fileprivate extension HistoryEntry {
         guard let url = historyEntryMO.urlEncrypted as? URL,
               let identifier = historyEntryMO.identifier,
               let lastVisit = historyEntryMO.lastVisit else {
-            PixelKit.fire(DebugEvent(GeneralPixel.historyEntryDecryptionFailedUnique), frequency: .dailyOnly)
+            PixelKit.fire(DebugEvent(GeneralPixel.historyEntryDecryptionFailedUnique), frequency: .daily)
             assertionFailure("HistoryEntry: Failed to init HistoryEntry from HistoryEntryManagedObject")
             return nil
         }

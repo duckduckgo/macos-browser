@@ -17,6 +17,8 @@
 //
 
 import XCTest
+import PixelKit
+import os.log
 @testable import DuckDuckGo_Privacy_Browser
 
 class PixelExperimentTests: XCTestCase {
@@ -55,13 +57,16 @@ class PixelExperimentTests: XCTestCase {
 
     override func tearDown() {
         logic.cleanup()
-        Pixel.tearDown()
+        PixelKit.tearDown()
         _store = nil
     }
 
     func testWhenNotInstalledThenCohortIsNill() {
         XCTAssertNil(logic.cohort)
-        Pixel.setUp { _ in
+
+        PixelKit.setUp(appVersion: "",
+                       defaultHeaders: [:],
+                       defaults: UserDefaults()) { _, _, _, _, _, _ in
             XCTFail("shouldn‘t fire pixels")
         }
 
@@ -71,14 +76,18 @@ class PixelExperimentTests: XCTestCase {
     }
 
     func testWhenNoCohort_NoEnrollmentPixelFired() {
-        Pixel.firstLaunchDate = now
-        PixelExperiment.install()
+        DispatchQueue.main.async {
+            AppDelegate.firstLaunchDate = self.now
+            PixelExperiment.install()
 
-        Pixel.setUp(store: self.store) { _ in
-            XCTFail("shouldn‘t fire pixels")
+            PixelKit.setUp(appVersion: "",
+                           defaultHeaders: [:],
+                           defaults: UserDefaults()) { _, _, _, _, _, _ in
+                XCTFail("shouldn‘t fire pixels")
+            }
+
+            PixelExperiment.fireEnrollmentPixel()
         }
-
-        PixelExperiment.fireEnrollmentPixel()
     }
 
     // See git history for fireFirstSerpPixel and fireDay21To27SerpPixel tests

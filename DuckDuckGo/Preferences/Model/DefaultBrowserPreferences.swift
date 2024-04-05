@@ -20,6 +20,7 @@ import Combine
 import Common
 import Foundation
 import SwiftUI
+import PixelKit
 
 protocol DefaultBrowserProvider {
     var bundleIdentifier: String { get }
@@ -76,12 +77,14 @@ final class DefaultBrowserPreferences: ObservableObject {
     @Published private(set) var isDefault: Bool = false {
         didSet {
             // Temporary pixel for first time user import data
+            DispatchQueue.main.async {
 #if DEBUG
-            guard NSApp.runType.requiresEnvironment else { return }
+                guard NSApp.runType.requiresEnvironment else { return }
 #endif
-//            if Pixel.isNewUser && isDefault { // TODO: reimplement Pixel.isNewUser
-//                PixelKit.fire(GeneralPixel.setAsDefaultInitial, limitTo: .initial)
-//            }
+                if AppDelegate.isNewUser && self.isDefault { // TODO: reimplement Pixel.isNewUser
+                    PixelKit.fire(GeneralPixel.setAsDefaultInitial, frequency: .legacyInitial)
+                }
+            }
         }
     }
     @Published private(set) var restorePreviousSession: Bool = false

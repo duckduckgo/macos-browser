@@ -345,12 +345,12 @@ final class NavigationBarViewController: NSViewController {
 
         if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
             NetworkProtectionWaitlistViewControllerPresenter.show()
-            PixelKit.fire(GeneralPixel.networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndContinuous)
+            PixelKit.fire(GeneralPixel.networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
         } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
         } else {
             NetworkProtectionWaitlistViewControllerPresenter.show()
-            PixelKit.fire(GeneralPixel.networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndContinuous)
+            PixelKit.fire(GeneralPixel.networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
         }
     }
 #endif

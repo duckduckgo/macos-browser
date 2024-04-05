@@ -24,21 +24,23 @@ public final class PixelKit {
     public typealias CompletionBlock = (Bool, Error?) -> Void
 
     /// The frequency with which a pixel is sent to our endpoint.
-    ///
     public enum Frequency {
         /// The default frequency for pixels. This fires pixels with the event names as-is.
         case standard
 
+        /// Used in Pixel.fire(...) as unique but without the `_u` requirement in the name
+        case legacyInitial
+
         /// Sent only once ever. The timestamp for this pixel is stored. Name for pixels of this type must end with `_u`.
-        case justOnce // TODO: Rename unique
+        case unique
 
         /// Sent once per day. The last timestamp for this pixel is stored and compared to the current date. Pixels of this type will have `_d` appended to their name.
-        case dailyOnly // TODO: Rename daily
+        case daily
 
         /// Sent once per day with a `_d` suffix, in addition to every time it is called with a `_c` suffix.
         /// This means a pixel will get sent twice the first time it is called per-day, and subsequent calls that day will only send the `_c` variant.
         /// This is useful in situations where pixels receive spikes in volume, as the daily pixel can be used to determine how many users are actually affected.
-        case dailyAndContinuous // TODO: Rename dailyAndCount
+        case dailyAndCount
     }
 
     public enum Header {
@@ -51,7 +53,6 @@ public final class PixelKit {
     }
 
     /// A closure typealias to request sending pixels through the network.
-    ///
     public typealias FireRequest = (
         _ pixelName: String,
         _ headers: [String: String],
@@ -61,10 +62,10 @@ public final class PixelKit {
         _ onComplete: @escaping CompletionBlock) -> Void
 
     public typealias Event = PixelKitEvent
-
     public static let duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
-
     private let defaults: UserDefaults
+
+    private let logger = Logger(subsystem: "com.duckduckgo.PixelKit", category: "PixelKit")
 
     private static let defaultDailyPixelCalendar: Calendar = {
         var calendar = Calendar.current
@@ -85,7 +86,6 @@ public final class PixelKit {
     public private(set) static var shared: PixelKit?
     private let appVersion: String
     private let defaultHeaders: [String: String]
-    private let log: OSLog
     private let fireRequest: FireRequest
 
     /// Sets up PixelKit for the entire app.
@@ -98,14 +98,12 @@ public final class PixelKit {
                              appVersion: String,
                              source: String? = nil,
                              defaultHeaders: [String: String],
-                             log: OSLog,
                              defaults: UserDefaults,
                              fireRequest: @escaping FireRequest) {
         shared = PixelKit(dryRun: dryRun,
                           appVersion: appVersion,
                           source: source,
                           defaultHeaders: defaultHeaders,
-                          log: log,
                           defaults: defaults,
                           fireRequest: fireRequest)
     }
@@ -122,7 +120,6 @@ public final class PixelKit {
          appVersion: String,
          source: String? = nil,
          defaultHeaders: [String: String],
-         log: OSLog,
          dailyPixelCalendar: Calendar? = nil,
          dateGenerator: @escaping () -> Date = Date.init,
          defaults: UserDefaults,
@@ -132,14 +129,13 @@ public final class PixelKit {
         self.appVersion = appVersion
         self.source = source
         self.defaultHeaders = defaultHeaders
-        self.log = log
         self.pixelCalendar = dailyPixelCalendar ?? Self.defaultDailyPixelCalendar
         self.dateGenerator = dateGenerator
         self.defaults = defaults
         self.fireRequest = fireRequest
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity, function_body_length
     private func fire(pixelNamed pixelName: String,
                       frequency: Frequency,
                       withHeaders headers: [String: String]?,
@@ -174,7 +170,14 @@ public final class PixelKit {
         switch frequency {
         case .standard:
             fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
-        case .justOnce:
+        case .legacyInitial:
+            if !pixelHasBeenFiredEver(pixelName) {
+                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+                updatePixelLastFireDate(pixelName: pixelName)
+            } else {
+                printDebugInfo(pixelName: pixelName, parameters: newParams, skipped: true)
+            }
+        case .unique:
             guard pixelName.hasSuffix("_u") else {
                 assertionFailure("Unique pixel: must end with _u")
                 return
@@ -185,14 +188,14 @@ public final class PixelKit {
             } else {
                 printDebugInfo(pixelName: pixelName, parameters: newParams, skipped: true)
             }
-        case .dailyOnly:
+        case .daily:
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
                 printDebugInfo(pixelName: pixelName + "_d", parameters: newParams, skipped: true)
             }
-        case .dailyAndContinuous:
+        case .dailyAndCount:
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
@@ -204,11 +207,10 @@ public final class PixelKit {
         }
     }
 
-    private func printDebugInfo(pixelName: String, parameters: [String: String], skipped: Bool = false) { // TODO: re-do all logging with Logger
-#if DEBUG
+    private func printDebugInfo(pixelName: String, parameters: [String: String], skipped: Bool = false) {
         let params = parameters.filter { key, _ in !["test"].contains(key) }
-        os_log(.debug, log: log, "👾 [%{public}@] %{public}@ %{public}@", skipped ? "SKIPPED" : "FIRED", pixelName.replacingOccurrences(of: "_", with: "."), params)
-#endif
+        let pixelName = pixelName.replacingOccurrences(of: "_", with: ".")
+        logger.debug("👾 [\(skipped ? "SKIPPED" : "FIRED")] \(pixelName) \(params)")
     }
 
     private func fireRequestWrapper(
@@ -256,10 +258,10 @@ public final class PixelKit {
         let pixelName = prefixedName(for: event)
 
         if !dryRun {
-            if frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName) {
+            if frequency == .daily, pixelHasBeenFiredToday(pixelName) {
                 onComplete(false, nil)
                 return
-            } else if frequency == .justOnce, pixelHasBeenFiredEver(pixelName) {
+            } else if frequency == .unique, pixelHasBeenFiredEver(pixelName) {
                 onComplete(false, nil)
                 return
             }
@@ -376,7 +378,8 @@ public final class PixelKit {
     }
 
     public static func clearFrequencyHistoryForAllPixels() {
-        //TODO: Implement changing storage approach
+        //TODO: Implement
+        assertionFailure("To be implemented")
     }
 
     /// Initially PixelKit was configured only for serving netP so these very specific keys were used, now PixelKit serves the entire app so we need to move away from them.

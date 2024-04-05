@@ -192,7 +192,7 @@ extension DownloadListItem {
               let modified = managedObject.modified,
               let url = managedObject.urlEncrypted as? URL
         else {
-            PixelKit.fire(DebugEvent(GeneralPixel.downloadListItemDecryptionFailedUnique), frequency: .dailyOnly)
+            PixelKit.fire(DebugEvent(GeneralPixel.downloadListItemDecryptionFailedUnique), frequency: .daily)
             assertionFailure("DownloadListItem: Failed to init from ManagedObject")
             return nil
         }

@@ -129,7 +129,7 @@ final internal class PixelExperimentLogic {
         isInstalled = true
     }
 
-    // You'll need additional pixels for your experiment.  Pass the cohort as a paramter.
+    // You'll need additional pixels for your experiment.  Pass the cohort as a parameter.
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
     }
@@ -137,16 +137,19 @@ final internal class PixelExperimentLogic {
     // Often used
     func fireFirstSerpPixel() {
         guard allocatedCohort != nil, let cohort else { return }
-        PixelKit.fire(GeneralPixel.serpInitial(cohort: cohort.rawValue), frequency: .justOnce, includeAppVersionParameter: false)
+        PixelKit.fire(GeneralPixel.serpInitial(cohort: cohort.rawValue), frequency: .unique, includeAppVersionParameter: false)
     }
 
     // Often used for retention experiments
     func fireDay21To27SerpPixel() {
         guard allocatedCohort != nil, let cohort else { return }
 
-//        if now() >= Pixel.firstLaunchDate.adding(.days(21)) && now() <= Pixel.firstLaunchDate.adding(.days(27)) { // TODO: reimplement
-//            PixelKit.fire(GeneralPixel.serpDay21to27(cohort: cohort.rawValue), frequency: .justOnce, includeAppVersionParameter: false)
-//        }
+        DispatchQueue.main.async {
+            let now = self.now()
+            if now >= AppDelegate.firstLaunchDate.adding(.days(21)) && now <= AppDelegate.firstLaunchDate.adding(.days(27)) {
+                PixelKit.fire(GeneralPixel.serpDay21to27(cohort: cohort.rawValue), frequency: .unique, includeAppVersionParameter: false)
+            }
+        }
     }
 
     func cleanup() {

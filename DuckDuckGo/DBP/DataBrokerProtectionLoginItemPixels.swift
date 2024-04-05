@@ -19,7 +19,7 @@
 import Foundation
 import PixelKit
 
-struct DataBrokerProtectionLoginItemPixels { // TODO: Remove struct and add private extension to PixelKit?
+struct DataBrokerProtectionLoginItemPixels {
 
     static func fire(pixel: PixelKitEventV2, frequency: PixelKit.Frequency) {
 
