@@ -95,15 +95,17 @@ final class FilePresenterTests: XCTestCase {
         return app
     }
 
-    private func terminateApp(timeout: TimeInterval = 1) async {
-        let eTerminated = runningApp != nil ? expectation(description: "terminated") : nil
+    private func terminateApp(timeout: TimeInterval = 5, expectation: XCTestExpectation = XCTestExpectation(description: "terminated")) async {
+        if runningApp == nil {
+            expectation.fulfill()
+        }
         let c = runningApp?.publisher(for: \.isTerminated).filter { $0 }.sink { _ in
-            eTerminated?.fulfill()
+            expectation.fulfill()
         }
         post(.terminate)
         runningApp?.forceTerminate()
 
-        await fulfillment(of: eTerminated.map { [$0] } ?? [], timeout: timeout)
+        await fulfillment(of: [expectation], timeout: timeout)
         withExtendedLifetime(c) {}
     }
 
@@ -111,7 +113,7 @@ final class FilePresenterTests: XCTestCase {
         DistributedNotificationCenter.default().post(name: .init(name.rawValue), object: object)
     }
 
-    private func fileReadPromise(timeout: TimeInterval = 5) -> Future<FileReadResult, Error> {
+    private func fileReadPromise(timeout: TimeInterval = 5, file: StaticString = #file, line: UInt = #line) -> Future<FileReadResult, Error> {
         Future<FileReadResult, Error> { [unowned self] fulfill in
             onFileRead = { result in
                 fulfill(.success(result))
@@ -124,13 +126,14 @@ final class FilePresenterTests: XCTestCase {
                 self.onError = nil
             }
         }
-        .timeout(timeout)
+        .timeout(timeout, file: file, line: line)
         .first()
         .promise()
     }
 
     // MARK: - Test sandboxed file access
 #if APPSTORE && !CI
+
     func testTool_run() async throws {
         // 1. make non-sandbox file
         let nonSandboxUrl = try makeNonSandboxFile()
