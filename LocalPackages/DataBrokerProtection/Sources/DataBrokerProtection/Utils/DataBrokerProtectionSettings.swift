@@ -85,7 +85,6 @@ extension UserDefaults {
         "dataBrokerProtectionShowMenuBarIcon"
     }
 
-
     // MARK: - Environment
 
     @objc
