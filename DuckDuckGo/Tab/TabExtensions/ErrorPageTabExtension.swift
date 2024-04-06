@@ -21,6 +21,7 @@ import Navigation
 import WebKit
 import Combine
 import ContentScopeScripts
+import BrowserServicesKit
 
 protocol SSLErrorPageScriptProvider {
     var sslErrorPageUserScript: SSLErrorPageUserScript? { get }
@@ -33,13 +34,16 @@ final class ErrorPageTabExtension {
     private weak var sslErrorPageUserScript: SSLErrorPageUserScript?
     private var shouldBypassSSLError = false
     private var urlCredentialCreator: URLCredentialCreating
+    private var featureFlagger: FeatureFlagger
 
     private var cancellables = Set<AnyCancellable>()
 
     init(
         webViewPublisher: some Publisher<WKWebView, Never>,
         scriptsPublisher: some Publisher<some SSLErrorPageScriptProvider, Never>,
-        urlCredentialCreator: URLCredentialCreating = URLCredentialCreator()) {
+        urlCredentialCreator: URLCredentialCreating = URLCredentialCreator(),
+        featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
+            self.featureFlagger = featureFlagger
             self.urlCredentialCreator = urlCredentialCreator
             webViewPublisher.sink { [weak self] webView in
                 self?.webView = webView
@@ -86,7 +90,8 @@ extension ErrorPageTabExtension: NavigationResponder {
             guard let webView else { return }
             let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
 
-            if error.errorCode == NSURLErrorServerCertificateUntrusted,
+            if featureFlagger.isFeatureOn(.sslCertificatesBypass),
+               error.errorCode == NSURLErrorServerCertificateUntrusted,
                let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
                 sslErrorPageUserScript?.failingURL = url
                 loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation, errorCode: errorCode)
