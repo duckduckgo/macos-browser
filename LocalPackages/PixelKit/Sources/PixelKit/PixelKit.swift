@@ -185,12 +185,12 @@ public final class PixelKit {
 
         switch frequency {
         case .standard:
-            assertIf(name: pixelName, endsWith: "_u")
-            assertIf(name: pixelName, endsWith: "_d")
+            reportErrorIf(pixel: pixelName, endsWith: "_u")
+            reportErrorIf(pixel: pixelName, endsWith: "_d")
             fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
         case .legacyInitial:
-            assertIf(name: pixelName, endsWith: "_u")
-            assertIf(name: pixelName, endsWith: "_d")
+            reportErrorIf(pixel: pixelName, endsWith: "_u")
+            reportErrorIf(pixel: pixelName, endsWith: "_d")
             if !pixelHasBeenFiredEver(pixelName) {
                 fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
@@ -198,7 +198,7 @@ public final class PixelKit {
                 printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
             }
         case .unique:
-            assertIf(name: pixelName, endsWith: "_d")
+            reportErrorIf(pixel: pixelName, endsWith: "_d")
             guard pixelName.hasSuffix("_u") else {
                 assertionFailure("Unique pixel: must end with _u")
                 return
@@ -210,8 +210,8 @@ public final class PixelKit {
                 printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
             }
         case .daily:
-            assertIf(name: pixelName, endsWith: "_u")
-            assertIf(name: pixelName, endsWith: "_d") // Because is added automatically
+            reportErrorIf(pixel: pixelName, endsWith: "_u")
+            reportErrorIf(pixel: pixelName, endsWith: "_d") // Because is added automatically
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
@@ -219,9 +219,9 @@ public final class PixelKit {
                 printDebugInfo(pixelName: pixelName + "_d", frequency: frequency, parameters: newParams, skipped: true)
             }
         case .dailyAndCount:
-            assertIf(name: pixelName, endsWith: "_u")
-            assertIf(name: pixelName, endsWith: "_d") // Because is added automatically
-            assertIf(name: pixelName, endsWith: "_c") // Because is added automatically
+            reportErrorIf(pixel: pixelName, endsWith: "_u")
+            reportErrorIf(pixel: pixelName, endsWith: "_d") // Because is added automatically
+            reportErrorIf(pixel: pixelName, endsWith: "_c") // Because is added automatically
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
@@ -233,9 +233,11 @@ public final class PixelKit {
         }
     }
 
-    func assertIf(name: String, endsWith forbiddenString: String) {
-        if name.hasSuffix(forbiddenString) {
-            assertionFailure("Pixel \(name) must not end with \(forbiddenString)")
+    /// If the pixel name ends with the forbiddenString then an error is logged or an assertion failure is fired in debug
+    func reportErrorIf(pixel: String, endsWith forbiddenString: String) {
+        if pixel.hasSuffix(forbiddenString) {
+            logger.error("Pixel \(pixel) must not end with \(forbiddenString)")
+            assertionFailure("Pixel \(pixel) must not end with \(forbiddenString)")
         }
     }
 
@@ -407,20 +409,28 @@ public final class PixelKit {
     }
 
     public static func clearFrequencyHistoryForAllPixels() {
-        // TODO: Implement
-        assertionFailure("To be implemented")
+        guard let userDefaults = Self.shared?.defaults else { return }
+        for (key, _) in userDefaults.dictionaryRepresentation() {
+            if key.hasPrefix(storageKeyPrefixLegacy) || key.hasPrefix(storageKeyPrefix) {
+                userDefaults.removeObject(forKey: key)
+                PixelKit.shared?.logger.debug("🚮 Removing from storage \(key)")
+            }
+        }
     }
+
+    static let storageKeyPrefixLegacy = "com.duckduckgo.network-protection.pixel."
+    static let storageKeyPrefix = "com.duckduckgo.network-protection.pixel."
 
     /// Initially PixelKit was configured only for serving netP so these very specific keys were used, now PixelKit serves the entire app so we need to move away from them.
     /// NOTE: I would remove this 6 months after release
     private func legacyUserDefaultsKeyName(forPixelName pixelName: String) -> String {
         dryRun
-            ? "com.duckduckgo.network-protection.pixel.\(pixelName).dry-run"
-            : "com.duckduckgo.network-protection.pixel.\(pixelName)"
+        ? "\(Self.storageKeyPrefixLegacy)\(pixelName).dry-run"
+        : "\(Self.storageKeyPrefixLegacy)\(pixelName)"
     }
 
     private func userDefaultsKeyName(forPixelName pixelName: String) -> String {
-        return "com.duckduckgo.pixel-date.\(pixelName)\( dryRun ? ".dry-run" : "" )"
+        return "\(Self.storageKeyPrefix)\(pixelName)\( dryRun ? ".dry-run" : "" )"
     }
 }
 

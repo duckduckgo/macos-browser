@@ -233,10 +233,7 @@ final class BWManager: BWManagement, ObservableObject {
         switch error {
         case "cannot-decrypt":
             logOrAssertionFailure("BWManagement: Bitwarden error - cannot decrypt")
-
-//            if Pixel.Event.Repetition(key: "bitwardenRespondedCannotDecryptUnique", update: false) != .repetitive { // TODO: reimplement?
-//                PixelKit.fire(DebugEvent(GeneralPixel.bitwardenRespondedCannotDecryptUnique))
-//            }
+            PixelKit.fire(DebugEvent(GeneralPixel.bitwardenRespondedCannotDecrypt), frequency: .daily)
         case "locked":
             if case let .connected(vault) = status {
                 status = .connected(vault: vault.locked)

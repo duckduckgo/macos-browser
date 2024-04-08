@@ -238,7 +238,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case removedInvalidBookmarkManagedObjects
 
     case bitwardenNotResponding
-    case bitwardenRespondedCannotDecryptUnique // (repetition: Repetition = .init(key: "bitwardenRespondedCannotDecryptUnique")) // TODO: REIMPLEMENTATION??
+    case bitwardenRespondedCannotDecrypt
     case bitwardenHandshakeFailed
     case bitwardenDecryptionOfSharedKeyFailed
     case bitwardenStoringOfTheSharedKeyFailed
@@ -681,8 +681,8 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .bitwardenNotResponding:
             return "bitwarden_not_responding"
-        case .bitwardenRespondedCannotDecryptUnique:
-            return "bitwarden_responded_cannot_decrypt_unique"
+        case .bitwardenRespondedCannotDecrypt:
+            return "bitwarden_responded_cannot_decrypt_d"
         case .bitwardenHandshakeFailed:
             return "bitwarden_handshake_failed"
         case .bitwardenDecryptionOfSharedKeyFailed:
