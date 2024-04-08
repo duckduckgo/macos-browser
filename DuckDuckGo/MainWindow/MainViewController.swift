@@ -191,9 +191,7 @@ final class MainViewController: NSViewController {
         browserTabViewController.windowDidBecomeKey()
         presentWaitlistThankYouPromptIfNecessary()
 
-#if NETWORK_PROTECTION
         refreshNetworkProtectionMessages()
-#endif
 
 #if DBP
         DataBrokerProtectionAppEvents().windowDidBecomeMain()
