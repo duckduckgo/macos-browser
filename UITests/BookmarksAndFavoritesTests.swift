@@ -96,15 +96,6 @@ class BookmarksAndFavoritesTests: XCTestCase {
         app.typeKey("n", modifierFlags: .command)
     }
 
-    func resetBookmarks() {
-        app.typeKey("n", modifierFlags: [.command]) // Can't use debug menu without a window
-        XCTAssertTrue(
-            resetBookMarksMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
-            "Reset bookmarks menu item didn't become available in a reasonable timeframe."
-        )
-        resetBookMarksMenuItem.click()
-    }
-
     func test_bookmarks_canBeAddedTo_withContextClickBookmarkThisPage() {
         openSiteToBookmark(bookmarkingViaDialog: false, escapingDialog: false)
         app.windows.webViews[pageTitle].rightClick()
@@ -632,6 +623,17 @@ class BookmarksAndFavoritesTests: XCTestCase {
 }
 
 private extension BookmarksAndFavoritesTests {
+    /// Reset the bookmarks so we can rely on a single bookmark's existence
+    func resetBookmarks() {
+        app.typeKey("n", modifierFlags: [.command]) // Can't use debug menu without a window
+        XCTAssertTrue(
+            resetBookMarksMenuItem.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Reset bookmarks menu item didn't become available in a reasonable timeframe."
+        )
+        resetBookMarksMenuItem.click()
+    }
+
+    /// Make sure that we can reply on the bookmarks bar always appearing
     func toggleShowBookmarksBarAlwaysOn() {
         app.typeKey(",", modifierFlags: [.command]) // Open settings
 
