@@ -1,0 +1,89 @@
+//
+//  ZoomPopoverViewModelTests.swift
+//
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
+
+final class ZoomPopoverViewModelTests: XCTestCase {
+
+    var tabVM: TabViewModel!
+    var zoomPopover: ZoomPopoverViewModel!
+    var accessibilityPreferences: AccessibilityPreferences!
+
+    @MainActor
+    override func setUp() {
+        UserDefaultsWrapper<Any>.clearAll()
+        tabVM = TabViewModel(tab: Tab())
+        accessibilityPreferences = AccessibilityPreferences()
+        zoomPopover = ZoomPopoverViewModel(accessibilityPreferences: accessibilityPreferences, tabViewModel: tabVM)
+        let window = NSWindow()
+        window.contentView = tabVM.tab.webView
+    }
+
+    @MainActor
+    func test_WhenZoomInFromPopover_ThenWebViewIsZoomedIn() {
+        var increasableDefaultValue = DefaultZoomValue.allCases
+        increasableDefaultValue.removeLast()
+        let randomZoomLevel = increasableDefaultValue.randomElement()!
+        tabVM.tab.webView.zoomLevel = randomZoomLevel
+
+        zoomPopover.zoomIn()
+
+        XCTAssertEqual(randomZoomLevel.index + 1, tabVM.tab.webView.zoomLevel.index)
+    }
+
+    @MainActor
+    func test_WhenZoomOutFromPopover_ThenWebViewIsZoomedOut() {
+        var decreasableDefaultValue = DefaultZoomValue.allCases
+        decreasableDefaultValue.removeFirst()
+        let randomZoomLevel = decreasableDefaultValue.randomElement()!
+        tabVM.tab.webView.zoomLevel = randomZoomLevel
+
+        zoomPopover.zoomOut()
+
+        XCTAssertEqual(randomZoomLevel.index - 1, tabVM.tab.webView.zoomLevel.index)
+    }
+
+    @MainActor
+    func test_WhenResetZoomFromPopover_ThenWebViewIsReset() {
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        tabVM.tab.webView.defaultZoomValue = .percent100
+        tabVM.tab.webView.zoomLevel = randomZoomLevel
+
+        zoomPopover.reset()
+
+        XCTAssertEqual(.percent100, tabVM.tab.webView.zoomLevel)
+    }
+
+    @MainActor
+    func test_WhenZoomValueIsSetInAppearancePreference_ThenPopoverZoomLevelUpdated() async {
+        let url = URL(string: "https://app.asana.com/0/1")!
+        let hostURL = "https://app.asana.com/"
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        let tab = Tab(url: url)
+        let tabVM = TabViewModel(tab: tab, accessibilityPreferences: accessibilityPreferences)
+        zoomPopover = ZoomPopoverViewModel(accessibilityPreferences: accessibilityPreferences, tabViewModel: tabVM)
+
+        accessibilityPreferences.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
+
+        await MainActor.run {
+            XCTAssertEqual(zoomPopover.zoomLevel, randomZoomLevel)
+        }
+    }
+
+}

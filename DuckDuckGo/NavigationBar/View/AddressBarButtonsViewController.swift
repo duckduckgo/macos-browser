@@ -34,6 +34,9 @@ final class AddressBarButtonsViewController: NSViewController {
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
+    private let accessibilityPreferences: AccessibilityPreferences
+
+    private var zoomPopover: ZoomPopover?
     private var bookmarkPopover: AddBookmarkPopover?
     private func bookmarkPopoverCreatingIfNeeded() -> AddBookmarkPopover {
         return bookmarkPopover ?? {
@@ -82,6 +85,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     @IBOutlet weak var privacyDashboardPositioningView: NSView!
 
+    @IBOutlet weak var zoomButton: NSButton!
     @IBOutlet weak var privacyEntryPointButton: MouseOverAnimationButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
@@ -159,6 +163,7 @@ final class AddressBarButtonsViewController: NSViewController {
         didSet {
             if isMouseOverNavigationBar != oldValue {
                 updateBookmarkButtonVisibility()
+                updateZoomButtonVisibility()
             }
         }
     }
@@ -168,6 +173,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var bookmarkListCancellable: AnyCancellable?
     private var privacyDashboadPendingUpdatesCancellable: AnyCancellable?
     private var effectiveAppearanceCancellable: AnyCancellable?
+    private var accessibilityPreferencesCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
     private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
@@ -181,8 +187,10 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel) {
+          tabCollectionViewModel: TabCollectionViewModel,
+          accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared)  {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.accessibilityPreferences = accessibilityPreferences
 
         super.init(coder: coder)
     }
@@ -195,8 +203,10 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToBookmarkList()
         subscribeToEffectiveAppearance()
+        subscribeToAccessibilityAppearancePreference()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
+        updateZoomButtonVisibility()
         bookmarkButton.sendAction(on: .leftMouseDown)
 
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
@@ -287,6 +297,31 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         bookmarkButton.isHidden = !showBookmarkButton
+    }
+
+    private func updateZoomButtonVisibility() {
+        zoomButton.isHidden = true
+        let hasURL = tabViewModel?.tab.url != nil
+        let isEditingMode = controllerMode?.isEditing ?? false
+        let isTextFieldValueText = textFieldValue?.isText ?? false
+
+        var hasNonDefaultZoom = false
+        guard let url = tabViewModel?.tab.url else { return }
+        if let zoomPerWebsite = accessibilityPreferences.zoomPerWebsite(url: url.absoluteString) {
+            if zoomPerWebsite != accessibilityPreferences.defaultPageZoom {
+                hasNonDefaultZoom = true
+            }
+        }
+
+        let shouldShowZoom = hasURL
+        && !isEditingMode
+        && !isTextFieldValueText
+        && !isTextFieldEditorFirstResponder
+        && !isAnyTrackerAnimationPlaying
+        && !isAnyShieldAnimationPlaying
+        && (hasNonDefaultZoom || isMouseOverNavigationBar || zoomPopover?.isShown == true)
+
+        zoomButton.isHidden = !shouldShowZoom
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
@@ -394,6 +429,17 @@ final class AddressBarButtonsViewController: NSViewController {
         updateImageButton()
         updatePermissionButtons()
         updateBookmarkButtonVisibility()
+        updateZoomButtonVisibility()
+    }
+
+    @IBAction func zoomButtonAction(_ sender: Any) {
+        NotificationCenter.default.removeObserver(self, name: NSPopover.willCloseNotification, object: zoomPopover)
+        guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+        zoomPopover = ZoomPopover(tabViewModel: tabViewModel)
+        zoomPopover!.show(positionedBelow: zoomButton)
+        NotificationCenter.default.addObserver(forName: NSPopover.didCloseNotification, object: zoomPopover, queue: .main) { _ in
+            self.updateZoomButtonVisibility()
+        }
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
@@ -530,6 +576,7 @@ final class AddressBarButtonsViewController: NSViewController {
         geolocationButton.sendAction(on: .leftMouseDown)
         popupsButton.sendAction(on: .leftMouseDown)
         externalSchemeButton.sendAction(on: .leftMouseDown)
+        zoomButton.contentTintColor = .black
     }
 
     private var animationViewCache = [String: LottieAnimationView]()
@@ -856,6 +903,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 self?.updatePrivacyEntryPointIcon()
                 self?.updatePermissionButtons()
                 self?.playBadgeAnimationIfNecessary()
+                self?.updateZoomButtonVisibility()
             }
         }
 
@@ -940,6 +988,15 @@ final class AddressBarButtonsViewController: NSViewController {
             .sink { [weak self] _ in
                 self?.setupAnimationViews()
                 self?.updatePrivacyEntryPointIcon()
+                self?.updateZoomButtonVisibility()
+            }
+    }
+
+    private func subscribeToAccessibilityAppearancePreference() {
+        accessibilityPreferencesCancellable = NotificationCenter.default.publisher(for: AccessibilityPreferences.zoomPerWebsiteUpdated)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateZoomButtonVisibility()
             }
     }
 

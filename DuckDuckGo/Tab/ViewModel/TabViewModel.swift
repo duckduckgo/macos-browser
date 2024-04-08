@@ -154,6 +154,7 @@ final class TabViewModel {
                 updateAddressBarStrings()
                 updateFavicon()
                 updateCanBeBookmarked()
+                updateZoomForWebsite()
             }
             .store(in: &cancellables)
     }
@@ -214,6 +215,7 @@ final class TabViewModel {
     }
 
     private func subscribeToPreferences() {
+        self.tab.webView.zoomLevelDelegate = self
         appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
             guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
             self.updatePassiveAddressBarString(showURL: newValue, url: url, hostURL: host)
@@ -221,13 +223,35 @@ final class TabViewModel {
         accessibilityPreferences.$defaultPageZoom.sink { [weak self] newValue in
             guard let self = self else { return }
             self.tab.webView.defaultZoomValue = newValue
-            self.tab.webView.zoomLevel = newValue
+            if !isThereZoomPerWebsite {
+                self.tab.webView.zoomLevel = newValue
+            }
         }.store(in: &cancellables)
+        NotificationCenter.default.publisher(for: AccessibilityPreferences.zoomPerWebsiteUpdated)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateZoomForWebsite()
+            }.store(in: &cancellables)
+    }
+
+    private var isThereZoomPerWebsite: Bool {
+        guard let urlString = tab.url?.absoluteString else { return false }
+        return accessibilityPreferences.zoomPerWebsite(url: urlString) != nil
+    }
+
+    private func updateZoomForWebsite() {
+        guard let urlString = tab.url?.absoluteString else { return }
+        let zoomToApply: DefaultZoomValue = accessibilityPreferences.zoomPerWebsite(url: urlString) ?? accessibilityPreferences.defaultPageZoom
+        if self.tab.webView.zoomLevel != zoomToApply {
+            self.tab.webView.zoomLevel = zoomToApply
+        }
     }
 
     private func subscribeToWebViewDidFinishNavigation() {
         tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
-            self?.sendAnimationTrigger()
+            guard let self = self else { return }
+            self.sendAnimationTrigger()
+            self.updateZoomForWebsite()
         }.store(in: &cancellables)
     }
 
@@ -235,7 +259,7 @@ final class TabViewModel {
         canBeBookmarked = !isShowingErrorPage && (tab.content.url ?? .blankPage) != .blankPage
     }
 
-    private var tabURL: URL? {
+    var tabURL: URL? {
         return tab.content.url
     }
 
@@ -411,4 +435,13 @@ extension TabViewModel: TabDataClearing {
         tab.prepareForDataClearing(caller: caller)
     }
 
+}
+
+extension TabViewModel: WebViewZoomLevelDelegate {
+    func zoomWasSet(to level: DefaultZoomValue) {
+        guard let urlString = tab.url?.absoluteString else { return }
+        if accessibilityPreferences.zoomPerWebsite(url: urlString) != level {
+            accessibilityPreferences.updateZoomPerWebsite(zoomLevel: level, url: urlString)
+        }
+    }
 }

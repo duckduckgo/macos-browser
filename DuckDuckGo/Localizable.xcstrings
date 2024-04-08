@@ -46108,6 +46108,9 @@
         }
       }
     },
+    "Reset" : {
+
+    },
     "restart.bitwarden" : {
       "comment" : "Button to restart Bitwarden application",
       "extractionState" : "extracted_with_value",
