@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Networking
 import UserNotifications
@@ -222,9 +220,7 @@ struct NetworkProtectionWaitlist: Waitlist {
                     do {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-                        sendInviteCodeAvailableNotification {
-                            DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
-                        }
+                        sendInviteCodeAvailableNotification(completion: nil)
                         completion(nil)
                     } catch {
                         assertionFailure("Failed to redeem invite code")
@@ -239,8 +235,6 @@ struct NetworkProtectionWaitlist: Waitlist {
     }
 
 }
-
-#endif
 
 #if DBP
 

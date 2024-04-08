@@ -20,8 +20,6 @@ import XCTest
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
-#if NETWORK_PROTECTION
-
 final class MockNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
 
     var messages: [NetworkProtectionRemoteMessage] = []
@@ -37,8 +35,6 @@ final class MockNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessagi
     func dismiss(message: NetworkProtectionRemoteMessage) {}
 
 }
-
-#endif
 
 #if DBP
 
@@ -96,25 +92,18 @@ final class ContinueSetUpModelTests: XCTestCase {
         privacyConfigManager.privacyConfig = config
         randomNumberGenerator = MockRandomNumberGenerator()
 
-#if NETWORK_PROTECTION && DBP
+#if DBP
         let messaging = HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: userDefaults,
             dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
             dataBrokerProtectionUserDefaults: userDefaults
         )
-#elseif NETWORK_PROTECTION
+#else
         let messaging = HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: userDefaults
         )
-#elseif DBP
-        let messaging =  HomePageRemoteMessaging(
-            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
-            dataBrokerProtectionUserDefaults: userDefaults
-        )
-#else
-        let messaging =  HomePageRemoteMessaging.defaultMessaging()
 #endif
 
         vm = HomePage.Models.ContinueSetUpModel(
@@ -200,7 +189,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     @MainActor func testWhenInstallDateIsLessThanADayAgoButUserNotIn10PercentNoSurveyCardIsShown() {
         let aDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
         userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        var randomGenerator = MockRandomNumberGenerator()
+        let randomGenerator = MockRandomNumberGenerator()
         randomGenerator.numberToReturn = 10
         vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, randomNumberGenerator: randomGenerator)
         vm.shouldShowAllFeatures = true
@@ -571,25 +560,18 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     private func createMessaging() -> HomePageRemoteMessaging {
-#if NETWORK_PROTECTION && DBP
+#if DBP
         return HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: userDefaults,
             dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
             dataBrokerProtectionUserDefaults: userDefaults
         )
-#elseif NETWORK_PROTECTION
+#else
         return HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: userDefaults
         )
-#elseif DBP
-        return HomePageRemoteMessaging(
-            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
-            dataBrokerProtectionUserDefaults: userDefaults
-        )
-#else
-        return HomePageRemoteMessaging.defaultMessaging()
 #endif
     }
 
@@ -617,25 +599,18 @@ extension HomePage.Models.ContinueSetUpModel {
         let manager = MockPrivacyConfigurationManager()
         manager.privacyConfig = privacyConfig
 
-#if NETWORK_PROTECTION && DBP
+#if DBP
         let messaging = HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: appGroupUserDefaults,
             dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
             dataBrokerProtectionUserDefaults: appGroupUserDefaults
         )
-#elseif NETWORK_PROTECTION
+#else
         let messaging = HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: appGroupUserDefaults
         )
-#elseif DBP
-        let messaging = HomePageRemoteMessaging(
-            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
-            dataBrokerProtectionUserDefaults: appGroupUserDefaults
-        )
-#else
-        let messaging =  HomePageRemoteMessaging.defaultMessaging()
 #endif
 
         return HomePage.Models.ContinueSetUpModel(

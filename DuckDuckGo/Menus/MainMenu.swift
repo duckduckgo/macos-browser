@@ -24,10 +24,7 @@ import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import SwiftUI
 import WebKit
 import Configuration
-
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
 
 #if SUBSCRIPTION
 import Subscription
@@ -85,9 +82,7 @@ import SubscriptionUI
     let toggleBookmarksShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowBookmarksShortcut, action: #selector(MainViewController.toggleBookmarksShortcut), keyEquivalent: "K")
     let toggleDownloadsShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowDownloadsShortcut, action: #selector(MainViewController.toggleDownloadsShortcut), keyEquivalent: "J")
 
-#if NETWORK_PROTECTION
     let toggleNetworkProtectionShortcutMenuItem = NSMenuItem(title: UserText.showNetworkProtectionShortcut, action: #selector(MainViewController.toggleNetworkProtectionShortcut), keyEquivalent: "N")
-#endif
 
     // MARK: Window
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
@@ -270,9 +265,7 @@ import SubscriptionUI
             toggleBookmarksShortcutMenuItem
             toggleDownloadsShortcutMenuItem
 
-#if NETWORK_PROTECTION
             toggleNetworkProtectionShortcutMenuItem
-#endif
 
             NSMenuItem.separator()
 
@@ -398,10 +391,8 @@ import SubscriptionUI
     override func update() {
         super.update()
 
-#if NETWORK_PROTECTION
         // To be safe, hide the NetP shortcut menu item by default.
         toggleNetworkProtectionShortcutMenuItem.isHidden = true
-#endif
 
         updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
@@ -549,14 +540,12 @@ import SubscriptionUI
             toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
-#if NETWORK_PROTECTION
-            if await DefaultNetworkProtectionVisibility().isVPNVisible() {
+            if DefaultNetworkProtectionVisibility().isVPNVisible() {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = false
                 toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             } else {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = true
             }
-#endif
         }
     }
 
@@ -572,8 +561,8 @@ import SubscriptionUI
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
-                NSMenuItem(title: "Reset Autofill Data", action: #selector(MainViewController.resetSecureVaultData))
-                NSMenuItem(title: "Reset Bookmarks", action: #selector(MainViewController.resetBookmarks))
+                NSMenuItem(title: "Reset Autofill Data", action: #selector(MainViewController.resetSecureVaultData)).withAccessibilityIdentifier("MainMenu.resetSecureVaultData")
+                NSMenuItem(title: "Reset Bookmarks", action: #selector(MainViewController.resetBookmarks)).withAccessibilityIdentifier("MainMenu.resetBookmarks")
                 NSMenuItem(title: "Reset Pinned Tabs", action: #selector(MainViewController.resetPinnedTabs))
                 NSMenuItem(title: "Reset YouTube Overlay Interactions", action: #selector(MainViewController.resetDuckPlayerOverlayInteractions))
                 NSMenuItem(title: "Reset MakeDuckDuckYours user settings", action: #selector(MainViewController.resetMakeDuckDuckGoYoursUserSettings))
@@ -588,7 +577,7 @@ import SubscriptionUI
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Daily Pixels", action: #selector(MainViewController.resetDailyPixels))
-            }
+            }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
                 NSMenuItem(title: "Show Credentials Saved Popover", action: #selector(MainViewController.showCredentialsSavedPopover))
@@ -616,12 +605,10 @@ import SubscriptionUI
                 .submenu(DataBrokerProtectionDebugMenu())
 #endif
 
-#if NETWORK_PROTECTION
             if case .normal = NSApp.runType {
                 NSMenuItem(title: "VPN")
                     .submenu(NetworkProtectionDebugMenu())
             }
-#endif
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 

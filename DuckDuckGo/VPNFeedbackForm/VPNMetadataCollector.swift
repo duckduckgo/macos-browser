@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import AppKit
 import Common
@@ -285,5 +283,3 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
 }
-
-#endif

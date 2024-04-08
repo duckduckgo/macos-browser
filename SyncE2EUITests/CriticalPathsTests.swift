@@ -62,14 +62,14 @@ final class CriticalPathsTests: XCTestCase {
         debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
 
         debugMenuBarItem.click()
-        let resetDataMenuItem = menuBarsQuery.menuItems["Reset Data"]
+        let resetDataMenuItem = menuBarsQuery.menuItems["MainMenu.resetData"]
         resetDataMenuItem.hover()
-        let resetBookMarksData = resetDataMenuItem.menuItems["Reset Bookmarks"]
+        let resetBookMarksData = resetDataMenuItem.menuItems["MainMenu.resetBookmarks"]
         resetBookMarksData.click()
 
         debugMenuBarItem.click()
         resetDataMenuItem.hover()
-        let resetAutofillData = resetDataMenuItem.menuItems["Reset Autofill Data"]
+        let resetAutofillData = resetDataMenuItem.menuItems["MainMenu.resetSecureVaultData"]
         resetAutofillData.click()
     }
 

@@ -19,10 +19,12 @@
 import Foundation
 import Subscription
 import SubscriptionUI
+import enum StoreKit.StoreKitError
 
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
 
+    // swiftlint:disable:next cyclomatic_complexity
     static func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
 
         let progressViewController = await ProgressViewController(title: UserText.restoringSubscriptionTitle)
@@ -36,8 +38,28 @@ struct SubscriptionAppStoreRestorer {
             mainViewController.presentAsSheet(progressViewController)
         }
 
-        guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else {
-            return
+        let syncResult = await PurchaseManager.shared.syncAppleIDAccount()
+
+        switch syncResult {
+        case .success:
+            break
+        case .failure(let error):
+            switch error as? StoreKitError {
+            case .some(.userCancelled):
+                return
+            default:
+                break
+            }
+
+            let alert = await NSAlert.appleIDSyncFailedAlert(text: error.localizedDescription)
+
+            switch await alert.runModal() {
+            case .alertFirstButtonReturn:
+                // Continue button
+                break
+            default:
+                return
+            }
         }
 
         let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))

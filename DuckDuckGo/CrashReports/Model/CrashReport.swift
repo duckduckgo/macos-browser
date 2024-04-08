@@ -96,6 +96,7 @@ struct JSONCrashReport: CrashReport {
 
 }
 
+@available(macOS 12.0, *)
 extension MXDiagnosticPayload: CrashReportPresenting {
     var content: String? {
         jsonRepresentation().utf8String()

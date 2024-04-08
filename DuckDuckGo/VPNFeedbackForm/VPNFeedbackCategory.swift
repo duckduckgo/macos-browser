@@ -18,8 +18,6 @@
 
 import Foundation
 
-#if NETWORK_PROTECTION
-
 enum VPNFeedbackCategory: String, CaseIterable {
     case landingPage
     case unableToInstall
@@ -61,5 +59,3 @@ enum VPNFeedbackCategory: String, CaseIterable {
         }
     }
 }
-
-#endif

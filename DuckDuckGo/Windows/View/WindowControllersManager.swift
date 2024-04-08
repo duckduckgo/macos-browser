@@ -200,7 +200,6 @@ extension WindowControllersManager {
 
     // MARK: - VPN
 
-#if NETWORK_PROTECTION
     @MainActor
     func showNetworkProtectionStatus(retry: Bool = false) async {
         guard let windowController = mainWindowControllers.first else {
@@ -244,7 +243,6 @@ extension WindowControllersManager {
 
         parentWindowController.window?.beginSheet(locationsFormWindow)
     }
-#endif
 
 }
 
