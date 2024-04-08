@@ -28,6 +28,10 @@ fileprivate extension Font {
             .system(size: 13, weight: .regular, design: .default)
         }
 
+        static var location: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
         static var content: Font {
             .system(size: 13, weight: .regular, design: .default)
         }
@@ -60,6 +64,10 @@ private enum Opacity {
         colorScheme == .light ? Double(0.6) : Double(0.5)
     }
 
+    static func location(colorScheme: ColorScheme) -> Double {
+        colorScheme == .light ? Double(0.6) : Double(0.5)
+    }
+
     static let content = Double(0.58)
     static let label = Double(0.9)
     static let description = Double(0.9)
@@ -79,10 +87,13 @@ private enum Opacity {
 }
 
 fileprivate extension View {
-    func applyConnectionStatusDetailAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.connectionStatusDetail(colorScheme: colorScheme))
+    func applyConnectionStatusDetailAttributes(colorScheme: ColorScheme) -> some View { opacity(Opacity.connectionStatusDetail(colorScheme: colorScheme))
             .font(.NetworkProtection.connectionStatusDetail)
             .foregroundColor(Color(.defaultText))
+    }
+
+    func applyLocationAttributes() -> some View {
+        font(.NetworkProtection.location)
     }
 
     func applyContentAttributes(colorScheme: ColorScheme) -> some View {
@@ -229,23 +240,25 @@ public struct TunnelControllerView: View {
                 dismiss()
             } label: { isHovered in
                 HStack(alignment: .center, spacing: 10) {
-                    Text("🇻🇳")
-                        .font(.system(size: 13))
-                        .frame(width: 26, height: 26)
-                        .background(Color(hex: "B2B2B2").opacity(0.3))
-                        .clipShape(Circle())
+                    if let emoji = model.emoji {
+                        Text(emoji)
+                            .font(.system(size: 13))
+                            .frame(width: 26, height: 26)
+                            .background(Color(hex: "B2B2B2").opacity(0.3))
+                            .clipShape(Circle())
+                    }
                     if #available(macOS 12, *) {
                         if isHovered {
                             Text(model.plainLocation)
-                                .font(.system(size: 13))
+                                .applyLocationAttributes()
                                 .foregroundColor(.white)
                         } else {
                             Text(model.formattedLocation)
-                                .font(.system(size: 13))
+                                .applyLocationAttributes()
                         }
                     } else {
                         Text(model.plainLocation)
-                            .font(.system(size: 13))
+                            .applyLocationAttributes()
                             .foregroundColor(isHovered ? .white: Color(.defaultText))
                     }
                 }

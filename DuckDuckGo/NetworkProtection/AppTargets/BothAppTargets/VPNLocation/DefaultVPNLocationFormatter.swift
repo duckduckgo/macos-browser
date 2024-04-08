@@ -17,11 +17,16 @@
 //
 
 import Foundation
+import SwiftUI
 import NetworkProtection
 
 struct DefaultVPNLocationFormatter: VPNLocationFormatting {
-    func string(from location: String?, preferredLocation: VPNSettings.SelectedLocation) -> String {
-        let preferredLocation = VPNLocationModel(selectedLocation: selectedLocation)
+    func emoji(for country: String?) -> String? {
+        country.map { NetworkProtectionVPNCountryLabelsModel(country: $0).emoji }
+    }
+
+    func string(from location: String?, preferredLocation someLocation: VPNSettings.SelectedLocation) -> String {
+        let preferredLocation = VPNLocationModel(selectedLocation: someLocation)
 
         if let location {
             return preferredLocation.isNearest ? "\(location) (Nearest)" : location
@@ -32,10 +37,10 @@ struct DefaultVPNLocationFormatter: VPNLocationFormatting {
 
     @available(macOS 12, *)
     func string(from location: String?,
-                preferredLocation: VPNSettings.SelectedLocation,
+                preferredLocation someLocation: VPNSettings.SelectedLocation,
                 locationTextColor: Color,
                 preferredLocationTextColor: Color) -> AttributedString {
-        let preferredLocation = VPNLocationModel(selectedLocation: selectedLocation)
+        let preferredLocation = VPNLocationModel(selectedLocation: someLocation)
 
         if let location {
             var attributedString = AttributedString(

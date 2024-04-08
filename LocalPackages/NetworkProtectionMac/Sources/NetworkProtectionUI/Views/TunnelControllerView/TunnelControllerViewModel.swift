@@ -91,7 +91,8 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         connectionStatus = statusReporter.statusObserver.recentValue
         internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
-        internalServerLocation = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation
+        internalServerAttributes = statusReporter.serverInfoObserver.recentValue.serverLocation
+        internalServerLocation = internalServerAttributes?.serverLocation
 
         // Particularly useful when unit testing with an initial status of our choosing.
         refreshInternalIsRunning()
@@ -439,6 +440,13 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
+    @Published
+    private var internalServerAttributes: NetworkProtectionServerInfo.ServerAttributes?
+
+    var emoji: String? {
+        locationFormatter.emoji(for: internalServerAttributes?.country)
+    }
+
     var plainLocation: String {
         locationFormatter.string(from: internalServerLocation, preferredLocation: vpnSettings.selectedLocation)
     }
@@ -448,7 +456,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         locationFormatter.string(from: internalServerLocation,
                                  preferredLocation: vpnSettings.selectedLocation,
                                  locationTextColor: Color(.defaultText),
-                                 preferredLocationTextColor: Color(.gray))
+                                 preferredLocationTextColor: Color(.defaultText).opacity(0.6))
     }
 
     // MARK: - Toggling VPN
