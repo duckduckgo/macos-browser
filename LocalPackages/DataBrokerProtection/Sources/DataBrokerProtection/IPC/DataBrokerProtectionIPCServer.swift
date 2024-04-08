@@ -19,12 +19,39 @@
 import Foundation
 import XPCHelper
 
-public final class DBPBackgroundAgentMetadata: NSObject {
+@objc(DBPBackgroundAgentMetadata)
+public final class DBPBackgroundAgentMetadata: NSObject, NSSecureCoding {
+    public static var supportsSecureCoding: Bool = true
 
     let backgroundAgentVersion: String
+    let isAgentEnabled: Bool
+    let isAgentRunning: Bool
+    let agentSchedulerState: String
 
-    init(backgroundAgentVersion: String) {
+    init(backgroundAgentVersion: String, isAgentEnabled: Bool, isAgentRunning: Bool, agentSchedulerState: String) {
         self.backgroundAgentVersion = backgroundAgentVersion
+        self.isAgentEnabled = isAgentEnabled
+        self.isAgentRunning = isAgentRunning
+        self.agentSchedulerState = agentSchedulerState
+    }
+
+    public init?(coder: NSCoder) {
+        guard let backgroundAgentVersion = coder.decodeObject(of: NSString.self, forKey: "backgroundAgentVersion") as? String,
+              let agentSchedulerState = coder.decodeObject(of: NSString.self, forKey: "agentSchedulerState") as? String else {
+            fatalError("Could not deserialise backgroundAgentVersion!")
+        }
+
+        self.backgroundAgentVersion = backgroundAgentVersion
+        self.isAgentEnabled = coder.decodeBool(forKey: "isAgentEnabled")
+        self.isAgentRunning = coder.decodeBool(forKey: "isAgentRunning")
+        self.agentSchedulerState = agentSchedulerState
+    }
+
+    public func encode(with coder: NSCoder) {
+        coder.encode(self.backgroundAgentVersion as NSString, forKey: "backgroundAgentVersion")
+        coder.encode(self.isAgentEnabled, forKey: "isAgentEnabled")
+        coder.encode(self.isAgentRunning, forKey: "isAgentRunning")
+        coder.encode(self.agentSchedulerState as NSString, forKey: "agentSchedulerState")
     }
 }
 

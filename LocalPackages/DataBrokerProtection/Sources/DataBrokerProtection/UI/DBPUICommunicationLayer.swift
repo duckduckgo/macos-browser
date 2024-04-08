@@ -103,10 +103,10 @@ struct DBPUICommunicationLayer: Subfeature {
         case .setAddressAtIndexInCurrentUserProfile: return setAddressAtIndexInCurrentUserProfile
         case .removeAddressAtIndexFromCurrentUserProfile: return removeAddressAtIndexFromCurrentUserProfile
         case .startScanAndOptOut: return startScanAndOptOut
-        case .initialScanStatus: return initialScanStatus
+        case .initialScanStatus: return getBackgroundAgentMetadata
         case .maintenanceScanStatus: return maintenanceScanStatus
         case .getDataBrokers: return getDataBrokers
-        case .getBackroundAgentMetadata: return getBackroundAgentMetadata
+        case .getBackroundAgentMetadata: return getBackgroundAgentMetadata
         }
 
     }
@@ -284,7 +284,7 @@ struct DBPUICommunicationLayer: Subfeature {
         return DBPUIDataBrokerList(dataBrokers: dataBrokers)
     }
 
-    func getBackroundAgentMetadata(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+    func getBackgroundAgentMetadata(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
         return await delegate?.getBackgroundAgentMetadata()
     }
 

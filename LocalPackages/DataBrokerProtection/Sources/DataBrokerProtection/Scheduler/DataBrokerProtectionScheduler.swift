@@ -295,6 +295,23 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func getDebugMetadata(completion: (DBPBackgroundAgentMetadata?) -> Void) {
-        completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: "TESTING"))
+        let backgroundAgentVersion = Bundle.main.releaseVersionNumber ?? "ERROR: Nil release version number"
+        completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: backgroundAgentVersion,
+                                              isAgentEnabled: true,
+                                              isAgentRunning: true,
+                                              agentSchedulerState: status.toString))
+    }
+}
+
+extension DataBrokerProtectionSchedulerStatus {
+    var toString: String {
+        switch self {
+        case .idle:
+            return "idle"
+        case .running:
+            return "running"
+        case .stopped:
+            return "stopped"
+        }
     }
 }

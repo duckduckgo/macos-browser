@@ -341,7 +341,7 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
         let dbpVisibility = DefaultDataBrokerProtectionFeatureVisibility()
-        if dbpVisibility.isFeatureVisible() || dbpVisibility.isPrivacyProEnabled() {
+        if true {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")

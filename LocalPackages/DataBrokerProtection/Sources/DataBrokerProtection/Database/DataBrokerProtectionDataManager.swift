@@ -327,6 +327,10 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     func getBackgroundAgentMetadata() async -> DBPUIBackgroundAgentMetadata {
         let currentAppVersion = Bundle.main.releaseVersionNumber
 
+        let metadata = await scanDelegate?.getBackgroundAgentMetadata()
+
+        print(metadata ?? "No metadata")
+
         return DBPUIBackgroundAgentMetadata(lastRunAppVersion: currentAppVersion ?? "Error fetching the version",
                                             lastRunAgentVersion: "",
                                             isAgentEnabled: false,
