@@ -974,13 +974,28 @@ extension BrowserTabViewController: TabDelegate {
                                                                  suggestedFilename: request.parameters.suggestedFilename,
                                                                  directoryURL: directoryURL)
 
-        savePanel.beginSheetModal(for: window) { [weak request] response in
+        savePanel.beginSheetModal(for: window) { [weak request, weak self] response in
             switch response {
             case .abort:
                 // panel not closed by user but by a tab switching
                 return
             case .OK:
-                guard let url = savePanel.url else { fallthrough }
+                guard let self,
+                      let window = view.window,
+                      let url = savePanel.url else { fallthrough }
+
+                do {
+                    // validate selected URL is writable
+                    try FileManager.default.checkWritability(url)
+                } catch {
+                    // hide the save panel
+                    self.activeUserDialogCancellable = nil
+                    NSAlert(error: error).beginSheetModal(for: window) { [weak self] _ in
+                        guard let self, let request else { return }
+                        self.activeUserDialogCancellable = showSavePanel(with: request)
+                    }
+                    return
+                }
                 request?.submit( (url, savePanel.selectedFileType) )
             default:
                 request?.submit(nil)

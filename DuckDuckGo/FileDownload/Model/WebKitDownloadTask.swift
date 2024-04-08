@@ -116,6 +116,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     @MainActor private var itemReplacementDirectory: URL?
     @MainActor private var itemReplacementDirectoryFSOCancellable: AnyCancellable?
     @MainActor private var tempFileUrlCancellable: AnyCancellable?
+    @MainActor private(set) var selectedDestinationURL: URL?
 
     var originalRequest: URLRequest? {
         download.originalRequest
@@ -594,6 +595,7 @@ extension WebKitDownloadTask: WKDownloadDelegate {
             return nil
         }
 
+        self.selectedDestinationURL = destinationURL
         return await prepareChosenDestinationURL(destinationURL, fileType: suggestedFileType, cleanupStyle: cleanupStyle)
     }
 

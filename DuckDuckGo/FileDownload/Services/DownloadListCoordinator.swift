@@ -223,10 +223,10 @@ final class DownloadListCoordinator {
                     case .downloading(destination: let destination, tempFile: let tempFile):
                         self.addItemIfNeededAndSubscribe(to: (destination, tempFile), for: item)
                     case .downloaded(let destination):
-                        let updatedItem = self.downloadTask(task, withId: item.identifier, completedWith: .finished)
+                        let updatedItem = self.downloadTask(task, withOriginalItem: item, completedWith: .finished)
                         self.subscribeToPresenters((destination: destination, tempFile: nil), of: updatedItem ?? item)
                     case .failed(destination: let destination, tempFile: let tempFile, resumeData: _, error: let error):
-                        let updatedItem = self.downloadTask(task, withId: item.identifier, completedWith: .failure(error))
+                        let updatedItem = self.downloadTask(task, withOriginalItem: item, completedWith: .failure(error))
                         self.subscribeToPresenters((destination: destination, tempFile: tempFile), of: updatedItem ?? item)
                     }
                 }
@@ -341,17 +341,23 @@ final class DownloadListCoordinator {
     }
 
     @MainActor
-    private func downloadTask(_ task: WebKitDownloadTask, withId identifier: UUID, completedWith result: Subscribers.Completion<FileDownloadError>) -> DownloadListItem? {
-        os_log(.debug, log: log, "coordinator: task did finish \(identifier) \(task) with .\(result)")
+    private func downloadTask(_ task: WebKitDownloadTask, withOriginalItem initialItem: DownloadListItem, completedWith result: Subscribers.Completion<FileDownloadError>) -> DownloadListItem? {
+        os_log(.debug, log: log, "coordinator: task did finish \(initialItem.identifier) \(task) with .\(result)")
 
         self.downloadTaskCancellables[task] = nil
 
-        // item will be really updated (completed) only if it was added before in `addItemOrUpdateFilePresenter` (when state switched to .downloading)
-        // if it has failed without starting - it won‘t be added or updated here
-        return updateItem(withId: identifier) { item in
+        return updateItem(withId: initialItem.identifier) { item in
             if item?.isBurner ?? false {
                 item = nil
                 return
+            }
+
+            if item == nil,
+                case .failure(let failure) = result, !failure.isCancelled,
+                let fileName = task.selectedDestinationURL?.lastPathComponent {
+                // add instantly failed downloads to the list (not user-cancelled)
+                item = initialItem
+                item?.fileName = fileName
             }
 
             item?.progress = nil
