@@ -353,7 +353,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func toggleShowStatusMenuItem() {
-        os_log("Fetching invite code...", log: .dataBrokerProtection)
         settings.showInMenuBar.toggle()
     }
 
