@@ -75,7 +75,7 @@ final class DownloadViewModel {
     }
 
     func update(with item: DownloadListItem) {
-        self.localURL = item.destinationURL
+        self.localURL = item.tempURL == nil ? item.destinationURL : nil // only return destination file URL for completed downloads
         self.filename = item.fileName
         let oldState = self.state
         let newState = State(item: item, shouldAnimateOnAppear: state.shouldAnimateOnAppear ?? true)
