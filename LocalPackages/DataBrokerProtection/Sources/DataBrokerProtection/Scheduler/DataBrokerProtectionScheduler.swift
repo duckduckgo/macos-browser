@@ -77,6 +77,10 @@ public protocol DataBrokerProtectionScheduler {
     func scanAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runQueuedOperations(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runAllOperations(showWebView: Bool)
+
+    /// Debug operations
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 
 extension DataBrokerProtectionScheduler {
@@ -288,5 +292,9 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             completion?(errors)
         })
+    }
+
+    public func getDebugMetadata(completion: (DBPBackgroundAgentMetadata?) -> Void) {
+        
     }
 }

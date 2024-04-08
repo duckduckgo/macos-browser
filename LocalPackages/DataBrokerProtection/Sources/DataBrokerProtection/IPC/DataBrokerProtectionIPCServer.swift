@@ -19,6 +19,15 @@
 import Foundation
 import XPCHelper
 
+public final class DBPBackgroundAgentMetadata: NSObject {
+
+    let backgroundAgentVersion: String
+
+    init(backgroundAgentVersion: String) {
+        self.backgroundAgentVersion = backgroundAgentVersion
+    }
+}
+
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
 public protocol IPCServerInterface: AnyObject {
@@ -51,6 +60,10 @@ public protocol IPCServerInterface: AnyObject {
     /// Opens a browser window with the specified domain
     ///
     func openBrowser(domain: String)
+
+    /// Returns background agent metadata for debugging purposes
+    /// TODO: Add information of what is being returned here
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -89,6 +102,8 @@ protocol XPCServerInterface {
     /// Opens a browser window with the specified domain
     ///
     func openBrowser(domain: String)
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 
 public final class DataBrokerProtectionIPCServer {
@@ -170,5 +185,9 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
 
     func openBrowser(domain: String) {
         serverDelegate?.openBrowser(domain: domain)
+    }
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        serverDelegate?.getDebugMetadata(completion: completion)
     }
 }

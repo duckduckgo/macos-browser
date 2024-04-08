@@ -176,6 +176,15 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
             // If you add a completion block, please remember to call it here too!
         })
     }
+
+    public func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        xpc.execute(call: { server in
+            server.getDebugMetadata(completion: completion)
+        }, xpcReplyErrorHandler: { error in
+            os_log("Error \(error.localizedDescription)")
+            completion(nil)
+        })
+    }
 }
 
 // MARK: - Incoming communication from the server
