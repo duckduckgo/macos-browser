@@ -86,6 +86,8 @@ public final class TunnelControllerIPCClient {
                 self.register()
             }
         }
+
+        self.register()
     }
 }
 
