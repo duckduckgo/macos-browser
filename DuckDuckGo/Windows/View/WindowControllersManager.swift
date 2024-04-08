@@ -223,13 +223,19 @@ extension WindowControllersManager {
         let feedbackFormViewController = VPNFeedbackFormViewController()
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
-        guard let feedbackFormWindow = feedbackFormWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
-            assertionFailure("Failed to present native VPN feedback form")
+        guard let feedbackFormWindow = feedbackFormWindowController.window else {
+            assertionFailure("Couldn't get window for feedback form")
             return
         }
 
-        parentWindowController.window?.beginSheet(feedbackFormWindow)
+        if let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
+            parentWindowController.window?.beginSheet(feedbackFormWindow)
+        } else {
+            let tabCollection = TabCollection(tabs: [])
+            let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+            let window = WindowsManager.openNewWindow(with: tabCollectionViewModel)
+            window?.beginSheet(feedbackFormWindow)
+        }
     }
 
     func showLocationPickerSheet() {
