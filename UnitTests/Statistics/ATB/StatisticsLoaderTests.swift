@@ -19,6 +19,7 @@
 import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class StatisticsLoaderTests: XCTestCase {

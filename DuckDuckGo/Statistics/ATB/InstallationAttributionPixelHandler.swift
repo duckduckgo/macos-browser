@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import PixelKit
 
 /// A type that handles Pixels for acquisition attributions.
 protocol AttributionsPixelHandler: AnyObject {
@@ -40,7 +41,7 @@ final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
     ///   - originProvider: A provider for the origin used to track the acquisition funnel.
     ///   - locale: The locale of the device.
     init(
-        fireRequest: @escaping FireRequest = Pixel.fire,
+        fireRequest: @escaping FireRequest = PixelKit.fire,
         originProvider: AttributionOriginProvider = AttributionOriginFileProvider(),
         locale: Locale = .current
     ) {
@@ -51,12 +52,14 @@ final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
 
     func fireInstallationAttributionPixel() {
         fireRequest(
-            .installationAttribution,
-            .initial,
+            GeneralPixel.installationAttribution,
+            .standard,
+            [:],
             additionalParameters(origin: originProvider.origin, locale: locale.identifier),
             nil,
+            nil,
             true,
-            { _ in }
+            { _, _ in }
         )
     }
 }
@@ -77,11 +80,13 @@ private extension InstallationAttributionPixelHandler {
 
 extension InstallationAttributionPixelHandler {
     typealias FireRequest = (
-        _ event: Pixel.Event,
-        _ repetition: Pixel.Event.Repetition,
+        _ event: PixelKit.Event,
+        _ frequency: PixelKit.Frequency,
+        _ headers: [String: String],
         _ parameters: [String: String]?,
+        _ error: Error?,
         _ allowedQueryReservedCharacters: CharacterSet?,
         _ includeAppVersionParameter: Bool,
-        _ onComplete: @escaping (Error?) -> Void
+        _ onComplete: @escaping (Bool, Error?) -> Void
     ) -> Void
 }
