@@ -186,7 +186,16 @@ struct DBPUIScanHistory: DBPUISendableMessage {
 }
 
 struct DBPUIBackgroundAgentMetadata: DBPUISendableMessage {
-
+    let lastRunAppVersion: String
+    let lastRunAgentVersion: String
+    let isAgentEnabled: Bool
+    let isAgentRunning: Bool
+    let lastSchedulerOperationType: String // scan or optOut
+    let lastSchedulerOperationTimestamp: Double
+    let lastSchedulerErrorMessage: String
+    let lastSchedulerErrorTimestamp: Double
+    let lastSchedulerSessionStartTimestamp: Double
+    let agentSchedulerState: String // stopped, running or idle
 }
 
 extension DBPUIInitialScanState {
