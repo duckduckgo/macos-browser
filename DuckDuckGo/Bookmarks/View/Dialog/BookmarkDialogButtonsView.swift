@@ -40,7 +40,7 @@ struct BookmarkDialogButtonsView: View {
                 Spacer()
             }
 
-            actionButton(action: otherButtonAction, viewState: viewState)
+            actionButton(action: otherButtonAction, viewState: viewState).accessibilityIdentifier("BookmarkDialogButtonsView.otherButton")
 
             actionButton(action: defaultButtonAction, viewState: viewState).accessibilityIdentifier("BookmarkDialogButtonsView.defaultButton")
         }

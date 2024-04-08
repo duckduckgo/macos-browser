@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import XCTest
 
 /// Helper values for the UI tests
 enum UITests {

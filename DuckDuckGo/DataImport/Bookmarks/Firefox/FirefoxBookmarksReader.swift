@@ -45,6 +45,8 @@ final class FirefoxBookmarksReader {
             case fetchAllFolders
 
             case copyTemporaryFile
+
+            case couldNotFindBookmarksFile
         }
 
         var action: DataImportAction { .bookmarks }
@@ -53,7 +55,7 @@ final class FirefoxBookmarksReader {
 
         var errorType: DataImport.ErrorType {
             switch type {
-            case .dbOpen: .noData
+            case .dbOpen, .couldNotFindBookmarksFile: .noData
             case .fetchRootEntries, .noRootEntries, .fetchTopLevelFolders, .fetchAllBookmarks, .fetchAllFolders: .dataCorrupted
             case .copyTemporaryFile: .other
             }
@@ -72,6 +74,10 @@ final class FirefoxBookmarksReader {
     }
 
     func readBookmarks() -> DataImportResult<ImportedBookmarks> {
+        guard FileManager.default.fileExists(atPath: firefoxPlacesDatabaseURL.path) else {
+            return .failure(ImportError(type: .couldNotFindBookmarksFile, underlyingError: nil))
+        }
+
         do {
             currentOperationType = .copyTemporaryFile
             return try firefoxPlacesDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
