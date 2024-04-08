@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Combine
 import Foundation
@@ -180,9 +178,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
         if networkProtectionVisibility.isNetworkProtectionBetaVisible() {
             if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
-                                frequency: .dailyOnly,
-                                includeAppVersionParameter: true)
                 showButton = true
                 return
             }
@@ -225,5 +220,3 @@ extension NetworkProtectionNavBarButtonModel: NSPopoverDelegate {
         updateVisibility()
     }
 }
-
-#endif

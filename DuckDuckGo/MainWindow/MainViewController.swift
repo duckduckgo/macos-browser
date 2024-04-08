@@ -20,11 +20,8 @@ import Cocoa
 import Carbon.HIToolbox
 import Combine
 import Common
-
-#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionIPC
-#endif
 
 final class MainViewController: NSViewController {
     private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
@@ -64,7 +61,6 @@ final class MainViewController: NSViewController {
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
 
-#if NETWORK_PROTECTION
         let networkProtectionPopoverManager: NetPPopoverManager = {
 #if DEBUG
             guard case .normal = NSApp.runType else {
@@ -100,9 +96,6 @@ final class MainViewController: NSViewController {
         }()
 
         navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter)
-#else
-        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, autofillPopoverPresenter: AutofillPopoverPresenter)
-#endif
 
         browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
@@ -198,10 +191,7 @@ final class MainViewController: NSViewController {
         browserTabViewController.windowDidBecomeKey()
         presentWaitlistThankYouPromptIfNecessary()
 
-#if NETWORK_PROTECTION
-        sendActiveNetworkProtectionWaitlistUserPixel()
         refreshNetworkProtectionMessages()
-#endif
 
 #if DBP
         DataBrokerProtectionAppEvents().windowDidBecomeMain()
@@ -228,13 +218,11 @@ final class MainViewController: NSViewController {
         }
     }
 
-#if NETWORK_PROTECTION
     private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
 
     func refreshNetworkProtectionMessages() {
         networkProtectionMessaging.fetchRemoteMessages()
     }
-#endif
 
 #if DBP
     private let dataBrokerProtectionMessaging = DefaultDataBrokerProtectionRemoteMessaging()
@@ -449,14 +437,6 @@ final class MainViewController: NSViewController {
         }
         NSApp.mainMenuTyped.stopMenuItem.isEnabled = selectedTabViewModel.isLoading
     }
-
-#if NETWORK_PROTECTION
-    private func sendActiveNetworkProtectionWaitlistUserPixel() {
-        if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
-            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly)
-        }
-    }
-#endif
 
     func presentWaitlistThankYouPromptIfNecessary() {
         guard let window = self.view.window else {
