@@ -24,19 +24,22 @@ final class ZoomPopoverViewModelTests: XCTestCase {
     var tabVM: TabViewModel!
     var zoomPopover: ZoomPopoverViewModel!
     var accessibilityPreferences: AccessibilityPreferences!
+    let url = URL(string: "https://app.asana.com/0/1")!
+    let hostURL = "https://app.asana.com/"
 
     @MainActor
     override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
-        tabVM = TabViewModel(tab: Tab())
-        accessibilityPreferences = AccessibilityPreferences()
+        let tab = Tab(url: url)
+        tabVM = TabViewModel(tab: tab)
+        accessibilityPreferences = AccessibilityPreferences.shared
         zoomPopover = ZoomPopoverViewModel(accessibilityPreferences: accessibilityPreferences, tabViewModel: tabVM)
         let window = NSWindow()
         window.contentView = tabVM.tab.webView
     }
 
     @MainActor
-    func test_WhenZoomInFromPopover_ThenWebViewIsZoomedIn() {
+    func test_WhenZoomInFromPopover_ThenWebViewIsZoomedIn() async {
         var increasableDefaultValue = DefaultZoomValue.allCases
         increasableDefaultValue.removeLast()
         let randomZoomLevel = increasableDefaultValue.randomElement()!
@@ -44,11 +47,14 @@ final class ZoomPopoverViewModelTests: XCTestCase {
 
         zoomPopover.zoomIn()
 
-        XCTAssertEqual(randomZoomLevel.index + 1, tabVM.tab.webView.zoomLevel.index)
+        await MainActor.run {
+            XCTAssertEqual(randomZoomLevel.index + 1, tabVM.tab.webView.zoomLevel.index)
+            XCTAssertEqual(randomZoomLevel.index + 1, zoomPopover.zoomLevel.index)
+        }
     }
 
     @MainActor
-    func test_WhenZoomOutFromPopover_ThenWebViewIsZoomedOut() {
+    func test_WhenZoomOutFromPopover_ThenWebViewIsZoomedOut() async {
         var decreasableDefaultValue = DefaultZoomValue.allCases
         decreasableDefaultValue.removeFirst()
         let randomZoomLevel = decreasableDefaultValue.randomElement()!
@@ -56,7 +62,10 @@ final class ZoomPopoverViewModelTests: XCTestCase {
 
         zoomPopover.zoomOut()
 
-        XCTAssertEqual(randomZoomLevel.index - 1, tabVM.tab.webView.zoomLevel.index)
+        await MainActor.run {
+            XCTAssertEqual(randomZoomLevel.index - 1, tabVM.tab.webView.zoomLevel.index)
+            XCTAssertEqual(randomZoomLevel.index - 1, zoomPopover.zoomLevel.index)
+        }
     }
 
     @MainActor
@@ -68,15 +77,12 @@ final class ZoomPopoverViewModelTests: XCTestCase {
         zoomPopover.reset()
 
         XCTAssertEqual(.percent100, tabVM.tab.webView.zoomLevel)
+        XCTAssertEqual(.percent100, zoomPopover.zoomLevel)
     }
 
     @MainActor
     func test_WhenZoomValueIsSetInAppearancePreference_ThenPopoverZoomLevelUpdated() async {
-        let url = URL(string: "https://app.asana.com/0/1")!
-        let hostURL = "https://app.asana.com/"
         let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
-        let tab = Tab(url: url)
-        let tabVM = TabViewModel(tab: tab, accessibilityPreferences: accessibilityPreferences)
         zoomPopover = ZoomPopoverViewModel(accessibilityPreferences: accessibilityPreferences, tabViewModel: tabVM)
 
         accessibilityPreferences.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)

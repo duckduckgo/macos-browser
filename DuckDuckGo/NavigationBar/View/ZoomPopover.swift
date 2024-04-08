@@ -25,13 +25,15 @@ struct ZoomPopoverContentView: View {
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
             Text(viewModel.zoomLevel.displayString)
-                .frame(height: 28)
+                .frame(width: 50, height: 28)
+                .padding(.horizontal, 8)
 
             Button {
                 viewModel.reset()
             } label: {
                 Text("Reset")
                     .frame(height: 28)
+                    .padding(.horizontal, 8)
             }
 
             HStack(spacing: 0) {
@@ -73,6 +75,8 @@ final class ZoomPopoverViewModel: ObservableObject {
             .sink { [weak self] _ in
                 if let newZoomLevel = accessibilityPreferences.zoomPerWebsite(url: urlString) {
                     self?.zoomLevel = newZoomLevel
+                } else {
+                    self?.zoomLevel = accessibilityPreferences.defaultPageZoom
                 }
             }.store(in: &cancellables)
         accessibilityPreferences.$defaultPageZoom.sink { [weak self] newValue in
