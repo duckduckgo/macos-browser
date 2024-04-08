@@ -149,15 +149,7 @@ public final class PixelKit {
         self.dateGenerator = dateGenerator
         self.defaults = defaults
         self.fireRequest = fireRequest
-
-        logger.debug("""
-        PixelKit initialised:
-                      dryRun: \(self.dryRun)
-                  appVersion: \(self.appVersion)
-                      source: \(self.source ?? "-")
-              defaultHeaders: \(self.defaultHeaders)
-               pixelCalendar: \(self.pixelCalendar)
-        """)
+        logger.debug("👾 PixelKit initialised: dryRun: \(self.dryRun) appVersion: \(self.appVersion) source: \(self.source ?? "-") defaultHeaders: \(self.defaultHeaders) pixelCalendar: \(self.pixelCalendar)")
     }
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
@@ -254,16 +246,16 @@ public final class PixelKit {
         _ callBackOnMainThread: Bool,
         _ onComplete: @escaping CompletionBlock,
         _ frequency: Frequency) {
-        guard !dryRun else {
             printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: parameters, skipped: false)
-            // simulate server response time for Dry Run mode
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                onComplete(true, nil)
+            guard !dryRun else {
+                // simulate server response time for Dry Run mode
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    onComplete(true, nil)
+                }
+                return
             }
-            return
+            fireRequest(pixelName, headers, parameters, allowedQueryReservedCharacters, callBackOnMainThread, onComplete)
         }
-        fireRequest(pixelName, headers, parameters, allowedQueryReservedCharacters, callBackOnMainThread, onComplete)
-    }
 
     private func prefixedName(for event: Event) -> String {
         if event.name.hasPrefix("m_mac_") {
