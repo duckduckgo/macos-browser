@@ -18,3 +18,5 @@
 #include "../Common.xcconfig"
 
 PRODUCT_NAME = $(TARGET_NAME);
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] =
