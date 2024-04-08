@@ -29,14 +29,6 @@ public extension NSAlert {
         return alert
     }
 
-    static func somethingWentWrongStripeAlert() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.somethingWentWrongAlertTitle
-        alert.informativeText = UserText.somethingWentWrongStripeAlertDescription
-        alert.addButton(withTitle: UserText.okButtonTitle)
-        return alert
-    }
-
     static func subscriptionNotFoundAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.subscriptionNotFoundAlertTitle
@@ -63,6 +55,16 @@ public extension NSAlert {
         alert.addButton(withTitle: UserText.cancelButtonTitle)
         return alert
     }
+
+    static func appleIDSyncFailedAlert(text: String) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.subscriptionAppleIDSyncFailedAlertTitle
+        alert.informativeText = text
+        alert.addButton(withTitle: UserText.continueButtonTitle)
+        alert.addButton(withTitle: UserText.cancelButtonTitle)
+        return alert
+    }
+
 }
 
 public extension NSWindow {

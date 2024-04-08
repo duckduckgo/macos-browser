@@ -23,6 +23,7 @@ protocol DownloadsPreferencesPersistor {
     var lastUsedCustomDownloadLocation: String? { get set }
 
     var alwaysRequestDownloadLocation: Bool { get set }
+    var shouldOpenPopupOnCompletion: Bool { get set }
 
     var defaultDownloadLocation: URL? { get }
     func isDownloadLocationValid(_ location: URL) -> Bool
@@ -37,6 +38,9 @@ struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor 
 
     @UserDefaultsWrapper(key: .alwaysRequestDownloadLocationKey, defaultValue: false)
     var alwaysRequestDownloadLocation: Bool
+
+    @UserDefaultsWrapper(key: .openDownloadsPopupOnCompletionKey, defaultValue: true)
+    var shouldOpenPopupOnCompletion: Bool
 
     var defaultDownloadLocation: URL? {
         let fileManager = FileManager.default
@@ -59,6 +63,8 @@ struct DownloadsPreferencesUserDefaultsPersistor: DownloadsPreferencesPersistor 
 
 final class DownloadsPreferences: ObservableObject {
 
+    static let shared = DownloadsPreferences(persistor: DownloadsPreferencesUserDefaultsPersistor())
+
     private func validatedDownloadLocation(_ location: String?) -> URL? {
         if let selectedLocation = location,
            let selectedLocationURL = URL(string: selectedLocation),
@@ -77,9 +83,13 @@ final class DownloadsPreferences: ObservableObject {
 
     var lastUsedCustomDownloadLocation: URL? {
         get {
-            persistor.lastUsedCustomDownloadLocation?.url
+            let url = persistor.lastUsedCustomDownloadLocation?.url
+            var isDirectory: ObjCBool = false
+            guard let url, FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+                return nil
+            }
+            return url
         }
-
         set {
             defer {
                 objectWillChange.send()
@@ -119,9 +129,18 @@ final class DownloadsPreferences: ObservableObject {
         get {
             persistor.alwaysRequestDownloadLocation
         }
-
         set {
             persistor.alwaysRequestDownloadLocation = newValue
+            objectWillChange.send()
+        }
+    }
+
+    var shouldOpenPopupOnCompletion: Bool {
+        get {
+            persistor.shouldOpenPopupOnCompletion
+        }
+        set {
+            persistor.shouldOpenPopupOnCompletion = newValue
             objectWillChange.send()
         }
     }
@@ -135,7 +154,7 @@ final class DownloadsPreferences: ObservableObject {
         }
     }
 
-    init(persistor: DownloadsPreferencesPersistor = DownloadsPreferencesUserDefaultsPersistor()) {
+    init(persistor: DownloadsPreferencesPersistor) {
         self.persistor = persistor
 
         // Fix the selected download location if it needs it
@@ -146,13 +165,13 @@ final class DownloadsPreferences: ObservableObject {
 
     private var persistor: DownloadsPreferencesPersistor
 
-    static func defaultDownloadLocation() -> URL? {
+    static func defaultDownloadLocation(validate: Bool = true) -> URL? {
         let fileManager = FileManager.default
         let folders = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask)
 
         guard let folderURL = folders.first,
               let resolvedURL = try? URL(resolvingAliasFileAt: folderURL),
-              fileManager.isWritableFile(atPath: resolvedURL.path) else { return nil }
+              fileManager.isWritableFile(atPath: resolvedURL.path) || !validate else { return nil }
 
         return resolvedURL
     }

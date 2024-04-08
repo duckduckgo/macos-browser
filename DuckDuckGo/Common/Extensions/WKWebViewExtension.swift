@@ -29,6 +29,12 @@ extension WKWebView {
         return false
     }
 
+    enum AudioState {
+        case muted
+        case unmuted
+        case notSupported
+    }
+
     enum CaptureState {
         case none
         case active
@@ -128,6 +134,48 @@ extension WKWebView {
         self._setPageMuted(newState)
     }
 #endif
+
+    func muteOrUnmute() {
+#if !APPSTORE
+        guard self.responds(to: #selector(WKWebView._setPageMuted(_:))) else {
+            assertionFailure("WKWebView does not respond to selector _stopMediaCapture")
+            return
+        }
+        let mutedState: _WKMediaMutedState = {
+            guard self.responds(to: #selector(WKWebView._mediaMutedState)) else { return [] }
+            return self._mediaMutedState()
+        }()
+        var newState = mutedState
+
+        if newState == .audioMuted {
+            newState.remove(.audioMuted)
+        } else {
+            newState.insert(.audioMuted)
+        }
+        guard newState != mutedState else { return }
+        self._setPageMuted(newState)
+#endif
+    }
+
+    /// Returns the audio state of the WKWebView.
+    ///
+    /// - Returns: `muted` if the web view is muted
+    ///            `unmuted` if the web view is unmuted
+    ///            `notSupported` if the web view does not support fetching the current audio state
+    func audioState() -> AudioState {
+#if APPSTORE
+        return .notSupported
+#else
+        guard self.responds(to: #selector(WKWebView._mediaMutedState)) else {
+            assertionFailure("WKWebView does not respond to selector _mediaMutedState")
+            return .notSupported
+        }
+
+        let mutedState = self._mediaMutedState()
+
+        return mutedState.contains(.audioMuted) ? .muted : .unmuted
+#endif
+    }
 
     func stopMediaCapture() {
         guard #available(macOS 12.0, *) else {
@@ -275,6 +323,16 @@ extension WKWebView {
         printInfo.scalingFactor = 0.95
 
         return self.printOperation(with: printInfo)
+    }
+
+    func hudView(at point: NSPoint? = nil) -> WKPDFHUDViewWrapper? {
+        WKPDFHUDViewWrapper.getPdfHudView(in: self, at: point)
+    }
+
+    func savePDF(_ pdfHUD: WKPDFHUDViewWrapper? = nil) -> Bool {
+        guard let hudView = pdfHUD ?? hudView() else { return false }
+        hudView.savePDF()
+        return true
     }
 
     var fullScreenPlaceholderView: NSView? {

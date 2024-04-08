@@ -27,23 +27,21 @@ import Common
 final class DataBrokerProtectionLoginItemScheduler {
     private let ipcScheduler: DataBrokerProtectionIPCScheduler
     private let loginItemsManager: LoginItemsManager
-    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
-    init(ipcScheduler: DataBrokerProtectionIPCScheduler, loginItemsManager: LoginItemsManager = .init(), pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
+    init(ipcScheduler: DataBrokerProtectionIPCScheduler, loginItemsManager: LoginItemsManager = .init()) {
         self.ipcScheduler = ipcScheduler
         self.loginItemsManager = loginItemsManager
-        self.pixelHandler = pixelHandler
     }
 
     // MARK: - Login Item Management
 
     func disableLoginItem() {
-        pixelHandler.fire(.disableLoginItem)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerDisableLoginItemDaily, frequency: .dailyOnly)
         loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 
     func enableLoginItem() {
-        pixelHandler.fire(.enableLoginItem)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerEnableLoginItemDaily, frequency: .dailyOnly)
         loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
     }
 }

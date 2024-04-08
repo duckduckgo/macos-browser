@@ -35,6 +35,7 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
         let childBroker = DataBroker(
             id: 1,
             name: "Child broker",
+            url: "childbroker.com",
             steps: [Step](),
             version: "1.0",
             schedulingConfig: DataBrokerScheduleConfig(

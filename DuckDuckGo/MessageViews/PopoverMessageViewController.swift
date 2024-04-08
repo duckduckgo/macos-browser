@@ -34,7 +34,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
     private var trackingArea: NSTrackingArea?
 
     init(message: String,
-         image: String? = nil,
+         image: NSImage? = nil,
          buttonText: String? = nil,
          buttonAction: (() -> Void)? = nil,
          onDismiss: (() -> Void)? = nil) {

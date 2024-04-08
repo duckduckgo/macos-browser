@@ -64,6 +64,7 @@ final class AppContentBlocking {
                                                                   embeddedDataProvider: AppPrivacyConfigurationDataProvider(),
                                                                   localProtection: LocalUnprotectedDomains.shared,
                                                                   errorReporting: Self.debugEvents,
+                                                                  toggleProtectionsCounterEventReporting: toggleProtectionsEvents,
                                                                   internalUserDecider: internalUserDecider)
 
         trackerDataManager = TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
@@ -85,7 +86,7 @@ final class AppContentBlocking {
                                                   privacyConfigurationManager: privacyConfigurationManager,
                                                   trackerDataManager: trackerDataManager,
                                                   configStorage: configStorage,
-                                                  privacySecurityPreferences: PrivacySecurityPreferences.shared,
+                                                  webTrackingProtectionPreferences: WebTrackingProtectionPreferences.shared,
                                                   tld: tld)
 
         adClickAttributionRulesProvider = AdClickAttributionRulesProvider(config: adClickAttribution,
@@ -94,6 +95,15 @@ final class AppContentBlocking {
                                                                           errorReporting: attributionDebugEvents,
                                                                           compilationErrorReporting: Self.debugEvents,
                                                                           log: .attribution)
+    }
+
+    private let toggleProtectionsEvents = EventMapping<ToggleProtectionsCounterEvent> { event, _, parameters, _ in
+        let domainEvent: Pixel.Event
+        switch event {
+        case .toggleProtectionsCounterDaily:
+            domainEvent = .toggleProtectionsDailyCount
+        }
+        Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in

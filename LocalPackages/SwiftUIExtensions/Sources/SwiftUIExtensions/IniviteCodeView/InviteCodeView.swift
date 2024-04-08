@@ -28,7 +28,7 @@ public struct InviteCodeView<ViewModel>: View where ViewModel: InviteCodeViewMod
     public var body: some View {
         Dialog {
             VStack(spacing: 20) {
-                Image("InviteLock")
+                Image(.inviteLock96)
                 Text(viewModel.titleText)
                     .font(.system(size: 17, weight: .semibold))
                     .fixedSize(horizontal: false, vertical: true)
@@ -50,7 +50,7 @@ public struct InviteCodeView<ViewModel>: View where ViewModel: InviteCodeViewMod
                 if let errorText = viewModel.errorText {
                     Text(errorText)
                         .font(.system(size: 13))
-                        .foregroundColor(Color("AlertRedLightDefaultText"))
+                        .foregroundColor(Color(.alertRedLightDefaultText))
                         .multilineTextAlignment(.center)
                 }
             }
@@ -97,7 +97,7 @@ public struct InviteCodeSuccessView<ViewModel>: View where ViewModel: InviteCode
     public var body: some View {
         Dialog {
             VStack(spacing: 20) {
-                Image("InviteLockSuccess")
+                Image(.intiveLockSucces96)
                 Text(viewModel.titleText)
                     .font(.system(size: 17, weight: .semibold))
                     .fixedSize(horizontal: false, vertical: true)

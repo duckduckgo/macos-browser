@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import History
 
 @MainActor
 final class HistoryMenu: NSMenu {
@@ -33,6 +34,7 @@ final class HistoryMenu: NSMenu {
     private let clearAllHistoryMenuItem = NSMenuItem(title: UserText.mainMenuHistoryClearAllHistory,
                                                      action: #selector(MainViewController.clearAllHistory),
                                                      keyEquivalent: [.command, .shift, .backspace])
+        .withAccessibilityIdentifier("HistoryMenu.clearAllHistory")
     private let clearAllHistorySeparator = NSMenuItem.separator()
 
     private let historyCoordinator: HistoryCoordinating
@@ -55,6 +57,7 @@ final class HistoryMenu: NSMenu {
         }
 
         reopenMenuItemKeyEquivalentManager.reopenLastClosedMenuItem = reopenLastClosedMenuItem
+        reopenAllWindowsFromLastSessionMenuItem.setAccessibilityIdentifier("HistoryMenu.reopenAllWindowsFromLastSessionMenuItem")
         reopenMenuItemKeyEquivalentManager.lastSessionMenuItem = reopenAllWindowsFromLastSessionMenuItem
     }
 
@@ -88,8 +91,10 @@ final class HistoryMenu: NSMenu {
         switch RecentlyClosedCoordinator.shared.cache.last {
         case is RecentlyClosedWindow:
             reopenLastClosedMenuItem.title = UserText.reopenLastClosedWindow
+            reopenLastClosedMenuItem.setAccessibilityIdentifier("HistoryMenu.reopenLastClosedWindow")
         default:
             reopenLastClosedMenuItem.title = UserText.reopenLastClosedTab
+            reopenLastClosedMenuItem.setAccessibilityIdentifier("HistoryMenu.reopenLastClosedTab")
         }
 
     }
@@ -105,6 +110,7 @@ final class HistoryMenu: NSMenu {
     var recentlyVisitedHeaderMenuItem: NSMenuItem {
         let item = NSMenuItem(title: UserText.recentlyVisitedMenuSection)
         item.isEnabled = false
+        item.setAccessibilityIdentifier("HistoryMenu.recentlyVisitedHeaderMenuItem")
         return item
     }
 
@@ -112,13 +118,16 @@ final class HistoryMenu: NSMenu {
 
     private func addRecentlyVisited() {
         recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
-        recentlyVisitedMenuItems.append(contentsOf: historyCoordinator.getRecentVisits(maxCount: 14)
-            .map {
-                VisitMenuItem(visitViewModel: VisitViewModel(visit: $0))
-            }
-        )
-        recentlyVisitedMenuItems.forEach {
-            addItem($0)
+        let recentVisits = historyCoordinator.getRecentVisits(maxCount: 14)
+        for (index, visit) in zip(
+            recentVisits.indices, recentVisits
+        ) {
+            let visitMenuItem = VisitMenuItem(visitViewModel: VisitViewModel(visit: visit))
+            visitMenuItem.setAccessibilityIdentifier("HistoryMenu.recentlyVisitedMenuItem.\(index)")
+            recentlyVisitedMenuItems.append(visitMenuItem)
+        }
+        for recentlyVisitedMenuItem in recentlyVisitedMenuItems {
+            addItem(recentlyVisitedMenuItem)
         }
     }
 
@@ -188,9 +197,18 @@ final class HistoryMenu: NSMenu {
     }
 
     private func makeMenuItems(from grouping: HistoryGrouping) -> [NSMenuItem] {
-        return grouping.visits.map { visit in
-            VisitMenuItem(visitViewModel: VisitViewModel(visit: visit))
+        let date = grouping.date
+        let isToday = NSCalendar.current.isDateInToday(date)
+        let visits = grouping.visits
+        var menuItems = [NSMenuItem]()
+        for (index, visit) in zip(
+            visits.indices, visits
+        ) {
+            let menuItem = VisitMenuItem(visitViewModel: VisitViewModel(visit: visit))
+            menuItem.setAccessibilityIdentifier("HistoryMenu.historyMenuItem.\(isToday ? "Today" : "\(date)").\(index)")
+            menuItems.append(menuItem)
         }
+        return menuItems
     }
 
     private func makeTitle(for grouping: HistoryGrouping) -> (String, String) {

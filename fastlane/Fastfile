@@ -264,6 +264,8 @@ platform :mac do
       build_number: build_number
     )
     sh('git', 'push')
+
+    sh("echo \"release_branch_name=#{HOTFIX_BRANCH}/#{new_version}\" >> $GITHUB_OUTPUT") if is_ci
   end
 
   # Updates embedded files and pushes to remote.
@@ -349,7 +351,7 @@ platform :mac do
       export_method: "app-store",
       scheme: "DuckDuckGo Privacy Browser App Store",
       export_options: "scripts/assets/AppStoreExportOptions.plist",
-      xcargs: "-skipPackagePluginValidation RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo"
+      xcargs: "-skipPackagePluginValidation -skipMacroValidation RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo"
     )
   end
 
@@ -362,7 +364,7 @@ platform :mac do
       export_method: "app-store",
       scheme: "Product Review Release App Store",
       export_options: "scripts/assets/AppStoreExportOptions.plist",
-      xcargs: "-skipPackagePluginValidation"
+      xcargs: "-skipPackagePluginValidation -skipMacroValidation"
     )
   end
 
@@ -541,9 +543,16 @@ release in progress and you're making a follow-up internal release that includes
     ).empty?
 
     # Create the branch and push
-    Action.sh('git', 'fetch', '--tags')
-    Action.sh('git', 'checkout', '-b', release_branch, source_version)
-    Action.sh('git', 'push', '-u', 'origin', release_branch)
+    if is_ci
+      sha = Action.sh('git', 'rev-parse', source_version).chomp
+      Action.sh('gh', 'api', '--method', 'POST', '/repos/duckduckgo/macos-browser/git/refs', '-f', "ref=refs/heads/#{release_branch}", '-f', "sha=#{sha}")
+      Action.sh('git', 'fetch', 'origin')
+      Action.sh('git', 'checkout', release_branch)
+    else
+      Action.sh('git', 'fetch', '--tags')
+      Action.sh('git', 'checkout', '-b', release_branch, source_version)
+      Action.sh('git', 'push', '-u', 'origin', release_branch)
+    end
   end
 
   # Updates embedded files:

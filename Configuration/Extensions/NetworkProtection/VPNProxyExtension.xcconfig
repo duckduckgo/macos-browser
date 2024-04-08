@@ -1,0 +1,52 @@
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+#include "../ExtensionBase.xcconfig"
+#include "../../AppStore.xcconfig"
+
+CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
+CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = VPNProxyExtension/VPNProxyExtension.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = VPNProxyExtension/VPNProxyExtension.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = VPNProxyExtension/VPNProxyExtension.entitlements
+CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
+
+CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
+CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_FILE = VPNProxyExtension/Info.plist
+INFOPLIST_KEY_NSHumanReadableCopyright = Copyright © 2023 DuckDuckGo. All rights reserved.
+
+FEATURE_FLAGS[arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
+
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
+
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore $(AGENT_BUNDLE_ID).proxy macos
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match AppStore $(AGENT_BUNDLE_ID).proxy macos
+
+SDKROOT = macosx
+SKIP_INSTALL = YES
+SWIFT_EMIT_LOC_STRINGS = YES
+
+LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks @executable_path/../../../../Frameworks

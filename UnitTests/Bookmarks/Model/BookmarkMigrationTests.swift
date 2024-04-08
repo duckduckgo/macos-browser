@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
-import XCTest
-import CoreData
 import Bookmarks
+import CoreData
 import Persistence
+import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockBookmarksDatabase {

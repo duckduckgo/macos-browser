@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSPrincipalClass</key>
-	<string>$(INFOPLIST_KEY_NSPrincipalClass)</string>
+	<key>AGENT_BUNDLE_ID</key>
+	<string>$(AGENT_BUNDLE_ID)</string>
+	<key>AGENT_PRODUCT_NAME</key>
+	<string>$(AGENT_PRODUCT_NAME)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDocumentTypes</key>
@@ -29,6 +31,20 @@
 			<string>Viewer</string>
 			<key>LSHandlerRank</key>
 			<string>Default</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>duckload</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Incomplete download</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSIsRelatedItemType</key>
+			<true/>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
@@ -58,7 +74,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>CFBundleURLName</key>
-			<string>Network Protection URLs</string>
+			<string>VPN URLs</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>networkprotection</string>
@@ -77,10 +93,28 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>DBP_APP_GROUP</key>
+	<string>$(DBP_APP_GROUP)</string>
+	<key>DBP_BACKGROUND_AGENT_BUNDLE_ID</key>
+	<string>$(DBP_BACKGROUND_AGENT_BUNDLE_ID)</string>
+	<key>DBP_BACKGROUND_AGENT_PRODUCT_NAME</key>
+	<string>$(DBP_BACKGROUND_AGENT_PRODUCT_NAME)</string>
+	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
+	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>NETP_APP_GROUP</key>
+	<string>$(NETP_APP_GROUP)</string>
+	<key>NOTIFICATIONS_AGENT_BUNDLE_ID</key>
+	<string>$(NOTIFICATIONS_AGENT_BUNDLE_ID)</string>
+	<key>NOTIFICATIONS_AGENT_PRODUCT_NAME</key>
+	<string>$(NOTIFICATIONS_AGENT_PRODUCT_NAME)</string>
+	<key>NSAppDataUsageDescription</key>
+	<string>DuckDuckGo will securely access your Bitwarden vault to autofill your passwords. To prevent this dialog in the future, go to Mac System Settings &gt; Privacy &amp; Security &gt; Full Disk Access and toggle DuckDuckGo on, or switch back to the built-in password manager.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
@@ -96,43 +130,25 @@
 	<string>Allows you to share your location</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allows you to share recordings</string>
-	<key>NSAppDataUsageDescription</key>
-	<string>DuckDuckGo will securely access your Bitwarden vault to autofill your passwords. To prevent this dialog in the future, go to Mac System Settings &gt; Privacy &amp; Security &gt; Full Disk Access and toggle DuckDuckGo on, or switch back to the built-in password manager.</string>
+	<key>NSPrincipalClass</key>
+	<string>$(INFOPLIST_KEY_NSPrincipalClass)</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<false/>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
+	<key>SUBSCRIPTION_APP_GROUP</key>
+	<string>$(SUBSCRIPTION_APP_GROUP)</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
 	<string>https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast2.xml</string>
-	<key>SUScheduledCheckInterval</key>
-	<integer>10800</integer>
 	<key>SUPublicEDKey</key>
 	<string>ZaO/DNMzMPBldh40b5xVrpNBmqRkuGY0BNRCUng2qRo=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>10800</integer>
 	<key>ViewBridgeService</key>
 	<false/>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>NOTIFICATIONS_AGENT_BUNDLE_ID</key>
-	<string>$(NOTIFICATIONS_AGENT_BUNDLE_ID)</string>
-	<key>NOTIFICATIONS_AGENT_PRODUCT_NAME</key>
-	<string>$(NOTIFICATIONS_AGENT_PRODUCT_NAME)</string>
-	<key>AGENT_BUNDLE_ID</key>
-	<string>$(AGENT_BUNDLE_ID)</string>
-	<key>AGENT_PRODUCT_NAME</key>
-	<string>$(AGENT_PRODUCT_NAME)</string>
-	<key>NETP_APP_GROUP</key>
-	<string>$(NETP_APP_GROUP)</string>
-	<key>DBP_APP_GROUP</key>
-	<string>$(DBP_APP_GROUP)</string>
-	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
-	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
-	<key>DBP_BACKGROUND_AGENT_BUNDLE_ID</key>
-	<string>$(DBP_BACKGROUND_AGENT_BUNDLE_ID)</string>
-	<key>DBP_BACKGROUND_AGENT_PRODUCT_NAME</key>
-	<string>$(DBP_BACKGROUND_AGENT_PRODUCT_NAME)</string>
 </dict>
 </plist>

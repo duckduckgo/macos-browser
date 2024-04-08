@@ -14,24 +14,29 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../SwiftUIExtensions"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.0"),
+        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "2.0.0"),
     ],
     targets: [
         .target(
             name: "SyncUI",
             dependencies: [
                 .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
+            ],
+            resources: [
+                .process("Resources")
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
         .testTarget(
             name: "SyncUITests",
-            dependencies: ["SyncUI"],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            dependencies: [
+                "SyncUI",
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
     ]
 )

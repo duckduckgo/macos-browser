@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import Combine
+import History
 
 /**
  * The delegate callbacks are triggered for events related to unpinned tabs only.
@@ -365,6 +366,16 @@ final class TabCollectionViewModel: NSObject {
 
     func removeAll(with content: Tab.TabContent) {
         let tabs = tabCollection.tabs.filter { $0.content == content }
+
+        for tab in tabs {
+            if let index = indexInAllTabs(of: tab) {
+                remove(at: index)
+            }
+        }
+    }
+
+    func removeAll(matching condition: (Tab.TabContent) -> Bool) {
+        let tabs = tabCollection.tabs.filter { condition($0.content) }
 
         for tab in tabs {
             if let index = indexInAllTabs(of: tab) {

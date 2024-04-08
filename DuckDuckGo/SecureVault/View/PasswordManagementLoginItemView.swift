@@ -42,7 +42,7 @@ struct PasswordManagementLoginItemView: View {
                 if editMode {
 
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .foregroundColor(Color(.editingPanel))
                         .shadow(radius: 6)
 
                 }
@@ -221,7 +221,7 @@ private struct UsernameLabel: View {
                     Button {
                         model.copy(model.username)
                     } label: {
-                        Image("Copy")
+                        Image(.copy)
                     }
                     .buttonStyle(PlainButtonStyle())
                     .tooltip(UserText.copyUsernameTooltip)
@@ -287,7 +287,7 @@ private struct PrivateEmailMessage: View {
         let text = String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection)
         var attributedString = AttributedString(text)
         if let range = attributedString.range(of: UserText.pmEnableEmailProtection) {
-            attributedString[range].foregroundColor = Color("LinkBlueColor")
+            attributedString[range].foregroundColor = Color(.linkBlue)
         }
         return attributedString
     }
@@ -375,7 +375,7 @@ private struct PasswordView: View {
                     Button {
                         isPasswordVisible = !isPasswordVisible
                     } label: {
-                        Image("SecureEyeToggle")
+                        Image(.secureEyeToggle)
                     }
                     .buttonStyle(PlainButtonStyle())
                     .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
@@ -398,7 +398,7 @@ private struct PasswordView: View {
                         Button {
                             isPasswordVisible = !isPasswordVisible
                         } label: {
-                            Image("SecureEyeToggle")
+                            Image(.secureEyeToggle)
                         }
                         .buttonStyle(PlainButtonStyle())
                         .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
@@ -408,7 +408,7 @@ private struct PasswordView: View {
                         Button {
                             model.copy(model.password)
                         } label: {
-                            Image("Copy")
+                            Image(.copy)
                         }
                         .buttonStyle(PlainButtonStyle())
                         .tooltip(UserText.copyPasswordTooltip)
@@ -493,9 +493,9 @@ private struct NotesView: View {
                     .background(
                         ZStack {
                             RoundedRectangle(cornerRadius: cornerRadius)
-                                .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
+                                .stroke(Color(.textEditorBorder), lineWidth: borderWidth)
                             RoundedRectangle(cornerRadius: cornerRadius)
-                                .fill(Color(NSColor.textEditorBackgroundColor))
+                                .fill(Color(.textEditorBackground))
                         }
                     )
             }
@@ -509,6 +509,20 @@ private struct NotesView: View {
                         model.copy(model.notes)
                     })
                 }))
+                .modifier(TextSelectionModifier())
+        }
+    }
+
+}
+
+private struct TextSelectionModifier: ViewModifier {
+
+    func body(content: Content) -> some View {
+        if #available(macOS 12, *) {
+            content
+                .textSelection(.enabled)
+        } else {
+            content
         }
     }
 

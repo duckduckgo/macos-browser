@@ -45,10 +45,18 @@ jobs:
           git config --global user.email "dax@duckduckgo.com"
           bundle exec fastlane make_release_branch
 
+      - name: Get Asana user ID
+        id: get-asana-user-id
+        uses: duckduckgo/apple-infra/actions/asana-get-user-id-for-github-handle@main
+        with:
+          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          github-handle: ${{ github.actor }}
+
       - name: Create release task
         id: create_release_task
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          ASSIGNEE_ID: ${{ steps.get-asana-user-id.outputs.user-id }}
         run: |
           version="$(echo ${{ steps.make_release_branch.outputs.release_branch_name }} | cut -d '/' -f 2)"
           task_name="macOS App Release $version"
@@ -67,14 +75,11 @@ jobs:
             --output /dev/null \
             -d "{\"data\": {\"task\": \"${asana_task_id}\"}}"
 
-          assignee_id="$(curl -fLSs https://raw.githubusercontent.com/duckduckgo/BrowserServicesKit/main/.github/actions/asana-failed-pr-checks/user_ids.json \
-            | jq -r .${{ github.actor }})"
-
           curl -fLSs -X PUT "https://app.asana.com/api/1.0/tasks/${asana_task_id}" \
             -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
             -H "Content-Type: application/json" \
             --output /dev/null \
-            -d "{ \"data\": { \"assignee\": \"$assignee_id\" }}"
+            -d "{ \"data\": { \"assignee\": \"$ASSIGNEE_ID\" }}"
 
       - name: Update Asana tasks for the release
         env:
@@ -82,9 +87,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           ./scripts/update_asana_for_release.sh \
+            internal \
             ${{ steps.create_release_task.outputs.asana_task_id }} \
-            ${{ steps.create_release_task.outputs.marketing_version }} \
-            ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }}
+            ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} \
+            ${{ steps.create_release_task.outputs.marketing_version }}
 
   run_tests:
 
@@ -163,10 +169,11 @@ jobs:
   tag_and_merge:
     name: Tag and Merge Branch
     needs: [ create_release_branch, prepare_release ]
-    uses: ./.github/workflows/tag_and_merge.yml
+    uses: ./.github/workflows/tag_release.yml
     with:
       asana-task-url: ${{ needs.create_release_branch.outputs.asana_task_url }}
       branch: ${{ needs.create_release_branch.outputs.release_branch_name }}
+      prerelease: true
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}

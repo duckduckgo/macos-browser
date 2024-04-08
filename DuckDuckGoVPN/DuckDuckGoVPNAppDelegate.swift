@@ -23,10 +23,14 @@ import LoginItems
 import Networking
 import NetworkExtension
 import NetworkProtection
-import NetworkProtectionIPC
+import NetworkProtectionProxy
 import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
+
+#if SUBSCRIPTION
+import Subscription
+#endif
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -43,6 +47,16 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
+
+#if DEBUG && SUBSCRIPTION
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+
+        if let token = accountManager.accessToken {
+            os_log(.error, log: .networkProtection, "🟢 VPN Agent found token: %{public}d", token)
+        } else {
+            os_log(.error, log: .networkProtection, "🔴 VPN Agent found no token")
+        }
+#endif
     }
 
     required init?(coder: NSCoder) {
@@ -60,25 +74,92 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private var cancellables = Set<AnyCancellable>()
 
-    var networkExtensionBundleID: String {
-        Bundle.main.networkExtensionBundleID
+    var proxyExtensionBundleID: String {
+        Bundle.proxyExtensionBundleID
     }
 
-#if NETWORK_PROTECTION
-    private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
+    var tunnelExtensionBundleID: String {
+        Bundle.tunnelExtensionBundleID
+    }
+
+    private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: tunnelExtensionBundleID)
+
+    private var storeProxySettingsInProviderConfiguration: Bool {
+#if NETP_SYSTEM_EXTENSION
+        true
+#else
+        false
 #endif
+    }
 
     private lazy var tunnelSettings = VPNSettings(defaults: .netP)
+    private lazy var userDefaults = UserDefaults.netP
+    private lazy var proxySettings = TransparentProxySettings(defaults: .netP)
 
+    @MainActor
+    private lazy var vpnProxyLauncher = VPNProxyLauncher(
+        tunnelController: tunnelController,
+        proxyController: proxyController)
+
+    @MainActor
+    private lazy var proxyController: TransparentProxyController = {
+        let controller = TransparentProxyController(
+            extensionID: proxyExtensionBundleID,
+            storeSettingsInProviderConfiguration: storeProxySettingsInProviderConfiguration,
+            settings: proxySettings) { [weak self] manager in
+                guard let self else { return }
+
+                manager.localizedDescription = "DuckDuckGo VPN Proxy"
+
+                if !manager.isEnabled {
+                    manager.isEnabled = true
+                }
+
+                manager.protocolConfiguration = {
+                    let protocolConfiguration = manager.protocolConfiguration as? NETunnelProviderProtocol ?? NETunnelProviderProtocol()
+                    protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
+                    protocolConfiguration.providerBundleIdentifier = self.proxyExtensionBundleID
+
+                    // always-on
+                    protocolConfiguration.disconnectOnSleep = false
+
+                    // kill switch
+                    // protocolConfiguration.enforceRoutes = false
+
+                    // this setting breaks Connection Tester
+                    // protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
+
+                    // This is intentionally not used but left here for documentation purposes.
+                    // The reason for this is that we want to have full control of the routes that
+                    // are excluded, so instead of using this setting we're just configuring the
+                    // excluded routes through our VPNSettings class, which our extension reads directly.
+                    // protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
+
+                    return protocolConfiguration
+                }()
+            }
+
+        controller.eventHandler = handleControllerEvent(_:)
+
+        return controller
+    }()
+
+    private func handleControllerEvent(_ event: TransparentProxyController.Event) {
+
+    }
+
+    @MainActor
     private lazy var tunnelController = NetworkProtectionTunnelController(
-        networkExtensionBundleID: networkExtensionBundleID,
+        networkExtensionBundleID: tunnelExtensionBundleID,
         networkExtensionController: networkExtensionController,
-        settings: tunnelSettings)
+        settings: tunnelSettings,
+        defaults: userDefaults)
 
     /// An IPC server that provides access to the tunnel controller.
     ///
     /// This is used by our main app to control the tunnel through the VPN login item.
     ///
+    @MainActor
     private lazy var tunnelControllerIPCService: TunnelControllerIPCService = {
         let ipcServer = TunnelControllerIPCService(
             tunnelController: tunnelController,
@@ -88,13 +169,15 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         return ipcServer
     }()
 
+    @MainActor
+    private lazy var statusObserver = ConnectionStatusObserverThroughSession(
+        tunnelSessionProvider: tunnelController,
+        platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+        platformDidWakeNotification: NSWorkspace.didWakeNotification)
+
+    @MainActor
     private lazy var statusReporter: NetworkProtectionStatusReporter = {
         let errorObserver = ConnectionErrorObserverThroughSession(
-            tunnelSessionProvider: tunnelController,
-            platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-            platformDidWakeNotification: NSWorkspace.didWakeNotification)
-
-        let statusObserver = ConnectionStatusObserverThroughSession(
             tunnelSessionProvider: tunnelController,
             platformNotificationCenter: NSWorkspace.shared.notificationCenter,
             platformDidWakeNotification: NSWorkspace.didWakeNotification)
@@ -113,8 +196,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         )
     }()
 
+    @MainActor
     private lazy var vpnAppEventsHandler = {
         VPNAppEventsHandler(tunnelController: tunnelController)
+    }()
+
+    private lazy var vpnUninstaller: VPNUninstaller = {
+        VPNUninstaller(networkExtensionController: networkExtensionController, vpnConfigurationManager: VPNConfigurationManager())
     }()
 
     /// The status bar NetworkProtection menu
@@ -154,6 +242,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .showSettings)
                     }),
+                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
+                        await self?.appLauncher.launchApp(withCommand: .showFAQ)
+                    }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .justOpen)
                     }),
@@ -162,67 +253,84 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     })
                 ]
             },
-            agentLoginItem: nil)
+            agentLoginItem: nil,
+            isMenuBarStatusView: true,
+            userDefaults: .netP,
+            uninstallHandler: { [weak self] in
+                guard let self else { return }
+                await self.vpnUninstaller.uninstall(includingSystemExtension: true)
+            }
+        )
     }
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
+#if SUBSCRIPTION
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
+#endif
 
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
 
         setupMenuVisibility()
 
-        bouncer.requireAuthTokenOrKillApp()
+        Task { @MainActor in
+            // The reason we want to await for this is that nothing else should be executed
+            // if the app should quit.
+            await bouncer.requireAuthTokenOrKillApp(controller: tunnelController)
 
-        // Initialize the IPC server
-        _ = tunnelControllerIPCService
+            // Initialize lazy properties
+            _ = tunnelControllerIPCService
+            _ = vpnProxyLauncher
 
-        let dryRun: Bool
+            let dryRun: Bool
 
 #if DEBUG
-        dryRun = true
+            dryRun = true
 #else
-        dryRun = false
+            dryRun = false
 #endif
 
-        let pixelSource: String
+            let pixelSource: String
 
 #if NETP_SYSTEM_EXTENSION
-        pixelSource = "vpnAgent"
+            pixelSource = "vpnAgent"
 #else
-        pixelSource = "vpnAgentAppStore"
+            pixelSource = "vpnAgentAppStore"
 #endif
 
-        PixelKit.setUp(dryRun: dryRun,
-                       appVersion: AppVersion.shared.versionNumber,
-                       source: pixelSource,
-                       defaultHeaders: [:],
-                       log: .networkProtectionPixel,
-                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
+            PixelKit.setUp(dryRun: dryRun,
+                           appVersion: AppVersion.shared.versionNumber,
+                           source: pixelSource,
+                           defaultHeaders: [:],
+                           log: .networkProtectionPixel,
+                           defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
-            let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
-            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
-            let request = APIRequest(configuration: configuration)
+                let url = URL.pixelUrl(forPixelNamed: pixelName)
+                let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
+                let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+                let request = APIRequest(configuration: configuration)
 
-            request.fetch { _, error in
-                onComplete(error == nil, error)
+                request.fetch { _, error in
+                    onComplete(error == nil, error)
+                }
             }
-        }
 
-        vpnAppEventsHandler.appDidFinishLaunching()
+            vpnAppEventsHandler.appDidFinishLaunching()
 
-        let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
-        let launchedOnStartup = launchInformation.wasLaunchedByStartup
-        launchInformation.update()
+            let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
+            let launchedOnStartup = launchInformation.wasLaunchedByStartup
+            launchInformation.update()
 
-        if launchedOnStartup {
-            Task {
-                let isConnected = await tunnelController.isConnected
+            setUpSubscriptionMonitoring()
 
-                if !isConnected && tunnelSettings.connectOnLogin {
-                    await tunnelController.start()
+            if launchedOnStartup {
+                Task {
+                    let isConnected = await tunnelController.isConnected
+
+                    if !isConnected && tunnelSettings.connectOnLogin {
+                        await tunnelController.start()
+                    }
                 }
             }
         }
@@ -245,6 +353,41 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }.store(in: &cancellables)
+    }
+
+    private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
+
+    private func setUpSubscriptionMonitoring() {
+#if SUBSCRIPTION
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        guard accountManager.isUserAuthenticated else { return }
+        let entitlementsCheck = {
+            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        }
+
+        Task {
+            await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { [weak self] result in
+                switch result {
+                case .validEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = false
+                case .invalidEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = true
+                    PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndContinuous)
+
+                    guard let self else { return }
+                    Task {
+                        let isConnected = await self.tunnelController.isConnected
+                        if isConnected {
+                            await self.tunnelController.stop()
+                            DistributedNotificationCenter.default().post(.showExpiredEntitlementNotification)
+                        }
+                    }
+                case .error:
+                    break
+                }
+            }
+        }
+#endif
     }
 }
 

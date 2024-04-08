@@ -111,7 +111,7 @@ struct BitwardenTitleView: View {
     var body: some View {
 
         HStack(spacing: 10) {
-            Image("BitwardenLogo")
+            Image(.bitwardenLogo)
                 .resizable()
                 .frame(width: 32, height: 32)
 
@@ -136,12 +136,12 @@ private struct ConnectToBitwardenDisclaimerView: View {
                 .padding(.top, 10)
 
             HStack {
-                Image("BitwardenLock")
+                Image(.bitwardenLock)
                 Text(UserText.bitwardenCommunicationInfo)
             }
 
             HStack {
-                Image("BitwardenClock")
+                    Image(.bitwardenClock)
                 Text(UserText.bitwardenHistoryInfo)
             }
         }
@@ -181,7 +181,7 @@ private struct BitwardenInstallationDetectionView: View {
             Button(action: {
                 viewModel.process(action: .openBitwardenProductPage)
             }, label: {
-                Image("MacAppStoreButton")
+                Image(.macAppStoreButton)
             })
             .buttonStyle(PlainButtonStyle())
             .frame(width: 156, height: 40)
@@ -195,7 +195,7 @@ private struct BitwardenInstallationDetectionView: View {
                     }
                 } else {
                     HStack {
-                        Image("SuccessCheckmark")
+                        Image(.successCheckmark)
                         Text(UserText.bitwardenAppFound)
                     }
                 }
@@ -266,11 +266,11 @@ private struct ConnectToBitwardenView: View {
                 Spacer()
             }
 
-            Image("BitwardenSettingsIllustration")
+            Image(.bitwardenSettingsIllustration)
 
             if canConnect {
                 HStack {
-                    Image("SuccessCheckmark")
+                    Image(.successCheckmark)
 
                     Text(UserText.bitwardenIsReadyToConnect)
 
@@ -311,7 +311,7 @@ private struct ConnectedToBitwardenView: View {
                 .font(.system(size: 13, weight: .bold))
 
             HStack {
-                Image("SuccessCheckmark")
+                Image(.successCheckmark)
 
                 Text(UserText.bitwardenIntegrationCompleteInfo)
 

@@ -476,9 +476,9 @@ struct FileImportView: View {
             {
                 switch dataType {
                 case .bookmarks:
-                    Text("Import Bookmarks")
+                    Text("Import Bookmarks", comment: "Title of dialog with instruction for the user to import bookmarks from another browser")
                 case .passwords:
-                    Text("Import Passwords")
+                    Text("Import Passwords", comment: "Title of dialog with instruction for the user to import passwords from another browser")
                 }
             }().bold()
 
@@ -500,11 +500,11 @@ struct FileImportView: View {
                     Spacer()
                 }
                 .padding(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
-                .background(Color("BlackWhite5"))
+                .background(Color(.blackWhite5))
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color("SeparatorColor"),
+                        .stroke(Color(.separator),
                                 style: StrokeStyle(lineWidth: 1))
                 )
                 .padding(.top, 8)
@@ -816,7 +816,7 @@ struct CircleNumberView: View {
             .frame(width: Constants.diameter, height: Constants.diameter)
             .overlay(
                 Text("\(number)")
-                    .foregroundColor(.onboardingActionButton)
+                    .foregroundColor(Color(.onboardingActionButton))
                     .bold()
 
             )

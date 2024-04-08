@@ -46,9 +46,9 @@ struct BookmarkViewModel {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
             favicon?.size = NSSize.faviconSize
 
-            return favicon ?? NSImage(named: "BookmarkDefaultFavicon")
+            return favicon ?? .bookmarkDefaultFavicon
         } else if entity is BookmarkFolder {
-            return NSImage(named: "Folder")
+            return .folder
         } else {
             return nil
         }
@@ -58,10 +58,8 @@ struct BookmarkViewModel {
 
 fileprivate extension NSImage {
 
-    static let favoriteFaviconImage = NSImage(named: "FavoriteFavicon")!
-
     func makeFavoriteOverlay() -> NSImage {
-        let overlayImage = Self.favoriteFaviconImage
+        let overlayImage = NSImage.favoriteFavicon
 
         let newImage = NSImage(size: size)
         newImage.lockFocus()

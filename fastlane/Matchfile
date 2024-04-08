@@ -11,6 +11,8 @@ app_identifier [
     "com.duckduckgo.mobile.ios.review",
     "com.duckduckgo.mobile.ios.vpn.agent.review",
     "com.duckduckgo.mobile.ios.vpn.agent.review.network-protection-extension",
+    "com.duckduckgo.mobile.ios.vpn.agent.proxy",
+    "com.duckduckgo.mobile.ios.vpn.agent.review.proxy",
     "com.duckduckgo.mobile.ios.DBP.backgroundAgent.review",
     "com.duckduckgo.mobile.ios.DBP.backgroundAgent"
 

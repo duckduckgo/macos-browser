@@ -16,15 +16,15 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import Combine
+import LoginItems
 import NetworkExtension
 import NetworkProtection
-import LoginItems
 import ServiceManagement
+import SwiftUI
 
-/// This view can be shown from any location where we want the user to be able to interact with NetP.
-/// This view shows status information about Network Protection, and offers a chance to toggle it ON and OFF.
+/// This view can be shown from any location where we want the user to be able to interact with VPN.
+/// This view shows status information about the VPN, and offers a chance to toggle it ON and OFF.
 ///
 extension NetworkProtectionStatusView {
 
@@ -57,7 +57,7 @@ extension NetworkProtectionStatusView {
         private(set) var onboardingStatus: OnboardingStatus = .completed
 
         var tunnelControllerViewDisabled: Bool {
-            onboardingStatus != .completed || loginItemNeedsApproval
+            onboardingStatus != .completed || loginItemNeedsApproval || shouldShowSubscriptionExpired
         }
 
         @MainActor
@@ -82,6 +82,7 @@ extension NetworkProtectionStatusView {
         var showDebugInformation: Bool
 
         public let agentLoginItem: LoginItem?
+        private let isMenuBarStatusView: Bool
 
         // MARK: - Extra Menu Items
 
@@ -92,6 +93,10 @@ extension NetworkProtectionStatusView {
         /// The `RunLoop` for the timer.
         ///
         private let runLoopMode: RunLoop.Mode?
+
+        private let appLauncher: AppLaunching
+
+        private let uninstallHandler: () async -> Void
 
         private var cancellables = Set<AnyCancellable>()
 
@@ -111,7 +116,10 @@ extension NetworkProtectionStatusView {
                     appLauncher: AppLaunching,
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
-                    runLoopMode: RunLoop.Mode? = nil) {
+                    isMenuBarStatusView: Bool,
+                    runLoopMode: RunLoop.Mode? = nil,
+                    userDefaults: UserDefaults,
+                    uninstallHandler: @escaping () async -> Void) {
 
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -119,7 +127,10 @@ extension NetworkProtectionStatusView {
             self.debugInformationPublisher = debugInformationPublisher
             self.menuItems = menuItems
             self.agentLoginItem = agentLoginItem
+            self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
+            self.appLauncher = appLauncher
+            self.uninstallHandler = uninstallHandler
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
@@ -146,6 +157,12 @@ extension NetworkProtectionStatusView {
                 self?.onboardingStatus = status
             }
             .store(in: &cancellables)
+
+            userDefaults
+                .publisher(for: \.networkProtectionEntitlementsExpired)
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.shouldShowSubscriptionExpired, onWeaklyHeld: self)
+                .store(in: &cancellables)
         }
 
         func refreshLoginItemStatus() {
@@ -156,12 +173,20 @@ extension NetworkProtectionStatusView {
             if #available(macOS 13.0, *) {
                 SMAppService.openSystemSettingsLoginItems()
             } else {
-                guard let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension") else {
-                    assertionFailure("Can't initialize login items URL")
-                    return
-                }
-
+                let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension")!
                 NSWorkspace.shared.open(loginItemsURL)
+            }
+        }
+
+        func openPrivacyPro() {
+            Task {
+                await appLauncher.launchApp(withCommand: .showPrivacyPro)
+            }
+        }
+
+        func uninstallVPN() {
+            Task {
+                await uninstallHandler()
             }
         }
 
@@ -184,14 +209,14 @@ extension NetworkProtectionStatusView {
                 .subscribe(on: Self.tunnelErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
-                guard let self else {
-                    return
-                }
+                    guard let self else {
+                        return
+                    }
 
-                Task { @MainActor in
-                    self.lastTunnelErrorMessage = errorMessage
-                }
-            }.store(in: &cancellables)
+                    Task { @MainActor in
+                        self.lastTunnelErrorMessage = errorMessage
+                    }
+                }.store(in: &cancellables)
         }
 
         private func subscribeToControllerErrorMessages() {
@@ -199,14 +224,14 @@ extension NetworkProtectionStatusView {
                 .subscribe(on: Self.controllerErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
-                guard let self else {
-                    return
-                }
+                    guard let self else {
+                        return
+                    }
 
-                Task { @MainActor in
-                    self.lastControllerErrorMessage = errorMessage
-                }
-            }.store(in: &cancellables)
+                    Task { @MainActor in
+                        self.lastControllerErrorMessage = errorMessage
+                    }
+                }.store(in: &cancellables)
         }
 
         private func subscribeToDebugInformationChanges() {
@@ -281,6 +306,9 @@ extension NetworkProtectionStatusView {
 
         let tunnelControllerViewModel: TunnelControllerViewModel
 
+        @Published
+        var shouldShowSubscriptionExpired: Bool = false
+
         var promptActionViewModel: PromptActionView.Model? {
 #if !APPSTORE && !DEBUG
             guard Bundle.main.isInApplicationDirectory else {
@@ -303,7 +331,7 @@ extension NetworkProtectionStatusView {
                 switch step {
 
                 case .userNeedsToAllowExtension, .userNeedsToAllowVPNConfiguration:
-                    return PromptActionView.Model(presentationData: step) { [weak self] in
+                    return PromptActionView.Model(onboardingStep: step, isMenuBar: self.isMenuBarStatusView) { [weak self] in
                         self?.tunnelControllerViewModel.startNetworkProtection()
                     }
                 }

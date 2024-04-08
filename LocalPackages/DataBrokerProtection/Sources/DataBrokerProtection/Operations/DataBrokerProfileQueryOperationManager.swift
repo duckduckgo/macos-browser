@@ -117,6 +117,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
 
+        let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
         let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
 
         do {
@@ -135,12 +136,15 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
                     // We check if the profile exists in the database.
                     let extractedProfilesForBroker = database.fetchExtractedProfiles(for: brokerId)
-                    let doesProfileExistsInDatabase = extractedProfilesForBroker.contains { $0.profileUrl == extractedProfile.profileUrl }
+                    let doesProfileExistsInDatabase = extractedProfilesForBroker.contains { $0.identifier == extractedProfile.identifier }
 
                     // If the profile exists we do not create a new opt-out operation
-                    if doesProfileExistsInDatabase, let alreadyInDatabaseProfile = extractedProfilesForBroker.first(where: { $0.profileUrl == extractedProfile.profileUrl }), let id = alreadyInDatabaseProfile.id {
+                    if doesProfileExistsInDatabase, let alreadyInDatabaseProfile = extractedProfilesForBroker.first(where: { $0.identifier == extractedProfile.identifier }), let id = alreadyInDatabaseProfile.id {
                         // If it was removed in the past but was found again when scanning, it means it appearead again, so we reset the remove date.
                         if alreadyInDatabaseProfile.removedDate != nil {
+                            let reAppereanceEvent = HistoryEvent(extractedProfileId: extractedProfile.id, brokerId: brokerId, profileQueryId: profileQueryId, type: .reAppearence)
+                            eventPixels.fireReAppereanceEventPixel()
+                            database.add(reAppereanceEvent)
                             database.updateRemovedDate(nil, on: id)
                         }
 
@@ -148,6 +152,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     } else {
                         // If it's a new found profile, we'd like to opt-out ASAP
                         // If this broker has a parent opt out, we set the preferred date to nil, as we will only perform the operation within the parent.
+                        eventPixels.fireNewMatchEventPixel()
                         let broker = brokerProfileQueryData.dataBroker
                         let preferredRunOperation: Date? = broker.performsOptOutWithinParent() ? nil : Date()
 
@@ -176,7 +181,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             // Check for removed profiles
             let removedProfiles = brokerProfileQueryData.extractedProfiles.filter { savedProfile in
                 !extractedProfiles.contains { recentlyFoundProfile in
-                    recentlyFoundProfile.profileUrl == savedProfile.profileUrl
+                    recentlyFoundProfile.identifier == savedProfile.identifier
                 }
             }
 
@@ -204,7 +209,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                             let calculateDurationSinceLastStage = now.timeIntervalSince(attempt.lastStageDate) * 1000
                             let calculateDurationSinceStart = now.timeIntervalSince(attempt.startDate) * 1000
                             pixelHandler.fire(.optOutFinish(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceLastStage))
-                            pixelHandler.fire(.optOutSuccess(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceStart))
+                            pixelHandler.fire(.optOutSuccess(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceStart, brokerType: brokerProfileQueryData.dataBroker.type))
                         }
                     }
                 }
@@ -279,7 +284,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             return
         }
 
-        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+        let retriesCalculatorUseCase = OperationRetriesCalculatorUseCase()
+        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.url, handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
@@ -319,6 +325,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
 
+            let tries = retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+            stageDurationCalculator.fireOptOutValidate()
+            stageDurationCalculator.fireOptOutSubmitSuccess(tries: tries)
+
             let updater = OperationPreferredDateUpdaterUseCase(database: database)
             updater.updateChildrenBrokerForParentBroker(brokerProfileQueryData.dataBroker,
                                                         profileQueryId: profileQueryId)
@@ -330,7 +340,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                 startTime: stageDurationCalculator.startTime)
             database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
         } catch {
-            stageDurationCalculator.fireOptOutFailure()
+            let tries = retriesCalculatorUseCase.calculateForOptOut(database: database, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+            stageDurationCalculator.fireOptOutFailure(tries: tries)
             handleOperationError(
                 origin: .optOut,
                 brokerId: brokerId,

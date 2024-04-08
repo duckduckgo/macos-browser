@@ -231,7 +231,7 @@ final class FutureExtensionTests: XCTestCase {
     // - main queue async -
 
     @MainActor
-    func testUnfulfilledPromiseAsyncDoesNotHaveValue() async {
+    func testUnfulfilledPromiseAsyncDoesNotHaveValue() {
         let promise = Future<String, Never>.promise()
         var value: String?
         let c = promise.future.sink {
@@ -243,8 +243,7 @@ final class FutureExtensionTests: XCTestCase {
         withExtendedLifetime(c, {})
     }
 
-    @MainActor
-    func testInstantlyFulfilledPromiseAsyncHasValue() async {
+    func testInstantlyFulfilledPromiseAsyncHasValue() {
         let promise = Future<String, Never>.promise()
         promise.fulfill("test")
         var value: String?
@@ -324,7 +323,6 @@ final class FutureExtensionTests: XCTestCase {
 
     @MainActor
     func testWhenFirstSucceeds_getFutureReceivesValue() async throws {
-
         let subj = PassthroughSubject<Int, Never>()
 
         let future = subj.first().promise()

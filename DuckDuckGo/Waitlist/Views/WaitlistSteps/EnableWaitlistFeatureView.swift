@@ -43,12 +43,12 @@ struct EnableWaitlistFeatureView: View {
 
                 Text(viewData.subtitle)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color("BlackWhite80"))
+                    .foregroundColor(Color(.blackWhite80))
 
                 Text(viewData.availabilityDisclaimer)
                     .multilineTextAlignment(.center)
                     .font(.system(size: 12))
-                    .foregroundColor(Color("BlackWhite60"))
+                    .foregroundColor(Color(.blackWhite60))
             }
         } buttons: {
             Button(viewData.buttonConfirmLabel) {

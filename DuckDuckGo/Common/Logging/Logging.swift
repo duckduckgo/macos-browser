@@ -25,8 +25,8 @@ extension OSLog {
     enum AppCategories: String, CaseIterable {
         case atb = "ATB"
         case config = "Configuration Downloading"
+        case downloads = "Downloads"
         case fire = "Fire"
-        case history = "History"
         case dataImportExport = "Data Import/Export"
         case pixel = "Pixel"
         case contentBlocking = "Content Blocking"
@@ -42,7 +42,7 @@ extension OSLog {
         case duckPlayer = "Duck Player"
         case tabSnapshots = "Tab Snapshots"
         case sync = "Sync"
-        case networkProtection = "Network Protection"
+        case networkProtection = "VPN"
         case dbp = "dbp"
     }
 
@@ -54,8 +54,8 @@ extension OSLog {
 
     @OSLogWrapper(.atb) static var atb
     @OSLogWrapper(.config) static var config
+    @OSLogWrapper(.downloads) static var downloads
     @OSLogWrapper(.fire) static var fire
-    @OSLogWrapper(.history) static var history
     @OSLogWrapper(.dataImportExport) static var dataImportExport
     @OSLogWrapper(.pixel) static var pixel
     @OSLogWrapper(.contentBlocking) static var contentBlocking

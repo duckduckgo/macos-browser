@@ -19,7 +19,5 @@
 import Foundation
 
 extension NSNotification.Name {
-
     static let PasswordManagerChanged = NSNotification.Name("PasswordManagerChanged")
-
 }

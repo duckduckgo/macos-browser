@@ -32,7 +32,7 @@ struct BookmarkFolderPicker: View {
             return popUpButton
         } content: {
 
-            PopupButtonItem(icon: .folder, title: UserText.bookmarks)
+            PopupButtonItem(icon: .bookmarksFolder, title: UserText.bookmarks)
 
             PopupButtonItem.separator()
 

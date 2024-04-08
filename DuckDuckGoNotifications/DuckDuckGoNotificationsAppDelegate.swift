@@ -111,6 +111,12 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
             os_log("Got notification: listener started")
             self?.notificationsPresenter.requestAuthorization()
         }.store(in: &cancellables)
+
+        distributedNotificationCenter.publisher(for: .showExpiredEntitlementNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.showEntitlementNotification()
+            }.store(in: &cancellables)
     }
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
@@ -137,6 +143,12 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     func showSupersededNotification() {
         os_log("Presenting Superseded notification", log: .networkProtection, type: .info)
         notificationsPresenter.showSupersededNotification()
+    }
+
+    func showEntitlementNotification() {
+        os_log("Presenting Entitlements notification", log: .networkProtection, type: .info)
+
+        notificationsPresenter.showEntitlementNotification()
     }
 
     func showTestNotification() {

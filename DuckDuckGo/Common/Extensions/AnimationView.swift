@@ -18,11 +18,12 @@
 
 import Foundation
 import Lottie
+import AppKit
 
-extension AnimationView {
+extension LottieAnimationView {
 
     convenience init?(named animationName: String, imageProvider: AnimationImageProvider? = nil) {
-        guard let animation = Animation.named(animationName, animationCache: LottieAnimationCache.shared) else {
+        guard let animation = LottieAnimation.named(animationName, animationCache: LottieAnimationCache.shared) else {
             return nil
         }
 

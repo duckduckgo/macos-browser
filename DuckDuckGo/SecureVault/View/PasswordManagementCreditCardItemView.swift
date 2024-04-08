@@ -39,7 +39,7 @@ struct PasswordManagementCreditCardItemView: View {
                 if model.isInEditMode {
 
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .foregroundColor(Color(.editingPanel))
                         .shadow(radius: 6)
 
                 }
@@ -119,7 +119,7 @@ private struct HeaderView: View {
 
         HStack(alignment: .center, spacing: 0) {
 
-            Image("Card")
+            Image(.card)
                 .padding(.trailing, 10)
 
             if model.isNew || model.isEditing {
@@ -221,7 +221,7 @@ private struct EditableCreditCardField: View {
                             Button {
                                 model.copy(textFieldValue)
                             } label: {
-                                Image("Copy")
+                                Image(.copy)
                             }.buttonStyle(PlainButtonStyle())
                         }
 

@@ -1,0 +1,92 @@
+name: Set Up Hotfix Release Branch
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  create_release_branch:
+
+    name: Create Release Branch
+
+    runs-on: macos-13-xlarge
+    timeout-minutes: 10
+
+    outputs:
+      release_branch_name: ${{ steps.make_release_branch.outputs.release_branch_name }}
+      asana_task_url: ${{ steps.create_release_task.outputs.asana_task_url }}
+
+    steps:
+
+      - name: Assert main branch
+        run: |
+          if [ "${{ github.ref_name }}" != "main" ]; then
+            echo "👎 Not the main branch"
+            exit 1
+          fi
+
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
+
+      - name: Prepare fastlane
+        run: bundle install
+
+      - name: Make release branch
+        id: make_release_branch
+        env:
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
+          # Elevated permissions token is needed here to use GH git/refs API (used by fastlane)
+          GH_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+        run: |
+          git config --global user.name "Dax the Duck"
+          git config --global user.email "dax@duckduckgo.com"
+          last_release="$(gh api repos/${{ github.repository }}/releases/latest | jq -r .tag_name)"
+          echo "last_release=$last_release" >> $GITHUB_OUTPUT
+          bundle exec fastlane prepare_hotfix version:"$last_release"
+
+      - name: Create release task
+        id: create_release_task
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          version="$(echo ${{ steps.make_release_branch.outputs.release_branch_name }} | cut -d '/' -f 2)"
+          task_name="macOS App Hotfix Release $version"
+          asana_task_id="$(curl -fLSs -X POST "https://app.asana.com/api/1.0/task_templates/${{ vars.MACOS_HOTFIX_TASK_TEMPLATE_ID }}/instantiateTask" \
+            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{ \"data\": { \"name\": \"$task_name\" }}" \
+            | jq -r .data.new_task.gid)"
+          echo "marketing_version=${version}" >> $GITHUB_OUTPUT
+          echo "asana_task_id=${asana_task_id}" >> $GITHUB_OUTPUT
+          echo "asana_task_url=https://app.asana.com/0/0/${asana_task_id}/f" >> $GITHUB_OUTPUT
+
+          curl -fLSs -X POST "https://app.asana.com/api/1.0/sections/${{ vars.MACOS_APP_DEVELOPMENT_RELEASE_SECTION_ID }}/addTask" \
+            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --output /dev/null \
+            -d "{\"data\": {\"task\": \"${asana_task_id}\"}}"
+
+          assignee_id="$(curl -fLSs https://raw.githubusercontent.com/duckduckgo/BrowserServicesKit/main/.github/actions/asana-failed-pr-checks/user_ids.json \
+            | jq -r .${{ github.actor }})"
+
+          curl -fLSs -X PUT "https://app.asana.com/api/1.0/tasks/${asana_task_id}" \
+            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --output /dev/null \
+            -d "{ \"data\": { \"assignee\": \"$assignee_id\" }}"
+
+      - name: Report success
+        uses: ./.github/actions/asana-add-comment
+        env:
+          BRANCH: ${{ steps.make_release_branch.outputs.release_branch_name }}
+          RELEASE_TAG: ${{ steps.make_release_branch.outputs.last_release }}
+          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          task-url: ${{ steps.create_release_task.outputs.asana_task_url }}
+          template-name: hotfix-branch-ready

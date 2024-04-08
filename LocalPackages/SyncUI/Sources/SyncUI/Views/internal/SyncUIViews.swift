@@ -27,6 +27,8 @@ enum SyncUIViews {
             Text(text)
                 .bold()
                 .font(.system(size: 17))
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.center)
         }
     }
 
@@ -47,7 +49,7 @@ enum SyncUIViews {
 
         var body: some View {
             Text(text)
-                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.center)
         }
     }
@@ -57,7 +59,7 @@ enum SyncUIViews {
 
         var body: some View {
             Text(text)
-                .foregroundColor(Color("BlackWhite60"))
+                .foregroundColor(Color(.blackWhite60))
                 .multilineTextAlignment(.center)
         }
     }
@@ -68,7 +70,7 @@ enum SyncUIViews {
         var body: some View {
             Text(text)
                 .fontWeight(.semibold)
-                .foregroundColor(Color("LinkBlueColor"))
+                .foregroundColor(Color(.linkBlue))
         }
     }
 }

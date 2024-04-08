@@ -49,4 +49,10 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         XCTAssertEqual(pagePrefs.customHeaderFields, customHeaderFields.map { [$0] })
     }
 
+    func testWKPDFHUDViewClassAvailable() {
+        XCTAssertNotNil(WKPDFHUDViewWrapper.WKPDFHUDViewClass)
+        XCTAssertTrue(WKPDFHUDViewWrapper.WKPDFHUDViewClass?.instancesRespond(to: WKPDFHUDViewWrapper.performActionForControlSelector) ==  true)
+        XCTAssertTrue(WKPDFHUDViewWrapper.WKPDFHUDViewClass?.instancesRespond(to: WKPDFHUDViewWrapper.setVisibleSelector) ==  true)
+    }
+
 }

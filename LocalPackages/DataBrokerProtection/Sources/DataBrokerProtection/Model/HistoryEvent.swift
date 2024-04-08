@@ -27,6 +27,7 @@ public struct HistoryEvent: Identifiable, Sendable {
         case optOutRequested
         case optOutConfirmed
         case scanStarted
+        case reAppearence
     }
 
     public let extractedProfileId: Int64?
@@ -49,5 +50,14 @@ public struct HistoryEvent: Identifiable, Sendable {
         self.profileQueryId = profileQueryId
         self.date = date
         self.type = type
+    }
+
+    func matchesFound() -> Int {
+        switch type {
+        case .matchesFound(let matchesFound):
+            return matchesFound
+        default:
+            return 0
+        }
     }
 }

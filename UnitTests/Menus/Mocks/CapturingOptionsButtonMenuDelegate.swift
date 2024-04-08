@@ -84,4 +84,11 @@ class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
 
     }
 
+    func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
+
+    }
+
+    func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
+
+    }
 }

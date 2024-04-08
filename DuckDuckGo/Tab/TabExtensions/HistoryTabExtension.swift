@@ -21,6 +21,7 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
+import History
 
 final class HistoryTabExtension: NSObject {
 
@@ -203,8 +204,8 @@ extension HistoryTabExtension: NavigationResponder {
         addVisit()
     }
 
-    func willStart(_ navigation: Navigation) {
-        if case .sameDocumentNavigation = navigation.navigationAction.navigationType {
+    func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
+        if navigation.isCurrent, navigationType != .sessionStatePop {
             self.url = navigation.navigationAction.url
             addVisit()
         }

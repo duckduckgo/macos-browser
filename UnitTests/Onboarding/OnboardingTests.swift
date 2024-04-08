@@ -37,6 +37,7 @@ class OnboardingTests: XCTestCase {
         XCTAssertEqual(model.state, .startFlow)
     }
 
+    @MainActor
     func testStateChanges() {
         let model = OnboardingViewModel(delegate: delegate)
         assertStateChange(model, .startFlow, .welcome, model.onSplashFinished)
@@ -68,6 +69,7 @@ class OnboardingTests: XCTestCase {
         XCTAssertEqual(0, delegate.hasFinishedCalled)
     }
 
+    @MainActor
     func testWhenSetDefaultPressedDelegateIsCalled() {
         let model = OnboardingViewModel(delegate: delegate)
         XCTAssertEqual(0, delegate.didRequestImportDataCalled)
@@ -93,10 +95,11 @@ class OnboardingTests: XCTestCase {
         XCTAssertEqual(model.state, .startFlow)
     }
 
+    @MainActor
     private func assertStateChange(_ model: OnboardingViewModel,
                                    _ expectedCurrentState: OnboardingViewModel.OnboardingPhase,
                                    _ expectedFinalState: OnboardingViewModel.OnboardingPhase,
-                                   _ mutator: () -> Void,
+                                   _ mutator: @MainActor () -> Void,
                                    file: StaticString = #file,
                                    line: UInt = #line) {
 

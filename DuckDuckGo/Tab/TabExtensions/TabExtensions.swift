@@ -21,6 +21,7 @@ import Combine
 import ContentBlocking
 import Foundation
 import PrivacyDashboard
+import History
 
 /**
  Tab Extensions should conform to TabExtension protocol

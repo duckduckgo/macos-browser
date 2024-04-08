@@ -46,11 +46,11 @@ final class DBPHomeViewController: NSViewController {
                                                   inlineIconCredentials: false,
                                                   thirdPartyCredentialsProvider: false)
 
-        let privacySettings = PrivacySecurityPreferences.shared
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
-                                                sessionKey: sessionKey,
-                                                featureToggles: features)
+        let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
+                                           sessionKey: sessionKey,
+                                           featureToggles: features)
 
         return DataBrokerProtectionViewController(
             scheduler: dataBrokerProtectionManager.scheduler,
@@ -163,6 +163,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutValidate,
                     .optOutFinish,
                     .optOutSubmitSuccess,
+                    .optOutFillForm,
                     .optOutSuccess,
                     .optOutFailure,
                     .backgroundAgentStarted,
@@ -177,10 +178,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
                     .ipcServerRunAllOperations,
-                    .enableLoginItem,
-                    .restartLoginItem,
-                    .disableLoginItem,
-                    .resetLoginItem,
                     .scanSuccess,
                     .scanFailed,
                     .scanError,
@@ -191,7 +188,17 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerProtectionNotificationScheduled2WeeksCheckIn,
                     .dataBrokerProtectionNotificationOpened2WeeksCheckIn,
                     .dataBrokerProtectionNotificationSentAllRecordsRemoved,
-                    .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
+                    .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
+                    .dailyActiveUser,
+                    .weeklyActiveUser,
+                    .monthlyActiveUser,
+                    .weeklyReportScanning,
+                    .weeklyReportRemovals,
+                    .scanningEventNewMatch,
+                    .scanningEventReAppearance,
+                    .webUILoadingFailed,
+                    .webUILoadingStarted,
+                    .webUILoadingSuccess:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }

@@ -18,6 +18,7 @@
 
 import AppKit
 import Foundation
+import History
 
 final class ClearThisHistoryMenuItem: NSMenuItem {
 

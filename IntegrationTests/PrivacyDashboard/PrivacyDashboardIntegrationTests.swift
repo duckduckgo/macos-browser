@@ -19,6 +19,7 @@
 import Combine
 import Common
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
@@ -32,7 +33,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
     @MainActor
     override func setUp() {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         window = WindowsManager.openNewWindow(with: .none)!
     }
@@ -42,7 +43,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
         window.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests

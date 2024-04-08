@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Common
+import Foundation
 
 @MainActor
 final class DownloadListViewModel {
@@ -40,6 +41,8 @@ final class DownloadListViewModel {
     }
 
     private func handleDownloadsUpdate(of kind: DownloadListCoordinator.UpdateKind, item: DownloadListItem) {
+        os_log(.debug, log: .downloads, "DownloadListViewModel: .\(kind) \(item.identifier)")
+
         dispatchPrecondition(condition: .onQueue(.main))
         switch kind {
         case .added:
@@ -59,17 +62,6 @@ final class DownloadListViewModel {
 
     func cleanupInactiveDownloads() {
         coordinator.cleanupInactiveDownloads()
-    }
-
-    func filterRemovedDownloads() {
-        items = items.filter {
-            if let localUrl = $0.localURL {
-                let fileSize = try? localUrl.resourceValues(forKeys: [.fileSizeKey]).fileSize
-                return fileSize != nil || $0.isActive
-            } else {
-                return true
-            }
-        }
     }
 
     func cancelDownload(at index: Int) {

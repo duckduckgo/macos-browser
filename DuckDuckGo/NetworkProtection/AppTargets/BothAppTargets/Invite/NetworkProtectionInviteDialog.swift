@@ -37,10 +37,4 @@ struct NetworkProtectionInviteDialog: View {
     }
 }
 
-struct NetworkProtectionInviteDialog_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkProtectionInviteDialog(model: NetworkProtectionInviteViewModel(delegate: NetworkProtectionInvitePresenter(), redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator()))
-    }
-}
-
 #endif

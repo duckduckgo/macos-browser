@@ -16,23 +16,26 @@
 //  limitations under the License.
 //
 
-import XCTest
 import Combine
+import Navigation
+import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
-@MainActor
 final class TabViewModelTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 
     // MARK: - Can reload
 
+    @MainActor
     func testWhenURLIsNilThenCanReloadIsFalse() {
         let tabViewModel = TabViewModel.aTabViewModel
 
         XCTAssertFalse(tabViewModel.canReload)
     }
 
+    @MainActor
     func testWhenURLIsNotNilThenCanReloadIsTrue() {
         let tabViewModel = TabViewModel.forTabWithURL(.duckDuckGo)
 
@@ -46,19 +49,22 @@ final class TabViewModelTests: XCTestCase {
 
     // MARK: - AddressBarString
 
+    @MainActor
     func testWhenURLIsNilThenAddressBarStringIsEmpty() {
         let tabViewModel = TabViewModel.aTabViewModel
 
         XCTAssertEqual(tabViewModel.addressBarString, "")
     }
 
+    @MainActor
     func testWhenURLIsSetThenAddressBarIsUpdated() {
         let urlString = "http://spreadprivacy.com"
-        let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlString)!)
+        let url = URL.makeURL(from: urlString)!
+        let tabViewModel = TabViewModel.forTabWithURL(url)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
-        tabViewModel.simulateLoadingCompletion()
+        tabViewModel.simulateLoadingCompletion(url, in: tabViewModel.tab.webView)
 
         tabViewModel.$addressBarString.debounce(for: 0.5, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
@@ -67,13 +73,15 @@ final class TabViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
+    @MainActor
     func testWhenURLIsFileURLThenAddressBarIsFilePath() {
         let urlString = "file:///Users/Dax/file.txt"
-        let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlString)!)
+        let url = URL.makeURL(from: urlString)!
+        let tabViewModel = TabViewModel.forTabWithURL(url)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
-        tabViewModel.simulateLoadingCompletion()
+        tabViewModel.simulateLoadingCompletion(url, in: tabViewModel.tab.webView)
 
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
@@ -83,13 +91,15 @@ final class TabViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
+    @MainActor
     func testWhenURLIsDataURLThenAddressBarIsDataURL() {
         let urlString = "data:,Hello%2C%20World%21"
-        let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlString)!)
+        let url = URL.makeURL(from: urlString)!
+        let tabViewModel = TabViewModel.forTabWithURL(url)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
-        tabViewModel.simulateLoadingCompletion()
+        tabViewModel.simulateLoadingCompletion(url, in: tabViewModel.tab.webView)
 
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
@@ -99,6 +109,7 @@ final class TabViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1, handler: nil)
     }
 
+    @MainActor
     func testWhenURLIsBlobURLWithBasicAuthThenAddressBarStripsBasicAuth() {
         let urlStrings = ["blob:https://spoofed.domain.com%20%20%20%20%20%20%20%20%20@attacker.com",
                           "blob:ftp://another.spoofed.domain.com%20%20%20%20%20%20%20%20%20@attacker.com",
@@ -109,9 +120,10 @@ final class TabViewModelTests: XCTestCase {
         let uuidRegex = try! NSRegularExpression(pattern: uuidPattern, options: [])
 
         for i in 0..<urlStrings.count {
-            let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlStrings[i])!)
+            let url = URL.makeURL(from: urlStrings[i])!
+            let tabViewModel = TabViewModel.forTabWithURL(url)
             let addressBarStringExpectation = expectation(description: "Address bar string")
-            tabViewModel.simulateLoadingCompletion()
+            tabViewModel.simulateLoadingCompletion(url, in: tabViewModel.tab.webView)
 
             tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
                 XCTAssertTrue(tabViewModel.addressBarString.starts(with: expectedStarts[i]))
@@ -128,12 +140,14 @@ final class TabViewModelTests: XCTestCase {
 
     // MARK: - Title
 
+    @MainActor
     func testWhenURLIsNilThenTitleIsNewTab() {
         let tabViewModel = TabViewModel.aTabViewModel
 
-        XCTAssertEqual(tabViewModel.title, "New Tab")
+        XCTAssertEqual(tabViewModel.title, UserText.tabHomeTitle)
     }
 
+    @MainActor
     func testWhenTabTitleIsNotNilThenTitleReflectsTabTitle() async throws {
         let tabViewModel = TabViewModel.forTabWithURL(.duckDuckGo)
         let testTitle = "Test title"
@@ -153,6 +167,7 @@ final class TabViewModelTests: XCTestCase {
         await fulfillment(of: [titleExpectation], timeout: 0.5)
     }
 
+    @MainActor
     func testWhenTabTitleIsNilThenTitleIsAddressBarString() {
         let tabViewModel = TabViewModel.forTabWithURL(.duckDuckGo)
 
@@ -167,6 +182,7 @@ final class TabViewModelTests: XCTestCase {
 
     // MARK: - Favicon
 
+    @MainActor
     func testWhenContentIsNoneThenFaviconIsNil() {
         let tab = Tab(content: .none)
         let tabViewModel = TabViewModel(tab: tab)
@@ -174,6 +190,7 @@ final class TabViewModelTests: XCTestCase {
         XCTAssertEqual(tabViewModel.favicon, nil)
     }
 
+    @MainActor
     func testWhenContentIsHomeThenFaviconIsHome() {
         let tabViewModel = TabViewModel.aTabViewModel
         tabViewModel.tab.setContent(.newtab)
@@ -194,26 +211,29 @@ final class TabViewModelTests: XCTestCase {
 
     // MARK: - Zoom
 
+    @MainActor
     func testThatDefaultValueForTabsWebViewIsOne() {
         UserDefaultsWrapper<Any>.clearAll()
-        let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences())
+        let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences(), accessibilityPreferences: AccessibilityPreferences())
 
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, DefaultZoomValue.percent100)
     }
 
+    @MainActor
     func testWhenAppearancePreferencesZoomLevelIsSetThenTabsWebViewZoomLevelIsUpdated() {
         UserDefaultsWrapper<Any>.clearAll()
         let tabVM = TabViewModel(tab: Tab())
         let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
-        AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
+        AccessibilityPreferences.shared.defaultPageZoom = randomZoomLevel
 
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
     }
 
+    @MainActor
     func testWhenAppearancePreferencesZoomLevelIsSetAndANewTabIsOpenThenItsWebViewHasTheLatestValueOfZoomLevel() {
         UserDefaultsWrapper<Any>.clearAll()
         let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
-        AppearancePreferences.shared.defaultPageZoom = randomZoomLevel
+        AccessibilityPreferences.shared.defaultPageZoom = randomZoomLevel
 
         let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences())
 
@@ -236,8 +256,11 @@ extension TabViewModel {
         return TabViewModel(tab: tab)
     }
 
-    func simulateLoadingCompletion() {
-        self.updateAddressBarStrings()
+    @MainActor
+    func simulateLoadingCompletion(_ url: URL, in webView: WKWebView) {
+        let navAction = NavigationAction(request: URLRequest(url: url), navigationType: .other, currentHistoryItemIdentity: nil, redirectHistory: nil, isUserInitiated: nil, sourceFrame: .mainFrame(for: webView), targetFrame: .mainFrame(for: webView), shouldDownload: false, mainFrameNavigation: nil)
+        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [navAction], isCurrent: true, isCommitted: true)
+        self.tab.didCommit(navigation)
     }
 
 }

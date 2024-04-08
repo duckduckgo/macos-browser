@@ -204,7 +204,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         return .next
     }
 
-    func navigation(_ navigation: Navigation?, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType?) {
+    func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
         // Navigating to a Youtube URL without page reload
         if duckPlayer.mode == .enabled,
            case .sessionStatePush = navigationType,

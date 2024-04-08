@@ -53,7 +53,30 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
-    private(set) static var isOnboardingFinished: Bool
+    private static var _isOnboardingFinished: Bool
+
+    @MainActor
+    private(set) static var isOnboardingFinished: Bool {
+        get {
+            guard !_isOnboardingFinished else { return true }
+
+            // when there‘s a restored state but Onboarding Finished flag is not set - set it
+            guard WindowsManager.mainWindows.count <= 1 else {
+                OnboardingViewModel.isOnboardingFinished = true
+                return true
+            }
+            guard let tabsContent = (WindowsManager.mainWindows.first?.contentViewController as? MainViewController)?.tabCollectionViewModel.tabs.map(\.content) else { return false }
+            if !tabsContent.isEmpty, tabsContent != [.newtab] {
+                // there‘s some tabs content not equal to the new tab page: it means there‘s a session restored
+                OnboardingViewModel.isOnboardingFinished = true
+                return true
+            }
+            return false
+        }
+        set {
+            _isOnboardingFinished = newValue
+        }
+    }
 
     weak var delegate: OnboardingDelegate?
 
@@ -79,6 +102,7 @@ final class OnboardingViewModel: ObservableObject {
         state = .setDefault
     }
 
+    @MainActor
     func onSetDefaultPressed() {
         delegate?.onboardingDidRequestSetDefault { [weak self] in
             self?.state = .startBrowsing
@@ -87,6 +111,7 @@ final class OnboardingViewModel: ObservableObject {
         }
     }
 
+    @MainActor
     func onSetDefaultSkipped() {
         state = .startBrowsing
         Self.isOnboardingFinished = true
@@ -97,6 +122,7 @@ final class OnboardingViewModel: ObservableObject {
         skipTypingRequested = true
     }
 
+    @MainActor
     func onboardingReshown() {
         if Self.isOnboardingFinished {
             typingDisabled = true

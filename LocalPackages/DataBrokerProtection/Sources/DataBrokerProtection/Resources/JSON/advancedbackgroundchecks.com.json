@@ -1,8 +1,9 @@
 {
-  "name": "advancedbackgroundchecks.com",
-  "version": "0.1.0",
+  "name": "AdvancedBackgroundChecks",
+  "url": "advancedbackgroundchecks.com",
+  "version": "0.1.6",
   "parent": "peoplefinders.com",
-  "addedDatetime": 1678078800000,
+  "addedDatetime": 1678060800000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "ef8031e6-5e61-4183-b57e-7df156c7129a",
+          "id": "7967f064-e3c5-442d-8380-99cf752fb8df",
           "url": "https://www.advancedbackgroundchecks.com/names/${firstName}-${lastName}_${city}-${state}_age_${age}"
         },
         {
           "actionType": "extract",
-          "id": "f3ed744c-6cfc-4a99-b46e-6095587eadfc",
+          "id": "6f6bb616-a4cb-4231-9abb-522722208f95",
           "selector": ".card-block",
           "profile": {
             "name": {
@@ -24,7 +25,8 @@
             },
             "alternativeNamesList": {
               "selector": "(.//p[@class='card-text max-lines-1'])[1]",
-              "afterText": "AKA:"
+              "afterText": "AKA:",
+              "separator": ","
             },
             "age": {
               "selector": ".card-title",
@@ -39,10 +41,13 @@
             },
             "relativesList": {
               "selector": "(.//p[@class='card-text max-lines-1'])[2]",
-              "afterText": "Related to:"
+              "afterText": "Related to:",
+              "separator": ","
             },
             "profileUrl": {
-              "selector": ".link-to-details"
+              "selector": ".link-to-details",
+              "identifierType": "path",
+              "identifier": "https://www.advancedbackgroundchecks.com/${id}"
             }
           }
         }

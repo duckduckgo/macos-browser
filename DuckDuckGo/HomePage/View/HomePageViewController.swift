@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import SwiftUI
+import History
 
 @MainActor
 final class HomePageViewController: NSViewController {
@@ -41,7 +42,9 @@ final class HomePageViewController: NSViewController {
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
-    var appearancePreferences: AppearancePreferences!
+    let accessibilityPreferences: AccessibilityPreferences
+    let appearancePreferences: AppearancePreferences
+    let defaultBrowserPreferences: DefaultBrowserPreferences
     var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
@@ -55,13 +58,19 @@ final class HomePageViewController: NSViewController {
          bookmarkManager: BookmarkManager,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          fireViewModel: FireViewModel? = nil,
-         onboardingViewModel: OnboardingViewModel = OnboardingViewModel()) {
+         onboardingViewModel: OnboardingViewModel = OnboardingViewModel(),
+         accessibilityPreferences: AccessibilityPreferences = AccessibilityPreferences.shared,
+         appearancePreferences: AppearancePreferences = AppearancePreferences.shared,
+         defaultBrowserPreferences: DefaultBrowserPreferences = DefaultBrowserPreferences.shared) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
         self.onboardingViewModel = onboardingViewModel
+        self.accessibilityPreferences = accessibilityPreferences
+        self.appearancePreferences = appearancePreferences
+        self.defaultBrowserPreferences = defaultBrowserPreferences
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -71,7 +80,6 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
-        appearancePreferences = AppearancePreferences.shared
 
         refreshModels()
 
@@ -80,6 +88,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
             .environmentObject(featuresModel)
+            .environmentObject(accessibilityPreferences)
             .environmentObject(appearancePreferences)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
@@ -148,8 +157,9 @@ final class HomePageViewController: NSViewController {
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
-        return .init(isDefault: DefaultBrowserPreferences().isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
-            let defaultBrowserPreferencesModel = DefaultBrowserPreferences()
+        return .init(isDefault: DefaultBrowserPreferences.shared.isDefault, wasClosed: defaultBrowserDismissed, requestSetDefault: { [weak self] in
+            Pixel.fire(.defaultRequestedFromHomepage)
+            let defaultBrowserPreferencesModel = DefaultBrowserPreferences.shared
             defaultBrowserPreferencesModel.becomeDefault { [weak self] isDefault in
                 _ = defaultBrowserPreferencesModel
                 self?.defaultBrowserModel.isDefault = isDefault
@@ -171,8 +181,10 @@ final class HomePageViewController: NSViewController {
             self?.bookmarkManager.update(bookmark: bookmark)
         }, deleteBookmark: { [weak self] bookmark in
             self?.bookmarkManager.remove(bookmark: bookmark)
-        }, addEdit: { [weak self] bookmark in
-            self?.showAddEditController(for: bookmark)
+        }, add: { [weak self] in
+            self?.showAddController()
+        }, edit: { [weak self] bookmark in
+            self?.showEditController(for: bookmark)
         }, moveFavorite: { [weak self] (bookmark, index) in
             self?.bookmarkManager.moveFavorites(with: [bookmark.id], toIndex: index) { _ in }
         }, onFaviconMissing: { [weak self] in
@@ -193,7 +205,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func refreshDefaultBrowserModel() {
-        let prefs = DefaultBrowserPreferences()
+        let prefs = DefaultBrowserPreferences.shared
         if prefs.isDefault {
             defaultBrowserDismissed = false
         }
@@ -203,7 +215,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func subscribeToBookmarks() {
-        bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
+        bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
             withAnimation {
                 self?.refreshFavoritesModel()
             }
@@ -229,9 +241,14 @@ final class HomePageViewController: NSViewController {
         tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url, source: .bookmark))
     }
 
-    private func showAddEditController(for bookmark: Bookmark? = nil) {
-        AddBookmarkModalView(model: AddBookmarkModalViewModel(originalBookmark: bookmark, isFavorite: true))
-            .show(in: self.view.window)
+    private func showAddController() {
+        BookmarksDialogViewFactory.makeAddFavoriteView()
+            .show(in: view.window)
+    }
+
+    private func showEditController(for bookmark: Bookmark) {
+        BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
+            .show(in: view.window)
     }
 
     private var burningDataCancellable: AnyCancellable?

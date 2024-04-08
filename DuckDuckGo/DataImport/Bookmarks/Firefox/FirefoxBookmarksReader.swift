@@ -45,6 +45,8 @@ final class FirefoxBookmarksReader {
             case fetchAllFolders
 
             case copyTemporaryFile
+
+            case couldNotFindBookmarksFile
         }
 
         var action: DataImportAction { .bookmarks }
@@ -53,7 +55,7 @@ final class FirefoxBookmarksReader {
 
         var errorType: DataImport.ErrorType {
             switch type {
-            case .dbOpen: .noData
+            case .dbOpen, .couldNotFindBookmarksFile: .noData
             case .fetchRootEntries, .noRootEntries, .fetchTopLevelFolders, .fetchAllBookmarks, .fetchAllFolders: .dataCorrupted
             case .copyTemporaryFile: .other
             }
@@ -62,12 +64,20 @@ final class FirefoxBookmarksReader {
 
     private let firefoxPlacesDatabaseURL: URL
     private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
+    private let otherBookmarksFolderTitle: String
+    private let mobileBookmarksFolderTitle: String
 
-    init(firefoxDataDirectoryURL: URL) {
+    init(firefoxDataDirectoryURL: URL, otherBookmarksFolderTitle: String = UserText.otherBookmarksImportedFolderTitle, mobileBookmarksFolderTitle: String = UserText.mobileBookmarksImportedFolderTitle) {
         self.firefoxPlacesDatabaseURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.placesDatabaseName)
+        self.otherBookmarksFolderTitle = otherBookmarksFolderTitle
+        self.mobileBookmarksFolderTitle = mobileBookmarksFolderTitle
     }
 
     func readBookmarks() -> DataImportResult<ImportedBookmarks> {
+        guard FileManager.default.fileExists(atPath: firefoxPlacesDatabaseURL.path) else {
+            return .failure(ImportError(type: .couldNotFindBookmarksFile, underlyingError: nil))
+        }
+
         do {
             currentOperationType = .copyTemporaryFile
             return try firefoxPlacesDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
@@ -181,8 +191,8 @@ final class FirefoxBookmarksReader {
                                                                urlString: nil,
                                                                children: toolbarBookmarksAndFolders + menuBookmarksAndFolders)
 
-        let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: UserText.otherBookmarksImportedFolderTitle, type: .folder, urlString: nil, children: unfiledBookmarksAndFolders)
-        let syncedFolder = ImportedBookmarks.BookmarkOrFolder(name: UserText.mobileBookmarksImportedFolderTitle, type: .folder, urlString: nil, children: syncedBookmarksAndFolders)
+        let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: self.otherBookmarksFolderTitle, type: .folder, urlString: nil, children: unfiledBookmarksAndFolders)
+        let syncedFolder = ImportedBookmarks.BookmarkOrFolder(name: self.mobileBookmarksFolderTitle, type: .folder, urlString: nil, children: syncedBookmarksAndFolders)
         let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder, syncedBookmarks: syncedFolder)
 
         return ImportedBookmarks(topLevelFolders: folders)

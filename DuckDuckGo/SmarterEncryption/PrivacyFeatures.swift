@@ -43,14 +43,22 @@ final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
 
     private static let httpsUpgradeDebugEvents = EventMapping<AppHTTPSUpgradeStore.ErrorEvents> { event, error, parameters, onComplete in
         let domainEvent: Pixel.Event.Debug
+        let dailyAndCount: Bool
+
         switch event {
         case .dbSaveBloomFilterError:
             domainEvent = .dbSaveBloomFilterError
+            dailyAndCount = true
         case .dbSaveExcludedHTTPSDomainsError:
             domainEvent = .dbSaveExcludedHTTPSDomainsError
+            dailyAndCount = false
         }
 
-        Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)
+        if dailyAndCount {
+            DailyPixel.fire(pixel: .debug(event: domainEvent, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true, withAdditionalParameters: parameters ?? [:], onComplete: onComplete)
+        } else {
+            Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)
+        }
     }
     private static var embeddedBloomFilterResources: EmbeddedBloomFilterResources {
         EmbeddedBloomFilterResources(bloomSpecification: Bundle.main.url(forResource: "httpsMobileV2BloomSpec", withExtension: "json")!,

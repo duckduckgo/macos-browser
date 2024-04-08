@@ -30,7 +30,7 @@ public struct EnterRecoveryCodeView: View {
 
     public var body: some View {
         SyncDialog(spacing: 20.0) {
-            Image("Lock-Succes-96")
+            Image(.lockSucces96)
             SyncUIViews.TextHeader(text: UserText.enterRecoveryCodeDialogTitle)
             SyncUIViews.TextDetailMultiline(text: UserText.enterRecoveryCodeDialogSubtitle)
             VStack(spacing: 16) {
@@ -43,7 +43,7 @@ public struct EnterRecoveryCodeView: View {
                     model.delegate?.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: true)
                 } label: {
                     HStack {
-                        Image("Paste")
+                        Image(.paste)
                         Text(UserText.paste)
                     }
                 }
@@ -59,7 +59,7 @@ public struct EnterRecoveryCodeView: View {
                     .frame(width: 184)
                     .fixedSize()
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color("BlackWhite60"))
+                    .foregroundColor(Color(.blackWhite60))
                 line()
             }
             QRCode(string: code, size: CGSize(width: 192, height: 192))
@@ -76,6 +76,6 @@ public struct EnterRecoveryCodeView: View {
         return Rectangle()
             .foregroundColor(.clear)
             .frame(maxWidth: .infinity, minHeight: 0.5, maxHeight: 0.5)
-            .background(Color("BlackWhite10"))
+            .background(Color(.blackWhite10))
     }
 }

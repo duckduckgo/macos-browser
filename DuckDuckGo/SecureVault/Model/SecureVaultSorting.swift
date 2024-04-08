@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import SwiftUI
 
@@ -40,21 +41,21 @@ struct SecureVaultSorting: Equatable {
             }
         }
 
-        var imageName: String? {
+        var image: NSImage? {
             switch self {
             case .allItems: return nil
-            case .logins: return "LoginGlyph"
-            case .identities: return "IdentityGlyph"
-            case .cards: return "CreditCardGlyph"
+            case .logins: return .loginGlyph
+            case .identities: return .identityGlyph
+            case .cards: return .creditCardGlyph
             }
         }
 
         var backgroundColor: NSColor {
             switch self {
-            case .allItems: return NSColor(named: "SecureVaultCategoryDefaultColor")!
-            case .logins: return NSColor(named: "LoginsColor")!
-            case .identities: return NSColor(named: "IdentitiesColor")!
-            case .cards: return NSColor(named: "CardsColor")!
+            case .allItems: .secureVaultCategoryDefault
+            case .logins: .logins
+            case .identities: .identities
+            case .cards: .cards
             }
         }
 

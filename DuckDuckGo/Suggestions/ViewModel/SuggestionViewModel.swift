@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-import BrowserServicesKit
+import Suggestions
 
 struct SuggestionViewModel: Equatable {
 
@@ -160,26 +160,20 @@ struct SuggestionViewModel: Equatable {
 
     // MARK: - Icon
 
-    static let webImage = NSImage(named: "Web")
-    static let searchImage = NSImage(named: "Search")
-    static let historyImage = NSImage(named: "HistorySuggestion")
-    static let bookmarkImage = NSImage(named: "BookmarkSuggestion")
-    static let favoriteImage = NSImage(named: "FavoritedBookmarkSuggestion")
-
     var icon: NSImage? {
         switch suggestion {
         case .phrase:
-            return Self.searchImage
+            return .search
         case .website:
-            return Self.webImage
+            return .web
         case .historyEntry:
-            return Self.historyImage
+            return .historySuggestion
         case .bookmark(title: _, url: _, isFavorite: false, allowedInTopHits: _):
-            return Self.bookmarkImage
+            return .bookmarkSuggestion
         case .bookmark(title: _, url: _, isFavorite: true, allowedInTopHits: _):
-            return Self.favoriteImage
+            return .favoritedBookmarkSuggestion
         case .unknown:
-            return Self.webImage
+            return .web
         }
     }
 

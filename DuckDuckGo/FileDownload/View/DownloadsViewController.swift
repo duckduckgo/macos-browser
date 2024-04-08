@@ -27,6 +27,8 @@ protocol DownloadsViewControllerDelegate: AnyObject {
 
 final class DownloadsViewController: NSViewController {
 
+    static let preferredContentSize = CGSize(width: 420, height: 500)
+
     static func create() -> Self {
         let storyboard = NSStoryboard(name: "Downloads", bundle: nil)
         // swiftlint:disable force_cast
@@ -65,12 +67,14 @@ final class DownloadsViewController: NSViewController {
 
         setupDragAndDrop()
         setUpStrings()
+
         openDownloadsFolderButton.toolTip = UserText.openDownloadsFolderTooltip
         clearDownloadsButton.toolTip = UserText.clearDownloadHistoryTooltip
+
+        preferredContentSize = Self.preferredContentSize
     }
 
     override func viewWillAppear() {
-        viewModel.filterRemovedDownloads()
 
         downloadsCancellable = viewModel.$items
             .throttle(for: 0.1, scheduler: DispatchQueue.main, latest: true)
@@ -92,7 +96,18 @@ final class DownloadsViewController: NSViewController {
                 self.tableView.reloadData(forRowIndexes: IndexSet(integer: value.new.count), columnIndexes: IndexSet(integer: 0))
                 self.tableView.endUpdates()
                 self.updateHeight()
+
+                // at this point all visible cells have started their progress animation
+                for change in diff {
+                    if case .insert(_, element: let item, _) = change {
+                        item.didAppear() // yet invisible cells shouldn‘t animate their progress when scrolled to
+                    }
+                }
             }
+
+        for item in viewModel.items {
+            item.didAppear() // initial table appearance should have no progress animations
+        }
         tableView.reloadData()
         updateHeight()
     }
@@ -142,13 +157,36 @@ final class DownloadsViewController: NSViewController {
     // MARK: User Actions
 
     @IBAction func openDownloadsFolderAction(_ sender: Any) {
-        guard let url = DownloadsPreferences().effectiveDownloadLocation
-                ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
-        else {
-            return
+        let prefs = DownloadsPreferences.shared
+        var url: URL?
+        var itemToSelect: URL?
+
+        if prefs.alwaysRequestDownloadLocation {
+            url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+
+            if let lastDownloaded = viewModel.items.first/* last added */(where: {
+                // should still exist
+                $0.localURL != nil && FileManager.default.fileExists(atPath: $0.localURL!.deletingLastPathComponent().path)
+            }),
+               let lastDownloadedURL = lastDownloaded.localURL,
+               // if no downloads are from the default Downloads folder - open the last downloaded item folder
+               !viewModel.items.contains(where: { $0.localURL?.deletingLastPathComponent().path == url?.path  }) || url == nil {
+
+                url = lastDownloadedURL.deletingLastPathComponent()
+                // select last downloaded item
+                itemToSelect = lastDownloadedURL
+
+            } /* else fallback to default User‘s Downloads */
+
+        } else {
+            // open preferred downlod location
+            url = prefs.effectiveDownloadLocation ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         }
+
+        guard let url else { return }
+
         self.dismiss()
-        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
+        NSWorkspace.shared.selectFile(itemToSelect?.path, inFileViewerRootedAtPath: url.path)
     }
 
     @IBAction func clearDownloadsAction(_ sender: Any) {
@@ -276,7 +314,7 @@ extension DownloadsViewController: NSMenuDelegate {
 extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return viewModel.items.count + 1
+        return downloadsCancellable == nil ? 0 : viewModel.items.count + 1 // updated on viewDidAppear
     }
 
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {

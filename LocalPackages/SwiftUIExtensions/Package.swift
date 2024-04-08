@@ -11,24 +11,27 @@ let package = Package(
         .library(name: "PreferencesViews", targets: ["PreferencesViews"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.0"),
+        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "2.0.0"),
     ],
     targets: [
         .target(
             name: "SwiftUIExtensions",
-            dependencies: [],
+            dependencies: [
+            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
         .target(
             name: "PreferencesViews",
-            dependencies: ["SwiftUIExtensions"],
+            dependencies: [
+                "SwiftUIExtensions",
+            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
     ]
 )

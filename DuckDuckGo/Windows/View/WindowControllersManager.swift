@@ -140,28 +140,6 @@ extension WindowControllersManager {
     }
 
     func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool = false) {
-
-        func show(url: URL?, in windowController: MainWindowController) {
-            let viewController = windowController.mainViewController
-            windowController.window?.makeKeyAndOrderFront(self)
-
-            let tabCollectionViewModel = viewController.tabCollectionViewModel
-            let tabCollection = tabCollectionViewModel.tabCollection
-
-            if tabCollection.tabs.count == 1,
-               let firstTab = tabCollection.tabs.first,
-               case .newtab = firstTab.content,
-               !newTab {
-                firstTab.setContent(url.map { .url($0, source: source) } ?? .newtab)
-            } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.setContent(url.map { .url($0, source: source) } ?? .newtab)
-            } else {
-                let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
-                newTab.setContent(url.map { .url($0, source: source) } ?? .newtab)
-                tabCollectionViewModel.append(tab: newTab)
-            }
-        }
-
         let nonPopupMainWindowControllers = mainWindowControllers.filter { $0.window?.isPopUpWindow == false }
 
         // If there is a main window, open the URL in it
@@ -173,7 +151,7 @@ extension WindowControllersManager {
             // If there is any non-popup window available, open the URL in it
             ?? nonPopupMainWindowControllers.first {
 
-            show(url: url, in: windowController)
+            show(url: url, in: windowController, source: source, newTab: newTab)
             return
         }
 
@@ -182,6 +160,27 @@ extension WindowControllersManager {
             WindowsManager.openNewWindow(with: url, source: source, isBurner: false)
         } else {
             WindowsManager.openNewWindow(burnerMode: .regular)
+        }
+    }
+
+    private func show(url: URL?, in windowController: MainWindowController, source: Tab.TabContent.URLSource, newTab: Bool) {
+        let viewController = windowController.mainViewController
+        windowController.window?.makeKeyAndOrderFront(self)
+
+        let tabCollectionViewModel = viewController.tabCollectionViewModel
+        let tabCollection = tabCollectionViewModel.tabCollection
+
+        if tabCollection.tabs.count == 1,
+           let firstTab = tabCollection.tabs.first,
+           case .newtab = firstTab.content,
+           !newTab {
+            firstTab.setContent(url.map { .url($0, source: source) } ?? .newtab)
+        } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
+            tab.setContent(url.map { .url($0, source: source) } ?? .newtab)
+        } else {
+            let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+            newTab.setContent(url.map { .url($0, source: source) } ?? .newtab)
+            tabCollectionViewModel.append(tab: newTab)
         }
     }
 
@@ -199,7 +198,7 @@ extension WindowControllersManager {
         windowController.window?.orderFront(nil)
     }
 
-    // MARK: - Network Protection
+    // MARK: - VPN
 
 #if NETWORK_PROTECTION
     @MainActor

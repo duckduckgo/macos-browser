@@ -21,6 +21,7 @@ import Carbon
 import Combine
 import Navigation
 import XCTest
+import History
 
 @testable import DuckDuckGo_Privacy_Browser
 

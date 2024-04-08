@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import CoreImage.CIFilterBuiltins
 
 extension CIImage {
@@ -82,10 +83,10 @@ extension CIImage {
         static let duckDuckGo: QRCodeParameters = {
             let logicalQrSize = QRCodeParameters.default.logicalQrSize
             let icon: CIImage = {
-                let logo = NSImage(named: "Logo")!
+                let logo = NSImage.logo
                 let logoRadiusFactor: CGFloat = 0.77
                 let logoMargin: CGFloat = 6
-                let logoBackgroundColor = NSColor.logoBackgroundColor
+                let logoBackgroundColor: NSColor = .logoBackground
 
                 let logoSize = NSSize(width: logicalQrSize, height: logicalQrSize).scaled(by: CIImage.retinaScaleFactor)
                 var image = logo.ciImage(with: logoSize)
@@ -105,7 +106,7 @@ extension CIImage {
             return QRCodeParameters(logicalQrSize: logicalQrSize,
                                     correctionLevel: .high,
                                     icon: icon,
-                                    color: .logoBackgroundColor,
+                                    color: .logoBackground,
                                     backgroundColor: .white)
         }()
     }

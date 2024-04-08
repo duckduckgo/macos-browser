@@ -20,7 +20,7 @@ import Foundation
 
 public extension PixelKit {
 
-    enum Parameters {
+    enum Parameters: Hashable {
         public static let duration = "duration"
         public static let test = "test"
         public static let appVersion = "appVersion"
@@ -28,14 +28,12 @@ public extension PixelKit {
         public static let osMajorVersion = "osMajorVersion"
 
         public static let errorCode = "e"
-        public static let errorDomain = "errorDomain"
-        public static let errorDesc = "d"
+        public static let errorDomain = "d"
         public static let errorCount = "c"
         public static let errorSource = "error_source"
         public static let sourceBrowserVersion = "source_browser_version"
         public static let underlyingErrorCode = "ue"
-        public static let underlyingErrorDomain = "underlyingErrorDomain"
-        public static let underlyingErrorDesc = "ud"
+        public static let underlyingErrorDomain = "ud"
         public static let underlyingErrorSQLiteCode = "sqlrc"
         public static let underlyingErrorSQLiteExtendedCode = "sqlerc"
 
@@ -94,11 +92,11 @@ public extension Error {
         let nsError = self as NSError
 
         params[PixelKit.Parameters.errorCode] = "\(nsError.code)"
-        params[PixelKit.Parameters.errorDesc] = nsError.domain
+        params[PixelKit.Parameters.errorDomain] = nsError.domain
 
         if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
             params[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            params[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
+            params[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
         }
 
         if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {

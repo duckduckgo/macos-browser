@@ -199,7 +199,7 @@ class TabLazyLoaderTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(didFinishEvents.first), true)
     }
 
-    func testThatLazyLoadingDoesNotStartIfCurrentUrlTabDoesNotFinishLoading() {
+    func testThatLazyLoadingDoesNotStartIfCurrentUrlTabDoesNotFinishLoading() async throws {
         let reloadExpectation = expectation(description: "TabMock.reload() called")
         reloadExpectation.isInverted = true
 
@@ -212,15 +212,15 @@ class TabLazyLoaderTests: XCTestCase {
 
         let lazyLoader = TabLazyLoader(dataSource: dataSource)
 
-        var didFinishEvents: [Bool] = []
-        lazyLoader?.lazyLoadingDidFinishPublisher.sink(receiveValue: { didFinishEvents.append($0) }).store(in: &cancellables)
+        lazyLoader?.lazyLoadingDidFinishPublisher.sink { _ in
+            XCTFail("Unexpected didFinish event")
+        }.store(in: &cancellables)
 
         // When
         lazyLoader?.scheduleLazyLoading()
 
         // Then
-        waitForExpectations(timeout: 0.1)
-        XCTAssertEqual(didFinishEvents.count, 0)
+        await fulfillment(of: [reloadExpectation], timeout: 0.1)
     }
 
     func testThatLazyLoadingStopsAfterLoadingMaximumNumberOfTabs() throws {

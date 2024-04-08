@@ -38,6 +38,7 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
     private let machServiceName: String
     private let clientInterface: NSXPCInterface
     private let serverInterface: NSXPCInterface
+    public var onDisconnect: (() -> Void)?
 
     /// The internal connection, which may still not have been created.
     ///
@@ -98,6 +99,7 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
             Task { @XPCConnectionActor in
                 self.internalConnection?.invalidate()
                 self.internalConnection = nil
+                self.onDisconnect?()
             }
         }
 

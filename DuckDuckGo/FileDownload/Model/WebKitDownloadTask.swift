@@ -16,17 +16,16 @@
 //  limitations under the License.
 //
 
-import Navigation
 import Combine
+import Common
 import Foundation
+import Navigation
 import UniformTypeIdentifiers
 import WebKit
 
 protocol WebKitDownloadTaskDelegate: AnyObject {
-    func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
-                                             suggestedFilename: String,
-                                             completionHandler: @escaping (URL?, UTType?) -> Void)
-    func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<URL, FileDownloadError>)
+    func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType: UTType?) async -> (URL?, UTType?)
+    func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<Void, FileDownloadError>)
 }
 
 /// WKDownload wrapper managing Finder File Progress and coordinating file URLs
@@ -34,47 +33,89 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
     static let downloadExtension = "duckload"
 
-    let progress: Progress
-    let shouldPromptForLocation: Bool
-    let isBurner: Bool
-
-    private(set) var suggestedFilename: String?
-    private(set) var suggestedFileType: UTType?
-
-    struct FileLocation: Equatable {
-        /// Desired local destination file URL used to display download location
-        var destinationURL: URL?
-        /// Temporary  (.duckload)  file URL; set to nil when download completes
-        var tempURL: URL?
-        /// Item-replacement directory for the item when .duckload file could not be created
-        var itemReplacementDirectory: URL?
+    enum DownloadDestination {
+        /// download destination would be requested from user or selected automatically depending on the “always prompt where to save files” setting
+        case auto
+        /// override “always prompt where to save files” for this download and prompt user for location
+        case prompt
+        /// desired destination URL provided when adding the download (like a temporary URL for PDF printing)
+        case preset(URL)
+        /// download is resumed to existing destination placeholder and `.duckload` file
+        case resume(destination: FilePresenter, tempFile: FilePresenter)
     }
+    enum FileDownloadState {
+        case initial(DownloadDestination)
+        /// - Parameter destination: final destination file placeholder file presenter
+        /// - Parameter tempFile: Temporary  (.duckload)  file presenter
+        case downloading(destination: FilePresenter, tempFile: FilePresenter)
+        /// file presenter used to track the downloaded file across file system
+        case downloaded(FilePresenter)
+        /// `destination` and `tempFile` can be used along with `resumeData` to restart a failed download (if `error.isRetryable` is `true`)
+        case failed(destination: FilePresenter?, tempFile: FilePresenter?, resumeData: Data?, error: FileDownloadError /* error type is force-casted in the code below in mapError (twice)! */)
 
-    @Published private(set) var location: FileLocation {
-        didSet {
-            guard let tempURL = location.tempURL else { return }
+        var isInitial: Bool {
+            if case .initial = self { true } else { false }
+        }
 
-            self.progress.fileURL = tempURL
-            self.progress.publishIfNotPublished()
+        var isDownloading: Bool {
+            if case .downloading = self { true } else { false }
+        }
+
+        var destinationFilePresenter: FilePresenter? {
+            switch self {
+            case .initial(.resume(destination: let destinationFile, _)): return destinationFile
+            case .initial: return nil
+            case .downloading(destination: let destinationFile, _): return destinationFile
+            case .downloaded(let destinationFile): return destinationFile
+            case .failed(destination: let destinationFile, _, resumeData: _, _): return destinationFile
+            }
+        }
+
+        var tempFilePresenter: FilePresenter? {
+            switch self {
+            case .initial(.resume(_, tempFile: let tempFile)): return tempFile
+            case .initial: return nil
+            case .downloading(_, tempFile: let tempFile): return tempFile
+            case .downloaded: return nil
+            case .failed(_, tempFile: let tempFile, _, _): return tempFile
+            }
+        }
+
+        var isCompleted: Bool {
+            switch self {
+            case .initial: false
+            case .downloading: false
+            case .downloaded: true
+            case .failed: true
+            }
         }
     }
 
-    private lazy var future: Future<URL, FileDownloadError> = {
-        dispatchPrecondition(condition: .onQueue(.main))
-        let future = Future<URL, FileDownloadError> { self.fulfill = $0 }
-        assert(self.fulfill != nil)
-        return future
-    }()
-    private var fulfill: Future<URL, FileDownloadError>.Promise?
-    /// Task completion Publisher outputting destination URL or failure Error with Resume Data if available
-    var output: AnyPublisher<URL, FileDownloadError> { future.eraseToAnyPublisher() }
+    @Published @MainActor private(set) var state: FileDownloadState {
+        didSet {
+            subscribeToTempFileURL(state.tempFilePresenter)
+        }
+    }
 
+    /// downloads initiated from a Burner Window won‘t stay in the Downloads panel after completion
+    let isBurner: Bool
+
+    private let log: OSLog
     private weak var delegate: WebKitDownloadTaskDelegate?
 
     private let download: WebKitDownload
-    private var cancellables = Set<AnyCancellable>()
+    /// used to report the download progress, byte count and estimated time
+    let progress: Progress
+    /// used to report file progress in Finder and Dock
+    private var fileProgressPresenter: FileProgressPresenter?
+#if DEBUG
+    var fileProgress: Progress? { fileProgressPresenter?.fileProgress }
+#endif
 
-    private var decideDestinationCompletionHandler: ((URL?) -> Void)?
+    /// temp directory for the downloaded item (removed after completion)
+    @MainActor private var itemReplacementDirectory: URL?
+    @MainActor private var itemReplacementDirectoryFSOCancellable: AnyCancellable?
+    @MainActor private var tempFileUrlCancellable: AnyCancellable?
 
     var originalRequest: URLRequest? {
         download.originalRequest
@@ -82,102 +123,283 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     var originalWebView: WKWebView? {
         download.webView
     }
+    @MainActor var shouldPromptForLocation: Bool {
+        return if case .initial(.prompt) = state { true } else { false }
+    }
 
-    init(download: WebKitDownload, promptForLocation: Bool, destinationURL: URL?, tempURL: URL?, isBurner: Bool) {
-
+    @MainActor(unsafe)
+    init(download: WebKitDownload, destination: DownloadDestination, isBurner: Bool, log: OSLog = .downloads) {
         self.download = download
-        self.progress = Progress(totalUnitCount: -1)
-        self.shouldPromptForLocation = promptForLocation
-        self.location = .init(destinationURL: destinationURL, tempURL: tempURL)
+        self.progress = DownloadProgress(download: download)
+        self.fileProgressPresenter = FileProgressPresenter(progress: progress)
+        self.state = .initial(destination)
         self.isBurner = isBurner
+        self.log = log
         super.init()
 
-        download.delegate = self
-
-        progress.fileOperationKind = .downloading
-        progress.kind = .file
-        progress.completedUnitCount = 0
-
-        progress.isPausable = false
-        progress.isCancellable = true
-        progress.cancellationHandler = { [weak self] in
+        progress.cancellationHandler = { [weak self, log, taskDescr=self.debugDescription] in
+            os_log(log: log, "❌ progress.cancellationHandler \(taskDescr)")
             self?.cancel()
         }
     }
 
-    func start(delegate: WebKitDownloadTaskDelegate) {
-        _=future
+    /// called by the FileDownloadManager after adding the Download Task
+    ///
+    /// 1. sets `WKDownload` delegate to approve&start the download
+    /// 2. `WKDownload` (a new one) calls `…decideDestinationUsingResponse:…`
+    ///     - resumed downloads use pre-provided destination and temp file
+    /// 3. after destination is chosen we create a placeholder file at the final destination URL (and set a File Presenter to track its renaming/removal)
+    ///   but start the download into a temporary directory (`itemReplacementDirectory`) observing its contents.
+    /// 4. when the download is started, we detect a file being created in the temporary directory and move it to the final destination folder
+    ///   replacing its original file extension with `.duckload` – this file would be used to track user-facing progress in Finder/Dock
+    /// 5. after the download is finished we merge the two files by replacing the final destination file with the `.duckload` file
+    ///
+    /// - if the temporary file is renamed, we try to rename the destination file accordingly (this would fail in sandboxed builds for non-preset directories)
+    /// - if any of the two files is removed, the download is cancelled
+    @MainActor func start(delegate: WebKitDownloadTaskDelegate) {
+        os_log(.debug, log: log, "🟢 start \(self)")
+
         self.delegate = delegate
-        start()
+
+        // if resuming download – file presenters are provided as init parameter
+        // when the resumed download is started using `WKWebView.resumeDownload`,
+        // `decideDestination` callback wouldn‘t be called.
+        // if the download is “resumed” as a new download (replacing the destination file) -
+        // the presenters will be used in the `decideDestination` callback
+        if case .initial(.resume(destination: let destination, tempFile: let tempFile)) = state {
+            state = .downloading(destination: destination, tempFile: tempFile)
+        }
+        // otherwise, setting `download.delegate` initiates `decideDestination` callback
+        // that will call `localFileURLCompletionHandler`
+        download.delegate = self
     }
 
-    private func start() {
-        self.progress.fileDownloadingSourceURL = download.originalRequest?.url
-        if let progress = (self.download as? ProgressReporting)?.progress {
-            progress.publisher(for: \.totalUnitCount)
-                .assign(to: \.totalUnitCount, onWeaklyHeld: self.progress)
-                .store(in: &self.cancellables)
-            progress.publisher(for: \.completedUnitCount)
-                .assign(to: \.completedUnitCount, onWeaklyHeld: self.progress)
-                .store(in: &self.cancellables)
+    @MainActor func subscribeToTempFileURL(_ tempFilePresenter: FilePresenter?) {
+        tempFileUrlCancellable = (tempFilePresenter?.urlPublisher ?? Just(nil).eraseToAnyPublisher())
+            .sink { [weak self] url in
+                Task { [weak self] in
+                    await self?.tempFileUrlUpdated(to: url)
+                }
+            }
+    }
+
+    /// Observe `.duckload` file moving and renaming, update the file progress and rename destination file if needed
+    private nonisolated func tempFileUrlUpdated(to url: URL?) async {
+        let (state, itemReplacementDirectory) = await MainActor.run {
+            // display file progress and fly-to-dock animation
+            // don‘t display progress in itemReplacementDirectory
+            if let url, self.itemReplacementDirectory == nil || !url.path.hasPrefix(self.itemReplacementDirectory!.path) {
+                self.fileProgressPresenter?.displayFileProgress(at: url)
+            } else {
+                self.fileProgressPresenter?.displayFileProgress(at: nil)
+            }
+
+            return (self.state, self.itemReplacementDirectory)
+        }
+
+        /// if user has renamed the `.duckload` file - also rename the destination file
+        guard let destinationFilePresenter = state.destinationFilePresenter,
+              let destinationURL = destinationFilePresenter.url,
+              let newDestinationURL = state.tempFilePresenter?.url.flatMap({ tempFileURL -> URL? in
+                  guard itemReplacementDirectory == nil || !tempFileURL.path.hasPrefix(itemReplacementDirectory!.path) else { return nil }
+
+                  // drop `duckload` file extension (if it‘s still there) and append the original one
+                  let newFileName = tempFileURL.lastPathComponent.dropping(suffix: "." + Self.downloadExtension).appendingPathExtension(destinationURL.pathExtension)
+                  return destinationURL.deletingLastPathComponent().appendingPathComponent(newFileName)
+              }),
+              destinationURL != newDestinationURL else { try? await Task.sleep(interval: 1); return }
+
+        do {
+            os_log(.debug, log: log, "renaming destination file \"\(destinationURL.path)\" ➡️ \"\(destinationURL.path)\"")
+            try destinationFilePresenter.coordinateMove(to: newDestinationURL, with: []) { from, to in
+                try FileManager.default.moveItem(at: from, to: to)
+                destinationFilePresenter.presentedItemDidMove(to: newDestinationURL) // coordinated File Presenter won‘t receive URL updates
+            }
+        } catch {
+            os_log(.debug, log: log, "renaming file failed: \(error)")
         }
     }
 
-    private func localFileURLCompletionHandler(localURL: URL?, fileType: UTType?) {
-        dispatchPrecondition(condition: .onQueue(.main))
-
+    /// called at `WKDownload`s `decideDestination` completion callback with selected URL (or `nil` if cancelled)
+    private enum DestinationCleanupStyle { case remove, clear }
+    private nonisolated func prepareChosenDestinationURL(_ destinationURL: URL?, fileType _: UTType?, cleanupStyle: DestinationCleanupStyle) async -> URL? {
         do {
-            guard let localURL = localURL,
-                  let completionHandler = self.decideDestinationCompletionHandler
-            else { throw URLError(.cancelled) }
+            let fm = FileManager()
+            guard let destinationURL else { throw URLError(.cancelled) }
+            os_log(.debug, log: log, "download task callback: creating temp directory for \"\(destinationURL.path)\"")
 
-            self.location = try self.downloadLocation(for: localURL)
+            switch cleanupStyle {
+            case .remove:
+                // 1. remove the destination file if exists – that would clear existing downloads file presenters and stop downloads accordingly (if any)
+                try NSFileCoordinator().coordinateWrite(at: destinationURL, with: .forDeleting) { url in
+                    if !fm.fileExists(atPath: url.path) {
+                        // validate we can write to the directory even if there‘s no existing file
+                        try Data().write(to: destinationURL)
+                    }
+                    os_log(.debug, log: log, "🧹 removing \"\(url.path)\"")
+                    try fm.removeItem(at: url)
+                }
+            case .clear:
+                // 2. the download is “resumed” to existing destinationURL – clear it.
+                try Data().write(to: destinationURL)
+            }
 
-            completionHandler(location.tempURL)
+            // 2. start downloading to a newly created same-volume temporary directory
+            let tempURL = try await setupTemporaryDownloadURL(for: destinationURL, fileAddedHandler: { [weak self] tempURL in
+                // keep the cancellable ref until File Presenters instantiation is finished
+                // - in case we receive an early `downloadDidFail:`
+                self?.itemReplacementDirectoryFSOCancellable?.cancel()
+
+                // then move the file to the final destination
+                Task { [weak self] in
+                    await self?.tempDownloadFileCreated(at: tempURL, destinationURL: destinationURL)
+                    self?.itemReplacementDirectoryFSOCancellable = nil
+                }
+            })
+
+            os_log(.debug, log: log, "download task callback: temp file: \(tempURL.path)")
+            return tempURL
 
         } catch {
-            self.download.cancel()
-            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: URLError(.cancelled), resumeData: nil, isRetryable: false)))
-            self.decideDestinationCompletionHandler?(nil)
+            await MainActor.run {
+                os_log(.error, log: log, "🛑 download task callback: \(self): \(error)")
 
-            Pixel.fire(.debug(event: .fileGetDownloadLocationFailed, error: error))
+                self.download.cancel()
+                self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
+                Pixel.fire(.debug(event: .fileGetDownloadLocationFailed, error: error))
+            }
+            return nil
         }
     }
 
-    private func downloadLocation(for localURL: URL) throws -> FileLocation {
-        var downloadURL = self.location.tempURL ?? localURL.appendingPathExtension(Self.downloadExtension)
-        let downloadFilename = downloadURL.lastPathComponent
-        let ext = localURL.pathExtension + (localURL.pathExtension.isEmpty ? "" : ".") + Self.downloadExtension
-        var itemReplacementDirectory: URL?
+    /// create sandbox-accessible temporary directory on the same volume with the desired destination URL and notify on the download file creation
+    private nonisolated func setupTemporaryDownloadURL(for destinationURL: URL, fileAddedHandler: @escaping @MainActor (URL) -> Void) async throws -> URL {
+        let itemReplacementDirectory = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: destinationURL, create: true)
+        let tempURL = itemReplacementDirectory.appendingPathComponent(destinationURL.lastPathComponent)
 
-        // create temp file and move to Downloads folder with .duckload extension increasing index if needed
-        let fm = FileManager.default
-        let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
-        do {
-            guard fm.createFile(atPath: tempURL.path, contents: nil, attributes: nil) else {
-                throw CocoaError(.fileWriteNoPermission)
+        // monitor our folder for download start
+        let fileDescriptor = open(itemReplacementDirectory.path, O_EVTONLY)
+        if fileDescriptor == -1 {
+            let err = errno
+            os_log(.error, log: log, "could not open \(itemReplacementDirectory.path): \(err) – \(String(cString: strerror(err)))")
+            throw NSError(domain: NSPOSIXErrorDomain, code: Int(err), userInfo: [NSLocalizedDescriptionKey: String(cString: strerror(err))])
+        }
+        let fileMonitor = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fileDescriptor, eventMask: .write, queue: .main)
+
+        // Set up a handler for file system events
+        fileMonitor.setEventHandler {
+            MainActor.assumeIsolated { // DispatchSource is set up with the main queue above
+                fileAddedHandler(tempURL)
             }
-            do {
-                downloadURL = try fm.moveItem(at: tempURL, to: downloadURL, incrementingIndexIfExists: true, pathExtension: ext)
-            } catch CocoaError.fileWriteNoPermission {
-                // [Sandbox] we have no access to whole directory, only to the localURL
-                // ask system for a temp directory on destination volume so we can adjust file quarantine attributes inside of it
-                itemReplacementDirectory = try fm.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: localURL, create: true)
-                downloadURL = try fm.moveItem(at: tempURL, to: itemReplacementDirectory!.appendingPathComponent(downloadFilename), incrementingIndexIfExists: true)
-            }
-        } catch CocoaError.fileWriteNoPermission {
-            try? fm.removeItem(at: tempURL)
-            downloadURL = localURL
-            // make sure we can write to the download location
-            guard fm.createFile(atPath: downloadURL.path, contents: nil, attributes: nil) else {
-                throw CocoaError(.fileWriteNoPermission)
+        }
+        await MainActor.run {
+            self.itemReplacementDirectory = itemReplacementDirectory
+            self.itemReplacementDirectoryFSOCancellable = AnyCancellable {
+                fileMonitor.cancel()
+                close(fileDescriptor)
             }
         }
 
-        // remove temp item and let WebKit download the file
-        try? fm.removeItem(at: downloadURL)
+        fileMonitor.resume()
 
-        return .init(destinationURL: localURL, tempURL: downloadURL, itemReplacementDirectory: itemReplacementDirectory)
+        return tempURL
+    }
+
+    /// when the download has started to a temporary directory, create a placeholder file at the destination URL and move the temp file to the destination directory as a `.duckload`
+    @MainActor
+    private func tempDownloadFileCreated(at tempURL: URL, destinationURL: URL) async {
+        os_log(.debug, log: log, "temp file created: \(self): \(tempURL.path)")
+
+        do {
+            let presenters = if case .downloading(destination: let destination, tempFile: let tempFile) = state {
+                // when “resuming” a non-resumable download - use the existing file presenters
+                try await self.reuseFilePresenters(tempFile: tempFile, destination: destination, tempURL: tempURL)
+            } else {
+                // instantiate File Presenters and move the temp file to the final destination directory
+                try await self.filePresenters(for: destinationURL, tempURL: tempURL)
+            }
+            self.state = .downloading(destination: presenters.destinationFile, tempFile: presenters.tempFile)
+
+        } catch {
+            os_log(.error, log: log, "🛑 file presenters failure: \(self): \(error)")
+
+            self.download.cancel()
+            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
+
+            Pixel.fire(.debug(event: .fileDownloadCreatePresentersFailed, error: error))
+        }
+    }
+
+    /// opens File Presenters for destination file and temp file
+    private nonisolated func filePresenters(for destinationURL: URL, tempURL: URL) async throws -> (tempFile: FilePresenter, destinationFile: FilePresenter) {
+        var destinationURL = destinationURL
+        let duckloadURL = destinationURL.deletingPathExtension().appendingPathExtension(Self.downloadExtension)
+        let fm = FileManager.default
+
+        // 🧙‍♂️ now we‘re doing do some magique here 🧙‍♂️
+        // --------------------------------------
+        os_log(.debug, log: log, "🧙‍♂️ magique.start: \"\(destinationURL.path)\" (\"\(duckloadURL.path)\") directory writable: \(fm.isWritableFile(atPath: destinationURL.deletingLastPathComponent().path))")
+        // 1. create our final destination file (let‘s say myfile.zip) and setup a File Presenter for it
+        //    doing this we preserve access to the file until it‘s actually downloaded
+        let destinationFilePresenter = try SandboxFilePresenter(url: destinationURL, consumeUnbalancedStartAccessingResource: true, logger: log) { url in
+            try fm.createFile(atPath: url.path, contents: nil) ? url : {
+                throw CocoaError(.fileWriteNoPermission, userInfo: [NSFilePathErrorKey: url.path])
+            }()
+        }
+        if duckloadURL == destinationURL {
+            // corner-case when downloading a `.duckload` file - the source and destination files will be the same then
+            return try await reuseFilePresenters(tempFile: destinationFilePresenter, destination: destinationFilePresenter, tempURL: tempURL)
+        }
+
+        // 2. mark the file as hidden until it‘s downloaded to not to confuse user
+        //    and prevent from unintentional opening of the empty file
+        var resourceValues = URLResourceValues()
+        resourceValues.isHidden = true
+        try destinationURL.setResourceValues(resourceValues)
+        os_log(.debug, log: log, "🧙‍♂️ \"\(destinationURL.path)\" hidden, moving temp file from \"\(tempURL.path)\" to \"\(duckloadURL.path)\"")
+
+        // 3. then we move the temporary download file to the destination directory (myfile.zip.duckload)
+        //    this is doable in sandboxed builds by using “Related Items” i.e. using a file URL with an extra
+        //    `.duckload` extension appended and “Primary Item” pointing to the sandbox-accessible destination URL
+        //    the `.duckload` document type is registered in the Info.plist with `NSIsRelatedItemType` flag
+        //
+        // -  after the file is downloaded we‘ll replace the destination file with the `.duckload` file
+        if fm.fileExists(atPath: duckloadURL.path) {
+            // remove the `.duckload` item if already exists
+            do {
+                try FilePresenter(url: duckloadURL, primaryItemURL: destinationURL).coordinateWrite(with: .forDeleting) { duckloadURL in
+                    try fm.removeItem(at: duckloadURL)
+                }
+            } catch {
+                // that‘s ok, we‘ll keep using the original temp file
+                os_log(.error, log: log, "❗️ could not remove \"\(duckloadURL.path)\" \(error)")
+            }
+        }
+        // now move the temp file to `.duckload` instantiating a File Presenter with it
+        let tempFilePresenter = try SandboxFilePresenter(url: duckloadURL, primaryItemURL: destinationURL, logger: log) { [log] duckloadURL in
+            do {
+                try fm.moveItem(at: tempURL, to: duckloadURL)
+            } catch {
+                // fallback: move failed, keep the temp file in the original location
+                os_log(.error, log: log, "🙁 fallback with \(error), will use \(tempURL.path)")
+                Pixel.fire(.debug(event: .fileAccessRelatedItemFailed, error: error))
+                return tempURL
+            }
+            return duckloadURL
+        }
+        os_log(.debug, log: log, "🧙‍♂️ \"\(duckloadURL.path)\" (\"\(tempFilePresenter.url?.path ?? "<nil>")\") ready")
+
+        return (tempFile: tempFilePresenter, destinationFile: destinationFilePresenter)
+    }
+
+    private nonisolated func reuseFilePresenters(tempFile: FilePresenter, destination: FilePresenter, tempURL: URL) async throws -> (tempFile: FilePresenter, destinationFile: FilePresenter) {
+        // if the download is “resumed” as a new download (replacing the destination file) -
+        // use the existing `.duckload` file and move the temp file in its place
+        _=try tempFile.coordinateWrite(with: .forReplacing) { duckloadURL in
+            try FileManager.default.replaceItemAt(duckloadURL, withItemAt: tempURL)
+        }
+
+        return (tempFile: tempFile, destinationFile: destination)
     }
 
     func cancel() {
@@ -187,144 +409,263 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
             }
             return
         }
-        download.cancel { [weak self] _ in
-            self?.downloadDidFail(with: URLError(.cancelled), resumeData: nil)
+        os_log(.debug, log: log, "cancel \(self)")
+        download.cancel { [weak self, log, taskDescr=self.debugDescription] resumeData in
+            os_log(.debug, log: log, "\(taskDescr): download.cancel callback")
+            DispatchQueue.main.asyncOrNow {
+                self?.downloadDidFail(with: URLError(.cancelled), resumeData: resumeData)
+            }
         }
     }
 
-    private func finish(with result: Result<URL, FileDownloadError>) {
-        dispatchPrecondition(condition: .onQueue(.main))
-        guard let fulfill = self.fulfill else {
-            // already finished
+    @MainActor
+    private func finish(with result: Result<FilePresenter, FileDownloadError>) {
+        assert(state.isInitial || state.isDownloading)
+        fileProgressPresenter = nil
+        itemReplacementDirectoryFSOCancellable = nil // in case we‘ve failed without the temp file been created
+
+        switch result {
+        case .success(let presenter):
+            let url = presenter.url
+            os_log(.debug, log: log, "finish \(self) with .success(\"\(url?.path ?? "<nil>")\")")
+
+            if progress.totalUnitCount == -1 {
+                progress.totalUnitCount = max(1, self.progress.completedUnitCount)
+            }
+            progress.completedUnitCount = progress.totalUnitCount
+
+            self.state = .downloaded(presenter)
+
+        case .failure(let error):
+            os_log(.debug, log: log, "finish \(self) with .failure(\(error))")
+
+            self.state = .failed(destination: error.isRetryable ? self.state.destinationFilePresenter : nil, // stop tracking removed files for non-retryable downloads
+                                 tempFile: error.isRetryable ? self.state.tempFilePresenter : nil,
+                                 resumeData: error.resumeData,
+                                 error: error)
+        }
+
+        self.delegate?.fileDownloadTask(self, didFinishWith: result.map { _ in })
+
+        // temp dir cleanup
+        if let itemReplacementDirectory,
+           // don‘t remove itemReplacementDirectory if we‘re keeping the temp file in it for a retryable error
+           self.state.tempFilePresenter?.url?.path.hasPrefix(itemReplacementDirectory.path) != true {
+
+            DispatchQueue.global().async { [log, itemReplacementDirectory] in
+                os_log(.debug, log: log, "removing \"\(itemReplacementDirectory.path)\"")
+                try? FileManager.default.removeItem(at: itemReplacementDirectory)
+            }
+            self.itemReplacementDirectory = nil
+        }
+    }
+
+    @MainActor
+    private func downloadDidFail(with error: Error, resumeData: Data?) {
+        guard case .downloading(destination: let destinationFile, tempFile: let tempFile) = self.state else {
+            // cancelled at early stage
+            if state.isInitial {
+                self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
+                return
+            }
+            os_log(.debug, log: log, "ignoring `cancel` for already completed task \(self)")
             return
         }
 
-        if case .success(let url) = result {
-            let newLocation = FileLocation(destinationURL: url, tempURL: nil)
-            if self.location != newLocation {
-                self.location = newLocation
-            }
-            if progress.fileURL != url {
-                progress.fileURL = url
-            }
-            if self.progress.totalUnitCount == -1 {
-                self.progress.totalUnitCount = 1
-            }
-            self.progress.completedUnitCount = self.progress.totalUnitCount
+        let tempURL = tempFile.url
+        // disable retrying download for user-removed/trashed files
+        let isRetryable = if tempURL == nil || tempURL.map({ !FileManager.default.fileExists(atPath: $0.path) || FileManager.default.isInTrash($0) }) == true {
+            false
+        } else {
+            true
         }
 
-        self.progress.unpublishIfNeeded()
+        os_log(.debug, log: log, "❗️ downloadDidFail \(self): \(error), retryable: \(isRetryable)")
+        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: resumeData, isRetryable: isRetryable)))
 
-        self.delegate?.fileDownloadTask(self, didFinishWith: result)
-        self.fulfill = nil
-        fulfill(result)
+        if !isRetryable {
+            DispatchQueue.global().async { [log, itemReplacementDirectory] in
+                let fm = FileManager()
+                try? destinationFile.coordinateWrite(with: .forDeleting) { url in
+                    os_log(.debug, log: log, "removing \"\(url.path)\"")
+                    try fm.removeItem(at: url)
+                }
+                try? tempFile.coordinateWrite(with: .forDeleting) { url in
+                    var url = url
+                    // if temp file is still in the itemReplacementDirectory - remove the itemReplacementDirectory
+                    if let itemReplacementDirectory, url.path.hasPrefix(itemReplacementDirectory.path) {
+                        url = itemReplacementDirectory
+                    }
+                    os_log(.debug, log: log, "removing \"\(url.path)\"")
+                    try fm.removeItem(at: url)
+                }
+            }
+            self.itemReplacementDirectory = nil
+        }
     }
 
-    private func downloadDidFail(with error: Error, resumeData: Data?) {
-        if resumeData == nil,
-           let tempURL = location.tempURL {
-            try? FileManager.default.removeItem(at: tempURL)
-            if let itemReplacementDirectory = location.itemReplacementDirectory {
-                try? FileManager.default.removeItem(at: itemReplacementDirectory)
+    /// when `downloadDidFinish` or `downloadDidFail` callback is received before File Presenters finish initialization -
+    /// we wait for the `state` to switch to `.downloading` and re-call the callback
+    private func waitForDownloadDidStart(completionHandler: @escaping @MainActor () -> Void) {
+        var cancellable: AnyCancellable?
+        cancellable = $state.receive(on: DispatchQueue.main).sink { state in
+            withExtendedLifetime(cancellable) {
+                switch state {
+                case .initial: return
+                case .downloading:
+                    MainActor.assumeIsolated(completionHandler)
+                    cancellable = nil
+                case .downloaded:
+                    pixelAssertionFailure("unexpected state change to \(state)")
+                    fallthrough
+                case .failed:
+                    // something went wrong while initializing File Presenters, but we‘re already completed
+                    cancellable = nil
+                }
             }
         }
-        self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error,
-                                                                 resumeData: resumeData,
-                                                                 isRetryable: location.destinationURL != nil)))
     }
 
     deinit {
-        dispatchPrecondition(condition: .onQueue(.main))
-        self.progress.unpublishIfNeeded()
-        assert(fulfill == nil, "FileDownloadTask is deallocated without finish(with:) been called")
+        @MainActor(unsafe)
+        func performRegardlessOfMainThread() {
+            os_log(.debug, log: log, "<Task \(download)>.deinit")
+            assert(state.isCompleted, "FileDownloadTask is deallocated without finish(with:) been called")
+        }
+        performRegardlessOfMainThread()
     }
 
 }
 
 extension WebKitDownloadTask: WKDownloadDelegate {
 
-    func download(_: WKDownload,
-                  decideDestinationUsing response: URLResponse,
-                  suggestedFilename: String,
-                  completionHandler: @escaping (URL?) -> Void) {
+    @MainActor
+    func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String) async -> URL? {
+        os_log(.debug, log: log, "decide destination \(self)")
 
         guard let delegate = delegate else {
             assertionFailure("WebKitDownloadTask: delegate is gone")
-            completionHandler(nil)
-            return
+            return nil
         }
 
-        if var mimeType = response.mimeType {
+        let suggestedFileType: UTType? = {
+            guard var mimeType = response.mimeType else { return nil }
             // drop ;charset=.. from "text/plain;charset=utf-8"
             if let charsetRange = mimeType.range(of: ";charset=") {
                 mimeType = String(mimeType[..<charsetRange.lowerBound])
             }
-            self.suggestedFileType = UTType(mimeType: mimeType)
-        }
-        if self.progress.totalUnitCount <= 0 {
-            self.progress.totalUnitCount = response.expectedContentLength
+            return UTType(mimeType: mimeType)
+        }()
+        if progress.totalUnitCount <= 0 {
+            progress.totalUnitCount = response.expectedContentLength
         }
 
         var suggestedFilename = suggestedFilename
         // sometimes suggesteFilename has an extension appended to already present URL file extension
         // e.g. feed.xml.rss for www.domain.com/rss.xml
         if let urlSuggestedFilename = response.url?.suggestedFilename,
-           !urlSuggestedFilename.pathExtension.isEmpty,
+           !(urlSuggestedFilename.pathExtension.isEmpty || (suggestedFileType == .html && urlSuggestedFilename.pathExtension == "html")),
            suggestedFilename.hasPrefix(urlSuggestedFilename) {
             suggestedFilename = urlSuggestedFilename
         }
 
-        self.suggestedFilename = suggestedFilename
-        self.decideDestinationCompletionHandler = completionHandler
-
-        if let destinationURL = location.destinationURL {
-            self.localFileURLCompletionHandler(localURL: destinationURL, fileType: self.suggestedFileType)
+        var cleanupStyle: DestinationCleanupStyle = .remove
+        guard let destinationURL = switch state {
+        case .initial(.auto), .initial(.prompt):
+            await delegate.fileDownloadTaskNeedsDestinationURL(self, suggestedFilename: suggestedFilename, suggestedFileType: suggestedFileType).0
+        case .initial(.preset(let destinationURL)):
+            destinationURL
+        case .initial(.resume(destination: let destination, tempFile: _)): {
+            cleanupStyle = .clear
+            return destination.url
+        }()
+        case .downloading, .downloaded, .failed: {
+            assertionFailure("Unexpected state in decideDestination callback – \(state)")
+            return nil
+        }()
         } else {
-            delegate.fileDownloadTaskNeedsDestinationURL(self,
-                                                         suggestedFilename: suggestedFilename,
-                                                         completionHandler: self.localFileURLCompletionHandler)
+            return nil
         }
+
+        return await prepareChosenDestinationURL(destinationURL, fileType: suggestedFileType, cleanupStyle: cleanupStyle)
     }
 
-    func download(_: WKDownload,
+    @MainActor
+    func download(_ download: WKDownload,
                   willPerformHTTPRedirection response: HTTPURLResponse,
                   newRequest request: URLRequest,
                   decisionHandler: @escaping (WKDownload.RedirectPolicy) -> Void) {
+        os_log(log: log, "will perform HTTP redirection \(self): \(response) to \(request)")
         decisionHandler(.allow)
     }
 
+    @MainActor
     func download(_ download: WKDownload,
                   didReceive challenge: URLAuthenticationChallenge,
                   completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        os_log(log: log, "did receive challenge \(self): \(challenge)")
         download.webView?.navigationDelegate?.webView?(download.webView!, didReceive: challenge, completionHandler: completionHandler) ?? {
             completionHandler(.performDefaultHandling, nil)
         }()
     }
 
-    func downloadDidFinish(_: WKDownload) {
-        guard var destinationURL = location.destinationURL else {
-            self.finish(with: .failure(.failedToMoveFileToDownloads))
+    @MainActor
+    func downloadDidFinish(_ download: WKDownload) {
+        let fm = FileManager.default
+
+        guard case .downloading(destination: let destinationFile, tempFile: let tempFile) = self.state else {
+            // if we receive `downloadDidFinish:` before the File Presenters are set up (async)
+            // - we‘ll be waiting for the `.downloading` state to come in with the presenters
+            os_log(log: log, "🏁 download did finish too early, we‘ll wait for the `.downloading` state: \(self)")
+            assert(itemReplacementDirectory != nil, "itemReplacementDirectory should be set")
+            waitForDownloadDidStart { [weak self] in
+                self?.downloadDidFinish(download)
+            }
             return
         }
-        // set quarantine attributes
-        try? (location.tempURL ?? destinationURL).setQuarantineAttributes(sourceURL: originalRequest?.url, referrerURL: originalRequest?.mainDocumentURL)
+        os_log(log: log, "🏁 download did finish: \(self)")
 
-        if let tempURL = location.tempURL, tempURL != destinationURL {
-            do {
-                destinationURL = try FileManager.default.moveItem(at: tempURL, to: destinationURL, incrementingIndexIfExists: true)
-            } catch {
-                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
-                destinationURL = tempURL
+        do {
+            try tempFile.coordinateWrite(with: .forMoving) { tempURL in
+                // replace destination file with temp file
+                try destinationFile.coordinateWrite(with: .forReplacing) { [log] destinationURL in
+                    if destinationURL != tempURL { // could be a corner-case when downloading a `.duckload` file
+                        os_log(.debug, log: log, "replacing \"\(destinationURL.path)\" with \"\(tempURL.path)\"")
+                        _=try fm.replaceItemAt(destinationURL, withItemAt: tempURL)
+                    }
+                    // set quarantine attributes
+                    try? destinationURL.setQuarantineAttributes(sourceURL: originalRequest?.url, referrerURL: originalRequest?.mainDocumentURL)
+                }
             }
-        }
-        if let itemReplacementDirectory = location.itemReplacementDirectory {
-            try? FileManager.default.removeItem(at: itemReplacementDirectory)
-        }
+            // remove temp file item replacement directory if present
+            if let itemReplacementDirectory {
+                os_log(.debug, log: log, "removing \(itemReplacementDirectory.path)")
+                try? fm.removeItem(at: itemReplacementDirectory)
+                self.itemReplacementDirectory = nil
+            }
+            self.finish(with: .success(destinationFile))
 
-        self.finish(with: .success(destinationURL))
+        } catch {
+            Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: error))
+            os_log(.error, log: log, "fileMoveToDownloadsFailed: \(error)")
+            self.finish(with: .failure(.failedToCompleteDownloadTask(underlyingError: error, resumeData: nil, isRetryable: false)))
+        }
     }
 
+    @MainActor
     func download(_: WKDownload, didFailWithError error: Error, resumeData: Data?) {
+        // if we receive `downloadDidFail:` before File Presenters are set up (async)
+        // - we‘ll be waiting for the `.downloading` state to come in with the presenters
+        guard state.isDownloading
+                // in case the File Presenters instantiation task is still running - we‘ll either receive the `state` change
+                // or the task will be finished with a file error
+                || itemReplacementDirectoryFSOCancellable == nil else {
+            os_log(log: log, "❌ download did fail too early, we‘ll wait for the `.downloading` state: \(self)")
+            waitForDownloadDidStart { [weak self] in
+                self?.downloadDidFail(with: error, resumeData: resumeData)
+            }
+            return
+        }
         downloadDidFail(with: error, resumeData: resumeData)
     }
 
@@ -333,18 +674,66 @@ extension WebKitDownloadTask: WKDownloadDelegate {
 extension WebKitDownloadTask {
 
     var didChooseDownloadLocationPublisher: AnyPublisher<URL, FileDownloadError> {
-        Publishers.Merge(
-            $location
-            // waiting for the download location to be chosen
-                .compactMap { $0.destinationURL }
-                .mapError { (_: Never) -> FileDownloadError in }
-                .eraseToAnyPublisher(),
-            // downloadTask.output Publisher will complete with an error if cancelled
-            output.eraseToAnyPublisher()
-        )
-        // complete the Publisher when the location is chosen
+        $state.tryCompactMap { state in
+            switch state {
+            case .initial:
+                return nil
+            case .downloading(destination: let destinationFile, _),
+                 .downloaded(let destinationFile):
+                return destinationFile.url
+            case .failed(_, _, resumeData: _, error: let error):
+                throw error
+            }
+        }
+        .mapError { $0 as! FileDownloadError } // swiftlint:disable:this force_cast
         .first()
         .eraseToAnyPublisher()
+    }
+
+}
+
+extension WebKitDownloadTask {
+
+    override var description: String {
+        guard Thread.isMainThread else {
+#if DEBUG
+            os_log("""
+
+
+            ------------------------------------------------------------------------------------------------------
+                BREAK:
+            ------------------------------------------------------------------------------------------------------
+
+            ❗️accessing WebKitDownloadTask.description from non-main thread
+
+                Hit Continue (^⌘Y) to continue program execution
+            ------------------------------------------------------------------------------------------------------
+
+            """, type: .fault)
+            raise(SIGINT)
+#endif
+            return ""
+        }
+        return MainActor.assumeIsolated {
+            "<Task \(download) – \(state)>"
+        }
+    }
+
+}
+
+extension WebKitDownloadTask.FileDownloadState: CustomDebugStringConvertible {
+
+    var debugDescription: String {
+        switch self {
+        case .initial(let destination):
+            ".initial(\(destination))"
+        case .downloading(destination: let destination, tempFile: let tempFile):
+            ".downloading(dest: \"\(destination.url?.path ?? "<nil>")\", temp: \"\(tempFile.url?.path ?? "<nil>")\")"
+        case .downloaded(let destination):
+            ".downloaded(dest: \"\(destination.url?.path ?? "<nil>")\")"
+        case .failed(destination: let destination, tempFile: let tempFile, resumeData: let resumeData, error: let error):
+            ".failed(dest: \"\(destination?.url?.path ?? "<nil>")\", temp: \"\(tempFile?.url?.path ?? "<nil>")\", resumeData: \(resumeData?.description ?? "<nil>") error: \(error))"
+        }
     }
 
 }

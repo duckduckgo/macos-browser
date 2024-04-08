@@ -23,11 +23,11 @@ import DataBrokerProtection
 
 final class DataBrokerProtectionSubscriptionEventHandler {
 
-    private let accountManager: Subscription.AccountManaging
+    private let accountManager: AccountManaging
     private let authRepository: AuthenticationRepository
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
-    init(accountManager: Subscription.AccountManaging = AccountManager(),
+    init(accountManager: AccountManaging = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)),
          authRepository: AuthenticationRepository = KeychainAuthenticationData(),
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
         self.accountManager = accountManager

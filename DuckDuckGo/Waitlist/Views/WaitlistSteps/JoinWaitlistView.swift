@@ -48,18 +48,18 @@ struct JoinWaitlistView: View {
 
                 Text(viewData.subtitle1)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(Color("BlackWhite80"))
+                    .foregroundColor(Color(.blackWhite80))
 
                 if !viewData.subtitle2.isEmpty {
                     Text(viewData.subtitle2)
                         .multilineTextAlignment(.center)
-                        .foregroundColor(Color("BlackWhite80"))
+                        .foregroundColor(Color(.blackWhite80))
                 }
 
                 Text(viewData.availabilityDisclaimer)
                     .multilineTextAlignment(.center)
                     .font(.system(size: 12))
-                    .foregroundColor(Color("BlackWhite60"))
+                    .foregroundColor(Color(.blackWhite60))
             }
         } buttons: {
             Button(viewData.buttonCloseLabel) {

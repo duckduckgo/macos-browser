@@ -21,11 +21,11 @@ import Foundation
 final class UserText {
     static let networkProtectionStatusViewFeatureDesc = NSLocalizedString("network.protection.status.view.feature.description", value: "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere.", comment: "Feature description shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewConnDetails = NSLocalizedString("network.protection.status.view.connection.details", value: "Connection Details", comment: "Connection details label shown in NetworkProtection's status view.")
-    static let networkProtectionStatusViewConnLabel = NSLocalizedString("network.protection.status.view.connection.label", value: "Network Protection", comment: "Connection label shown in NetworkProtection's status view.")
+    static let networkProtectionStatusViewConnLabel = NSLocalizedString("network.protection.status.view.connection.label", value: "VPN", comment: "Connection label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewLocation = NSLocalizedString("network.protection.status.view.location", value: "Location", comment: "Location label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewIPAddress = NSLocalizedString("network.protection.status.view.ip.address", value: "IP Address", comment: "IP Address label shown in NetworkProtection's status view.")
-    static let networkProtectionStatusViewFeatureOff = NSLocalizedString("network.protection.status.view.feature.on", value: "Network Protection is OFF", comment: "Text shown in NetworkProtection's status view when NetP is OFF.")
-    static let networkProtectionStatusViewFeatureOn = NSLocalizedString("network.protection.status.view.feature.on", value: "Network Protection is ON", comment: "Text shown in NetworkProtection's status view when NetP is ON.")
+    static let networkProtectionStatusViewFeatureOff = NSLocalizedString("network.protection.status.view.feature.on", value: "DuckDuckGo VPN is OFF", comment: "Text shown in NetworkProtection's status view when NetP is OFF.")
+    static let networkProtectionStatusViewFeatureOn = NSLocalizedString("network.protection.status.view.feature.on", value: "DuckDuckGo VPN is ON", comment: "Text shown in NetworkProtection's status view when NetP is ON.")
     static let networkProtectionStatusViewTimerZero = "00:00:00"
 
     // MARK: - Onboarding
@@ -39,7 +39,8 @@ final class UserText {
     static let networkProtectionOnboardingAllowVPNTitle = NSLocalizedString("network.protection.onboarding.allow.vpn.title", value: "Add VPN Configuration", comment: "Title for the onboarding allow-VPN step")
     static let networkProtectionOnboardingAllowVPNDescPrefix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.prefix", value: "Select ", comment: "Non-bold prefix for the onboarding allow-VPN description")
     static let networkProtectionOnboardingAllowVPNDescAllow = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.allow", value: "Allow", comment: "'Allow' word between the prefix and suffix for the onboarding allow-VPN description")
-    static let networkProtectionOnboardingAllowVPNDescSuffix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.suffix", value: " when prompted to finish setting up Network Protection.", comment: "Non-bold suffix for the onboarding allow-VPN description")
+    static let networkProtectionOnboardingAllowVPNDescSuffix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.suffix", value: " when prompted to finish setting up VPN.", comment: "Non-bold suffix for the onboarding allow-VPN description")
+    static let networkProtectionOnboardingAllowVPNDescExpandedSuffix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.expanded.suffix", value: " when prompted to finish setting up VPN.\n\nThis adds a shortcut in the menu bar so you can still access the VPN if the browser isn't running.", comment: "Non-bold suffix for the onboarding allow-VPN description")
     static let networkProtectionOnboardingAllowVPNAction = NSLocalizedString("network.protection.onboarding.allow.vpn.action", value: "Add VPN Configuration...", comment: "Action button title for the onboarding allow-VPN view")
 
     static let networkProtectionOnboardingMoveToApplicationsTitle = NSLocalizedString("network.protection.onboarding.move.to.applications.title", value: "Move DuckDuckGo App", comment: "Title for the onboarding move-app-to-applications step")
@@ -55,8 +56,8 @@ final class UserText {
 
     // MARK: - Connection Issues
 
-    static let networkProtectionInterruptedReconnecting = NSLocalizedString("network.protection.interrupted.reconnecting", value: "Your Network Protection connection was interrupted. Attempting to reconnect now...", comment: "The warning message shown in NetP's status view when the connection is interrupted and its attempting to reconnect.")
-    static let networkProtectionInterrupted = NSLocalizedString("network.protection.interrupted", value: "Network Protection was unable to connect at this time. Please try again later.", comment: "The warning message shown in NetP's status view when the connection is interrupted.")
+    static let networkProtectionInterruptedReconnecting = NSLocalizedString("network.protection.interrupted.reconnecting", value: "Your VPN connection was interrupted. Attempting to reconnect now...", comment: "The warning message shown in NetP's status view when the connection is interrupted and its attempting to reconnect.")
+    static let networkProtectionInterrupted = NSLocalizedString("network.protection.interrupted", value: "The VPN was unable to connect at this time. Please try again later.", comment: "The warning message shown in NetP's status view when the connection is interrupted.")
 
     // MARK: - Connection Information
 
@@ -66,4 +67,11 @@ final class UserText {
         let localized = NSLocalizedString("network.protection.server.location.link", value: "%@...", comment: "Clickable text linking to the server location picker screen")
         return String(format: localized, location)
     }
+
+    // MARK: Subscription Expired
+
+    static let networkProtectionSubscriptionExpiredTitle = NSLocalizedString("network.protection.subscription.expired.title", value: "VPN disconnected", comment: "Title for the prompt that tells the user their subscription expired.")
+    static let networkProtectionSubscriptionExpiredSubtitle = NSLocalizedString("network.protection.subscription.expired.subtitle", value: "Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.", comment: "Subtitle for the prompt that tells the user their subscription expired.")
+    static let networkProtectionSubscriptionExpiredResubscribeButton = NSLocalizedString("network.protection.subscription.expired.resubscribe.button", value: "Subscribe to Privacy Pro", comment: "Button for the prompt that takes the user to the page to resubscribe.")
+    static let networkProtectionSubscriptionExpiredUninstallButton = NSLocalizedString("network.protection.subscription.expired.uninstall.button", value: "Uninstall DuckDuckGo VPN", comment: "Button for the prompt that uninstalls the VPN.")
 }

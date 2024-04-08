@@ -16,22 +16,26 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
-import BrowserServicesKit
+import Common
 
 final class TabViewModel {
 
     enum Favicon {
-        static let home = NSImage(named: "HomeFavicon")!
-        static let burnerHome = NSImage(named: "BurnerTabFavicon")!
-        static let preferences = NSImage(named: "Preferences")!
-        static let bookmarks = NSImage(named: "Bookmarks")!
-        static let dataBrokerProtection = NSImage(named: "BurnerWindowIcon2")! // PLACEHOLDER: Change it once we have the final icon
+        static let home = NSImage.homeFavicon
+        static let burnerHome = NSImage.burnerTabFavicon
+        static let preferences = NSImage.preferences
+        static let bookmarks = NSImage.bookmarks
+        static let dataBrokerProtection = NSImage.dbpIcon
+        static let subscription = NSImage.subscriptionIcon
+        static let identityTheftRestoration = NSImage.itrIcon
     }
 
     private(set) var tab: Tab
     private let appearancePreferences: AppearancePreferences
+    private let accessibilityPreferences: AccessibilityPreferences
     private var cancellables = Set<AnyCancellable>()
 
     @Published private(set) var canGoForward: Bool = false
@@ -59,7 +63,6 @@ final class TabViewModel {
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
-    private(set) var addressBarHasUpdated: Bool = false
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
@@ -76,9 +79,12 @@ final class TabViewModel {
         !isShowingErrorPage && canReload && !tab.webView.isInFullScreenMode
     }
 
-    init(tab: Tab, appearancePreferences: AppearancePreferences = .shared) {
+    init(tab: Tab,
+         appearancePreferences: AppearancePreferences = .shared,
+         accessibilityPreferences: AccessibilityPreferences = .shared) {
         self.tab = tab
         self.appearancePreferences = appearancePreferences
+        self.accessibilityPreferences = accessibilityPreferences
 
         subscribeToUrl()
         subscribeToCanGoBackForwardAndReload()
@@ -86,7 +92,7 @@ final class TabViewModel {
         subscribeToFavicon()
         subscribeToTabError()
         subscribeToPermissions()
-        subscribeToAppearancePreferences()
+        subscribeToPreferences()
         subscribeToWebViewDidFinishNavigation()
         tab.$isLoading
             .assign(to: \.isLoading, onWeaklyHeld: self)
@@ -94,30 +100,60 @@ final class TabViewModel {
         tab.$loadingProgress
             .assign(to: \.progress, onWeaklyHeld: self)
             .store(in: &cancellables)
+        if case .url(_, credential: _, source: .pendingStateRestoration) = tab.content {
+            updateAddressBarStrings()
+        }
     }
 
     private func subscribeToUrl() {
+        enum Event {
+            case instant
+            case didCommit
+        }
         tab.$content
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] content in
-                self?.waitToUpdateAddressBar(content)
-            }
-            .store(in: &cancellables)
-    }
+            .map { [tab] content -> AnyPublisher<Event, Never> in
+                switch content {
+                case .url(let url, _, source: .webViewUpdated),
+                     .url(let url, _, source: .link):
 
-    private func waitToUpdateAddressBar(_ content: Published<Tab.TabContent>.Publisher.Output) {
-        self.addressBarHasUpdated = false
-        tab.$loadingProgress
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] progress in
-                // Update the address bar only after the tab has reached 10% loading
-                // to prevent Address Bar Spoofing
-                if progress > 0.1 && !(self?.addressBarHasUpdated ?? true) {
-                    self?.updateAddressBarStrings()
-                    self?.updateCanBeBookmarked()
-                    self?.updateFavicon()
-                    self?.addressBarHasUpdated = true
+                    // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
+                    return tab.$committedURL.filter { committedURL in
+                        committedURL == url
+                    }.map { _ in
+                        .didCommit
+                    }.eraseToAnyPublisher()
+
+                case .url(_, _, source: .userEntered(_, downloadRequested: true)):
+                    // don‘t update the address bar for download navigations
+                    return Empty().eraseToAnyPublisher()
+
+                case .url(_, _, source: .pendingStateRestoration),
+                     .url(_, _, source: .loadedByStateRestoration),
+                     .url(_, _, source: .userEntered),
+                     .url(_, _, source: .historyEntry),
+                     .url(_, _, source: .bookmark),
+                     .url(_, _, source: .ui),
+                     .url(_, _, source: .appOpenUrl),
+                     .url(_, _, source: .reload),
+                     .newtab,
+                     .settings,
+                     .bookmarks,
+                     .onboarding,
+                     .none,
+                     .dataBrokerProtection,
+                     .subscription,
+                     .identityTheftRestoration:
+                    // Update the address bar instantly for built-in content types or user-initiated navigations
+                    return Just( .instant ).eraseToAnyPublisher()
                 }
+            }
+            .switchToLatest()
+            .sink { [weak self] _ in
+                guard let self else { return }
+
+                updateAddressBarStrings()
+                updateFavicon()
+                updateCanBeBookmarked()
             }
             .store(in: &cancellables)
     }
@@ -154,18 +190,20 @@ final class TabViewModel {
             .filter { [weak self] _ in
                 self?.tab.isLazyLoadingInProgress == false
             }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.updateFavicon()
+            .sink { [weak self] favicon in
+                self?.updateFavicon(favicon)
             }
             .store(in: &cancellables)
     }
 
     private func subscribeToTabError() {
-        tab.$error.sink { [weak self] _ in
-            self?.updateTitle()
-            self?.updateFavicon()
-        }.store(in: &cancellables)
+        tab.$error
+            .map { $0 != nil }
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.updateTitle()
+                self?.updateFavicon()
+            }.store(in: &cancellables)
     }
 
     private func subscribeToPermissions() {
@@ -175,12 +213,12 @@ final class TabViewModel {
             .store(in: &cancellables)
     }
 
-    private func subscribeToAppearancePreferences() {
+    private func subscribeToPreferences() {
         appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
             guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
             self.updatePassiveAddressBarString(showURL: newValue, url: url, hostURL: host)
         }.store(in: &cancellables)
-        appearancePreferences.$defaultPageZoom.sink { [weak self] newValue in
+        accessibilityPreferences.$defaultPageZoom.sink { [weak self] newValue in
             guard let self = self else { return }
             self.tab.webView.defaultZoomValue = newValue
             self.tab.webView.zoomLevel = newValue
@@ -205,7 +243,7 @@ final class TabViewModel {
         return tabURL?.root
     }
 
-    func updateAddressBarStrings() {
+    private func updateAddressBarStrings() {
         guard tab.content.isUrl, let url = tabURL else {
             addressBarString = ""
             passiveAddressBarString = ""
@@ -270,11 +308,13 @@ final class TabViewModel {
             }
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none, .subscription:
+        case .url, .none, .subscription, .identityTheftRestoration:
             if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
                 title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
                 title = host
+            } else if let url = tab.url, url.isFileURL {
+                title = url.lastPathComponent
             } else {
                 title = addressBarString
             }
@@ -284,7 +324,7 @@ final class TabViewModel {
         }
     }
 
-    private func updateFavicon() {
+    private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
             favicon = .alertCircleColor16
             return
@@ -307,13 +347,19 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .none, .subscription: break
+        case .subscription:
+            favicon = Favicon.subscription
+            return
+        case .identityTheftRestoration:
+            favicon = Favicon.identityTheftRestoration
+            return
+        case .url, .onboarding, .none: break
         }
 
-        if let favicon = tab.favicon {
+        if let favicon: NSImage? = tabFavicon {
             self.favicon = favicon
         } else {
-            favicon = nil
+            self.favicon = tab.favicon
         }
     }
 

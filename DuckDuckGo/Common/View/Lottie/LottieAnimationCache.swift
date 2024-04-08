@@ -22,21 +22,32 @@ import Lottie
 final class LottieAnimationCache: AnimationCacheProvider {
 
     static let shared = LottieAnimationCache()
+    private let lock = NSRecursiveLock()
 
-    private var cache = [String: Animation]()
+    private var cache: [String: LottieAnimation] = [:]
 
-    func animation(forKey: String) -> Animation? {
+    func animation(forKey: String) -> LottieAnimation? {
+        lock.lock()
+        defer { lock.unlock() }
         return cache[forKey]
     }
 
-    func setAnimation(_ animation: Animation, forKey: String) {
+    func setAnimation(_ animation: LottieAnimation, forKey: String) {
+        lock.lock()
+        defer { lock.unlock() }
         if cache[forKey] == nil {
             cache[forKey] = animation
         }
     }
 
     func clearCache() {
-        cache = [String: Animation]()
+        lock.lock()
+        defer { lock.unlock() }
+        cache = [String: LottieAnimation]()
     }
 
 }
+
+// `AnimationCacheProvider` conforms now to `Sendable`. This generates the warning `Stored property 'cache' of 'Sendable'-conforming class 'LottieAnimationCache' is mutable`.
+// Implemented a lock mechanism and removed compiler strict check for Sendable requirement.
+extension LottieAnimationCache: @unchecked Sendable {}

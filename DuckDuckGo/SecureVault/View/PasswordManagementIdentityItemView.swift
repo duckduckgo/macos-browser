@@ -41,7 +41,7 @@ struct PasswordManagementIdentityItemView: View {
                 if editMode {
 
                     RoundedRectangle(cornerRadius: 8)
-                        .foregroundColor(Color(NSColor.editingPanelColor))
+                        .foregroundColor(Color(.editingPanel))
                         .shadow(radius: 6)
 
                 }
@@ -106,7 +106,7 @@ private struct IdentificationView: View {
             EditableIdentityField(textFieldValue: $model.lastName, title: UserText.pmLastName)
 
             if model.isInEditMode {
-                Text("Birthday")
+                Text("Birthday", comment: "Title of the section of the Identities manager where the user can add/modify a date of birth")
                     .bold()
                     .padding(.bottom, 5)
 
@@ -219,7 +219,7 @@ private struct AddressView: View {
                 !model.addressPostalCode.isEmpty ||
                 !model.addressCountryCode.isEmpty ||
                 model.isInEditMode {
-                Text("Address")
+                Text("Address", comment: "Title of the section of the Identities manager where the user can add/modify an address (street city etc,)")
                     .bold()
                     .foregroundColor(.gray)
                     .padding(.bottom, 20)
@@ -232,7 +232,7 @@ private struct AddressView: View {
             EditableIdentityField(textFieldValue: $model.addressPostalCode, title: UserText.pmAddressPostalCode)
 
             if model.isInEditMode {
-                Text("Country")
+                Text("Country", comment: "Title of the section of the Identities manager where the user can add/modify a country (US,UK, Italy etc...)")
                     .bold()
                     .padding(.bottom, 5)
 
@@ -252,7 +252,7 @@ private struct AddressView: View {
                 .padding(.bottom, 5)
 
             } else if !model.addressCountryCode.isEmpty {
-                Text("Country")
+                Text("Country", comment: "Title of the section of the Identities manager where the user can add/modify a country (US,UK, Italy etc...)")
                     .bold()
                     .padding(.bottom, 5)
 
@@ -273,7 +273,7 @@ private struct ContactInfoView: View {
 
         VStack(alignment: .leading, spacing: 0) {
             if !model.homePhone.isEmpty || !model.mobilePhone.isEmpty || !model.emailAddress.isEmpty || model.isInEditMode {
-                Text("Contact Info")
+                Text("Contact Info", comment: "Title of the section of the Identities manager where the user can add/modify contact info (phone, email address)")
                     .bold()
                     .foregroundColor(.gray)
                     .padding(.bottom, 20)
@@ -297,7 +297,7 @@ private struct HeaderView: View {
 
         HStack(alignment: .center, spacing: 0) {
 
-            Image("Identity")
+            Image(.identity)
                 .padding(.trailing, 10)
 
             if model.isNew || model.isEditing {
@@ -398,7 +398,7 @@ private struct EditableIdentityField: View {
                             Button {
                                 model.copy(textFieldValue)
                             } label: {
-                                Image("Copy")
+                                Image(.copy)
                             }.buttonStyle(PlainButtonStyle())
                         }
 

@@ -38,7 +38,7 @@ final class AuthenticationServiceTests: XCTestCase {
 
     func testWhenFailsOnNetworkingLayer_thenNoAuthenticationErrorIsThrown() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
-        let sut = AuthenticationService(urlSession: mockURLSession)
+        let sut = AuthenticationService(urlSession: mockURLSession, settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
             _ = try await sut.redeem(inviteCode: "someInviteCode")
@@ -54,7 +54,7 @@ final class AuthenticationServiceTests: XCTestCase {
         let emptyMessageResponseData = try? JSONEncoder().encode(RedeemResponse(accessToken: nil, message: nil))
         let emptyMessageResponse: RequestHandler = { _ in (HTTPURLResponse.ok, emptyMessageResponseData) }
         MockURLProtocol.requestHandlerQueue.append(emptyMessageResponse)
-        let sut = AuthenticationService(urlSession: mockURLSession)
+        let sut = AuthenticationService(urlSession: mockURLSession, settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
             _ = try await sut.redeem(inviteCode: "someInviteCode")
@@ -77,7 +77,7 @@ final class AuthenticationServiceTests: XCTestCase {
         let failureCriticalResponseData = try? JSONEncoder().encode(RedeemResponse(accessToken: nil, message: message))
         let failureCriticalResponse: RequestHandler = { _ in (HTTPURLResponse.ok, failureCriticalResponseData) }
         MockURLProtocol.requestHandlerQueue.append(failureCriticalResponse)
-        let sut = AuthenticationService(urlSession: mockURLSession)
+        let sut = AuthenticationService(urlSession: mockURLSession, settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
             _ = try await sut.redeem(inviteCode: "someInviteCode")
@@ -99,7 +99,7 @@ final class AuthenticationServiceTests: XCTestCase {
         let emptyMessageResponseData = try? JSONEncoder().encode(RedeemResponse(accessToken: "accessToken", message: nil))
         let emptyMessageResponse: RequestHandler = { _ in (HTTPURLResponse.ok, emptyMessageResponseData) }
         MockURLProtocol.requestHandlerQueue.append(emptyMessageResponse)
-        let sut = AuthenticationService(urlSession: mockURLSession)
+        let sut = AuthenticationService(urlSession: mockURLSession, settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
             let accessToken = try await sut.redeem(inviteCode: "someInviteCode")

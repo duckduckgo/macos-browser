@@ -2,6 +2,7 @@
 
 # Constants
 S3_PATH="s3://ddg-staticcdn/macos-desktop-browser/"
+CDN_PATH="https://staticcdn.duckduckgo.com/macos-desktop-browser/"
 
 # Defaults
 if [[ -n "$CI" ]]; then
@@ -149,13 +150,13 @@ for FILENAME in $FILES_TO_UPLOAD; do
     fi
 
     # Check if the file exists on S3
-    AWS_CMD="$AWS s3 ls ${S3_PATH}${FILENAME}"
-    echo "Checking S3 for ${S3_PATH}${FILENAME}..."
-    if ! $AWS s3 ls "${S3_PATH}${FILENAME}" > /dev/null 2>&1; then
-        echo "$FILENAME not found on S3. Marking for upload."
-        MISSING_FILES+=("$FILENAME")
+    printf '%s' "Checking CDN for ${CDN_PATH}${FILENAME} ... "
+    if curl -fLSsI "${CDN_PATH}${FILENAME}" >/dev/null 2>&1; then
+        echo "✅"
     else
-        echo "$FILENAME exists on S3. Skipping."
+        echo "❌"
+        echo "🚢 Marking $FILENAME for upload."
+        MISSING_FILES+=("$FILENAME")
     fi
 done
 

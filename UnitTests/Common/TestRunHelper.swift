@@ -52,7 +52,9 @@ extension TestRunHelper: XCTestObservation {
 
     func testBundleDidFinish(_ testBundle: Bundle) {
         if case .integrationTests = NSApp.runType {
-            FileManager.default.cleanupTemporaryDirectory()
+            FileManager.default.cleanupTemporaryDirectory(excluding: ["Database.sqlite",
+                                                                      "Database.sqlite-wal",
+                                                                      "Database.sqlite-shm"])
         }
     }
 
@@ -68,6 +70,7 @@ extension TestRunHelper: XCTestObservation {
         if case .unitTests = NSApp.runType {
             // cleanup dedicated temporary directory before each test run
             FileManager.default.cleanupTemporaryDirectory()
+            NSAnimationContext.current.duration = 0
         }
         NSApp.swizzled_currentEvent = nil
     }

@@ -50,7 +50,9 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         Task {
             let data = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
 
-            let dataBrokers = data.map { $0.dataBroker }
+            let profileBrokers = data.map { $0.dataBroker }
+            let dataBrokers = Array(Set(profileBrokers)).sorted { $0.id ?? 0 < $1.id ?? 0 }
+
             let profileQuery = Array(Set(data.map { $0.profileQuery }))
             let scanOperations = data.map { $0.scanOperationData }
             let optOutOperations = data.flatMap { $0.optOutOperationsData }

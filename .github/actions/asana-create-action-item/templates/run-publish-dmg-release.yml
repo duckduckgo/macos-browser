@@ -1,0 +1,38 @@
+data:
+  name: Run Publish DMG Release GitHub Actions workflow
+  assignee: "${ASSIGNEE_ID}"
+  html_notes: |
+    <body>
+      <h1>Using GH CLI</h1>
+      Run the following command:
+
+
+      <code>gh workflow run publish_dmg_release.yml --ref ${BRANCH} -f asana-task-url=${ASANA_TASK_URL} -f tag=${TAG} -f release-type=internal</code>
+      <h1>Using GitHub web UI</h1>
+      <ol>
+        <li>Open <a href='https://github.com/duckduckgo/macos-browser/actions/workflows/publish_dmg_release.yml'>Publish DMG Release workflow page</a>.</li>
+        <li>Click "Run Workflow" and fill in the form as follows:
+          <ul>
+            <li><b>Branch</b> <code>${BRANCH}</code></li>
+            <li><b>Asana release task URL</b> <code>${ASANA_TASK_URL}</code></li>
+            <li><b>Tag to publish</b> <code>${TAG}</code></li>
+            <li><b>Release Type</b> <code>internal</code></li>
+          </ul></li>
+      </ol>
+
+      The GitHub Action workflow does the following:
+      <ul>
+        <li>Fetches the release DMG from staticcdn.duckduckgo.com</li>
+        <li>Extracts release notes from the Asana task description</li>
+        <li>Runs <code>appcastManager</code> to generate the new appcast2.xml file</li>
+        <li>Stores the diff against previous version and the copy of the old appcast2.xml file</li>
+        <li>Uploads new appcast, DMG and binary delta files to S3</li>
+        <li>On success, creates a task for the release DRI to validate that "Check for Updates" works, with instructions on how to revert that change if "Check for Updates" is broken.</li>
+        <li>On failure, creates a task for the release DRI with manual instructions on generating the appcast and uploading to S3.</li>
+      </ul>
+
+      Complete this task when ready and proceed with testing the build. If GitHub Actions is unavailable, you'll find manual instructions in the <em>Run Publish DMG Release GitHub Actions workflow</em> subtask of <em>Make Internal Release</em> task.
+
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

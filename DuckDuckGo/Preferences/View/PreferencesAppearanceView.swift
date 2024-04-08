@@ -47,7 +47,7 @@ extension Preferences {
         private var selectionBackground: some View {
             if isSelected {
                 RoundedRectangle(cornerRadius: 6)
-                    .stroke(Color("LinkBlueColor"), lineWidth: 2)
+                    .stroke(Color(.linkBlue), lineWidth: 2)
             }
         }
 
@@ -98,7 +98,6 @@ extension Preferences {
                 // SECTION 2: Address Bar
                 PreferencePaneSection(UserText.addressBar) {
                     ToggleMenuItem(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
-                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
 
                 // SECTION 3: New Tab Page
@@ -116,37 +115,23 @@ extension Preferences {
 
                     HStack {
                         ToggleMenuItem(UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
+                            .accessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarPreferenceToggle")
                         NSPopUpButtonView(selection: $model.bookmarksBarAppearance) {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+                            button.setAccessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarPopUp")
 
                             let alwaysOn = button.menu?.addItem(withTitle: UserText.showBookmarksBarAlways, action: nil, keyEquivalent: "")
                             alwaysOn?.representedObject = BookmarksBarAppearance.alwaysOn
+                            alwaysOn?.setAccessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarAlways")
 
                             let newTabOnly = button.menu?.addItem(withTitle: UserText.showBookmarksBarNewTabOnly, action: nil, keyEquivalent: "")
                             newTabOnly?.representedObject = BookmarksBarAppearance.newTabOnly
+                            newTabOnly?.setAccessibilityIdentifier("Preferences.AppearanceView.showBookmarksBarNewTabOnly")
 
                             return button
                         }
                         .disabled(!model.showBookmarksBar)
-                    }
-                }
-
-                // SECTION 5: Zoom Setting
-                PreferencePaneSection(UserText.zoomSettingTitle) {
-
-                    HStack {
-                        Text(UserText.zoomPickerTitle)
-                        NSPopUpButtonView(selection: $model.defaultPageZoom) {
-                            let button = NSPopUpButton()
-                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-
-                            for value in DefaultZoomValue.allCases {
-                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
-                                item?.representedObject = value
-                            }
-                            return button
-                        }
                     }
                 }
             }

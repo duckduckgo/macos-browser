@@ -129,7 +129,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="344" height="388"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="qlI-3L-uej">
+                            <customView verticalHuggingPriority="750" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="qlI-3L-uej">
                                 <rect key="frame" x="0.0" y="304" width="344" height="84"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GTJ-4U-z5f">
@@ -141,33 +141,30 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="BurnerWindowButtonIcon" id="BZd-q6-uGA"/>
                                         <color key="contentTintColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     </imageView>
-                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="W2S-mS-R1N">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="W2S-mS-R1N">
                                         <rect key="frame" x="60" y="43" width="266" height="16"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="16" id="3i2-os-2Vr"/>
-                                        </constraints>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Open New Fire Window" id="7Sk-yJ-PYl">
+                                        <textFieldCell key="cell" title="Open New Fire Window" id="7Sk-yJ-PYl">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Oiy-AY-h7p">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Oiy-AY-h7p">
                                         <rect key="frame" x="60" y="27" width="266" height="14"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="An isolated window that doesn’t save any data" id="56V-TF-ueO">
+                                        <textFieldCell key="cell" title="An isolated window that doesn’t save any data" id="56V-TF-ueO">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hDS-1f-O3D" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="20" y="16" width="304" height="52"/>
+                                    <button verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="hDS-1f-O3D" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="20" y="8" width="304" height="60"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" alignment="center" imageScaling="proportionallyDown" inset="2" id="eX6-Bz-xnr">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="52" id="0XQ-BR-Cvd"/>
+                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="52" id="0XQ-BR-Cvd"/>
                                         </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
@@ -186,16 +183,18 @@
                                     </button>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="hDS-1f-O3D" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="top" constant="16" id="23g-RI-UXD"/>
                                     <constraint firstItem="GTJ-4U-z5f" firstAttribute="leading" secondItem="qlI-3L-uej" secondAttribute="leading" constant="24" id="3gm-SA-uID"/>
+                                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Oiy-AY-h7p" secondAttribute="bottom" constant="16" id="8f3-DX-B2x"/>
                                     <constraint firstItem="hDS-1f-O3D" firstAttribute="leading" secondItem="qlI-3L-uej" secondAttribute="leading" constant="20" symbolic="YES" id="EsW-fw-FbV"/>
                                     <constraint firstItem="W2S-mS-R1N" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="top" constant="25" id="KSF-fN-sVq"/>
                                     <constraint firstAttribute="trailing" secondItem="hDS-1f-O3D" secondAttribute="trailing" constant="20" symbolic="YES" id="KpZ-eW-OG7"/>
                                     <constraint firstItem="GTJ-4U-z5f" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="top" constant="26" id="O5k-Uo-Lhd"/>
                                     <constraint firstItem="Oiy-AY-h7p" firstAttribute="leading" secondItem="GTJ-4U-z5f" secondAttribute="trailing" constant="6" id="RPi-O2-JZo"/>
                                     <constraint firstItem="W2S-mS-R1N" firstAttribute="leading" secondItem="GTJ-4U-z5f" secondAttribute="trailing" constant="6" id="eQW-6Z-VR8"/>
-                                    <constraint firstItem="hDS-1f-O3D" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="top" constant="16" id="fm0-tj-3a6"/>
+                                    <constraint firstAttribute="bottom" secondItem="hDS-1f-O3D" secondAttribute="bottom" constant="8" id="h09-DK-4fo"/>
                                     <constraint firstAttribute="trailing" secondItem="W2S-mS-R1N" secondAttribute="trailing" constant="20" id="lx0-S9-8ls"/>
-                                    <constraint firstAttribute="height" constant="84" id="m6u-dN-ps3"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="84" id="m6u-dN-ps3"/>
                                     <constraint firstItem="Oiy-AY-h7p" firstAttribute="top" secondItem="W2S-mS-R1N" secondAttribute="bottom" constant="2" id="nuB-l8-g2J"/>
                                     <constraint firstAttribute="trailing" secondItem="Oiy-AY-h7p" secondAttribute="trailing" constant="20" id="q42-vt-Q6Q"/>
                                 </constraints>
@@ -222,23 +221,31 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="ckJ-6G-38h">
-                                        <rect key="frame" x="51" y="45" width="243" height="37"/>
+                                    <popUpButton clipsToBounds="YES" autoresizesSubviews="NO" horizontalHuggingPriority="1000" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="ckJ-6G-38h">
+                                        <rect key="frame" x="52" y="45" width="241" height="37"/>
                                         <popUpButtonCell key="cell" type="bevel" title="All Sites" bezelStyle="regularSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="2" inset="2" selectedItem="36I-OU-7Bw" id="j8q-KC-blV">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
                                             <menu key="menu" id="oaR-se-uak">
                                                 <items>
-                                                    <menuItem title="All Sites Visited in Current Tab" id="0e7-Td-3OA"/>
-                                                    <menuItem title="All Sites Visited in Current Window" tag="1" id="15H-Hj-EPs"/>
-                                                    <menuItem isSeparatorItem="YES" id="diM-Ta-dwx"/>
-                                                    <menuItem title="All Sites" state="on" tag="2" id="36I-OU-7Bw"/>
+                                                    <menuItem title="All Sites Visited in Current Tab" id="0e7-Td-3OA">
+                                                        <attributedString key="attributedTitle"/>
+                                                    </menuItem>
+                                                    <menuItem title="All Sites Visited in Current Window" tag="1" id="15H-Hj-EPs">
+                                                        <attributedString key="attributedTitle"/>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="diM-Ta-dwx">
+                                                        <attributedString key="attributedTitle"/>
+                                                    </menuItem>
+                                                    <menuItem title="All Sites" state="on" tag="2" id="36I-OU-7Bw">
+                                                        <attributedString key="attributedTitle"/>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="AOr-Ku-GpD"/>
-                                            <constraint firstAttribute="width" constant="237" id="f5G-AU-bU2"/>
+                                            <constraint firstAttribute="width" priority="250" constant="235" id="f5G-AU-bU2"/>
                                         </constraints>
                                         <connections>
                                             <action selector="optionsButtonAction:" target="DMI-mh-xLJ" id="4KY-AK-Ajq"/>
@@ -258,13 +265,14 @@
                                     </textField>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="leading" secondItem="3Jn-h4-fXL" secondAttribute="leading" constant="55" id="8CE-5X-Xx2"/>
                                     <constraint firstItem="ckJ-6G-38h" firstAttribute="top" secondItem="gVh-tG-Gue" secondAttribute="bottom" constant="8" symbolic="YES" id="8kx-GV-lIj"/>
                                     <constraint firstAttribute="height" constant="202" id="KFj-xA-het"/>
                                     <constraint firstItem="YMk-Hq-WfZ" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="Kpg-KV-X8x"/>
+                                    <constraint firstAttribute="trailing" secondItem="ckJ-6G-38h" secondAttribute="trailing" constant="54" id="L7r-cy-LB6"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="top" constant="20" id="TNw-m8-oz1"/>
                                     <constraint firstItem="YMk-Hq-WfZ" firstAttribute="top" secondItem="ckJ-6G-38h" secondAttribute="bottom" constant="8" symbolic="YES" id="ZSq-dY-LaB"/>
                                     <constraint firstItem="gVh-tG-Gue" firstAttribute="top" secondItem="acV-lE-jVh" secondAttribute="bottom" constant="15" id="dzE-fi-9Qb"/>
-                                    <constraint firstItem="ckJ-6G-38h" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="eVG-pj-q6k"/>
                                     <constraint firstAttribute="trailing" secondItem="Lru-AG-Hl2" secondAttribute="trailing" constant="20" symbolic="YES" id="gTj-Xj-Ngb"/>
                                     <constraint firstAttribute="trailing" secondItem="YMk-Hq-WfZ" secondAttribute="trailing" constant="20" id="hOC-gE-s8w"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="jdZ-Ii-nMi"/>
@@ -434,7 +442,7 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </box>
                                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bir-wk-iOW">
-                                        <rect key="frame" x="20" y="0.0" width="288" height="32"/>
+                                        <rect key="frame" x="20" y="0.0" width="304" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="square" title="   All unpinned tabs open to selected sites will close" bezelStyle="shadowlessSquare" image="WarningTriangle" imagePosition="leading" alignment="left" inset="2" id="6NW-yL-FoB">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

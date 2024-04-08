@@ -86,6 +86,17 @@ final class PasswordManagementListSectionTests: XCTestCase {
         XCTAssertEqual(sections.first!.title, "#")
     }
 
+    private let enFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en-US")
+        formatter.dateFormat = "MMM yyyy"
+        return formatter
+    }()
+    private let currentLocaleFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM yyyy"
+        return formatter
+    }()
     func testWhenSortingItemsByDate_AndAllMonthsAndYearsAreTheSame_ThenOneSectionIsReturned() {
         let months = [1, 1, 1, 1, 1]
         let accounts = months.map { login(named: "Login", month: $0, year: 2000) }
@@ -93,7 +104,7 @@ final class PasswordManagementListSectionTests: XCTestCase {
 
         XCTAssertEqual(sections.count, 1)
         XCTAssertEqual(sections.first!.items.count, months.count)
-        XCTAssertEqual(sections.first!.title, "Jan 2000")
+        XCTAssertEqual(sections.first!.title, currentLocaleFormatter.string(from: enFormatter.date(from: "Jan 2000")!))
     }
 
     func testWhenSortingItemsByDate_AndMonthsAreDifferent_ThenMultipleSectionsAreReturned() {
@@ -121,7 +132,9 @@ final class PasswordManagementListSectionTests: XCTestCase {
             XCTAssertEqual(section.items.count, 1)
         }
 
-        let expectedTitles = ["Dec 2001", "Nov 2001", "Oct 2001", "Sep 2001", "Aug 2001", "Jul 2001", "Jun 2001", "May 2001", "Apr 2001", "Mar 2001", "Feb 2001", "Jan 2001", "Dec 2000", "Nov 2000", "Oct 2000", "Sep 2000", "Aug 2000", "Jul 2000", "Jun 2000", "May 2000", "Apr 2000", "Mar 2000", "Feb 2000", "Jan 2000"]
+        let expectedTitles = ["Dec 2001", "Nov 2001", "Oct 2001", "Sep 2001", "Aug 2001", "Jul 2001", "Jun 2001", "May 2001", "Apr 2001", "Mar 2001", "Feb 2001", "Jan 2001", "Dec 2000", "Nov 2000", "Oct 2000", "Sep 2000", "Aug 2000", "Jul 2000", "Jun 2000", "May 2000", "Apr 2000", "Mar 2000", "Feb 2000", "Jan 2000"].map {
+            currentLocaleFormatter.string(from: enFormatter.date(from: $0)!)
+        }
         let actualTitles = sections.map(\.title)
         XCTAssertEqual(actualTitles, expectedTitles)
     }

@@ -28,7 +28,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
 
     private class MockStatusReporter: NetworkProtectionStatusReporter {
         static let defaultServerInfo = NetworkProtectionStatusServerInfo(
-            serverLocation: "New York, USA",
+            serverLocation: TunnelControllerViewModelTests.serverAttributes(),
             serverAddress: "127.0.0.1")
 
         let statusObserver: ConnectionStatusObserver
@@ -138,14 +138,13 @@ final class TunnelControllerViewModelTests: XCTestCase {
     ///
     @MainActor
     func testProperlyReflectsStatusConnected() async throws {
-        let mockServerLocation = "Los Angeles, United States"
         let mockServerIP = "127.0.0.1"
         let mockDate = Date().addingTimeInterval(-59)
         let mockDateString = "00:00:59"
 
         let controller = MockTunnelController()
         let serverInfo = NetworkProtectionStatusServerInfo(
-            serverLocation: mockServerLocation,
+            serverLocation: Self.serverAttributes(),
             serverAddress: mockServerIP)
         let statusReporter = MockStatusReporter(status: .connected(connectedDate: mockDate), serverInfo: serverInfo)
         let model = TunnelControllerViewModel(
@@ -161,7 +160,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOn)
         XCTAssertTrue(model.showServerDetails)
         XCTAssertEqual(model.serverAddress, mockServerIP)
-        XCTAssertEqual(model.serverLocation, "Los Angeles, United States...")
+        XCTAssertEqual(model.serverLocation, "El Segundo, CA...")
     }
 
     /// We expect the model to properly reflect the connecting status.
@@ -182,7 +181,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         XCTAssertFalse(model.showServerDetails)
     }
 
-    /// We expect that setting the model's `isRunning` to `true`, will start network protection.
+    /// We expect that setting the model's `isRunning` to `true`, will start the VPN.
     ///
     @MainActor
     func testStartsNetworkProtection() async throws {
@@ -193,7 +192,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
             appLauncher: MockAppLauncher())
-        let networkProtectionWasStarted = expectation(description: "The model started network protection when appropriate")
+        let networkProtectionWasStarted = expectation(description: "The model started the VPN when appropriate")
 
         controller.startCallback = {
             networkProtectionWasStarted.fulfill()
@@ -206,16 +205,15 @@ final class TunnelControllerViewModelTests: XCTestCase {
         await fulfillment(of: [networkProtectionWasStarted], timeout: 0.1)
     }
 
-    /// We expect that setting the model's `isRunning` to `false`, will stop network protection.
+    /// We expect that setting the model's `isRunning` to `false`, will stop the VPN.
     ///
     @MainActor
     func testStopsNetworkProtection() async throws {
         let mockDate = Date().addingTimeInterval(-59)
-        let mockServerLocation = "Los Angeles, United States"
         let mockServerIP = "127.0.0.1"
 
         let controller = MockTunnelController()
-        let serverInfo = NetworkProtectionStatusServerInfo(serverLocation: mockServerLocation, serverAddress: mockServerIP)
+        let serverInfo = NetworkProtectionStatusServerInfo(serverLocation: Self.serverAttributes(), serverAddress: mockServerIP)
         let statusReporter = MockStatusReporter(
             status: .connected(connectedDate: mockDate),
             serverInfo: serverInfo)
@@ -225,7 +223,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             appLauncher: MockAppLauncher())
 
-        let networkProtectionWasStopped = expectation(description: "The model stopped network protection when appropriate")
+        let networkProtectionWasStopped = expectation(description: "The model stopped the VPN when appropriate")
 
         controller.stopCallback = {
             networkProtectionWasStopped.fulfill()
@@ -237,4 +235,21 @@ final class TunnelControllerViewModelTests: XCTestCase {
 
         await fulfillment(of: [networkProtectionWasStopped], timeout: 0.1)
     }
+
+    fileprivate static func serverAttributes() -> NetworkProtectionServerInfo.ServerAttributes {
+         let json = """
+         {
+             "city": "El Segundo",
+             "country": "us",
+             "latitude": 33.9192,
+             "longitude": -118.4165,
+             "region": "North America",
+             "state": "ca",
+             "tzOffset": -28800
+         }
+         """
+
+         // swiftlint:disable:next force_try
+         return try! JSONDecoder().decode(NetworkProtectionServerInfo.ServerAttributes.self, from: json.data(using: .utf8)!)
+     }
 }

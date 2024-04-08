@@ -114,13 +114,19 @@ struct PasswordManagementListSection {
             return DateMetadata(title: Self.dateFormatter.string(from: date), month: month, year: year)
         }
 
-        let metadataSortFunction: (DateMetadata, DateMetadata) -> Bool = order == .ascending ? (>) : (<)
-        let dateSortFunction: (Date, Date) -> Bool = order == .ascending ? (>) : (<)
-        let sortedKeys = itemsByDateMetadata.keys.sorted(by: metadataSortFunction)
+        let sortedKeys = switch order {
+        case .ascending: itemsByDateMetadata.keys.sorted(by: (>))
+        case .descending: itemsByDateMetadata.keys.sorted(by: (<))
+        }
 
         return sortedKeys.map { key in
-            var itemsInSection = itemsByDateMetadata[key] ?? []
-            itemsInSection.sort { lhs, rhs in dateSortFunction(lhs[keyPath: keyPath], rhs[keyPath: keyPath]) }
+            var itemsInSection = itemsByDateMetadata[key, default: []]
+            switch order {
+            case .ascending:
+                itemsInSection.sort(by: { $0[keyPath: keyPath] > $1[keyPath: keyPath] })
+            case .descending:
+                itemsInSection.sort(by: { $0[keyPath: keyPath] < $1[keyPath: keyPath] })
+            }
             return PasswordManagementListSection(title: key.title, items: itemsInSection)
         }
     }

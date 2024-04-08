@@ -44,9 +44,9 @@ struct FocusableTextEditor: View {
                     RoundedRectangle(cornerRadius: cornerRadius).stroke(Color.accentColor.opacity(0.5), lineWidth: 4).opacity(isFocused ? 1 : 0).scaleEffect(isFocused ? 1 : 1.04)
                         .animation(isFocused ? .easeIn(duration: 0.2) : .easeOut(duration: 0.0), value: isFocused)
                     RoundedRectangle(cornerRadius: cornerRadius)
-                        .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
+                        .stroke(Color(.textEditorBorder), lineWidth: borderWidth)
                     RoundedRectangle(cornerRadius: cornerRadius)
-                        .fill(Color(NSColor.textEditorBackgroundColor))
+                        .fill(Color(.textEditorBackground))
                 }
             )
     }

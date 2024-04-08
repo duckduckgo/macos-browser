@@ -29,14 +29,14 @@ import NetworkProtectionUI
 /// Clients can edit those defaults and this class will observe the changes and relay them to the runnel.
 ///
 final class TunnelControllerIPCService {
-    private let tunnelController: TunnelController
+    private let tunnelController: NetworkProtectionTunnelController
     private let networkExtensionController: NetworkExtensionController
     private let server: NetworkProtectionIPC.TunnelControllerIPCServer
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
 
-    init(tunnelController: TunnelController,
+    init(tunnelController: NetworkProtectionTunnelController,
          networkExtensionController: NetworkExtensionController,
          statusReporter: NetworkProtectionStatusReporter,
          defaults: UserDefaults = .netP) {
@@ -112,6 +112,8 @@ extension TunnelControllerIPCService: IPCServerInterface {
     }
 
     func debugCommand(_ command: DebugCommand) async throws {
+        try await tunnelController.relay(command)
+
         switch command {
         case .removeSystemExtension:
 #if NETP_SYSTEM_EXTENSION

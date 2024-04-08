@@ -21,4 +21,5 @@ struct NavigateAction: Action {
     let actionType: ActionType
     let url: String
     let ageRange: [String]?
+    let dataSource: DataSource?
 }

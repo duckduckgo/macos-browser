@@ -97,15 +97,8 @@ struct PasswordManagementItemListCategoryView: View {
                 let button = PopUpButton()
 
                 for category in SecureVaultSorting.Category.allCases {
-                    button.addItem(withTitle: category.title,
-                                   foregroundColor: category.foregroundColor,
-                                   backgroundColor: category.backgroundColor)
-
-                    if let imageName = category.imageName {
-                        button.lastItem?.image = NSImage(named: imageName)
-                    }
-
-                    button.lastItem?.representedObject = category
+                    button.add(NSMenuItem(title: category.title, representedObject: category).withImage(category.image),
+                               withForegroundColor: category.foregroundColor, backgroundColor: category.backgroundColor)
 
                     if category == .allItems {
                         button.menu?.addItem(NSMenuItem.separator())
@@ -123,8 +116,6 @@ struct PasswordManagementItemListCategoryView: View {
                     return 11
                 }
 
-            Spacer()
-
             // MenuButton incorrectly displays a disabled state when you re-render it with a different image.
             // According to Stack Overflow, this was fixed in macOS 12, but it can still be reproduced on 12.2.
             // This also happens with Menu in macOS 11.0+, so using that on later macOS versions doesn't help.
@@ -135,8 +126,10 @@ struct PasswordManagementItemListCategoryView: View {
 
             if model.sortDescriptor.order == .ascending {
                 PasswordManagementSortButton(imageName: "SortAscending")
+                    .frame(width: 24)
             } else {
                 PasswordManagementSortButton(imageName: "SortDescending")
+                    .frame(width: 24)
             }
         }
         .padding(.vertical, -4)
@@ -185,7 +178,7 @@ private struct PasswordManagementItemStackContentsView: View {
             ExternalPasswordManagerItemSection(model: model)
         }
 
-        ForEach(Array(model.displayedItems.enumerated()), id: \.offset) { index, section in
+        ForEach(Array(model.displayedSections.enumerated()), id: \.offset) { index, section in
             Section(header: Text(section.title).padding(.leading, 18).padding(.top, index == 0 ? 0 : 10)) {
 
                 ForEach(section.items, id: \.id) { item in
@@ -225,10 +218,10 @@ private struct PasswordManagerItemView: View {
         Button(action: action, label: {
             HStack(spacing: 3) {
                 ZStack {
-                    Image("BitwardenIcon")
+                    Image(.bitwardenIcon)
 
                     if isLocked {
-                        Image("PasswordManager-lock")
+                        Image(.passwordManagerLock)
                             .padding(.leading, 28)
                             .padding(.top, 21)
                     }
@@ -286,15 +279,15 @@ private struct ItemView: View {
                         LetterIconView(title: "#")
                     }
                 case .card:
-                    Image("Card")
+                    Image(.card)
                         .frame(width: 32)
                         .padding(.leading, 6)
                 case .identity:
-                    Image("Identity")
+                    Image(.identity)
                         .frame(width: 32)
                         .padding(.leading, 6)
                 case .note:
-                    Image("Note")
+                    Image(.note)
                         .frame(width: 32)
                         .padding(.leading, 6)
                 }
@@ -324,7 +317,7 @@ private struct ItemView: View {
             .buttonStyle(selected ?
                          PasswordManagerItemButtonStyle(bgColor: Color.accentColor) :
                             // Almost clear, so that whole view is clickable
-                         PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackgroundColor.withAlphaComponent(0.001))))
+                         PasswordManagerItemButtonStyle(bgColor: Color(NSColor.windowBackground.withAlphaComponent(0.001))))
     }
 
 }
@@ -381,7 +374,7 @@ struct PasswordManagementSortButton: View {
             }
             .menuButtonStyle(BorderlessButtonMenuButtonStyle())
             .padding(5)
-            .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? Color("SecureVaultCategoryDefaultColor") : Color.clear))
+            .background(RoundedRectangle(cornerRadius: 5).foregroundColor(sortHover ? .secureVaultCategoryDefault : .clear))
             .onHover { isOver in
                 sortHover = isOver
             }

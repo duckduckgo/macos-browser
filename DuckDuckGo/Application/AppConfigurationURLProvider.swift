@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Configuration
+import Foundation
 
 struct AppConfigurationURLProvider: ConfigurationURLProviding {
 

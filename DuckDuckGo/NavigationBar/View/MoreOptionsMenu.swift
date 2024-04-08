@@ -48,6 +48,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 #endif
 #if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu)
+    func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
 #endif
 }
 
@@ -60,7 +61,8 @@ final class MoreOptionsMenu: NSMenu {
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
-    private lazy var sharingMenu = SharingMenu(title: UserText.shareMenuItem)
+    private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
+    private lazy var accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
 #if NETWORK_PROTECTION
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
@@ -75,6 +77,7 @@ final class MoreOptionsMenu: NSMenu {
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
          networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -85,6 +88,9 @@ final class MoreOptionsMenu: NSMenu {
 
         super.init(title: "")
 
+        if let sharingMenu {
+            self.sharingMenu = sharingMenu
+        }
         self.emailManager.requestDelegate = self
 
         setupMenuItems()
@@ -93,6 +99,7 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
+         sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -102,6 +109,9 @@ final class MoreOptionsMenu: NSMenu {
 
         super.init(title: "")
 
+        if let sharingMenu {
+            self.sharingMenu = sharingMenu
+        }
         self.emailManager.requestDelegate = self
 
         setupMenuItems()
@@ -113,10 +123,14 @@ final class MoreOptionsMenu: NSMenu {
     private func setupMenuItems() {
 
 #if FEEDBACK
-        let feedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: nil, keyEquivalent: "")
-#if !APPSTORE
-            .withImage(NSImage(named: "BetaLabel"))
-#endif // !APPSTORE
+        let feedbackString: String = {
+            guard internalUserDecider.isInternalUser else {
+                return UserText.sendFeedback
+            }
+            return "\(UserText.sendFeedback) (version: \(AppVersion.shared.versionNumber).\(AppVersion.shared.buildNumber))"
+        }()
+        let feedbackMenuItem = NSMenuItem(title: feedbackString, action: nil, keyEquivalent: "")
+
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(feedbackMenuItem)
 
@@ -134,7 +148,7 @@ final class MoreOptionsMenu: NSMenu {
         addUtilityItems()
 
         addItem(withTitle: UserText.emailOptionsMenuItem, action: nil, keyEquivalent: "")
-            .withImage(NSImage(named: "OptionsButtonMenuEmail"))
+            .withImage(.optionsButtonMenuEmail)
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
         addItem(NSMenuItem.separator())
@@ -145,21 +159,17 @@ final class MoreOptionsMenu: NSMenu {
 
         let preferencesItem = NSMenuItem(title: UserText.settings, action: #selector(openPreferences(_:)), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "Preferences"))
+            .withImage(.preferences)
         addItem(preferencesItem)
     }
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        #if SUBSCRIPTION
-        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
-        #else
         if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         } else {
             actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
         }
-        #endif
     }
 #endif // DBP
 
@@ -244,6 +254,10 @@ final class MoreOptionsMenu: NSMenu {
     @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
+
+    @objc func openIdentityTheftRestoration(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedIdentityTheftRestoration(self)
+    }
 #endif
 
     @objc func findInPage(_ sender: NSMenuItem) {
@@ -258,12 +272,12 @@ final class MoreOptionsMenu: NSMenu {
         // New Tab
         addItem(withTitle: UserText.plusButtonNewTabMenuItem, action: #selector(newTab(_:)), keyEquivalent: "t")
             .targetting(self)
-            .withImage(NSImage(named: "Add"))
+            .withImage(.add)
 
         // New Window
         addItem(withTitle: UserText.newWindowMenuItem, action: #selector(newWindow(_:)), keyEquivalent: "n")
             .targetting(self)
-            .withImage(NSImage(named: "NewWindow"))
+            .withImage(.newWindow)
 
         // New Burner Window
         let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
@@ -271,7 +285,7 @@ final class MoreOptionsMenu: NSMenu {
                                           target: self)
         burnerWindowItem.keyEquivalent = "n"
         burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
-        burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
+        burnerWindowItem.image = .newBurnerWindow
         addItem(burnerWindowItem)
 
         addItem(NSMenuItem.separator())
@@ -282,19 +296,19 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(withTitle: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "Bookmarks"))
+            .withImage(.bookmarks)
             .withSubmenu(bookmarksSubMenu)
 
         addItem(withTitle: UserText.downloads, action: #selector(openDownloads), keyEquivalent: "j")
             .targetting(self)
-            .withImage(NSImage(named: "Downloads"))
+            .withImage(.downloads)
 
         let loginsSubMenu = LoginsSubMenu(targetting: self,
                                           passwordManagerCoordinator: passwordManagerCoordinator)
 
         addItem(withTitle: UserText.passwordManagement, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "PasswordManagement"))
+            .withImage(.passwordManagement)
             .withSubmenu(loginsSubMenu)
 
         addItem(NSMenuItem.separator())
@@ -304,13 +318,13 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        if AccountManager().isUserAuthenticated {
-            items.append(contentsOf: makeActiveSubscriptionItems())
-        } else if SubscriptionPurchaseEnvironment.canPurchase {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable && !accountManager.isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
+        } else {
+            items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
         }
 #else
-        items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
+        items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
 #endif
 
         if !items.isEmpty {
@@ -319,21 +333,37 @@ final class MoreOptionsMenu: NSMenu {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     private func makeActiveSubscriptionItems() -> [NSMenuItem] {
         var items: [NSMenuItem] = []
 
-#if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
-            let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
-            let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
+#if SUBSCRIPTION
+        let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
+#endif
 
-            // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
-            // badge to bring it to their attention.
-            if !isWaitlistUser && !hasAuthToken {
-                items.append(makeNetworkProtectionItem(showNewLabel: true))
-            } else {
-                items.append(makeNetworkProtectionItem(showNewLabel: false))
+#if NETWORK_PROTECTION
+        if networkProtectionFeatureVisibility.isNetworkProtectionBetaVisible() {
+            let networkProtectionItem: NSMenuItem
+
+            networkProtectionItem = makeNetworkProtectionItem()
+
+            items.append(networkProtectionItem)
+#if SUBSCRIPTION
+            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
+                Task {
+                    let isMenuItemEnabled: Bool
+
+                    switch await accountManager.hasEntitlement(for: .networkProtection) {
+                    case let .success(result):
+                        isMenuItemEnabled = result
+                    case .failure:
+                        isMenuItemEnabled = false
+                    }
+
+                    networkProtectionItem.isEnabled = isMenuItemEnabled
+                }
             }
+#endif
 
             DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else {
@@ -342,43 +372,80 @@ final class MoreOptionsMenu: NSMenu {
 #endif // NETWORK_PROTECTION
 
 #if DBP
-        if DefaultDataBrokerProtectionFeatureVisibility().isFeatureVisible() {
+        let dbpVisibility = DefaultDataBrokerProtectionFeatureVisibility()
+        if dbpVisibility.isFeatureVisible() || dbpVisibility.isPrivacyProEnabled() {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "DBP-Icon"))
+                .withImage(.dbpIcon)
             items.append(dataBrokerProtectionItem)
+
+#if SUBSCRIPTION
+            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated  {
+                Task {
+                    let isMenuItemEnabled: Bool
+
+                    switch await accountManager.hasEntitlement(for: .dataBrokerProtection) {
+                    case let .success(result):
+                        isMenuItemEnabled = result
+                    case .failure:
+                        isMenuItemEnabled = false
+                    }
+
+                    dataBrokerProtectionItem.isEnabled = isMenuItemEnabled
+                }
+            }
+#endif
 
             DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
 
         } else {
             DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
         }
-
 #endif // DBP
+
+#if SUBSCRIPTION
+        if accountManager.isUserAuthenticated {
+            let identityTheftRestorationItem = NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
+                                                          action: #selector(openIdentityTheftRestoration),
+                                                          keyEquivalent: "")
+                .targetting(self)
+                .withImage(.itrIcon)
+            items.append(identityTheftRestorationItem)
+
+            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated  {
+                Task {
+                    let isMenuItemEnabled: Bool
+
+                    switch await accountManager.hasEntitlement(for: .identityTheftRestoration) {
+                    case let .success(result):
+                        isMenuItemEnabled = result
+                    case .failure:
+                        isMenuItemEnabled = false
+                    }
+
+                    identityTheftRestorationItem.isEnabled = isMenuItemEnabled
+                }
+            }
+        }
+#endif
 
         return items
     }
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let privacyProItem = NSMenuItem(title: "",
+        let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+        if shouldHidePrivacyProDueToNoProducts {
+            return []
+        }
+
+        let privacyProItem = NSMenuItem(title: UserText.subscriptionOptionsMenuItem,
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "SubscriptionIcon"))
-
-        let attributedText = NSMutableAttributedString(string: UserText.subscriptionOptionsMenuItem)
-        attributedText.append(NSAttributedString(string: "  "))
-
-        let imageAttachment = NSTextAttachment()
-        imageAttachment.image = NSImage(named: "NewLabel")
-        imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
-
-        attributedText.append(NSAttributedString(attachment: imageAttachment))
-
-        privacyProItem.attributedTitle = attributedText
+            .withImage(.subscriptionIcon)
 
         return [privacyProItem]
     }
@@ -391,7 +458,7 @@ final class MoreOptionsMenu: NSMenu {
 
             let isFireproof = FireproofDomains.shared.isFireproof(fireproofDomain: host)
             let title = isFireproof ? UserText.removeFireproofing : UserText.fireproofSite
-            let image = isFireproof ? NSImage(named: "Burn") : NSImage(named: "Fireproof")
+            let image: NSImage = isFireproof ? .burn : .fireproof
 
             addItem(withTitle: title, action: #selector(toggleFireproofing(_:)), keyEquivalent: "")
                 .targetting(self)
@@ -401,41 +468,29 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(withTitle: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
             .targetting(self)
-            .withImage(NSImage(named: "Find-Search"))
+            .withImage(.findSearch)
+            .withAccessibilityIdentifier("MoreOptionsMenu.findInPage")
 
         addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "Share"))
+            .withImage(.share)
             .withSubmenu(sharingMenu)
 
         addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "Print"))
+            .withImage(.print)
 
         addItem(NSMenuItem.separator())
 
     }
 
 #if NETWORK_PROTECTION
-    private func makeNetworkProtectionItem(showNewLabel: Bool) -> NSMenuItem {
+    private func makeNetworkProtectionItem() -> NSMenuItem {
         let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(.image(for: .vpnIcon))
 
-        if showNewLabel {
-            let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
-            attributedText.append(NSAttributedString(string: "  "))
-
-            let imageAttachment = NSTextAttachment()
-            imageAttachment.image = NSImage(named: "NewLabel")
-            imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
-
-            attributedText.append(NSAttributedString(attachment: imageAttachment))
-
-            networkProtectionItem.attributedTitle = attributedText
-        } else {
-            networkProtectionItem.title = UserText.networkProtection
-        }
+        networkProtectionItem.title = UserText.networkProtection
 
         return networkProtectionItem
     }
@@ -477,22 +532,22 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         if emailManager.isSignedIn {
             addItem(withTitle: UserText.emailOptionsMenuCreateAddressSubItem, action: #selector(createAddressAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "OptionsButtonMenuEmailGenerateAddress"))
+                .withImage(.optionsButtonMenuEmailGenerateAddress)
 
             addItem(withTitle: UserText.emailOptionsMenuManageAccountSubItem, action: #selector(manageAccountAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "Identity-16"))
+                .withImage(.identity16)
 
             addItem(.separator())
 
             addItem(withTitle: UserText.emailOptionsMenuTurnOffSubItem, action: #selector(turnOffEmailAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "Email-Disabled-16"))
+                .withImage(.emailDisabled16)
 
         } else {
             addItem(withTitle: UserText.emailOptionsMenuTurnOnSubItem, action: #selector(turnOnEmailAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "OptionsButtonMenuEmail"))
+                .withImage(.optionsButtonMenuEmail)
 
         }
     }
@@ -554,13 +609,13 @@ final class FeedbackSubMenu: NSMenu {
         let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite,
                                               action: #selector(AppDelegate.openReportBrokenSite(_:)),
                                               keyEquivalent: "")
-            .withImage(NSImage(named: "Exclamation"))
+            .withImage(.exclamation)
         addItem(reportBrokenSiteItem)
 
         let browserFeedbackItem = NSMenuItem(title: UserText.browserFeedback,
                                              action: #selector(AppDelegate.openFeedback(_:)),
                                              keyEquivalent: "")
-            .withImage(NSImage(named: "Feedback"))
+            .withImage(.feedback)
         addItem(browserFeedbackItem)
     }
 }
@@ -640,7 +695,7 @@ final class BookmarksSubMenu: NSMenu {
 
             let favoritesItem = addItem(withTitle: UserText.favorites, action: nil, keyEquivalent: "")
             favoritesItem.submenu = NSMenu(items: favoriteMenuItems)
-            favoritesItem.image = NSImage(named: "Favorite")
+            favoritesItem.image = .favorite
 
             addItem(NSMenuItem.separator())
         }
@@ -731,15 +786,15 @@ final class LoginsSubMenu: NSMenu {
 
         addItem(withTitle: autofillTitle, action: autofillSelector, keyEquivalent: "")
             .targetting(target)
-            .withImage(NSImage(named: "LoginGlyph"))
+            .withImage(.loginGlyph)
 
         addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(MoreOptionsMenu.openAutofillWithIdentities), keyEquivalent: "")
             .targetting(target)
-            .withImage(NSImage(named: "IdentityGlyph"))
+            .withImage(.identityGlyph)
 
         addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(MoreOptionsMenu.openAutofillWithCreditCards), keyEquivalent: "")
             .targetting(target)
-            .withImage(NSImage(named: "CreditCardGlyph"))
+            .withImage(.creditCardGlyph)
     }
 
 }

@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
-import XCTest
-import Foundation
 import BrowserServicesKit
 import Combine
+import Foundation
+import XCTest
+
 @testable import DataBrokerProtection
 
 final class DataBrokerOperationActionTests: XCTestCase {
@@ -35,7 +36,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenEmailConfirmationActionSucceeds_thenExtractedLinkIsOpened() async {
-        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1)
+        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1, dataSource: nil)
         let step = Step(type: .optOut, actions: [emailConfirmationAction])
         let extractedProfile = ExtractedProfile(email: "test@duck.com")
         let sut = OptOutOperation(
@@ -43,12 +44,14 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
 
         do {
-            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler)
             XCTAssertEqual(webViewHandler.wasLoadCalledWithURL?.absoluteString, "https://www.duckduckgo.com")
             XCTAssertTrue(webViewHandler.wasFinishCalled)
         } catch {
@@ -57,7 +60,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenEmailConfirmationActionHasNoEmail_thenNoURLIsLoadedAndWebViewFinishes() async {
-        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1)
+        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1, dataSource: nil)
         let step = Step(type: .optOut, actions: [emailConfirmationAction])
         let noEmailExtractedProfile = ExtractedProfile()
         let sut = OptOutOperation(
@@ -65,12 +68,14 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
 
         do {
-            _ = try await sut.run(inputValue: noEmailExtractedProfile, webViewHandler: webViewHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: noEmailExtractedProfile, webViewHandler: webViewHandler)
             XCTFail("Expected an error to be thrown")
         } catch {
             XCTAssertNil(webViewHandler.wasLoadCalledWithURL?.absoluteString)
@@ -85,7 +90,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenOnEmailConfirmationActionEmailServiceThrows_thenOperationThrows() async {
-        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1)
+        let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1, dataSource: nil)
         let step = Step(type: .optOut, actions: [emailConfirmationAction])
         let extractedProfile = ExtractedProfile(email: "test@duck.com")
         emailService.shouldThrow = true
@@ -94,12 +99,14 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
 
         do {
-            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler)
             XCTFail("Expected an error to be thrown")
         } catch {
             XCTAssertNil(webViewHandler.wasLoadCalledWithURL?.absoluteString)
@@ -114,14 +121,16 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenActionNeedsEmail_thenExtractedProfileEmailIsSet() async {
-        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email")])
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil)], dataSource: nil)
         let step = Step(type: .optOut, actions: [fillFormAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -130,24 +139,26 @@ final class DataBrokerOperationActionTests: XCTestCase {
         await sut.runNextAction(fillFormAction)
 
         XCTAssertEqual(sut.extractedProfile?.email, "test@duck.com")
-        XCTAssertTrue(webViewHandler.wasExecuteCalledForExtractedProfile)
+        XCTAssertTrue(webViewHandler.wasExecuteCalledForUserData)
     }
 
     func testWhenGetEmailServiceFails_thenOperationThrows() async {
-        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email")])
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "#test", elements: [.init(type: "email", selector: "#email", parent: nil)], dataSource: nil)
         let step = Step(type: .optOut, actions: [fillFormAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         emailService.shouldThrow = true
 
         do {
-            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler)
             XCTFail("Expected an error to be thrown")
         } catch {
             XCTAssertTrue(webViewHandler.wasFinishCalled)
@@ -166,14 +177,17 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
+            clickAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
 
         await sut.success(actionId: "1", actionType: .click)
 
-        XCTAssertTrue(webViewHandler.wasWaitForWebViewLoadCalled)
+        XCTAssertFalse(webViewHandler.wasWaitForWebViewLoadCalled)
         XCTAssertTrue(webViewHandler.wasFinishCalled)
     }
 
@@ -183,7 +197,9 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -195,14 +211,16 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenSolveCaptchaActionIsRun_thenCaptchaIsResolved() async {
-        let solveCaptchaAction = SolveCaptchaAction(id: "1", actionType: .solveCaptcha, selector: "g-captcha")
+        let solveCaptchaAction = SolveCaptchaAction(id: "1", actionType: .solveCaptcha, selector: "g-captcha", dataSource: nil)
         let step = Step(type: .optOut, actions: [solveCaptchaAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -215,14 +233,16 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenSolveCapchaActionFailsToSubmitDataToTheBackend_thenOperationFails() async {
-        let solveCaptchaAction = SolveCaptchaAction(id: "1", actionType: .solveCaptcha, selector: "g-captcha")
+        let solveCaptchaAction = SolveCaptchaAction(id: "1", actionType: .solveCaptcha, selector: "g-captcha", dataSource: nil)
         let step = Step(type: .optOut, actions: [solveCaptchaAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
+            emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         let actionsHandler = ActionsHandler(step: step)
@@ -230,7 +250,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
         captchaService.shouldThrow = true
 
         do {
-            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler, actionsHandler: actionsHandler, stageCalculator: stageCalulator)
+            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler, actionsHandler: actionsHandler)
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? DataBrokerProtectionError, case .captchaServiceError(.nilDataWhenFetchingCaptchaResult) = error {
@@ -248,8 +268,10 @@ final class DataBrokerOperationActionTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -268,8 +290,10 @@ final class DataBrokerOperationActionTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
             captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.retriesCountOnError = 0
@@ -284,20 +308,22 @@ final class DataBrokerOperationActionTests: XCTestCase {
     }
 
     func testWhenRunningActionWithoutExtractedProfile_thenExecuteIsCalledWithProfileData() async {
-        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item]())
+        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil)
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
 
         await sut.runNextAction(expectationAction)
 
-        XCTAssertTrue(webViewHandler.wasExecuteCalledForProfileData)
+        XCTAssertTrue(webViewHandler.wasExecuteCalledForUserData)
     }
 
     func testWhenLoadURLDelegateIsCalled_thenCorrectMethodIsExecutedOnWebViewHandler() async {
@@ -306,7 +332,9 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
+            captchaService: captchaService,
             operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
             shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
@@ -314,5 +342,123 @@ final class DataBrokerOperationActionTests: XCTestCase {
         await sut.loadURL(url: URL(string: "https://www.duckduckgo.com")!)
 
         XCTAssertEqual(webViewHandler.wasLoadCalledWithURL?.absoluteString, "https://www.duckduckgo.com")
+    }
+
+    func testWhenGetCaptchaActionRuns_thenStageIsSetToCaptchaParse() async {
+        let mockStageCalculator = MockStageDurationCalculator()
+        let captchaAction = GetCaptchaInfoAction(id: "1", actionType: .getCaptchaInfo, selector: "captcha", dataSource: nil)
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
+            captchaService: captchaService,
+            operationAwaitTime: 0,
+            stageCalculator: mockStageCalculator,
+            shouldRunNextStep: { true }
+        )
+
+        await sut.runNextAction(captchaAction)
+
+        XCTAssertEqual(mockStageCalculator.stage, .captchaParse)
+    }
+
+    func testWhenClickActionRuns_thenStageIsSetToSubmit() async {
+        let mockStageCalculator = MockStageDurationCalculator()
+        let clickAction = ClickAction(id: "1", actionType: .click, elements: [PageElement](), dataSource: nil)
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
+            captchaService: captchaService,
+            operationAwaitTime: 0,
+            stageCalculator: mockStageCalculator,
+            shouldRunNextStep: { true }
+        )
+
+        await sut.runNextAction(clickAction)
+
+        XCTAssertEqual(mockStageCalculator.stage, .fillForm)
+    }
+
+    func testWhenExpectationActionRuns_thenStageIsSetToSubmit() async {
+        let mockStageCalculator = MockStageDurationCalculator()
+        let expectationAction = ExpectationAction(id: "1", actionType: .expectation, expectations: [Item](), dataSource: nil)
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
+            captchaService: captchaService,
+            operationAwaitTime: 0,
+            stageCalculator: mockStageCalculator,
+            shouldRunNextStep: { true }
+        )
+
+        await sut.runNextAction(expectationAction)
+
+        XCTAssertEqual(mockStageCalculator.stage, .submit)
+    }
+
+    func testWhenFillFormActionRuns_thenStageIsSetToFillForm() async {
+        let mockStageCalculator = MockStageDurationCalculator()
+        let fillFormAction = FillFormAction(id: "1", actionType: .fillForm, selector: "", elements: [PageElement](), dataSource: nil)
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(),
+            emailService: emailService,
+            captchaService: captchaService,
+            operationAwaitTime: 0,
+            stageCalculator: mockStageCalculator,
+            shouldRunNextStep: { true }
+        )
+
+        await sut.runNextAction(fillFormAction)
+
+        XCTAssertEqual(mockStageCalculator.stage, .fillForm)
+    }
+
+    func testWhenLoadUrlOnSpokeo_thenSetCookiesIsCalled() async {
+        let mockCookieHandler = MockCookieHandler()
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(url: "spokeo.com"),
+            emailService: emailService,
+            captchaService: captchaService,
+            cookieHandler: mockCookieHandler,
+            operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
+            shouldRunNextStep: { true }
+        )
+
+        mockCookieHandler.cookiesToReturn = [.init()]
+        sut.webViewHandler = webViewHandler
+        await sut.loadURL(url: URL(string: "www.test.com")!)
+
+        XCTAssertTrue(webViewHandler.wasSetCookiesCalled)
+    }
+
+    func testWhenLoadUrlOnOtherBroker_thenSetCookiesIsNotCalled() async {
+        let mockCookieHandler = MockCookieHandler()
+        let sut = OptOutOperation(
+            privacyConfig: PrivacyConfigurationManagingMock(),
+            prefs: ContentScopeProperties.mock,
+            query: BrokerProfileQueryData.mock(url: "verecor.com"),
+            emailService: emailService,
+            captchaService: captchaService,
+            cookieHandler: mockCookieHandler,
+            operationAwaitTime: 0,
+            stageCalculator: stageCalulator,
+            shouldRunNextStep: { true }
+        )
+
+        mockCookieHandler.cookiesToReturn = [.init()]
+        sut.webViewHandler = webViewHandler
+        await sut.loadURL(url: URL(string: "www.test.com")!)
+
+        XCTAssertFalse(webViewHandler.wasSetCookiesCalled)
     }
 }

@@ -50,7 +50,7 @@ final class SuggestionTableRowView: NSTableRowView {
     }
 
     private func updateBackgroundColor() {
-        let accentColor: NSColor = isBurner ? .burnerAccentColor : .controlAccentColor
+        let accentColor: NSColor = isBurner ? .burnerAccent : .controlAccentColor
         backgroundColor = isSelected ? accentColor : .clear
     }
 

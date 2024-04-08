@@ -79,4 +79,38 @@ extension NSAlert {
         return alert
     }
 
+    static func deleteAllPasswordsConfirmationAlert(count: Int, syncEnabled: Bool) -> NSAlert {
+        let messageText = UserText.deleteAllPasswordsConfirmationMessageText(count: count)
+        let informationText = UserText.deleteAllPasswordsConfirmationInformationText(syncEnabled: syncEnabled)
+        return autofillActionConfirmationAlert(messageText: messageText,
+                                        informationText: informationText,
+                                        confirmButtonText: UserText.passwordManagerAlerDeleteButton)
+    }
+
+    private static func autofillActionConfirmationAlert(messageText: String,
+                                                        informationText: String,
+                                                        confirmButtonText: String) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = messageText
+        alert.informativeText = informationText
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: confirmButtonText)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+    static func deleteAllPasswordsCompletionAlert(count: Int, syncEnabled: Bool) -> NSAlert {
+        let messageText = UserText.deleteAllPasswordsCompletionMessageText(count: count)
+        let informationText = UserText.deleteAllPasswordsCompletionInformationText(syncEnabled: syncEnabled)
+        return autofillActionCompletionAlert(messageText: messageText,
+                                      informationText: informationText)
+    }
+
+    private static func autofillActionCompletionAlert(messageText: String, informationText: String) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = messageText
+        alert.informativeText = informationText
+        alert.addButton(withTitle: UserText.deleteAllPasswordsCompletionButtonText)
+        return alert
+    }
 }

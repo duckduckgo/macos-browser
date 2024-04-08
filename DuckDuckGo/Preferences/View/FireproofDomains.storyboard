@@ -29,6 +29,9 @@
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="removeAllDomains:" target="Clu-Bo-JRW" id="xPH-8I-h5n"/>
+                                </connections>
                             </button>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aPG-Pg-rGL">
                                 <rect key="frame" x="20" y="60" width="435" height="195"/>

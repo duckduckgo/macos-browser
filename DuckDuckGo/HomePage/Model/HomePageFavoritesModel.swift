@@ -86,14 +86,16 @@ extension HomePage.Models {
         let open: (Bookmark, OpenTarget) -> Void
         let removeFavorite: (Bookmark) -> Void
         let deleteBookmark: (Bookmark) -> Void
-        let addEdit: (Bookmark?) -> Void
+        let add: () -> Void
+        let edit: (Bookmark) -> Void
         let moveFavorite: (Bookmark, Int) -> Void
         let onFaviconMissing: () -> Void
 
         init(open: @escaping (Bookmark, OpenTarget) -> Void,
              removeFavorite: @escaping (Bookmark) -> Void,
              deleteBookmark: @escaping (Bookmark) -> Void,
-             addEdit: @escaping (Bookmark?) -> Void,
+             add: @escaping () -> Void,
+             edit: @escaping (Bookmark) -> Void,
              moveFavorite: @escaping (Bookmark, Int) -> Void,
              onFaviconMissing: @escaping () -> Void
         ) {
@@ -102,7 +104,8 @@ extension HomePage.Models {
             self.open = open
             self.removeFavorite = removeFavorite
             self.deleteBookmark = deleteBookmark
-            self.addEdit = addEdit
+            self.add = add
+            self.edit = edit
             self.moveFavorite = moveFavorite
             self.onFaviconMissing = onFaviconMissing
         }
@@ -119,12 +122,12 @@ extension HomePage.Models {
             open(bookmark, .current)
         }
 
-        func edit(_ bookmark: Bookmark) {
-            addEdit(bookmark)
+        func editBookmark(_ bookmark: Bookmark) {
+            edit(bookmark)
         }
 
         func addNew() {
-            addEdit(nil)
+            add()
         }
 
         private func updateVisibleModels() {

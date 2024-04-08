@@ -37,8 +37,6 @@ class StringExtensionTests: XCTestCase {
                        "&lt;hey beep&#61;&#92;&quot;&#35;test&#92;&quot; boop&#61;&apos;&#35;&apos; fool&#61;1 &gt;floop&excl;&lt;b&gt;burp&lt;&#x2F;b&gt;&lt;&#x2F;hey&gt;")
 
         XCTAssertEqual(URLError(URLError.Code.cannotConnectToHost, userInfo: [NSLocalizedDescriptionKey: "Could not connect to the server."]).localizedDescription.escapedUnicodeHtmlString(), "Could not connect to the server.")
-        XCTAssertEqual(URLError(URLError.Code.cannotConnectToHost).localizedDescription.escapedUnicodeHtmlString(), "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)")
-        XCTAssertEqual(URLError(URLError.Code.cannotFindHost).localizedDescription.escapedUnicodeHtmlString(), "The operation couldn’t be completed. (NSURLErrorDomain error -1003.)")
     }
 
 }

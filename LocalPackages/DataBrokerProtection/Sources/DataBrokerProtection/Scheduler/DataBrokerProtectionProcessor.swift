@@ -32,6 +32,8 @@ final class DataBrokerProtectionProcessor {
     private let operationQueue: OperationQueue
     private var pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userNotificationService: DataBrokerProtectionUserNotificationService
+    private let engagementPixels: DataBrokerProtectionEngagementPixels
+    private let eventPixels: DataBrokerProtectionEventPixels
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
@@ -48,6 +50,8 @@ final class DataBrokerProtectionProcessor {
         self.pixelHandler = pixelHandler
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
         self.userNotificationService = userNotificationService
+        self.engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
+        self.eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
     }
 
     // MARK: - Public functions
@@ -106,11 +110,15 @@ final class DataBrokerProtectionProcessor {
                                completion: @escaping () -> Void) {
 
         // Before running new operations we check if there is any updates to the broker files.
-        // This runs only once per 24 hours.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
             let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault)
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
+
+        // This will fire the DAU/WAU/MAU pixels,
+        engagementPixels.fireEngagementPixel()
+        // This will try to fire the event weekly report pixels
+        eventPixels.tryToFireWeeklyPixels()
 
         let brokersProfileData = database.fetchAllBrokerProfileQueryData()
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
@@ -139,8 +147,7 @@ final class DataBrokerProtectionProcessor {
             guard let dataBrokerID = queryData.dataBroker.id else { continue }
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
-                let matchingQueriesData = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }
-                let collection = DataBrokerOperationsCollection(brokerProfileQueriesData: matchingQueriesData,
+                let collection = DataBrokerOperationsCollection(dataBrokerID: dataBrokerID,
                                                                 database: database,
                                                                 operationType: operationType,
                                                                 intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,

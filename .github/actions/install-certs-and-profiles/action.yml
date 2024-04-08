@@ -1,4 +1,4 @@
-name: Instal Certs and Profiles
+name: Install Certs and Profiles
 description: Installs signing certificates and provisioning profiles
 inputs:
   BUILD_CERTIFICATE_BASE64:

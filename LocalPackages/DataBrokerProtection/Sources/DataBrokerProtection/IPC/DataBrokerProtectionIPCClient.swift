@@ -17,9 +17,9 @@
 //
 
 import Combine
+import Common
 import Foundation
 import XPCHelper
-import Common
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
@@ -146,6 +146,17 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         xpc.execute(call: { server in
             server.runAllOperations(showWebView: showWebView)
         }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
+    }
+
+    public func openBrowser(domain: String) {
+        self.pixelHandler.fire(.ipcServerRunAllOperations)
+        xpc.execute(call: { server in
+            server.openBrowser(domain: domain)
+        }, xpcReplyErrorHandler: { error in
+            os_log("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
         })

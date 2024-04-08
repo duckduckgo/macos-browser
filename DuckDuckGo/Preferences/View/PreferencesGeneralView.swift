@@ -25,33 +25,15 @@ import SwiftUIExtensions
 extension Preferences {
 
     struct GeneralView: View {
-        @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
         @ObservedObject var startupModel: StartupPreferences
+        @ObservedObject var downloadsModel: DownloadsPreferences
+        @ObservedObject var searchModel: SearchPreferences
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
             PreferencePane(UserText.general) {
 
-                // SECTION 1: Default Browser
-                PreferencePaneSection(UserText.defaultBrowser) {
-
-                    PreferencePaneSubSection {
-                        HStack {
-                            if defaultBrowserModel.isDefault {
-                                Image("SolidCheckmark")
-                                Text(UserText.isDefaultBrowser)
-                            } else {
-                                Image("Warning").foregroundColor(Color("LinkBlueColor"))
-                                Text(UserText.isNotDefaultBrowser)
-                                Button(UserText.makeDefaultBrowser) {
-                                    defaultBrowserModel.becomeDefault()
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // SECTION 2: On Startup
+                // SECTION 1: On Startup
                 PreferencePaneSection(UserText.onStartup) {
 
                     PreferencePaneSubSection {
@@ -65,7 +47,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 3: Home Page
+                // SECTION 2: Home Page
                 PreferencePaneSection(UserText.homePage) {
 
                     PreferencePaneSubSection {
@@ -98,7 +80,7 @@ extension Preferences {
                                     Text(UserText.homeButtonMode(for: position)).tag(position)
                                 }
                             }
-                            .scaledToFit()
+                            .fixedSize()
                             .onChange(of: startupModel.homeButtonPosition) { _ in
                                 startupModel.updateHomeButton()
                             }
@@ -109,6 +91,34 @@ extension Preferences {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
+                // SECTION 3: Search Settings
+                PreferencePaneSection(UserText.privateSearch) {
+                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions)
+                }
+
+                // SECTION 4: Downloads
+                PreferencePaneSection(UserText.downloads) {
+                    PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,
+                                       isOn: $downloadsModel.shouldOpenPopupOnCompletion)
+                    }.padding(.bottom, 5)
+
+                    // MARK: Location
+                    PreferencePaneSubSection {
+                        Text(UserText.downloadsLocation).bold()
+                        HStack {
+                            NSPathControlView(url: downloadsModel.selectedDownloadLocation)
+#if !APPSTORE
+                            Button(UserText.downloadsChangeDirectory) {
+                                downloadsModel.presentDownloadDirectoryPanel()
+                            }
+#endif
+                        }
+                        .disabled(downloadsModel.alwaysRequestDownloadLocation)
+                        ToggleMenuItem(UserText.downloadsAlwaysAsk,
+                                       isOn: $downloadsModel.alwaysRequestDownloadLocation)
+                    }
+                }
             }
         }
     }

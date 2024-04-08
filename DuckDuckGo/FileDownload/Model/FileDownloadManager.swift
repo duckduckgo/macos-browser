@@ -27,10 +27,8 @@ protocol FileDownloadManagerProtocol: AnyObject {
     var downloadsPublisher: AnyPublisher<WebKitDownloadTask, Never> { get }
 
     @discardableResult
-    func add(_ download: WebKitDownload,
-             fromBurnerWindow: Bool,
-             delegate: DownloadTaskDelegate?,
-             location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask
+    @MainActor
+    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask
 
     func cancelAll(waitUntilDone: Bool)
 }
@@ -38,26 +36,25 @@ protocol FileDownloadManagerProtocol: AnyObject {
 extension FileDownloadManagerProtocol {
 
     @discardableResult
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, location: FileDownloadManager.DownloadLocationPreference) -> WebKitDownloadTask {
-        add(download, fromBurnerWindow: fromBurnerWindow, delegate: nil, location: location)
+    @MainActor
+    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
+        add(download, fromBurnerWindow: fromBurnerWindow, delegate: nil, destination: destination)
     }
 
-}
-
-@MainActor
-protocol FileDownloadManagerDelegate: AnyObject {
-    func askUserToGrantAccessToDestination(_ folderUrl: URL)
 }
 
 final class FileDownloadManager: FileDownloadManagerProtocol {
 
     static let shared = FileDownloadManager()
     private let preferences: DownloadsPreferences
+    private let getLogger: (() -> OSLog)
+    private var log: OSLog {
+        getLogger()
+    }
 
-    weak var delegate: FileDownloadManagerDelegate?
-
-    init(preferences: DownloadsPreferences = .init()) {
+    init(preferences: DownloadsPreferences = .shared, log: @autoclosure @escaping (() -> OSLog) = .downloads) {
         self.preferences = preferences
+        self.getLogger = log
     }
 
     private (set) var downloads = Set<WebKitDownloadTask>()
@@ -68,40 +65,31 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 
     private var downloadTaskDelegates = [WebKitDownloadTask: () -> DownloadTaskDelegate?]()
 
-    enum DownloadLocationPreference: Equatable {
-        case auto
-        case prompt
-        case preset(destinationURL: URL, tempURL: URL?)
-
-        var destinationURL: URL? {
-            guard case .preset(destinationURL: let url, tempURL: _) = self else { return nil }
-            return url
-        }
-
-        var tempURL: URL? {
-            guard case .preset(destinationURL: _, tempURL: let url) = self else { return nil }
-            return url
-        }
-
-        var promptForLocation: Bool {
-            switch self {
-            case .prompt: return true
-            case .preset, .auto: return false
-            }
-        }
-    }
-
     @discardableResult
-    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, location: DownloadLocationPreference) -> WebKitDownloadTask {
+    @MainActor
+    func add(_ download: WebKitDownload, fromBurnerWindow: Bool, delegate: DownloadTaskDelegate?, destination: WebKitDownloadTask.DownloadDestination) -> WebKitDownloadTask {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        let task = WebKitDownloadTask(download: download,
-                                      promptForLocation: location.promptForLocation,
-                                      destinationURL: location.destinationURL,
-                                      tempURL: location.tempURL,
-                                      isBurner: fromBurnerWindow)
+        var destination = destination
+        // always prompt when "downloading" a local file
+        if download.originalRequest?.url?.isFileURL ?? true, case .auto = destination {
+            destination = .prompt
+        }
+        let task = WebKitDownloadTask(download: download, destination: destination, isBurner: fromBurnerWindow)
+        os_log(log: log, "add \(download): \(download.originalRequest?.url?.absoluteString ?? "<nil>") -> \(destination): \(task)")
 
-        self.downloadTaskDelegates[task] = { [weak delegate] in delegate }
+        let shouldCancelDownloadIfDelegateIsGone = delegate != nil
+        self.downloadTaskDelegates[task] = { [weak delegate, log] in
+            if let delegate {
+                return delegate
+            }
+            // if the delegate was originally provided but deallocated since then – the download task should be cancelled
+            if shouldCancelDownloadIfDelegateIsGone {
+                os_log(log: log, "🦀 \(download) delegate is gone: cancelling")
+                return CancelledDownloadTaskDelegate()
+            }
+            return nil
+        }
 
         downloads.insert(task)
         downloadAddedSubject.send(task)
@@ -113,21 +101,26 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
     func cancelAll(waitUntilDone: Bool) {
         dispatchPrecondition(condition: .onQueue(.main))
 
+        os_log(log: log, "FileDownloadManager: cancel all: [\(downloads.map(\.debugDescription).joined(separator: ", "))]")
         let dispatchGroup: DispatchGroup? = waitUntilDone ? DispatchGroup() : nil
         var cancellables = Set<AnyCancellable>()
         for task in downloads {
             if waitUntilDone {
                 dispatchGroup?.enter()
-                task.output.sink { _ in
-                    dispatchGroup?.leave()
-                } receiveValue: { _ in }
+                task.$state.sink { state in
+                    if state.isCompleted {
+                        dispatchGroup?.leave()
+                    }
+                }
                 .store(in: &cancellables)
             }
 
             task.cancel()
         }
-        if let dispatchGroup = dispatchGroup {
-            RunLoop.main.run(until: RunLoop.ResumeCondition(dispatchGroup: dispatchGroup))
+        if let dispatchGroup {
+            withExtendedLifetime(cancellables) {
+                RunLoop.main.run(until: RunLoop.ResumeCondition(dispatchGroup: dispatchGroup))
+            }
         }
     }
 
@@ -136,56 +129,50 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
 extension FileDownloadManager: WebKitDownloadTaskDelegate {
 
     @MainActor
-    // swiftlint:disable:next function_body_length
-    func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask,
-                                             suggestedFilename: String,
-                                             completionHandler: @escaping (URL?, UTType?) -> Void) {
+    func fileDownloadTaskNeedsDestinationURL(_ task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType fileType: UTType?) async -> (URL?, UTType?) {
+        guard case (.some(let url), let fileType) = await chooseDestination(for: task, suggestedFilename: suggestedFilename, suggestedFileType: fileType) else {
+            os_log(log: log, "choose destination cancelled: \(task)")
+            return (nil, nil)
+        }
+        os_log(log: log, "destination chosen: \(task): \"\(url.path)\" (\(fileType?.description ?? "nil"))")
 
-        let completion: (URL?, UTType?) -> Void = { url, fileType in
-            defer {
-                self.downloadTaskDelegates[task] = nil
-            }
-
-            guard let url = url else {
-                completionHandler(nil, nil)
-                return
-            }
-
-            if let originalRect = self.downloadTaskDelegates[task]?()?.fileIconFlyAnimationOriginalRect(for: task) {
-                let utType = UTType(filenameExtension: url.pathExtension) ?? fileType ?? .data
-                task.progress.flyToImage = NSWorkspace.shared.icon(for: utType)
-                task.progress.fileIconOriginalRect = originalRect
-            }
-
-            completionHandler(url, fileType)
+        if let originalRect = self.downloadTaskDelegates[task]?()?.fileIconFlyAnimationOriginalRect(for: task) {
+            let utType = UTType(filenameExtension: url.pathExtension) ?? fileType ?? .data
+            task.progress.flyToImage = NSWorkspace.shared.icon(for: utType)
+            task.progress.fileIcon = task.progress.flyToImage
+            task.progress.fileIconOriginalRect = originalRect
         }
 
-        let downloadLocation = preferences.effectiveDownloadLocation
-        let fileType = task.suggestedFileType
+        self.downloadTaskDelegates[task] = nil
+        return (url, fileType)
+    }
 
+    @MainActor
+    private func chooseDestination(for task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType fileType: UTType?) async -> (URL?, UTType?) {
         guard task.shouldPromptForLocation || preferences.alwaysRequestDownloadLocation,
-              let delegate = self.downloadTaskDelegates[task]?()
-        else {
-            // download to default Downloads destination
-            let fileName = suggestedFilename.isEmpty ? .uniqueFilename(for: fileType) : suggestedFilename
+              self.downloadTaskDelegates[task]?() != nil else {
+            return await defaultDownloadLocation(for: task, suggestedFilename: suggestedFilename, fileType: fileType)
+        }
 
-            guard let url = downloadLocation?.appendingPathComponent(fileName) else {
-                os_log("Failed to access Downloads folder")
-                Pixel.fire(.debug(event: .fileMoveToDownloadsFailed, error: CocoaError(.fileWriteUnknown)))
-                completion(nil, nil)
-                return
+        return await requestDestinationFromUser(for: task, suggestedFilename: suggestedFilename, suggestedFileType: fileType)
+    }
+
+    @MainActor
+    private func requestDestinationFromUser(for task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType fileType: UTType?) async -> (URL?, UTType?) {
+        return await withCheckedContinuation { continuation in
+            requestDestinationFromUser(for: task, suggestedFilename: suggestedFilename, suggestedFileType: fileType) { (url, fileType) in
+                continuation.resume(returning: (url, fileType))
             }
+        }
+    }
 
-            // Make sure the app has an access to destination
-            let folderUrl = url.deletingLastPathComponent()
-            guard self.verifyAccessToDestinationFolder(folderUrl,
-                                                       destinationRequested: preferences.alwaysRequestDownloadLocation,
-                                                       isSandboxed: NSApp.isSandboxed) else {
-                completion(nil, nil)
-                return
-            }
-
-            completion(url, fileType)
+    @MainActor
+    private func requestDestinationFromUser(for task: WebKitDownloadTask, suggestedFilename: String, suggestedFileType fileType: UTType?, completionHandler: @escaping (URL?, UTType?) -> Void) {
+        // !!!
+        // don‘t refactor this to `async` style as it will make the `delegate` retained for the scope of the async func
+        // leading to a retain cycle when a background Tab presenting Save Dialog is closed
+        guard let delegate = self.downloadTaskDelegates[task]?() else {
+            completionHandler(nil, nil)
             return
         }
 
@@ -204,53 +191,62 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             fileTypes.append(fileType)
         }
 
-        delegate.chooseDestination(suggestedFilename: suggestedFilename, directoryURL: downloadLocation, fileTypes: fileTypes) { [weak self] url, fileType in
-            guard let self, let url else {
-                completion(nil, nil)
+        os_log(log: log, "FileDownloadManager: requesting download location \"\(suggestedFilename)\"/\(fileTypes.map(\.description).joined(separator: ", "))")
+        delegate.chooseDestination(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { url, fileType in
+            guard let url else {
+                completionHandler(nil, nil)
                 return
             }
 
             let folderUrl = url.deletingLastPathComponent()
             self.preferences.lastUsedCustomDownloadLocation = folderUrl
 
-            // Make sure the app has an access to destination
-            guard self.verifyAccessToDestinationFolder(folderUrl,
-                                                       destinationRequested: self.preferences.alwaysRequestDownloadLocation,
-                                                       isSandboxed: NSApp.isSandboxed) else {
-                completion(nil, nil)
-                return
-            }
-
-            if FileManager.default.fileExists(atPath: url.path) {
-                // if SavePanel points to an existing location that means overwrite was chosen
-                try? FileManager.default.removeItem(at: url)
-            }
-
-            completion(url, fileType)
+            // we shouldn‘t validate directory access here as we won‘t have it in sandboxed builds - only to the destination URL
+            completionHandler(url, fileType)
         }
     }
 
     @MainActor
-    private func verifyAccessToDestinationFolder(_ folderUrl: URL, destinationRequested: Bool, isSandboxed: Bool) -> Bool {
-        if destinationRequested && isSandboxed { return true }
-
-        let folderPath = folderUrl.relativePath
-        let c = open(folderPath, O_RDONLY)
-        let hasAccess = c != -1
-        close(c)
-
-        if !hasAccess {
-            delegate?.askUserToGrantAccessToDestination(folderUrl)
+    private func defaultDownloadLocation(for task: WebKitDownloadTask, suggestedFilename: String, fileType: UTType?) async -> (URL?, UTType?) {
+        // download to default Downloads destination
+        guard let downloadLocation = preferences.effectiveDownloadLocation ?? DownloadsPreferences.defaultDownloadLocation(validate: false /* verify later */) else {
+            pixelAssertionFailure("Failed to access Downloads folder")
+            return (nil, nil)
         }
 
-        return hasAccess
+        let fileName = suggestedFilename.isEmpty ? "download".appendingPathExtension(fileType?.preferredFilenameExtension) : suggestedFilename
+        var url = downloadLocation.appendingPathComponent(fileName)
+        os_log(log: log, "FileDownloadManager: using default download location for \"\(suggestedFilename)\": \"\(url.path)\"")
+
+        // make sure the app has access to the destination
+        let folderUrl = url.deletingLastPathComponent()
+        let fm = FileManager.default
+        guard fm.isWritableFile(atPath: folderUrl.path) else {
+            os_log(log: log, "FileDownloadManager: no write permissions for \"\(folderUrl.path)\": fallback to user request")
+            return await requestDestinationFromUser(for: task, suggestedFilename: suggestedFilename, suggestedFileType: fileType)
+        }
+
+        // choose non-existent filename
+        do {
+            url = try fm.withNonExistentUrl(for: url, incrementingIndexIfExistsUpTo: 10000) { url in
+                // the file will be overwritten in the WebKitDownloadTask
+                try fm.createFile(atPath: url.path, contents: nil) ? url : { throw CocoaError(.fileWriteFileExists) }()
+            }
+        } catch {
+            pixelAssertionFailure("Failed to create file in the Downloads folder")
+            return (nil, nil)
+        }
+
+        return (url, fileType)
     }
 
-    func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<URL, FileDownloadError>) {
+    func fileDownloadTask(_ task: WebKitDownloadTask, didFinishWith result: Result<Void, FileDownloadError>) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         self.downloads.remove(task)
         self.downloadTaskDelegates[task] = nil
+
+        os_log(log: log, "❎ removed task \(task)")
     }
 
 }
@@ -258,8 +254,36 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
 protocol DownloadTaskDelegate: AnyObject {
 
     @MainActor
-    func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void)
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void)
     @MainActor
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
 
+}
+
+// if the original Download Task delegate is gone, this one is used to cancel the download
+final class CancelledDownloadTaskDelegate: DownloadTaskDelegate {
+
+    func chooseDestination(suggestedFilename: String?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
+        callback(nil, nil)
+    }
+
+    func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect? {
+        nil
+    }
+
+}
+
+extension WebKitDownloadTask.DownloadDestination: CustomDebugStringConvertible {
+    var debugDescription: String {
+        switch self {
+        case .auto:
+            ".auto"
+        case .prompt:
+            ".prompt"
+        case .preset(let destinationURL):
+            ".preset(destinationURL: \"\(destinationURL.path)\")"
+        case .resume(destination: let destination, tempFile: let tempFile):
+            ".resume(destination: \"\(destination.url?.path ?? "<nil>")\", tempFile: \"\(tempFile.url?.path ?? "<nil>")\")"
+        }
+    }
 }

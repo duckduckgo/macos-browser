@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Navigation
+import Combine
 import Common
 import Foundation
+import Navigation
 import WebKit
 
 extension Tab: NavigationResponder {
@@ -68,6 +69,8 @@ extension Tab: NavigationResponder {
 
             // add extra headers to SERP requests
             .struct(SerpHeadersNavigationResponder()),
+
+            .struct(RedirectNavigationResponder()),
 
             // ensure Content Blocking Rules are applied before navigation
             .weak(nullable: self.contentBlockingAndSurrogates),

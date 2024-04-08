@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import History
 
 final class VisitMenuItem: NSMenuItem {
 

@@ -55,7 +55,10 @@ final class StatusBarMenuTests: XCTestCase {
             iconProvider: MenuIconProvider(),
             appLauncher: MockAppLauncher(),
             menuItems: { [] },
-            agentLoginItem: nil)
+            agentLoginItem: nil,
+            isMenuBarStatusView: false,
+            userDefaults: .standard,
+            uninstallHandler: { })
 
         menu.show()
 
@@ -77,7 +80,10 @@ final class StatusBarMenuTests: XCTestCase {
             iconProvider: MenuIconProvider(),
             appLauncher: MockAppLauncher(),
             menuItems: { [] },
-            agentLoginItem: nil)
+            agentLoginItem: nil,
+            isMenuBarStatusView: false,
+            userDefaults: .standard,
+            uninstallHandler: { })
 
         menu.hide()
 

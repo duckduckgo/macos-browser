@@ -139,10 +139,15 @@ final class MapperToUITests: XCTestCase {
     }
 
     func testLastScans_areMappedCorrectly() {
+        var dateComponent = DateComponents()
+        dateComponent.day = -10
+        let date10daysAgo = Calendar.current.date(byAdding: dateComponent, to: Date())!
+
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
-            .mock(dataBrokerName: "Broker #1", lastRunDate: Date().yesterday),
-            .mock(dataBrokerName: "Broker #2", lastRunDate: Date().yesterday),
-            .mock(dataBrokerName: "Broker #3")
+            .mock(dataBrokerName: "Broker #1", url: "broker1.com", lastRunDate: Date().yesterday),
+            .mock(dataBrokerName: "Broker #2", url: "broker2.com", lastRunDate: Date().yesterday),
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com", lastRunDate: date10daysAgo),
+            .mock(dataBrokerName: "Broker #4", url: "broker4.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)
@@ -152,10 +157,15 @@ final class MapperToUITests: XCTestCase {
     }
 
     func testNextScans_areMappedCorrectly() {
+        var dateComponent = DateComponents()
+        dateComponent.day = 10
+        let date10daysFromNow = Calendar.current.date(byAdding: dateComponent, to: Date())!
+
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
-            .mock(dataBrokerName: "Broker #1", preferredRunDate: Date().tomorrow),
-            .mock(dataBrokerName: "Broker #2", preferredRunDate: Date().tomorrow),
-            .mock(dataBrokerName: "Broker #3")
+            .mock(dataBrokerName: "Broker #1", url: "broker1.com", preferredRunDate: Date().tomorrow),
+            .mock(dataBrokerName: "Broker #2", url: "broker2.com", preferredRunDate: Date().tomorrow),
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com", preferredRunDate: date10daysFromNow),
+            .mock(dataBrokerName: "Broker #4", url: "broker4.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)
@@ -165,7 +175,7 @@ final class MapperToUITests: XCTestCase {
     }
 
     func testWhenMirrorSiteIsNotInRemovedPeriod_thenItShouldBeAddedToTotalScans() {
-        let brokerProfileQueryWithMirrorSite: BrokerProfileQueryData = .mock(dataBrokerName: "Broker #1", mirrorSites: [.init(name: "mirror", addedAt: Date(), removedAt: nil)])
+        let brokerProfileQueryWithMirrorSite: BrokerProfileQueryData = .mock(dataBrokerName: "Broker #1", mirrorSites: [.init(name: "mirror", url: "mirror1.com", addedAt: Date(), removedAt: nil)])
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             brokerProfileQueryWithMirrorSite,
             brokerProfileQueryWithMirrorSite,
@@ -178,7 +188,7 @@ final class MapperToUITests: XCTestCase {
     }
 
     func testWhenMirrorSiteIsInRemovedPeriod_thenItShouldNotBeAddedToTotalScans() {
-        let brokerWithMirrorSiteThatWasRemoved = BrokerProfileQueryData.mock(dataBrokerName: "Broker #1", mirrorSites: [.init(name: "mirror", addedAt: Date(), removedAt: Date().yesterday)])
+        let brokerWithMirrorSiteThatWasRemoved = BrokerProfileQueryData.mock(dataBrokerName: "Broker #1", mirrorSites: [.init(name: "mirror", url: "mirror1.com", addedAt: Date(), removedAt: Date().yesterday)])
         let brokerProfileQueryData: [BrokerProfileQueryData] = [.mock(dataBrokerName: "Broker #1"), brokerWithMirrorSiteThatWasRemoved, .mock(dataBrokerName: "Broker #2")]
 
         let result = sut.initialScanState(brokerProfileQueryData)
@@ -190,7 +200,7 @@ final class MapperToUITests: XCTestCase {
         let brokerWithMirrorSiteNotRemovedAndWithScan = BrokerProfileQueryData.mock(
             dataBrokerName: "Broker #1",
             lastRunDate: Date(),
-            mirrorSites: [.init(name: "mirror", addedAt: Date(), removedAt: nil)]
+            mirrorSites: [.init(name: "mirror", url: "mirror.com", addedAt: Date(), removedAt: nil)]
         )
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             brokerWithMirrorSiteNotRemovedAndWithScan,
@@ -207,7 +217,7 @@ final class MapperToUITests: XCTestCase {
         let brokerWithMirrorSiteRemovedAndWithScan = BrokerProfileQueryData.mock(
             dataBrokerName: "Broker #2",
             lastRunDate: Date(),
-            mirrorSites: [.init(name: "mirror", addedAt: Date(), removedAt: Date().yesterday)]
+            mirrorSites: [.init(name: "mirror", url: "mirror1.com", addedAt: Date(), removedAt: Date().yesterday)]
         )
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(dataBrokerName: "Broker #1"),
@@ -223,7 +233,7 @@ final class MapperToUITests: XCTestCase {
     func testWhenMirrorSiteIsNotInRemovedPeriod_thenMatchIsAdded() {
         let brokerWithMirrorSiteNotRemovedAndWithMatch = BrokerProfileQueryData.mock(
             extractedProfile: .mockWithoutRemovedDate,
-            mirrorSites: [.init(name: "mirror", addedAt: Date(), removedAt: nil)]
+            mirrorSites: [.init(name: "mirror", url: "mirror1.com", addedAt: Date(), removedAt: nil)]
         )
         let brokerProfileQueryData: [BrokerProfileQueryData] = [.mock(), .mock(), brokerWithMirrorSiteNotRemovedAndWithMatch]
 
@@ -235,7 +245,7 @@ final class MapperToUITests: XCTestCase {
     func testWhenMirrorSiteIsInRemovedPeriod_thenMatchIsNotAdded() {
         let brokerWithMirrorSiteRemovedAndWithMatch = BrokerProfileQueryData.mock(
             extractedProfile: .mockWithoutRemovedDate,
-            mirrorSites: [.init(name: "mirror", addedAt: Date(), removedAt: Date().yesterday)]
+            mirrorSites: [.init(name: "mirror", url: "mirror1.com", addedAt: Date(), removedAt: Date().yesterday)]
         )
         let brokerProfileQueryData: [BrokerProfileQueryData] = [.mock(), .mock(), brokerWithMirrorSiteRemovedAndWithMatch]
 
@@ -246,8 +256,8 @@ final class MapperToUITests: XCTestCase {
 
     func testMirrorSites_areCorrectlyMappedToInProgressOptOuts() {
         let scanHistoryEventsWithMatchesFound: [HistoryEvent] = [.init(brokerId: 1, profileQueryId: 1, type: .matchesFound(count: 1), date: Date())]
-        let mirrorSiteNotRemoved = MirrorSite(name: "mirror #1", addedAt: Date.distantPast, removedAt: nil)
-        let mirrorSiteRemoved = MirrorSite(name: "mirror #2", addedAt: Date.distantPast, removedAt: Date().yesterday) // Should not be added
+        let mirrorSiteNotRemoved = MirrorSite(name: "mirror #1", url: "mirror1.com", addedAt: Date.distantPast, removedAt: nil)
+        let mirrorSiteRemoved = MirrorSite(name: "mirror #2", url: "mirror2.com", addedAt: Date.distantPast, removedAt: Date().yesterday) // Should not be added
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(extractedProfile: .mockWithoutRemovedDate,
                   scanHistoryEvents: scanHistoryEventsWithMatchesFound,
@@ -261,10 +271,10 @@ final class MapperToUITests: XCTestCase {
 
     func testWhenMirrorSiteRemovedIsInRangeToPastRemovedProfile_thenIsAddedToCompletedOptOuts() {
         let scanHistoryEventsWithMatchesFound: [HistoryEvent] = [.init(brokerId: 1, profileQueryId: 1, type: .matchesFound(count: 1), date: Date().yesterday!)]
-        let mirrorSiteRemoved = MirrorSite(name: "mirror #1", addedAt: Date.distantPast, removedAt: Date()) // Should be added
+        let mirrorSiteRemoved = MirrorSite(name: "mirror #1", url: "mirror1.com", addedAt: Date.distantPast, removedAt: Date()) // Should be added
         // The next two mirror sites should not be added. New mirror sites should not count for old opt-outs
-        let newMirrorSiteOne = MirrorSite(name: "mirror #2", addedAt: Date(), removedAt: nil)
-        let newMirrorSiteTwo = MirrorSite(name: "mirror #3", addedAt: Date(), removedAt: nil)
+        let newMirrorSiteOne = MirrorSite(name: "mirror #2", url: "mirror2.com", addedAt: Date(), removedAt: nil)
+        let newMirrorSiteTwo = MirrorSite(name: "mirror #3", url: "mirror3.com", addedAt: Date(), removedAt: nil)
         let brokerProfileQuery = BrokerProfileQueryData.mock(extractedProfile: .mockWithRemoveDate(Date().yesterday!),
                                                              scanHistoryEvents: scanHistoryEventsWithMatchesFound,
                                                              mirrorSites: [mirrorSiteRemoved, newMirrorSiteOne, newMirrorSiteTwo])
@@ -276,12 +286,12 @@ final class MapperToUITests: XCTestCase {
     }
 
     func testLastScansWithMirrorSites_areMappedCorrectly() {
-        let includedMirrorSite = MirrorSite(name: "mirror #1", addedAt: Date.distantPast, removedAt: nil)
-        let notIncludedMirrorSite = MirrorSite(name: "mirror #2", addedAt: Date(), removedAt: nil)
+        let includedMirrorSite = MirrorSite(name: "mirror #1", url: "mirror1.com", addedAt: Date.distantPast, removedAt: nil)
+        let notIncludedMirrorSite = MirrorSite(name: "mirror #2", url: "mirror2.com", addedAt: Date(), removedAt: nil)
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
-            .mock(dataBrokerName: "Broker #1", lastRunDate: Date().yesterday, mirrorSites: [includedMirrorSite, notIncludedMirrorSite]),
-            .mock(dataBrokerName: "Broker #2", lastRunDate: Date().yesterday),
-            .mock(dataBrokerName: "Broker #3")
+            .mock(dataBrokerName: "Broker #1", url: "broker1.com", lastRunDate: Date().yesterday, mirrorSites: [includedMirrorSite, notIncludedMirrorSite]),
+            .mock(dataBrokerName: "Broker #2", url: "broker2.com", lastRunDate: Date().yesterday),
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)
@@ -291,12 +301,12 @@ final class MapperToUITests: XCTestCase {
     }
 
     func testNextScansWithMirrorSites_areMappedCorrectly() {
-        let includedMirrorSite = MirrorSite(name: "mirror #1", addedAt: Date.distantPast, removedAt: nil)
-        let notIncludedMirrorSite = MirrorSite(name: "mirror #2", addedAt: Date.distantPast, removedAt: Date())
+        let includedMirrorSite = MirrorSite(name: "mirror #1", url: "mirror1.com", addedAt: Date.distantPast, removedAt: nil)
+        let notIncludedMirrorSite = MirrorSite(name: "mirror #2", url: "mirror2.com", addedAt: Date.distantPast, removedAt: Date())
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
-            .mock(dataBrokerName: "Broker #1", preferredRunDate: Date().tomorrow, mirrorSites: [includedMirrorSite, notIncludedMirrorSite]),
-            .mock(dataBrokerName: "Broker #2", preferredRunDate: Date().tomorrow),
-            .mock(dataBrokerName: "Broker #3")
+            .mock(dataBrokerName: "Broker #1", url: "broker1.com", preferredRunDate: Date().tomorrow, mirrorSites: [includedMirrorSite, notIncludedMirrorSite]),
+            .mock(dataBrokerName: "Broker #2", url: "broker2.com", preferredRunDate: Date().tomorrow),
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)

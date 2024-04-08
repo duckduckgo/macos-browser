@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import History
 
 final class BackForwardListItemViewModel {
 

@@ -20,8 +20,8 @@ import Common
 import Foundation
 import LoginItems
 
-/// Class to manage the login items for Network Protection and DBP
-/// 
+/// Class to manage the login items for the VPN and DBP
+///
 final class LoginItemsManager {
     private enum Action: String {
         case enable
@@ -59,6 +59,12 @@ final class LoginItemsManager {
         }
     }
 
+    func isAnyEnabled(_ items: Set<LoginItem>) -> Bool {
+        return items.contains(where: { item in
+            item.status == .enabled
+        })
+    }
+
     private func handleError(for item: LoginItem, action: Action, error: NSError) {
         let event = Pixel.Event.Debug.loginItemUpdateError(
             loginItemBundleID: item.agentBundleID,
@@ -66,9 +72,11 @@ final class LoginItemsManager {
             buildType: AppVersion.shared.buildType,
             osVersion: AppVersion.shared.osVersion
         )
-        DailyPixel.fire(pixel: .debug(event: event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
+        DailyPixel.fire(pixel: .debug(event: event, error: error), frequency: .dailyAndCount)
 
-        logOrAssertionFailure("🔴 Could not enable \(item): \(error.debugDescription)")
+        os_log("🔴 Could not enable %{public}@: %{public}@",
+               item.debugDescription,
+               error.debugDescription)
     }
 
     // MARK: - Debug Interactions

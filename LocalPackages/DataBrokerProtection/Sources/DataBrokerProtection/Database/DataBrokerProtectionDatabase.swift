@@ -40,6 +40,8 @@ protocol DataBrokerProtectionRepository {
 
     func add(_ historyEvent: HistoryEvent)
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent?
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) -> [HistoryEvent]
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) -> [HistoryEvent]
     func hasMatches() -> Bool
 
     func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation?
@@ -273,6 +275,34 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: fetchLastEvent, error: %{public}@", log: .error, error.localizedDescription)
             return nil
+        }
+    }
+
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) -> [HistoryEvent] {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            guard let scan = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
+                return [HistoryEvent]()
+            }
+
+            return scan.historyEvents
+        } catch {
+            os_log("Database error: fetchHistoryEvents, error: %{public}@", log: .error, error.localizedDescription)
+            return [HistoryEvent]()
+        }
+    }
+
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) -> [HistoryEvent] {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            guard let optOut = try vault.fetchOptOut(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId) else {
+                return [HistoryEvent]()
+            }
+
+            return optOut.historyEvents
+        } catch {
+            os_log("Database error: fetchHistoryEvents, error: %{public}@", log: .error, error.localizedDescription)
+            return [HistoryEvent]()
         }
     }
 

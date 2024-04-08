@@ -22,5 +22,8 @@ protocol Workspace {
     func urlForApplication(toOpen url: URL) -> URL?
     @discardableResult
     func open(_ url: URL) -> Bool
+
+    @discardableResult
+    func open(_ urls: [URL], withAppBundleIdentifier bundleIdentifier: String?, options: NSWorkspace.LaunchOptions, additionalEventParamDescriptor descriptor: NSAppleEventDescriptor?, launchIdentifiers identifiers: AutoreleasingUnsafeMutablePointer<NSArray?>?) -> Bool
 }
 extension NSWorkspace: Workspace {}

@@ -39,10 +39,10 @@ final class CaptchaServiceTests: XCTestCase {
 
     func testWhenSessionThrowsOnSubmittingCaptchaInfo_thenTheCorrectErrorIsThrown() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
-        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
-            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, attemptId: UUID(), shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .errorWhenSubmittingCaptcha = error {
@@ -56,10 +56,10 @@ final class CaptchaServiceTests: XCTestCase {
     func testWhenFailureCriticalIsReturnedOnSubmittingCaptchaInfo_thenCriticalErrorWhenSubmittingCaptchaIsThrown() async {
         let response = CaptchaTransaction(message: .failureCritical, transactionId: nil)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(response)) })
-        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
-            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, attemptId: UUID(), shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .criticalFailureWhenSubmittingCaptcha = error {
@@ -73,10 +73,10 @@ final class CaptchaServiceTests: XCTestCase {
     func testWhenInvalidRequestIsReturnedOnSubmittingCaptchaInfo_thenInvalidRequestWhenSubmittingCaptchaIsThrown() async {
         let response = CaptchaTransaction(message: .invalidRequest, transactionId: nil)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(response)) })
-        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
-            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, attemptId: UUID(), shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .invalidRequestWhenSubmittingCaptcha = error {
@@ -94,10 +94,10 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
-            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, retries: 2, shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, retries: 2, pollingInterval: 0.01, attemptId: UUID(), shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .timedOutWhenSubmittingCaptcha = error {
@@ -113,10 +113,10 @@ final class CaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
-            _ = try await sut.submitCaptchaToBeResolved(for: "123456", shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaToBeResolved(for: "123456", attemptId: UUID(), shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .failureWhenFetchingCaptchaResult = error {
@@ -132,10 +132,10 @@ final class CaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
-            _ = try await sut.submitCaptchaToBeResolved(for: "123456", shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaToBeResolved(for: "123456", attemptId: UUID(), shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .invalidRequestWhenFetchingCaptchaResult = error {
@@ -151,10 +151,10 @@ final class CaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
-            _ = try await sut.submitCaptchaToBeResolved(for: "123456", shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaToBeResolved(for: "123456", attemptId: UUID(), shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .nilDataWhenFetchingCaptchaResult = error {
@@ -172,10 +172,10 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
-            _ = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 1, shouldRunNextStep: { true })
+            _ = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 0.01, attemptId: UUID(), shouldRunNextStep: { true })
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? CaptchaServiceError, case .timedOutWhenFetchingCaptchaResult = error {
@@ -191,10 +191,10 @@ final class CaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
 
         do {
-            let data = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 1, shouldRunNextStep: { true })
+            let data = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 1, attemptId: UUID(), shouldRunNextStep: { true })
             XCTAssertEqual(data, "some data")
         } catch {
             XCTFail("Unexpected error thrown: \(error).")

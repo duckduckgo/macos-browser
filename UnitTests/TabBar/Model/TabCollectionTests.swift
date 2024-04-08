@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import History
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -187,7 +188,7 @@ extension Tab {
 
 class HistoryTabExtensionMock: TabExtension, HistoryExtensionProtocol {
 
-    var localHistory: [DuckDuckGo_Privacy_Browser.Visit] = []
+    var localHistory: [Visit] = []
     func getPublicProtocol() -> HistoryExtensionProtocol { self }
 
 }

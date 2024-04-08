@@ -1,6 +1,7 @@
 {
-  "name": "quickpeopletrace.com",
-  "version": "0.1.1",
+  "name": "Quick People Trace",
+  "url": "quickpeopletrace.com",
+  "version": "0.1.5",
   "parent": "peoplefinders.com",
   "addedDatetime": 1674540000000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "45443ab2-7563-4c7d-8bf2-b1b550f4b825",
+          "id": "d97db33b-c755-48b1-b751-51541d55b0fe",
           "url": "https://www.quickpeopletrace.com/search/?addresssearch=1&tabid=1&teaser-firstname=${firstName}&teaser-middlename=&teaser-lastname=${lastName}&teaser-city=${city}&teaser-state=${state|upcase}&teaser-submitted=Search"
         },
         {
           "actionType": "extract",
-          "id": "08607047-96e8-4fbb-9af9-bf7b8e163b20",
+          "id": "54cdba05-95bd-4142-b97c-4cafc59059df",
           "selector": "//table/tbody/tr[position() > 1]",
           "profile": {
             "name": {
@@ -23,9 +24,6 @@
             },
             "age": {
               "selector": ".//td[3]"
-            },
-            "addressCityState": {
-              "selector": ".//td[4]/strong"
             },
             "addressCityStateList": {
               "selector": ".//td[4]"
@@ -35,7 +33,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": ".//a[@class='btn red-btn']"
+              "selector": ".//a[@class='btn red-btn']",
+              "identifierType": "param",
+              "identifier": "id"
             }
           }
         }

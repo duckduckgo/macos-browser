@@ -108,7 +108,7 @@ final class PermissionAuthorizationViewController: NSViewController {
                                                   query.domain,
                                                   query.permissions.localizedDescription)
         }
-        alwaysAllowCheckbox.stringValue = UserText.permissionAlwaysAllowOnDomainCheckbox
+        alwaysAllowCheckbox.title = UserText.permissionAlwaysAllowOnDomainCheckbox
         domainNameLabel.stringValue = query.domain.isEmpty ? "" : "“" + query.domain + "”"
         alwaysAllowStackView.isHidden = !query.shouldShowAlwaysAllowCheckbox
         learnMoreStackView.isHidden = !query.permissions.contains(.geolocation)

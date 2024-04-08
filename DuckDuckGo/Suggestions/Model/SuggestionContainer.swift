@@ -17,8 +17,9 @@
 //
 
 import Foundation
-import BrowserServicesKit
+import Suggestions
 import Common
+import History
 
 final class SuggestionContainer {
 
@@ -85,11 +86,11 @@ final class SuggestionContainer {
 
 extension SuggestionContainer: SuggestionLoadingDataSource {
 
-    func history(for suggestionLoading: SuggestionLoading) -> [BrowserServicesKit.HistoryEntry] {
+    func history(for suggestionLoading: SuggestionLoading) -> [HistorySuggestion] {
         return historyCoordinating.history ?? []
     }
 
-    func bookmarks(for suggestionLoading: SuggestionLoading) -> [BrowserServicesKit.Bookmark] {
+    func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
         bookmarkManager.list?.bookmarks() ?? []
     }
 
@@ -108,9 +109,9 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
 
 }
 
-extension HistoryEntry: BrowserServicesKit.HistoryEntry {
+extension HistoryEntry: HistorySuggestion {
 
-    var numberOfVisits: Int {
+    public var numberOfVisits: Int {
         return numberOfTotalVisits
     }
 

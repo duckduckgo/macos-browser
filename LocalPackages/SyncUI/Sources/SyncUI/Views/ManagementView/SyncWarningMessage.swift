@@ -34,7 +34,7 @@ struct SyncWarningMessage: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
-            Image("Alert-Color-16")
+            Image(.alertColor16)
                 .frame(width: 16)
             VStack(alignment: .leading, spacing: 8) {
                 Text(title).bold()
@@ -48,7 +48,7 @@ struct SyncWarningMessage: View {
         .padding(.leading, -12)
         .frame(maxWidth: .infinity)
         .padding()
-        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
+        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color(.alertBubbleBackground)))
         .padding(.top, 16)
     }
 }

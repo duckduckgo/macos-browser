@@ -43,7 +43,7 @@ final class DailyPixel {
 
     static func fire(pixel: Pixel.Event,
                      frequency: PixelFrequency,
-                     includeAppVersionParameter includeAppVersion: Bool,
+                     includeAppVersionParameter includeAppVersion: Bool = true,
                      withAdditionalParameters params: [String: String] = [:],
                      onComplete: @escaping (Swift.Error?) -> Void = { _ in }) {
         switch frequency {
@@ -64,6 +64,10 @@ final class DailyPixel {
 
     private static func updatePixelLastFireDate(pixel: Pixel.Event) {
         storage.set(Date(), forKey: pixel.name)
+    }
+
+    static func clearLastFireDate(pixel: Pixel.Event) {
+        storage.removeObject(forKey: pixel.name)
     }
 
 }

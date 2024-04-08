@@ -107,13 +107,13 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
     }
 
-    /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
+    /// Uses the "days since VPN activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
     func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
         let possibleMessages: [NetworkProtectionRemoteMessage] = messageStorage.storedMessages()
 
-        // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user
-        // has used Network Protection for.
+        // Only show messages that haven't been dismissed, and check whether they have a
+        // requirement on how long the user has used the VPN for.
         let filteredMessages = possibleMessages.filter { message in
 
             // Don't show messages that have already been dismissed. If you need to show the same message to a user again,
@@ -133,7 +133,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
 
             // Next, check if the message requires access to NetP but it's not visible:
-            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isNetworkProtectionVisible() {
+            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isNetworkProtectionBetaVisible() {
                 return false
             }
 

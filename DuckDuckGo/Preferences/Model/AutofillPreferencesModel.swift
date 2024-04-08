@@ -189,11 +189,7 @@ final class AutofillPreferencesModel: ObservableObject {
     }
 
     func openSettings() {
-        guard let link = URL.fullDiskAccess else {
-            assertionFailure("Can't initialize link to Settings")
-            return
-        }
-        NSWorkspace.shared.open(link)
+        NSWorkspace.shared.open(.fullDiskAccess)
     }
 
 }

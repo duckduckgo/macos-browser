@@ -19,11 +19,24 @@
 import AppKit
 import Foundation
 
+protocol BookmarkOutlineCellViewDelegate: AnyObject {
+    func outlineCellViewRequestedMenu(_ cell: BookmarkOutlineCellView)
+}
+
 final class BookmarkOutlineCellView: NSTableCellView {
 
     private lazy var faviconImageView = NSImageView()
     private lazy var titleLabel = NSTextField(string: "Bookmark/Folder")
     private lazy var countLabel = NSTextField(string: "42")
+    private lazy var menuButton = NSButton(title: "", image: .settings, target: self, action: #selector(cellMenuButtonClicked))
+    private lazy var favoriteImageView = NSImageView()
+    private lazy var trackingArea: NSTrackingArea = {
+        NSTrackingArea(rect: .zero, options: [.inVisibleRect, .activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
+    }()
+
+    var shouldShowMenuButton = false
+
+    weak var delegate: BookmarkOutlineCellViewDelegate?
 
     init(identifier: NSUserInterfaceItemIdentifier) {
         super.init(frame: .zero)
@@ -34,10 +47,35 @@ final class BookmarkOutlineCellView: NSTableCellView {
         fatalError("\(type(of: self)): Bad initializer")
     }
 
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+
+        guard !trackingAreas.contains(trackingArea), shouldShowMenuButton else { return }
+        addTrackingArea(trackingArea)
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        guard shouldShowMenuButton else { return }
+        countLabel.isHidden = true
+        favoriteImageView.isHidden = true
+        menuButton.isHidden = false
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        guard shouldShowMenuButton else { return }
+        menuButton.isHidden = true
+        countLabel.isHidden = false
+        favoriteImageView.isHidden = false
+    }
+
+    // MARK: - Private
+
     private func setupUI() {
         addSubview(faviconImageView)
         addSubview(titleLabel)
         addSubview(countLabel)
+        addSubview(menuButton)
+        addSubview(favoriteImageView)
 
         faviconImageView.translatesAutoresizingMaskIntoConstraints = false
         faviconImageView.image = .bookmarkDefaultFavicon
@@ -64,40 +102,74 @@ final class BookmarkOutlineCellView: NSTableCellView {
         countLabel.textColor = .blackWhite60
         countLabel.lineBreakMode = .byClipping
 
+        menuButton.translatesAutoresizingMaskIntoConstraints = false
+        menuButton.contentTintColor = .button
+        menuButton.imagePosition = .imageTrailing
+        menuButton.isBordered = false
+        menuButton.isHidden = true
+
+        favoriteImageView.translatesAutoresizingMaskIntoConstraints = false
+        favoriteImageView.imageScaling = .scaleProportionallyDown
         setupLayout()
     }
 
     private func setupLayout() {
-        faviconImageView.heightAnchor.constraint(equalToConstant: 16).isActive = true
-        faviconImageView.widthAnchor.constraint(equalToConstant: 16).isActive = true
-        faviconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5).isActive = true
-        faviconImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            faviconImageView.heightAnchor.constraint(equalToConstant: 16),
+            faviconImageView.widthAnchor.constraint(equalToConstant: 16),
+            faviconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5),
+            faviconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+
+            titleLabel.leadingAnchor.constraint(equalTo: faviconImageView.trailingAnchor, constant: 10),
+            bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 6),
+
+            countLabel.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+            countLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 5),
+            trailingAnchor.constraint(equalTo: countLabel.trailingAnchor),
+
+            menuButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+           menuButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
+            menuButton.trailingAnchor.constraint(equalTo: trailingAnchor),
+            menuButton.topAnchor.constraint(equalTo: topAnchor),
+            menuButton.bottomAnchor.constraint(equalTo: bottomAnchor),
+            menuButton.widthAnchor.constraint(equalToConstant: 28),
+
+            favoriteImageView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+            favoriteImageView.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
+            favoriteImageView.trailingAnchor.constraint(equalTo: menuButton.trailingAnchor),
+            favoriteImageView.heightAnchor.constraint(equalToConstant: 15),
+            favoriteImageView.widthAnchor.constraint(equalToConstant: 15),
+        ])
+
         faviconImageView.setContentHuggingPriority(NSLayoutConstraint.Priority(rawValue: 251), for: .horizontal)
         faviconImageView.setContentHuggingPriority(NSLayoutConstraint.Priority(rawValue: 251), for: .vertical)
 
-        titleLabel.leadingAnchor.constraint(equalTo: faviconImageView.trailingAnchor, constant: 10).isActive = true
-        bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6).isActive = true
-        titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 6).isActive = true
         titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         titleLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
         titleLabel.setContentHuggingPriority(.init(rawValue: 200), for: .horizontal)
 
-        countLabel.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
-        countLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 5).isActive = true
-        trailingAnchor.constraint(equalTo: countLabel.trailingAnchor).isActive = true
         countLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
         countLabel.setContentHuggingPriority(.required, for: .horizontal)
     }
+
+    @objc private func cellMenuButtonClicked() {
+        delegate?.outlineCellViewRequestedMenu(self)
+    }
+
+    // MARK: - Public
 
     func update(from bookmark: Bookmark) {
         faviconImageView.image = bookmark.favicon(.small) ?? .bookmarkDefaultFavicon
         titleLabel.stringValue = bookmark.title
         countLabel.stringValue = ""
+        favoriteImageView.image = bookmark.isFavorite ? .favoriteFilledBorder : nil
     }
 
     func update(from folder: BookmarkFolder) {
         faviconImageView.image = .folder
         titleLabel.stringValue = folder.title
+        favoriteImageView.image = nil
 
         let totalChildBookmarks = folder.totalChildBookmarks
         if totalChildBookmarks > 0 {
@@ -111,9 +183,12 @@ final class BookmarkOutlineCellView: NSTableCellView {
         faviconImageView.image = pseudoFolder.icon
         titleLabel.stringValue = pseudoFolder.name
         countLabel.stringValue = pseudoFolder.count > 0 ? String(pseudoFolder.count) : ""
+        favoriteImageView.image = nil
     }
 
 }
+
+// MARK: - Preview
 
 #if DEBUG
 @available(macOS 14.0, *)

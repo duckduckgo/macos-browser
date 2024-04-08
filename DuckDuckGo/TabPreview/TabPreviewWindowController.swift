@@ -34,18 +34,37 @@ final class TabPreviewWindowController: NSWindowController {
 
     // swiftlint:disable force_cast
     var tabPreviewViewController: TabPreviewViewController {
-        contentViewController as! TabPreviewViewController
+        return self.window!.contentViewController as! TabPreviewViewController
     }
     // swiftlint:enable force_cast
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
+    init() {
+        super.init(window: Self.loadWindow())
 
-        window?.animationBehavior = .utilityWindow
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(suggestionWindowOpenNotification(_:)),
                                                name: .suggestionWindowOpen,
                                                object: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
+    private static func loadWindow() -> NSWindow {
+        let tabPreviewViewController = TabPreviewViewController()
+
+        let window = NSWindow(contentRect: CGRect(x: 294, y: 313, width: 280, height: 58), styleMask: [.titled, .fullSizeContentView], backing: .buffered, defer: true)
+        window.contentViewController = tabPreviewViewController
+
+        window.allowsToolTipsWhenApplicationIsInactive = false
+        window.autorecalculatesKeyViewLoop = false
+        window.isReleasedWhenClosed = false
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.animationBehavior = .utilityWindow
+
+        return window
     }
 
     deinit {

@@ -35,7 +35,11 @@ struct DataBrokerProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
         let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
 
-        guard featureVisibility.isFeatureVisible() else {
+        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
+
+        /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
+        /// since the waitlist flag might have been turned off
+        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
             featureVisibility.disableAndDeleteForWaitlistUsers()
             return
         }
@@ -58,7 +62,11 @@ struct DataBrokerProtectionAppEvents {
     func applicationDidBecomeActive() {
         let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
 
-        guard featureVisibility.isFeatureVisible() else {
+        guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
+
+        /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
+        /// since the waitlist flag might have been turned off
+        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
             featureVisibility.disableAndDeleteForWaitlistUsers()
             return
         }
@@ -93,7 +101,7 @@ struct DataBrokerProtectionAppEvents {
     }
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
-        pixelHandler.fire(.resetLoginItem)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerResetLoginItemDaily, frequency: .dailyOnly)
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
 

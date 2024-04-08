@@ -16,17 +16,19 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.0"),
+        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "2.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "SystemExtensionManager",
+            dependencies: [
+            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         )
     ]
 )

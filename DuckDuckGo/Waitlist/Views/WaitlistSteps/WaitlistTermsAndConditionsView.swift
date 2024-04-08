@@ -153,7 +153,7 @@ struct NetworkProtectionTermsAndConditionsContentView: View {
 }
 
 struct NetworkProtectionWaitlistTermsAndConditionsViewData: WaitlistTermsAndConditionsViewData {
-    let title = "Network Protection Beta\nService Terms and Privacy Policy"
+    let title = "VPN Beta\nService Terms and Privacy Policy"
     let buttonCancelLabel = UserText.networkProtectionWaitlistButtonCancel
     let buttonAgreeAndContinueLabel = UserText.networkProtectionWaitlistButtonAgreeAndContinue
 }
@@ -185,9 +185,8 @@ struct DataBrokerProtectionTermsAndConditionsContentView: View {
                         .foregroundColor(Color.blue)
                         .underline(color: .blue)
                         .onTapGesture {
-                            if let url = URL(string: "https://duckduckgo.com/privacy") {
-                                WindowsManager.openNewWindow(with: url, source: .ui, isBurner: false)
-                            }
+                            let url = URL(string: "https://duckduckgo.com/privacy")!
+                            WindowsManager.openNewWindow(with: url, source: .ui, isBurner: false)
                         }
                     Text(verbatim: "also applies here.")
                 }

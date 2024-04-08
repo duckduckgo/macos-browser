@@ -52,14 +52,14 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         model.update(items: createdAccounts)
         model.filter = "domain5"
 
-        XCTAssertEqual(model.displayedItems.count, 1)
+        XCTAssertEqual(model.displayedSections.count, 1)
 
-        let filteredAccounts = accounts(from: model.displayedItems)
+        let filteredAccounts = accounts(from: model.displayedSections)
         XCTAssertEqual(filteredAccounts[0].domain, "domain5")
 
         model.filter = ""
 
-        let unfilteredAccounts = accounts(from: model.displayedItems)
+        let unfilteredAccounts = accounts(from: model.displayedSections)
         XCTAssertEqual(unfilteredAccounts.count, 10)
         XCTAssertEqual(unfilteredAccounts[0].domain, "domain0")
         XCTAssertEqual(unfilteredAccounts[9].domain, "domain9")

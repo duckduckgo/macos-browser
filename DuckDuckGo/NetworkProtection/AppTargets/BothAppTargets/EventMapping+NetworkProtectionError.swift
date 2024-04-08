@@ -36,10 +36,10 @@ extension EventMapping where Event == NetworkProtectionError {
             domainEvent = .networkProtectionClientInvalidInviteCode
             frequency = .standard
         case .failedToRedeemInviteCode(let error):
-            domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error: error)
+            domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error)
             frequency = .standard
         case .failedToParseRedeemResponse(let error):
-            domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error: error)
+            domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error)
             frequency = .standard
         case .invalidAuthToken:
             domainEvent = .networkProtectionClientInvalidAuthToken
@@ -63,10 +63,10 @@ extension EventMapping where Event == NetworkProtectionError {
             domainEvent = .networkProtectionNoAuthTokenFoundError
             frequency = .standard
         case .failedToFetchLocationList(let error):
-            domainEvent = .networkProtectionClientFailedToFetchLocations(error: error)
+            domainEvent = .networkProtectionClientFailedToFetchLocations(error)
             frequency = .dailyAndContinuous
         case .failedToParseLocationListResponse(let error):
-            domainEvent = .networkProtectionClientFailedToParseLocationsResponse(error: error)
+            domainEvent = .networkProtectionClientFailedToParseLocationsResponse(error)
             frequency = .dailyAndContinuous
         case .noServerRegistrationInfo,
                 .couldNotSelectClosestServer,
@@ -74,17 +74,11 @@ extension EventMapping where Event == NetworkProtectionError {
                 .couldNotGetPeerHostName,
                 .couldNotGetInterfaceAddressRange,
                 .failedToEncodeRegisterKeyRequest,
-                .noServerListFound,
                 .serverListInconsistency,
                 .failedToFetchRegisteredServers,
                 .failedToFetchServerList,
                 .failedToParseServerListResponse,
                 .failedToParseRegisteredServersResponse,
-                .failedToEncodeServerList,
-                .failedToDecodeServerList,
-                .failedToWriteServerList,
-                .couldNotCreateServerListDirectory,
-                .failedToReadServerList,
                 .wireGuardCannotLocateTunnelFileDescriptor,
                 .wireGuardInvalidState,
                 .wireGuardDnsResolution,
@@ -97,6 +91,8 @@ extension EventMapping where Event == NetworkProtectionError {
         case .unhandledError(function: let function, line: let line, error: let error):
             domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             frequency = .standard
+            return
+        case .vpnAccessRevoked:
             return
         }
 

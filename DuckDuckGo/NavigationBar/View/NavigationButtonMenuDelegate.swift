@@ -19,6 +19,7 @@
 import Cocoa
 import Common
 import WebKit
+import History
 
 @MainActor
 final class NavigationButtonMenuDelegate: NSObject {

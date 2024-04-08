@@ -27,6 +27,22 @@ import PrivacyDashboard
 final class BrokenSiteReportingReferenceTests: XCTestCase {
     private let testHelper = PrivacyReferenceTestHelper()
 
+    struct MockError: LocalizedError {
+        let description: String
+
+        init(_ description: String) {
+            self.description = description
+        }
+
+        var errorDescription: String? {
+            description
+        }
+
+        var localizedDescription: String? {
+            description
+        }
+    }
+
     private enum Resource {
         static let tests = "privacy-reference-tests/broken-site-reporting/tests.json"
     }
@@ -37,7 +53,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
         params["test"] = "1"
         let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
                                                      queryParameters: params,
-                                                     allowedQueryReservedCharacters: WebsiteBreakage.allowedQueryReservedCharacters)
+                                                     allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         return configuration.request
     }
 
@@ -53,22 +69,33 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
             os_log("Testing [%s]", type: .info, test.name)
 
-            let breakage = WebsiteBreakage(siteUrl: test.siteURL,
-                                           category: "test",
-                                           description: "description",
-                                           osVersion: test.os ?? "",
-                                           manufacturer: "Apple",
-                                           upgradedHttps: test.wasUpgraded,
-                                           tdsETag: test.blocklistVersion,
-                                           blockedTrackerDomains: test.blockedTrackers,
-                                           installedSurrogates: test.surrogates,
-                                           isGPCEnabled: test.gpcEnabled ?? false,
-                                           ampURL: "",
-                                           urlParametersRemoved: false,
-                                           protectionsState: test.protectionsEnabled,
-                                           reportFlow: .appMenu,
-                                           error: nil,
-                                           httpStatusCode: nil)
+            var errors: [Error]?
+            if let errs = test.errorDescriptions {
+                errors = errs.map { MockError($0) }
+            }
+
+            let breakage = BrokenSiteReport(siteUrl: test.siteURL,
+                                            category: test.category,
+                                            description: test.providedDescription,
+                                            osVersion: test.os ?? "",
+                                            manufacturer: "Apple",
+                                            upgradedHttps: test.wasUpgraded,
+                                            tdsETag: test.blocklistVersion,
+                                            blockedTrackerDomains: test.blockedTrackers,
+                                            installedSurrogates: test.surrogates,
+                                            isGPCEnabled: test.gpcEnabled ?? false,
+                                            ampURL: "",
+                                            urlParametersRemoved: false,
+                                            protectionsState: test.protectionsEnabled,
+                                            reportFlow: .appMenu,
+                                            errors: errors,
+                                            httpStatusCodes: test.httpErrorCodes ?? [],
+                                            openerContext: nil,
+                                            vpnOn: false,
+                                            jsPerformance: nil,
+                                            userRefreshCount: 0,
+                                            didOpenReportInfo: false,
+                                            toggleReportCounter: nil)
 
             let request = makeURLRequest(with: breakage.requestParameters)
 
@@ -94,7 +121,23 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
                 let match = regex.matches(in: absoluteURL, range: NSRange(location: 0, length: absoluteURL.count))
 
-                XCTAssertEqual(match.count, 1, "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
+                if param.name == "errorDescriptions" {
+                    // `localizedDescription` adds class information to the error. The value is not standardized across platforms
+                    // so we'll just check the result is an array of strings
+                    guard let params = URLComponents(string: absoluteURL)?.queryItems else {
+                        XCTFail("Unable to parse query parameters from \(absoluteURL)")
+                        return
+                    }
+                    var errorsFound = false
+                    for queryItem in params {
+                        if queryItem.name != param.name { continue }
+                        errorsFound = true
+                        XCTAssert((queryItem.value?.split(separator: ",").count ?? 0) > 1, "Error descriptions should return an array of strings. Parsed: \(queryItem.value ?? "")")
+                    }
+                    XCTAssert(errorsFound, "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
+                } else {
+                    XCTAssertEqual(match.count, 1, "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
+                }
             }
         }
     }
@@ -121,6 +164,7 @@ private struct Test: Codable {
     let siteURL: URL
     let wasUpgraded: Bool
     let category: String
+    let providedDescription: String?
     let blockedTrackers, surrogates: [String]
     let atb, blocklistVersion: String
     let expectReportURLPrefix: String
@@ -129,6 +173,8 @@ private struct Test: Codable {
     let manufacturer, model, os: String?
     let gpcEnabled: Bool?
     let protectionsEnabled: Bool
+    let errorDescriptions: [String]?
+    let httpErrorCodes: [Int]?
 }
 
 // MARK: - ExpectReportURLParam

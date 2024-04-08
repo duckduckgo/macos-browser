@@ -138,7 +138,7 @@ private struct HeaderView: View {
 
         HStack(alignment: .center, spacing: 0) {
 
-            Image("Note")
+            Image(.note)
                 .padding(.trailing, 10)
 
             Text(model.title)

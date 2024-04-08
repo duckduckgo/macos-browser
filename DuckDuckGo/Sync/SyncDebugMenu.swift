@@ -18,6 +18,7 @@
 
 import Foundation
 import DDGSync
+import Bookmarks
 
 @MainActor
 final class SyncDebugMenu: NSMenu {
@@ -31,6 +32,8 @@ final class SyncDebugMenu: NSMenu {
             NSMenuItem(title: "Environment")
                 .submenu(environmentMenu)
             NSMenuItem(title: "Reset Favicons Fetcher Onboarding Dialog", action: #selector(resetFaviconsFetcherOnboardingDialog))
+                .targetting(self)
+            NSMenuItem(title: "Populate Stub objects", action: #selector(createStubsForDebug))
                 .targetting(self)
         }
     }
@@ -75,6 +78,28 @@ final class SyncDebugMenu: NSMenu {
 
         syncService.updateServerEnvironment(environment)
         UserDefaults.standard.set(environment.description, forKey: UserDefaultsWrapper<String>.Key.syncEnvironment.rawValue)
+#endif
+    }
+
+    @objc func createStubsForDebug() {
+#if DEBUG || REVIEW
+        let db = BookmarkDatabase.shared
+
+        let context = db.db.makeContext(concurrencyType: .privateQueueConcurrencyType)
+
+        context.performAndWait {
+            let root = BookmarkUtils.fetchRootFolder(context)!
+
+            _ = BookmarkEntity.makeBookmark(title: "Non stub", url: "url", parent: root, context: context)
+            let stub = BookmarkEntity.makeBookmark(title: "Stub", url: "", parent: root, context: context)
+            stub.isStub = true
+            let emptyStub = BookmarkEntity.makeBookmark(title: "", url: "", parent: root, context: context)
+            emptyStub.isStub = true
+            emptyStub.title = nil
+            emptyStub.url = nil
+
+            try? context.save()
+        }
 #endif
     }
 

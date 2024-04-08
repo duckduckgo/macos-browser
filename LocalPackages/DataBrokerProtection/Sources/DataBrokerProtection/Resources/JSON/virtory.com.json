@@ -1,6 +1,7 @@
 {
-  "name": "virtory.com",
-  "version": "0.1.1",
+  "name": "Virtory",
+  "url": "virtory.com",
+  "version": "0.1.5",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -10,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "99465bd6-ce87-4fc6-96a2-eea8137e4a30",
+          "id": "dcd02b38-c2a2-462b-979c-5af85260ff64",
           "url": "https://virtory.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -24,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "8d66ac98-f788-4fbd-acec-56034682b4b1",
+          "id": "3ab2b9a0-647d-4ad2-9709-ef934c977a48",
           "selector": ".card",
           "profile": {
             "name": {
@@ -50,7 +51,9 @@
               "findElements": true
             },
             "profileUrl": {
-              "selector": "a"
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://virtory.com/prof/${id}"
             }
           }
         }

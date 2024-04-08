@@ -164,7 +164,7 @@ extension Pixel {
         // VPN
         case vpnBreakageReport(category: String, description: String, metadata: String)
 
-        // Network Protection
+        // VPN
         case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
         case networkProtectionWaitlistEntryPointToolbarButtonDisplayed
@@ -208,10 +208,77 @@ extension Pixel {
         case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
         case dataBrokerProtectionRemoteMessageOpened(messageID: String)
 
+        // Login Item events
+        case dataBrokerEnableLoginItemDaily
+        case dataBrokerDisableLoginItemDaily
+        case dataBrokerResetLoginItemDaily
+        case dataBrokerDisableAndDeleteDaily
+
         // DataBrokerProtection Other
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
+        // Subscription
+        case privacyProFeatureEnabled
+        case privacyProBetaUserThankYouVPN
+        case privacyProBetaUserThankYouDBP
+        case privacyProSubscriptionActive
+        case privacyProOfferScreenImpression
+        case privacyProPurchaseAttempt
+        case privacyProPurchaseFailure
+        case privacyProPurchaseFailureStoreError
+        case privacyProPurchaseFailureBackendError
+        case privacyProPurchaseFailureAccountNotCreated
+        case privacyProPurchaseSuccess
+        case privacyProRestorePurchaseOfferPageEntry
+        case privacyProRestorePurchaseClick
+        case privacyProRestorePurchaseSettingsMenuEntry
+        case privacyProRestorePurchaseEmailStart
+        case privacyProRestorePurchaseStoreStart
+        case privacyProRestorePurchaseEmailSuccess
+        case privacyProRestorePurchaseStoreSuccess
+        case privacyProRestorePurchaseStoreFailureNotFound
+        case privacyProRestorePurchaseStoreFailureOther
+        case privacyProRestoreAfterPurchaseAttempt
+        case privacyProSubscriptionActivated
+        case privacyProWelcomeAddDevice
+        case privacyProSettingsAddDevice
+        case privacyProAddDeviceEnterEmail
+        case privacyProWelcomeVPN
+        case privacyProWelcomePersonalInformationRemoval
+        case privacyProWelcomeIdentityRestoration
+        case privacyProSubscriptionSettings
+        case privacyProVPNSettings
+        case privacyProPersonalInformationRemovalSettings
+        case privacyProIdentityRestorationSettings
+        case privacyProSubscriptionManagementEmail
+        case privacyProSubscriptionManagementPlanBilling
+        case privacyProSubscriptionManagementRemoval
+        case privacyProPurchaseStripeSuccess
+        // Web pixels
+        case privacyProOfferMonthlyPriceClick
+        case privacyProOfferYearlyPriceClick
+        case privacyProAddEmailSuccess
+        case privacyProWelcomeFAQClick
+
         case dailyPixel(Event, isFirst: Bool)
+
+        // Default Browser
+        case defaultRequestedFromHomepage
+        case defaultRequestedFromHomepageSetupView
+        case defaultRequestedFromSettings
+        case defaultRequestedFromOnboarding
+
+        case protectionToggledOffBreakageReport
+        case toggleProtectionsDailyCount
+        case toggleReportDoNotSend
+        case toggleReportDismiss
+
+        // Password Import Keychain Prompt
+        case passwordImportKeychainPrompt
+        case passwordImportKeychainPromptDenied
+
+        // Tracks installation without tracking retention.
+        case installationAttribution
 
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
@@ -239,7 +306,10 @@ extension Pixel {
 
             case fileStoreWriteFailed
             case fileMoveToDownloadsFailed
+            case fileAccessRelatedItemFailed
             case fileGetDownloadLocationFailed
+            case fileDownloadCreatePresentersFailed
+            case downloadResumeDataCodingFailed
 
             case suggestionsFetchFailed
             case appOpenURLFailed
@@ -365,7 +435,6 @@ extension Pixel {
 
             case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
         }
-
     }
 }
 
@@ -574,6 +643,11 @@ extension Pixel.Event {
         case .dataBrokerProtectionRemoteMessageOpened(let messageID):
             return "m_mac_dbp_remote_message_opened_\(messageID)"
 
+        case .dataBrokerEnableLoginItemDaily: return "m_mac_dbp_daily_login-item_enable"
+        case .dataBrokerDisableLoginItemDaily: return "m_mac_dbp_daily_login-item_disable"
+        case .dataBrokerResetLoginItemDaily: return "m_mac_dbp_daily_login-item_reset"
+        case .dataBrokerDisableAndDeleteDaily: return "m_mac_dbp_daily_disable-and-delete"
+
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
         case .networkProtectionGeoswitchingOpened:
@@ -584,9 +658,78 @@ extension Pixel.Event {
             return "m_mac_netp_ev_geoswitching_set_custom"
         case .networkProtectionGeoswitchingNoLocations:
             return "m_mac_netp_ev_geoswitching_no_locations"
+
+        case .defaultRequestedFromHomepage: return "m_mac_default_requested_from_homepage"
+        case .defaultRequestedFromHomepageSetupView: return "m_mac_default_requested_from_homepage_setup_view"
+        case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
+        case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
+
+            // MARK: - Subscription
+        case .privacyProFeatureEnabled: return
+            "m_mac_\(appDistribution)_privacy-pro_feature_enabled"
+        case .privacyProBetaUserThankYouVPN: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_vpn"
+        case .privacyProBetaUserThankYouDBP: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_dbp"
+        case .privacyProSubscriptionActive: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_active"
+        case .privacyProOfferScreenImpression: return "m_mac_\(appDistribution)_privacy-pro_offer_screen_impression"
+        case .privacyProPurchaseAttempt: return "m_mac_\(appDistribution)_privacy-pro_terms-conditions_subscribe_click"
+        case .privacyProPurchaseFailure: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_failure_other"
+        case .privacyProPurchaseFailureStoreError: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_failure_store"
+        case .privacyProPurchaseFailureBackendError: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_failure_backend"
+        case .privacyProPurchaseFailureAccountNotCreated: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_failure_account-creation"
+        case .privacyProPurchaseSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_success"
+        case .privacyProRestorePurchaseOfferPageEntry: return "m_mac_\(appDistribution)_privacy-pro_offer_restore-purchase_click"
+        case .privacyProRestorePurchaseClick: return "m_mac_\(appDistribution)_privacy-pro_settings_restore-purchase_click"
+        case .privacyProRestorePurchaseSettingsMenuEntry: return "m_mac_\(appDistribution)_privacy-pro_settings_restore-purchase_click"
+        case .privacyProRestorePurchaseEmailStart: return "m_mac_\(appDistribution)_privacy-pro_activate-subscription_enter-email_click"
+        case .privacyProRestorePurchaseStoreStart: return "m_mac_\(appDistribution)_privacy-pro_activate-subscription_restore-purchase_click"
+        case .privacyProRestorePurchaseEmailSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-restore-using-email_success"
+        case .privacyProRestorePurchaseStoreSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-restore-using-store_success"
+        case .privacyProRestorePurchaseStoreFailureNotFound: return "m_mac_\(appDistribution)_privacy-pro_subscription-restore-using-store_failure_not-found"
+        case .privacyProRestorePurchaseStoreFailureOther: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-restore-using-store_failure_other"
+        case .privacyProRestoreAfterPurchaseAttempt: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-restore-after-purchase-attempt_success"
+        case .privacyProSubscriptionActivated: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_activated_u"
+        case .privacyProWelcomeAddDevice: return "m_mac_\(appDistribution)_privacy-pro_welcome_add-device_click_u"
+        case .privacyProSettingsAddDevice: return "m_mac_\(appDistribution)_privacy-pro_settings_add-device_click"
+        case .privacyProAddDeviceEnterEmail: return "m_mac_\(appDistribution)_privacy-pro_add-device_enter-email_click"
+        case .privacyProWelcomeVPN: return "m_mac_\(appDistribution)_privacy-pro_welcome_vpn_click_u"
+        case .privacyProWelcomePersonalInformationRemoval: return "m_mac_\(appDistribution)_privacy-pro_welcome_personal-information-removal_click_u"
+        case .privacyProWelcomeIdentityRestoration: return "m_mac_\(appDistribution)_privacy-pro_welcome_identity-theft-restoration_click_u"
+        case .privacyProSubscriptionSettings: return "m_mac_\(appDistribution)_privacy-pro_settings_screen_impression"
+        case .privacyProVPNSettings: return "m_mac_\(appDistribution)_privacy-pro_settings_vpn_click"
+        case .privacyProPersonalInformationRemovalSettings: return "m_mac_\(appDistribution)_privacy-pro_settings_personal-information-removal_click"
+        case .privacyProIdentityRestorationSettings: return "m_mac_\(appDistribution)_privacy-pro_settings_identity-theft-restoration_click"
+        case .privacyProSubscriptionManagementEmail: return "m_mac_\(appDistribution)_privacy-pro_manage-email_edit_click"
+        case .privacyProSubscriptionManagementPlanBilling: return "m_mac_\(appDistribution)_privacy-pro_settings_change-plan-or-billing_click"
+        case .privacyProSubscriptionManagementRemoval: return "m_mac_\(appDistribution)_privacy-pro_settings_remove-from-device_click"
+        case .privacyProPurchaseStripeSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_stripe_success"
+            // Web
+        case .privacyProOfferMonthlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_monthly-price_click"
+        case .privacyProOfferYearlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_yearly-price_click"
+        case .privacyProAddEmailSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_add-email_success_u"
+        case .privacyProWelcomeFAQClick: return "m_mac_\(appDistribution)_privacy-pro_welcome_faq_click_u"
+
+        case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
+        case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
+        case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
+        case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
+
+        // Password Import Keychain Prompt
+        case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
+        case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
+
+        // Installation Attribution
+        case .installationAttribution: return "m_mac_install"
         }
     }
 }
+
+// swiftlint:disable private_over_fileprivate
+#if APPSTORE
+fileprivate let appDistribution = "store"
+#else
+fileprivate let appDistribution = "direct"
+#endif
+// swiftlint:enable private_over_fileprivate
 
 extension Pixel.Event: Equatable {
 
@@ -640,6 +783,12 @@ extension Pixel.Event.Debug {
             return "df"
         case .fileGetDownloadLocationFailed:
             return "dl"
+        case .fileAccessRelatedItemFailed:
+            return "dari"
+        case .fileDownloadCreatePresentersFailed:
+            return "dfpf"
+        case .downloadResumeDataCodingFailed:
+            return "drdc"
 
         case .suggestionsFetchFailed:
             return "sgf"

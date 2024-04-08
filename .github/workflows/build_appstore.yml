@@ -63,13 +63,14 @@ jobs:
     env:
       destination: ${{ github.event.inputs.destination || inputs.destination }}
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      branch: ${{ inputs.branch || github.ref_name }}
 
     steps:
 
     - name: Assert release branch
       if: env.destination == 'appstore'
       run: |
-        case "${{ inputs.branch || github.ref_name }}" in
+        case "${branch}" in
           release/*) ;;
           hotfix/*) ;;
           *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
@@ -85,12 +86,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-        ref: ${{ inputs.branch || github.ref_name }}
+        ref: ${{ env.branch }}
 
     - name: Check if this is an official release build
       id: is-official-release
       env:
-        is-official-release: ${{ env.destination == 'appstore' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
+        is-official-release: ${{ env.destination == 'appstore' && (startsWith(env.branch, 'release') || startsWith(env.branch, 'hotfix')) }}
       run: |
         if [[ "${{ env.is-official-release }}" == "true" ]]; then
           upload_to=s3

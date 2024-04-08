@@ -22,6 +22,7 @@ import Foundation
 import Navigation
 import UniformTypeIdentifiers
 import WebKit
+import PDFKit
 
 extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
@@ -35,9 +36,27 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         self.value(forKey: Tab.objcNewWindowPolicyDecisionMakersKeyPath) as? [NewWindowPolicyDecisionMaker]
     }
 
+    @MainActor private static var expectedSaveDataToFileCallback: (@MainActor (URL?) -> Void)?
+    @MainActor
+    private static func consumeExpectedSaveDataToFileCallback() -> (@MainActor (URL?) -> Void)? {
+        defer {
+            expectedSaveDataToFileCallback = nil
+        }
+        return expectedSaveDataToFileCallback
+    }
+
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        saveDownloaded(data: data, suggestedFilename: suggestedFilename, mimeType: mimeType)
+        Task {
+            var result: URL?
+            do {
+                result = try await saveDownloadedData(data, suggestedFilename: suggestedFilename, mimeType: mimeType, originatingURL: originatingURL)
+            } catch {
+                assertionFailure("Save web content failed with \(error)")
+            }
+            // when print function saves a PDF setting the callback, return the saved temporary file to it
+            await Self.consumeExpectedSaveDataToFileCallback()?(result)
+        }
     }
 
     @MainActor
@@ -299,6 +318,10 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             printOperation.view?.frame = webView.bounds
         }
 
+        runPrintOperation(printOperation, completionHandler: completionHandler)
+    }
+
+    func runPrintOperation(_ printOperation: NSPrintOperation, completionHandler: ((Bool) -> Void)? = nil) {
         let dialog = UserDialogType.print(.init(printOperation) { result in
             completionHandler?((try? result.get()) ?? false)
         })
@@ -315,7 +338,29 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         self.runPrintOperation(for: frameHandle, in: webView) { _ in completionHandler() }
     }
 
-    func print() {
+    @MainActor(unsafe)
+    func print(pdfHUD: WKPDFHUDViewWrapper? = nil) {
+        if let pdfHUD {
+            Self.expectedSaveDataToFileCallback = { [weak self] url in
+                guard let self, let url,
+                      let pdfDocument = PDFDocument(url: url) else {
+                    assertionFailure("Could not load PDF document from \(url?.path ?? "<nil>")")
+                    return
+                }
+                // Set up NSPrintOperation
+                guard let printOperation = pdfDocument.printOperation(for: .shared, scalingMode: .pageScaleNone, autoRotate: false) else {
+                    assertionFailure("Could not print PDF document")
+                    return
+                }
+
+                self.runPrintOperation(printOperation) { _ in
+                    try? FileManager.default.removeItem(at: url)
+                }
+            }
+            saveWebContent(pdfHUD: pdfHUD, location: .temporary)
+            return
+        }
+
         self.runPrintOperation(for: nil, in: self.webView)
     }
 

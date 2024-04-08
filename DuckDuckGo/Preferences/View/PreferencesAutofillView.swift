@@ -83,24 +83,31 @@ extension Preferences {
 #if !APPSTORE
                 // SECTION 1: Password Manager
                 PreferencePaneSection(UserText.autofillPasswordManager) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        passwordManagerPicker(passwordManagerBinding) {
+                            Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
+                        }
+                    }
+
+                    if model.passwordManager != .bitwarden {
+                        VStack {
+                            Button(UserText.importPasswords) {
+                                model.openImportBrowserDataWindow()
+                            }
+                            Button(UserText.exportLogins) {
+                                model.openExportLogins()
+                            }
+                        }
+                        .padding(.leading, 15)
+                    }
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Picker(selection: passwordManagerBinding, content: {
-                            Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
+                        passwordManagerPicker(passwordManagerBinding) {
                             Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
-                        }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        }
                         if model.passwordManager == .bitwarden && !model.isBitwardenSetupFlowPresented {
                             bitwardenStatusView(for: bitwardenManager.status)
                         }
-                    }
-                    Spacer()
-                    Button(UserText.importPasswords) {
-                        model.openImportBrowserDataWindow()
-                    }
-                    Button(UserText.exportLogins) {
-                        model.openExportLogins()
                     }
                 }
 #endif
@@ -142,6 +149,8 @@ extension Preferences {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text(UserText.autofillLockWhenIdle)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .multilineTextAlignment(.leading)
                                 NSPopUpButtonView(selection: autoLockThresholdBinding) {
                                     let button = NSPopUpButton()
                                     button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -166,6 +175,15 @@ extension Preferences {
                     TextMenuItemCaption(UserText.autofillNeverLockWarning)
                 }
             }
+        }
+
+        @ViewBuilder
+        private func passwordManagerPicker(_ binding: Binding<PasswordManager>, @ViewBuilder content: @escaping () -> some View) -> some View {
+            Picker(selection: binding, content: {
+                content()
+            }, label: {})
+            .pickerStyle(.radioGroup)
+            .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
         }
 
         // swiftlint:disable cyclomatic_complexity

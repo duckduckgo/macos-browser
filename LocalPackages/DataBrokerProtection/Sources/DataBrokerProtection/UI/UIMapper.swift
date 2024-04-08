@@ -26,22 +26,24 @@ struct MapperToUI {
             name: extractedProfile.fullName ?? "No name",
             addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
             alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String]()
+            relatives: extractedProfile.relatives ?? [String](),
+            date: extractedProfile.removedDate?.timeIntervalSince1970
         )
     }
 
-    func mapToUI(_ dataBrokerName: String, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
+    func mapToUI(_ dataBrokerName: String, databrokerURL: String, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
         DBPUIDataBrokerProfileMatch(
-            dataBroker: DBPUIDataBroker(name: dataBrokerName),
+            dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
             name: extractedProfile.fullName ?? "No name",
             addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
             alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String]()
+            relatives: extractedProfile.relatives ?? [String](),
+            date: extractedProfile.removedDate?.timeIntervalSince1970
         )
     }
 
     func mapToUI(_ dataBroker: DataBroker) -> DBPUIDataBroker {
-        DBPUIDataBroker(name: dataBroker.name)
+        DBPUIDataBroker(name: dataBroker.name, url: dataBroker.url)
     }
 
     func mapToUI(_ address: AddressCityState) -> DBPUIUserProfileAddress {
@@ -75,7 +77,7 @@ struct MapperToUI {
                 if !$0.dataBroker.mirrorSites.isEmpty {
                     let mirrorSitesMatches = $0.dataBroker.mirrorSites.compactMap { mirrorSite in
                         if mirrorSite.shouldWeIncludeMirrorSite() {
-                            return mapToUI(mirrorSite.name, extractedProfile: extractedProfile)
+                            return mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
                         }
 
                         return nil
@@ -110,7 +112,7 @@ struct MapperToUI {
 
                 if let closestMatchesFoundEvent = scanOperation.closestMatchesFoundEvent() {
                     for mirrorSite in dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: closestMatchesFoundEvent.date) {
-                        let mirrorSiteMatch = mapToUI(mirrorSite.name, extractedProfile: extractedProfile)
+                        let mirrorSiteMatch = mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
                             mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
@@ -124,10 +126,19 @@ struct MapperToUI {
         }
 
         let completedOptOutsDictionary = Dictionary(grouping: removedProfiles, by: { $0.dataBroker })
-        let completedOptOuts = completedOptOutsDictionary.map { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
-            DBPUIOptOutMatch(dataBroker: key, matches: value.count)
-        }
-        let lastScans = getLastScanInformation(brokerProfileQueryData: brokerProfileQueryData)
+        let completedOptOuts: [DBPUIOptOutMatch] = completedOptOutsDictionary.compactMap { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
+            value.compactMap { match in
+                guard let removedDate = match.date else { return nil }
+                return DBPUIOptOutMatch(dataBroker: key,
+                                 matches: value.count,
+                                 name: match.name,
+                                 alternativeNames: match.alternativeNames,
+                                 addresses: match.addresses,
+                                 date: removedDate)
+            }
+        }.flatMap { $0 }
+
+        let lastScans = getLastScansInformation(brokerProfileQueryData: brokerProfileQueryData)
         let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData)
 
         return DBPUIScanAndOptOutMaintenanceState(
@@ -138,48 +149,69 @@ struct MapperToUI {
         )
     }
 
-    private func getLastScanInformation(brokerProfileQueryData: [BrokerProfileQueryData],
-                                        currentDate: Date = Date(),
-                                        format: String = "dd/MM/yyyy") -> DBUIScanDate {
-        let scansGroupedByLastRunDate = Dictionary(grouping: brokerProfileQueryData, by: { $0.scanOperationData.lastRunDate?.toFormat(format) })
-        let closestScansBeforeToday = scansGroupedByLastRunDate
-            .filter { $0.key != nil && $0.key!.toDate(using: format) < currentDate }
-            .sorted { $0.key! < $1.key! }
-            .flatMap { [$0.key?.toDate(using: format): $0.value] }
-            .last
+    private func getLastScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
+                                         currentDate: Date = Date(),
+                                         format: String = "dd/MM/yyyy") -> DBPUIScanDate {
+        let eightDaysBeforeToday = currentDate.addingTimeInterval(-8 * 24 * 60 * 60)
+        let scansInTheLastEightDays = brokerProfileQueryData
+            .filter { $0.scanOperationData.lastRunDate != nil && $0.scanOperationData.lastRunDate! <= currentDate && $0.scanOperationData.lastRunDate! > eightDaysBeforeToday }
+            .sorted { $0.scanOperationData.lastRunDate! < $1.scanOperationData.lastRunDate! }
+            .reduce(into: [BrokerProfileQueryData]()) { result, element in
+                if !result.contains(where: { $0.dataBroker.url == element.dataBroker.url }) {
+                    result.append(element)
+                }
+            }
+            .flatMap {
+                var brokers = [DBPUIDataBroker]()
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanOperationData.lastRunDate!.timeIntervalSince1970))
 
-        return scanDate(element: closestScansBeforeToday)
+                for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.addedAt < $0.scanOperationData.lastRunDate! {
+                    brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanOperationData.lastRunDate!.timeIntervalSince1970))
+                }
+
+                return brokers
+            }
+
+        if scansInTheLastEightDays.isEmpty {
+            return DBPUIScanDate(date: currentDate.timeIntervalSince1970, dataBrokers: [DBPUIDataBroker]())
+        } else {
+            return DBPUIScanDate(date: scansInTheLastEightDays.first!.date!, dataBrokers: scansInTheLastEightDays)
+        }
     }
 
     private func getNextScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
                                          currentDate: Date = Date(),
-                                         format: String = "dd/MM/yyyy") -> DBUIScanDate {
-        let scansGroupedByPreferredRunDate = Dictionary(grouping: brokerProfileQueryData, by: { $0.scanOperationData.preferredRunDate?.toFormat(format) })
-        let closestScansAfterToday = scansGroupedByPreferredRunDate
-            .filter { $0.key != nil && $0.key!.toDate(using: format) > currentDate }
-            .sorted { $0.key! < $1.key! }
-            .flatMap { [$0.key?.toDate(using: format): $0.value] }
-            .first
-
-        return scanDate(element: closestScansAfterToday)
-    }
-
-    private func scanDate(element: Dictionary<Date?, [BrokerProfileQueryData]>.Element?) -> DBUIScanDate {
-        if let element = element, let date = element.key {
-            return DBUIScanDate(
-                date: date.timeIntervalSince1970,
-                dataBrokers: element.value.flatMap {
-                    var brokers = [DBPUIDataBroker(name: $0.dataBroker.name)]
-
-                    for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: date) {
-                        brokers.append(DBPUIDataBroker(name: mirrorSite.name))
-                    }
-
-                    return brokers
+                                         format: String = "dd/MM/yyyy") -> DBPUIScanDate {
+        let eightDaysAfterToday = currentDate.addingTimeInterval(8 * 24 * 60 * 60)
+        let scansHappeningInTheNextEightDays = brokerProfileQueryData
+            .filter { $0.scanOperationData.preferredRunDate != nil && $0.scanOperationData.preferredRunDate! > currentDate && $0.scanOperationData.preferredRunDate! < eightDaysAfterToday }
+            .sorted { $0.scanOperationData.preferredRunDate! < $1.scanOperationData.preferredRunDate! }
+            .reduce(into: [BrokerProfileQueryData]()) { result, element in
+                if !result.contains(where: { $0.dataBroker.url == element.dataBroker.url }) {
+                    result.append(element)
                 }
-            )
+            }
+            .flatMap {
+                var brokers = [DBPUIDataBroker]()
+                brokers.append(DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: $0.scanOperationData.preferredRunDate!.timeIntervalSince1970))
+
+                for mirrorSite in $0.dataBroker.mirrorSites {
+                    if let removedDate = mirrorSite.removedAt {
+                        if removedDate > $0.scanOperationData.preferredRunDate! {
+                            brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanOperationData.preferredRunDate!.timeIntervalSince1970))
+                        }
+                    } else {
+                        brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: $0.scanOperationData.preferredRunDate!.timeIntervalSince1970))
+                    }
+                }
+
+                return brokers
+            }
+
+        if scansHappeningInTheNextEightDays.isEmpty {
+            return DBPUIScanDate(date: currentDate.timeIntervalSince1970, dataBrokers: [DBPUIDataBroker]())
         } else {
-            return DBUIScanDate(date: 0, dataBrokers: [DBPUIDataBroker]())
+            return DBPUIScanDate(date: scansHappeningInTheNextEightDays.first!.date!, dataBrokers: scansHappeningInTheNextEightDays)
         }
     }
 }

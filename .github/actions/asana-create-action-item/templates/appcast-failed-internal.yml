@@ -1,0 +1,37 @@
+data:
+  name: Generate appcast2.xml for ${TAG} internal release and upload assets to S3
+  assignee: "${ASSIGNEE_ID}"
+  html_notes: |
+    <body>
+      Publishing ${TAG} internal release failed in CI. Please follow the steps to generate the appcast file and upload files to S3 from your local machine.
+
+      <ol>
+        <li>Download <a href='${DMG_URL}'>the DMG for ${TAG} release</a>.</li>
+        <li>Create a new file called <code>release-notes.txt</code> on your disk.
+          <ul>
+            <li>Add each release note as a separate line and don't add bullet points (•) – the script will add them automatically.</li>
+          </ul></li>
+        <li>Run <code>appcastManager</code>:
+          <ul>
+            <li><code>./scripts/appcast_manager/appcastManager.swift --release-to-internal-channel --dmg ~/Downloads/${DMG_NAME} --release-notes release-notes.txt</code></li>
+          </ul></li>
+        <li>Verify that the new build is in the appcast file with the following internal channel tag:
+          <ul>
+            <li><code>&lt;sparkle:channel&gt;internal-channel&lt;/sparkle:channel&gt;</code></li>
+          </ul></li>
+        <li>Run <code>upload_to_s3.sh</code> script:
+          <ul>
+            <li><code>./scripts/upload_to_s3/upload_to_s3.sh --run</code></li>
+          </ul></li>
+      </ol>
+      When done, please verify that "Check for Updates" works correctly:
+      <ol>
+        <li>Launch a debug version of the app with an old version number.</li>
+        <li>Identify as an internal user in the app.</li>
+        <li>Go to Main Menu → DuckDuckGo → Check for Updates...</li>
+        <li>Verify that you're being offered to update to ${TAG}.</li>
+        <li>Verify that the update works.</li>
+      </ol>
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>

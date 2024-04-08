@@ -31,9 +31,17 @@ extension NavigationAction {
         return false
     }
 
+    var isCustom: Bool {
+        if case .custom = self.navigationType {
+            return true
+        }
+        return false
+    }
+
 }
 
 extension CustomNavigationType {
     static let userEnteredUrl = CustomNavigationType(rawValue: "userEnteredUrl")
     static let tabContentUpdate = CustomNavigationType(rawValue: "tabContentUpdate")
+    static let userRequestedPageDownload = CustomNavigationType(rawValue: "userRequestedPageDownload")
 }

@@ -43,7 +43,7 @@ extension Preferences {
 
                 PreferencePaneSection {
                     HStack {
-                        Image("AboutPageLogo")
+                        Image(.aboutPageLogo)
                         VStack(alignment: .leading, spacing: 8) {
 #if APPSTORE
                             Text(UserText.duckDuckGoForMacAppStore).font(.companyName)
@@ -51,10 +51,12 @@ extension Preferences {
                             Text(UserText.duckDuckGo).font(.companyName)
 #endif
                             Text(UserText.privacySimplified).font(.privacySimplified)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.leading)
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                                 .onTapGesture(count: 12) {
-#if NETWORK_PROTECTION && !SUBSCRIPTION
+#if NETWORK_PROTECTION
                                     model.displayNetPInvite()
 #endif
                                 }
@@ -68,11 +70,11 @@ extension Preferences {
                     .padding(.bottom, 8)
 
                     TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
-                        model.openURL(.aboutDuckDuckGo)
+                        model.openNewTab(with: .aboutDuckDuckGo)
                     }
 
                     TextButton(UserText.privacyPolicy) {
-                        model.openURL(.privacyPolicy)
+                        model.openNewTab(with: .privacyPolicy)
                     }
 
                     #if FEEDBACK
@@ -121,7 +123,7 @@ extension Preferences {
         }
 
         var body: some View {
-            let image = Image("Alert-Color-16")
+            let image = Image(.alertColor16)
                 .resizable()
                 .frame(width: 16, height: 16)
                 .padding(.trailing, 4)
@@ -150,7 +152,7 @@ extension Preferences {
                 }
             }
             .padding()
-            .background(Color("UnsupportedOSWarningColor"))
+            .background(Color.unsupportedOSWarning)
             .cornerRadius(8)
             .frame(width: width, height: height)
         }

@@ -55,16 +55,22 @@ public final class NetworkProtectionPopover: NSPopover {
                          statusReporter: NetworkProtectionStatusReporter,
                          appLauncher: AppLaunching,
                          menuItems: @escaping () -> [MenuItem],
-                         agentLoginItem: LoginItem?) {
+                         agentLoginItem: LoginItem?,
+                         isMenuBarStatusView: Bool,
+                         userDefaults: UserDefaults,
+                         uninstallHandler: @escaping () async -> Void) {
 
         self.statusReporter = statusReporter
         self.model = NetworkProtectionStatusView.Model(controller: controller,
-                                                      onboardingStatusPublisher: onboardingStatusPublisher,
-                                                      statusReporter: statusReporter,
-                                                      debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
-                                                      appLauncher: appLauncher,
-                                                      menuItems: menuItems,
-                                                      agentLoginItem: agentLoginItem)
+                                                       onboardingStatusPublisher: onboardingStatusPublisher,
+                                                       statusReporter: statusReporter,
+                                                       debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
+                                                       appLauncher: appLauncher,
+                                                       menuItems: menuItems,
+                                                       agentLoginItem: agentLoginItem,
+                                                       isMenuBarStatusView: isMenuBarStatusView,
+                                                       userDefaults: userDefaults,
+                                                       uninstallHandler: uninstallHandler)
 
         super.init()
 

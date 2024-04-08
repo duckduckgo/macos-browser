@@ -28,3 +28,12 @@ extension Publisher where Failure == Never {
     }
 
 }
+
+extension Publisher where Failure: Error {
+
+    func timeout(_ interval: TimeInterval, _ description: String? = nil, file: StaticString = #file, line: UInt = #line) -> Publishers.Timeout<Publishers.MapError<Self, Error>, DispatchQueue> {
+        return self.mapError { $0 }
+            .timeout(.seconds(interval), scheduler: DispatchQueue.main, customError: { TimeoutError(interval: interval, description: description, file: file, line: line) })
+    }
+
+}

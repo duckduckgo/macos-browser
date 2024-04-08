@@ -128,7 +128,7 @@ struct DataImportView: ModalView {
 
                 // if no data to import
                 if model.summary(for: dataType)?.isEmpty == true
-                            || model.error(for: dataType)?.errorType == .noData {
+                    || model.error(for: dataType)?.errorType == .noData {
 
                     DataImportNoDataView(source: model.importSource, dataType: dataType)
                         .padding(.bottom, 24)

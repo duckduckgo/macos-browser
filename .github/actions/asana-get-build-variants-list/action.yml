@@ -1,0 +1,36 @@
+name: Get The List of Build Variants From Asana
+description: |
+  Fetch the lists of build variants to measure retention (ATB) and attribution (Origin) from different Asana projects and combine them in a list.
+inputs:
+  access-token:
+    description: "Asana access token"
+    required: true
+    type: string
+  github-token:
+    description: "GitHub Token"
+    required: false
+    type: string
+  atb-asana-task-id:
+    description: "Asana Task id for the ATB list."
+    required: true
+    type: string
+  origin-asana-section-id:
+    description: "Asana Section id for the Origins list"
+    required: true
+    type: string
+outputs:
+  build-variants:
+    description: "The list of build variants to create"
+    value: ${{ steps.get-build-variants-task.outputs.build-variants }}
+runs:
+  using: "composite"
+  steps:
+    - id: get-build-variants-task
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+        GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+        ORIGIN_ASANA_SECTION_ID: ${{ inputs.origin-asana-section-id }}
+        ATB_ASANA_TASK_ID: ${{ inputs.atb-asana-task-id }}
+      run: |
+        ${{ github.action_path }}/get_build_variants_list.sh

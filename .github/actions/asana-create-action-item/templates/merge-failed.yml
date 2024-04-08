@@ -1,5 +1,5 @@
 data:
-  name: Merging ${BRANCH} to ${BASE_BRANCH} failed
+  name: Merge ${BRANCH} to ${BASE_BRANCH}
   assignee: "${ASSIGNEE_ID}"
   html_notes: |
     <body>
@@ -16,7 +16,12 @@ data:
         <li><code>git pull origin ${BASE_BRANCH}</code> pull the latest code</li>
         <li><code>git merge ${BRANCH}</code>
           <ul>
-            <li>resolve conflicts as needed</li>
+            <li>Resolve conflicts as needed</li>
+            <li>When merging a hotfix branch into an internal release branch, you will get conflicts in version and build number xcconfig files:
+              <ul>
+                <li>In the version file: accept the internal version number (higher).</li>
+                <li>In the build number file: accept the hotfix build number (higher). This step is very important in order to calculate the build number of the next internal release correctly.</li>
+              </ul></li>
           </ul></li>
         <li><code>git push origin ${BASE_BRANCH}</code> push merged branch</li>
       </ul>

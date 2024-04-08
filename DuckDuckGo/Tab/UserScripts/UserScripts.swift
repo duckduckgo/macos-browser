@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import UserScript
 import WebKit
+import Subscription
 
 @MainActor
 final class UserScripts: UserScriptsProvider {
@@ -50,10 +51,10 @@ final class UserScripts: UserScriptsProvider {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
-        let privacySettings = PrivacySecurityPreferences.shared
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let privacyConfig = sourceProvider.privacyConfigurationManager.privacyConfig
         let sessionKey = sourceProvider.sessionKey ?? ""
-        let prefs = ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
+        let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                                 sessionKey: sessionKey,
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig))
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
@@ -87,11 +88,13 @@ final class UserScripts: UserScriptsProvider {
         }
 
 #if SUBSCRIPTION
-        subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
-        userScripts.append(subscriptionPagesUserScript)
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
+            userScripts.append(subscriptionPagesUserScript)
 
-        identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
-        userScripts.append(identityTheftRestorationPagesUserScript)
+            identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
+            userScripts.append(identityTheftRestorationPagesUserScript)
+        }
 #endif
     }
 
