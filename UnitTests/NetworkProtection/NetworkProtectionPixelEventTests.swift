@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import NetworkProtection
 import PixelKit
 import PixelKitTestingUtilities
@@ -321,5 +319,3 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
              line: #line)
     }
 }
-
-#endif

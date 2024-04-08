@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Combine
 import Foundation
@@ -222,5 +220,3 @@ extension NetworkProtectionNavBarButtonModel: NSPopoverDelegate {
         updateVisibility()
     }
 }
-
-#endif

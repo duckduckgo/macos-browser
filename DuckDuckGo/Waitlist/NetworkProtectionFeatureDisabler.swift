@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import BrowserServicesKit
 import Common
 import NetworkExtension
@@ -165,5 +163,3 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         }
     }
 }
-
-#endif
