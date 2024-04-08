@@ -27,20 +27,20 @@ import PixelKit
 public struct PixelFireExpectations {
     let pixelName: String
     var error: Error?
-    var underlyingError: Error?
+    var underlyingErrors: [Error]
     var customFields: [String: String]?
 
     /// Convenience initializer for cleaner semantics
     ///
-    public static func expect(pixelName: String, error: Error? = nil, underlyingError: Error? = nil, customFields: [String: String]? = nil) -> PixelFireExpectations {
+    public static func expect(pixelName: String, error: Error? = nil, underlyingErrors: [Error] = [], customFields: [String: String]? = nil) -> PixelFireExpectations {
 
-        .init(pixelName: pixelName, error: error, underlyingError: underlyingError, customFields: customFields)
+        .init(pixelName: pixelName, error: error, underlyingErrors: underlyingErrors, customFields: customFields)
     }
 
-    public init(pixelName: String, error: Error? = nil, underlyingError: Error? = nil, customFields: [String: String]? = nil) {
+    public init(pixelName: String, error: Error? = nil, underlyingErrors: [Error] = [], customFields: [String: String]? = nil) {
         self.pixelName = pixelName
         self.error = error
-        self.underlyingError = underlyingError
+        self.underlyingErrors = underlyingErrors
         self.customFields = customFields
     }
 
@@ -52,9 +52,13 @@ public struct PixelFireExpectations {
             parameters[PixelKit.Parameters.errorDomain] = nsError.domain
         }
 
-        if let nsUnderlyingError = underlyingError as? NSError {
-            parameters[PixelKit.Parameters.underlyingErrorCode] = String(nsUnderlyingError.code)
-            parameters[PixelKit.Parameters.underlyingErrorDomain] = nsUnderlyingError.domain
+        for (index, error) in underlyingErrors.enumerated() {
+            let errorCodeParameterName = PixelKit.Parameters.underlyingErrorCode + (index == 0 ? "" : String(index + 1))
+            let errorDomainParameterName = PixelKit.Parameters.underlyingErrorDomain + (index == 0 ? "" : String(index + 1))
+            let nsError = error as NSError
+
+            parameters[errorCodeParameterName] = String(nsError.code)
+            parameters[errorDomainParameterName] = nsError.domain
         }
 
         return parameters
