@@ -62,7 +62,7 @@ extension XCUIElement {
             self.typeText("\r")
         }
     }
-    
+
     func clickAfterExistenceTestSucceeds() {
         XCTAssertTrue(
             self.waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -70,7 +70,7 @@ extension XCUIElement {
         )
         self.click()
     }
-    
+
     func hoverAfterExistenceTestSucceeds() {
         XCTAssertTrue(
             self.waitForExistence(timeout: UITests.Timeouts.elementExistence),

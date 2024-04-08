@@ -568,13 +568,13 @@ class BookmarksAndFavoritesTests: XCTestCase {
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)
         openSiteToBookmark(bookmarkingViaDialog: true, escapingDialog: true)
-        
+
         addressBarBookmarkButton.clickAfterExistenceTestSucceeds()
         defaultBookmarkOtherButton.clickAfterExistenceTestSucceeds()
         app.typeKey(.escape, modifierFlags: []) // Exit dialog
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)
-        
+
         XCTAssertTrue(
             app.staticTexts[pageTitle].waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "Since there is no bookmark of the page, and we show bookmarks in the bookmark bar, the title of the page should not appear in a new browser window anywhere."
@@ -585,7 +585,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)
         openSiteToBookmark(bookmarkingViaDialog: true, escapingDialog: true)
-        
+
         bookmarksMenu.clickAfterExistenceTestSucceeds()
         manageBookmarksMenuItem.clickAfterExistenceTestSucceeds()
         bookmarkTableCellViewFavIconImageView.hoverAfterExistenceTestSucceeds()
@@ -593,7 +593,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
         contextualMenuDeleteBookmarkMenuItem.clickAfterExistenceTestSucceeds()
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)
-        
+
         XCTAssertTrue(
             app.staticTexts[pageTitle].waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "Since there is no bookmark of the page, and we show bookmarks in the bookmark bar, the title of the page should not appear in a new browser window anywhere."
@@ -607,7 +607,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
         openSiteToBookmark(bookmarkingViaDialog: true, escapingDialog: true)
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)
-        
+
         XCTAssertTrue(
             bookmarksBarCollectionView.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The bookmarks bar collection view failed to become available in a reasonable timeframe."
@@ -623,7 +623,7 @@ class BookmarksAndFavoritesTests: XCTestCase {
         deleteContextMenuItemCoordinate.click()
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)
-        
+
         XCTAssertTrue(
             app.staticTexts[pageTitle].waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "Since there is no bookmark of the page, and we show bookmarks in the bookmark bar, the title of the page should not appear in a new browser window anywhere. In this specific test, it is highly probable that the reason for a failure (when this area of the app appears to be working correctly) is the contextual menu being rearranged, since it has to address the menu elements by coordinate."
