@@ -263,7 +263,7 @@ enum ThirdPartyBrowser: CaseIterable {
             applicationSupportURL.appendingPathComponent("Google/Chrome/"),
             applicationSupportURL.appendingPathComponent("Google/Chrome Beta/"),
             applicationSupportURL.appendingPathComponent("Google/Chrome Dev/"),
-            applicationSupportURL.appendingPathComponent("Google/Chrome Canary/")
+            applicationSupportURL.appendingPathComponent("Google/Chrome Canary/"),
         ]
         case .chromium: [applicationSupportURL.appendingPathComponent("Chromium/")]
         case .coccoc:  [applicationSupportURL.appendingPathComponent("Coccoc/")]

@@ -69,7 +69,7 @@ final class HoverTrackingArea: NSTrackingArea {
             owner.observe(\.backgroundInset) { [weak self] _, _ in self?.updateLayer() },
             (owner as? NSControl)?.observe(\.isEnabled) { [weak self] _, _ in self?.updateLayer(animated: false) },
             owner.observe(\.isMouseDown) { [weak self] _, _ in self?.mouseDownDidChange() },
-            owner.observe(\.window) { [weak self] _, _ in self?.viewWindowDidChange() }
+            owner.observe(\.window) { [weak self] _, _ in self?.viewWindowDidChange() },
         ].compactMap { $0 }
     }
 

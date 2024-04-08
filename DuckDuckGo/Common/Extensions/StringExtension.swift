@@ -55,7 +55,7 @@ extension String {
         "^": "&#94;",
         "`": "&#97;",
         "{": "&#123;",
-        "}": "&#125;"
+        "}": "&#125;",
     ]
     func escapedUnicodeHtmlString() -> String {
         var result = ""

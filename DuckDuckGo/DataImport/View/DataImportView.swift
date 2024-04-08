@@ -491,7 +491,7 @@ extension DataImportViewModel.ButtonType {
             .init(browser: .chrome,
                   profileURL: URL(fileURLWithPath: "/test/Profile 1")),
             .init(browser: .chrome,
-                  profileURL: URL(fileURLWithPath: "/test/Profile 2"))
+                  profileURL: URL(fileURLWithPath: "/test/Profile 2")),
         ], validateProfileData: { _ in { .init(logins: .available, bookmarks: .available) } // swiftlint:disable:this opening_brace
         })
     } dataImporterFactory: { source, type, _, _ in
