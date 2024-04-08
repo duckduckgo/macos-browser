@@ -66,5 +66,7 @@ final class PreviewViewController: NSViewController {
 
 }
 #else
-final class PreviewViewController: NSViewController {}
+final class PreviewViewController: NSViewController {
+    init(showWindowTitle: Bool = true, adjustWindowFrame: Bool = false, @NSViewBuilder builder: () -> NSView) {}
+}
 #endif
