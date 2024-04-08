@@ -192,7 +192,6 @@ final class MainViewController: NSViewController {
         presentWaitlistThankYouPromptIfNecessary()
 
 #if NETWORK_PROTECTION
-        sendActiveNetworkProtectionWaitlistUserPixel()
         refreshNetworkProtectionMessages()
 #endif
 
@@ -439,12 +438,6 @@ final class MainViewController: NSViewController {
             return
         }
         NSApp.mainMenuTyped.stopMenuItem.isEnabled = selectedTabViewModel.isLoading
-    }
-
-    private func sendActiveNetworkProtectionWaitlistUserPixel() {
-        if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
-            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly)
-        }
     }
 
     func presentWaitlistThankYouPromptIfNecessary() {

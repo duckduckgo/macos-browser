@@ -291,7 +291,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func toggleNetworkProtectionPopover() {
         let featureVisibility = DefaultNetworkProtectionVisibility()
-        guard featureVisibility.isNetworkProtectionVisible() else {
+        guard featureVisibility.isNetworkProtectionBetaVisible() else {
             featureVisibility.disableForWaitlistUsers()
             LocalPinningManager.shared.unpin(.networkProtection)
             return
@@ -299,7 +299,7 @@ final class NavigationBarViewController: NSViewController {
 
         #if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let accountManager = AccountManager()
+            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
 
             if accountManager.accessToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
@@ -315,12 +315,10 @@ final class NavigationBarViewController: NSViewController {
 
         if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
             NetworkProtectionWaitlistViewControllerPresenter.show()
-            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
         } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
         } else {
             NetworkProtectionWaitlistViewControllerPresenter.show()
-            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
         }
     }
 
@@ -372,7 +370,7 @@ final class NavigationBarViewController: NSViewController {
                 case .homeButton:
                     self.updateHomeButton()
                 case .networkProtection:
-                    networkProtectionButtonModel.updateVisibility()
+                    self.networkProtectionButtonModel.updateVisibility()
                 }
             } else {
                 assertionFailure("Failed to get changed pinned view type")
@@ -908,7 +906,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && networkProtectionFeatureActivation.isFeatureActivated {
+        if !isPopUpWindow && DefaultNetworkProtectionVisibility().isVPNVisible() {
             let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
@@ -939,7 +937,7 @@ extension NavigationBarViewController: NSMenuDelegate {
     func showNetworkProtectionStatus() {
         let featureVisibility = DefaultNetworkProtectionVisibility()
 
-        if featureVisibility.isNetworkProtectionVisible() {
+        if featureVisibility.isNetworkProtectionBetaVisible() {
             popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
                                                   withDelegate: networkProtectionButtonModel)
         } else {

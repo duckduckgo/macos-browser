@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="23E214" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="DownloadManagedObject" representedClassName="DownloadManagedObject" syncable="YES" codeGenerationType="class">
+        <attribute name="added" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="destinationFileBookmarkDataEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="">
+            <userInfo>
+                <entry key="transformer" value="NSDataTransformer"/>
+            </userInfo>
+        </attribute>
+        <attribute name="destinationURLEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="">
+            <userInfo>
+                <entry key="transformer" value="NSURLTransformer"/>
+            </userInfo>
+        </attribute>
+        <attribute name="errorEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="">
+            <userInfo>
+                <entry key="transformer" value="NSErrorTransformer"/>
+            </userInfo>
+        </attribute>
+        <attribute name="filenameEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="">
+            <userInfo>
+                <entry key="transformer" value="NSStringTransformer"/>
+            </userInfo>
+        </attribute>
+        <attribute name="fileType" optional="YES" attributeType="String"/>
+        <attribute name="identifier" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modified" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="tempFileBookmarkDataEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="">
+            <userInfo>
+                <entry key="transformer" value="NSDataTransformer"/>
+            </userInfo>
+        </attribute>
+        <attribute name="tempURLEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="">
+            <userInfo>
+                <entry key="transformer" value="NSURLTransformer"/>
+            </userInfo>
+        </attribute>
+        <attribute name="urlEncrypted" attributeType="Transformable" valueTransformerName="">
+            <userInfo>
+                <entry key="transformer" value="NSURLTransformer"/>
+            </userInfo>
+        </attribute>
+        <attribute name="websiteURLEncrypted" optional="YES" attributeType="Transformable" valueTransformerName="">
+            <userInfo>
+                <entry key="transformer" value="NSURLTransformer"/>
+            </userInfo>
+        </attribute>
+    </entity>
+</model>

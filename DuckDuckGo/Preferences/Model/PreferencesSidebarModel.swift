@@ -101,26 +101,12 @@ final class PreferencesSidebarModel: ObservableObject {
     private func setupVPNPaneVisibility() {
         DefaultNetworkProtectionVisibility().onboardStatusPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] onboardingStatus in
+            .sink { [weak self] _ in
                 guard let self else { return }
-
-                if onboardingStatus != .completed && self.selectedPane == .vpn {
-                    self.selectedPane = .general
-                }
 
                 self.refreshSections()
             }
             .store(in: &cancellables)
-
-        UserDefaults.netP.publisher(for: \.networkProtectionEntitlementsExpired)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] entitlementsExpired in
-                guard let self else { return }
-                if !entitlementsExpired && self.selectedPane == .vpn {
-                    self.selectedPane = .general
-                }
-                self.refreshSections()
-        }.store(in: &cancellables)
     }
 
     // MARK: - Refreshing logic

@@ -124,14 +124,6 @@ extension Pixel.Event {
              .duckPlayerSettingAlways,
              .duckPlayerSettingNever,
              .duckPlayerSettingBackToDefault,
-             .networkProtectionWaitlistEntryPointMenuItemDisplayed,
-             .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
-             .networkProtectionWaitlistNotificationShown,
-             .networkProtectionWaitlistNotificationTapped,
-             .networkProtectionWaitlistTermsAndConditionsDisplayed,
-             .networkProtectionWaitlistTermsAndConditionsAccepted,
-             .networkProtectionWaitlistUserActive,
-             .networkProtectionWaitlistIntroDisplayed,
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
@@ -215,7 +207,8 @@ extension Pixel.Event {
              .privacyProWelcomeFAQClick,
              .privacyProPurchaseStripeSuccess,
              .passwordImportKeychainPrompt,
-             .passwordImportKeychainPromptDenied:
+             .passwordImportKeychainPromptDenied,
+             .installationAttribution:
             return nil
         }
     }
@@ -245,6 +238,9 @@ extension Pixel.Event.Debug {
                 .fileStoreWriteFailed,
                 .fileMoveToDownloadsFailed,
                 .fileGetDownloadLocationFailed,
+                .fileAccessRelatedItemFailed,
+                .fileDownloadCreatePresentersFailed,
+                .downloadResumeDataCodingFailed,
                 .suggestionsFetchFailed,
                 .appOpenURLFailed,
                 .appStateRestorationFailed,

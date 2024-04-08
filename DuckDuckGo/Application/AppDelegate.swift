@@ -31,6 +31,8 @@ import PixelKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
+import Lottie
+
 import NetworkProtection
 
 #if SUBSCRIPTION
@@ -38,7 +40,7 @@ import Subscription
 #endif
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
@@ -222,7 +224,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             FaviconManager.shared.loadFavicons()
         }
         ConfigurationManager.shared.start()
-        FileDownloadManager.shared.delegate = self
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
@@ -252,7 +253,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
 
         Task {
-            let accountManager = AccountManager()
+            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             if let token = accountManager.accessToken {
                 _ = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
                 _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
@@ -328,7 +329,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
             // if there‘re downloads without location chosen yet (save dialog should display) - ignore them
-            if FileDownloadManager.shared.downloads.contains(where: { $0.location.destinationURL != nil }) {
+            if FileDownloadManager.shared.downloads.contains(where: { $0.state.isDownloading }) {
                 let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
                 if alert.runModal() == .cancel {
                     return .terminateCancel
@@ -340,20 +341,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
-    }
-
-    func askUserToGrantAccessToDestination(_ folderUrl: URL) {
-        if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
-            let alert = NSAlert.noAccessToDownloads()
-            if alert.runModal() != .cancel {
-                let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")!
-                NSWorkspace.shared.open(preferencesLink)
-                return
-            }
-        } else {
-            let alert = NSAlert.noAccessToSelectedFolder()
-            alert.runModal()
-        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -558,7 +545,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 func updateSubscriptionStatus() {
 #if SUBSCRIPTION
     Task {
-        let accountManager = AccountManager()
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
         guard let token = accountManager.accessToken else { return }
 
@@ -588,7 +575,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
                     NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }

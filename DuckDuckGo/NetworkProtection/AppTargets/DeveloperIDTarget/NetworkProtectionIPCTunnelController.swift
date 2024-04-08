@@ -81,7 +81,7 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
     // MARK: - Login Items Manager
 
     private func enableLoginItems() async throws -> Bool {
-        guard try await featureVisibility.isFeatureEnabled() else {
+        guard try await featureVisibility.canStartVPN() else {
             // We shouldn't enable the menu app is the VPN feature is disabled.
             return false
         }
