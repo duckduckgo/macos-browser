@@ -89,14 +89,18 @@ public extension XCTestCase {
 
     // MARK: - Pixel Firing Expectations
 
-    func fire(_ event: PixelKitEventV2, and expectations: PixelFireExpectations, file: StaticString, line: UInt) {
-        verifyThat(event, meets: expectations, file: file, line: line)
+    func fire(_ event: PixelKitEventV2, frequency: PixelKit.Frequency, and expectations: PixelFireExpectations, file: StaticString, line: UInt) {
+        verifyThat(event, frequency: frequency, meets: expectations, file: file, line: line)
     }
 
     /// Provides some snapshot of a fired pixel so that external libraries can validate all the expected info is included.
     ///
     /// This method also checks that there is internal consistency in the expected fields.
-    func verifyThat(_ event: PixelKitEventV2, meets expectations: PixelFireExpectations, file: StaticString, line: UInt) {
+    func verifyThat(_ event: PixelKitEventV2,
+                    frequency: PixelKit.Frequency,
+                    meets expectations: PixelFireExpectations,
+                    file: StaticString,
+                    line: UInt) {
 
         let expectedPixelName = event.name.hasPrefix(Self.pixelPlatformPrefix) ? event.name : Self.pixelPlatformPrefix + event.name
         let knownExpectedParameters = knownExpectedParameters(for: event)
@@ -129,7 +133,7 @@ public extension XCTestCase {
             completion(true, nil)
         }
 
-        PixelKit.fire(event)
+        PixelKit.fire(event, frequency: frequency)
         waitForExpectations(timeout: 0.1)
     }
 }

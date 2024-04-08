@@ -28,12 +28,15 @@ public final class PixelKit {
         /// The default frequency for pixels. This fires pixels with the event names as-is.
         case standard
 
-        /// Used in Pixel.fire(...) as unique but without the `_u` requirement in the name
+        /// [Legacy] Used in Pixel.fire(...) as .unique but without the `_u` requirement in the name
         case legacyInitial
 
         /// Sent only once ever. The timestamp for this pixel is stored. 
         /// Note: This is the only pixel that MUST end with `_u`, Name for pixels of this type must end with if it doesn't an assertion is fired.
         case unique
+
+        /// [Legacy] Used in Pixel.fire(...) as .daily but without the `_d` automatically added to the name
+        case legacyDaily
 
         /// Sent once per day. The last timestamp for this pixel is stored and compared to the current date. Pixels of this type will have `_d` appended to their name.
         case daily
@@ -51,6 +54,8 @@ public final class PixelKit {
                 "Legacy Initial"
             case .unique:
                 "Unique"
+            case .legacyDaily:
+                "Legacy Daily"
             case .daily:
                 "Daily"
             case .dailyAndCount:
@@ -196,6 +201,15 @@ public final class PixelKit {
                 return
             }
             if !pixelHasBeenFiredEver(pixelName) {
+                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
+                updatePixelLastFireDate(pixelName: pixelName)
+            } else {
+                printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
+            }
+        case .legacyDaily:
+            reportErrorIf(pixel: pixelName, endsWith: "_u")
+            reportErrorIf(pixel: pixelName, endsWith: "_d")
+            if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
