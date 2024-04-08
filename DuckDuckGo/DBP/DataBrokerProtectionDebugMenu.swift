@@ -366,7 +366,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private func populateDataBrokerProtectionEnvironmentListMenuItems() {
         environmentMenu.items = [
             NSMenuItem(title: EnvironmentTitle.production.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
-            NSMenuItem(title: EnvironmentTitle.staging.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: EnvironmentTitle.staging.rawValue, action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: "")
         ]
     }
 

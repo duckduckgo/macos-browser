@@ -58,8 +58,7 @@ final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
             additionalParameters(origin: originProvider.origin, locale: locale.identifier),
             nil,
             nil,
-            true,
-            { _, _ in }
+            true, { _, _ in }
         )
     }
 }

@@ -159,7 +159,7 @@ final class BookmarkTableCellView: NSTableCellView {
         titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5),
 
         accessoryImageView.widthAnchor.constraint(equalToConstant: 22),
-        accessoryImageView.heightAnchor.constraint(equalToConstant: 32),
+        accessoryImageView.heightAnchor.constraint(equalToConstant: 32)
         ])
     }
 

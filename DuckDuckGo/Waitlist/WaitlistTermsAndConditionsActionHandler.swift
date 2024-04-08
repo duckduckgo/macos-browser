@@ -37,15 +37,13 @@ struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAn
     var acceptedTermsAndConditions: Bool
 
     func didShow() {
-        PixelKit.fire(GeneralPixel.networkProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndCount)
+        // Intentional no-op
     }
 
     mutating func didAccept() {
         acceptedTermsAndConditions = true
         // Remove delivered NetP notifications in case the user didn't click them.
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NetworkProtectionWaitlist.notificationIdentifier])
-
-        PixelKit.fire(GeneralPixel.networkProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount)
     }
 }
 
@@ -65,6 +63,7 @@ struct DataBrokerProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTerm
         acceptedTermsAndConditions = true
         // Remove delivered NetP notifications in case the user didn't click them.
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [DataBrokerProtectionWaitlist.notificationIdentifier])
+
         PixelKit.fire(GeneralPixel.dataBrokerProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount)
     }
 }

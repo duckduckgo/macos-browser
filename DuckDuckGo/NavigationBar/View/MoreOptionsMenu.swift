@@ -365,8 +365,6 @@ final class MoreOptionsMenu: NSMenu {
                 }
             }
 #endif
-
-            PixelKit.fire(GeneralPixel.networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else {
             networkProtectionFeatureVisibility.disableForWaitlistUsers()
         }
@@ -383,7 +381,7 @@ final class MoreOptionsMenu: NSMenu {
             items.append(dataBrokerProtectionItem)
 
 #if SUBSCRIPTION
-            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated  {
+            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -415,7 +413,7 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.itrIcon)
             items.append(identityTheftRestorationItem)
 
-            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated  {
+            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 

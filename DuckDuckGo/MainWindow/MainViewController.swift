@@ -24,7 +24,6 @@ import Common
 #if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionIPC
-import PixelKit
 #endif
 
 final class MainViewController: NSViewController {
@@ -200,7 +199,6 @@ final class MainViewController: NSViewController {
         presentWaitlistThankYouPromptIfNecessary()
 
 #if NETWORK_PROTECTION
-        sendActiveNetworkProtectionWaitlistUserPixel()
         refreshNetworkProtectionMessages()
 #endif
 
@@ -450,14 +448,6 @@ final class MainViewController: NSViewController {
         }
         NSApp.mainMenuTyped.stopMenuItem.isEnabled = selectedTabViewModel.isLoading
     }
-
-#if NETWORK_PROTECTION
-    private func sendActiveNetworkProtectionWaitlistUserPixel() {
-        if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
-            PixelKit.fire(GeneralPixel.networkProtectionWaitlistUserActive, frequency: .daily)
-        }
-    }
-#endif
 
     func presentWaitlistThankYouPromptIfNecessary() {
         guard let window = self.view.window else {

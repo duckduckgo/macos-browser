@@ -819,10 +819,10 @@ final class PasswordManagementViewController: NSViewController {
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
-        NSMenu {
-            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin)).withImage(.loginGlyph)
-            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity)).withImage(.identityGlyph)
-            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard)).withImage(.creditCardGlyph)
+        return NSMenu {
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), target: self).withImage(.loginGlyph)
+            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), target: self).withImage(.identityGlyph)
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), target: self).withImage(.creditCardGlyph)
         }
     }
 

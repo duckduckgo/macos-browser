@@ -386,7 +386,7 @@ private let previewSize = NSSize(width: 400, height: 660)
                                     BookmarkFolder(id: "d", title: "Another Nested Folder", children: [
                                         Bookmark(id: "z1", url: "a:b", title: "a", isFavorite: false),
                                         Bookmark(id: "z2", url: "a:b", title: "a", isFavorite: false),
-                                        Bookmark(id: "z3", url: "a:b", title: "a", isFavorite: false),
+                                        Bookmark(id: "z3", url: "a:b", title: "a", isFavorite: false)
                                     ])
                                 ])
                             ])

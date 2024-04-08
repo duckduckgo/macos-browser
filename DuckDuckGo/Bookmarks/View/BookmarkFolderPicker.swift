@@ -55,7 +55,7 @@ struct BookmarkFolderPicker: View {
         BookmarkFolderPicker(folders: [
             FolderViewModel(entity: folder1, level: 0),
             FolderViewModel(entity: folder2, level: 1),
-            FolderViewModel(entity: folder3, level: 2),
+            FolderViewModel(entity: folder3, level: 2)
         ], selectedFolder: _selectedFolder.projectedValue)
     }.frame(width: 300)
 

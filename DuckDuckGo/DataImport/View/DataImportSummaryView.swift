@@ -162,7 +162,7 @@ private func skippedImage() -> some View {
 //                .init(.bookmarks, .failure(DataImportViewModel.TestImportError(action: .bookmarks, errorType: .dataCorrupted))),
 //                .init(.bookmarks, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
                 .init(.passwords, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
-                .init(.passwords, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
+                .init(.passwords, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError)))
             ]))
             .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
             Spacer()

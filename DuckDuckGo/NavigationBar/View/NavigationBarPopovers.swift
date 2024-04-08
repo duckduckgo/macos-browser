@@ -121,7 +121,7 @@ final class NavigationBarPopovers: PopoverPresenter {
     }
 
     func passwordManagementButtonPressed(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        if autofillPopoverPresenter.popoverIsShown == true && view.window == autofillPopoverPresenter.popoverPresentingWindow  {
+        if autofillPopoverPresenter.popoverIsShown == true && view.window == autofillPopoverPresenter.popoverPresentingWindow {
             autofillPopoverPresenter.dismiss()
         } else {
             showPasswordManagementPopover(selectedCategory: nil, usingView: view, withDelegate: delegate)

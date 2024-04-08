@@ -164,7 +164,7 @@ final class DownloadsViewController: NSViewController {
         if prefs.alwaysRequestDownloadLocation {
             url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
 
-            if let lastDownloaded = viewModel.items.first/* last added */(where: {
+            if let lastDownloaded = viewModel.items.first(where: {
                 // should still exist
                 $0.localURL != nil && FileManager.default.fileExists(atPath: $0.localURL!.deletingLastPathComponent().path)
             }),

@@ -25,7 +25,6 @@ import NetworkProtection
 import BrowserServicesKit
 import Common
 import Subscription
-import PixelKit
 
 protocol WaitlistConstants {
     static var identifier: String { get }
@@ -223,9 +222,7 @@ struct NetworkProtectionWaitlist: Waitlist {
                     do {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-                        sendInviteCodeAvailableNotification {
-                            PixelKit.fire(GeneralPixel.networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
-                        }
+                        sendInviteCodeAvailableNotification(completion: nil)
                         completion(nil)
                     } catch {
                         assertionFailure("Failed to redeem invite code")

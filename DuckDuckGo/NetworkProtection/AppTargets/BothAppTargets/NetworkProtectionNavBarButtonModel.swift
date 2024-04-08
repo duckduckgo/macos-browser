@@ -24,7 +24,6 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-import PixelKit
 
 /// Model for managing the NetP button in the Nav Bar.
 ///
@@ -181,7 +180,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
         if networkProtectionVisibility.isNetworkProtectionBetaVisible() {
             if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                PixelKit.fire(GeneralPixel.networkProtectionWaitlistEntryPointToolbarButtonDisplayed, frequency: .daily, includeAppVersionParameter: true)
                 showButton = true
                 return
             }
