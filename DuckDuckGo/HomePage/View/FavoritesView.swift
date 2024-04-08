@@ -324,12 +324,12 @@ struct Favorite: View {
             .link {
                 model.open(bookmark)
             }.contextMenu(ContextMenu(menuItems: {
-                Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) })
-                Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) })
+                Button(UserText.openInNewTab, action: { model.openInNewTab(bookmark) }).accessibilityIdentifier("HomePage.Views.openInNewTab")
+                Button(UserText.openInNewWindow, action: { model.openInNewWindow(bookmark) }).accessibilityIdentifier("HomePage.Views.openInNewWindow")
                 Divider()
-                Button(UserText.edit, action: { model.edit(bookmark) })
-                Button(UserText.removeFavorite, action: { model.removeFavorite(bookmark) })
-                Button(UserText.deleteBookmark, action: { model.deleteBookmark(bookmark) })
+                Button(UserText.edit, action: { model.edit(bookmark) }).accessibilityIdentifier("HomePage.Views.editBookmark")
+                Button(UserText.removeFavorite, action: { model.removeFavorite(bookmark) }).accessibilityIdentifier("HomePage.Views.removeFavorite")
+                Button(UserText.deleteBookmark, action: { model.deleteBookmark(bookmark) }).accessibilityIdentifier("HomePage.Views.deleteBookmark")
             }))
 
     }
