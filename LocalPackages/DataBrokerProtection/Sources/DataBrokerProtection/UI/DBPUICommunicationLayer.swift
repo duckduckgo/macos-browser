@@ -37,6 +37,7 @@ protocol DBPUICommunicationDelegate: AnyObject {
     func getInitialScanState() async -> DBPUIInitialScanState
     func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState
     func getDataBrokers() async -> [DBPUIDataBroker]
+    func getBackgroundAgentMetadata() async -> DBPUIBackgroundAgentMetadata
 }
 
 enum DBPUIReceivedMethodName: String {
@@ -55,6 +56,7 @@ enum DBPUIReceivedMethodName: String {
     case initialScanStatus
     case maintenanceScanStatus
     case getDataBrokers
+    case getBackroundAgentMetadata
 }
 
 enum DBPUISendableMethodName: String {
@@ -104,6 +106,7 @@ struct DBPUICommunicationLayer: Subfeature {
         case .initialScanStatus: return initialScanStatus
         case .maintenanceScanStatus: return maintenanceScanStatus
         case .getDataBrokers: return getDataBrokers
+        case .getBackroundAgentMetadata: return getBackroundAgentMetadata
         }
 
     }
@@ -279,6 +282,10 @@ struct DBPUICommunicationLayer: Subfeature {
     func getDataBrokers(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
         let dataBrokers = await delegate?.getDataBrokers() ?? [DBPUIDataBroker]()
         return DBPUIDataBrokerList(dataBrokers: dataBrokers)
+    }
+
+    func getBackroundAgentMetadata(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        return await delegate?.getBackgroundAgentMetadata()
     }
 
     func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {

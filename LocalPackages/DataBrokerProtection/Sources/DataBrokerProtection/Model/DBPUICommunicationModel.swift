@@ -185,6 +185,10 @@ struct DBPUIScanHistory: DBPUISendableMessage {
     let sitesScanned: Int
 }
 
+struct DBPUIBackgroundAgentMetadata: DBPUISendableMessage {
+
+}
+
 extension DBPUIInitialScanState {
     static var empty: DBPUIInitialScanState {
         .init(resultsFound: [DBPUIDataBrokerProfileMatch](),
