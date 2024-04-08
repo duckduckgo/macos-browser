@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import PixelKit
 import BrowserServicesKit
 import DDGSync
