@@ -25,18 +25,16 @@ public protocol DataBrokerProtectionDataManaging {
 
     init(pixelHandler: EventMapping<DataBrokerProtectionPixels>, fakeBrokerFlag: DataBrokerDebugFlag)
     func saveProfile(_ profile: DataBrokerProtectionProfile) async throws
-    func fetchProfile(ignoresCache: Bool) throws -> DataBrokerProtectionProfile?
-    func fetchBrokerProfileQueryData(ignoresCache: Bool) async throws -> [BrokerProfileQueryData]
+    func fetchProfile() throws -> DataBrokerProtectionProfile?
+    func prepareProfileCache() throws
+    func fetchBrokerProfileQueryData(ignoresCache: Bool) throws -> [BrokerProfileQueryData]
+    func prepareBrokerProfileQueryDataCache() throws
     func hasMatches() throws -> Bool
 }
 
 extension DataBrokerProtectionDataManaging {
-    func fetchProfile() throws -> DataBrokerProtectionProfile? {
-        try fetchProfile(ignoresCache: false)
-    }
-
-    func fetchBrokerProfileQueryData() async throws -> [BrokerProfileQueryData] {
-        try await fetchBrokerProfileQueryData(ignoresCache: false)
+    func fetchBrokerProfileQueryData() throws -> [BrokerProfileQueryData] {
+        try fetchBrokerProfileQueryData(ignoresCache: false)
     }
 }
 
@@ -70,8 +68,8 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         cache.profile = profile
     }
 
-    public func fetchProfile(ignoresCache: Bool = false) throws -> DataBrokerProtectionProfile? {
-        if !ignoresCache, cache.profile != nil {
+    public func fetchProfile() throws -> DataBrokerProtectionProfile? {
+        if cache.profile != nil {
             os_log("Returning cached profile", log: .dataBrokerProtection)
             return cache.profile
         }
@@ -85,7 +83,15 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         }
     }
 
-    public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) async throws -> [BrokerProfileQueryData] {
+    public func prepareProfileCache() throws {
+        if let profile = try database.fetchProfile() {
+            cache.profile = profile
+        } else {
+            os_log("No profile found", log: .dataBrokerProtection)
+        }
+    }
+
+    public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) throws -> [BrokerProfileQueryData] {
         if !ignoresCache, !cache.brokerProfileQueryData.isEmpty {
             os_log("Returning cached brokerProfileQueryData", log: .dataBrokerProtection)
             return cache.brokerProfileQueryData
@@ -96,14 +102,17 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         return queryData
     }
 
+    public func prepareBrokerProfileQueryDataCache() throws {
+        cache.brokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
+    }
+
     public func hasMatches() throws -> Bool {
         return try database.hasMatches()
     }
 }
 
 extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
-    public func flushCache(profile: DataBrokerProtectionProfile?) async throws {
-        guard let profile = profile else { return }
+    public func saveCachedProfileToDatabase(_ profile: DataBrokerProtectionProfile) async throws {
         try await saveProfile(profile)
 
         delegate?.dataBrokerProtectionDataManagerDidUpdateData()
@@ -118,7 +127,7 @@ extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
 }
 
 public protocol InMemoryDataCacheDelegate: AnyObject {
-    func flushCache(profile: DataBrokerProtectionProfile?) async throws
+    func saveCachedProfileToDatabase(_ profile: DataBrokerProtectionProfile) async throws
     func removeAllData() throws
 }
 
@@ -142,7 +151,8 @@ public final class InMemoryDataCache {
 
 extension InMemoryDataCache: DBPUICommunicationDelegate {
     func saveProfile() async throws {
-        try await delegate?.flushCache(profile: profile)
+        guard let profile = profile else { return }
+        try await delegate?.saveCachedProfileToDatabase(profile)
     }
 
     private func indexForName(matching name: DBPUIUserProfileName, in profile: DataBrokerProtectionProfile) -> Int? {

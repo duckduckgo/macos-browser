@@ -48,7 +48,7 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         guard let dataManager = self.dataManager else { return }
 
         Task {
-            guard let data = try? await dataManager.fetchBrokerProfileQueryData(ignoresCache: true) else {
+            guard let data = try? dataManager.fetchBrokerProfileQueryData(ignoresCache: true) else {
                 assertionFailure("DataManager error during DataBrokerDatavaseBrowserViewModel.updateTables")
                 return
             }

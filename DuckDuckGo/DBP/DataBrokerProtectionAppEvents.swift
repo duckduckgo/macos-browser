@@ -49,7 +49,7 @@ struct DataBrokerProtectionAppEvents {
 
             // If we don't have profileQueries it means there's no user profile saved in our DB
             // In this case, let's disable the agent and delete any left-over data because there's nothing for it to do
-            if let profileQueries = try? await DataBrokerProtectionManager.shared.dataManager.fetchBrokerProfileQueryData(ignoresCache: true),
+            if let profileQueries = try? DataBrokerProtectionManager.shared.dataManager.fetchBrokerProfileQueryData(ignoresCache: true),
                profileQueries.count > 0 {
                 restartBackgroundAgent(loginItemsManager: loginItemsManager)
             } else {

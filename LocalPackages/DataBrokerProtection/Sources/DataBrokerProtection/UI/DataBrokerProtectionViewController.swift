@@ -50,8 +50,10 @@ final public class DataBrokerProtectionViewController: NSViewController {
                                              prefs: prefs,
                                              webView: webView)
 
+        // Prepare the profile cache to avoid stuttering later
+        // It's in a task to avoid stuttering now
         Task {
-            _ = try? dataManager.fetchProfile(ignoresCache: true)
+            try? dataManager.prepareProfileCache()
         }
 
         super.init(nibName: nil, bundle: nil)

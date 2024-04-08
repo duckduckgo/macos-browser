@@ -31,7 +31,7 @@ final class DataBrokerForceOptOutViewModel: ObservableObject {
 
     private func loadNotRemovedOptOutData() {
         Task { @MainActor in
-            guard let brokerProfileData = try? await dataManager.fetchBrokerProfileQueryData(ignoresCache: true) else {
+            guard let brokerProfileData = try? dataManager.fetchBrokerProfileQueryData(ignoresCache: true) else {
                 assertionFailure()
                 return
             }
