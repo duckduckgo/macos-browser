@@ -40,6 +40,16 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
         }
     }
 
+    @Published
+    var isWarnBeforeClearingEnabled: Bool {
+        didSet {
+            persistor.warnBeforeClearingEnabled = isWarnBeforeClearingEnabled
+        }
+    }
+
+    @Published
+    var clearDataAfter: ClearDataAfterOption = .quittingAppOnly
+
     @MainActor
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
@@ -58,6 +68,8 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
         self.persistor = persistor
         isLoginDetectionEnabled = persistor.loginDetectionEnabled
         isBurnDataOnQuitEnabled = persistor.burnDataOnQuitEnabled
+        isWarnBeforeClearingEnabled = persistor.warnBeforeClearingEnabled
+        clearDataAfter = persistor.clearDataAfter
     }
 
     private var persistor: FireButtonPreferencesPersistor
@@ -66,6 +78,8 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
 protocol FireButtonPreferencesPersistor {
     var loginDetectionEnabled: Bool { get set }
     var burnDataOnQuitEnabled: Bool { get set }
+    var warnBeforeClearingEnabled: Bool { get set }
+    var clearDataAfter: ClearDataAfterOption { get set }
 }
 
 struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersistor {
@@ -76,6 +90,20 @@ struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersisto
     @UserDefaultsWrapper(key: .burnDataOnQuitEnabled, defaultValue: false)
     var burnDataOnQuitEnabled: Bool
 
+    @UserDefaultsWrapper(key: .warnBeforeClearingEnabled, defaultValue: false)
+    var warnBeforeClearingEnabled: Bool
+
+    @UserDefaultsWrapper(key: .clearDataAfter, defaultValue: .quittingAppOnly)
+    var clearDataAfter: ClearDataAfterOption
+
+}
+
+enum ClearDataAfterOption: String, CaseIterable {
+    case quittingAppOnly
+    case quittingApp30MinutesOfInactivity
+    case quittingApp2HoursOfInactivity
+    case quittingApp8HoursOfInactivity
+    case quittingApp1DayOfInactivity
 }
 
 extension Notification.Name {

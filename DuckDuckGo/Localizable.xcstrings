@@ -5485,7 +5485,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Automatically Clear Data"
+            "value" : "Automatically Clear"
           }
         }
       }
@@ -9766,7 +9766,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Burn data on quit"
+            "value" : "Clear Data upon Quitting"
           }
         }
       }
@@ -9778,7 +9778,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Clear all browsing data, history, and cookies whenever you close the browser. Cookies for Fireproof Sites won't be erased."
+            "value" : "Data from \"Fireproofed\" sites won't be cleared, keeping your essential logins and preferences intact."
           }
         }
       }
@@ -10605,6 +10605,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Очистить всю историю…"
+          }
+        }
+      }
+    },
+    "clear.data.after" : {
+      "comment" : "A label for a setting to automatically clear data after some delay",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear Data After:"
           }
         }
       }
@@ -44818,6 +44830,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выйти"
+          }
+        }
+      }
+    },
+    "quitting.app.1.day.of.inactivity" : {
+      "comment" : "A label describing an option to clear data automatically only upon quitting the app or after 1 day of inactivity",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quitting App, 1 Day of Inactivity"
+          }
+        }
+      }
+    },
+    "quitting.app.2.hours.of.inactivity" : {
+      "comment" : "A label describing an option to clear data automatically only upon quitting the app or after 2 hours of inactivity",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quitting App, 2 Hours of Inactivity"
+          }
+        }
+      }
+    },
+    "quitting.app.8.hours.of.inactivity" : {
+      "comment" : "A label describing an option to clear data automatically only upon quitting the app or after 8 hours of inactivity",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quitting App, 8 Hours of Inactivity"
+          }
+        }
+      }
+    },
+    "quitting.app.30.minutes.of.inactivity" : {
+      "comment" : "A label describing an option to clear data automatically only upon quitting the app or after 30 minutes of inactivity",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quitting App, 30 Minutes of Inactivity"
+          }
+        }
+      }
+    },
+    "quitting.app.only" : {
+      "comment" : "A label describing an option to clear data automatically only upon quitting the app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quitting App Only"
           }
         }
       }

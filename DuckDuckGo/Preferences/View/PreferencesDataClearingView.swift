@@ -36,6 +36,20 @@ extension Preferences {
                         VStack(alignment: .leading, spacing: 1) {
                             TextMenuItemCaption(UserText.burnDataOnQuitExplanation)
                         }
+                        ToggleMenuItem("Warn before Clearing",
+                                       isOn: $model.isWarnBeforeClearingEnabled)
+                        .disabled(!model.isBurnDataOnQuitEnabled)
+                        .padding(.leading, 16)
+                    }
+
+                    PreferencePaneSubSection {
+                        Picker(UserText.clearDataAfter, selection: $model.clearDataAfter) {
+                            ForEach(ClearDataAfterOption.allCases, id: \.self) { option in
+                                Text(UserText.clearDataAfter(for: option)).tag(option)
+                            }
+                        }
+                        .fixedSize()
+                        .disabled(!model.isBurnDataOnQuitEnabled)
                     }
 
                 }

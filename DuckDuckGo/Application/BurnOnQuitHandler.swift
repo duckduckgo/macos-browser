@@ -36,12 +36,27 @@ final class BurnOnQuitHandler {
         return preferences.isBurnDataOnQuitEnabled
     }
 
+    var shouldWarnOnBurn: Bool {
+        return preferences.isWarnBeforeClearingEnabled
+    }
+
     // Completion handler for all quit tasks
     var onBurnOnQuitCompleted: (() -> Void)?
 
     @MainActor
     func burnOnQuit() {
         guard shouldBurnOnQuit else { return }
+
+        if shouldWarnOnBurn {
+            let alert = NSAlert.burnOnQuitAlert()
+            let response = alert.runModal()
+            guard response == .alertFirstButtonReturn else {
+                burnPerformedSuccessfullyOnQuit = true
+                onBurnOnQuitCompleted?()
+                return
+            }
+        }
+
         // TODO: Refactor from static
         FireCoordinator.fireViewModel.fire.burnAll { [weak self] in
             self?.burnPerformedSuccessfullyOnQuit = true
@@ -52,6 +67,7 @@ final class BurnOnQuitHandler {
     // MARK: - Burn On Start
     // In case the burn on quit wasn't successfull
 
+    //TODO Rename - application quit handled correctly
     @UserDefaultsWrapper(key: .burnPerformedSuccessfullyOnQuit, defaultValue: false)
     private var burnPerformedSuccessfullyOnQuit: Bool
 

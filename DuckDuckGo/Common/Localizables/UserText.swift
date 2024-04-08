@@ -1037,9 +1037,19 @@ struct UserText {
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
     static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button.", comment: "Fireproofing mechanism explanation")
     static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites…", comment: "Fireproof settings button caption")
-    static let automaticallyClearData = NSLocalizedString("automatically.clear.data", value: "Automatically Clear Data", comment: "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.")
-    static let burnDataOnQuit = NSLocalizedString("burn.data.on.quit", value: "Burn data on quit", comment: "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.")
-    static let burnDataOnQuitExplanation = NSLocalizedString("burn.data.on.quit.explanation", value: "Clear all browsing data, history, and cookies whenever you close the browser. Cookies for Fireproof Sites won't be erased.", comment: "Explanation of a setting which configures clearing data automatically after quitting the app.")
+    static let automaticallyClearData = NSLocalizedString("automatically.clear.data", value: "Automatically Clear", comment: "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.")
+    static let burnDataOnQuit = NSLocalizedString("burn.data.on.quit", value: "Clear Data upon Quitting", comment: "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.")
+    static let burnDataOnQuitExplanation = NSLocalizedString("burn.data.on.quit.explanation", value: "Data from \"Fireproofed\" sites won't be cleared, keeping your essential logins and preferences intact.", comment: "Explanation of a setting which configures clearing data automatically after quitting the app.")
+    static let clearDataAfter = NSLocalizedString("clear.data.after", value: "Clear Data After:", comment: "A label for a setting to automatically clear data after some delay")
+    static func clearDataAfter(for option: ClearDataAfterOption) -> String {
+        switch option {
+        case .quittingAppOnly: return NSLocalizedString("quitting.app.only", value: "Quitting App Only", comment: "A label describing an option to clear data automatically only upon quitting the app")
+        case .quittingApp30MinutesOfInactivity: return NSLocalizedString("quitting.app.30.minutes.of.inactivity", value: "Quitting App, 30 Minutes of Inactivity", comment: "A label describing an option to clear data automatically only upon quitting the app or after 30 minutes of inactivity")
+        case .quittingApp2HoursOfInactivity: return NSLocalizedString("quitting.app.2.hours.of.inactivity", value: "Quitting App, 2 Hours of Inactivity", comment: "A label describing an option to clear data automatically only upon quitting the app or after 2 hours of inactivity")
+        case .quittingApp8HoursOfInactivity: return NSLocalizedString("quitting.app.8.hours.of.inactivity", value: "Quitting App, 8 Hours of Inactivity", comment: "A label describing an option to clear data automatically only upon quitting the app or after 8 hours of inactivity")
+        case .quittingApp1DayOfInactivity: return NSLocalizedString("quitting.app.1.day.of.inactivity", value: "Quitting App, 1 Day of Inactivity", comment: "A label describing an option to clear data automatically only upon quitting the app or after 1 day of inactivity")
+        }
+    }
     static func disableBurnOnQuitToEnableSessionRestore() -> String {
         let localized = NSLocalizedString("disable.burn.on.quit.to.enable.session.restore",
                                           value: "Disable the %@ setting to enable session restore on startup.",
