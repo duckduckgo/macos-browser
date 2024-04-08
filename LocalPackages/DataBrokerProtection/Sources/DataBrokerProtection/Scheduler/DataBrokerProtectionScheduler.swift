@@ -295,6 +295,6 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func getDebugMetadata(completion: (DBPBackgroundAgentMetadata?) -> Void) {
-        
+        completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: "TESTING"))
     }
 }
