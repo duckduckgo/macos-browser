@@ -152,9 +152,9 @@ final class DownloadListCoordinator {
         // locate destination file
         let destinationPresenterResult = Result<FilePresenter?, Error> {
             if let destinationFileBookmarkData = item.destinationFileBookmarkData {
-                try SandboxFilePresenter(fileBookmarkData: destinationFileBookmarkData, logger: log)
+                try BookmarkFilePresenter(fileBookmarkData: destinationFileBookmarkData, logger: log)
             } else if let destinationURL = item.destinationURL {
-                try SandboxFilePresenter(url: destinationURL, logger: log)
+                try BookmarkFilePresenter(url: destinationURL, logger: log)
             } else {
                 nil
             }
@@ -163,9 +163,9 @@ final class DownloadListCoordinator {
         // locate temp download file
         var tempFilePresenterResult = Result<FilePresenter?, Error> {
             if let tempFileBookmarkData = item.tempFileBookmarkData {
-                try SandboxFilePresenter(fileBookmarkData: tempFileBookmarkData, logger: log)
+                try BookmarkFilePresenter(fileBookmarkData: tempFileBookmarkData, logger: log)
             } else if let tempURL = item.tempURL {
-                try SandboxFilePresenter(url: tempURL, logger: log)
+                try BookmarkFilePresenter(url: tempURL, logger: log)
             } else {
                 nil
             }
@@ -250,7 +250,7 @@ final class DownloadListCoordinator {
 
         Publishers.CombineLatest(
             presenters.destination?.urlPublisher ?? Just(nil).eraseToAnyPublisher(),
-            (presenters.destination as? SandboxFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
+            (presenters.destination as? BookmarkFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
         )
         .scan((oldURL: nil, newURL: nil, fileBookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, fileBookmarkData: $1.1) }
         .sink { [weak self] oldURL, newURL, fileBookmarkData in
@@ -279,7 +279,7 @@ final class DownloadListCoordinator {
 
         Publishers.CombineLatest(
             presenters.tempFile?.urlPublisher ?? Just(nil).eraseToAnyPublisher(),
-            (presenters.tempFile as? SandboxFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
+            (presenters.tempFile as? BookmarkFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
         )
         .scan((oldURL: nil, newURL: nil, fileBookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, fileBookmarkData: $1.1) }
         .sink { [weak self] oldURL, newURL, fileBookmarkData in
