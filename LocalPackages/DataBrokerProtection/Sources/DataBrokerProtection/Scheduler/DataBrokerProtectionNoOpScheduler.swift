@@ -38,4 +38,5 @@ final class DataBrokerProtectionNoOpScheduler: DataBrokerProtectionScheduler {
     func runQueuedOperations(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) { }
     func scanAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) { }
     func runAllOperations(showWebView: Bool) { }
+    func getDebugMetadata(completion: (DBPBackgroundAgentMetadata?) -> Void) { }
 }
