@@ -67,9 +67,11 @@ final class PreviewViewController: NSViewController {
 }
 #else
 final class PreviewViewController: NSViewController {
-    init(showWindowTitle: Bool = true, adjustWindowFrame: Bool = false, @NSViewBuilder builder: () -> NSView) {}
+    init(showWindowTitle: Bool = true, adjustWindowFrame: Bool = false, @NSViewBuilder builder: () -> NSView) {
+        fatalError("only for DEBUG")
+    }
     required init?(coder: NSCoder) {
-        fatalError("\(Self.self): Bad initializer")
+        fatalError("only for DEBUG")
     }
 }
 #endif
