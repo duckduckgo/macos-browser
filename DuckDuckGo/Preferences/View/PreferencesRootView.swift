@@ -160,7 +160,7 @@ enum Preferences {
                     case .activateAddEmailClick:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
                     case .postSubscriptionAddEmailClick:
-                        Pixel.fire(.privacyProWelcomeAddDevice, limitTo: .initial)
+                        Pixel.fire(.privacyProSubscriptionManagementEmail, limitTo: .initial)
                     case .restorePurchaseStoreClick:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
                     case .addToAnotherDeviceClick:

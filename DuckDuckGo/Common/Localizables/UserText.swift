@@ -147,11 +147,11 @@ struct UserText {
     static func mainMenuHomeButtonMode(for position: HomeButtonPosition) -> String {
         switch position {
         case .hidden:
-            return NSLocalizedString("Hide", comment: "Main Menu > View > Home Button > None item")
+            return NSLocalizedString("main.menu.home.button.mode.hide", value: "Hide", comment: "Main Menu > View > Home Button > None item")
         case .left:
-            return NSLocalizedString("Show Left of the Back Button", comment: "Main Menu > View > Home Button > left position item")
+            return NSLocalizedString("main.menu.home.button.mode.left", value: "Show Left of the Back Button", comment: "Main Menu > View > Home Button > left position item")
         case .right:
-            return NSLocalizedString("Show Right of the Reload Button", comment: "Main Menu > View > Home Button > right position item")
+            return NSLocalizedString("main.menu.home.button.mode.right", value: "Show Right of the Reload Button", comment: "Main Menu > View > Home Button > right position item")
         }
     }
     
@@ -605,11 +605,11 @@ struct UserText {
     static func homeButtonMode(for position: HomeButtonPosition) -> String {
         switch position {
         case .hidden:
-            return NSLocalizedString("Hide", comment: "Preferences > Home Button > None item")
+            return NSLocalizedString("context.menu.home.button.mode.hide", value: "Hide", comment: "Preferences > Home Button > None item")
         case .left:
-            return NSLocalizedString("Show left of the back button", comment: "Preferences > Home Button > left position item")
+            return NSLocalizedString("context.menu.home.button.mode.left", value: "Show left of the back button", comment: "Preferences > Home Button > left position item")
         case .right:
-            return NSLocalizedString("Show right of the reload button", comment: "Preferences > Home Button > right position item")
+            return NSLocalizedString("context.menu.home.button.mode.right", value: "Show right of the reload button", comment: "Preferences > Home Button > right position item")
         }
     }
 
@@ -670,6 +670,13 @@ struct UserText {
     static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select Passwords CSV File…", comment: "Button text for selecting a CSV file")
     static func importLoginsSelectCSVFile(from source: DataImport.Source) -> String {
         String(format: NSLocalizedString("import.logins.select-csv-file.source", value: "Select %@ CSV File…", comment: "Button text for selecting a CSV file exported from (LastPass or Bitwarden or 1Password - %@)"), source.importSourceName)
+    }
+
+    static func importNoDataBookmarksSubtitle(from source: DataImport.Source) -> String {
+        String(format: NSLocalizedString("import.nodata.bookmarks.subtitle", value: "If you have %@ bookmarks, try importing them manually instead.", comment: "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox."), source.importSourceName)
+    }
+    static func importNoDataPasswordsSubtitle(from source: DataImport.Source) -> String {
+        String(format: NSLocalizedString("import.nodata.passwords.subtitle", value: "If you have %@ passwords, try importing them manually instead.", comment: "Data import error subtitle: suggestion to import passwords manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox."), source.importSourceName)
     }
 
     static let importLoginsPasswords = NSLocalizedString("import.logins.passwords", value: "Passwords", comment: "Title text for the Passwords import option")

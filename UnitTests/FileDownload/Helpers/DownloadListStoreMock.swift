@@ -21,9 +21,9 @@ import Foundation
 
 final class DownloadListStoreMock: DownloadListStoring {
 
-    var fetchBlock: ((Date, @escaping (Result<[DownloadListItem], Error>) -> Void) -> Void)?
-    func fetch(clearingItemsOlderThan date: Date, completionHandler: @escaping (Result<[DownloadListItem], Error>) -> Void) {
-        fetchBlock?(date, completionHandler)
+    var fetchBlock: ((@escaping @MainActor (Result<[DownloadListItem], Error>) -> Void) -> Void)?
+    func fetch(completionHandler: @escaping @MainActor (Result<[DuckDuckGo_Privacy_Browser.DownloadListItem], any Error>) -> Void) {
+        fetchBlock?(completionHandler)
     }
 
     var saveBlock: ((DownloadListItem, ((Error?) -> Void)?) -> Void)?
@@ -34,11 +34,6 @@ final class DownloadListStoreMock: DownloadListStoring {
     var removeBlock: ((DownloadListItem, ((Error?) -> Void)?) -> Void)?
     func remove(_ item: DownloadListItem, completionHandler: ((Error?) -> Void)?) {
         removeBlock?(item, completionHandler)
-    }
-
-    var clearBlock: ((Date, ((Error?) -> Void)?) -> Void)?
-    func clear(itemsOlderThan date: Date, completionHandler: ((Error?) -> Void)?) {
-        clearBlock?(date, completionHandler)
     }
 
     var syncBlock: (() -> Void)?

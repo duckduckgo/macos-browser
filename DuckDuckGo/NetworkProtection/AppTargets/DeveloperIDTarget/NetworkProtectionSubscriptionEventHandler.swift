@@ -26,14 +26,14 @@ import NetworkProtectionUI
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let accountManager: AccountManaging
+    private let accountManager: AccountManager
     private let networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
     private let userDefaults: UserDefaults
     private var cancellables = Set<AnyCancellable>()
 
-    init(accountManager: AccountManaging = AccountManager(),
+    init(accountManager: AccountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)),
          networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming = NetworkProtectionCodeRedemptionCoordinator(),
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
@@ -49,7 +49,7 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private func subscribeToEntitlementChanges() {
         Task {
-            switch await AccountManager().hasEntitlement(for: .networkProtection) {
+            switch await accountManager.hasEntitlement(for: .networkProtection) {
             case .success(let hasEntitlements):
                 Task {
                     await handleEntitlementsChange(hasEntitlements: hasEntitlements)

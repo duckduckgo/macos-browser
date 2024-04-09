@@ -41,6 +41,8 @@ final class FirefoxLoginReader {
 
             case decryptUsername
             case decryptPassword
+
+            case couldNotFindKeyDB
         }
 
         var action: DataImportAction { .passwords }
@@ -49,7 +51,7 @@ final class FirefoxLoginReader {
 
         var errorType: DataImport.ErrorType {
             switch type {
-            case .couldNotFindLoginsFile, .couldNotReadLoginsFile: .noData
+            case .couldNotFindLoginsFile, .couldNotFindKeyDB, .couldNotReadLoginsFile: .noData
             case .key3readerStage1, .key3readerStage2, .key3readerStage3, .key4readerStage1, .key4readerStage2, .key4readerStage3, .decryptUsername, .decryptPassword: .decryptionError
             case .couldNotDetermineFormat: .dataCorrupted
             case .requiresPrimaryPassword: .other
@@ -94,7 +96,7 @@ final class FirefoxLoginReader {
     func readLogins(dataFormat: DataFormat?) -> DataImportResult<[ImportedLoginCredential]> {
         var currentOperationType: ImportError.OperationType = .couldNotFindLoginsFile
         do {
-            let dataFormat = try dataFormat ?? detectLoginFormat() ?? { throw ImportError(type: .couldNotDetermineFormat, underlyingError: nil) }()
+            let dataFormat = try dataFormat ?? detectLoginFormat() ?? { throw ImportError(type: .couldNotFindKeyDB, underlyingError: nil) }()
             let keyData = try getEncryptionKey(dataFormat: dataFormat)
             let result = try reallyReadLogins(dataFormat: dataFormat, keyData: keyData, currentOperationType: &currentOperationType)
             return .success(result)
@@ -106,7 +108,7 @@ final class FirefoxLoginReader {
     }
 
     func getEncryptionKey() throws -> Data {
-        let dataFormat = try detectLoginFormat() ?? { throw ImportError(type: .couldNotDetermineFormat, underlyingError: nil) }()
+        let dataFormat = try detectLoginFormat() ?? { throw ImportError(type: .couldNotFindKeyDB, underlyingError: nil) }()
         return try getEncryptionKey(dataFormat: dataFormat)
     }
 

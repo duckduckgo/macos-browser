@@ -65,38 +65,6 @@ final class DownloadListStoreTests: XCTestCase {
         XCTAssertEqual(items.count, 1)
     }
 
-    func testWhenFetchClearingItemsOlderThanIsCalled_ThenOlderItemsThanDateAreCleaned() {
-        let oldItem = DownloadListItem(identifier: UUID(),
-                                       added: Date.daysAgo(30),
-                                       modified: Date.daysAgo(3),
-                                       url: URL(string: "https://duckduckgo.com")!,
-                                       websiteURL: nil,
-                                       progress: nil,
-                                       isBurner: false,
-                                       fileType: .pdf,
-                                       destinationURL: URL(fileURLWithPath: "/test/path"),
-                                       tempURL: nil,
-                                       error: nil)
-        let notSoOldItem = DownloadListItem.olderItem
-        let newItem = DownloadListItem.testItem
-
-        save(oldItem, expectation: self.expectation(description: "Saving 1"))
-        save(notSoOldItem, expectation: self.expectation(description: "Saving 2"))
-        save(newItem, expectation: self.expectation(description: "Saving 3"))
-
-        let loadingExpectation = self.expectation(description: "Loading")
-        store.fetch(clearingItemsOlderThan: Date.daysAgo(2)) { result in
-            loadingExpectation.fulfill()
-            guard case .success(let items) = result else { XCTFail("unexpected failure \(result)"); return }
-
-            XCTAssertEqual(items.count, 2)
-            XCTAssertTrue(items.contains(notSoOldItem))
-            XCTAssertTrue(items.contains(newItem))
-        }
-
-        waitForExpectations(timeout: 1, handler: nil)
-    }
-
     func testWhenDownloadIsRemoved_ThenItShouldntBeLoadedFromStore() throws {
         let item1 = DownloadListItem.testItem
         let item2 = DownloadListItem.olderItem
@@ -116,46 +84,46 @@ final class DownloadListStoreTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
-    func testWhenDownloadsCleared_ThenNoItemsLoaded() throws {
-        save(.testItem, expectation: self.expectation(description: "Saving 1"))
-        save(.olderItem, expectation: self.expectation(description: "Saving 2"))
-
-        store.clear()
-
-        let loadingExpectation = self.expectation(description: "Loading")
-        store.fetch { result in
-            loadingExpectation.fulfill()
-            guard case .success(let items) = result else { XCTFail("unexpected failure \(result)"); return }
-
-            XCTAssertEqual(items, [])
-        }
-
-        waitForExpectations(timeout: 1)
-    }
-
 }
 
-extension DownloadListItem {
+private extension DownloadListItem {
     static let testItem = DownloadListItem(identifier: UUID(),
                                            added: Date(),
                                            modified: Date(),
-                                           url: URL(string: "https://duckduckgo.com/testdload")!,
-                                           websiteURL: URL(string: "https://duckduckgo.com")!,
+                                           downloadURL: URL(string: "https://duckduckgo.com/testdload")!,
+                                           websiteURL: .duckDuckGo,
+                                           fileName: "fileName",
                                            progress: nil,
                                            isBurner: false,
-                                           fileType: .pdf,
-                                           destinationURL: URL(fileURLWithPath: "/test/file/path"),
+                                           destinationURL: URL(fileURLWithPath: "/test/path"),
+                                           destinationFileBookmarkData: nil,
                                            tempURL: URL(fileURLWithPath: "/temp/file/path"),
+                                           tempFileBookmarkData: nil,
                                            error: nil)
+    static let oldItem = DownloadListItem(identifier: UUID(),
+                                          added: .daysAgo(30),
+                                          modified: .daysAgo(3),
+                                          downloadURL: .duckDuckGo,
+                                          websiteURL: .duckDuckGo,
+                                          fileName: "fileName",
+                                          progress: nil,
+                                          isBurner: false,
+                                          destinationURL: URL(fileURLWithPath: "/test/path"),
+                                          destinationFileBookmarkData: nil,
+                                          tempURL: nil,
+                                          tempFileBookmarkData: nil,
+                                          error: nil)
     static let olderItem = DownloadListItem(identifier: UUID(),
-                                            added: Date.daysAgo(30),
-                                            modified: Date.daysAgo(1),
-                                            url: URL(string: "https://testdownload.com")!,
+                                            added: .daysAgo(30),
+                                            modified: .daysAgo(1),
+                                            downloadURL: URL(string: "https://testdownload.com")!,
                                             websiteURL: nil,
+                                            fileName: "fileName",
                                             progress: nil,
                                             isBurner: false,
-                                            fileType: .jpeg,
                                             destinationURL: URL(fileURLWithPath: "/test/path.jpeg"),
+                                            destinationFileBookmarkData: nil,
                                             tempURL: nil,
+                                            tempFileBookmarkData: nil,
                                             error: nil)
 }

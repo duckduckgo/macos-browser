@@ -84,7 +84,7 @@ final class NetworkProtectionAppEvents {
             await featureVisibility.disableIfUserHasNoAccess()
 
 #if SUBSCRIPTION
-            await AccountManager().refreshSubscriptionAndEntitlements()
+            await AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).refreshSubscriptionAndEntitlements()
 #endif
         }
     }

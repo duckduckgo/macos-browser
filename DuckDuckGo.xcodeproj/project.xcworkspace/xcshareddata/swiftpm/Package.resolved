@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sabrina/ssl-error",
-        "revision" : "c5861d2c30d0d5cd6bd54cedb0de54f97007e84a"
+        "revision" : "826347db901df6a4de9a34f7588e7153a14c2f0e"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
         "branch" : "03-28-built_assets_for_sslerror",
-        "revision" : "9948256d05b54552702c18b1f79c6637ff6bfc1c"
+        "revision" : "146709e0dc843591f2267b86e6b93328d1fce22e"
       }
     },
     {
@@ -64,12 +64,12 @@
       }
     },
     {
-      "identity" : "lottie-ios",
+      "identity" : "lottie-spm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/lottie-ios.git",
+      "location" : "https://github.com/airbnb/lottie-spm.git",
       "state" : {
-        "revision" : "abf5510e261c85ffddd29de0bca9b72592ea2bdd",
-        "version" : "3.3.0"
+        "revision" : "3bd43e12d6fb54654366a61f7cfaca787318b8ce",
+        "version" : "4.4.1"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "branch" : "03-29-support_invalid_certs",
-        "revision" : "0468f69831e6068a474c35977efd66e6b5b527da"
+        "revision" : "14b13d0c3db38f471ce4ba1ecb502ee1986c84d7",
+        "version" : "3.5.0"
       }
     },
     {
@@ -165,7 +165,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "a6b7ba151d9dc6684484f3785293875ec01cc1ff",
         "version" : "1.2.2"

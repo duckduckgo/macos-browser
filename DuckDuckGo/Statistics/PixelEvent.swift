@@ -277,6 +277,9 @@ extension Pixel {
         case passwordImportKeychainPrompt
         case passwordImportKeychainPromptDenied
 
+        // Tracks installation without tracking retention.
+        case installationAttribution
+
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
             /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
@@ -303,7 +306,10 @@ extension Pixel {
 
             case fileStoreWriteFailed
             case fileMoveToDownloadsFailed
+            case fileAccessRelatedItemFailed
             case fileGetDownloadLocationFailed
+            case fileDownloadCreatePresentersFailed
+            case downloadResumeDataCodingFailed
 
             case suggestionsFetchFailed
             case appOpenURLFailed
@@ -710,6 +716,9 @@ extension Pixel.Event {
         // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
         case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
+
+        // Installation Attribution
+        case .installationAttribution: return "m_mac_install"
         }
     }
 }
@@ -774,6 +783,12 @@ extension Pixel.Event.Debug {
             return "df"
         case .fileGetDownloadLocationFailed:
             return "dl"
+        case .fileAccessRelatedItemFailed:
+            return "dari"
+        case .fileDownloadCreatePresentersFailed:
+            return "dfpf"
+        case .downloadResumeDataCodingFailed:
+            return "drdc"
 
         case .suggestionsFetchFailed:
             return "sgf"
