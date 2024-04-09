@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1712071688011,
+    "version": 1712611145027,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -302,11 +302,12 @@
                 "disabledCMPs": [
                     "generic-cosmetic",
                     "termsfeed3",
-                    "strato.de"
+                    "strato.de",
+                    "healthline-media"
                 ]
             },
             "state": "enabled",
-            "hash": "98e57a3eb872c9dfb4a019b90dc6c0ec"
+            "hash": "44af0b568856ce87b825bb7fc61b6961"
         },
         "autofill": {
             "exceptions": [
@@ -1096,7 +1097,7 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
                     },
                     {
-                        "domain": "www.canva.com",
+                        "domain": "canva.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1818"
                     },
                     {
@@ -1136,12 +1137,16 @@
                     {
                         "domain": "sas.dk",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
+                    },
+                    {
+                        "domain": "nationalmssociety.org",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1963"
                     }
                 ]
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "7edfa8344fd2577b31426130696d8b23"
+            "hash": "76976e1ac417949aae8cb1c7c7ca0a60"
         },
         "dbp": {
             "state": "enabled",
@@ -1184,7 +1189,9 @@
                             "videoElement": "#player video",
                             "videoElementContainer": "#player .html5-video-player",
                             "hoverExcluded": [],
-                            "clickExcluded": [],
+                            "clickExcluded": [
+                                "ytd-thumbnail-overlay-toggle-button-renderer"
+                            ],
                             "allowedEventTargets": [
                                 ".ytp-inline-preview-scrim",
                                 ".ytd-video-preview",
@@ -1231,7 +1238,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "ab2c73639ad75b2d6efb18f324230397"
+            "hash": "b685397a8317384bec3b8d7e8b7571bb"
         },
         "elementHiding": {
             "exceptions": [
@@ -1915,6 +1922,14 @@
                             {
                                 "selector": ".proper-dynamic-insertion",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".Page-header-leaderboardAd",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".SovrnAd",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -2361,6 +2376,23 @@
                         "rules": [
                             {
                                 "selector": ".es-ad-space-container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "eurogamer.net",
+                        "rules": [
+                            {
+                                "selector": "#sticky_leaderboard",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".primis_wrapper",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".autoad",
                                 "type": "hide-empty"
                             }
                         ]
@@ -4222,7 +4254,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "10545dae34a5b5f2cc26c91976be5809"
+            "hash": "ea31ebf0dd3e4831467ed2b2ec783279"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4952,14 +4984,14 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 5
+                                "percent": 10
                             }
                         ]
                     }
                 }
             },
             "state": "enabled",
-            "hash": "f7cce63c16c142db4ff5764b542a6c52"
+            "hash": "b337f9c7cf15e7e4807ef232befaa999"
         },
         "privacyPro": {
             "state": "enabled",
@@ -5081,6 +5113,16 @@
             ],
             "state": "disabled",
             "hash": "5e792dd491428702bc0104240fbce0ce"
+        },
+        "sslCertificates": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "allowBypass": {
+                    "state": "enabled"
+                }
+            },
+            "hash": "abe9584048f7f8157f71a14e7914cb1c"
         },
         "sync": {
             "state": "enabled",
@@ -5366,6 +5408,7 @@
                                     "fattoincasadabenedetta.it",
                                     "inquirer.com",
                                     "thesurfersview.com",
+                                    "twitchy.com",
                                     "wildrivers.lostcoastoutpost.com"
                                 ]
                             },
@@ -5990,6 +6033,12 @@
                                 ]
                             },
                             {
+                                "rule": "www3.doubleclick.net",
+                                "domains": [
+                                    "scrolller.com"
+                                ]
+                            },
+                            {
                                 "rule": "doubleclick.net",
                                 "domains": [
                                     "rocketnews24.com"
@@ -6421,6 +6470,12 @@
                                 "domains": [
                                     "<all>"
                                 ]
+                            },
+                            {
+                                "rule": "marketingplatform.google.com/about/enterprise",
+                                "domains": [
+                                    "scrolller.com"
+                                ]
                             }
                         ]
                     },
@@ -6429,19 +6484,7 @@
                             {
                                 "rule": "imasdk.googleapis.com/js/sdkloader/ima3.js",
                                 "domains": [
-                                    "arkadium.com",
-                                    "bloomberg.com",
-                                    "cbssports.com",
-                                    "crunchyroll.com",
-                                    "gamak.tv",
-                                    "games.washingtonpost.com",
-                                    "metro.co.uk",
-                                    "nfl.com",
-                                    "pandora.com",
-                                    "paper-io.com",
-                                    "rawstory.com",
-                                    "usatoday.com",
-                                    "washingtonpost.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6466,6 +6509,7 @@
                                     "daotranslate.com",
                                     "drakescans.com",
                                     "duden.de",
+                                    "edealinfo.com",
                                     "freetubetv.net",
                                     "hscprojects.com",
                                     "kits4beats.com",
@@ -7777,6 +7821,16 @@
                             }
                         ]
                     },
+                    "sundaysky.com": {
+                        "rules": [
+                            {
+                                "rule": "sundaysky.com",
+                                "domains": [
+                                    "bankofamerica.com"
+                                ]
+                            }
+                        ]
+                    },
                     "taboola.com": {
                         "rules": [
                             {
@@ -8209,7 +8263,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "adf596be88e8975a3cdcaaef3d24990d"
+            "hash": "936913b03c62ec1861b64a7a2316ddfd"
         },
         "trackingCookies1p": {
             "settings": {
