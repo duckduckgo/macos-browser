@@ -1028,7 +1028,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {
-        toggleDownloadsPopover(keepButtonVisible: false)
+        toggleDownloadsPopover(keepButtonVisible: true)
     }
 
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu) {
