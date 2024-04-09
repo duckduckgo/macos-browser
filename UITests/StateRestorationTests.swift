@@ -48,6 +48,10 @@ class StateRestorationTests: XCTestCase {
         app.typeKey("n", modifierFlags: .command)
     }
 
+    override func tearDownWithError() throws {
+        app.terminate()
+    }
+
     func test_tabStateAtRelaunch_shouldContainTwoSitesVisitedInPreviousSession_whenReopenAllWindowsFromLastSessionIsSet() {
         app.typeKey(",", modifierFlags: [.command]) // Open settings
         settingsGeneralButton.click(forDuration: 0.5, thenDragTo: settingsGeneralButton)
