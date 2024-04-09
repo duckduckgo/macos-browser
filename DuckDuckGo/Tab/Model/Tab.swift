@@ -341,7 +341,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
 
-    private(set) var tunnelController: NetworkProtectionIPCTunnelController?
+    private(set) var tunnelController: NetworkProtectionIPCTunnelController
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -510,6 +510,10 @@ protocol NewWindowPolicyDecisionMaker {
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager))
 
+        let ipcClient = TunnelControllerIPCClient()
+        ipcClient.register()
+        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+
         super.init()
         tabGetter = { [weak self] in self }
         userContentController.map(userContentControllerPromise.fulfill)
@@ -527,17 +531,6 @@ protocol NewWindowPolicyDecisionMaker {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 self?.onDuckDuckGoEmailSignOut(notification)
-            }
-
-        netPOnboardStatusCancellabel = DefaultNetworkProtectionVisibility().onboardStatusPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] onboardingStatus in
-                guard onboardingStatus == .completed else { return }
-
-                let ipcClient = TunnelControllerIPCClient()
-                ipcClient.register()
-
-                self?.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
             }
 
         self.audioState = webView.audioState()
@@ -1456,7 +1449,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-        if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {
+        if navigation.url.isDuckDuckGoSearch, tunnelController.isConnected == true {
             DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount)
         }
     }
