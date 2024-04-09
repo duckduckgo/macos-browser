@@ -249,17 +249,17 @@ final class PixelKitTests: XCTestCase {
         // Run test
         pixelKit.fire(event, frequency: .daily) // Fired
         timeMachine.travel(by: .hour, value: 2)
-        pixelKit.fire(event, frequency: .dailyOnly) // Skipped
+        pixelKit.fire(event, frequency: .legacyDaily) // Skipped
 
         timeMachine.travel(by: .day, value: 1)
         timeMachine.travel(by: .hour, value: 2)
-        pixelKit.fire(event, frequency: .dailyOnly) // Fired
+        pixelKit.fire(event, frequency: .legacyDaily) // Fired
 
         timeMachine.travel(by: .hour, value: 10)
-        pixelKit.fire(event, frequency: .dailyOnly) // Skipped
+        pixelKit.fire(event, frequency: .legacyDaily) // Skipped
 
         timeMachine.travel(by: .day, value: 1)
-        pixelKit.fire(event, frequency: .dailyOnly) // Fired
+        pixelKit.fire(event, frequency: .legacyDaily) // Fired
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
@@ -292,17 +292,17 @@ final class PixelKitTests: XCTestCase {
         // Run test
         pixelKit.fire(event, frequency: .unique) // Fired
         timeMachine.travel(by: .hour, value: 2)
-        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+        pixelKit.fire(event, frequency: .unique) // Skipped (already fired)
 
         timeMachine.travel(by: .day, value: 1)
         timeMachine.travel(by: .hour, value: 2)
-        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+        pixelKit.fire(event, frequency: .unique) // Skipped (already fired)
 
         timeMachine.travel(by: .hour, value: 10)
-        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+        pixelKit.fire(event, frequency: .unique) // Skipped (already fired)
 
         timeMachine.travel(by: .day, value: 1)
-        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+        pixelKit.fire(event, frequency: .unique) // Skipped (already fired)
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
@@ -324,7 +324,6 @@ final class PixelKitTests: XCTestCase {
 
         PixelKit.setUp(appVersion: "test",
                        defaultHeaders: [:],
-                       log: .disabled,
                        dailyPixelCalendar: calendar,
                        dateGenerator: timeMachine.now,
                        defaults: userDefaults()) { _, _, _, _, _, _ in }
