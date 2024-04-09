@@ -196,6 +196,14 @@ extension DownloadsTabExtension: NavigationResponder {
             return .cancel
         }
 
+        var isDirectory: ObjCBool = false
+        if navigationResponse.url.isFileURL,
+           FileManager.default.fileExists(atPath: navigationResponse.url.path, isDirectory: &isDirectory),
+           isDirectory.boolValue == true {
+            // don‘t download a directory
+            return .next
+        }
+
         return .download
     }
 
