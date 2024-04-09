@@ -136,13 +136,14 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
     }
 
     @MainActor
-    func didReceiveRedirect(_ navigationAction: NavigationAction, for navigation: Navigation) {
-        resetDashboardInfo(for: navigationAction.url, didGoBackForward: false)
+    func didCommit(_ navigation: Navigation) {
+        resetDashboardInfo(for: navigation.url, didGoBackForward: navigation.navigationAction.navigationType.isBackForward)
     }
 
-    @MainActor
-    func didStart(_ navigation: Navigation) {
-        resetDashboardInfo(for: navigation.url, didGoBackForward: navigation.navigationAction.navigationType.isBackForward)
+    func navigationDidFinish(_ navigation: Navigation) {
+        if privacyInfo?.url != navigation.url {
+            resetDashboardInfo(for: navigation.url, didGoBackForward: navigation.navigationAction.navigationType.isBackForward)
+        }
     }
 
 }
