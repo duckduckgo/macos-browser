@@ -87,7 +87,8 @@ private enum Opacity {
 }
 
 fileprivate extension View {
-    func applyConnectionStatusDetailAttributes(colorScheme: ColorScheme) -> some View { opacity(Opacity.connectionStatusDetail(colorScheme: colorScheme))
+    func applyConnectionStatusDetailAttributes(colorScheme: ColorScheme) -> some View {
+        opacity(Opacity.connectionStatusDetail(colorScheme: colorScheme))
             .font(.NetworkProtection.connectionStatusDetail)
             .foregroundColor(Color(.defaultText))
     }
