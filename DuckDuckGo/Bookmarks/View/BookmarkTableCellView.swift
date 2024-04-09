@@ -129,6 +129,7 @@ final class BookmarkTableCellView: NSTableCellView {
         menuButton.translatesAutoresizingMaskIntoConstraints = false
         menuButton.isBordered = false
         menuButton.isHidden = true
+        menuButton.setAccessibilityIdentifier("BookmarkTableCellView.menuButton")
     }
 
     private func setupLayout() {
@@ -209,11 +210,14 @@ final class BookmarkTableCellView: NSTableCellView {
 
         faviconImageView.image = bookmark.favicon(.small) ?? .bookmarkDefaultFavicon
 
+        faviconImageView.setAccessibilityIdentifier("BookmarkTableCellView.favIconImageView")
         if bookmark.isFavorite {
             accessoryImageView.isHidden = false
         }
 
         accessoryImageView.image = bookmark.isFavorite ? .favoriteFilledBorder : nil
+        accessoryImageView.setAccessibilityIdentifier("BookmarkTableCellView.accessoryImageView")
+        accessoryImageView.setAccessibilityValue(bookmark.isFavorite ? "Favorited" : "Unfavorited")
         titleLabel.stringValue = bookmark.title
         primaryTitleLabelValue = bookmark.title
         tertiaryTitleLabelValue = bookmark.url

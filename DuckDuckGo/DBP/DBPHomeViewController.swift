@@ -33,6 +33,7 @@ public extension Notification.Name {
 final class DBPHomeViewController: NSViewController {
     private var presentedWindowController: NSWindowController?
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
         let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
@@ -83,9 +84,14 @@ final class DBPHomeViewController: NSViewController {
             attachDataBrokerContainerView()
         }
 
-        if dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
-            let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
-            dbpDateStore.updateLastActiveDate()
+        do {
+            if try dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
+                let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+                dbpDateStore.updateLastActiveDate()
+            }
+        } catch {
+            os_log("DBPHomeViewController error: viewDidLoad, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPHomeViewController.viewDidLoad"))
         }
     }
 
@@ -145,6 +151,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
         super.init { event, _, _, _ in
             switch event {
             case .error(let error, _):
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .generalError(let error, _),
+                    .secureVaultInitError(let error),
+                    .secureVaultError(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerScanAllBrokersCompletion(error: let error),
