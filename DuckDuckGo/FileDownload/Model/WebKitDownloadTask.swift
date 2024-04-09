@@ -560,7 +560,7 @@ extension WebKitDownloadTask: WKDownloadDelegate {
             progress.totalUnitCount = response.expectedContentLength
         }
 
-        var suggestedFilename = suggestedFilename
+        var suggestedFilename = (suggestedFilename.removingPercentEncoding ?? suggestedFilename).replacingInvalidFileNameCharacters()
         // sometimes suggesteFilename has an extension appended to already present URL file extension
         // e.g. feed.xml.rss for www.domain.com/rss.xml
         if let urlSuggestedFilename = response.url?.suggestedFilename,
