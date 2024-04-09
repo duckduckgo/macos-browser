@@ -16,13 +16,14 @@
 //  limitations under the License.
 //
 
+import Combine
+import NetworkProtection
+import NetworkProtectionUI
 import XCTest
 
 #if SUBSCRIPTION
 import Subscription
 #endif
-
-import NetworkProtection
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -165,6 +166,9 @@ final class MoreOptionsMenuTests: XCTestCase {
 }
 
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
+    var onboardStatusPublisher: AnyPublisher<NetworkProtectionUI.OnboardingStatus, Never> {
+        Just(.default).eraseToAnyPublisher()
+    }
 
     var isInstalled: Bool
     var visible: Bool

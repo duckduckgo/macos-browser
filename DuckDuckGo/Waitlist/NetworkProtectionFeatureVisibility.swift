@@ -41,6 +41,8 @@ protocol NetworkProtectionFeatureVisibility {
     func disableForWaitlistUsers()
     @discardableResult
     func disableIfUserHasNoAccess() async -> Bool
+
+    var onboardStatusPublisher: AnyPublisher<OnboardingStatus, Never> { get }
 }
 
 struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {

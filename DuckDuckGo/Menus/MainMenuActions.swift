@@ -392,7 +392,7 @@ extension MainViewController {
             }
             navigationBarViewController.view.window?.makeKeyAndOrderFront(nil)
         }
-        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
+        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: sender is NSMenuItem /* keep button visible for some time on Cmd+J */)
     }
 
     @objc func toggleBookmarksBarFromMenu(_ sender: Any) {

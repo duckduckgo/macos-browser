@@ -55,7 +55,7 @@ final class DownloadListCoordinator {
     enum UpdateKind {
         case added
         case removed
-        case updated
+        case updated(oldValue: DownloadListItem)
     }
     typealias Update = (kind: UpdateKind, item: DownloadListItem)
     private let updatesSubject = PassthroughSubject<Update, Never>()
@@ -380,8 +380,8 @@ final class DownloadListCoordinator {
         case (.none, .some(let item)):
             self.updatesSubject.send((.added, item))
             store.save(item)
-        case (.some, .some(let item)):
-            self.updatesSubject.send((.updated, item))
+        case (.some(let oldValue), .some(let item)):
+            self.updatesSubject.send((.updated(oldValue: oldValue), item))
             store.save(item)
         case (.some(let item), .none):
             item.progress?.cancel()
@@ -447,10 +447,9 @@ final class DownloadListCoordinator {
 
     @MainActor
     func downloads<T: Comparable>(sortedBy keyPath: KeyPath<DownloadListItem, T>, ascending: Bool) -> [DownloadListItem] {
-        let comparator: (T, T) -> Bool = ascending ? (<) : (>)
-        return items.values.sorted(by: {
-            comparator($0[keyPath: keyPath], $1[keyPath: keyPath])
-        })
+        return items.values.sorted {
+            ascending ? ($0[keyPath: keyPath] < $1[keyPath: keyPath]) : ($0[keyPath: keyPath] > $1[keyPath: keyPath])
+        }
     }
 
     var updates: AnyPublisher<Update, Never> {

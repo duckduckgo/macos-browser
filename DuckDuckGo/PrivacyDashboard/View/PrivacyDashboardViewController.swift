@@ -365,7 +365,7 @@ extension PrivacyDashboardViewController {
                                                errors: errors,
                                                httpStatusCodes: statusCodes,
                                                openerContext: currentTab.inferredOpenerContext,
-                                               vpnOn: currentTab.tunnelController?.isConnected ?? false,
+                                               vpnOn: currentTab.tunnelController.isConnected,
                                                jsPerformance: webVitals,
                                                userRefreshCount: currentTab.refreshCountSinceLoad,
                                                didOpenReportInfo: didOpenReportInfo,
