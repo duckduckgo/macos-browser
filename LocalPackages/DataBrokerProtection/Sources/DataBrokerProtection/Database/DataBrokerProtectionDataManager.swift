@@ -325,21 +325,8 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     }
 
     func getBackgroundAgentMetadata() async -> DBPUIBackgroundAgentMetadata {
-        let currentAppVersion = Bundle.main.releaseVersionNumber
-
         let metadata = await scanDelegate?.getBackgroundAgentMetadata()
 
-        print(metadata ?? "No metadata")
-
-        return DBPUIBackgroundAgentMetadata(lastRunAppVersion: currentAppVersion ?? "Error fetching the version",
-                                            lastRunAgentVersion: "",
-                                            isAgentEnabled: false,
-                                            isAgentRunning: false,
-                                            lastSchedulerOperationType: "",
-                                            lastSchedulerOperationTimestamp: 0.0,
-                                            lastSchedulerErrorMessage: "",
-                                            lastSchedulerErrorTimestamp: 0.0,
-                                            lastSchedulerSessionStartTimestamp: 0.0,
-                                            agentSchedulerState: "")
+        return mapper.mapToMetadata(metadata: metadata, brokerProfileQueryData: brokerProfileQueryData)
     }
 }

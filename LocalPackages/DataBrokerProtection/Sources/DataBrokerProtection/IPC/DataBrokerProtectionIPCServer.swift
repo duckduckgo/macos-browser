@@ -21,37 +21,55 @@ import XPCHelper
 
 @objc(DBPBackgroundAgentMetadata)
 public final class DBPBackgroundAgentMetadata: NSObject, NSSecureCoding {
+    enum Consts {
+        static let backgroundAgentVersionKey = "backgroundAgentVersion"
+        static let isAgentRunningKey = "isAgentRunning"
+        static let agentSchedulerStateKey = "agentSchedulerState"
+        static let lastSchedulerSessionStartTimestampKey = "lastSchedulerSessionStartTimestamp"
+    }
+
     public static var supportsSecureCoding: Bool = true
 
     let backgroundAgentVersion: String
-    let isAgentEnabled: Bool
     let isAgentRunning: Bool
     let agentSchedulerState: String
+    let lastSchedulerSessionStartTimestamp: Double?
 
-    init(backgroundAgentVersion: String, isAgentEnabled: Bool, isAgentRunning: Bool, agentSchedulerState: String) {
+    init(backgroundAgentVersion: String,
+         isAgentRunning: Bool,
+         agentSchedulerState: String,
+         lastSchedulerSessionStartTimestamp: Double?) {
         self.backgroundAgentVersion = backgroundAgentVersion
-        self.isAgentEnabled = isAgentEnabled
         self.isAgentRunning = isAgentRunning
         self.agentSchedulerState = agentSchedulerState
+        self.lastSchedulerSessionStartTimestamp = lastSchedulerSessionStartTimestamp
     }
 
     public init?(coder: NSCoder) {
-        guard let backgroundAgentVersion = coder.decodeObject(of: NSString.self, forKey: "backgroundAgentVersion") as? String,
-              let agentSchedulerState = coder.decodeObject(of: NSString.self, forKey: "agentSchedulerState") as? String else {
-            fatalError("Could not deserialise backgroundAgentVersion!")
+        guard let backgroundAgentVersion = coder.decodeObject(of: NSString.self,
+                                                              forKey: Consts.backgroundAgentVersionKey) as? String,
+              let agentSchedulerState = coder.decodeObject(of: NSString.self,
+                                                           forKey: Consts.agentSchedulerStateKey) as? String else {
+            return nil
         }
 
         self.backgroundAgentVersion = backgroundAgentVersion
-        self.isAgentEnabled = coder.decodeBool(forKey: "isAgentEnabled")
-        self.isAgentRunning = coder.decodeBool(forKey: "isAgentRunning")
+        self.isAgentRunning = coder.decodeBool(forKey: Consts.isAgentRunningKey)
         self.agentSchedulerState = agentSchedulerState
+        self.lastSchedulerSessionStartTimestamp = coder.decodeObject(
+            of: NSNumber.self,
+            forKey: Consts.lastSchedulerSessionStartTimestampKey
+        )?.doubleValue
     }
 
     public func encode(with coder: NSCoder) {
-        coder.encode(self.backgroundAgentVersion as NSString, forKey: "backgroundAgentVersion")
-        coder.encode(self.isAgentEnabled, forKey: "isAgentEnabled")
-        coder.encode(self.isAgentRunning, forKey: "isAgentRunning")
-        coder.encode(self.agentSchedulerState as NSString, forKey: "agentSchedulerState")
+        coder.encode(self.backgroundAgentVersion as NSString, forKey: Consts.backgroundAgentVersionKey)
+        coder.encode(self.isAgentRunning, forKey: Consts.isAgentRunningKey)
+        coder.encode(self.agentSchedulerState as NSString, forKey: Consts.agentSchedulerStateKey)
+
+        if let lastSchedulerSessionStartTimestamp = self.lastSchedulerSessionStartTimestamp {
+            coder.encode(lastSchedulerSessionStartTimestamp as NSNumber, forKey: Consts.lastSchedulerSessionStartTimestampKey)
+        }
     }
 }
 
@@ -89,7 +107,6 @@ public protocol IPCServerInterface: AnyObject {
     func openBrowser(domain: String)
 
     /// Returns background agent metadata for debugging purposes
-    /// TODO: Add information of what is being returned here
     func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 

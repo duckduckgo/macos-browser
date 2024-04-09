@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 struct MapperToUI {
 
@@ -115,7 +116,7 @@ struct MapperToUI {
                         let mirrorSiteMatch = mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
-                            mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
+                           mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
                             removedProfiles.append(mirrorSiteMatch)
                         } else {
                             inProgressOptOuts.append(mirrorSiteMatch)
@@ -130,11 +131,11 @@ struct MapperToUI {
             value.compactMap { match in
                 guard let removedDate = match.date else { return nil }
                 return DBPUIOptOutMatch(dataBroker: key,
-                                 matches: value.count,
-                                 name: match.name,
-                                 alternativeNames: match.alternativeNames,
-                                 addresses: match.addresses,
-                                 date: removedDate)
+                                        matches: value.count,
+                                        name: match.name,
+                                        alternativeNames: match.alternativeNames,
+                                        addresses: match.addresses,
+                                        date: removedDate)
             }
         }.flatMap { $0 }
 
@@ -214,6 +215,69 @@ struct MapperToUI {
             return DBPUIScanDate(date: scansHappeningInTheNextEightDays.first!.date!, dataBrokers: scansHappeningInTheNextEightDays)
         }
     }
+
+    func mapToMetadata(metadata: DBPBackgroundAgentMetadata?,
+                       brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIBackgroundAgentMetadata {
+        let currentAppVersion = Bundle.main.fullVersionNumber ?? "ERROR: Error fetching app version"
+
+        guard let metadata = metadata else {
+            return DBPUIBackgroundAgentMetadata(lastRunAppVersion: currentAppVersion, isAgentRunning: false)
+        }
+
+        let lastOperation = brokerProfileQueryData.lastOperation
+        let lastStartedOperation = brokerProfileQueryData.lastStartedOperation
+        let lastError = brokerProfileQueryData.lastOperationThatErrored
+
+        let lastOperationBrokerURL = brokerProfileQueryData.filter { $0.dataBroker.id == lastOperation?.brokerId }.first?.dataBroker.url
+        let lastStartedOperationBrokerURL = brokerProfileQueryData.filter { $0.dataBroker.id == lastStartedOperation?.brokerId }.first?.dataBroker.url
+
+        let metadataUI = DBPUIBackgroundAgentMetadata(lastRunAppVersion: currentAppVersion,
+                                                      lastRunAgentVersion: metadata.backgroundAgentVersion,
+                                                      isAgentRunning: true,
+                                                      lastSchedulerOperationType: lastOperation?.toString,
+                                                      lastSchedulerOperationTimestamp: lastOperation?.lastRunDate?.timeIntervalSince1970.withoutDecimals,
+                                                      lastSchedulerOperationBrokerUrl: lastOperationBrokerURL,
+                                                      lastSchedulerErrorMessage: lastError?.error,
+                                                      lastSchedulerErrorTimestamp: lastError?.date.timeIntervalSince1970.withoutDecimals,
+                                                      lastSchedulerSessionStartTimestamp: metadata.lastSchedulerSessionStartTimestamp,
+                                                      agentSchedulerState: metadata.agentSchedulerState,
+                                                      lastStartedSchedulerOperationType: lastStartedOperation?.toString,
+                                                      lastStartedSchedulerOperationTimestamp: lastStartedOperation?.historyEvents.closestHistoryEvent?.date.timeIntervalSince1970.withoutDecimals,
+                                                      lastStartedSchedulerOperationBrokerUrl: lastStartedOperationBrokerURL)
+
+
+        #if DEBUG
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let jsonData = try encoder.encode(metadataUI)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                os_log("Metadata: %{public}s", log: OSLog.default, type: .info, jsonString)
+            }
+        } catch {
+            os_log("Error encoding struct to JSON: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
+        }
+        #endif
+
+        return metadataUI
+    }
+}
+
+extension Bundle {
+    var fullVersionNumber: String? {
+        guard let appVersion = self.releaseVersionNumber,
+                let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else {
+            return nil
+        }
+
+        return appVersion + " (build: \(buildNumber))"
+    }
+}
+
+extension TimeInterval {
+    var withoutDecimals: Double {
+        Double(Int(self))
+    }
 }
 
 extension Date {
@@ -240,6 +304,10 @@ extension String {
 }
 
 fileprivate extension BrokerProfileQueryData {
+
+    var closestHistoryEvent: HistoryEvent? {
+        events.sorted(by: { $0.date > $1.date }).first
+    }
 
     var sitesScanned: [String] {
         if scanOperationData.lastRunDate != nil {
@@ -287,6 +355,80 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
             return 0
         } else {
             return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+        }
+    }
+
+    var lastOperation: BrokerOperationData? {
+        let allOperations = flatMap { $0.operationsData }
+        let lastOperation = allOperations.sorted(by: {
+            if let date1 = $0.lastRunDate, let date2 = $1.lastRunDate {
+                return date1 > date2
+            } else if $0.lastRunDate != nil {
+                return true
+            } else {
+                return false
+            }
+        }).first
+
+        return lastOperation
+    }
+
+    var lastOperationThatErrored: HistoryEvent? {
+        let lastError = flatMap { $0.operationsData }
+            .flatMap { $0.historyEvents }
+            .filter { $0.isError }
+            .sorted(by: { $0.date > $1.date })
+            .first
+
+        return lastError
+    }
+
+    var lastStartedOperation: BrokerOperationData? {
+        let allOperations = flatMap { $0.operationsData }
+
+        return allOperations.sorted(by: {
+            if let date1 = $0.historyEvents.closestHistoryEvent?.date, let date2 = $1.historyEvents.closestHistoryEvent?.date {
+                return date1 > date2
+            } else if $0.historyEvents.closestHistoryEvent?.date != nil {
+                return true
+            } else {
+                return false
+            }
+        }).first
+    }
+}
+
+fileprivate extension BrokerOperationData {
+    var toString: String {
+        if (self as? OptOutOperationData) != nil {
+            return "optOut"
+        } else {
+            return "scan"
+        }
+    }
+}
+
+fileprivate extension Array where Element == HistoryEvent {
+    var closestHistoryEvent: HistoryEvent? {
+        self.sorted(by: { $0.date > $1.date }).first
+    }
+}
+
+extension HistoryEvent {
+
+    var isError: Bool {
+        if case .error(_) = type {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    var error: String? {
+        switch type {
+        case .error(let error):
+            return error.name
+        default: return nil
         }
     }
 }

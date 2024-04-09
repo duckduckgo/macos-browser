@@ -125,6 +125,8 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status }
 
+    private var lastSchedulerSessionStartTimestamp: Date?
+
     private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
         let runnerProvider = DataBrokerOperationRunnerProvider(privacyConfigManager: privacyConfigManager,
@@ -178,6 +180,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 completion(.finished)
                 return
             }
+            self.lastSchedulerSessionStartTimestamp = Date()
             self.status = .running
             os_log("Scheduler running...", log: .dataBrokerProtection)
             self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] errors in
@@ -295,11 +298,17 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func getDebugMetadata(completion: (DBPBackgroundAgentMetadata?) -> Void) {
-        let backgroundAgentVersion = Bundle.main.releaseVersionNumber ?? "ERROR: Nil release version number"
-        completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: backgroundAgentVersion,
-                                              isAgentEnabled: true,
-                                              isAgentRunning: true,
-                                              agentSchedulerState: status.toString))
+        if let backgroundAgentVersion = Bundle.main.releaseVersionNumber, let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
+            completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: backgroundAgentVersion + " (build: \(buildNumber))",
+                                                  isAgentRunning: status == .running,
+                                                  agentSchedulerState: status.toString,
+                                                  lastSchedulerSessionStartTimestamp: lastSchedulerSessionStartTimestamp?.timeIntervalSince1970))
+        } else {
+            completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: "ERROR: Error fetching background agent version",
+                                                  isAgentRunning: status == .running,
+                                                  agentSchedulerState: status.toString,
+                                                  lastSchedulerSessionStartTimestamp: lastSchedulerSessionStartTimestamp?.timeIntervalSince1970))
+        }
     }
 }
 

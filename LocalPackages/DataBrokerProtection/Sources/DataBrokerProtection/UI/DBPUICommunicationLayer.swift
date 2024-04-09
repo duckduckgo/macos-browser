@@ -56,7 +56,7 @@ enum DBPUIReceivedMethodName: String {
     case initialScanStatus
     case maintenanceScanStatus
     case getDataBrokers
-    case getBackroundAgentMetadata
+    case getBackgroundAgentMetadata
 }
 
 enum DBPUISendableMethodName: String {
@@ -73,7 +73,7 @@ struct DBPUICommunicationLayer: Subfeature {
     weak var delegate: DBPUICommunicationDelegate?
 
     private enum Constants {
-        static let version = 2
+        static let version = 3
     }
 
     internal init(webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
@@ -103,10 +103,10 @@ struct DBPUICommunicationLayer: Subfeature {
         case .setAddressAtIndexInCurrentUserProfile: return setAddressAtIndexInCurrentUserProfile
         case .removeAddressAtIndexFromCurrentUserProfile: return removeAddressAtIndexFromCurrentUserProfile
         case .startScanAndOptOut: return startScanAndOptOut
-        case .initialScanStatus: return getBackgroundAgentMetadata
+        case .initialScanStatus: return initialScanStatus
         case .maintenanceScanStatus: return maintenanceScanStatus
         case .getDataBrokers: return getDataBrokers
-        case .getBackroundAgentMetadata: return getBackgroundAgentMetadata
+        case .getBackgroundAgentMetadata: return getBackgroundAgentMetadata
         }
 
     }
