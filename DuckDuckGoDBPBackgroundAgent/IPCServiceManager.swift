@@ -77,27 +77,30 @@ extension IPCServiceManager: IPCServerInterface {
         scheduler.stopScheduler()
     }
 
-    func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+    func optOutAllBrokers(showWebView: Bool,
+                          completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         pixelHandler.fire(.ipcServerOptOutAllBrokers)
-        scheduler.optOutAllBrokers(showWebView: showWebView) { error in
-            self.pixelHandler.fire(.ipcServerOptOutAllBrokersCompletion(error: error))
-            completion(error)
+        scheduler.optOutAllBrokers(showWebView: showWebView) { errors in
+            self.pixelHandler.fire(.ipcServerOptOutAllBrokersCompletion(error: errors?.oneTimeError))
+            completion(errors)
         }
     }
 
-    func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+    func scanAllBrokers(showWebView: Bool,
+                        completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         pixelHandler.fire(.ipcServerScanAllBrokers)
-        scheduler.scanAllBrokers(showWebView: showWebView) { error in
-            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error))
-            completion(error)
+        scheduler.scanAllBrokers(showWebView: showWebView) { errors in
+            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: errors?.oneTimeError))
+            completion(errors)
         }
     }
 
-    func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+    func runQueuedOperations(showWebView: Bool,
+                             completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         pixelHandler.fire(.ipcServerRunQueuedOperations)
-        scheduler.runQueuedOperations(showWebView: showWebView) { error in
-            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
-            completion(error)
+        scheduler.runQueuedOperations(showWebView: showWebView) { errors in
+            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: errors?.oneTimeError))
+            completion(errors)
         }
     }
 

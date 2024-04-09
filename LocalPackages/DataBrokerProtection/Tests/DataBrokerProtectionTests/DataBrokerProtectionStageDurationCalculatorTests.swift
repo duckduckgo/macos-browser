@@ -18,6 +18,7 @@
 
 import BrowserServicesKit
 import Foundation
+import SecureStorage
 import XCTest
 
 @testable import DataBrokerProtection
@@ -113,6 +114,25 @@ final class DataBrokerProtectionStageDurationCalculatorTests: XCTestCase {
             switch failurePixel {
             case .scanError(_, _, let category, _):
                 XCTAssertEqual(category, ErrorCategory.networkError.toString)
+            default: XCTFail("The scan error pixel should be fired")
+            }
+        } else {
+            XCTFail("A pixel should be fired")
+        }
+    }
+
+    func testWhenErrorIsSecureVaultError_thenWeFireScanErorrPixelWithDatabaseErrorCategory() {
+        let sut = DataBrokerProtectionStageDurationCalculator(dataBroker: "broker", handler: handler)
+        let error = SecureStorageError.encodingFailed
+
+        sut.fireScanError(error: error)
+
+        XCTAssertTrue(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.count == 1)
+
+        if let failurePixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last{
+            switch failurePixel {
+            case .scanError(_, _, let category, _):
+                XCTAssertEqual(category, "database-error-SecureVaultError-13")
             default: XCTFail("The scan error pixel should be fired")
             }
         } else {
