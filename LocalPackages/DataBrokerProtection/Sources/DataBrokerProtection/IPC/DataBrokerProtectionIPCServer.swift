@@ -38,9 +38,12 @@ public protocol IPCServerInterface: AnyObject {
     ///
     func stopScheduler()
 
-    func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void))
-    func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void))
-    func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void))
+    func optOutAllBrokers(showWebView: Bool,
+                          completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
+    func scanAllBrokers(showWebView: Bool,
+                        completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
+    func runQueuedOperations(showWebView: Bool,
+                             completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
     func runAllOperations(showWebView: Bool)
 
     // MARK: - Debugging Features
@@ -73,9 +76,12 @@ protocol XPCServerInterface {
     ///
     func stopScheduler()
 
-    func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void))
-    func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void))
-    func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void))
+    func optOutAllBrokers(showWebView: Bool,
+                          completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
+    func scanAllBrokers(showWebView: Bool,
+                        completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
+    func runQueuedOperations(showWebView: Bool,
+                             completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
     func runAllOperations(showWebView: Bool)
 
     // MARK: - Debugging Features
@@ -143,15 +149,18 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
         serverDelegate?.stopScheduler()
     }
 
-    func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+    func optOutAllBrokers(showWebView: Bool,
+                          completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         serverDelegate?.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+    func scanAllBrokers(showWebView: Bool,
+                        completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         serverDelegate?.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+    func runQueuedOperations(showWebView: Bool,
+                             completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         serverDelegate?.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 

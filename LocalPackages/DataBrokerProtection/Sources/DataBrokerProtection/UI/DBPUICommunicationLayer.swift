@@ -23,9 +23,9 @@ import UserScript
 import Common
 
 protocol DBPUICommunicationDelegate: AnyObject {
-    func saveProfile() async -> Bool
+    func saveProfile() async throws
     func getUserProfile() -> DBPUIUserProfile?
-    func deleteProfileData()
+    func deleteProfileData() throws
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
     func setNameAtIndexInCurrentUserProfile(_ payload: DBPUINameAtIndex) -> Bool
     func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
@@ -127,9 +127,13 @@ struct DBPUICommunicationLayer: Subfeature {
     func saveProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         os_log("Web UI requested to save the profile", log: .dataBrokerProtection)
 
-        let success = await delegate?.saveProfile()
-
-        return DBPUIStandardResponse(version: Constants.version, success: success ?? false)
+        do {
+            try await delegate?.saveProfile()
+            return DBPUIStandardResponse(version: Constants.version, success: true)
+        } catch {
+            os_log("DBPUICommunicationLayer saveProfile, error: %{public}@", log: .error, error.localizedDescription)
+            return DBPUIStandardResponse(version: Constants.version, success: false)
+        }
     }
 
     func getCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -141,8 +145,13 @@ struct DBPUICommunicationLayer: Subfeature {
     }
 
     func deleteUserProfileData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        delegate?.deleteProfileData()
-        return DBPUIStandardResponse(version: Constants.version, success: true)
+        do {
+            try delegate?.deleteProfileData()
+            return DBPUIStandardResponse(version: Constants.version, success: true)
+        } catch {
+            os_log("DBPUICommunicationLayer deleteUserProfileData, error: %{public}@", log: .error, error.localizedDescription)
+            return DBPUIStandardResponse(version: Constants.version, success: false)
+        }
     }
 
     func addNameToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
