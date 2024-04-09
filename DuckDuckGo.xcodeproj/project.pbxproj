@@ -3263,6 +3263,10 @@
 		BDA764802BC4998A00D0400C /* DefaultVPNLocationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA7647B2BC497BE00D0400C /* DefaultVPNLocationFormatter.swift */; };
 		BDA764842BC49E3F00D0400C /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */; };
 		BDA764852BC49E4000D0400C /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */; };
+		BDA7648D2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA7648C2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift */; };
+		BDA7648E2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA7648C2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift */; };
+		BDA764912BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA764902BC4E57200D0400C /* MockVPNLocationFormatter.swift */; };
+		BDA764922BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA764902BC4E57200D0400C /* MockVPNLocationFormatter.swift */; };
 		BDE981D82BBCE4C700645880 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = BDE981D72BBCE4C700645880 /* Lottie */; };
 		BDE981D92BBD10D600645880 /* vpn-dark-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */; };
 		BDE981DA2BBD10D600645880 /* vpn-light-mode.json in Resources */ = {isa = PBXBuildFile; fileRef = BD384AC72BBC821100EF3735 /* vpn-light-mode.json */; };
@@ -4785,6 +4789,8 @@
 		BD384AC82BBC821100EF3735 /* vpn-dark-mode.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "vpn-dark-mode.json"; sourceTree = "<group>"; };
 		BDA7647B2BC497BE00D0400C /* DefaultVPNLocationFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultVPNLocationFormatter.swift; sourceTree = "<group>"; };
 		BDA764812BC499D200D0400C /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		BDA7648C2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultVPNLocationFormatterTests.swift; sourceTree = "<group>"; };
+		BDA764902BC4E57200D0400C /* MockVPNLocationFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockVPNLocationFormatter.swift; sourceTree = "<group>"; };
 		C1372EF32BBC5BAD003F8793 /* SecureTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureTextField.swift; sourceTree = "<group>"; };
 		C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionExecutor.swift; sourceTree = "<group>"; };
 		C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillDeleteAllPasswordsExecutorTests.swift; sourceTree = "<group>"; };
@@ -6475,10 +6481,12 @@
 		4BCF15E32ABB987F0083F6DF /* NetworkProtection */ = {
 			isa = PBXGroup;
 			children = (
+				BDA7648F2BC4E56200D0400C /* Mocks */,
 				4BCF15E62ABB98A20083F6DF /* Resources */,
 				4BCF15E42ABB98990083F6DF /* NetworkProtectionRemoteMessageTests.swift */,
 				4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */,
 				7B09CBA72BA4BE7000CF245B /* NetworkProtectionPixelEventTests.swift */,
+				BDA7648C2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift */,
 			);
 			path = NetworkProtection;
 			sourceTree = "<group>";
@@ -8779,6 +8787,14 @@
 				B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		BDA7648F2BC4E56200D0400C /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				BDA764902BC4E57200D0400C /* MockVPNLocationFormatter.swift */,
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 		BDE981DB2BBD110800645880 /* Assets */ = {
@@ -11269,6 +11285,7 @@
 				1DE03425298BC7F000CAB3D7 /* InternalUserDeciderStoreMock.swift in Sources */,
 				3706FE4A293F661700E42796 /* BookmarkManagedObjectTests.swift in Sources */,
 				EEC8EB402982CD550065AA39 /* JSAlertViewModelTests.swift in Sources */,
+				BDA764922BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */,
 				3706FE4B293F661700E42796 /* BookmarksHTMLImporterTests.swift in Sources */,
 				9FA75A3F2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */,
 				56D145E929E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */,
@@ -11364,6 +11381,7 @@
 				B603975229C1FFAD00902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				3706FE85293F661700E42796 /* BWRequestTests.swift in Sources */,
 				3706FE86293F661700E42796 /* FileDownloadManagerTests.swift in Sources */,
+				BDA7648E2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13295,6 +13313,7 @@
 				B68412202B6A30680092F66A /* StringExtensionTests.swift in Sources */,
 				B662D3D92755D7AD0035D4D6 /* PixelStoreTests.swift in Sources */,
 				B6106BB526A809E60013B453 /* GeolocationProviderTests.swift in Sources */,
+				BDA764912BC4E57200D0400C /* MockVPNLocationFormatter.swift in Sources */,
 				B6E6BA232BA2EDDE008AA7E1 /* FileReadResult.swift in Sources */,
 				B6A5A2A025B96E8300AA7ADA /* AppStateChangePublisherTests.swift in Sources */,
 				B63ED0E326B3E7FA00A9DAD1 /* CLLocationManagerMock.swift in Sources */,
@@ -13373,6 +13392,7 @@
 				373A1AB228451ED400586521 /* BookmarksHTMLImporterTests.swift in Sources */,
 				4B723E0626B0003E00E14D75 /* CSVParserTests.swift in Sources */,
 				B60C6F8429B1BAD3007BFAA8 /* FileManagerTempDirReplacement.swift in Sources */,
+				BDA7648D2BC4E4EF00D0400C /* DefaultVPNLocationFormatterTests.swift in Sources */,
 				85F487B5276A8F2E003CE668 /* OnboardingTests.swift in Sources */,
 				B626A7642992506A00053070 /* SerpHeadersNavigationResponderTests.swift in Sources */,
 				AA652CCE25DD9071009059CC /* BookmarkListTests.swift in Sources */,

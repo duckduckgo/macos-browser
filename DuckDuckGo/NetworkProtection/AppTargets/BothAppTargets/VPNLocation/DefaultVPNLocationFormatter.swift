@@ -21,18 +21,9 @@ import SwiftUI
 import NetworkProtection
 
 struct DefaultVPNLocationFormatter: VPNLocationFormatting {
-    func emoji(for country: String?,
-               preferredLocation someLocation: VPNSettings.SelectedLocation,
-               isConnected: Bool) -> String? {
-        let preferredLocation = VPNLocationModel(selectedLocation: someLocation)
-
-        switch preferredLocation.icon {
-        case .defaultIcon:
-            guard isConnected, let country else { return nil }
-            return NetworkProtectionVPNCountryLabelsModel(country: country, useFullCountryName: true).emoji
-        case .emoji(let emoji):
-            return emoji
-        }
+    func emoji(for country: String?) -> String? {
+        guard let country else { return nil }
+        return NetworkProtectionVPNCountryLabelsModel(country: country, useFullCountryName: true).emoji
     }
 
     func string(from location: String?,

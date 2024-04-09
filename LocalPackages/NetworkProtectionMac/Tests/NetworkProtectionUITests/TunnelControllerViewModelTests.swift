@@ -104,6 +104,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         let isToggleOn = model.isToggleOn.wrappedValue
@@ -124,6 +126,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnecting)
@@ -151,6 +155,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         let isToggleOn = model.isToggleOn.wrappedValue
@@ -173,6 +179,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusConnecting)
@@ -191,6 +199,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
         let networkProtectionWasStarted = expectation(description: "The model started the VPN when appropriate")
 
@@ -221,6 +231,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         let networkProtectionWasStopped = expectation(description: "The model stopped the VPN when appropriate")

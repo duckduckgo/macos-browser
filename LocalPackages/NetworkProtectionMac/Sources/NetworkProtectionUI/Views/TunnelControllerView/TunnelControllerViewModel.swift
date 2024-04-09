@@ -445,9 +445,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     private var internalServerAttributes: NetworkProtectionServerInfo.ServerAttributes?
 
     var emoji: String? {
-        locationFormatter.emoji(for: internalServerAttributes?.country,
-                                preferredLocation: vpnSettings.selectedLocation,
-                                isConnected: isVPNEnabled)
+        locationFormatter.emoji(for: internalServerAttributes?.country)
     }
 
     var plainLocation: String {
