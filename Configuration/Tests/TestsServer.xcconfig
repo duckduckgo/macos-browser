@@ -20,3 +20,8 @@
 PRODUCT_NAME = $(TARGET_NAME);
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] =
+CODE_SIGN_STYLE[config=Review][sdk=*] = Manual
+
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
+CODE_SIGN_STYLE[config=CI][sdk=*] = Manual
