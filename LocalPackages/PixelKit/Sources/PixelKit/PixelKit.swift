@@ -72,13 +72,7 @@ public final class PixelKit {
         return calendar
     }()
 
-    private var dateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.calendar = defaultDailyPixelCalendar
-        dateFormatter.timeZone = defaultDailyPixelCalendar.timeZone
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        return dateFormatter
-    }()
+    private static let weeksToCoalesceCohort = 6
 
     private let dateGenerator: () -> Date
 
@@ -99,6 +93,8 @@ public final class PixelKit {
                              source: String? = nil,
                              defaultHeaders: [String: String],
                              log: OSLog,
+                             dailyPixelCalendar: Calendar? = nil,
+                             dateGenerator: @escaping () -> Date = Date.init,
                              defaults: UserDefaults,
                              fireRequest: @escaping FireRequest) {
         shared = PixelKit(dryRun: dryRun,
@@ -106,6 +102,8 @@ public final class PixelKit {
                           source: source,
                           defaultHeaders: defaultHeaders,
                           log: log,
+                          dailyPixelCalendar: dailyPixelCalendar,
+                          dateGenerator: dateGenerator,
                           defaults: defaults,
                           fireRequest: fireRequest)
     }
@@ -318,13 +316,23 @@ public final class PixelKit {
                           onComplete: onComplete)
     }
 
-    private func dateString(for date: Date?) -> String? {
-        guard let date else { return nil }
-        return dateFormatter.string(from: date)
+    private func cohort(from cohortLocalDate: Date?, dateGenerator: () -> Date = Date.init) -> String? {
+        guard let cohortLocalDate,
+              let baseDate = pixelCalendar.date(from: .init(year: 2023, month: 1, day: 1)),
+              let weeksSinceCohortAssigned = pixelCalendar.dateComponents([.weekOfYear], from: cohortLocalDate, to: dateGenerator()).weekOfYear,
+              let assignedCohort = pixelCalendar.dateComponents([.weekOfYear], from: baseDate, to: cohortLocalDate).weekOfYear else {
+            return nil
+        }
+
+        if weeksSinceCohortAssigned > Self.weeksToCoalesceCohort {
+            return ""
+        } else {
+            return "week-" + String(assignedCohort + 1)
+        }
     }
 
-    public static func dateString(for date: Date?) -> String {
-        Self.shared?.dateString(for: date) ?? ""
+    public static func cohort(from cohortLocalDate: Date?, dateGenerator: () -> Date = Date.init) -> String {
+        Self.shared?.cohort(from: cohortLocalDate, dateGenerator: dateGenerator) ?? ""
     }
 
     public static func pixelLastFireDate(event: Event) -> Date? {

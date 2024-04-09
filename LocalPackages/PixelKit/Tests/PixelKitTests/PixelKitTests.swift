@@ -258,17 +258,18 @@ final class PixelKitTests: XCTestCase {
         // Run test
         pixelKit.fire(event, frequency: .dailyOnly) // Fired
 
-        timeMachine.travel(by: 60 * 60 * 2)
-        pixelKit.fire(event, frequency: .dailyOnly) // Skipped (2 hours since last fire)
+        timeMachine.travel(by: .hour, value: 2)
+        pixelKit.fire(event, frequency: .dailyOnly) // Skipped
 
-        timeMachine.travel(by: 60 * 60 * 24 + 1000)
-        pixelKit.fire(event, frequency: .dailyOnly) // Fired (24 hours + 1000 seconds since last fire)
+        timeMachine.travel(by: .day, value: 1)
+        timeMachine.travel(by: .hour, value: 2)
+        pixelKit.fire(event, frequency: .dailyOnly) // Fired
 
-        timeMachine.travel(by: 60 * 60 * 10)
-        pixelKit.fire(event, frequency: .dailyOnly) // Skipped (10 hours since last fire)
+        timeMachine.travel(by: .hour, value: 10)
+        pixelKit.fire(event, frequency: .dailyOnly) // Skipped
 
-        timeMachine.travel(by: 60 * 60 * 14)
-        pixelKit.fire(event, frequency: .dailyOnly) // Fired (24 hours since last fire)
+        timeMachine.travel(by: .day, value: 1)
+        pixelKit.fire(event, frequency: .dailyOnly) // Fired
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
@@ -303,28 +304,93 @@ final class PixelKitTests: XCTestCase {
         // Run test
         pixelKit.fire(event, frequency: .justOnce) // Fired
 
-        timeMachine.travel(by: 60 * 60 * 2)
+        timeMachine.travel(by: .hour, value: 2)
         pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
 
-        timeMachine.travel(by: 60 * 60 * 24 + 1000)
+        timeMachine.travel(by: .day, value: 1)
+        timeMachine.travel(by: .hour, value: 2)
         pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
 
-        timeMachine.travel(by: 60 * 60 * 10)
+        timeMachine.travel(by: .hour, value: 10)
         pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
 
-        timeMachine.travel(by: 60 * 60 * 14)
+        timeMachine.travel(by: .day, value: 1)
         pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
     }
+
+    func testVPNCohort() {
+        XCTAssertEqual(PixelKit.cohort(from: nil), "")
+        assertCohortEqual(.init(year: 2023, month: 1, day: 1), reportAs: "week-1")
+        assertCohortEqual(.init(year: 2024, month: 2, day: 24), reportAs: "week-60")
+    }
+
+    private func assertCohortEqual(_ cohort: DateComponents, reportAs reportedCohort: String) {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.locale = Locale(identifier: "en_US_POSIX")
+
+        let cohort = calendar.date(from: cohort)
+        let timeMachine = TimeMachine(calendar: calendar, date: cohort)
+
+        PixelKit.setUp(appVersion: "test",
+                       defaultHeaders: [:],
+                       log: .disabled,
+                       dailyPixelCalendar: calendar,
+                       dateGenerator: timeMachine.now,
+                       defaults: userDefaults()) { _, _, _, _, _, _ in }
+
+        // 1st week
+        XCTAssertEqual(PixelKit.cohort(from: cohort, dateGenerator: timeMachine.now), reportedCohort)
+
+        // 2nd week
+        timeMachine.travel(by: .weekOfYear, value: 1)
+        XCTAssertEqual(PixelKit.cohort(from: cohort, dateGenerator: timeMachine.now), reportedCohort)
+
+        // 3rd week
+        timeMachine.travel(by: .weekOfYear, value: 1)
+        XCTAssertEqual(PixelKit.cohort(from: cohort, dateGenerator: timeMachine.now), reportedCohort)
+
+        // 4th week
+        timeMachine.travel(by: .weekOfYear, value: 1)
+        XCTAssertEqual(PixelKit.cohort(from: cohort, dateGenerator: timeMachine.now), reportedCohort)
+
+        // 5th week
+        timeMachine.travel(by: .weekOfYear, value: 1)
+        XCTAssertEqual(PixelKit.cohort(from: cohort, dateGenerator: timeMachine.now), reportedCohort)
+
+        // 6th week
+        timeMachine.travel(by: .weekOfYear, value: 1)
+        XCTAssertEqual(PixelKit.cohort(from: cohort, dateGenerator: timeMachine.now), reportedCohort)
+
+        // 7th week
+        timeMachine.travel(by: .weekOfYear, value: 1)
+        XCTAssertEqual(PixelKit.cohort(from: cohort, dateGenerator: timeMachine.now), reportedCohort)
+
+        // 8th week
+        timeMachine.travel(by: .weekOfYear, value: 1)
+        XCTAssertEqual(PixelKit.cohort(from: cohort, dateGenerator: timeMachine.now), "")
+    }
 }
 
 private class TimeMachine {
-    private var date = Date(timeIntervalSince1970: 0)
+    private var date: Date
+    private let calendar: Calendar
 
-    func travel(by timeInterval: TimeInterval) {
-        date = date.addingTimeInterval(timeInterval)
+    init(calendar: Calendar? = nil, date: Date? = nil) {
+        self.calendar = calendar ?? {
+            var calendar = Calendar.current
+            calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+            calendar.locale = Locale(identifier: "en_US_POSIX")
+            return calendar
+        }()
+        self.date = date ?? .init(timeIntervalSince1970: 0)
+    }
+
+    func travel(by component: Calendar.Component, value: Int) {
+        date = calendar.date(byAdding: component, value: value, to: now())!
     }
 
     func now() -> Date {
