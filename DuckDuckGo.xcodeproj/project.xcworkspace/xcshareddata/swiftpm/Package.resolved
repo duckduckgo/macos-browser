@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "c0b0cb55e7ac2f69d10452e1a5c06713155d798e",
-        "version" : "133.0.0"
+        "branch" : "graeme/fix-nearest-city-bug",
+        "revision" : "68c9d7a625827d48381fd61914f86685911d0304"
       }
     },
     {
