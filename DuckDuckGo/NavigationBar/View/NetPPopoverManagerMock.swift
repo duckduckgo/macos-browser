@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#if DEBUG && NETWORK_PROTECTION
+#if DEBUG
 
 import Combine
 import Foundation

@@ -24,10 +24,7 @@ import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import SwiftUI
 import WebKit
 import Configuration
-
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
 
 #if SUBSCRIPTION
 import Subscription
@@ -85,9 +82,7 @@ import SubscriptionUI
     let toggleBookmarksShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowBookmarksShortcut, action: #selector(MainViewController.toggleBookmarksShortcut), keyEquivalent: "K")
     let toggleDownloadsShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowDownloadsShortcut, action: #selector(MainViewController.toggleDownloadsShortcut), keyEquivalent: "J")
 
-#if NETWORK_PROTECTION
     let toggleNetworkProtectionShortcutMenuItem = NSMenuItem(title: UserText.showNetworkProtectionShortcut, action: #selector(MainViewController.toggleNetworkProtectionShortcut), keyEquivalent: "N")
-#endif
 
     // MARK: Window
     let windowsMenu = NSMenu(title: UserText.mainMenuWindow)
@@ -270,9 +265,7 @@ import SubscriptionUI
             toggleBookmarksShortcutMenuItem
             toggleDownloadsShortcutMenuItem
 
-#if NETWORK_PROTECTION
             toggleNetworkProtectionShortcutMenuItem
-#endif
 
             NSMenuItem.separator()
 
@@ -399,10 +392,8 @@ import SubscriptionUI
     override func update() {
         super.update()
 
-#if NETWORK_PROTECTION
         // To be safe, hide the NetP shortcut menu item by default.
         toggleNetworkProtectionShortcutMenuItem.isHidden = true
-#endif
 
         updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
@@ -550,14 +541,12 @@ import SubscriptionUI
             toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
-#if NETWORK_PROTECTION
             if DefaultNetworkProtectionVisibility().isVPNVisible() {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = false
                 toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             } else {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = true
             }
-#endif
         }
     }
 
@@ -617,12 +606,10 @@ import SubscriptionUI
                 .submenu(DataBrokerProtectionDebugMenu())
 #endif
 
-#if NETWORK_PROTECTION
             if case .normal = NSApp.runType {
                 NSMenuItem(title: "VPN")
                     .submenu(NetworkProtectionDebugMenu())
             }
-#endif
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 

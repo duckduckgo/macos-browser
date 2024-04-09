@@ -26,14 +26,11 @@ import UserScript
 import WebKit
 import History
 import PrivacyDashboard
+import NetworkProtection
+import NetworkProtectionIPC
 
 #if SUBSCRIPTION
 import Subscription
-#endif
-
-#if NETWORK_PROTECTION
-import NetworkProtection
-import NetworkProtectionIPC
 #endif
 
 // swiftlint:disable file_length
@@ -344,9 +341,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
 
-#if NETWORK_PROTECTION
-    private(set) var tunnelController: NetworkProtectionIPCTunnelController?
-#endif
+    private(set) var tunnelController: NetworkProtectionIPCTunnelController
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -515,6 +510,10 @@ protocol NewWindowPolicyDecisionMaker {
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager))
 
+        let ipcClient = TunnelControllerIPCClient()
+        ipcClient.register()
+        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+
         super.init()
         tabGetter = { [weak self] in self }
         userContentController.map(userContentControllerPromise.fulfill)
@@ -533,19 +532,6 @@ protocol NewWindowPolicyDecisionMaker {
             .sink { [weak self] notification in
                 self?.onDuckDuckGoEmailSignOut(notification)
             }
-
-#if NETWORK_PROTECTION
-        netPOnboardStatusCancellabel = DefaultNetworkProtectionVisibility().onboardStatusPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] onboardingStatus in
-                guard onboardingStatus == .completed else { return }
-
-                let ipcClient = TunnelControllerIPCClient()
-                ipcClient.register()
-
-                self?.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-            }
-#endif
 
         self.audioState = webView.audioState()
         addDeallocationChecks(for: webView)
@@ -1177,10 +1163,6 @@ protocol NewWindowPolicyDecisionMaker {
     private var webViewCancellables = Set<AnyCancellable>()
     private var emailDidSignOutCancellable: AnyCancellable?
 
-#if NETWORK_PROTECTION
-    private var netPOnboardStatusCancellabel: AnyCancellable?
-#endif
-
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
         webView.uiDelegate = self
@@ -1465,11 +1447,9 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-#if NETWORK_PROTECTION
-        if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {
+        if navigation.url.isDuckDuckGoSearch, tunnelController.isConnected == true {
             DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount)
         }
-#endif
     }
 
     @MainActor
