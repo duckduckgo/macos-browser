@@ -82,6 +82,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         faviconImageView.imageScaling = .scaleProportionallyDown
         faviconImageView.wantsLayer = true
         faviconImageView.layer?.cornerRadius = 2.0
+        faviconImageView.setAccessibilityIdentifier("BookmarkOutlineCellView.favIconImageView")
 
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.isEditable = false
