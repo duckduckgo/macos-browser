@@ -101,10 +101,13 @@ public extension XCTestCase {
                     meets expectations: PixelFireExpectations,
                     file: StaticString,
                     line: UInt) {
-
-        let expectedPixelName = event.name.hasPrefix(Self.pixelPlatformPrefix) ? event.name : Self.pixelPlatformPrefix + event.name
+        let expectedPixelNames: [String] = expectedPixelNames(originalName: event.name, frequency: frequency)
         let knownExpectedParameters = knownExpectedParameters(for: event)
         let callbackExecutedExpectation = expectation(description: "The PixelKit callback has been executed")
+
+        if frequency == .dailyAndCount {
+            callbackExecutedExpectation.expectedFulfillmentCount = 2
+        }
 
         // Ensure PixelKit is torn down before setting it back up, avoiding unit test race conditions:
         PixelKit.tearDown()
@@ -119,15 +122,16 @@ public extension XCTestCase {
             let firedParameters = Self.filterStandardPixelParameters(from: firedParameters)
 
             // Internal validations
-
-            XCTAssertEqual(firedPixelName, expectedPixelName, file: file, line: line)
-
+            XCTAssertTrue(expectedPixelNames.contains(firedPixelName), file: file, line: line)
             XCTAssertTrue(knownExpectedParameters.allSatisfy { (key, value) in
                 firedParameters[key] == value
             })
 
-            // Expectations
-            XCTAssertEqual(firedPixelName, expectations.pixelName)
+            if frequency == .dailyAndCount {
+                XCTAssertTrue(firedPixelName.hasSuffix("_c") || firedPixelName.hasSuffix("_d"))
+            } else {
+                XCTAssertEqual(expectations.pixelName, firedPixelName)
+            }
             XCTAssertEqual(firedParameters, expectations.parameters)
 
             completion(true, nil)
@@ -135,5 +139,27 @@ public extension XCTestCase {
 
         PixelKit.fire(event, frequency: frequency)
         waitForExpectations(timeout: 0.1)
+    }
+
+    func expectedPixelNames(originalName: String, frequency: PixelKit.Frequency) -> [String] {
+        let expectedPixelNameWithoutSuffix = originalName.hasPrefix(Self.pixelPlatformPrefix) ? originalName : Self.pixelPlatformPrefix + originalName
+        var expectedPixelNames: [String] = []
+
+        switch frequency {
+        case .standard:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix)
+        case .legacyInitial:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix)
+        case .unique:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix)
+        case .legacyDaily:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix)
+        case .daily:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix.appending("_d"))
+        case .dailyAndCount:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix.appending("_d"))
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix.appending("_c"))
+        }
+        return expectedPixelNames
     }
 }

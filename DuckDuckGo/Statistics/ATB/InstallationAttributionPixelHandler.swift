@@ -53,7 +53,7 @@ final class InstallationAttributionPixelHandler: AttributionsPixelHandler {
     func fireInstallationAttributionPixel() {
         fireRequest(
             GeneralPixel.installationAttribution,
-            .standard,
+            .legacyInitial,
             [:],
             additionalParameters(origin: originProvider.origin, locale: locale.identifier),
             nil,
