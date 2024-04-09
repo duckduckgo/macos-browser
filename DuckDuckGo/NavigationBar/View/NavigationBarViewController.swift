@@ -636,22 +636,20 @@ final class NavigationBarViewController: NSViewController {
             .sink { [weak self] update in
                 guard let self else { return }
 
-                let shouldShowPopover = update.kind == .updated
-                && DownloadsPreferences.shared.shouldOpenPopupOnCompletion
-                && update.item.destinationURL != nil
-                && update.item.tempURL == nil
-                && !update.item.isBurner
-                && WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window
+                if case .updated(let oldValue) = update.kind,
+                    DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
+                    update.item.destinationURL != nil,
+                    update.item.tempURL == nil,
+                    oldValue.tempURL != nil, // download finished
+                    !update.item.isBurner,
+                    WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window {
 
-                if shouldShowPopover {
                     self.popovers.showDownloadsPopoverAndAutoHide(usingView: downloadsButton,
                                                                   popoverDelegate: self,
                                                                   downloadsDelegate: self)
-                } else {
-                    if update.item.isBurner {
-                        invalidateDownloadButtonHidingTimer()
-                        updateDownloadsButton(updatingFromPinnedViewsNotification: false)
-                    }
+                } else if update.item.isBurner {
+                    invalidateDownloadButtonHidingTimer()
+                    updateDownloadsButton(updatingFromPinnedViewsNotification: false)
                 }
                 updateDownloadsButton()
             }
