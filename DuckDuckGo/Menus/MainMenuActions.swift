@@ -745,10 +745,6 @@ extension MainViewController {
         UserDefaults.standard.removePersistentDomain(forName: DailyPixel.Constant.dailyPixelStorageIdentifier)
     }
 
-    @objc func resetHistorySaveFailedDailyPixel(_ sender: Any?) {
-        Pixel.shared?.clearRepetitions(for: .debug(event: .historySaveFailedDaily))
-    }
-
     @objc func in10PercentSurveyOn(_ sender: Any?) {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay0in10Percent.rawValue)
