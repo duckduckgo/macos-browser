@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Common
 import Foundation
 import NetworkProtection
@@ -92,5 +90,3 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
         return true
     }
 }
-
-#endif

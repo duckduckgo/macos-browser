@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Networking
 import UserNotifications
@@ -237,8 +235,6 @@ struct NetworkProtectionWaitlist: Waitlist {
     }
 
 }
-
-#endif
 
 #if DBP
 

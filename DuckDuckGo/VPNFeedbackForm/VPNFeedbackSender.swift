@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import PixelKit
 
@@ -44,5 +42,3 @@ struct DefaultVPNFeedbackSender: VPNFeedbackSender {
     }
 
 }
-
-#endif

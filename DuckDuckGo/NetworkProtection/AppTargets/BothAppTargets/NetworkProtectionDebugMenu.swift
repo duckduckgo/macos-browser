@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Common
 import Foundation
@@ -667,6 +665,4 @@ extension NetworkProtectionDebugMenu: NSMenuDelegate {
 #Preview {
     return MenuPreview(menu: NetworkProtectionDebugMenu())
 }
-#endif
-
 #endif

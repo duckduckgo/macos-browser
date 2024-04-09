@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import SwiftUI
 import SwiftUIExtensions
@@ -119,10 +117,6 @@ struct WaitlistEntryViewItemViewData: Identifiable {
     let subtitle: String
 }
 
-#endif
-
-#if NETWORK_PROTECTION
-
 struct NetworkProtectionInvitedToWaitlistViewData: InvitedToWaitlistViewData {
     let headerImageName = "Gift-96"
     let title = UserText.networkProtectionWaitlistInvitedTitle
@@ -145,8 +139,6 @@ struct NetworkProtectionInvitedToWaitlistViewData: InvitedToWaitlistViewData {
                   subtitle: UserText.networkProtectionWaitlistInvitedSection3Subtitle)
     ]
 }
-
-#endif
 
 #if DBP
 

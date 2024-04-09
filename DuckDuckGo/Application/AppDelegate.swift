@@ -33,9 +33,7 @@ import SyncDataProviders
 import UserNotifications
 import Lottie
 
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
 
 #if SUBSCRIPTION
 import Subscription
@@ -82,7 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-#if NETWORK_PROTECTION && SUBSCRIPTION
+#if SUBSCRIPTION
     // Needs to be lazy as indirectly depends on AppDelegate
     private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
 #endif
@@ -174,8 +172,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
 #endif
 
-        featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
-                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+        featureFlagger = DefaultFeatureFlagger(
+            internalUserDecider: internalUserDecider,
+            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        )
 
 #if SUBSCRIPTION
     #if APPSTORE || !STRIPE
@@ -289,14 +289,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-#if NETWORK_PROTECTION && SUBSCRIPTION
+#if SUBSCRIPTION
         networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 #endif
 
-#if NETWORK_PROTECTION
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
-#endif
 
 #if DBP && SUBSCRIPTION
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
@@ -317,13 +315,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-#if NETWORK_PROTECTION
         NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
             // Do nothing when code fetching fails, as the app will try again later
         }
 
         NetworkProtectionAppEvents().applicationDidBecomeActive()
-#endif
 
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidBecomeActive()
@@ -374,7 +370,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private static func setUpPixelKit(dryRun: Bool) {
-#if NETWORK_PROTECTION
 #if APPSTORE
         let source = "browser-appstore"
 #else
@@ -396,7 +391,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 onComplete(error == nil, error)
             }
         }
-#endif
     }
 
     // MARK: - Sync
@@ -568,8 +562,6 @@ func updateSubscriptionStatus() {
 #endif
 }
 
-#if NETWORK_PROTECTION || DBP
-
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,
@@ -583,13 +575,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
 
-#if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
                     NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }
-#endif
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
@@ -602,5 +592,3 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 
 }
-
-#endif

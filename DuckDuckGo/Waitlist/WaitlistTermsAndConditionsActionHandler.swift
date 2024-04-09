@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION || DBP
-
 import Foundation
 import UserNotifications
 import PixelKit
@@ -27,10 +25,6 @@ protocol WaitlistTermsAndConditionsActionHandler {
     func didShow()
     mutating func didAccept()
 }
-
-#endif
-
-#if NETWORK_PROTECTION
 
 struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {
     @UserDefaultsWrapper(key: .networkProtectionTermsAndConditionsAccepted, defaultValue: false)
@@ -46,8 +40,6 @@ struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAn
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NetworkProtectionWaitlist.notificationIdentifier])
     }
 }
-
-#endif
 
 #if DBP
 

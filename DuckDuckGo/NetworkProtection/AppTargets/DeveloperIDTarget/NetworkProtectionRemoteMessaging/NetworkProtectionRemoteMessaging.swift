@@ -20,8 +20,6 @@ import Foundation
 import Networking
 import PixelKit
 
-#if NETWORK_PROTECTION
-
 protocol NetworkProtectionRemoteMessaging {
 
     func fetchRemoteMessages(completion: (() -> Void)?)
@@ -179,5 +177,3 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
 }
-
-#endif
