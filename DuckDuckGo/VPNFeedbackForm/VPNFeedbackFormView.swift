@@ -19,8 +19,6 @@
 import Foundation
 import SwiftUI
 
-#if NETWORK_PROTECTION
-
 struct VPNFeedbackFormView: View {
 
     @EnvironmentObject var viewModel: VPNFeedbackFormViewModel
@@ -214,5 +212,3 @@ private struct VPNFeedbackFormButtons: View {
     }
 
 }
-
-#endif

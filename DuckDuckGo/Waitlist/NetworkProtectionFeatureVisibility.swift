@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import BrowserServicesKit
 import Combine
 import Common
@@ -261,5 +259,3 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         isPreSubscriptionUser() && subscriptionFeatureAvailability.isFeatureAvailable
     }
 }
-
-#endif
