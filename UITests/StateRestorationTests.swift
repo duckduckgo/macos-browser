@@ -113,10 +113,18 @@ class StateRestorationTests: XCTestCase {
             app.windows.webViews[secondPageTitle].waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "Second visited site from previous session should not be in any webview."
         )
+        XCTAssertTrue(
+            app.windows.webViews[firstPageTitle].waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
+            "First visited site from previous session should not be in any webview."
+        )
         app.typeKey("w", modifierFlags: [.command])
         XCTAssertTrue(
             app.windows.webViews[firstPageTitle].waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "First visited site from previous session should not be in any webview."
+        )
+        XCTAssertTrue(
+            app.windows.webViews[secondPageTitle].waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
+            "Second visited site from previous session should not be in any webview."
         )
     }
 }
