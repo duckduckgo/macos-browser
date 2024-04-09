@@ -49,24 +49,18 @@ extension XCUIElement {
     /// will be pressed.
     func typeURL(_ url: URL, pressingEnter: Bool = true) {
         let urlString = url.absoluteString
-        for character in urlString {
-            self.typeKey("\(character)", modifierFlags: [])
+        let urlParts = urlString.split(separator: ":")
+        var completedURLSections = 0
+        for urlPart in urlParts {
+            self.typeText(String(urlPart))
+            completedURLSections += 1
+            if completedURLSections != urlParts.count {
+                self.typeKey(":", modifierFlags: [])
+            }
         }
         if pressingEnter {
-                 self.typeText("\r")
-             }
-//        let urlParts = urlString.split(separator: ":")
-//        var completedURLSections = 0
-//        for urlPart in urlParts {
-//            self.typeText(String(urlPart))
-//            completedURLSections += 1
-//            if completedURLSections != urlParts.count {
-//                self.typeKey(":", modifierFlags: [])
-//            }
-//        }
-//        if pressingEnter {
-//            self.typeText("\r")
-//        }
+            self.typeText("\r")
+        }
     }
 
     func clickAfterExistenceTestSucceeds() {
