@@ -309,16 +309,26 @@ final class NavigationBarViewController: NSViewController {
         }
         #endif
 
-        // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
-        // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
-        // 3. If the user has no state of any kind, show the waitlist screen.
+        // Note: the following code is quite contrived but we're aiming to hotfix issues without mixing subscription and
+        // waitlist logic.  This should be cleaned up once waitlist can safely be removed.
 
-        if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
-            NetworkProtectionWaitlistViewControllerPresenter.show()
-        } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            if NetworkProtectionKeychainTokenStore().isFeatureActivated {
+                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+            }
         } else {
-            NetworkProtectionWaitlistViewControllerPresenter.show()
+            // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
+            // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
+            // 3. If the user has no state of any kind, show the waitlist screen.
+
+            if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
+                NetworkProtectionWaitlistViewControllerPresenter.show()
+                DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
+            } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
+                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+            } else {
+                NetworkProtectionWaitlistViewControllerPresenter.show()
+            }
         }
     }
 
