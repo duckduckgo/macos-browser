@@ -1077,8 +1077,15 @@ protocol NewWindowPolicyDecisionMaker {
 
         let source = content.source
         if url.isFileURL {
+#if APPSTORE
+            // grant access to a containing folder when a sandbox extension available for it (e.g. Downloads)
+            // only access the file when no access to the containing folder
+            let readAccessScopeURL = url.deletingLastPathComponent().isWritableLocation() ? url.deletingLastPathComponent() : url
+#else
+            let readAccessScopeURL = url.deletingLastPathComponent()
+#endif
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
+                .loadFileURL(url, allowingReadAccessTo: readAccessScopeURL, withExpectedNavigationType: source.navigationType)
         }
 
         var request = URLRequest(url: url, cachePolicy: source.cachePolicy)
@@ -1136,7 +1143,12 @@ protocol NewWindowPolicyDecisionMaker {
         // only restore session from interactionStateData passed to Tab.init
         guard case .loadCachedFromTabContent(let interactionStateData) = self.interactionState else { return false }
 
-        if let url = content.urlForWebView, url.isFileURL {
+        switch content.urlForWebView {
+        case .some(let url) where url.isFileURL:
+#if APPSTORE
+            guard url.isWritableLocation() else { fallthrough }
+#endif
+
             // request file system access before restoration
             webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .loadFileURL(url, allowingReadAccessTo: url)?
@@ -1145,7 +1157,8 @@ protocol NewWindowPolicyDecisionMaker {
                 }, navigationDidFail: { [weak self] _, _ in
                     self?.restoreInteractionState(with: interactionStateData)
                 })
-        } else {
+
+        default:
             restoreInteractionState(with: interactionStateData)
         }
 
