@@ -592,6 +592,19 @@ class BookmarksAndFavoritesTests: XCTestCase {
     }
 
     func test_bookmark_canBeRemovedFromBookmarksBarViaRightClick() {
+//        This test uses coordinates (instead of accessibility IDs) to address the elements of the right click. As the writer of this test, I see this
+//        as a fragile test hook. However, I think it is preferable to making changes to the UI element it tests for this test alone. The reason is
+//        that the bookmark item on the bookmark bar isn't yet an accessibility-enabled UI element and doesn't appear to have a natural anchor point
+//        from which we can set its accessibility values without redesigning it. However, redesigning a road-tested UI element for a single test isn't a
+//        good idea, since the road-testing is also (valuable) testing and we don't want a single test to be the driver of a possible behavioral
+//        change in existing interface.
+//
+//        My advice is to keep this as-is for now, with an awareness that it can fail if the coordinates of the items in the right-click menu change,
+//        or if the system where the testing is done has accessibility settings which change scaling. When the time comes to update this element, into
+//        SwiftUI, or into a general accessibility revision (for end-user accessibility rather than UI test accessibility), that will be the natural
+//        time to correct this test and give it accessibility ID access. Until then, I have added some hinting in the failure reason to explain why
+//        this test can fail while the app is working correctly. -Halle Winkler
+
         toggleShowBookmarksBarAlwaysOn()
         app.typeKey("w", modifierFlags: [.command, .option, .shift])
         app.typeKey("n", modifierFlags: .command)
