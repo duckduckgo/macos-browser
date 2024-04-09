@@ -450,7 +450,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     }
 
     var emoji: String? {
-        locationFormatter.emoji(for: internalServerAttributes?.country, 
+        locationFormatter.emoji(for: internalServerAttributes?.country,
                                 preferredLocation: vpnSettings.selectedLocation)
     }
 
