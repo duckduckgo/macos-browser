@@ -24,6 +24,7 @@ public enum NetworkProtectionAsset: String, CaseIterable {
     case vpnDisabledImage = "VPNDisabled"
     case vpnEnabledImage = "VPN"
     case vpnIcon = "VPN-16"
+    case nearestAvailable = "VPNLocation"
 
     // Apple Icons
     case appleVaultIcon = "apple-vault-icon"

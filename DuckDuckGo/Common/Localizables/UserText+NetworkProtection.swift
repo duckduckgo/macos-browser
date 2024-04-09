@@ -330,6 +330,15 @@ extension UserText {
     static let uninstallVPNAlertTitle = "Are you sure you want to uninstall the VPN?"
     // "vpn.uninstall.alert.informative.text" - Informative text for the alert that comes up when the user decides to uninstall our VPN
     static let uninstallVPNInformativeText = "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device."
+
+    // MARK: - VPN Screen
+    // "network.protection.vpn.location.nearest" - Description of the location type in the VPN status view
+    static let netPVPNLocationNearest = "(Nearest)"
+
+    // "network.protection.vpn.location.subtitle.formatted.city.and.country" - Subtitle for the preferred location item that formats a city and country. E.g Chicago, United States
+    static func netPVPNSettingsLocationSubtitleFormattedCityAndCountry(city: String, country: String) -> String {
+        return "\(city), \(country)"
+    }
 }
 
 #if DBP

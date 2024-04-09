@@ -149,7 +149,8 @@ public final class TunnelControllerViewModel: ObservableObject {
 
             Task { @MainActor in
                 self.internalServerAddress = serverInfo.serverAddress
-                self.internalServerLocation = serverInfo.serverLocation?.serverLocation
+                self.internalServerAttributes = serverInfo.serverLocation
+                self.internalServerLocation = self.internalServerAttributes?.serverLocation
             }
         }
             .store(in: &cancellables)
@@ -444,11 +445,14 @@ public final class TunnelControllerViewModel: ObservableObject {
     private var internalServerAttributes: NetworkProtectionServerInfo.ServerAttributes?
 
     var emoji: String? {
-        locationFormatter.emoji(for: internalServerAttributes?.country)
+        locationFormatter.emoji(for: internalServerAttributes?.country,
+                                preferredLocation: vpnSettings.selectedLocation,
+                                isConnected: isVPNEnabled)
     }
 
     var plainLocation: String {
-        locationFormatter.string(from: internalServerLocation, preferredLocation: vpnSettings.selectedLocation)
+        locationFormatter.string(from: internalServerLocation,
+                                 preferredLocation: vpnSettings.selectedLocation)
     }
 
     @available(macOS 12, *)

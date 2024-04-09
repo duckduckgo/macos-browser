@@ -21,11 +21,22 @@ import SwiftUI
 import NetworkProtection
 
 struct DefaultVPNLocationFormatter: VPNLocationFormatting {
-    func emoji(for country: String?) -> String? {
-        country.map { NetworkProtectionVPNCountryLabelsModel(country: $0).emoji }
+    func emoji(for country: String?,
+               preferredLocation someLocation: VPNSettings.SelectedLocation,
+               isConnected: Bool) -> String? {
+        let preferredLocation = VPNLocationModel(selectedLocation: someLocation)
+
+        switch preferredLocation.icon {
+        case .defaultIcon:
+            guard isConnected, let country else { return nil }
+            return NetworkProtectionVPNCountryLabelsModel(country: country, useFullCountryName: true).emoji
+        case .emoji(let emoji):
+            return emoji
+        }
     }
 
-    func string(from location: String?, preferredLocation someLocation: VPNSettings.SelectedLocation) -> String {
+    func string(from location: String?,
+                preferredLocation someLocation: VPNSettings.SelectedLocation) -> String {
         let preferredLocation = VPNLocationModel(selectedLocation: someLocation)
 
         if let location {
@@ -44,10 +55,10 @@ struct DefaultVPNLocationFormatter: VPNLocationFormatting {
 
         if let location {
             var attributedString = AttributedString(
-                preferredLocation.isNearest ? "\(location) (Nearest)" : location
+                preferredLocation.isNearest ? "\(location) \(UserText.netPVPNLocationNearest)" : location
             )
             attributedString.foregroundColor = locationTextColor
-            if let range = attributedString.range(of: "(Nearest)") {
+            if let range = attributedString.range(of: UserText.netPVPNLocationNearest) {
                 attributedString[range].foregroundColor = preferredLocationTextColor
             }
             return attributedString
@@ -66,7 +77,6 @@ final class VPNLocationModel: ObservableObject {
     }
 
     let title: String
-    let subtitle: String?
     let icon: LocationIcon
     let isNearest: Bool
 
@@ -74,13 +84,18 @@ final class VPNLocationModel: ObservableObject {
         switch selectedLocation {
         case .nearest:
             title = UserText.vpnLocationNearestAvailable
-            subtitle = UserText.vpnLocationNearestAvailableSubtitle
             icon = .defaultIcon
             isNearest = true
         case .location(let location):
-            let countryLabelsModel = NetworkProtectionVPNCountryLabelsModel(country: location.country)
-            title = countryLabelsModel.title
-            subtitle = selectedLocation.location?.city
+            let countryLabelsModel = NetworkProtectionVPNCountryLabelsModel(country: location.country, useFullCountryName: true)
+            if let city = location.city {
+                title = UserText.netPVPNSettingsLocationSubtitleFormattedCityAndCountry(
+                    city: city,
+                    country: countryLabelsModel.title
+                )
+            } else {
+                title = countryLabelsModel.title
+            }
             icon = .emoji(countryLabelsModel.emoji)
             isNearest = false
         }
