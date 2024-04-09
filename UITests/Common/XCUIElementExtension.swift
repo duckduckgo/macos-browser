@@ -62,4 +62,20 @@ extension XCUIElement {
             self.typeText("\r")
         }
     }
+
+    func clickAfterExistenceTestSucceeds() {
+        XCTAssertTrue(
+            self.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "\(self.debugDescription) didn't load with the expected title in a reasonable timeframe."
+        )
+        self.click()
+    }
+
+    func hoverAfterExistenceTestSucceeds() {
+        XCTAssertTrue(
+            self.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "\(self.debugDescription) didn't load with the expected title in a reasonable timeframe."
+        )
+        self.hover()
+    }
 }
