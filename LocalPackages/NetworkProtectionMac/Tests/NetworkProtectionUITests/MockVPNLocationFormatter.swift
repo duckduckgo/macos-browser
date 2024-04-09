@@ -21,7 +21,7 @@ import SwiftUI
 import NetworkProtection
 
 struct MockVPNLocationFormatter: VPNLocationFormatting {
-    func emoji(for country: String?) -> String? {
+    func emoji(for country: String?, preferredLocation someLocation: VPNSettings.SelectedLocation) -> String? {
         nil
     }
 

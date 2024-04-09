@@ -246,7 +246,7 @@ public struct TunnelControllerView: View {
                             .frame(width: 26, height: 26)
                             .background(Color(hex: "B2B2B2").opacity(0.3))
                             .clipShape(Circle())
-                    } else {
+                    } else if model.wantsNearestLocation {
                         Image(NetworkProtectionAsset.nearestAvailable)
                             .frame(width: 26, height: 26)
                     }

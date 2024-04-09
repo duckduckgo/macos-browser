@@ -31,13 +31,20 @@ final class DefaultVPNLocationFormatterTests: XCTestCase {
     func testUSLocation() {
         let server = NetworkProtectionServerInfo.ServerAttributes(city: "Lafayette", country: "us", state: "la", timezoneOffset: 0)
         let preferredLocation = VPNSettings.SelectedLocation.location(.init(country: "us"))
+        let otherPreferredLocation = VPNSettings.SelectedLocation.location(.init(country: "gb"))
 
-        XCTAssertNil(formatter.emoji(for: nil))
-        XCTAssertEqual(formatter.emoji(for: server.country), "🇺🇸")
+        XCTAssertNil(formatter.emoji(for: nil, preferredLocation: .nearest))
+        XCTAssertEqual(formatter.emoji(for: nil, preferredLocation: preferredLocation), "🇺🇸")
+        XCTAssertEqual(formatter.emoji(for: nil, preferredLocation: otherPreferredLocation), "🇬🇧")
+        XCTAssertEqual(formatter.emoji(for: server.country, preferredLocation: preferredLocation), "🇺🇸")
+        XCTAssertEqual(formatter.emoji(for: server.country, preferredLocation: otherPreferredLocation), "🇺🇸")
 
         XCTAssertEqual(formatter.string(from: nil, preferredLocation: .nearest), "Nearest available")
+        XCTAssertEqual(formatter.string(from: nil, preferredLocation: preferredLocation), "United States")
+        XCTAssertEqual(formatter.string(from: nil, preferredLocation: otherPreferredLocation), "United Kingdom")
         XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: .nearest), "Lafayette, LA (Nearest)")
         XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: preferredLocation), "Lafayette, LA")
+        XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: otherPreferredLocation), "Lafayette, LA")
 
         if #available(macOS 12, *) {
             XCTAssertEqual(NSAttributedString(formatter.string(from: server.serverLocation,
@@ -54,13 +61,20 @@ final class DefaultVPNLocationFormatterTests: XCTestCase {
     func testCALocation() {
         let server = NetworkProtectionServerInfo.ServerAttributes(city: "Toronto", country: "ca", state: "on", timezoneOffset: 0)
         let preferredLocation = VPNSettings.SelectedLocation.location(.init(country: "ca"))
+        let otherPreferredLocation = VPNSettings.SelectedLocation.location(.init(country: "gb"))
 
-        XCTAssertNil(formatter.emoji(for: nil))
-        XCTAssertEqual(formatter.emoji(for: server.country), "🇨🇦")
+        XCTAssertNil(formatter.emoji(for: nil, preferredLocation: .nearest))
+        XCTAssertEqual(formatter.emoji(for: nil, preferredLocation: preferredLocation), "🇨🇦")
+        XCTAssertEqual(formatter.emoji(for: nil, preferredLocation: otherPreferredLocation), "🇬🇧")
+        XCTAssertEqual(formatter.emoji(for: server.country, preferredLocation: preferredLocation), "🇨🇦")
+        XCTAssertEqual(formatter.emoji(for: server.country, preferredLocation: otherPreferredLocation), "🇨🇦")
 
         XCTAssertEqual(formatter.string(from: nil, preferredLocation: .nearest), "Nearest available")
+        XCTAssertEqual(formatter.string(from: nil, preferredLocation: preferredLocation), "Canada")
+        XCTAssertEqual(formatter.string(from: nil, preferredLocation: otherPreferredLocation), "United Kingdom")
         XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: .nearest), "Toronto, Canada (Nearest)")
         XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: preferredLocation), "Toronto, Canada")
+        XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: otherPreferredLocation), "Toronto, Canada")
 
         if #available(macOS 12, *) {
             XCTAssertEqual(NSAttributedString(formatter.string(from: server.serverLocation,

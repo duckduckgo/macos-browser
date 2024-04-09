@@ -22,7 +22,7 @@ import NetworkProtection
 @testable import DuckDuckGo_Privacy_Browser
 
 struct MockVPNLocationFormatter: VPNLocationFormatting {
-    func emoji(for country: String?) -> String? {
+    func emoji(for country: String?, preferredLocation someLocation: VPNSettings.SelectedLocation) -> String? {
         nil
     }
 

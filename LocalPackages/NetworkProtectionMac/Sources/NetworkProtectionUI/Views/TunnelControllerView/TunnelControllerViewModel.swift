@@ -444,8 +444,14 @@ public final class TunnelControllerViewModel: ObservableObject {
     @Published
     private var internalServerAttributes: NetworkProtectionServerInfo.ServerAttributes?
 
+    var wantsNearestLocation: Bool {
+        guard case .nearest = vpnSettings.selectedLocation else { return false }
+        return true
+    }
+
     var emoji: String? {
-        locationFormatter.emoji(for: internalServerAttributes?.country)
+        locationFormatter.emoji(for: internalServerAttributes?.country, 
+                                preferredLocation: vpnSettings.selectedLocation)
     }
 
     var plainLocation: String {
