@@ -204,6 +204,7 @@ final class TabViewModel {
             .sink { [weak self] _ in
                 self?.updateTitle()
                 self?.updateFavicon()
+                self?.updateCanBeBookmarked()
             }.store(in: &cancellables)
     }
 

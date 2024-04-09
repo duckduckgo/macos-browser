@@ -89,7 +89,6 @@ extension ErrorPageTabExtension: NavigationResponder {
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             guard let webView else { return }
             let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
-
             if featureFlagger.isFeatureOn(.sslCertificatesBypass),
                error.errorCode == NSURLErrorServerCertificateUntrusted,
                let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {

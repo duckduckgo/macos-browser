@@ -36,7 +36,7 @@ extension FeatureFlag: FeatureFlagSourceProviding {
         case .appendAtbToSerpQueries:
             return .internalOnly
         case .sslCertificatesBypass:
-            return .internalOnly
+            return .remoteReleasable(.subfeature(sslCertificatesSubfeature.allowBypass))
         }
     }
 }
