@@ -14540,8 +14540,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-<<<<<<< HEAD
-=======
 		1E0068AC2B1673BB00BBF43B /* SubscriptionUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SubscriptionUI;
@@ -15176,11 +15174,90 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = BrowserServicesKit;
 		};
->>>>>>> main
 		B6EC37F829B5DAD7001ACE79 /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B6EC37F529B5DAAC001ACE79 /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
+		};
+		B6EC37FE29B8D915001ACE79 /* Configuration */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Configuration;
+		};
+		B6F997BA2B8F353F00476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6F997BC2B8F35EF00476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6F997BE2B8F35F400476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6F997C02B8F35F800476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		CBC83E3529B63D380008E19C /* Configuration */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Configuration;
+		};
+		EE02D41F2BB460C000DBE6B3 /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
+		};
+		EE2F9C5A2B90F2FF00D45FC9 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		EE7295E22A545B9A008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		EE7295E62A545BBB008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		EE7295E82A545BC4008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		EE7295EC2A545C0A008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		EE7295EE2A545C12008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
+		};
+		F1D43AF42B98E48900BAB743 /* BareBonesBrowserKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
+		};
+		F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 
