@@ -1064,11 +1064,20 @@ protocol NewWindowPolicyDecisionMaker {
         let source = content.source
         if url.isFileURL {
 #if APPSTORE
-            // grant access to a containing folder when a sandbox extension available for it (e.g. Downloads)
-            // only access the file when no access to the containing folder
-            let readAccessScopeURL = url.deletingLastPathComponent().isWritableLocation() ? url.deletingLastPathComponent() : url
+            // grant access to a topmost folder with a sandbox access available (e.g. ~/Downloads)
+            // to support local HTML files linking resources from outside of the root HTML file directory (e.g. "../style.css").
+            // fallback to only the file access scope when no access to the containing folder
+            let readAccessScopeURL = {
+                var url = url
+                // recurse up until reaching the topmost accessible directory
+                while let parentDirectory = (url.path == "/" ? nil : url.deletingLastPathComponent()),
+                      parentDirectory.isWritableLocation() {
+                    url = parentDirectory
+                }
+                return url
+            }()
 #else
-            let readAccessScopeURL = url.deletingLastPathComponent()
+            let readAccessScopeURL = URL(fileURLWithPath: "/")
 #endif
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .loadFileURL(url, allowingReadAccessTo: readAccessScopeURL, withExpectedNavigationType: source.navigationType)
