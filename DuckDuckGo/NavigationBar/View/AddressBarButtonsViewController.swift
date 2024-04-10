@@ -553,7 +553,13 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func setupAnimationViews() {
-        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?, animationName: String, renderingEngine: Lottie.RenderingEngineOption = .automatic) -> LottieAnimationView {
+                
+        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?, 
+                                               animationName: String,
+                                               // Default use of .mainThread to prevent high WindowServer Usage
+                                               // Pending Fix with newer Lottie versions
+                                               //https://app.asana.com/0/1177771139624306/1207024603216659/f
+                                               renderingEngine: Lottie.RenderingEngineOption = .mainThread) -> LottieAnimationView {
             if let animationView = animationView, animationView.identifier?.rawValue == animationName {
                 return animationView
             }
