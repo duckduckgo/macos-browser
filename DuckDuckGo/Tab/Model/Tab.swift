@@ -1064,8 +1064,11 @@ protocol NewWindowPolicyDecisionMaker {
 
         let source = content.source
         if url.isFileURL {
+            // WebKit won‘t load local page‘s external resouces even with `allowingReadAccessTo` provided
+            // this could be fixed using a custom scheme handler loading local resources in future.
+            let readAccessScopeURL = url
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
+                .loadFileURL(url, allowingReadAccessTo: readAccessScopeURL, withExpectedNavigationType: source.navigationType)
         }
 
         var request = URLRequest(url: url, cachePolicy: source.cachePolicy)
@@ -1123,7 +1126,12 @@ protocol NewWindowPolicyDecisionMaker {
         // only restore session from interactionStateData passed to Tab.init
         guard case .loadCachedFromTabContent(let interactionStateData) = self.interactionState else { return false }
 
-        if let url = content.urlForWebView, url.isFileURL {
+        switch content.urlForWebView {
+        case .some(let url) where url.isFileURL:
+#if APPSTORE
+            guard url.isWritableLocation() else { fallthrough }
+#endif
+
             // request file system access before restoration
             webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .loadFileURL(url, allowingReadAccessTo: url)?
@@ -1132,7 +1140,8 @@ protocol NewWindowPolicyDecisionMaker {
                 }, navigationDidFail: { [weak self] _, _ in
                     self?.restoreInteractionState(with: interactionStateData)
                 })
-        } else {
+
+        default:
             restoreInteractionState(with: interactionStateData)
         }
 
