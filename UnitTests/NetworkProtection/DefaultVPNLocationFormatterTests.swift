@@ -42,19 +42,19 @@ final class DefaultVPNLocationFormatterTests: XCTestCase {
         XCTAssertEqual(formatter.string(from: nil, preferredLocation: .nearest), "Nearest available")
         XCTAssertEqual(formatter.string(from: nil, preferredLocation: preferredLocation), "United States")
         XCTAssertEqual(formatter.string(from: nil, preferredLocation: otherPreferredLocation), "United Kingdom")
-        XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: .nearest), "Lafayette, LA (Nearest)")
-        XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: preferredLocation), "Lafayette, LA")
-        XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: otherPreferredLocation), "Lafayette, LA")
+        XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: .nearest), "Lafayette, United States (Nearest)")
+        XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: preferredLocation), "Lafayette, United States")
+        XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: otherPreferredLocation), "Lafayette, United States")
 
         if #available(macOS 12, *) {
             XCTAssertEqual(NSAttributedString(formatter.string(from: server.serverLocation,
                                                                preferredLocation: .nearest,
                                                                locationTextColor: .black,
-                                                               preferredLocationTextColor: .black)).string, "Lafayette, LA (Nearest)")
+                                                               preferredLocationTextColor: .black)).string, "Lafayette, United States (Nearest)")
             XCTAssertEqual(NSAttributedString(formatter.string(from: server.serverLocation,
                                                                preferredLocation: preferredLocation,
                                                                locationTextColor: .black,
-                                                               preferredLocationTextColor: .black)).string, "Lafayette, LA")
+                                                               preferredLocationTextColor: .black)).string, "Lafayette, United States")
         }
     }
 
