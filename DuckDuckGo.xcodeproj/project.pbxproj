@@ -14236,8 +14236,828 @@
 		};
 /* End XCRemoteSwiftPackageReference section */
 
+/* Begin XCSwiftPackageProductDependency section */
+		1E0068AC2B1673BB00BBF43B /* SubscriptionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SubscriptionUI;
+		};
+		1E21F8E22B73E48600FB272E /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		1E950E3E2912A10D0051A99B /* ContentBlocking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = ContentBlocking;
+		};
+		1E950E402912A10D0051A99B /* PrivacyDashboard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PrivacyDashboard;
+		};
+		1E950E422912A10D0051A99B /* UserScript */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = UserScript;
+		};
+		1EA7B8D22B7E078C000330A4 /* SubscriptionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SubscriptionUI;
+		};
+		1EA7B8D42B7E078C000330A4 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		312978892B64131200B67619 /* DataBrokerProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DataBrokerProtection;
+		};
+		3143C8782B0D1F3D00382627 /* DataBrokerProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DataBrokerProtection;
+		};
+		315A023E2B6421AE00BFA577 /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Networking;
+		};
+		31A3A4E22B0C115F0021063C /* DataBrokerProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DataBrokerProtection;
+		};
+		3706FA6B293F65D500E42796 /* TrackerRadarKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3706FA6C293F65D500E42796 /* XCRemoteSwiftPackageReference "TrackerRadarKit" */;
+			productName = TrackerRadarKit;
+		};
+		3706FA6D293F65D500E42796 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3706FA6E293F65D500E42796 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+		3706FA71293F65D500E42796 /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3706FA72293F65D500E42796 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
+		};
+		3706FA76293F65D500E42796 /* ContentBlocking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3706FA72293F65D500E42796 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = ContentBlocking;
+		};
+		3706FA77293F65D500E42796 /* PrivacyDashboard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3706FA72293F65D500E42796 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PrivacyDashboard;
+		};
+		3706FA78293F65D500E42796 /* UserScript */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3706FA72293F65D500E42796 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = UserScript;
+		};
+		3706FDD6293F661700E42796 /* OHHTTPStubs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3706FDD7293F661700E42796 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubs;
+		};
+		3706FDD8293F661700E42796 /* OHHTTPStubsSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3706FDD7293F661700E42796 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubsSwift;
+		};
+		371D00E029D8509400EC8598 /* OpenSSL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 371D00DF29D8509400EC8598 /* XCRemoteSwiftPackageReference "OpenSSL-XCFramework" */;
+			productName = OpenSSL;
+		};
+		3722177F2B3337FE00B8E9C2 /* TestUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = TestUtils;
+		};
+		372217812B33380700B8E9C2 /* TestUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = TestUtils;
+		};
+		372217832B33380E00B8E9C2 /* TestUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = TestUtils;
+		};
+		37269EFA2B332F9E005E8E46 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Common;
+		};
+		37269EFC2B332FAC005E8E46 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Common;
+		};
+		37269EFE2B332FBB005E8E46 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Common;
+		};
+		37269F002B332FC8005E8E46 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Common;
+		};
+		37269F022B332FD8005E8E46 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Common;
+		};
+		37269F042B3332C2005E8E46 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Common;
+		};
+		3739326429AE4B39009346AE /* DDGSync */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = DDGSync;
+		};
+		3739326629AE4B42009346AE /* DDGSync */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = DDGSync;
+		};
+		373FB4B02B4D6C42004C88D6 /* PreferencesViews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PreferencesViews;
+		};
+		373FB4B22B4D6C4B004C88D6 /* PreferencesViews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PreferencesViews;
+		};
+		373FB4B42B4D6C57004C88D6 /* PreferencesViews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PreferencesViews;
+		};
+		378F44E329B4BDE900899924 /* SwiftUIExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftUIExtensions;
+		};
+		378F44E529B4BDEE00899924 /* SwiftUIExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftUIExtensions;
+		};
+		37A5E2EF298AA1B20047046B /* Persistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Persistence;
+		};
+		37BA812C29B3CD690053F1A3 /* SyncUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SyncUI;
+		};
+		37BA812E29B3CD6E0053F1A3 /* SyncUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SyncUI;
+		};
+		37DF000429F9C056002B7D3E /* SyncDataProviders */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = SyncDataProviders;
+		};
+		37DF000629F9C061002B7D3E /* SyncDataProviders */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = SyncDataProviders;
+		};
+		37F44A5E298C17830025E7FE /* Navigation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Navigation;
+		};
+		4B2537762A11BFE100610219 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		4B2AAAF429E70DEA0026AFC0 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+		4B2D062B2A11C0E100DE1F49 /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Networking;
+		};
+		4B2D067E2A1334D700DE1F49 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
+		};
+		4B41EDAA2B1544B2001EEDF4 /* LoginItems */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LoginItems;
+		};
+		4B4BEC492A11B627001D9AC5 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtection;
+		};
+		4B4D60522A0B29CB00BCD287 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtection;
+		};
+		4B4D60972A0B2A5C00BCD287 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		4B4D60AE2A0C837F00BCD287 /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Networking;
+		};
+		4B4D60B02A0C83B900BCD287 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
+		};
+		4B5F14FB2A15291D0060320F /* InputFilesChecker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:InputFilesChecker";
+		};
+		4B5F14FD2A1529230060320F /* InputFilesChecker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:InputFilesChecker";
+		};
+		4B81AD342B29512B00706C96 /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
+		};
+		4B81AD362B29513100706C96 /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
+		};
+		4B9579292AC7AE700062CA31 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792A2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+		4B95792B2AC7AE700062CA31 /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
+		};
+		4B95792E2AC7AE700062CA31 /* ContentBlocking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = ContentBlocking;
+		};
+		4B95792F2AC7AE700062CA31 /* PrivacyDashboard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PrivacyDashboard;
+		};
+		4B9579302AC7AE700062CA31 /* UserScript */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = UserScript;
+		};
+		4B9579312AC7AE700062CA31 /* Persistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Persistence;
+		};
+		4B9579322AC7AE700062CA31 /* Configuration */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Configuration;
+		};
+		4B9579332AC7AE700062CA31 /* Navigation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Navigation;
+		};
+		4B9579342AC7AE700062CA31 /* Bookmarks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Bookmarks;
+		};
+		4B9579352AC7AE700062CA31 /* DDGSync */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = DDGSync;
+		};
+		4B9579362AC7AE700062CA31 /* SyncUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SyncUI;
+		};
+		4B9579372AC7AE700062CA31 /* SwiftUIExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftUIExtensions;
+		};
+		4B9579382AC7AE700062CA31 /* OpenSSL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B9579392AC7AE700062CA31 /* XCRemoteSwiftPackageReference "OpenSSL-XCFramework" */;
+			productName = OpenSSL;
+		};
+		4B95793A2AC7AE700062CA31 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95793B2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+		4B95793C2AC7AE700062CA31 /* SyncDataProviders */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = SyncDataProviders;
+		};
+		4B95793D2AC7AE700062CA31 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
+		};
+		4B95793E2AC7AE700062CA31 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B95792C2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		4B95793F2AC7AE700062CA31 /* LoginItems */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LoginItems;
+		};
+		4BA7C4DC2B3F64E500AFE511 /* LoginItems */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LoginItems;
+		};
+		4BCBE4572BA7E17800FC75A1 /* SubscriptionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SubscriptionUI;
+		};
+		4BCBE4592BA7E17800FC75A1 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		4BCBE45B2BA7E18500FC75A1 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		4BF97AD02B43C43F00EB4240 /* NetworkProtectionIPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionIPC;
+		};
+		4BF97AD22B43C43F00EB4240 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
+		};
+		4BF97AD42B43C43F00EB4240 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		7B00997C2B6508B700FE7C31 /* NetworkProtectionProxy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionProxy;
+		};
+		7B00997E2B6508C200FE7C31 /* NetworkProtectionProxy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionProxy;
+		};
+		7B1459562B7D43E500047F2C /* NetworkProtectionProxy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionProxy;
+		};
+		7B25856D2BA2F2ED00D49F79 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
+		};
+		7B31FD8B2AD125620086AA24 /* NetworkProtectionIPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionIPC;
+		};
+		7B31FD8F2AD1257B0086AA24 /* NetworkProtectionIPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionIPC;
+		};
+		7B37C7A42BAA32A50062546A /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		7B5DD6992AE51FFA001DE99C /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		7B5F9A742AE2BE4E002AEBC0 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		7B624F162BA25C1F00A6C544 /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
+		};
+		7B7DFB212B7E7473009EA1A3 /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Networking;
+		};
+		7B8C083B2AE1268E00F4C67F /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		7B94E1642B7ED95100E32B96 /* NetworkProtectionProxy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionProxy;
+		};
+		7B97CD582B7E0B57004FEF43 /* NetworkProtectionProxy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionProxy;
+		};
+		7B97CD5A2B7E0B85004FEF43 /* Common */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Common;
+		};
+		7B97CD612B7E0C4B004FEF43 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		7BA076BA2B65D61400D7FB72 /* NetworkProtectionProxy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionProxy;
+		};
+		7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SystemExtensionManager;
+		};
+		7BA7CC5E2AD1210C0042E5CE /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Networking;
+		};
+		7BA7CC602AD1211C0042E5CE /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Networking;
+		};
+		7BBD44272AD730A400D0A064 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		7BBE2B7A2B61663C00697445 /* NetworkProtectionProxy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionProxy;
+		};
+		7BEC182E2AD5D8DC00D30536 /* SystemExtensionManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SystemExtensionManager;
+		};
+		7BEEA5112AD1235B00A9E72B /* NetworkProtectionIPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionIPC;
+		};
+		7BEEA5132AD1236300A9E72B /* NetworkProtectionIPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionIPC;
+		};
+		7BEEA5152AD1236E00A9E72B /* NetworkProtectionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkProtectionUI;
+		};
+		7BFCB74D2ADE7E1A00DA3EA7 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		7BFCB74F2ADE7E2300DA3EA7 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		85D44B852BA08D29001B4AB5 /* Suggestions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Suggestions;
+		};
+		85D44B872BA08D30001B4AB5 /* Suggestions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Suggestions;
+		};
+		85D44B892BA08D3B001B4AB5 /* Suggestions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Suggestions;
+		};
+		85E2BBCD2B8F534000DBEC7A /* History */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = History;
+		};
+		85E2BBCF2B8F534A00DBEC7A /* History */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = History;
+		};
+		85E2BBD12B8F536F00DBEC7A /* History */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = History;
+		};
+		9807F644278CA16F00E1547B /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
+		};
+		984FD3BE299ACF35007334DD /* Bookmarks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Bookmarks;
+		};
+		987799EC299998B1005D8EB6 /* Bookmarks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Bookmarks;
+		};
+		98A50963294B691800D10880 /* Persistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Persistence;
+		};
+		9D6983F82AC773C3002C02FC /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		9D6983FA2AC773C8002C02FC /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DataBrokerProtection;
+		};
+		9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DataBrokerProtection;
+		};
+		9DB6E7232AA0DC5800A17F3C /* LoginItems */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LoginItems;
+		};
+		9DC70B192AA1FA5B005A844B /* LoginItems */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LoginItems;
+		};
+		9DEF97E02B06C4EE00764F03 /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Networking;
+		};
+		AA06B6B62672AF8100F541C5 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+		B65CD8CA2B316DF100A595BB /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		B65CD8CC2B316DFC00A595BB /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		B65CD8CE2B316E0200A595BB /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		B65CD8D02B316E0C00A595BB /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		B65CD8D22B316E1700A595BB /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubs;
+		};
+		B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubsSwift;
+		};
+		B6B77BE7297973D4001E68A1 /* Navigation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Navigation;
+		};
+		B6DA44162616C13800DD1EC2 /* OHHTTPStubs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubs;
+		};
+		B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6DA44152616C13800DD1EC2 /* XCRemoteSwiftPackageReference "OHHTTPStubs" */;
+			productName = OHHTTPStubsSwift;
+		};
 		B6EC37F829B5DAD7001ACE79 /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B6EC37F529B5DAAC001ACE79 /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
 		};
+		B6EC37FE29B8D915001ACE79 /* Configuration */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Configuration;
+		};
+		B6F997BA2B8F353F00476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6F997BC2B8F35EF00476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6F997BE2B8F35F400476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6F997C02B8F35F800476735 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		CBC83E3529B63D380008E19C /* Configuration */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Configuration;
+		};
+		EE02D41F2BB460C000DBE6B3 /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
+		};
+		EE2F9C5A2B90F2FF00D45FC9 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		EE7295E22A545B9A008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		EE7295E62A545BBB008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		EE7295E82A545BC4008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		EE7295EC2A545C0A008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		EE7295EE2A545C12008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
+		F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
+		};
+		F1D43AF42B98E48900BAB743 /* BareBonesBrowserKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
+		};
+		F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */,
+			);
+			currentVersion = 4B11060425903E570039B979 /* CoreDataEncryptionTesting.xcdatamodel */;
+			path = CoreDataEncryptionTesting.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		987799FC29999B64005D8EB6 /* Bookmark.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				987799FD29999B64005D8EB6 /* Bookmark 2.xcdatamodel */,
+				987799FE29999B64005D8EB6 /* Bookmark.xcdatamodel */,
+				987799FF29999B64005D8EB6 /* Bookmark 3.xcdatamodel */,
+			);
+			currentVersion = 987799FF29999B64005D8EB6 /* Bookmark 3.xcdatamodel */;
+			path = Bookmark.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		AA5FA69E275F948900DCE9C9 /* Favicons.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				AA5FA69F275F948900DCE9C9 /* Favicons.xcdatamodel */,
+			);
+			currentVersion = AA5FA69F275F948900DCE9C9 /* Favicons.xcdatamodel */;
+			path = Favicons.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		AAE75278263B046100B973F8 /* History.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				AA7E91982875AB4700AB6B62 /* History 6.xcdatamodel */,
+				85F91D9327F47BC40096B1C8 /* History 5.xcdatamodel */,
+				85589E9227BFBBD60038AD11 /* History 4.xcdatamodel */,
+				AAC6BBEE27AC151D0006DCC2 /* History 3.xcdatamodel */,
+				AA7DE8E026A9BD000012B490 /* History 2.xcdatamodel */,
+				AAE75279263B046100B973F8 /* History.xcdatamodel */,
+			);
+			currentVersion = AA7E91982875AB4700AB6B62 /* History 6.xcdatamodel */;
+			path = History.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		B604085A274B8CA300680351 /* UnprotectedDomains.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B604085B274B8CA400680351 /* Permissions.xcdatamodel */,
+			);
+			currentVersion = B604085B274B8CA400680351 /* Permissions.xcdatamodel */;
+			path = UnprotectedDomains.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		B6085D072743993C00A9C456 /* FireproofDomains.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B6085D082743993D00A9C456 /* Permissions.xcdatamodel */,
+			);
+			currentVersion = B6085D082743993D00A9C456 /* Permissions.xcdatamodel */;
+			path = FireproofDomains.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		B64C852E26943BC10048FEBE /* Permissions.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B64C852F26943BC10048FEBE /* Permissions.xcdatamodel */,
+			);
+			currentVersion = B64C852F26943BC10048FEBE /* Permissions.xcdatamodel */;
+			path = Permissions.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		B6C0B23226E71BCD0031CB7F /* Downloads.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B6C0B23326E71BCD0031CB7F /* Downloads.xcdatamodel */,
+			);
+			currentVersion = B6C0B23326E71BCD0031CB7F /* Downloads.xcdatamodel */;
+			path = Downloads.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		B6C2C9F42760B659005B7F0A /* TestDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B6C2C9F52760B659005B7F0A /* Permissions.xcdatamodel */,
+			);
+			currentVersion = B6C2C9F52760B659005B7F0A /* Permissions.xcdatamodel */;
+			path = TestDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B6DA44072616B30600DD1EC2 /* PixelDataModel.xcdatamodel */,
+			);
+			currentVersion = B6DA44072616B30600DD1EC2 /* PixelDataModel.xcdatamodel */;
+			path = PixelDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = AA585D76248FD31100E9A3E2 /* Project object */;
+}
