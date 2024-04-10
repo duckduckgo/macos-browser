@@ -65,7 +65,7 @@ final class ScanOperation: DataBrokerOperation {
         self.cookieHandler = cookieHandler
     }
 
-    func run(inputValue: Void,
+    func run(inputValue: InputValue,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
              showWebView: Bool) async throws -> [ExtractedProfile] {

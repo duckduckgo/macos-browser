@@ -30,6 +30,18 @@ import Subscription
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
+    static var isAppex: Bool {
+#if NETP_SYSTEM_EXTENSION
+        false
+#else
+        true
+#endif
+    }
+
+    static var subscriptionsAppGroup: String? {
+        isAppex ? Bundle.main.appGroup(bundle: .subs) : nil
+    }
+
     // MARK: - Additional Status Info
 
     /// Holds the date when the status was last changed so we can send it out as additional information
@@ -139,7 +151,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionActiveUser,
                 frequency: .dailyOnly,
-                withAdditionalParameters: ["cohort": PixelKit.dateString(for: defaults.vpnFirstEnabled)],
+                withAdditionalParameters: [PixelKit.Parameters.vpnCohort: PixelKit.cohort(from: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
         case .reportConnectionAttempt(attempt: let attempt):
             switch attempt {
@@ -276,7 +288,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         )
 #if SUBSCRIPTION
 
-        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs), accessTokenStorage: tokenStore)
+        let accountManager = AccountManager(subscriptionAppGroup: Self.subscriptionsAppGroup, accessTokenStorage: tokenStore)
 
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
         let entitlementsCheck = {

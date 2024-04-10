@@ -135,6 +135,7 @@ final class AppearancePreferences: ObservableObject {
 
     struct Notifications {
         static let showBookmarksBarSettingChanged = NSNotification.Name("ShowBookmarksBarSettingChanged")
+        static let bookmarksBarSettingAppearanceChanged = NSNotification.Name("BookmarksBarSettingAppearanceChanged")
     }
 
     static let shared = AppearancePreferences()
@@ -197,6 +198,7 @@ final class AppearancePreferences: ObservableObject {
     @Published var bookmarksBarAppearance: BookmarksBarAppearance {
         didSet {
             persistor.bookmarksBarAppearance = bookmarksBarAppearance
+            NotificationCenter.default.post(name: Notifications.bookmarksBarSettingAppearanceChanged, object: nil)
         }
     }
 

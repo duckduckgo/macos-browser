@@ -39,9 +39,26 @@ class FirefoxBookmarksReaderTests: XCTestCase {
         }), true)
     }
 
+    func testFileNotFoundReturnsFailureWithDbOpenError() {
+        // Given
+        let bookmarksReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: invalidResourceURL())
+        let expected: DataImportResult<ImportedBookmarks> = .failure(FirefoxBookmarksReader.ImportError(type: .couldNotFindBookmarksFile, underlyingError: nil))
+
+        // When
+        let result = bookmarksReader.readBookmarks()
+
+        // Then
+        XCTAssertEqual(expected, result)
+    }
+
     private func resourceURL() -> URL {
         let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
         return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData")
+    }
+
+    private func invalidResourceURL() -> URL {
+        let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
+        return bundle.resourceURL!.appendingPathComponent("Nothing/Here")
     }
 
 }

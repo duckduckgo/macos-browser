@@ -31,15 +31,13 @@ struct DataImportNoDataView: View {
                 Text("We couldn‘t find any bookmarks.", comment: "Data import error message: Bookmarks weren‘t found.")
                     .bold()
 
-                Text("Try importing bookmarks manually instead.",
-                     comment: "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file.")
+                Text(UserText.importNoDataBookmarksSubtitle(from: source))
 
             case .passwords:
                 Text("We couldn‘t find any passwords.", comment: "Data import error message: Passwords weren‘t found.")
                     .bold()
 
-                Text("Try importing passwords manually instead.",
-                     comment: "Data import error subtitle: suggestion to import Passwords manually by selecting a CSV or HTML file.")
+                Text(UserText.importNoDataPasswordsSubtitle(from: source))
             }
         }
     }

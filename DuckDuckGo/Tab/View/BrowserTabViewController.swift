@@ -163,10 +163,6 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onSubscriptionAccountDidSignOut),
                                                name: .accountDidSignOut,
                                                object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onSubscriptionDidChange),
-                                               name: .subscriptionDidChange,
-                                               object: nil)
 #endif
     }
 
@@ -250,25 +246,6 @@ final class BrowserTabViewController: NSViewController {
                 if case .subscription = tabContent {
                     return true
                 } else if case .identityTheftRestoration = tabContent {
-                    return true
-                } else {
-                    return false
-                }
-            }
-        }
-    }
-
-    @objc
-    private func onSubscriptionDidChange(_ notification: Notification) {
-        guard let subscription = (notification.userInfo?[UserDefaultsCacheKey.subscription] as? DDGSubscription), !subscription.isActive else { return }
-
-        Task { @MainActor in
-            tabCollectionViewModel.removeAll { tabContent in
-                if case .subscription = tabContent {
-                    return true
-                } else if case .identityTheftRestoration = tabContent {
-                    return true
-                } else if case .dataBrokerProtection = tabContent {
                     return true
                 } else {
                     return false
@@ -448,6 +425,7 @@ final class BrowserTabViewController: NSViewController {
             tabViewModel.tab.downloads?.savePanelDialogPublisher ?? Just(nil).eraseToAnyPublisher()
         )
         .map { $1 ?? $0 }
+        .removeDuplicates()
         .sink { [weak self] dialog in
             self?.show(dialog)
         }
@@ -939,6 +917,15 @@ extension BrowserTabViewController: TabDelegate {
     // MARK: - Dialogs
 
     fileprivate func show(_ dialog: Tab.UserDialog?) {
+        guard activeUserDialogCancellable == nil || dialog == nil else {
+            // first hide a displayed dialog before showing another one
+            activeUserDialogCancellable = nil
+            DispatchQueue.main.async { [weak self] in
+                self?.show(dialog)
+            }
+            return
+        }
+
         switch dialog?.dialog {
         case .basicAuthenticationChallenge(let query):
             activeUserDialogCancellable = showBasicAuthenticationChallenge(with: query)
@@ -961,14 +948,14 @@ extension BrowserTabViewController: TabDelegate {
 
         let alert = AuthenticationAlert(host: request.parameters.host,
                                         isEncrypted: request.parameters.receivesCredentialSecurely)
-        alert.beginSheetModal(for: window) { [request] response in
+        alert.beginSheetModal(for: window) { [weak request] response in
             // don‘t submit the query when tab is switched
             if case .abort = response { return }
             guard case .OK = response else {
-                request.submit(nil)
+                request?.submit(nil)
                 return
             }
-            request.submit(.credential(URLCredential(user: alert.usernameTextField.stringValue,
+            request?.submit(.credential(URLCredential(user: alert.usernameTextField.stringValue,
                                                      password: alert.passwordTextField.stringValue,
                                                      persistence: .forSession)))
         }
@@ -987,14 +974,31 @@ extension BrowserTabViewController: TabDelegate {
                                                                  suggestedFilename: request.parameters.suggestedFilename,
                                                                  directoryURL: directoryURL)
 
-        savePanel.beginSheetModal(for: window) { [request] response in
-            if case .abort = response {
+        savePanel.beginSheetModal(for: window) { [weak request, weak self] response in
+            switch response {
+            case .abort:
                 // panel not closed by user but by a tab switching
                 return
-            } else if case .OK = response, let url = savePanel.url {
-                request.submit( (url, savePanel.selectedFileType) )
-            } else {
-                request.submit(nil)
+            case .OK:
+                guard let self,
+                      let window = view.window,
+                      let url = savePanel.url else { fallthrough }
+
+                do {
+                    // validate selected URL is writable
+                    try FileManager.default.checkWritability(url)
+                } catch {
+                    // hide the save panel
+                    self.activeUserDialogCancellable = nil
+                    NSAlert(error: error).beginSheetModal(for: window) { [weak self] _ in
+                        guard let self, let request else { return }
+                        self.activeUserDialogCancellable = showSavePanel(with: request)
+                    }
+                    return
+                }
+                request?.submit( (url, savePanel.selectedFileType) )
+            default:
+                request?.submit(nil)
             }
         }
 
@@ -1008,14 +1012,16 @@ extension BrowserTabViewController: TabDelegate {
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = request.parameters.allowsMultipleSelection
 
-        openPanel.beginSheetModal(for: window) { [request] response in
-            // don‘t submit the query when tab is switched
-            if case .abort = response { return }
-            guard case .OK = response else {
-                request.submit(nil)
+        openPanel.beginSheetModal(for: window) { [weak request] response in
+            switch response {
+            case .abort:
+                // don‘t submit the query when tab is switched
                 return
+            case .OK:
+                request?.submit(openPanel.urls)
+            default:
+                request?.submit(nil)
             }
-            request.submit(openPanel.urls)
         }
 
         // when subscribing to another Tab, the sheet will be temporarily closed with response == .abort on the cancellable deinit
