@@ -20,15 +20,18 @@ import Common
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
+import PixelKit
 
-final class NetworkProtectionIPCTunnelController: TunnelController {
+/// VPN tunnel controller through IPC.
+///
+final class NetworkProtectionIPCTunnelController {
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
-    private let loginItemsManager: LoginItemsManager
+    private let loginItemsManager: LoginItemsManaging
     private let ipcClient: NetworkProtectionIPCClient
 
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
-         loginItemsManager: LoginItemsManager = LoginItemsManager(),
+         loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          ipcClient: NetworkProtectionIPCClient) {
 
         self.featureVisibility = featureVisibility
@@ -37,7 +40,9 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
     }
 
     @MainActor
-    func start() async {
+    func start(attemptHandler: VPNStartAttemptHandling = DefaultVPNStartAttemptHandler()) async {
+        attemptHandler.begin()
+
         do {
             guard try await enableLoginItems() else {
                 os_log("🔴 IPC Controller refusing to start the VPN menu app.  Not authorized.", log: .networkProtection)
@@ -45,13 +50,17 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
             }
 
             ipcClient.start()
+            attemptHandler.success()
         } catch {
             os_log("🔴 IPC Controller found en error when starting the VPN: \(error)", log: .networkProtection)
+            attemptHandler.failure(error)
         }
     }
 
     @MainActor
-    func stop() async {
+    func stop(attemptHandler: VPNStopAttemptHandling) async {
+        attemptHandler.begin()
+
         do {
             guard try await enableLoginItems() else {
                 os_log("🔴 IPC Controller refusing to start the VPN.  Not authorized.", log: .networkProtection)
@@ -59,9 +68,38 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
             }
 
             ipcClient.stop()
+            attemptHandler.success()
         } catch {
             os_log("🔴 IPC Controller found en error when starting the VPN: \(error)", log: .networkProtection)
+            attemptHandler.failure(error)
         }
+    }
+
+    // MARK: - Login Items Manager
+
+    private func enableLoginItems() async throws -> Bool {
+        guard try await featureVisibility.canStartVPN() else {
+            // We shouldn't enable the menu app is the VPN feature is disabled.
+            return false
+        }
+
+        try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
+        return true
+    }
+}
+
+// MARK: - TunnelController Conformance
+
+extension NetworkProtectionIPCTunnelController: TunnelController {
+
+    @MainActor
+    func start() async {
+        await start(attemptHandler: DefaultVPNStartAttemptHandler())
+    }
+
+    @MainActor
+    func stop() async {
+        await stop(attemptHandler: DefaultVPNStopAttemptHandler())
     }
 
     /// Queries VPN to know if it's connected.
@@ -77,16 +115,132 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
             return false
         }
     }
+}
 
-    // MARK: - Login Items Manager
+// MARK: - Start Attempts
 
-    private func enableLoginItems() async throws -> Bool {
-        guard try await featureVisibility.canStartVPN() else {
-            // We shouldn't enable the menu app is the VPN feature is disabled.
-            return false
+protocol VPNStartAttemptHandling {
+    func begin()
+    func success()
+    func failure(_ error: Error)
+}
+
+extension NetworkProtectionIPCTunnelController {
+
+    private enum StartAttempt: PixelKitEventV2 {
+        case begin
+        case success
+        case failure(_ error: Error)
+
+        var name: String {
+            switch self {
+            case .begin:
+                return "netp_browser_start_attempt"
+
+            case .success:
+                return "netp_browser_start_success"
+
+            case .failure:
+                return "netp_browser_start_failure"
+            }
         }
 
-        loginItemsManager.enableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
-        return true
+        var parameters: [String: String]? {
+            return nil
+        }
+
+        var error: Error? {
+            switch self {
+            case .begin,
+                    .success:
+                return nil
+            case .failure(let error):
+                return error
+            }
+        }
+    }
+
+    private class DefaultVPNStartAttemptHandler: VPNStartAttemptHandling {
+        private let pixelKit: PixelKit?
+
+        init(pixelKit: PixelKit? = .shared) {
+            self.pixelKit = pixelKit
+        }
+
+        func begin() {
+            pixelKit?.fire(StartAttempt.begin)
+        }
+
+        func success() {
+            pixelKit?.fire(StartAttempt.success, frequency: .dailyAndContinuous)
+        }
+
+        func failure(_ error: Error) {
+            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndContinuous)
+        }
+    }
+}
+
+// MARK: - Stop Attempts
+
+protocol VPNStopAttemptHandling {
+    func begin()
+    func success()
+    func failure(_ error: Error)
+}
+
+extension NetworkProtectionIPCTunnelController {
+
+    private enum StopAttempt: PixelKitEventV2 {
+        case begin
+        case success
+        case failure(_ error: Error)
+
+        var name: String {
+            switch self {
+            case .begin:
+                return "netp_browser_stop_attempt"
+
+            case .success:
+                return "netp_browser_stop_success"
+
+            case .failure:
+                return "netp_browser_stop_failure"
+            }
+        }
+
+        var parameters: [String: String]? {
+            return nil
+        }
+
+        var error: Error? {
+            switch self {
+            case .begin,
+                    .success:
+                return nil
+            case .failure(let error):
+                return error
+            }
+        }
+    }
+
+    private class DefaultVPNStopAttemptHandler: VPNStopAttemptHandling {
+        private let pixelKit: PixelKit?
+
+        init(pixelKit: PixelKit? = .shared) {
+            self.pixelKit = pixelKit
+        }
+
+        func begin() {
+            pixelKit?.fire(StopAttempt.begin)
+        }
+
+        func success() {
+            pixelKit?.fire(StopAttempt.success, frequency: .dailyAndContinuous)
+        }
+
+        func failure(_ error: Error) {
+            pixelKit?.fire(StopAttempt.failure(error), frequency: .dailyAndContinuous)
+        }
     }
 }
