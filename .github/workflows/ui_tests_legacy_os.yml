@@ -97,10 +97,12 @@ jobs:
 
     - name: Build test runner 
       run: |
-        ls -latr LocalPackages
         rm -rf LocalPackages
         rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved 
         sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
+        sed -i '' -e '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/* End XCSwiftPackageProductDependency section *\// { 
+            /B6EC37F829B5DAD7001ACE79 \/\* Swifter \*\/ = {/,/};/!d
+        }' DuckDuckGo.xcodeproj/project.pbxproj
         set -o pipefail && xcodebuild build-for-testing \
           -scheme "UI Tests Legacy" \
           -derivedDataPath DerivedData \
