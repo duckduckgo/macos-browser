@@ -74,6 +74,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     @MainActor
     @discardableResult
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool {
+        // We can do this optimistically as it has little if any impact.
+        unpinNetworkProtection()
+
         // To disable NetP we need the login item to be running
         // This should be fine though as we'll disable them further down below
         guard canUninstall(includingSystemExtension: uninstallSystemExtension) else {
@@ -83,7 +86,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         isDisabling = true
 
         defer {
-            unpinNetworkProtection()
             resetUserDefaults(uninstallSystemExtension: uninstallSystemExtension)
         }
 
