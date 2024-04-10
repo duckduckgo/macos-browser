@@ -55,10 +55,10 @@ internal class FilePresenter {
 
         final let presentedItemOperationQueue: OperationQueue
         fileprivate final weak var delegate: FilePresenterDelegate?
-        final var shouldBeRemovedTwice = false
 
-        init(presentedItemOperationQueue: OperationQueue) {
+        init(presentedItemOperationQueue: OperationQueue, delegate: FilePresenterDelegate) {
             self.presentedItemOperationQueue = presentedItemOperationQueue
+            self.delegate = delegate
         }
 
         final var fallbackPresentedItemURL: URL?
@@ -73,12 +73,10 @@ internal class FilePresenter {
         }
 
         final func presentedItemDidMove(to newURL: URL) {
-            assert(delegate != nil)
             delegate?.presentedItemDidMove(to: newURL)
         }
 
         func accommodatePresentedItemDeletion(completionHandler: @escaping @Sendable ((any Error)?) -> Void) {
-            assert(delegate != nil)
             do {
                 try delegate?.accommodatePresentedItemDeletion()
                 completionHandler(nil)
@@ -88,9 +86,8 @@ internal class FilePresenter {
         }
 
         func accommodatePresentedItemEviction(completionHandler: @escaping @Sendable ((any Error)?) -> Void) {
-            assert(delegate != nil)
             do {
-            try delegate?.accommodatePresentedItemEviction()
+                try delegate?.accommodatePresentedItemEviction()
                 completionHandler(nil)
             } catch {
                 completionHandler(error)
@@ -103,34 +100,50 @@ internal class FilePresenter {
 
         let primaryPresentedItemURL: URL?
 
-        init(primaryPresentedItemURL: URL?, presentedItemOperationQueue: OperationQueue) {
+        init(primaryPresentedItemURL: URL?, presentedItemOperationQueue: OperationQueue, delegate: FilePresenterDelegate) {
             self.primaryPresentedItemURL = primaryPresentedItemURL
-            super.init(presentedItemOperationQueue: presentedItemOperationQueue)
+            super.init(presentedItemOperationQueue: presentedItemOperationQueue, delegate: delegate)
         }
 
     }
 
     fileprivate let lock = NSLock()
-    private var innerPresenter: DelegatingFilePresenter?
+    private var innerPresenters = [DelegatingFilePresenter]()
     private var dispatchSourceCancellable: AnyCancellable?
 
     fileprivate let logger: any FilePresenterLogger
 
-    private var _url: URL?
+    private var urlController: SecurityScopedFileURLController?
     final var url: URL? {
         lock.withLock {
-            _url
+            urlController?.url
         }
     }
     private func setURL(_ newURL: URL?) {
-        guard let oldValue = lock.withLock({ () -> URL?? in
-            let oldValue = _url
-            guard oldValue != newURL else { return URL??.none }
-            _url = newURL
-            return oldValue
-        }) else { return }
+        guard let oldValue = lock.withLock({ _setURL(newURL) }) else { return }
 
         didSetURL(newURL, oldValue: oldValue)
+    }
+
+    // inside locked scope
+    private func _setURL(_ newURL: URL?) -> URL?? /* returns old value (URL?) if new value was updated */ {
+        let oldValue = urlController?.url
+        guard oldValue != newURL else { return URL??.none }
+        guard let newURL else {
+            urlController = nil
+            return newURL
+        }
+
+        // if the new url is pointing to the same path (only letter case has changed) - keep its sandbox extension in a new Controller
+        if let urlController, let oldValue,
+           oldValue.resolvingSymlinksInPath().path == newURL.resolvingSymlinksInPath().path,
+           urlController.isManagingSecurityScope {
+            urlController.updateUrlKeepingSandboxExtensionRetainCount(newURL)
+        } else {
+            urlController = SecurityScopedFileURLController(url: newURL, logger: logger)
+        }
+
+        return oldValue
     }
 
     private var urlSubject = PassthroughSubject<URL?, Never>()
@@ -138,31 +151,52 @@ internal class FilePresenter {
         urlSubject.prepend(url).eraseToAnyPublisher()
     }
 
-    init(url: URL, primaryItemURL: URL? = nil, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
-        self._url = url
+    /// - Parameter url: represented file URL access to which is coordinated by the File Presenter.
+    /// - Parameter consumeUnbalancedStartAccessingResource: assume the `url` is already accessible (e.g. after choosing the file using Open Panel).
+    ///   would cause an unbalanced `stopAccessingSecurityScopedResource` call on the File Presenter deallocation.
+    /// - Note: see https://stackoverflow.com/questions/25627628/sandboxed-mac-app-exhausting-security-scoped-url-resources
+    init(url: URL, consumeUnbalancedStartAccessingResource: Bool = false, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
+        self.urlController = SecurityScopedFileURLController(url: url, manageSecurityScope: consumeUnbalancedStartAccessingResource, logger: logger)
+
+        self.logger = logger
+
+        do {
+            try setupInnerPresenter(for: url, primaryItemURL: nil, createIfNeededCallback: createIfNeededCallback)
+            logger.log("🗄️  added file presenter for \"\(url.path)\"")
+        } catch {
+            removeFilePresenters()
+            throw error
+        }
+    }
+
+    /// - Parameter url: represented file URL access to which is coordinated by the File Presenter.
+    /// - Parameter primaryItemURL: URL to a main file resource access to which has been granted.
+    ///   Used to grant out-of-sandbox access to `url` representing a “related” resource like “download.duckload” where the `primaryItemURL` would point to “download.zip”.
+    /// - Note: the related (“duckload”) file extension should be registered in the Info.plist with `NSIsRelatedItemType` flag set to `true`.
+    /// - Note: when presenting a related item the security scoped resource access will always be stopped on the File Presenter deallocation
+    /// - Parameter consumeUnbalancedStartAccessingResource: assume the `url` is already accessible (e.g. after choosing the file using Open Panel).
+    ///   would cause an unbalanced `stopAccessingSecurityScopedResource` call on the File Presenter deallocation.
+    init(url: URL, primaryItemURL: URL, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
+        self.urlController = SecurityScopedFileURLController(url: url, logger: logger)
         self.logger = logger
 
         do {
             try setupInnerPresenter(for: url, primaryItemURL: primaryItemURL, createIfNeededCallback: createIfNeededCallback)
-            logger.log("🗄️  added file presenter for \"\(url.path)\"\(primaryItemURL != nil ? " primary item: \"\(primaryItemURL!.path)\"" : "")")
+            logger.log("🗄️  added file presenter for \"\(url.path) primary item: \"\(primaryItemURL.path)\"")
         } catch {
-            removeFilePresenter()
+            removeFilePresenters()
             throw error
         }
     }
 
     private func setupInnerPresenter(for url: URL, primaryItemURL: URL?, createIfNeededCallback: ((URL) throws -> URL)?) throws {
         let innerPresenter = if let primaryItemURL {
-            DelegatingRelatedFilePresenter(primaryPresentedItemURL: primaryItemURL, presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue)
+            DelegatingRelatedFilePresenter(primaryPresentedItemURL: primaryItemURL, presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue, delegate: self)
         } else {
-            DelegatingFilePresenter(presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue)
+            DelegatingFilePresenter(presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue, delegate: self)
         }
-        innerPresenter.delegate = self
-        self.innerPresenter = innerPresenter
+        self.innerPresenters = [innerPresenter]
 
-        // even though we will call `addFilePresenter` again for a non-existent file,
-        // we still must call this `addFilePresenter` to get access to the secondary item
-        // (when primaryPresentedItemURL is provided).
         NSFileCoordinator.addFilePresenter(innerPresenter)
 
         if !FileManager.default.fileExists(atPath: url.path) {
@@ -170,13 +204,29 @@ internal class FilePresenter {
                 throw CocoaError(.fileReadNoSuchFile, userInfo: [NSFilePathErrorKey: url.path])
             }
             logger.log("🗄️💥 creating file for presenter at \"\(url.path)\"")
-            self._url = try coordinateWrite(at: url, using: createFile)
-            // add the File Presenter once again after the file was created.
-            // otherwise, file move events may not be received (looks like an API bug).
-            NSFileCoordinator.addFilePresenter(innerPresenter)
-            // need to balance sandbox extension release for secondary item presenters added twice
-            innerPresenter.shouldBeRemovedTwice = (primaryItemURL != nil)
+            // create new file at the presented URL using the provided callback and update URL if needed
+            _=self._setURL(
+                try coordinateWrite(at: url, using: createFile)
+            )
+
+            if primaryItemURL == nil {
+                // Remove and re-add the file presenter for regular item presenters.
+                NSFileCoordinator.removeFilePresenter(innerPresenter)
+                NSFileCoordinator.addFilePresenter(innerPresenter)
+            }
         }
+        // to correctly handle file move events for a “related” item presenters we need to use a secondary presenter
+        if primaryItemURL != nil {
+            // set permanent original url without tracking file movements
+            // to correctly release the sandbox extension when the “related” presenter is removed
+            innerPresenter.fallbackPresentedItemURL = url
+            innerPresenter.delegate = nil
+
+            let innerPresenter2 = DelegatingFilePresenter(presentedItemOperationQueue: FilePresenter.presentedItemOperationQueue, delegate: self)
+            NSFileCoordinator.addFilePresenter(innerPresenter2)
+            innerPresenters.append(innerPresenter2)
+        }
+
         try coordinateRead(at: url, with: .withoutChanges) { url in
             addFSODispatchSource(for: url)
         }
@@ -199,7 +249,7 @@ internal class FilePresenter {
             self.logger.log("🗄️⚠️ file delete event handler: \"\(url.path)\"")
             var resolvedBookmarkData: URL? {
                 var isStale = false
-                guard let presenter = self as? SandboxFilePresenter,
+                guard let presenter = self as? BookmarkFilePresenter,
                       let bookmarkData = presenter.fileBookmarkData,
                       let url = try? URL(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale) else {
                     if FileManager().fileExists(atPath: url.path) { return url } // file still exists but with different letter case ?
@@ -224,29 +274,36 @@ internal class FilePresenter {
         dispatchSource.resume()
     }
 
-    private func removeFilePresenter() {
-        if let innerPresenter {
-            logger.log("🗄️  removing file presenter for \"\(url?.path ?? "<nil>")\"")
-            for _ in 1...(innerPresenter.shouldBeRemovedTwice ? 2 : 1) { // if secondary item presenter was added twice - remove it twice
-                NSFileCoordinator.removeFilePresenter(innerPresenter)
+    private func removeFilePresenters() {
+        for (idx, innerPresenter) in innerPresenters.enumerated() {
+            // innerPresenter delegate won‘t be available at this point when called from `deinit`,
+            // so set the final url here to correctly remove the presenter.
+            if innerPresenter.fallbackPresentedItemURL == nil {
+                innerPresenter.fallbackPresentedItemURL = urlController?.url
             }
-            self.innerPresenter = nil
+            logger.log("🗄️  removing file presenter \(idx) for \"\(innerPresenter.presentedItemURL?.path ?? "<nil>")\"")
+            NSFileCoordinator.removeFilePresenter(innerPresenter)
         }
+        if innerPresenters.count > 1 {
+            // ”related” item File Presenters make an unbalanced sandbox extension retain,
+            // release the actual file URL sandbox extension by calling an extra `stopAccessingSecurityScopedResource`
+            urlController?.url.consumeUnbalancedStartAccessingSecurityScopedResource()
+        }
+        innerPresenters = []
     }
 
     fileprivate func didSetURL(_ newValue: URL?, oldValue: URL?) {
-        assert(newValue != oldValue)
+        assert(newValue == nil || newValue != oldValue)
         logger.log("🗄️  did update url from \"\(oldValue?.path ?? "<nil>")\" to \"\(newValue?.path ?? "<nil>")\"")
         urlSubject.send(newValue)
     }
 
     deinit {
-        // innerPresenter delegate won‘t be available at this point, so set the final url here to remove the presenter
-        innerPresenter?.fallbackPresentedItemURL = _url
-        removeFilePresenter()
+        removeFilePresenters()
     }
 
 }
+
 extension FilePresenter: FilePresenterDelegate {
 
     func presentedItemDidMove(to newURL: URL) {
@@ -256,8 +313,9 @@ extension FilePresenter: FilePresenterDelegate {
 
     func accommodatePresentedItemDeletion() throws {
         logger.log("🗄️  accommodatePresentedItemDeletion (\"\(url?.path ?? "<nil>")\")")
+        // should go before resetting the URL to correctly remove File Presenter
+        removeFilePresenters()
         setURL(nil)
-        removeFilePresenter()
     }
 
     func accommodatePresentedItemEviction() throws {
@@ -270,9 +328,7 @@ extension FilePresenter: FilePresenterDelegate {
 /// Maintains File Bookmark Data for presented resource URL
 /// and manages its sandbox security scope access calling `stopAccessingSecurityScopedResource` on deinit
 /// balanced with preceding `startAccessingSecurityScopedResource`
-final class SandboxFilePresenter: FilePresenter {
-
-    private let securityScopedURL: URL?
+final class BookmarkFilePresenter: FilePresenter {
 
     private var _fileBookmarkData: Data?
     final var fileBookmarkData: Data? {
@@ -287,21 +343,31 @@ final class SandboxFilePresenter: FilePresenter {
     }
 
     /// - Parameter url: represented file URL access to which is coordinated by the File Presenter.
-    /// - Parameter primaryItemURL: URL to a main file resource access to which has been granted.
-    ///   Used to grant out-of-sandbox access to `url` representing a “secondary” resource like “download.duckload” where the `primaryItemURL` would point to “download.zip”.
-    /// - Note: the secondary (“duckload”) file extension should be registered in the Info.plist with `NSIsRelatedItemType` flag set to `true`.
     /// - Parameter consumeUnbalancedStartAccessingResource: assume the `url` is already accessible (e.g. after choosing the file using Open Panel).
     ///   would cause an unbalanced `stopAccessingSecurityScopedResource` call on the File Presenter deallocation.
-    init(url: URL, primaryItemURL: URL? = nil, consumeUnbalancedStartAccessingResource: Bool = false, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
+    override init(url: URL, consumeUnbalancedStartAccessingResource: Bool = false, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
 
-        if consumeUnbalancedStartAccessingResource || url.startAccessingSecurityScopedResource() == true {
-            self.securityScopedURL = url
-            logger.log("🏝️ \(consumeUnbalancedStartAccessingResource ? "consuming unbalanced startAccessingResource for" : "started resource access for") \"\(url.path)\"")
-        } else {
-            self.securityScopedURL = nil
-            logger.log("🏖️ didn‘t start resource access for \"\(url.path)\"")
+        try super.init(url: url, consumeUnbalancedStartAccessingResource: consumeUnbalancedStartAccessingResource, logger: logger, createIfNeededCallback: createIfNeededCallback)
+
+        do {
+            try self.coordinateRead(at: url, with: .withoutChanges) { url in
+                logger.log("📒 updating bookmark data for \"\(url.path)\"")
+                self._fileBookmarkData = try url.bookmarkData(options: .withSecurityScope)
+            }
+        } catch {
+            logger.log("📕 bookmark data retreival failed for \"\(url.path)\": \(error)")
+            throw error
         }
+    }
 
+    /// - Parameter url: represented file URL access to which is coordinated by the File Presenter.
+    /// - Parameter primaryItemURL: URL to a main file resource access to which has been granted.
+    ///   Used to grant out-of-sandbox access to `url` representing a “related” resource like “download.duckload” where the `primaryItemURL` would point to “download.zip”.
+    /// - Note: the related (“duckload”) file extension should be registered in the Info.plist with `NSIsRelatedItemType` flag set to `true`.
+    /// - Note: when presenting a related item the security scoped resource access will always be stopped on the File Presenter deallocation
+    /// - Parameter consumeUnbalancedStartAccessingResource: assume the `url` is already accessible (e.g. after choosing the file using Open Panel).
+    ///   would cause an unbalanced `stopAccessingSecurityScopedResource` call on the File Presenter deallocation.
+    override init(url: URL, primaryItemURL: URL, logger: FilePresenterLogger = OSLog.disabled, createIfNeededCallback: ((URL) throws -> URL)? = nil) throws {
         try super.init(url: url, primaryItemURL: primaryItemURL, logger: logger, createIfNeededCallback: createIfNeededCallback)
 
         do {
@@ -321,15 +387,8 @@ final class SandboxFilePresenter: FilePresenter {
         var isStale = false
         logger.log("📒 resolving url from bookmark data")
         let url = try URL(resolvingBookmarkData: fileBookmarkData, options: .withSecurityScope, bookmarkDataIsStale: &isStale)
-        if url.startAccessingSecurityScopedResource() == true {
-            self.securityScopedURL = url
-            logger.log("🏝️ started resource access for \"\(url.path)\"\(isStale ? " (stale)" : "")")
-        } else {
-            self.securityScopedURL = nil
-            logger.log("🏖️ didn‘t start resource access for \"\(url.path)\"\(isStale ? " (stale)" : "")")
-        }
 
-        try super.init(url: url, logger: logger)
+        try super.init(url: url, consumeUnbalancedStartAccessingResource: true, logger: logger)
 
         if isStale {
             DispatchQueue.global().async { [weak self] in
@@ -362,25 +421,18 @@ final class SandboxFilePresenter: FilePresenter {
         fileBookmarkDataSubject.send(fileBookmarkData)
     }
 
-    deinit {
-        if let securityScopedURL {
-            logger.log("🗄️  stopAccessingSecurityScopedResource \"\(securityScopedURL.path)\"")
-            securityScopedURL.stopAccessingSecurityScopedResource()
-        }
-    }
-
 }
 
 extension FilePresenter {
 
     func coordinateRead<T>(at url: URL? = nil, with options: NSFileCoordinator.ReadingOptions = [], using reader: (URL) throws -> T) throws -> T {
-        guard let innerPresenter, let url = url ?? self.url else { throw CocoaError(.fileNoSuchFile) }
+        guard let innerPresenter = innerPresenters.last, let url = url ?? self.url else { throw CocoaError(.fileNoSuchFile) }
 
         return try NSFileCoordinator(filePresenter: innerPresenter).coordinateRead(at: url, with: options, using: reader)
     }
 
     func coordinateWrite<T>(at url: URL? = nil, with options: NSFileCoordinator.WritingOptions = [], using writer: (URL) throws -> T) throws -> T {
-        guard let innerPresenter, let url = url ?? self.url else { throw CocoaError(.fileNoSuchFile) }
+        guard let innerPresenter = innerPresenters.last, let url = url ?? self.url else { throw CocoaError(.fileNoSuchFile) }
 
         // temporarily disable DispatchSource file removal events
         dispatchSourceCancellable?.cancel()
@@ -393,7 +445,7 @@ extension FilePresenter {
     }
 
     public func coordinateMove<T>(from url: URL? = nil, to: URL, with options2: NSFileCoordinator.WritingOptions = .forReplacing, using move: (URL, URL) throws -> T) throws -> T {
-        guard let innerPresenter, let url = url ?? self.url else { throw CocoaError(.fileNoSuchFile) }
+        guard let innerPresenter = innerPresenters.last, let url = url ?? self.url else { throw CocoaError(.fileNoSuchFile) }
 
         return try NSFileCoordinator(filePresenter: innerPresenter).coordinateMove(from: url, to: to, with: options2, using: move)
     }
@@ -441,33 +493,3 @@ extension NSFileCoordinator {
     }
 
 }
-
-#if DEBUG
-extension NSURL {
-
-    private static var stopAccessingSecurityScopedResourceCallback: ((URL) -> Void)?
-
-    private static let originalStopAccessingSecurityScopedResource = {
-        class_getInstanceMethod(NSURL.self, #selector(NSURL.stopAccessingSecurityScopedResource))!
-    }()
-    private static let swizzledStopAccessingSecurityScopedResource = {
-        class_getInstanceMethod(NSURL.self, #selector(NSURL.swizzled_stopAccessingSecurityScopedResource))!
-    }()
-    private static let swizzleStopAccessingSecurityScopedResourceOnce: Void = {
-        method_exchangeImplementations(originalStopAccessingSecurityScopedResource, swizzledStopAccessingSecurityScopedResource)
-    }()
-
-    static func swizzleStopAccessingSecurityScopedResource(with stopAccessingSecurityScopedResourceCallback: ((URL) -> Void)?) {
-        _=swizzleStopAccessingSecurityScopedResourceOnce
-        self.stopAccessingSecurityScopedResourceCallback = stopAccessingSecurityScopedResourceCallback
-    }
-
-    @objc private dynamic func swizzled_stopAccessingSecurityScopedResource() {
-        if let stopAccessingSecurityScopedResourceCallback = Self.stopAccessingSecurityScopedResourceCallback {
-            stopAccessingSecurityScopedResourceCallback(self as URL)
-        }
-        self.swizzled_stopAccessingSecurityScopedResource() // call original
-    }
-
-}
-#endif

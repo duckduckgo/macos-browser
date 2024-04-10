@@ -101,4 +101,16 @@ extension FileManager {
         return resolvedUrl.path.hasPrefix(trashUrl.path)
     }
 
+    /// Check if location pointed by the URL is writable by writing an empty data to it and removing the file if write succeeds
+    /// - Throws error if writing to the location fails
+    func checkWritability(_ url: URL) throws {
+        if fileExists(atPath: url.path), isWritableFile(atPath: url.path) {
+            return // we can write
+        } else {
+            // either we can‘t write or there‘s no file at the url – try writing throwing access error if no permission
+            try Data().write(to: url)
+            try removeItem(at: url)
+        }
+    }
+
 }

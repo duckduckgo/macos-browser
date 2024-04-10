@@ -152,9 +152,9 @@ final class DownloadListCoordinator {
         // locate destination file
         let destinationPresenterResult = Result<FilePresenter?, Error> {
             if let destinationFileBookmarkData = item.destinationFileBookmarkData {
-                try SandboxFilePresenter(fileBookmarkData: destinationFileBookmarkData, logger: log)
+                try BookmarkFilePresenter(fileBookmarkData: destinationFileBookmarkData, logger: log)
             } else if let destinationURL = item.destinationURL {
-                try SandboxFilePresenter(url: destinationURL, logger: log)
+                try BookmarkFilePresenter(url: destinationURL, logger: log)
             } else {
                 nil
             }
@@ -163,9 +163,9 @@ final class DownloadListCoordinator {
         // locate temp download file
         var tempFilePresenterResult = Result<FilePresenter?, Error> {
             if let tempFileBookmarkData = item.tempFileBookmarkData {
-                try SandboxFilePresenter(fileBookmarkData: tempFileBookmarkData, logger: log)
+                try BookmarkFilePresenter(fileBookmarkData: tempFileBookmarkData, logger: log)
             } else if let tempURL = item.tempURL {
-                try SandboxFilePresenter(url: tempURL, logger: log)
+                try BookmarkFilePresenter(url: tempURL, logger: log)
             } else {
                 nil
             }
@@ -223,10 +223,10 @@ final class DownloadListCoordinator {
                     case .downloading(destination: let destination, tempFile: let tempFile):
                         self.addItemIfNeededAndSubscribe(to: (destination, tempFile), for: item)
                     case .downloaded(let destination):
-                        let updatedItem = self.downloadTask(task, withId: item.identifier, completedWith: .finished)
+                        let updatedItem = self.downloadTask(task, withOriginalItem: item, completedWith: .finished)
                         self.subscribeToPresenters((destination: destination, tempFile: nil), of: updatedItem ?? item)
                     case .failed(destination: let destination, tempFile: let tempFile, resumeData: _, error: let error):
-                        let updatedItem = self.downloadTask(task, withId: item.identifier, completedWith: .failure(error))
+                        let updatedItem = self.downloadTask(task, withOriginalItem: item, completedWith: .failure(error))
                         self.subscribeToPresenters((destination: destination, tempFile: tempFile), of: updatedItem ?? item)
                     }
                 }
@@ -250,7 +250,7 @@ final class DownloadListCoordinator {
 
         Publishers.CombineLatest(
             presenters.destination?.urlPublisher ?? Just(nil).eraseToAnyPublisher(),
-            (presenters.destination as? SandboxFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
+            (presenters.destination as? BookmarkFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
         )
         .scan((oldURL: nil, newURL: nil, fileBookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, fileBookmarkData: $1.1) }
         .sink { [weak self] oldURL, newURL, fileBookmarkData in
@@ -279,7 +279,7 @@ final class DownloadListCoordinator {
 
         Publishers.CombineLatest(
             presenters.tempFile?.urlPublisher ?? Just(nil).eraseToAnyPublisher(),
-            (presenters.tempFile as? SandboxFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
+            (presenters.tempFile as? BookmarkFilePresenter)?.fileBookmarkDataPublisher ?? Just(nil).eraseToAnyPublisher()
         )
         .scan((oldURL: nil, newURL: nil, fileBookmarkData: nil)) { (oldURL: $0.newURL, newURL: $1.0, fileBookmarkData: $1.1) }
         .sink { [weak self] oldURL, newURL, fileBookmarkData in
@@ -341,17 +341,23 @@ final class DownloadListCoordinator {
     }
 
     @MainActor
-    private func downloadTask(_ task: WebKitDownloadTask, withId identifier: UUID, completedWith result: Subscribers.Completion<FileDownloadError>) -> DownloadListItem? {
-        os_log(.debug, log: log, "coordinator: task did finish \(identifier) \(task) with .\(result)")
+    private func downloadTask(_ task: WebKitDownloadTask, withOriginalItem initialItem: DownloadListItem, completedWith result: Subscribers.Completion<FileDownloadError>) -> DownloadListItem? {
+        os_log(.debug, log: log, "coordinator: task did finish \(initialItem.identifier) \(task) with .\(result)")
 
         self.downloadTaskCancellables[task] = nil
 
-        // item will be really updated (completed) only if it was added before in `addItemOrUpdateFilePresenter` (when state switched to .downloading)
-        // if it has failed without starting - it won‘t be added or updated here
-        return updateItem(withId: identifier) { item in
+        return updateItem(withId: initialItem.identifier) { item in
             if item?.isBurner ?? false {
                 item = nil
                 return
+            }
+
+            if item == nil,
+                case .failure(let failure) = result, !failure.isCancelled,
+                let fileName = task.selectedDestinationURL?.lastPathComponent {
+                // add instantly failed downloads to the list (not user-cancelled)
+                item = initialItem
+                item?.fileName = fileName
             }
 
             item?.progress = nil

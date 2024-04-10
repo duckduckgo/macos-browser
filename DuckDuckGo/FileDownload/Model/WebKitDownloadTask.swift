@@ -116,6 +116,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     @MainActor private var itemReplacementDirectory: URL?
     @MainActor private var itemReplacementDirectoryFSOCancellable: AnyCancellable?
     @MainActor private var tempFileUrlCancellable: AnyCancellable?
+    @MainActor private(set) var selectedDestinationURL: URL?
 
     var originalRequest: URLRequest? {
         download.originalRequest
@@ -226,6 +227,13 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         do {
             let fm = FileManager()
             guard let destinationURL else { throw URLError(.cancelled) }
+            // in case we‘re overwriting the URL – increment the access counter for the duration of the method
+            let accessStarted = destinationURL.startAccessingSecurityScopedResource()
+            defer {
+                if accessStarted {
+                    destinationURL.stopAccessingSecurityScopedResource()
+                }
+            }
             os_log(.debug, log: log, "download task callback: creating temp directory for \"\(destinationURL.path)\"")
 
             switch cleanupStyle {
@@ -333,15 +341,15 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     /// opens File Presenters for destination file and temp file
     private nonisolated func filePresenters(for destinationURL: URL, tempURL: URL) async throws -> (tempFile: FilePresenter, destinationFile: FilePresenter) {
         var destinationURL = destinationURL
-        let duckloadURL = destinationURL.deletingPathExtension().appendingPathExtension(Self.downloadExtension)
-        let fm = FileManager.default
+        var duckloadURL = destinationURL.deletingPathExtension().appendingPathExtension(Self.downloadExtension)
+        let fm = FileManager()
 
         // 🧙‍♂️ now we‘re doing do some magique here 🧙‍♂️
         // --------------------------------------
         os_log(.debug, log: log, "🧙‍♂️ magique.start: \"\(destinationURL.path)\" (\"\(duckloadURL.path)\") directory writable: \(fm.isWritableFile(atPath: destinationURL.deletingLastPathComponent().path))")
         // 1. create our final destination file (let‘s say myfile.zip) and setup a File Presenter for it
         //    doing this we preserve access to the file until it‘s actually downloaded
-        let destinationFilePresenter = try SandboxFilePresenter(url: destinationURL, consumeUnbalancedStartAccessingResource: true, logger: log) { url in
+        let destinationFilePresenter = try BookmarkFilePresenter(url: destinationURL, consumeUnbalancedStartAccessingResource: true, logger: log) { url in
             try fm.createFile(atPath: url.path, contents: nil) ? url : {
                 throw CocoaError(.fileWriteNoPermission, userInfo: [NSFilePathErrorKey: url.path])
             }()
@@ -353,30 +361,28 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
         // 2. mark the file as hidden until it‘s downloaded to not to confuse user
         //    and prevent from unintentional opening of the empty file
-        var resourceValues = URLResourceValues()
-        resourceValues.isHidden = true
-        try destinationURL.setResourceValues(resourceValues)
-        os_log(.debug, log: log, "🧙‍♂️ \"\(destinationURL.path)\" hidden, moving temp file from \"\(tempURL.path)\" to \"\(duckloadURL.path)\"")
+        try destinationURL.setFileHidden(true)
+        os_log(.debug, log: log, "🧙‍♂️ \"\(destinationURL.path)\" hidden")
 
-        // 3. then we move the temporary download file to the destination directory (myfile.zip.duckload)
+        // 3. then we move the temporary download file to the destination directory (myfile.duckload)
         //    this is doable in sandboxed builds by using “Related Items” i.e. using a file URL with an extra
         //    `.duckload` extension appended and “Primary Item” pointing to the sandbox-accessible destination URL
         //    the `.duckload` document type is registered in the Info.plist with `NSIsRelatedItemType` flag
         //
         // -  after the file is downloaded we‘ll replace the destination file with the `.duckload` file
         if fm.fileExists(atPath: duckloadURL.path) {
-            // remove the `.duckload` item if already exists
+            // `.duckload` already exists
             do {
-                try FilePresenter(url: duckloadURL, primaryItemURL: destinationURL).coordinateWrite(with: .forDeleting) { duckloadURL in
-                    try fm.removeItem(at: duckloadURL)
-                }
+                try chooseAlternativeDuckloadFileNameOrRemove(&duckloadURL, destinationURL: destinationURL)
             } catch {
                 // that‘s ok, we‘ll keep using the original temp file
-                os_log(.error, log: log, "❗️ could not remove \"\(duckloadURL.path)\" \(error)")
+                os_log(.error, log: log, "❗️ can‘t resolve duckload file exists: \"\(duckloadURL.path)\": \(error)")
+                duckloadURL = tempURL
             }
         }
         // now move the temp file to `.duckload` instantiating a File Presenter with it
-        let tempFilePresenter = try SandboxFilePresenter(url: duckloadURL, primaryItemURL: destinationURL, logger: log) { [log] duckloadURL in
+        let tempFilePresenter = try BookmarkFilePresenter(url: duckloadURL, primaryItemURL: destinationURL, logger: log) { [log] duckloadURL in
+            guard duckloadURL != tempURL else { return tempURL }
             do {
                 try fm.moveItem(at: tempURL, to: duckloadURL)
             } catch {
@@ -390,6 +396,34 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         os_log(.debug, log: log, "🧙‍♂️ \"\(duckloadURL.path)\" (\"\(tempFilePresenter.url?.path ?? "<nil>")\") ready")
 
         return (tempFile: tempFilePresenter, destinationFile: destinationFilePresenter)
+    }
+
+    private func chooseAlternativeDuckloadFileNameOrRemove(_ duckloadURL: inout URL, destinationURL: URL) throws {
+        let fm = FileManager()
+        // are we using the `.duckload` file for some other download (with different extension)?
+        if NSFileCoordinator.filePresenters.first(where: { $0.presentedItemURL?.resolvingSymlinksInPath() == duckloadURL.resolvingSymlinksInPath() }) != nil {
+            // if the downloads directory is writable without extra permission – try choosing another `.duckload` filename
+            if fm.isWritableFile(atPath: duckloadURL.deletingLastPathComponent().path) {
+                // append `.duckload` to the destination file name with extension
+                let destinationPathExtension = destinationURL.pathExtension
+                let pathExtension = destinationPathExtension.isEmpty ? Self.downloadExtension : destinationPathExtension + "." + Self.downloadExtension
+                duckloadURL = duckloadURL.deletingPathExtension().appendingPathExtension(pathExtension)
+
+                // choose non-existent path
+                duckloadURL = try fm.withNonExistentUrl(for: duckloadURL, incrementingIndexIfExistsUpTo: 1000, pathExtension: pathExtension) { url in
+                    try Data().write(to: url)
+                    return url
+                }
+            } else {
+                // continue keeping the temp file in the temp dir
+                throw CocoaError(.fileWriteFileExists)
+            }
+        }
+
+        os_log(.debug, log: log, "removing temp file \"\(duckloadURL.path)\"")
+        try FilePresenter(url: duckloadURL, primaryItemURL: destinationURL).coordinateWrite(with: .forDeleting) { duckloadURL in
+            try fm.removeItem(at: duckloadURL)
+        }
     }
 
     private nonisolated func reuseFilePresenters(tempFile: FilePresenter, destination: FilePresenter, tempURL: URL) async throws -> (tempFile: FilePresenter, destinationFile: FilePresenter) {
@@ -587,6 +621,7 @@ extension WebKitDownloadTask: WKDownloadDelegate {
             return nil
         }
 
+        self.selectedDestinationURL = destinationURL
         return await prepareChosenDestinationURL(destinationURL, fileType: suggestedFileType, cleanupStyle: cleanupStyle)
     }
 
@@ -697,20 +732,7 @@ extension WebKitDownloadTask {
     override var description: String {
         guard Thread.isMainThread else {
 #if DEBUG
-            os_log("""
-
-
-            ------------------------------------------------------------------------------------------------------
-                BREAK:
-            ------------------------------------------------------------------------------------------------------
-
-            ❗️accessing WebKitDownloadTask.description from non-main thread
-
-                Hit Continue (^⌘Y) to continue program execution
-            ------------------------------------------------------------------------------------------------------
-
-            """, type: .fault)
-            raise(SIGINT)
+            breakByRaisingSigInt("❗️accessing WebKitDownloadTask.description from non-main thread")
 #endif
             return ""
         }
