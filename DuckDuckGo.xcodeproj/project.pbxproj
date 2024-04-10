@@ -3487,13 +3487,6 @@
 			remoteGlobalIDString = B6EC37E729B5DA2A001ACE79;
 			remoteInfo = "tests-server";
 		};
-		EE02D41D2BB460B500DBE6B3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B6EC37E729B5DA2A001ACE79;
-			remoteInfo = "tests-server";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -9252,7 +9245,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				EE02D41E2BB460B500DBE6B3 /* PBXTargetDependency */,
 				B6F997BD2B8F35EF00476735 /* PBXTargetDependency */,
 			);
 			name = "UI Tests";
@@ -13580,11 +13572,6 @@
 		B6F997C12B8F35F800476735 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = B6F997C02B8F35F800476735 /* SwiftLintPlugin */;
-		};
-		EE02D41E2BB460B500DBE6B3 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B6EC37E729B5DA2A001ACE79 /* tests-server */;
-			targetProxy = EE02D41D2BB460B500DBE6B3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
