@@ -73,6 +73,13 @@ public final class PixelKit {
         public static let client = "X-DuckDuckGo-Client"
     }
 
+    public enum Source: String {
+        case macStore = "browser-appstore"
+        case macDMG = "browser-dmg"
+        case iOS = ""
+        case iPadOS = ""
+    }
+
     /// A closure typealias to request sending pixels through the network.
     public typealias FireRequest = (
         _ pixelName: String,
