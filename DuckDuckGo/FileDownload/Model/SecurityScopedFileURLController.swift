@@ -152,6 +152,9 @@ extension NSURL {
         func hash(into hasher: inout Hasher) {
             hasher.combine(ObjectIdentifier(url))
         }
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.url === rhs.url
+        }
     }
     static var activeSecurityScopedUrlUsages: Set<SecurityScopedUrlUsage> = []
 #endif
