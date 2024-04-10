@@ -46,7 +46,7 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
         )
         databaseMock.childBrokers = [childBroker]
 
-        sut.updateChildrenBrokerForParentBroker(.mock, profileQueryId: profileQueryId)
+        XCTAssertNoThrow(try sut.updateChildrenBrokerForParentBroker(.mock, profileQueryId: profileQueryId))
 
         XCTAssertTrue(databaseMock.wasUpdatedPreferredRunDateForScanCalled)
         XCTAssertEqual(databaseMock.lastParentBrokerWhereChildSitesWhereFetched, "Test broker")
@@ -57,7 +57,7 @@ final class OperationPreferredDateUpdaterTests: XCTestCase {
     func testWhenParentBrokerHasNoChildsites_thenNoCallsToTheDatabaseAreDone() {
         let sut = OperationPreferredDateUpdaterUseCase(database: databaseMock)
 
-        sut.updateChildrenBrokerForParentBroker(.mock, profileQueryId: 1)
+        XCTAssertNoThrow(try sut.updateChildrenBrokerForParentBroker(.mock, profileQueryId: 1))
 
         XCTAssertFalse(databaseMock.wasDatabaseCalled)
     }

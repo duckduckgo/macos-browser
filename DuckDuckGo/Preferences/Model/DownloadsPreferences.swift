@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 
 protocol DownloadsPreferencesPersistor {
@@ -101,11 +102,11 @@ final class DownloadsPreferences: ObservableObject {
         }
     }
 
-    private var _selectedDownloadLocation: URL?
-    private var isUsingSecurityScopedResource = false
+    private var selectedDownloadLocationController: SecurityScopedFileURLController?
+
     var selectedDownloadLocation: URL? {
         get {
-            if let selectedDownloadLocation = _selectedDownloadLocation {
+            if let selectedDownloadLocation = selectedDownloadLocationController?.url {
                 return selectedDownloadLocation
             }
 #if APPSTORE
@@ -113,38 +114,38 @@ final class DownloadsPreferences: ObservableObject {
             if let bookmarkData = persistor.selectedDownloadLocation.flatMap({ Data(base64Encoded: $0) }),
                let url = try? URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale) {
                 if isStale {
-                    setSelectedDownloadLocation(url) // update bookmark data
+                    setSelectedDownloadLocation(url) // update bookmark data and selectedDownloadLocationController
+                } else {
+                    selectedDownloadLocationController = SecurityScopedFileURLController(url: url, logger: OSLog.downloads)
                 }
-                if !isUsingSecurityScopedResource {
-                    isUsingSecurityScopedResource = url.startAccessingSecurityScopedResource()
-                }
-
-                _selectedDownloadLocation = url
                 return url
             }
 #endif
             guard let url = persistor.selectedDownloadLocation.flatMap(URL.init(string:)),
                   url.isFileURL else { return nil }
-            return url
+            return url.resolvingSymlinksInPath()
         }
         set {
             defer {
                 objectWillChange.send()
             }
 
-            if isUsingSecurityScopedResource,
-               let newValue, _selectedDownloadLocation /* oldValue */ != newValue {
-                selectedDownloadLocation?.stopAccessingSecurityScopedResource()
-            }
-            // the setter is called for already selected directory,
-            // so consume the unbalanced startAccessingSecurityScopedResource
-            isUsingSecurityScopedResource = true
-
             setSelectedDownloadLocation(validatedDownloadLocation(newValue))
         }
     }
     private func setSelectedDownloadLocation(_ url: URL?) {
         _selectedDownloadLocation = url
+        let locationString: String?
+#if APPSTORE
+        locationString = (try? url?.bookmarkData(options: .withSecurityScope).base64EncodedString()) ?? url?.absoluteString
+#else
+        locationString = url?.absoluteString
+#endif
+        persistor.selectedDownloadLocation = locationString
+    }
+
+    private func setSelectedDownloadLocation(_ url: URL?) {
+        selectedDownloadLocationController = url.map { SecurityScopedFileURLController(url: $0, logger: OSLog.downloads) }
         let locationString: String?
 #if APPSTORE
         locationString = (try? url?.bookmarkData(options: .withSecurityScope).base64EncodedString()) ?? url?.absoluteString

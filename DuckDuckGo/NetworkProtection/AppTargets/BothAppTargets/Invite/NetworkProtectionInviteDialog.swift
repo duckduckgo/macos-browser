@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import SwiftUI
 import NetworkProtection
 import SwiftUIExtensions
@@ -36,5 +34,3 @@ struct NetworkProtectionInviteDialog: View {
         }
     }
 }
-
-#endif

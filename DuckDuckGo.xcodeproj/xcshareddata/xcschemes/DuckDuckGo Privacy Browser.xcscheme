@@ -204,6 +204,16 @@
                ReferencedContainer = "container:LocalPackages/DataBrokerProtection">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "NetworkProtectionTests"
+               BuildableName = "NetworkProtectionTests"
+               BlueprintName = "NetworkProtectionTests"
+               ReferencedContainer = "container:../BrowserServicesKit">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

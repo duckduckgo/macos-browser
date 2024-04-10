@@ -174,7 +174,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         self.contentScopeProperties = contentScopeProperties
 
         let fileResources = FileResources()
-        self.brokers = fileResources.fetchBrokerFromResourceFiles() ?? [DataBroker]()
+        self.brokers = (try? fileResources.fetchBrokerFromResourceFiles()) ?? [DataBroker]()
     }
 
     func runAllBrokers() {

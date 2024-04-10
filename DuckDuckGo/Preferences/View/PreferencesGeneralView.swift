@@ -39,11 +39,13 @@ extension Preferences {
                     PreferencePaneSubSection {
                         Picker(selection: $startupModel.restorePreviousSession, content: {
                             Text(UserText.showHomePage).tag(false)
-                                .padding(.bottom, 4)
+                                .padding(.bottom, 4).accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.openANewWindow")
                             Text(UserText.reopenAllWindowsFromLastSession).tag(true)
+                                .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.reopenAllWindowsFromLastSession")
                         }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                            .pickerStyle(.radioGroup)
+                            .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                            .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
                     }
                 }
 

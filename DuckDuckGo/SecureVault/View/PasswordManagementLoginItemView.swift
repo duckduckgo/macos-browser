@@ -360,25 +360,9 @@ private struct PasswordView: View {
 
                 HStack {
 
-                    if isPasswordVisible {
+                    SecureTextField(textValue: $model.password, isVisible: isPasswordVisible)
 
-                        TextField("", text: $model.password)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                    } else {
-
-                        SecureField("", text: $model.password)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                    }
-
-                    Button {
-                        isPasswordVisible = !isPasswordVisible
-                    } label: {
-                        Image(.secureEyeToggle)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
+                    SecureTextFieldButton(isVisible: $isPasswordVisible, toolTipHideText: UserText.hidePasswordTooltip, toolTipShowText: UserText.showPasswordTooltip)
                     .padding(.trailing, 10)
 
                 }
@@ -388,29 +372,16 @@ private struct PasswordView: View {
 
                 HStack(alignment: .center, spacing: 6) {
 
-                    if isPasswordVisible {
-                        Text(model.password)
-                    } else {
-                        Text(model.password.isEmpty ? "" : "••••••••••••")
-                    }
+                    HiddenText(isVisible: isPasswordVisible, text: model.password, hiddenTextLength: 12)
 
                     if (isHovering || isPasswordVisible) && model.password != "" {
-                        Button {
-                            isPasswordVisible = !isPasswordVisible
-                        } label: {
-                            Image(.secureEyeToggle)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
+                        SecureTextFieldButton(isVisible: $isPasswordVisible, toolTipHideText: UserText.hidePasswordTooltip, toolTipShowText: UserText.showPasswordTooltip)
                     }
 
                     if isHovering && model.password != "" {
-                        Button {
+                        CopyButton {
                             model.copy(model.password)
-                        } label: {
-                            Image(.copy)
                         }
-                        .buttonStyle(PlainButtonStyle())
                         .tooltip(UserText.copyPasswordTooltip)
                     }
 

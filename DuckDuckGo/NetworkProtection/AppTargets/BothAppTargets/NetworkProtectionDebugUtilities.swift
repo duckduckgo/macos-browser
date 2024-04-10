@@ -18,8 +18,6 @@
 
 import Common
 import Foundation
-
-#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
 import NetworkExtension
@@ -87,5 +85,3 @@ final class NetworkProtectionDebugUtilities {
         try await ipcClient.debugCommand(.expireRegistrationKey)
     }
 }
-
-#endif

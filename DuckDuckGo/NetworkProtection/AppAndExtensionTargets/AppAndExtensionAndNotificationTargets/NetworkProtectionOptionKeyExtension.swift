@@ -16,12 +16,8 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import NetworkProtection
 
 extension NetworkProtectionOptionKey {
     public static let defaultPixelHeaders = "defaultPixelHeaders"
 }
-
-#endif
