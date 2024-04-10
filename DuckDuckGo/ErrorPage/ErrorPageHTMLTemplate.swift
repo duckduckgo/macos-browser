@@ -65,11 +65,11 @@ struct SSLErrorPageHTMLTemplate {
             return ""
         }
         let eTldPlus1 = tld.eTLDplus1(domain) ?? domain
-        let loadTimeData = createJSONString(header: sslError.header, body: sslError.body(for: domain), advancedButton: sslError.advancedButton, leaveSiteButton: sslError.leaveSiteButton, advancedInfoHeader: sslError.advancedInfoTitle, specificMessage: sslError.specificMessage(for: domain, eTldPlus1: eTldPlus1), advancedInfoBody: sslError.advancedInfoBody, visitSiteButton: sslError.visitSiteButton, errorCode: String(errorCode))
+        let loadTimeData = createJSONString(header: sslError.header, body: sslError.body(for: domain), advancedButton: sslError.advancedButton, leaveSiteButton: sslError.leaveSiteButton, advancedInfoHeader: sslError.advancedInfoTitle, specificMessage: sslError.specificMessage(for: domain, eTldPlus1: eTldPlus1), advancedInfoBody: sslError.advancedInfoBody, visitSiteButton: sslError.visitSiteButton)
         return html.replacingOccurrences(of: "$LOAD_TIME_DATA$", with: loadTimeData, options: .literal)
     }
 
-    private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, specificMessage: String, advancedInfoBody: String, visitSiteButton: String, errorCode: String) -> String {
+    private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, specificMessage: String, advancedInfoBody: String, visitSiteButton: String) -> String {
         let innerDictionary: [String: Any] = [
             "header": header,
             "body": body,
@@ -78,8 +78,7 @@ struct SSLErrorPageHTMLTemplate {
             "advancedInfoHeader": advancedInfoHeader,
             "specificMessage": specificMessage,
             "advancedInfoBody": advancedInfoBody,
-            "visitSiteButton": visitSiteButton,
-            "errorCode": errorCode
+            "visitSiteButton": visitSiteButton
         ]
 
         let outerDictionary: [String: Any] = [
