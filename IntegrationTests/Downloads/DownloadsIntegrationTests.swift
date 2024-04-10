@@ -161,7 +161,6 @@ class DownloadsIntegrationTests: XCTestCase {
         preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
         let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
 
-        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
         let tab = tabViewModel.tab
         let loadingResult = await tab.setUrl(tempFileURL, source: .link)?.result
 
@@ -178,7 +177,6 @@ class DownloadsIntegrationTests: XCTestCase {
         let dirURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: dirURL, withIntermediateDirectories: true)
 
-        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
         let tab = tabViewModel.tab
         let loadingResult = await tab.setUrl(dirURL, source: .link)?.result
 
