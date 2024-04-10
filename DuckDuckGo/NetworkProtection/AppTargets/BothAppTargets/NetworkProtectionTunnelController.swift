@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Combine
 import SwiftUI
@@ -599,15 +597,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             return
         }
 
-        await stop(tunnelManager: manager, disableOnDemand: true)
+        await stop(tunnelManager: manager)
     }
 
     @MainActor
-    private func stop(tunnelManager: NETunnelProviderManager, disableOnDemand: Bool) async {
-        if disableOnDemand {
-            // disable reconnect on demand if requested to stop
-            try? await self.disableOnDemand(tunnelManager: tunnelManager)
-        }
+    private func stop(tunnelManager: NETunnelProviderManager) async {
+        try? await self.disableOnDemand(tunnelManager: tunnelManager)
 
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
@@ -625,8 +620,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             return
         }
 
-        await stop(tunnelManager: manager, disableOnDemand: false)
+        await stop(tunnelManager: manager)
         await start()
+
+        // When restarting the tunnel we enable on-demand optimistically
+        try? await enableOnDemand(tunnelManager: manager)
     }
 
     // MARK: - On Demand & Kill Switch
@@ -764,5 +762,3 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         "ddg:\(token)"
     }
 }
-
-#endif

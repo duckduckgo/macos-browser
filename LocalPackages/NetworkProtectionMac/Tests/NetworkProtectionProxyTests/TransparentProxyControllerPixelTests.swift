@@ -55,13 +55,20 @@ final class TransparentProxyControllerPixelTests: XCTestCase {
     static let startInitiatedFullPixelName = "m_mac_vpn_proxy_controller_start_initiated"
     static let startSuccessFullPixelName = "m_mac_vpn_proxy_controller_start_success"
 
-    enum TestError: PixelKitEventErrorDetails {
+    enum TestError: CustomNSError {
         case testError
 
         static let underlyingError = NSError(domain: "test", code: 1)
 
-        var underlyingError: Error? {
-            Self.underlyingError
+        public var errorUserInfo: [String: Any] {
+            switch self {
+            case .testError(let underlyingError):
+                return [
+                    NSUnderlyingErrorKey: underlyingError as NSError
+                ]
+            default:
+                return [:]
+            }
         }
     }
 

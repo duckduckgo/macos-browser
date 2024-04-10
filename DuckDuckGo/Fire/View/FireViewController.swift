@@ -17,7 +17,7 @@
 //
 
 import Cocoa
-@preconcurrency import Lottie
+import Lottie
 import Combine
 
 @MainActor

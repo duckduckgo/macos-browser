@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import BrowserServicesKit
 import Combine
 import Common
@@ -43,6 +41,8 @@ protocol NetworkProtectionFeatureVisibility {
     func disableForWaitlistUsers()
     @discardableResult
     func disableIfUserHasNoAccess() async -> Bool
+
+    var onboardStatusPublisher: AnyPublisher<OnboardingStatus, Never> { get }
 }
 
 struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
@@ -261,5 +261,3 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         isPreSubscriptionUser() && subscriptionFeatureAvailability.isFeatureAvailable
     }
 }
-
-#endif

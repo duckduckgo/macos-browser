@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import SwiftUI
 
@@ -44,5 +42,3 @@ final class VPNLocationsHostingViewController: NSHostingController<VPNLocationVi
         fatalError("init(coder:) has not been implemented")
     }
 }
-
-#endif
