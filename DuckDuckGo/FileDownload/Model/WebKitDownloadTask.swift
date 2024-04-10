@@ -380,18 +380,23 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
                 duckloadURL = tempURL
             }
         }
-        // now move the temp file to `.duckload` instantiating a File Presenter with it
-        let tempFilePresenter = try BookmarkFilePresenter(url: duckloadURL, primaryItemURL: destinationURL, logger: log) { [log] duckloadURL in
-            guard duckloadURL != tempURL else { return tempURL }
-            do {
-                try fm.moveItem(at: tempURL, to: duckloadURL)
-            } catch {
-                // fallback: move failed, keep the temp file in the original location
-                os_log(.error, log: log, "🙁 fallback with \(error), will use \(tempURL.path)")
-                Pixel.fire(.debug(event: .fileAccessRelatedItemFailed, error: error))
-                return tempURL
+
+        let tempFilePresenter = if duckloadURL == tempURL {
+            // we won‘t use a `.duckload` file for this download, the file will be left in the temp location instead
+            try BookmarkFilePresenter(url: duckloadURL, logger: log)
+        } else {
+            // now move the temp file to `.duckload` instantiating a File Presenter with it
+            try BookmarkFilePresenter(url: duckloadURL, primaryItemURL: destinationURL, logger: log) { [log] duckloadURL in
+                do {
+                    try fm.moveItem(at: tempURL, to: duckloadURL)
+                    return duckloadURL
+                } catch {
+                    // fallback: move failed, keep the temp file in the original location
+                    os_log(.error, log: log, "🙁 fallback with \(error), will use \(tempURL.path)")
+                    Pixel.fire(.debug(event: .fileAccessRelatedItemFailed, error: error))
+                    return tempURL
+                }
             }
-            return duckloadURL
         }
         os_log(.debug, log: log, "🧙‍♂️ \"\(duckloadURL.path)\" (\"\(tempFilePresenter.url?.path ?? "<nil>")\") ready")
 
