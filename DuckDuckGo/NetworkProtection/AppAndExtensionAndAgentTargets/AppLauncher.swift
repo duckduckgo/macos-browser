@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if (NETWORK_PROTECTION || NETP_SYSTEM_EXTENSION)
-
 import AppKit
 import Foundation
 import Common
@@ -156,5 +154,3 @@ extension URL {
     }
 
 }
-
-#endif

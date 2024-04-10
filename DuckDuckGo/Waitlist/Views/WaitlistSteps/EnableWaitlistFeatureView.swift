@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION || DBP
-
 import SwiftUI
 import SwiftUIExtensions
 
@@ -62,10 +60,6 @@ struct EnableWaitlistFeatureView: View {
     }
 }
 
-#endif
-
-#if NETWORK_PROTECTION
-
 struct EnableNetworkProtectionViewData: EnableWaitlistFeatureViewData {
     var headerImageName: String = "Network-Protection-256"
     var title: String = UserText.networkProtectionWaitlistEnableTitle
@@ -73,5 +67,3 @@ struct EnableNetworkProtectionViewData: EnableWaitlistFeatureViewData {
     var availabilityDisclaimer: String = UserText.networkProtectionWaitlistAvailabilityDisclaimer
     var buttonConfirmLabel: String = UserText.networkProtectionWaitlistButtonGotIt
 }
-
-#endif

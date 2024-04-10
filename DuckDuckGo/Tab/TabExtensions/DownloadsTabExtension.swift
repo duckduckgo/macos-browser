@@ -183,7 +183,7 @@ extension DownloadsTabExtension: NavigationResponder {
 
         guard navigationResponse.httpResponse?.isSuccessful != false, // download non-http responses
               !navigationResponse.url.isDirectory, // don‘t download a local directory
-              !responseaCanShowMIMEType(navigationResponse) || navigationResponse.shouldDownload
+              !responseCanShowMIMEType(navigationResponse) || navigationResponse.shouldDownload
                 // if user pressed Opt+Enter in the Address bar to download from a URL
                 || (navigationResponse.mainFrameNavigation?.redirectHistory.last ?? navigationResponse.mainFrameNavigation?.navigationAction)?.navigationType == .custom(.userRequestedPageDownload)
         else {
@@ -200,7 +200,7 @@ extension DownloadsTabExtension: NavigationResponder {
         return .download
     }
 
-    private func responseaCanShowMIMEType(_ response: NavigationResponse) -> Bool {
+    private func responseCanShowMIMEType(_ response: NavigationResponse) -> Bool {
         if response.canShowMIMEType {
             return true
         } else if response.url.isFileURL {

@@ -175,6 +175,7 @@ final class EncryptedHistoryStore: HistoryStoring {
                     fetchedObjects = try self.context.fetch(fetchRequest)
                 } catch {
                     Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                    Pixel.fire(.debug(event: .historySaveFailedDaily, error: error), limitTo: .dailyFirst)
                     promise(.failure(error))
                     return
                 }
@@ -203,6 +204,7 @@ final class EncryptedHistoryStore: HistoryStoring {
                 switch insertionResult {
                 case .failure(let error):
                     Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                    Pixel.fire(.debug(event: .historySaveFailedDaily, error: error), limitTo: .dailyFirst)
                     context.reset()
                     promise(.failure(error))
                 case .success(let visitMOs):
@@ -210,6 +212,7 @@ final class EncryptedHistoryStore: HistoryStoring {
                         try self.context.save()
                     } catch {
                         Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                        Pixel.fire(.debug(event: .historySaveFailedDaily, error: error), limitTo: .dailyFirst)
                         context.reset()
                         promise(.failure(HistoryStoreError.savingFailed))
                         return

@@ -48,7 +48,7 @@ public final class NetworkProtectionPopover: NSPopover {
     private let debugInformationPublisher = CurrentValueSubject<Bool, Never>(false)
     private let statusReporter: NetworkProtectionStatusReporter
     private let model: NetworkProtectionStatusView.Model
-    private var appLifecycleCancellable: AnyCancellable?
+    private var appLifecycleCancellables = Set<AnyCancellable>()
 
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
@@ -101,11 +101,22 @@ public final class NetworkProtectionPopover: NSPopover {
     // MARK: - Status Refresh
 
     private func subscribeToAppLifecycleEvents() {
-        appLifecycleCancellable = NotificationCenter
+        NotificationCenter
             .default
             .publisher(for: NSApplication.didBecomeActiveNotification)
-            .sink { [weak self] _ in
-                self?.model.refreshLoginItemStatus()
+            .sink { [weak self] _ in self?.model.refreshLoginItemStatus() }
+            .store(in: &appLifecycleCancellables)
+
+        NotificationCenter
+            .default
+            .publisher(for: NSApplication.didResignActiveNotification)
+            .sink { [weak self] _ in self?.closePopoverIfOnboarded() }
+            .store(in: &appLifecycleCancellables)
+    }
+
+    private func closePopoverIfOnboarded() {
+        if self.model.onboardingStatus == .completed {
+            self.close()
         }
     }
 

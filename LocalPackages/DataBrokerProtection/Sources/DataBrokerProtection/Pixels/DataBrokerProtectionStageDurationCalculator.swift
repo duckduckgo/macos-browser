@@ -20,6 +20,7 @@ import Foundation
 import Common
 import BrowserServicesKit
 import PixelKit
+import SecureStorage
 
 enum Stage: String {
     case start
@@ -184,6 +185,8 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
             default:
                 errorCategory = .validationError
             }
+        } else if let databaseError = error as? SecureStorageError {
+            errorCategory = .databaseError(domain: SecureStorageError.errorDomain, code: databaseError.errorCode)
         } else {
             if let nsError = error as NSError? {
                 if nsError.domain == NSURLErrorDomain {

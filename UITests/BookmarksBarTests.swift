@@ -55,7 +55,6 @@ class BookmarksBarTests: XCTestCase {
         resetBookmarksAndAddOneBookmark()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
         openSettingsAndSetShowBookmarksBarToUnchecked()
-        settingsWindow = app.windows.containing(.checkBox, identifier: "Preferences.AppearanceView.showBookmarksBarPreferenceToggle").firstMatch
         openSecondWindowAndVisitSite()
         siteWindow = app.windows.containing(.webView, identifier: pageTitle).firstMatch
     }

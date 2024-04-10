@@ -20,11 +20,8 @@ import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
-
-#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
-#endif
 
 extension HomePage.Models {
 
@@ -221,10 +218,8 @@ extension HomePage.Models {
             case .surveyDay14:
                 shouldShowSurveyDay14 = false
             case .networkProtectionRemoteMessage(let message):
-#if NETWORK_PROTECTION
                 homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: message)
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
-#endif
             case .dataBrokerProtectionRemoteMessage(let message):
 #if DBP
                 homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.dismiss(message: message)
@@ -257,7 +252,6 @@ extension HomePage.Models {
             }
 #endif
 
-#if NETWORK_PROTECTION
             for message in homePageRemoteMessaging.networkProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.networkProtectionRemoteMessage(message))
                 DailyPixel.fire(
@@ -265,7 +259,6 @@ extension HomePage.Models {
                     frequency: .dailyOnly
                 )
             }
-#endif
 
             if waitlistBetaThankYouPresenter.canShowVPNCard {
                 features.append(.vpnThankYou)
@@ -445,7 +438,6 @@ extension HomePage.Models {
         }
 
         @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
-#if NETWORK_PROTECTION
             guard let actionType = remoteMessage.action.actionType else {
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
                 homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
@@ -467,7 +459,6 @@ extension HomePage.Models {
                     refreshFeaturesMatrix()
                 }
             }
-#endif
         }
 
         @MainActor private func handle(remoteMessage: DataBrokerProtectionRemoteMessage) {
@@ -649,32 +640,23 @@ extension HomePage.Models {
 struct HomePageRemoteMessaging {
 
     static func defaultMessaging() -> HomePageRemoteMessaging {
-#if NETWORK_PROTECTION && DBP
+#if DBP
         return HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: .netP,
             dataBrokerProtectionRemoteMessaging: DefaultDataBrokerProtectionRemoteMessaging(),
             dataBrokerProtectionUserDefaults: .dbp
         )
-#elseif NETWORK_PROTECTION
+#else
         return HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: .netP
         )
-#elseif DBP
-        return HomePageRemoteMessaging(
-            dataBrokerProtectionRemoteMessaging: DefaultDataBrokerProtectionRemoteMessaging(),
-            dataBrokerProtectionUserDefaults: .dbp
-        )
-#else
-        return HomePageRemoteMessaging()
 #endif
     }
 
-#if NETWORK_PROTECTION
     let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
     let networkProtectionUserDefaults: UserDefaults
-#endif
 
 #if DBP
     let dataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging
