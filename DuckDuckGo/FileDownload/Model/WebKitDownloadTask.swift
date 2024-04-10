@@ -116,6 +116,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
     @MainActor private var itemReplacementDirectory: URL?
     @MainActor private var itemReplacementDirectoryFSOCancellable: AnyCancellable?
     @MainActor private var tempFileUrlCancellable: AnyCancellable?
+    @MainActor private(set) var selectedDestinationURL: URL?
 
     var originalRequest: URLRequest? {
         download.originalRequest
@@ -372,9 +373,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         if fm.fileExists(atPath: duckloadURL.path) {
             // `.duckload` already exists
             do {
-                try FilePresenter(url: duckloadURL, primaryItemURL: destinationURL).coordinateWrite(with: .forDeleting) { duckloadURL in
-                    try fm.removeItem(at: duckloadURL)
-                }
+                try chooseAlternativeDuckloadFileNameOrRemove(&duckloadURL, destinationURL: destinationURL)
             } catch {
                 // that‘s ok, we‘ll keep using the original temp file
                 os_log(.error, log: log, "❗️ can‘t resolve duckload file exists: \"\(duckloadURL.path)\": \(error)")
@@ -397,6 +396,34 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
         os_log(.debug, log: log, "🧙‍♂️ \"\(duckloadURL.path)\" (\"\(tempFilePresenter.url?.path ?? "<nil>")\") ready")
 
         return (tempFile: tempFilePresenter, destinationFile: destinationFilePresenter)
+    }
+
+    private func chooseAlternativeDuckloadFileNameOrRemove(_ duckloadURL: inout URL, destinationURL: URL) throws {
+        let fm = FileManager()
+        // are we using the `.duckload` file for some other download (with different extension)?
+        if NSFileCoordinator.filePresenters.first(where: { $0.presentedItemURL?.resolvingSymlinksInPath() == duckloadURL.resolvingSymlinksInPath() }) != nil {
+            // if the downloads directory is writable without extra permission – try choosing another `.duckload` filename
+            if fm.isWritableFile(atPath: duckloadURL.deletingLastPathComponent().path) {
+                // append `.duckload` to the destination file name with extension
+                let destinationPathExtension = destinationURL.pathExtension
+                let pathExtension = destinationPathExtension.isEmpty ? Self.downloadExtension : destinationPathExtension + "." + Self.downloadExtension
+                duckloadURL = duckloadURL.deletingPathExtension().appendingPathExtension(pathExtension)
+
+                // choose non-existent path
+                duckloadURL = try fm.withNonExistentUrl(for: duckloadURL, incrementingIndexIfExistsUpTo: 1000, pathExtension: pathExtension) { url in
+                    try Data().write(to: url)
+                    return url
+                }
+            } else {
+                // continue keeping the temp file in the temp dir
+                throw CocoaError(.fileWriteFileExists)
+            }
+        }
+
+        os_log(.debug, log: log, "removing temp file \"\(duckloadURL.path)\"")
+        try FilePresenter(url: duckloadURL, primaryItemURL: destinationURL).coordinateWrite(with: .forDeleting) { duckloadURL in
+            try fm.removeItem(at: duckloadURL)
+        }
     }
 
     private nonisolated func reuseFilePresenters(tempFile: FilePresenter, destination: FilePresenter, tempURL: URL) async throws -> (tempFile: FilePresenter, destinationFile: FilePresenter) {
@@ -594,6 +621,7 @@ extension WebKitDownloadTask: WKDownloadDelegate {
             return nil
         }
 
+        self.selectedDestinationURL = destinationURL
         return await prepareChosenDestinationURL(destinationURL, fileType: suggestedFileType, cleanupStyle: cleanupStyle)
     }
 
