@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "39d74829150a9ecffea2f503c01851e54eda8ad1",
-        "version" : "133.0.1"
+        "branch" : "shane/duckplayer-batch-bugs",
+        "revision" : "7b2faa38042663d5dca5bc4d5e4cae89a17fff01"
       }
     },
     {
@@ -41,8 +41,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "62d5dc3d02f6a8347dc5f0b52162a0107d38b74c",
-        "version" : "5.8.0"
+        "revision" : "0e47a888688a2645a735db4ddb59181f3c8b436a"
       }
     },
     {
@@ -138,7 +137,7 @@
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax",
+      "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
         "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
         "version" : "509.1.1"
@@ -165,7 +164,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "a6b7ba151d9dc6684484f3785293875ec01cc1ff",
         "version" : "1.2.2"
