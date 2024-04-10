@@ -62,6 +62,12 @@ final class IPCClientMock: NetworkProtectionIPCClient {
         var recentValue: String?
     }
     var ipcControllerErrorMessageObserver: any NetworkProtection.ControllerErrorMesssageObserver = ControllerErrorMesssageObserverMock()
+    
+    final class DataVolumeObserverMock: NetworkProtection.DataVolumeObserver {
+        var publisher: AnyPublisher<DataVolume, Never> = PassthroughSubject().eraseToAnyPublisher()
+        var recentValue: DataVolume = .init()
+    }
+    var ipcDataVolumeObserver: any NetworkProtection.DataVolumeObserver = DataVolumeObserverMock()
 
     func start() {}
 
