@@ -97,8 +97,10 @@ jobs:
 
     - name: Build test runner 
       run: |
+        ls -latr LocalPackages
         rm -rf LocalPackages
         rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved 
+        sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
         set -o pipefail && xcodebuild build-for-testing \
           -scheme "UI Tests Legacy" \
           -derivedDataPath DerivedData \
