@@ -3338,6 +3338,7 @@
 		EEC589DA2A4F1CE400BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEC589DB2A4F1CE700BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEC589DC2A4F1CE800BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
+		EEC7BE2E2BC6C09500F86835 /* AddressBarKeyboardShortcutsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC7BE2D2BC6C09400F86835 /* AddressBarKeyboardShortcutsTests.swift */; };
 		EEC8EB3E2982CA3B0065AA39 /* JSAlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC111E5294D06290086524F /* JSAlertViewModel.swift */; };
 		EEC8EB3F2982CA440065AA39 /* JSAlert.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EEC111E3294D06020086524F /* JSAlert.storyboard */; };
 		EEC8EB402982CD550065AA39 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
@@ -4799,6 +4800,7 @@
 		EEC4A6682B2C87D300F7C0AA /* VPNLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationView.swift; sourceTree = "<group>"; };
 		EEC4A66C2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationPreferenceItemModel.swift; sourceTree = "<group>"; };
 		EEC4A6702B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationPreferenceItem.swift; sourceTree = "<group>"; };
+		EEC7BE2D2BC6C09400F86835 /* AddressBarKeyboardShortcutsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressBarKeyboardShortcutsTests.swift; sourceTree = "<group>"; };
 		EECE10E429DD77E60044D027 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
 		EED735352BB46B6000F173D6 /* AutocompleteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutocompleteTests.swift; sourceTree = "<group>"; };
 		EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+VPNAgentConvenienceInitializers.swift"; sourceTree = "<group>"; };
@@ -6570,6 +6572,7 @@
 			isa = PBXGroup;
 			children = (
 				EEBCE6802BA444FA00B9DF00 /* Common */,
+				EEC7BE2D2BC6C09400F86835 /* AddressBarKeyboardShortcutsTests.swift */,
 				EED735352BB46B6000F173D6 /* AutocompleteTests.swift */,
 				EE54F7B22BBFEA48006218DB /* BookmarksAndFavoritesTests.swift */,
 				EE7F74902BB5D76600CD9456 /* BookmarksBarTests.swift */,
@@ -12303,6 +12306,7 @@
 				EE0429E02BA31D2F009EB20F /* FindInPageTests.swift in Sources */,
 				EE02D4212BB460FE00DBE6B3 /* StringExtension.swift in Sources */,
 				EE9D81C32BC57A3700338BE3 /* StateRestorationTests.swift in Sources */,
+				EEC7BE2E2BC6C09500F86835 /* AddressBarKeyboardShortcutsTests.swift in Sources */,
 				EE54F7B32BBFEA49006218DB /* BookmarksAndFavoritesTests.swift in Sources */,
 				EE02D4222BB4611A00DBE6B3 /* TestsURLExtension.swift in Sources */,
 				7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */,
