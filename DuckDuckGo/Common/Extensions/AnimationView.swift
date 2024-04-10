@@ -27,11 +27,6 @@ extension LottieAnimationView {
             return nil
         }
 
-        // Force use of .mainThread to prevent high WindowServer Usage
-        // Pending Fix with newer Lottie versions
-        // https://app.asana.com/0/1177771139624306/1207024603216659/f
-        LottieConfiguration.shared.renderingEngine = .mainThread
-
         self.init(animation: animation, imageProvider: imageProvider)
         identifier = NSUserInterfaceItemIdentifier(rawValue: animationName)
     }

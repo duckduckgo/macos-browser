@@ -224,6 +224,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         bookmarksManager.loadBookmarks()
         if case .normal = NSApp.runType {
             FaviconManager.shared.loadFavicons()
+            LottieConfiguration.shared.renderingEngine = .mainThread
         }
         ConfigurationManager.shared.start()
         _ = DownloadListCoordinator.shared
