@@ -95,7 +95,7 @@ extension Preferences {
 
                 // SECTION 3: Search Settings
                 PreferencePaneSection(UserText.privateSearch) {
-                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions)
+                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions).accessibilityIdentifier("PreferencesGeneralView.showAutocompleteSuggestions")
                 }
 
                 // SECTION 4: Downloads
