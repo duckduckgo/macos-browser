@@ -49,7 +49,12 @@ struct PreferencesSection: Hashable, Identifiable {
             return panes
         }()
 
+#if APPSTORE
+        // App Store guidelines don't allow references to other platforms, so the Mac App Store build omits the otherPlatforms section.
+        let otherPanes: [PreferencePaneIdentifier] = [.about]
+#else
         let otherPanes: [PreferencePaneIdentifier] = [.about, .otherPlatforms]
+#endif
 
         var sections: [PreferencesSection] = [
             .init(id: .privacyProtections, panes: privacyPanes),

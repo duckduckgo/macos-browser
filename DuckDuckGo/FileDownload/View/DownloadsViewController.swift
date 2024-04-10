@@ -158,35 +158,43 @@ final class DownloadsViewController: NSViewController {
 
     @IBAction func openDownloadsFolderAction(_ sender: Any) {
         let prefs = DownloadsPreferences.shared
+        let downloads = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
         var url: URL?
         var itemToSelect: URL?
 
         if prefs.alwaysRequestDownloadLocation {
-            url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+            url = prefs.lastUsedCustomDownloadLocation
 
-            if let lastDownloaded = viewModel.items.first(where: {
+            // reveal the last completed download
+            if let lastDownloaded = viewModel.items.first/* last added */(where: {
                 // should still exist
-                $0.localURL != nil && FileManager.default.fileExists(atPath: $0.localURL!.deletingLastPathComponent().path)
+                if let url = $0.localURL, FileManager.default.fileExists(atPath: url.path) { true } else { false }
             }),
                let lastDownloadedURL = lastDownloaded.localURL,
-               // if no downloads are from the default Downloads folder - open the last downloaded item folder
                !viewModel.items.contains(where: { $0.localURL?.deletingLastPathComponent().path == url?.path  }) || url == nil {
 
                 url = lastDownloadedURL.deletingLastPathComponent()
                 // select last downloaded item
                 itemToSelect = lastDownloadedURL
 
-            } /* else fallback to default User‘s Downloads */
+            } /* else fallback to the last location chosen in the Save Panel */
 
         } else {
             // open preferred downlod location
-            url = prefs.effectiveDownloadLocation ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+            url = prefs.effectiveDownloadLocation
         }
 
-        guard let url else { return }
+        let folder = url ?? downloads
+
+        _=NSWorkspace.shared.selectFile(itemToSelect?.path, inFileViewerRootedAtPath: folder.path)
+        // hack for the sandboxed environment:
+        // when we have no permission to open a folder we don‘t have access to
+        // try to guess a file that would most probably exist and reveal it: it‘s the ".DS_Store" file
+        || NSWorkspace.shared.selectFile(folder.appendingPathComponent(".DS_Store").path, inFileViewerRootedAtPath: folder.path)
+        // fallback to default Downloads folder
+        || NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: downloads.path)
 
         self.dismiss()
-        NSWorkspace.shared.selectFile(itemToSelect?.path, inFileViewerRootedAtPath: url.path)
     }
 
     @IBAction func clearDownloadsAction(_ sender: Any) {
