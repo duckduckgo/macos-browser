@@ -63,8 +63,6 @@ typedef NS_OPTIONS(NSUInteger, _WKFindOptions) {
 
 - (void)_stopMediaCapture API_AVAILABLE(macos(10.15.4), ios(13.4));
 - (void)_stopAllMediaPlayback;
-- (_WKMediaMutedState)_mediaMutedState API_AVAILABLE(macos(11.0), ios(14.0));;
-- (void)_setPageMuted:(_WKMediaMutedState)mutedState API_AVAILABLE(macos(10.13), ios(11.0));
 
 @end
 

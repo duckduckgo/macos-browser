@@ -533,7 +533,7 @@ protocol NewWindowPolicyDecisionMaker {
                 self?.onDuckDuckGoEmailSignOut(notification)
             }
 
-        self.audioState = webView.audioState()
+        self.audioState = webView.audioState
         addDeallocationChecks(for: webView)
     }
 
@@ -1029,12 +1029,11 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
-    @Published private(set) var audioState: WKWebView.AudioState = .notSupported
+    @Published private(set) var audioState: WKWebView.AudioState?
 
     func muteUnmuteTab() {
-        webView.muteOrUnmute()
-
-        audioState = webView.audioState()
+        webView.audioState.toggle()
+        audioState = webView.audioState
     }
 
     private enum ReloadIfNeededSource {
