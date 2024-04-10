@@ -50833,6 +50833,18 @@
         }
       }
     },
+    "warn.before.quit" : {
+      "comment" : "Label after the checkbox in Settings which configures a warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warn before Quit"
+          }
+        }
+      }
+    },
     "We couldn‘t find any bookmarks." : {
       "comment" : "Data import error message: Bookmarks weren‘t found.",
       "localizations" : {

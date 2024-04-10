@@ -1040,6 +1040,7 @@ struct UserText {
     static let automaticallyClearData = NSLocalizedString("automatically.clear.data", value: "Automatically Clear", comment: "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.")
     static let burnDataOnQuit = NSLocalizedString("burn.data.on.quit", value: "Clear Data upon Quitting", comment: "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.")
     static let burnDataOnQuitExplanation = NSLocalizedString("burn.data.on.quit.explanation", value: "Data from \"Fireproofed\" sites won't be cleared, keeping your essential logins and preferences intact.", comment: "Explanation of a setting which configures clearing data automatically after quitting the app.")
+    static let warnBeforeQuit = NSLocalizedString("warn.before.quit", value: "Warn before Quit", comment: "Label after the checkbox in Settings which configures a warning before clearing data on the application termination.")
     static let clearDataAfter = NSLocalizedString("clear.data.after", value: "Clear Data After:", comment: "A label for a setting to automatically clear data after some delay")
     static func clearDataAfter(for option: ClearDataAfterOption) -> String {
         switch option {

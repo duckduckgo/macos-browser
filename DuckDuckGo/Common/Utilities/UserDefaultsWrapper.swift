@@ -80,7 +80,7 @@ public struct UserDefaultsWrapper<T> {
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
-        case burnPerformedSuccessfullyOnQuit = "burn.performed.successfully.on.quit"
+        case appTerminationHandledCorrectly = "app.termination.handled.correctly"
 
         case restorePreviousSession = "preferences.startup.restore-previous-session"
         case launchToCustomHomePage = "preferences.startup.launch-to-custom-home-page"

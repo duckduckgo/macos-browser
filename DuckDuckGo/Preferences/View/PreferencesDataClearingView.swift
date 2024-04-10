@@ -36,7 +36,7 @@ extension Preferences {
                         VStack(alignment: .leading, spacing: 1) {
                             TextMenuItemCaption(UserText.burnDataOnQuitExplanation)
                         }
-                        ToggleMenuItem("Warn before Clearing",
+                        ToggleMenuItem(UserText.warnBeforeQuit,
                                        isOn: $model.isWarnBeforeClearingEnabled)
                         .disabled(!model.isBurnDataOnQuitEnabled)
                         .padding(.leading, 16)

@@ -48,7 +48,11 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
     }
 
     @Published
-    var clearDataAfter: ClearDataAfterOption = .quittingAppOnly
+    var clearDataAfter: ClearDataAfterOption = .quittingAppOnly {
+        didSet {
+            persistor.clearDataAfter = clearDataAfter
+        }
+    }
 
     @MainActor
     func presentManageFireproofSitesDialog() {
@@ -104,6 +108,16 @@ enum ClearDataAfterOption: String, CaseIterable {
     case quittingApp2HoursOfInactivity
     case quittingApp8HoursOfInactivity
     case quittingApp1DayOfInactivity
+
+    var timeInterval: TimeInterval? {
+        switch self {
+        case .quittingAppOnly: return nil
+        case .quittingApp30MinutesOfInactivity: return 30 * 60
+        case .quittingApp2HoursOfInactivity: return 2 * 60 * 60
+        case .quittingApp8HoursOfInactivity: return 8 * 60 * 60
+        case .quittingApp1DayOfInactivity: return 24 * 60 * 60
+        }
+    }
 }
 
 extension Notification.Name {

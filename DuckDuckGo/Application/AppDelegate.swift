@@ -309,7 +309,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #endif
 
-        burnOnQuitHandler = BurnOnQuitHandler(preferences: .shared, fireCoordinator: FireCoordinator())
+        burnOnQuitHandler = BurnOnQuitHandler(preferences: .shared, fireViewModel: FireCoordinator.fireViewModel)
         burnOnQuitHandler.burnOnStartIfNeeded()
         burnOnQuitHandler.resetTheFlag()
     }
@@ -335,6 +335,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
 
         updateSubscriptionStatus()
+
+        burnOnQuitHandler.applicationDidBecomeActive()
+    }
+
+    func applicationWillResignActive(_ notification: Notification) {
+        burnOnQuitHandler.applicationWillResignActive()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

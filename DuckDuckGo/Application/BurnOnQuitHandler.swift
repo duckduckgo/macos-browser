@@ -21,14 +21,13 @@ import Combine
 
 final class BurnOnQuitHandler {
 
-    init(preferences: DataClearingPreferences,
-         fireCoordinator: FireCoordinator ) {
+    init(preferences: DataClearingPreferences, fireViewModel: FireViewModel) {
         self.preferences = preferences
-        self.fireCoordinator = fireCoordinator
+        self.fireViewModel = fireViewModel
     }
 
     private let preferences: DataClearingPreferences
-    private let fireCoordinator: FireCoordinator
+    private let fireViewModel: FireViewModel
 
     // MARK: - Burn On Quit
 
@@ -36,7 +35,7 @@ final class BurnOnQuitHandler {
         return preferences.isBurnDataOnQuitEnabled
     }
 
-    var shouldWarnOnBurn: Bool {
+    private var shouldWarnOnBurn: Bool {
         return preferences.isWarnBeforeClearingEnabled
     }
 
@@ -51,39 +50,69 @@ final class BurnOnQuitHandler {
             let alert = NSAlert.burnOnQuitAlert()
             let response = alert.runModal()
             guard response == .alertFirstButtonReturn else {
-                burnPerformedSuccessfullyOnQuit = true
+                appTerminationHandledCorrectly = true
                 onBurnOnQuitCompleted?()
                 return
             }
         }
 
-        // TODO: Refactor from static
-        FireCoordinator.fireViewModel.fire.burnAll { [weak self] in
-            self?.burnPerformedSuccessfullyOnQuit = true
+        fireViewModel.fire.burnAll { [weak self] in
+            self?.appTerminationHandledCorrectly = true
             self?.onBurnOnQuitCompleted?()
         }
     }
 
     // MARK: - Burn On Start
-    // In case the burn on quit wasn't successfull
+    // In case burning on quit wasn't successful (force quit, crash, etc.)
 
-    //TODO Rename - application quit handled correctly
-    @UserDefaultsWrapper(key: .burnPerformedSuccessfullyOnQuit, defaultValue: false)
-    private var burnPerformedSuccessfullyOnQuit: Bool
+    @UserDefaultsWrapper(key: .appTerminationHandledCorrectly, defaultValue: false)
+    private var appTerminationHandledCorrectly: Bool
 
-    var shouldBurnOnStart: Bool {
-        return !burnPerformedSuccessfullyOnQuit
+    private var shouldBurnOnStart: Bool {
+        return shouldBurnOnQuit && !appTerminationHandledCorrectly
     }
 
     func resetTheFlag() {
-        burnPerformedSuccessfullyOnQuit = false
+        appTerminationHandledCorrectly = false
     }
 
     @MainActor
     func burnOnStartIfNeeded() {
         guard preferences.isBurnDataOnQuitEnabled, shouldBurnOnStart else { return }
 
-        FireCoordinator.fireViewModel.fire.burnAll()
+        fireViewModel.fire.burnAll()
+    }
+
+    // MARK: - Burn After
+
+    private var inactivityTimer: Timer?
+
+    var shouldBurnAfterDelay: Bool {
+        preferences.isBurnDataOnQuitEnabled && preferences.clearDataAfter.timeInterval != nil
+    }
+
+    var burnTimeInterval: Double? {
+        preferences.clearDataAfter.timeInterval
+    }
+
+    func applicationDidBecomeActive() {
+        // Cancel the burn timer if the app becomes active
+        inactivityTimer?.invalidate()
+        inactivityTimer = nil
+    }
+
+    func applicationWillResignActive() {
+        guard shouldBurnAfterDelay, let interval = burnTimeInterval else { return }
+
+        inactivityTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+            self?.performBurnAfterDelay()
+        }
+    }
+
+    private func performBurnAfterDelay() {
+        DispatchQueue.main.async { [weak self] in
+            self?.fireViewModel.fire.burnAll()
+        }
     }
 
 }
