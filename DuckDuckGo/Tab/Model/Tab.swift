@@ -1063,22 +1063,9 @@ protocol NewWindowPolicyDecisionMaker {
 
         let source = content.source
         if url.isFileURL {
-#if APPSTORE
-            // grant access to a topmost folder with a sandbox access available (e.g. ~/Downloads)
-            // to support local HTML files linking resources from outside of the root HTML file directory (e.g. "../style.css").
-            // fallback to only the file access scope when no access to the containing folder
-            let readAccessScopeURL = {
-                var url = url
-                // recurse up until reaching the topmost accessible directory
-                while let parentDirectory = (url.path == "/" ? nil : url.deletingLastPathComponent()),
-                      parentDirectory.isWritableLocation() {
-                    url = parentDirectory
-                }
-                return url
-            }()
-#else
-            let readAccessScopeURL = URL(fileURLWithPath: "/")
-#endif
+            // WebKit won‘t load local page‘s external resouces even with `allowingReadAccessTo` is passed
+            // this could be fixed using a custom scheme handler loading local resources
+            let readAccessScopeURL = url
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .loadFileURL(url, allowingReadAccessTo: readAccessScopeURL, withExpectedNavigationType: source.navigationType)
         }
