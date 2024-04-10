@@ -40,7 +40,7 @@ jobs:
 
   ui-tests-legacy-os:
     name: UI Tests legacy OS
-    needs: create-notarized-app
+#    needs: create-notarized-app
 
     runs-on: ${{ matrix.runner }}
     strategy:
