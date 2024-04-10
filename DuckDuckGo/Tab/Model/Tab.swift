@@ -1063,8 +1063,8 @@ protocol NewWindowPolicyDecisionMaker {
 
         let source = content.source
         if url.isFileURL {
-            // WebKit won‘t load local page‘s external resouces even with `allowingReadAccessTo` is passed
-            // this could be fixed using a custom scheme handler loading local resources
+            // WebKit won‘t load local page‘s external resouces even with `allowingReadAccessTo` provided
+            // this could be fixed using a custom scheme handler loading local resources in future.
             let readAccessScopeURL = url
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .loadFileURL(url, allowingReadAccessTo: readAccessScopeURL, withExpectedNavigationType: source.navigationType)
