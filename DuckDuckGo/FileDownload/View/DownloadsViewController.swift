@@ -125,10 +125,6 @@ final class DownloadsViewController: NSViewController {
         tableView.dataSource = self
         tableView.menu = setUpContextMenu()
 
-        tableView.registerForDraggedTypes([.fileURL])
-        tableView.setDraggingSourceOperationMask(NSDragOperation.none, forLocal: true)
-        tableView.setDraggingSourceOperationMask(NSDragOperation.move, forLocal: false)
-
         scrollView.contentView = clipView
 
         let separator = NSBox()
@@ -174,6 +170,7 @@ final class DownloadsViewController: NSViewController {
         super.viewDidLoad()
 
         preferredContentSize = Self.preferredContentSize
+        setupDragAndDrop()
     }
 
     override func viewWillAppear() {
@@ -356,6 +353,12 @@ final class DownloadsViewController: NSViewController {
         } else {
             openDownloadsFolderAction(sender)
         }
+    }
+
+    private func setupDragAndDrop() {
+        tableView.registerForDraggedTypes([.fileURL])
+        tableView.setDraggingSourceOperationMask(NSDragOperation.none, forLocal: true)
+        tableView.setDraggingSourceOperationMask(NSDragOperation.move, forLocal: false)
     }
 
 }

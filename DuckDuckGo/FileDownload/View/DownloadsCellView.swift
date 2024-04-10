@@ -170,7 +170,7 @@ final class DownloadsCellView: NSTableCellView {
         revealButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
         revealButton.alignment = .center
         revealButton.bezelStyle = .shadowlessSquare
-        cancelButton.isBordered = false
+        revealButton.isBordered = false
         revealButton.imagePosition = .imageOnly
         revealButton.imageScaling = .scaleProportionallyDown
         revealButton.cornerRadius = 4
