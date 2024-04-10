@@ -133,16 +133,6 @@ final class DownloadsPreferences: ObservableObject {
             setSelectedDownloadLocation(validatedDownloadLocation(newValue))
         }
     }
-    private func setSelectedDownloadLocation(_ url: URL?) {
-        _selectedDownloadLocation = url
-        let locationString: String?
-#if APPSTORE
-        locationString = (try? url?.bookmarkData(options: .withSecurityScope).base64EncodedString()) ?? url?.absoluteString
-#else
-        locationString = url?.absoluteString
-#endif
-        persistor.selectedDownloadLocation = locationString
-    }
 
     private func setSelectedDownloadLocation(_ url: URL?) {
         selectedDownloadLocationController = url.map { SecurityScopedFileURLController(url: $0, logger: OSLog.downloads) }
