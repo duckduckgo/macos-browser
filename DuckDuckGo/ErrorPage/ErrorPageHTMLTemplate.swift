@@ -71,14 +71,14 @@ struct SSLErrorPageHTMLTemplate {
 
     private func createJSONString(header: String, body: String, advancedButton: String, leaveSiteButton: String, advancedInfoHeader: String, specificMessage: String, advancedInfoBody: String, visitSiteButton: String) -> String {
         let innerDictionary: [String: Any] = [
-            "header": header,
-            "body": body,
-            "advancedButton": advancedButton,
-            "leaveSiteButton": leaveSiteButton,
-            "advancedInfoHeader": advancedInfoHeader,
-            "specificMessage": specificMessage,
-            "advancedInfoBody": advancedInfoBody,
-            "visitSiteButton": visitSiteButton
+            "header": header.escapedUnicodeHtmlString(),
+            "body": body.escapedUnicodeHtmlString(),
+            "advancedButton": advancedButton.escapedUnicodeHtmlString(),
+            "leaveSiteButton": leaveSiteButton.escapedUnicodeHtmlString(),
+            "advancedInfoHeader": advancedInfoHeader.escapedUnicodeHtmlString(),
+            "specificMessage": specificMessage.escapedUnicodeHtmlString(),
+            "advancedInfoBody": advancedInfoBody.escapedUnicodeHtmlString(),
+            "visitSiteButton": visitSiteButton.escapedUnicodeHtmlString()
         ]
 
         let outerDictionary: [String: Any] = [
