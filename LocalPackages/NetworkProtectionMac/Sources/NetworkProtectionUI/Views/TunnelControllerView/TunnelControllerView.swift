@@ -208,10 +208,6 @@ public struct TunnelControllerView: View {
     @ViewBuilder
     private func headerAnimationView(_ animationName: String) -> some View {
         LottieView(animation: .named(animationName))
-            .configure { animationView in
-                animationView.contentMode = .scaleAspectFit
-                animationView.clipsToBounds = true
-            }
             .playing(withIntro: .init(
                     skipIntro: model.isVPNEnabled && !model.isToggleDisabled,
                     introStartFrame: 0,
