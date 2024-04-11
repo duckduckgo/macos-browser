@@ -34,6 +34,11 @@ public class DataBrokerProtectionSchedulerErrorCollection: NSObject, NSSecureCod
      for the IPC layer
      */
 
+    private enum NSSecureCodingKeys {
+        static let oneTimeError = "oneTimeError"
+        static let operationErrors = "operationErrors"
+    }
+
     public let oneTimeError: Error?
     public let operationErrors: [Error]?
 
@@ -50,13 +55,13 @@ public class DataBrokerProtectionSchedulerErrorCollection: NSObject, NSSecureCod
     }
 
     public func encode(with coder: NSCoder) {
-        coder.encode(oneTimeError, forKey: "oneTimeError")
-        coder.encode(operationErrors, forKey: "operationErrors")
+        coder.encode(oneTimeError, forKey: NSSecureCodingKeys.oneTimeError)
+        coder.encode(operationErrors, forKey: NSSecureCodingKeys.operationErrors)
     }
 
     public required init?(coder: NSCoder) {
-        oneTimeError = coder.decodeObject(forKey: "oneTimeError") as? Error
-        operationErrors = coder.decodeObject(forKey: "operationErrors") as? [Error]
+        oneTimeError = coder.decodeObject(forKey: NSSecureCodingKeys.oneTimeError) as? Error
+        operationErrors = coder.decodeObject(forKey: NSSecureCodingKeys.operationErrors) as? [Error]
     }
 }
 
