@@ -64,8 +64,6 @@ extension UserText {
         }
     }
 
-    // "network.protection.system.extension.unknown.activation.error" - Message shown to users when they try to enable NetP and there is an unexpected activation error.
-    static let networkProtectionUnknownActivationError = "There as an unexpected error. Please try again."
     // "network.protection.system.extension.please.reboot" - Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation
     static let networkProtectionPleaseReboot = "Please reboot to activate the VPN"
 }
