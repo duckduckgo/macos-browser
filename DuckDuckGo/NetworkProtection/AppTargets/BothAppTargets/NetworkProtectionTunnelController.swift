@@ -417,7 +417,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 // to go to System Settings to allow the extension
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case SystemExtensionRequestError.unknownRequestResult:
-                controllerErrorStore.lastErrorMessage = "There as an unexpected error. Please try again."
+                controllerErrorStore.lastErrorMessage = UserText.networkProtectionUnknownActivationError
             case OSSystemExtensionError.extensionNotFound,
                 SystemExtensionRequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
