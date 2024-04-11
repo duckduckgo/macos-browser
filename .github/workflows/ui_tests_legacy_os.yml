@@ -115,11 +115,6 @@ jobs:
         NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}
         NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
 
-    - name: Unzip and Copy tests-server to /DerivedData                         
-      run: |
-        ls -R
-        cp  tests-server/tests-server "../DerivedData/Build/Products/Review/"
-
     # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
     - name: Build test runner 
       run: |
@@ -132,6 +127,11 @@ jobs:
           -derivedDataPath DerivedData \
           -configuration Review 
     
+    - name: Unzip and Copy tests-server to /DerivedData                         
+      run: |
+        ls -R
+        cp -R tests-server/tests-server "../DerivedData/Build/Products/Review/"
+
     - name: Unzip and Copy app to /DerivedData                         
       run: |
         cd DuckDuckGo-review-*.app && unzip DuckDuckGo-*.zip
