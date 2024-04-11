@@ -70,10 +70,13 @@ final class BurnOnQuitHandler {
     private var appTerminationHandledCorrectly: Bool
 
     @MainActor
-    func burnOnStartIfNeeded() {
+    @discardableResult
+    func burnOnStartIfNeeded() -> Bool {
         let shouldBurnOnStart = preferences.isBurnDataOnQuitEnabled && !appTerminationHandledCorrectly
-        guard shouldBurnOnStart else { return }
+        guard shouldBurnOnStart else { return false }
 
         fireViewModel.fire.burnAll()
+        return true
     }
+
 }
