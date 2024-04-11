@@ -5,6 +5,15 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;if [ &quot;$CONFIGURATION&quot; != &quot;CI&quot; ]; then&#10;    echo &quot;Configuration is not &apos;CI&apos;, building &apos;tests-server&apos;.&quot;&#10;    if [ -n &quot;$DERIVED_DATA_PATH&quot; ]; then&#10;        echo &quot;Using DERIVED_DATA_PATH to build tests server: $DERIVED_DATA_PATH&quot;&#10;        xcodebuild build -workspace &quot;$WORKSPACE_PATH&quot; -scheme &quot;tests-server&quot; -derivedDataPath &quot;$DERIVED_DATA_PATH&quot;&#10;    else&#10;        xcodebuild build -workspace &quot;$WORKSPACE_PATH&quot; -scheme &quot;tests-server&quot;&#10;    fi&#10;fi&#10;">
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
