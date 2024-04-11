@@ -76,8 +76,8 @@ public final class PixelKit {
     public enum Source: String {
         case macStore = "browser-appstore"
         case macDMG = "browser-dmg"
-        case iOS = ""
-        case iPadOS = ""
+        case iOS = "phone"
+        case iPadOS = "tablet"
     }
 
     /// A closure typealias to request sending pixels through the network.
@@ -105,7 +105,8 @@ public final class PixelKit {
 
     private let dateGenerator: () -> Date
 
-    public static var shared: PixelKit?
+    public private(set) static var shared: PixelKit?
+
     private let appVersion: String
     private let defaultHeaders: [String: String]
     private let fireRequest: FireRequest
@@ -189,12 +190,12 @@ public final class PixelKit {
         case .standard:
             reportErrorIf(pixel: pixelName, endsWith: "_u")
             reportErrorIf(pixel: pixelName, endsWith: "_d")
-            fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
+            fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, frequency, onComplete)
         case .legacyInitial:
             reportErrorIf(pixel: pixelName, endsWith: "_u")
             reportErrorIf(pixel: pixelName, endsWith: "_d")
             if !pixelHasBeenFiredEver(pixelName) {
-                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
+                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, frequency, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
                 printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
@@ -206,7 +207,7 @@ public final class PixelKit {
                 return
             }
             if !pixelHasBeenFiredEver(pixelName) {
-                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
+                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, frequency, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
                 printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
@@ -215,7 +216,7 @@ public final class PixelKit {
             reportErrorIf(pixel: pixelName, endsWith: "_u")
             reportErrorIf(pixel: pixelName, endsWith: "_d")
             if !pixelHasBeenFiredToday(pixelName) {
-                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
+                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, frequency, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
                 printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: newParams, skipped: true)
@@ -224,7 +225,7 @@ public final class PixelKit {
             reportErrorIf(pixel: pixelName, endsWith: "_u")
             reportErrorIf(pixel: pixelName, endsWith: "_d") // Because is added automatically
             if !pixelHasBeenFiredToday(pixelName) {
-                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
+                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, frequency, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
                 printDebugInfo(pixelName: pixelName + "_d", frequency: frequency, parameters: newParams, skipped: true)
@@ -234,13 +235,13 @@ public final class PixelKit {
             reportErrorIf(pixel: pixelName, endsWith: "_d") // Because is added automatically
             reportErrorIf(pixel: pixelName, endsWith: "_c") // Because is added automatically
             if !pixelHasBeenFiredToday(pixelName) {
-                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
+                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, frequency, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
             } else {
                 printDebugInfo(pixelName: pixelName + "_d", frequency: frequency, parameters: newParams, skipped: true)
             }
 
-            fireRequestWrapper(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, onComplete, frequency)
+            fireRequestWrapper(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, frequency, onComplete)
         }
     }
 
@@ -263,8 +264,8 @@ public final class PixelKit {
         _ parameters: [String: String],
         _ allowedQueryReservedCharacters: CharacterSet?,
         _ callBackOnMainThread: Bool,
-        _ onComplete: @escaping CompletionBlock,
-        _ frequency: Frequency) {
+        _ frequency: Frequency,
+        _ onComplete: @escaping CompletionBlock) {
             printDebugInfo(pixelName: pixelName, frequency: frequency, parameters: parameters, skipped: false)
             guard !dryRun else {
                 // simulate server response time for Dry Run mode
@@ -422,19 +423,18 @@ public final class PixelKit {
         pixelLastFireDate(pixelName: name) != nil
     }
 
-    public static func clearFrequencyHistoryFor(pixel: PixelKitEventV2) {
+    public func clearFrequencyHistoryFor(pixel: PixelKitEventV2) {
         guard let name = Self.shared?.userDefaultsKeyName(forPixelName: pixel.name) else {
             return
         }
-        Self.shared?.defaults.removeObject(forKey: name)
+        self.defaults.removeObject(forKey: name)
     }
 
-    public static func clearFrequencyHistoryForAllPixels() {
-        guard let userDefaults = Self.shared?.defaults else { return }
-        for (key, _) in userDefaults.dictionaryRepresentation() {
-            if key.hasPrefix(storageKeyPrefixLegacy) || key.hasPrefix(storageKeyPrefix) {
-                userDefaults.removeObject(forKey: key)
-                PixelKit.shared?.logger.debug("🚮 Removing from storage \(key)")
+    public func clearFrequencyHistoryForAllPixels() {
+        for (key, _) in self.defaults.dictionaryRepresentation() {
+            if key.hasPrefix(Self.storageKeyPrefixLegacy) || key.hasPrefix(Self.storageKeyPrefix) {
+                self.defaults.removeObject(forKey: key)
+                self.logger.debug("🚮 Removing from storage \(key)")
             }
         }
     }
@@ -461,5 +461,14 @@ extension Dictionary where Key == String, Value == String {
         self.merge(error.pixelParameters) { _, second in
             return second
         }
+    }
+}
+
+internal extension PixelKit {
+
+    /// [USE ONLY FOR TESTS] Sets the shared PixelKit.shared singleton
+    /// - Parameter pixelkit: A custom instance of PixelKit
+    static func setSharedForTesting(pixelKit: PixelKit) {
+        Self.shared = pixelKit
     }
 }

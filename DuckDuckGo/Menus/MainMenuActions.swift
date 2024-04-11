@@ -740,13 +740,13 @@ extension MainViewController {
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
 
         // Clear pixel data
-        PixelKit.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProFeatureEnabled)
-        PixelKit.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouDBP)
-        PixelKit.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouVPN)
+        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProFeatureEnabled)
+        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouDBP)
+        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouVPN)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
-        PixelKit.clearFrequencyHistoryForAllPixels()
+        PixelKit.shared?.clearFrequencyHistoryForAllPixels()
     }
 
     @objc func in10PercentSurveyOn(_ sender: Any?) {

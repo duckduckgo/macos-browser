@@ -20,7 +20,6 @@ import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
 @testable import PixelKit
-
 @testable import DuckDuckGo_Privacy_Browser
 
 class CBRCompileTimeReporterTests: XCTestCase {
@@ -38,7 +37,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
     })
 
     override func setUp() {
-        PixelKit.shared = pixelKit
+        PixelKit.setSharedForTesting(pixelKit: pixelKit)
         UserDefaultsWrapper<Any>.clearAll()
     }
 

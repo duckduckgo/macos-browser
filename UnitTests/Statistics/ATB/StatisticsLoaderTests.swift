@@ -19,7 +19,7 @@
 import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
-import PixelKit
+@testable import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class StatisticsLoaderTests: XCTestCase {
@@ -36,7 +36,7 @@ class StatisticsLoaderTests: XCTestCase {
             })
 
     override func setUp() {
-        PixelKit.shared = pixelKit
+        PixelKit.setSharedForTesting(pixelKit: pixelKit)
 
         mockAttributionsPixelHandler = MockAttributionsPixelHandler()
         mockStatisticsStore = MockStatisticsStore()
