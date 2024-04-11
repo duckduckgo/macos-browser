@@ -40,6 +40,8 @@ final class BookmarkOutlineCellView: NSTableCellView {
 
     init(identifier: NSUserInterfaceItemIdentifier) {
         super.init(frame: .zero)
+        self.identifier = identifier
+
         setupUI()
     }
 
