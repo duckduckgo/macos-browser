@@ -50780,7 +50780,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Quit the application and \nclear all dara?"
+            "value" : "Quit the application and \nclear all data?"
           }
         }
       }

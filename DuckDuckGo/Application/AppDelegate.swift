@@ -350,7 +350,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager?.applicationWillTerminate()
 
         // Handling of "Burn on quit"
-        if let terminationReply = burnOnQuitHandler.terminationReply() {
+        if let terminationReply = burnOnQuitHandler.handleAppTermination() {
             return terminationReply
         }
 
