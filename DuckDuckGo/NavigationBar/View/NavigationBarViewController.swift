@@ -1000,8 +1000,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedBookmarkAllOpenTabs(_ sender: NSMenuItem) {
-        // TODO: https://app.asana.com/0/0/1207032400501907/f
-        print(#function)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(url: []).show()
     }
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {

@@ -80,6 +80,13 @@ enum BookmarksDialogViewFactory {
         return makeAddEditBookmarkDialogView(viewModel: viewModel, bookmarkManager: bookmarkManager)
     }
 
+    static func makeBookmarkAllOpenTabsView(url: [URL], bookmarkManager: LocalBookmarkManager = .shared) -> BookmarkAllTabsCoordinatorView {
+        let addFolderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
+        let bookmarkAllTabsViewModel = BookmarkAllTabsViewModel(websites: [], bookmarkManager: bookmarkManager)
+        let viewModel = BookmarkAllTabsDialogCoordinatorViewModel(bookmarkModel: bookmarkAllTabsViewModel, folderModel: addFolderViewModel)
+        return BookmarkAllTabsCoordinatorView(viewModel: viewModel)
+    }
+
 }
 
 private extension BookmarksDialogViewFactory {

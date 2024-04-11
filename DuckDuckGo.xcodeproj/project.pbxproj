@@ -2517,6 +2517,15 @@
 		9F982F142B822C7400231028 /* AddEditBookmarkFolderDialogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */; };
 		9F9C49F62BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F52BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift */; };
 		9F9C49F72BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F52BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift */; };
+		9F9C49F92BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */; };
+		9F9C49FA2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */; };
+		9F9C49FB2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */; };
+		9F9C49FD2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */; };
+		9F9C49FE2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */; };
+		9F9C49FF2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */; };
+		9F9C4A012BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */; };
+		9F9C4A022BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */; };
+		9F9C4A032BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */; };
 		9FA173DA2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
 		9FA173DB2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
 		9FA173DC2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
@@ -4249,6 +4258,9 @@
 		9F982F0C2B8224BE00231028 /* AddEditBookmarkFolderDialogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkFolderDialogViewModel.swift; sourceTree = "<group>"; };
 		9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkFolderDialogViewModelTests.swift; sourceTree = "<group>"; };
 		9F9C49F52BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoreOptionsMenu+BookmarksTests.swift"; sourceTree = "<group>"; };
+		9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogView.swift; sourceTree = "<group>"; };
+		9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsViewModel.swift; sourceTree = "<group>"; };
+		9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogCoordinatorViewModel.swift; sourceTree = "<group>"; };
 		9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogContainerView.swift; sourceTree = "<group>"; };
 		9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogButtonsView.swift; sourceTree = "<group>"; };
 		9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogFolderManagementView.swift; sourceTree = "<group>"; };
@@ -7048,6 +7060,7 @@
 				9F56CFA82B82DC4300BB7F11 /* AddEditBookmarkFolderView.swift */,
 				9FEE98642B846870002E44E8 /* AddEditBookmarkView.swift */,
 				9F56CFB02B843F6C00BB7F11 /* BookmarksDialogViewFactory.swift */,
+				9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */,
 			);
 			path = Dialog;
 			sourceTree = "<group>";
@@ -7828,6 +7841,8 @@
 				9F56CFAC2B84326C00BB7F11 /* AddEditBookmarkDialogViewModel.swift */,
 				9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */,
 				9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */,
+				9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */,
+				9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -10653,6 +10668,7 @@
 				98779A0129999B64005D8EB6 /* Bookmark.xcdatamodeld in Sources */,
 				3706FB9E293F65D500E42796 /* AboutModel.swift in Sources */,
 				3706FB9F293F65D500E42796 /* PasswordManagementCreditCardItemView.swift in Sources */,
+				9F9C4A022BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */,
 				3706FBA0293F65D500E42796 /* NSTextFieldExtension.swift in Sources */,
 				9FA173E82B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */,
 				3706FBA1293F65D500E42796 /* FireproofDomainsContainer.swift in Sources */,
@@ -10907,6 +10923,7 @@
 				3706FC50293F65D500E42796 /* FeedbackWindow.swift in Sources */,
 				3706FC51293F65D500E42796 /* RecentlyVisitedView.swift in Sources */,
 				B645D8F729FA95440024461F /* WKProcessPoolExtension.swift in Sources */,
+				9F9C49FE2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */,
 				9F514F922B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */,
 				3706FC52293F65D500E42796 /* MouseOverAnimationButton.swift in Sources */,
 				B60293E72BA19ECD0033186B /* NetPPopoverManagerMock.swift in Sources */,
@@ -11016,6 +11033,7 @@
 				3706FCA0293F65D500E42796 /* ContiguousBytesExtension.swift in Sources */,
 				B602E8172A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				3706FCA1293F65D500E42796 /* AdjacentItemEnumerator.swift in Sources */,
+				9F9C49FA2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */,
 				3706FCA2293F65D500E42796 /* ChromiumKeychainPrompt.swift in Sources */,
 				3707C71E294B5D2900682A9F /* URLRequestExtension.swift in Sources */,
 				3706FCA3293F65D500E42796 /* WKProcessPool+GeolocationProvider.swift in Sources */,
@@ -11644,6 +11662,7 @@
 				4B9579C02AC7AE700062CA31 /* DebugUserScript.swift in Sources */,
 				1DC669722B6CF0D700AA0645 /* TabSnapshotStore.swift in Sources */,
 				4B9579C12AC7AE700062CA31 /* RecentlyClosedTab.swift in Sources */,
+				9F9C49FB2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */,
 				4B9579C22AC7AE700062CA31 /* PDFSearchTextMenuItemHandler.swift in Sources */,
 				4B9579C42AC7AE700062CA31 /* HistoryMenu.swift in Sources */,
 				4B9579C52AC7AE700062CA31 /* ContentScopeFeatureFlagging.swift in Sources */,
@@ -12003,6 +12022,7 @@
 				4B957AF22AC7AE700062CA31 /* DailyPixel.swift in Sources */,
 				9FDA6C232B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */,
 				4B957AF32AC7AE700062CA31 /* NavigationHotkeyHandler.swift in Sources */,
+				9F9C4A032BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */,
 				B6CC266E2BAD9CD800F53F8D /* FileProgressPresenter.swift in Sources */,
 				4B957AF42AC7AE700062CA31 /* ClickToLoadUserScript.swift in Sources */,
 				4B957AF52AC7AE700062CA31 /* WindowControllersManager.swift in Sources */,
@@ -12078,6 +12098,7 @@
 				4B957B352AC7AE700062CA31 /* PreferencesAutofillView.swift in Sources */,
 				4B957B362AC7AE700062CA31 /* BurnerHomePageView.swift in Sources */,
 				4B957B372AC7AE700062CA31 /* UserText+PasswordManager.swift in Sources */,
+				9F9C49FF2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */,
 				4B957B382AC7AE700062CA31 /* LoadingProgressView.swift in Sources */,
 				7BEC20472B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift in Sources */,
 				4B957B392AC7AE700062CA31 /* StatisticsStore.swift in Sources */,
@@ -12848,6 +12869,7 @@
 				AAD86E52267A0DFF005C11BE /* UpdateController.swift in Sources */,
 				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
 				7BA7CC4E2AD11F6F0042E5CE /* NetworkProtectionIPCTunnelController.swift in Sources */,
+				9F9C49FD2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */,
 				4B9292A226670D2A00AD2C21 /* PseudoFolder.swift in Sources */,
 				1DDD3EC42B84F96B004CBF2B /* CookiePopupProtectionPreferences.swift in Sources */,
 				4BCF15D92ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift in Sources */,
@@ -12937,6 +12959,7 @@
 				B693955726F04BEC0015B914 /* MouseOverButton.swift in Sources */,
 				AA61C0D02722159B00E6B681 /* FireInfoViewController.swift in Sources */,
 				9D9AE8692AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift in Sources */,
+				9F9C49F92BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */,
 				B64C85422694590B0048FEBE /* PermissionButton.swift in Sources */,
 				AAA0CC472533833C0079BC96 /* MoreOptionsMenu.swift in Sources */,
 				B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */,
@@ -13031,6 +13054,7 @@
 				B68C92C42750EF76002AC6B0 /* PixelDataRecord.swift in Sources */,
 				853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */,
 				B677FC4F2B06376B0099EB04 /* ReportFeedbackView.swift in Sources */,
+				9F9C4A012BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */,
 				B642738227B65BAC0005DFD1 /* SecureVaultErrorReporter.swift in Sources */,
 				4B139AFD26B60BD800894F82 /* NSImageExtensions.swift in Sources */,
 				B62B48392ADE46FC000DECE5 /* Application.swift in Sources */,

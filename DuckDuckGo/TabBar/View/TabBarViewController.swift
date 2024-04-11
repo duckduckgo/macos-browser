@@ -1054,8 +1054,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: TabBarViewItem) {
-        // TODO: https://app.asana.com/0/0/1207032400501907/f
-        print(#function)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(url: []).show()
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
