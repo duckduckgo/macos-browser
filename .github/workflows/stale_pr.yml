@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Close stale pull requests
-        uses: actions/stale@v5
+        uses: actions/stale@v9
         with:
           stale-pr-message: 'This PR has been inactive for more than 7 days and will be automatically closed 7 days from now.'
           days-before-stale: 7
