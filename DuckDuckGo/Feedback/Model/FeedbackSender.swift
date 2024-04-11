@@ -18,12 +18,11 @@
 
 import Common
 import Foundation
-import Macros
 import Networking
 
 final class FeedbackSender {
 
-    static let feedbackURL = #URL("https://duckduckgo.com/feedback.js")
+    static let feedbackURL = URL(string: "https://duckduckgo.com/feedback.js")!
 
     func sendFeedback(_ feedback: Feedback) {
 #if APPSTORE

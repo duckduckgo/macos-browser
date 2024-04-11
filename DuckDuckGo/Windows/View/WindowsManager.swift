@@ -30,6 +30,9 @@ final class WindowsManager {
         NSApplication.shared.windows.compactMap { $0 as? MainWindow }
     }
 
+    // Shared type to enable managing `PasswordManagementPopover`s in multiple windows
+    private static let autofillPopoverPresenter: AutofillPopoverPresenter = DefaultAutofillPopoverPresenter()
+
     class func closeWindows(except windows: [NSWindow] = []) {
         for controller in WindowControllersManager.shared.mainWindowControllers {
             guard let window = controller.window, !windows.contains(window) else { continue }
@@ -58,14 +61,18 @@ final class WindowsManager {
                              contentSize: NSSize? = nil,
                              showWindow: Bool = true,
                              popUp: Bool = false,
-                             lazyLoadTabs: Bool = false) -> MainWindow? {
+                             lazyLoadTabs: Bool = false,
+                             isMiniaturized: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel,
                                                  popUp: popUp,
-                                                 burnerMode: burnerMode)
+                                                 burnerMode: burnerMode,
+                                                 autofillPopoverPresenter: autofillPopoverPresenter)
 
         if let contentSize {
             mainWindowController.window?.setContentSize(contentSize)
         }
+
+        mainWindowController.window?.setIsMiniaturized(isMiniaturized)
 
         if let droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -110,7 +117,8 @@ final class WindowsManager {
                              popUp: popUp)
     }
 
-    class func openNewWindow(with initialUrl: URL, source: Tab.TabContent.URLSource, isBurner: Bool, parentTab: Tab? = nil) {
+    @discardableResult
+    class func openNewWindow(with initialUrl: URL, source: Tab.TabContent.URLSource, isBurner: Bool, parentTab: Tab? = nil) -> MainWindow? {
         openNewWindow(with: Tab(content: .contentFromURL(initialUrl, source: source), parentTab: parentTab, shouldLoadInBackground: true, burnerMode: BurnerMode(isBurner: isBurner)))
     }
 
@@ -161,8 +169,9 @@ final class WindowsManager {
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil,
                                      contentSize: NSSize? = nil,
                                      popUp: Bool = false,
-                                     burnerMode: BurnerMode) -> MainWindowController {
-        let mainViewController = MainViewController(tabCollectionViewModel: tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode))
+                                     burnerMode: BurnerMode,
+                                     autofillPopoverPresenter: AutofillPopoverPresenter) -> MainWindowController {
+        let mainViewController = MainViewController(tabCollectionViewModel: tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode), autofillPopoverPresenter: autofillPopoverPresenter)
 
         var contentSize = contentSize ?? NSSize(width: 1024, height: 790)
         contentSize.width = min(NSScreen.main?.frame.size.width ?? 1024, max(contentSize.width, 300))

@@ -20,6 +20,7 @@ import Foundation
 import Common
 import BrowserServicesKit
 import PixelKit
+import SecureStorage
 
 enum Stage: String {
     case start
@@ -32,9 +33,12 @@ enum Stage: String {
     case emailConfirm = "email-confirm"
     case validate
     case other
+    case fillForm = "fill-form"
 }
 
 protocol StageDurationCalculator {
+    var attemptId: UUID { get }
+
     func durationSinceLastStage() -> Double
     func durationSinceStartTime() -> Double
     func fireOptOutStart()
@@ -43,6 +47,7 @@ protocol StageDurationCalculator {
     func fireOptOutCaptchaSend()
     func fireOptOutCaptchaSolve()
     func fireOptOutSubmit()
+    func fireOptOutFillForm()
     func fireOptOutEmailReceive()
     func fireOptOutEmailConfirm()
     func fireOptOutValidate()
@@ -53,6 +58,7 @@ protocol StageDurationCalculator {
     func fireScanError(error: Error)
     func setStage(_ stage: Stage)
     func setEmailPattern(_ emailPattern: String?)
+    func setLastActionId(_ actionID: String)
 }
 
 final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator {
@@ -61,6 +67,7 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     let dataBroker: String
     let startTime: Date
     var lastStateTime: Date
+    private (set) var actionID: String?
     private (set) var stage: Stage = .other
     private (set) var emailPattern: String?
 
@@ -137,13 +144,18 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
                                           emailPattern: emailPattern))
     }
 
+    func fireOptOutFillForm() {
+        handler.fire(.optOutFillForm(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
+    }
+
     func fireOptOutFailure(tries: Int) {
         handler.fire(.optOutFailure(dataBroker: dataBroker,
                                     attemptId: attemptId,
                                     duration: durationSinceStartTime(),
                                     stage: stage.rawValue,
                                     tries: tries,
-                                    emailPattern: emailPattern))
+                                    emailPattern: emailPattern,
+                                    actionID: actionID))
     }
 
     func fireScanSuccess(matchesFound: Int) {
@@ -161,13 +173,20 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
             switch dataBrokerProtectionError {
             case .httpError(let httpCode):
                 if httpCode < 500 {
-                    errorCategory = .clientError(httpCode: httpCode)
+                    if httpCode == 404 {
+                        fireScanFailed()
+                        return
+                    } else {
+                        errorCategory = .clientError(httpCode: httpCode)
+                    }
                 } else {
                     errorCategory = .serverError(httpCode: httpCode)
                 }
             default:
                 errorCategory = .validationError
             }
+        } else if let databaseError = error as? SecureStorageError {
+            errorCategory = .databaseError(domain: SecureStorageError.errorDomain, code: databaseError.errorCode)
         } else {
             if let nsError = error as NSError? {
                 if nsError.domain == NSURLErrorDomain {
@@ -190,10 +209,15 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     // identifying the stage so we can know which one was the one that failed.
 
     func setStage(_ stage: Stage) {
+        lastStateTime = Date() // When we set a new stage we need to reset the lastStateTime so we count from there
         self.stage = stage
     }
 
     func setEmailPattern(_ emailPattern: String?) {
         self.emailPattern = emailPattern
+    }
+
+    func setLastActionId(_ actionID: String) {
+        self.actionID = actionID
     }
 }

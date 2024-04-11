@@ -18,7 +18,6 @@
 
 import Combine
 import Common
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -924,8 +923,8 @@ class ErrorPageTests: XCTestCase {
 }
 
 private extension URL {
-    static let test = #URL("https://test.com/")
-    static let alternative = #URL("https://alternative.com/")
+    static let test = URL(string: "https://test.com/")!
+    static let alternative = URL(string: "https://alternative.com/")!
 }
 
 private extension NSError {

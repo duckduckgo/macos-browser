@@ -18,7 +18,6 @@
 
 import BrowserServicesKit
 import Combine
-import Macros
 import Navigation
 import WebKit
 import XCTest

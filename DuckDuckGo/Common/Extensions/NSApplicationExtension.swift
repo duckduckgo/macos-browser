@@ -54,16 +54,23 @@ extension NSApplication {
             }
         } else if ProcessInfo().environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             return .xcPreviews
+        } else if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+            return .uiTests
         } else {
             return .normal
         }
+#elseif REVIEW
+        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+            return .uiTests
+        }
+        return .normal
 #else
         return .normal
 #endif
     }()
     var runType: RunType { Self.runType }
 
-#if !NETWORK_EXTENSION
+#if !NETWORK_EXTENSION && !SANDBOX_TEST_TOOL
     var mainMenuTyped: MainMenu {
         return mainMenu as! MainMenu // swiftlint:disable:this force_cast
     }

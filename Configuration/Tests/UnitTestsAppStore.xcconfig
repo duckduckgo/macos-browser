@@ -16,7 +16,7 @@
 #include "UnitTests.xcconfig"
 #include "../AppStore.xcconfig"
 
-FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION DBP
+FEATURE_FLAGS = FEEDBACK DBP SUBSCRIPTION
 
 PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.mobile.ios.DuckDuckGoTests
 

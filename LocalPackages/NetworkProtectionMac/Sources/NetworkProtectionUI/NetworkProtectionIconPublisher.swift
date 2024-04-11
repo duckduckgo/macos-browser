@@ -60,13 +60,13 @@ public final class NetworkProtectionIconPublisher {
     // MARK: - Subscribing to NetP updates
 
     private func subscribeToConnectionStatusChanges() {
-        statusChangeCancellable = statusReporter.statusObserver.publisher.sink { [weak self] _ in
+        statusChangeCancellable = statusReporter.statusObserver.publisher.receive(on: RunLoop.main).sink { [weak self] _ in
             self?.updateMenuIcon()
         }
     }
 
     private func subscribeToConnectionIssues() {
-        connectivityIssuesCancellable = statusReporter.connectivityIssuesObserver.publisher.sink { [weak self] _ in
+        connectivityIssuesCancellable = statusReporter.connectivityIssuesObserver.publisher.receive(on: RunLoop.main).sink { [weak self] _ in
             self?.updateMenuIcon()
         }
     }

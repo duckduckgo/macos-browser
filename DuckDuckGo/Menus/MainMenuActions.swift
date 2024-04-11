@@ -22,6 +22,8 @@ import Common
 import WebKit
 import Configuration
 import History
+import PixelKit
+import Subscription
 
 // Actions are sent to objects of responder chain
 
@@ -122,7 +124,7 @@ extension AppDelegate {
     @objc func openReportBrokenSite(_ sender: Any?) {
         let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
         let privacyDashboardViewController = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { coder in
-            PrivacyDashboardViewController(coder: coder, initMode: .reportBrokenSite)
+            PrivacyDashboardViewController(coder: coder, privacyInfo: nil, dashboardMode: .report)
         }
 
         privacyDashboardViewController.sizeDelegate = self
@@ -316,7 +318,13 @@ extension MainViewController {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
             return
         }
-        addressBarTextField.makeMeFirstResponder()
+
+        // If the address bar is already the first responder it means that the user is editing the URL and wants to select the whole url.
+        if addressBarTextField.isFirstResponder {
+            addressBarTextField.selectText(nil)
+        } else {
+            addressBarTextField.makeMeFirstResponder()
+        }
     }
 
     @objc func closeTab(_ sender: Any?) {
@@ -384,7 +392,7 @@ extension MainViewController {
             }
             navigationBarViewController.view.window?.makeKeyAndOrderFront(nil)
         }
-        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
+        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: sender is NSMenuItem /* keep button visible for some time on Cmd+J */)
     }
 
     @objc func toggleBookmarksBarFromMenu(_ sender: Any) {
@@ -414,9 +422,7 @@ extension MainViewController {
     }
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
-#if NETWORK_PROTECTION
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
-#endif
     }
 
     // MARK: - History
@@ -708,7 +714,7 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay7.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay14.rawValue)
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
     }
 
@@ -716,28 +722,64 @@ extension MainViewController {
         guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
+
+        if !DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            // We only clear PPro state when it's not available, as otherwise
+            // there should be no state to clear.  Clearing PPro state can
+            // trigger notifications which we want to avoid unless
+            // necessary.
+            clearPrivacyProState()
+        }
+    }
+
+    /// Clears the PrivacyPro state to make testing easier.
+    ///
+    private func clearPrivacyProState() {
+        AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).signOut()
+        resetThankYouModalChecks(nil)
+        UserDefaults.netP.networkProtectionEntitlementsExpired = false
+
+        // Clear pixel data
+        DailyPixel.clearLastFireDate(pixel: .privacyProFeatureEnabled)
+        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouDBP)
+        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouVPN)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
         UserDefaults.standard.removePersistentDomain(forName: DailyPixel.Constant.dailyPixelStorageIdentifier)
     }
 
+    @objc func in10PercentSurveyOn(_ sender: Any?) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay0in10Percent.rawValue)
+    }
+
+    @objc func in10PercentSurveyOff(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay0in10Percent.rawValue)
+    }
+
     @objc func changeInstallDateToToday(_ sender: Any?) {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToLessThan21DaysAgo(_ sender: Any?) {
-        let lessThanTwentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -20, to: Date())
-        UserDefaults.standard.set(lessThanTwentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToLessThan1DayAgo(_ sender: Any?) {
+        let lessThanOneDaysAgo = Calendar.current.date(byAdding: .hour, value: -23, to: Date())
+        UserDefaults.standard.set(lessThanOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToMoreThan21DaysAgoButLessThan27(_ sender: Any?) {
-        let twentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -21, to: Date())
-        UserDefaults.standard.set(twentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToMoreThan1DayAgoButLessThan14(_ sender: Any?) {
+        let between1And4DaysAgo = Calendar.current.date(byAdding: .day, value: -13, to: Date())
+        UserDefaults.standard.set(between1And4DaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToMoreThan27DaysAgo(_ sender: Any?) {
-        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -28, to: Date())
+    @objc func changeInstallDateToMoreThan14DaysAgoButLessThan15(_ sender: Any?) {
+        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -14, to: Date())
+        UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    }
+
+    @objc func changeInstallDateToMoreThan15DaysAgo(_ sender: Any?) {
+        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -16, to: Date())
         UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
@@ -762,6 +804,28 @@ extension MainViewController {
                       webViewSize: .zero)
 
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
+    }
+
+    @objc func resetThankYouModalChecks(_ sender: Any?) {
+        let presenter = WaitlistThankYouPromptPresenter()
+        presenter.resetPromptCheck()
+        UserDefaults.netP.removeObject(forKey: UserDefaults.vpnLegacyUserAccessDisabledOnceKey)
+    }
+
+    @objc func showVPNThankYouModal(_ sender: Any?) {
+        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .vpn)
+        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
+        if let thankYouWindow = thankYouWindowController.window {
+            WindowsManager.windows.first?.beginSheet(thankYouWindow)
+        }
+    }
+
+    @objc func showPIRThankYouModal(_ sender: Any?) {
+        let thankYouModalView = WaitlistBetaThankYouDialogViewController(copy: .dbp)
+        let thankYouWindowController = thankYouModalView.wrappedInWindowController()
+        if let thankYouWindow = thankYouWindowController.window {
+            WindowsManager.windows.first?.beginSheet(thankYouWindow)
+        }
     }
 
     @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {
@@ -844,6 +908,9 @@ extension MainViewController: NSMenuItemValidation {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        guard fireViewController.fireViewModel.fire.burningData == nil else {
+            return true
+        }
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):

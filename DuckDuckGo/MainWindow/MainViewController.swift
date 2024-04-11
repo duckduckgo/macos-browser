@@ -20,10 +20,8 @@ import Cocoa
 import Carbon.HIToolbox
 import Combine
 import Common
-
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
+import NetworkProtectionIPC
 
 final class MainViewController: NSViewController {
     private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
@@ -34,6 +32,7 @@ final class MainViewController: NSViewController {
     let findInPageViewController: FindInPageViewController
     let fireViewController: FireViewController
     let bookmarksBarViewController: BookmarksBarViewController
+    private let bookmarksBarVisibilityManager: BookmarksBarVisibilityManager
 
     let tabCollectionViewModel: TabCollectionViewModel
     let isBurner: Bool
@@ -56,14 +55,50 @@ final class MainViewController: NSViewController {
         fatalError("MainViewController: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel? = nil,
-         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(tabCollectionViewModel: TabCollectionViewModel? = nil, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, autofillPopoverPresenter: AutofillPopoverPresenter) {
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
-        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner)
+        bookmarksBarVisibilityManager = BookmarksBarVisibilityManager(selectedTabPublisher: tabCollectionViewModel.$selectedTabViewModel.eraseToAnyPublisher())
+
+        let networkProtectionPopoverManager: NetPPopoverManager = {
+#if DEBUG
+            guard case .normal = NSApp.runType else {
+                return NetPPopoverManagerMock()
+            }
+#endif
+
+            let ipcClient = TunnelControllerIPCClient()
+            ipcClient.register()
+
+            return NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient, networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler())
+        }()
+        let networkProtectionStatusReporter: NetworkProtectionStatusReporter = {
+            var connectivityIssuesObserver: ConnectivityIssueObserver!
+            var controllerErrorMessageObserver: ControllerErrorMesssageObserver!
+#if DEBUG
+            if ![.normal, .integrationTests].contains(NSApp.runType) {
+                connectivityIssuesObserver = ConnectivityIssueObserverMock()
+                controllerErrorMessageObserver = ControllerErrorMesssageObserverMock()
+            }
+#endif
+            connectivityIssuesObserver = connectivityIssuesObserver ?? DisabledConnectivityIssueObserver()
+            controllerErrorMessageObserver = controllerErrorMessageObserver ?? ControllerErrorMesssageObserverThroughDistributedNotifications()
+
+            let ipcClient = networkProtectionPopoverManager.ipcClient
+            return DefaultNetworkProtectionStatusReporter(
+                statusObserver: ipcClient.ipcStatusObserver,
+                serverInfoObserver: ipcClient.ipcServerInfoObserver,
+                connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
+                connectivityIssuesObserver: connectivityIssuesObserver,
+                controllerErrorMessageObserver: controllerErrorMessageObserver
+            )
+        }()
+
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionPopoverManager: networkProtectionPopoverManager, networkProtectionStatusReporter: networkProtectionStatusReporter, autofillPopoverPresenter: autofillPopoverPresenter)
+
         browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
         fireViewController = FireViewController.create(tabCollectionViewModel: tabCollectionViewModel)
@@ -91,7 +126,7 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToMouseTrackingArea()
         subscribeToSelectedTabViewModel()
-        subscribeToAppSettingsNotifications()
+        subscribeToBookmarkBarVisibility()
         subscribeToFirstResponder()
         mainView.findInPageContainerView.applyDropShadow()
 
@@ -138,9 +173,6 @@ final class MainViewController: NSViewController {
 
             resizeNavigationBar(isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
                                 animated: false)
-
-            let bookmarksBarVisible = AppearancePreferences.shared.showBookmarksBar
-            updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
         }
 
         updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
@@ -156,11 +188,9 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
+        presentWaitlistThankYouPromptIfNecessary()
 
-#if NETWORK_PROTECTION
-        sendActiveNetworkProtectionWaitlistUserPixel()
         refreshNetworkProtectionMessages()
-#endif
 
 #if DBP
         DataBrokerProtectionAppEvents().windowDidBecomeMain()
@@ -187,13 +217,11 @@ final class MainViewController: NSViewController {
         }
     }
 
-#if NETWORK_PROTECTION
     private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
 
     func refreshNetworkProtectionMessages() {
         networkProtectionMessaging.fetchRemoteMessages()
     }
-#endif
 
 #if DBP
     private let dataBrokerProtectionMessaging = DefaultDataBrokerProtectionRemoteMessaging()
@@ -285,11 +313,13 @@ final class MainViewController: NSViewController {
             .store(in: &tabViewModelCancellables)
     }
 
-    private func subscribeToAppSettingsNotifications() {
-        bookmarksBarVisibilityChangedCancellable = NotificationCenter.default
-            .publisher(for: AppearancePreferences.Notifications.showBookmarksBarSettingChanged)
-            .sink { [weak self] _ in
-                self?.updateBookmarksBarViewVisibility(visible: AppearancePreferences.shared.showBookmarksBar)
+    private func subscribeToBookmarkBarVisibility() {
+        bookmarksBarVisibilityChangedCancellable = bookmarksBarVisibilityManager
+            .$isBookmarksBarVisible
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isBookmarksBarVisible in
+                self?.updateBookmarksBarViewVisibility(visible: isBookmarksBarVisible)
             }
     }
 
@@ -306,7 +336,6 @@ final class MainViewController: NSViewController {
                 defer { lastTabContent = content }
 
                 resizeNavigationBar(isHomePage: content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
-                updateBookmarksBar(content)
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
             }
             .store(in: &self.tabViewModelCancellables)
@@ -323,14 +352,6 @@ final class MainViewController: NSViewController {
         // when window first responder is reset (to the window): activate Tab Content View
         if view.window?.firstResponder === view.window {
             browserTabViewController.adjustFirstResponder()
-        }
-    }
-
-    private func updateBookmarksBar(_ content: Tab.TabContent, _ prefs: AppearancePreferences = AppearancePreferences.shared) {
-        if content.isUrl && prefs.bookmarksBarAppearance == .newTabOnly {
-            updateBookmarksBarViewVisibility(visible: false)
-        } else if prefs.showBookmarksBar {
-            updateBookmarksBarViewVisibility(visible: true)
         }
     }
 
@@ -409,13 +430,15 @@ final class MainViewController: NSViewController {
         NSApp.mainMenuTyped.stopMenuItem.isEnabled = selectedTabViewModel.isLoading
     }
 
-#if NETWORK_PROTECTION
-    private func sendActiveNetworkProtectionWaitlistUserPixel() {
-        if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
-            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly, includeAppVersionParameter: true)
+    func presentWaitlistThankYouPromptIfNecessary() {
+        guard let window = self.view.window else {
+            assertionFailure("Couldn't get main view controller's window")
+            return
         }
+
+        let presenter = WaitlistThankYouPromptPresenter()
+        presenter.presentThankYouPromptIfNecessary(in: window)
     }
-#endif
 
     // MARK: - First responder
 
@@ -560,7 +583,7 @@ extension MainViewController {
     ]))
     bkman.loadBookmarks()
 
-    let vc = MainViewController(bookmarkManager: bkman)
+    let vc = MainViewController(bookmarkManager: bkman, autofillPopoverPresenter: DefaultAutofillPopoverPresenter())
     var c: AnyCancellable!
     c = vc.publisher(for: \.view.window).sink { window in
         window?.titlebarAppearsTransparent = true

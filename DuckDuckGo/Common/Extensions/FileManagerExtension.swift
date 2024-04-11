@@ -23,62 +23,94 @@ extension FileManager {
 
     @discardableResult
     func moveItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
-        return try self.perform(self.moveItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
+        guard srcURL != destURL else { return destURL }
+        guard flag else {
+            try moveItem(at: srcURL, to: destURL)
+            return destURL
+        }
+        return try withNonExistentUrl(for: destURL, incrementingIndexIfExistsUpTo: 10000, pathExtension: pathExtension) { url in
+            try moveItem(at: srcURL, to: url)
+            return url
+        }
     }
 
     @discardableResult
     func copyItem(at srcURL: URL, to destURL: URL, incrementingIndexIfExists flag: Bool, pathExtension: String? = nil) throws -> URL {
-        return try self.perform(self.copyItem, from: srcURL, to: destURL, incrementingIndexIfExists: flag, pathExtension: pathExtension)
-    }
-
-    private func perform(_ operation: (URL, URL) throws -> Void,
-                         from srcURL: URL,
-                         to destURL: URL,
-                         incrementingIndexIfExists: Bool,
-                         pathExtension: String?) throws -> URL {
-
-        guard incrementingIndexIfExists else {
-            try operation(srcURL, destURL)
+        guard srcURL != destURL else { return destURL }
+        guard flag else {
+            try moveItem(at: srcURL, to: destURL)
             return destURL
         }
+        return try withNonExistentUrl(for: destURL, incrementingIndexIfExistsUpTo: flag ? 10000 : 0, pathExtension: pathExtension) { url in
+            try copyItem(at: srcURL, to: url)
+            return url
+        }
+    }
 
-        var suffix = pathExtension ?? destURL.pathExtension
+    func withNonExistentUrl<T>(for desiredURL: URL,
+                               incrementingIndexIfExistsUpTo limit: UInt,
+                               pathExtension: String? = nil,
+                               continueOn shouldContinue: (Error) -> Bool = { ($0 as? CocoaError)?.code == .fileWriteFileExists },
+                               perform operation: (URL) throws -> T) throws -> T {
+
+        var suffix = pathExtension ?? desiredURL.pathExtension
         if !suffix.hasPrefix(".") {
             suffix = "." + suffix
         }
-        if !destURL.pathExtension.isEmpty {
-            if !destURL.path.hasSuffix(suffix) {
-                suffix = "." + destURL.pathExtension
+        if !desiredURL.pathExtension.isEmpty {
+            if !desiredURL.path.hasSuffix(suffix) {
+                suffix = "." + desiredURL.pathExtension
             }
         } else {
             suffix = ""
         }
 
-        let ownerDirectory = destURL.deletingLastPathComponent()
-        let fileNameWithoutExtension = destURL.lastPathComponent.dropping(suffix: suffix)
+        let ownerDirectory = desiredURL.deletingLastPathComponent()
+        let fileNameWithoutExtension = desiredURL.lastPathComponent.dropping(suffix: suffix)
 
-        for copy in 0... {
-            let destURL: URL = {
+        var index: UInt = 0
+        repeat {
+            let desiredURL: URL = {
                 // Zero means we haven't tried anything yet, so use the suggested name.
                 // Otherwise, simply append the file name with the copy number.
-                guard copy > 0 else { return destURL }
-                return ownerDirectory.appendingPathComponent("\(fileNameWithoutExtension) \(copy)\(suffix)")
+                guard index > 0 else { return desiredURL }
+                return ownerDirectory.appendingPathComponent("\(fileNameWithoutExtension) \(index)\(suffix)")
             }()
 
-            do {
-                try operation(srcURL, destURL)
-                return destURL
-
-            } catch CocoaError.fileWriteFileExists {
-                // This is expected, as moveItem throws an error if the file already exists
-                guard copy <= 1000 else {
-                    // If it gets to 1000 of these then chances are something else is wrong
-                    os_log("Failed to move file to Downloads folder, attempt %d", type: .error, copy)
-                    throw CocoaError(.fileWriteFileExists)
+            if !self.fileExists(atPath: desiredURL.path) {
+                do {
+                    return try operation(desiredURL)
+                } catch {
+                    guard shouldContinue(error) else { throw error }
+                    // This is expected, as moveItem throws an error if the file already exists
+                    index += 1
                 }
             }
+            index += 1
+        } while index <= limit
+        // If it gets beyond the limit then chances are something else is wrong
+        os_log("Failed to move file to %s, attempt: %d", type: .error, desiredURL.deletingLastPathComponent().path, index)
+        throw CocoaError(.fileWriteFileExists)
+    }
+
+    func isInTrash(_ url: URL) -> Bool {
+        let resolvedUrl = url.resolvingSymlinksInPath()
+        guard let trashUrl = (try? self.url(for: .trashDirectory, in: .allDomainsMask, appropriateFor: resolvedUrl, create: false))
+                ?? urls(for: .trashDirectory, in: .userDomainMask).first else { return false }
+
+        return resolvedUrl.path.hasPrefix(trashUrl.path)
+    }
+
+    /// Check if location pointed by the URL is writable by writing an empty data to it and removing the file if write succeeds
+    /// - Throws error if writing to the location fails
+    func checkWritability(_ url: URL) throws {
+        if fileExists(atPath: url.path), isWritableFile(atPath: url.path) {
+            return // we can write
+        } else {
+            // either we can‘t write or there‘s no file at the url – try writing throwing access error if no permission
+            try Data().write(to: url)
+            try removeItem(at: url)
         }
-        fatalError("Unexpected flow")
     }
 
 }

@@ -17,14 +17,12 @@
 //
 
 import Foundation
-import Macros
-
-@testable import DuckDuckGo_Privacy_Browser
+import Common
 
 // Integration Tests helpers
 extension URL {
 
-    static let testsServer = #URL("http://localhost:8085/")
+    static let testsServer = URL(string: "http://localhost:8085/")!
 
     /// used for Tests Server mock HTTP requests creation (see tests-server/main.swift)
     /**
@@ -56,7 +54,7 @@ extension URL {
             let value = URL(string: "/")!.appendingParameters(headers).query!
             url = url.appendingParameter(name: "headers", value: value)
         }
-        if let dataStr = data?.utf8String() {
+        if let data, let dataStr = String(data: data, encoding: .utf8) {
             url = url.appendingParameter(name: "data", value: dataStr)
         } else if let data {
             url = url.appendingParameter(name: "data", value: data.base64EncodedString())

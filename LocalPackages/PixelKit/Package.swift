@@ -26,11 +26,9 @@ let package = Package(
         .target(
             name: "PixelKit",
             dependencies: [
-                .product(name: "Macros", package: "apple-toolbox"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),
-                .unsafeFlags(["-Xfrontend", "-load-plugin-executable", "-Xfrontend", "${BUILT_PRODUCTS_DIR}/MacrosImplementation#MacrosImplementation"]),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),
@@ -39,7 +37,6 @@ let package = Package(
             dependencies: [
                 "PixelKit",
                 "PixelKitTestingUtilities",
-                .product(name: "Macros", package: "apple-toolbox"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
@@ -50,7 +47,6 @@ let package = Package(
             name: "PixelKitTestingUtilities",
             dependencies: [
                 "PixelKit",
-                .product(name: "Macros", package: "apple-toolbox"),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         )

@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -73,8 +72,8 @@ final class URLEventHandlerTests: XCTestCase {
     }
 
     func testWhenURLPassedOnLaunchThenURLOpenedAfterAppDidFinishLaunching() {
-        let url1 = #URL("https://duckduckgo.com")
-        let url2 = #URL("data://somedata")
+        let url1 = URL(string: "https://duckduckgo.com")!
+        let url2 = URL(string: "data://somedata")!
         var handlerCalled: XCTestExpectation!
         let listener = URLEventHandler { url in
             XCTAssertEqual(url.absoluteString, url1.absoluteString)
@@ -92,7 +91,7 @@ final class URLEventHandlerTests: XCTestCase {
     }
 
     func testWhenFileOpenedAfterAppDidFinishLaunchingThenItIsOpened() {
-        let url = #URL("https://duckduckgo.com")
+        let url = URL(string: "https://duckduckgo.com")!
         let handlerCalled = expectation(description: "handler called")
         let listener = URLEventHandler { url in
             XCTAssertEqual(url.absoluteString, url.absoluteString)

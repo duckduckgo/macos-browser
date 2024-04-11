@@ -33,6 +33,7 @@ public extension Notification.Name {
 final class DBPHomeViewController: NSViewController {
     private var presentedWindowController: NSWindowController?
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
         let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
@@ -46,9 +47,9 @@ final class DBPHomeViewController: NSViewController {
                                                   inlineIconCredentials: false,
                                                   thirdPartyCredentialsProvider: false)
 
-        let privacySettings = PrivacySecurityPreferences.shared
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
+        let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                            sessionKey: sessionKey,
                                            featureToggles: features)
 
@@ -83,9 +84,14 @@ final class DBPHomeViewController: NSViewController {
             attachDataBrokerContainerView()
         }
 
-        if dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
-            let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
-            dbpDateStore.updateLastActiveDate()
+        do {
+            if try dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
+                let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+                dbpDateStore.updateLastActiveDate()
+            }
+        } catch {
+            os_log("DBPHomeViewController error: viewDidLoad, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPHomeViewController.viewDidLoad"))
         }
     }
 
@@ -146,6 +152,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
+            case .generalError(let error, _),
+                    .secureVaultInitError(let error),
+                    .secureVaultError(let error):
+                // We can't use .debug directly because it modifies the pixel name and clobbers the params
+                Pixel.fire(.pixelKitEvent(DebugEvent(event, error: error)))
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerScanAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
@@ -163,6 +174,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutValidate,
                     .optOutFinish,
                     .optOutSubmitSuccess,
+                    .optOutFillForm,
                     .optOutSuccess,
                     .optOutFailure,
                     .backgroundAgentStarted,
@@ -190,7 +202,14 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                     .dailyActiveUser,
                     .weeklyActiveUser,
-                    .monthlyActiveUser:
+                    .monthlyActiveUser,
+                    .weeklyReportScanning,
+                    .weeklyReportRemovals,
+                    .scanningEventNewMatch,
+                    .scanningEventReAppearance,
+                    .webUILoadingFailed,
+                    .webUILoadingStarted,
+                    .webUILoadingSuccess:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }

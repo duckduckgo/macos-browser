@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Combine
 import SwiftUI
@@ -32,6 +30,10 @@ import PixelKit
 #if NETP_SYSTEM_EXTENSION
 import SystemExtensionManager
 import SystemExtensions
+#endif
+
+#if SUBSCRIPTION
+import Subscription
 #endif
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
@@ -71,6 +73,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
+
+#if SUBSCRIPTION
+    // MARK: - Subscriptions
+
+    private let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+#endif
 
     // MARK: - Debug Options Support
 
@@ -379,7 +387,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - Connection Status Querying
 
-    /// Queries Network Protection to know if its VPN is connected.
+    /// Queries the VPN to know if it's connected.
     ///
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
     ///
@@ -445,12 +453,15 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     // MARK: - Starting & Stopping the VPN
 
     enum StartError: LocalizedError {
+        case noAuthToken
         case connectionStatusInvalid
         case connectionAlreadyStarted
         case simulateControllerFailureError
 
         var errorDescription: String? {
             switch self {
+            case .noAuthToken:
+                return "You need a subscription to start the VPN"
             case .connectionAlreadyStarted:
 #if DEBUG
                 return "[Debug] Connection already started"
@@ -470,7 +481,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         }
     }
 
-    /// Starts the VPN connection used for Network Protection
+    /// Starts the VPN connection
     ///
     func start() async {
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
@@ -519,7 +530,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
         } catch {
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure, frequency: .dailyAndContinuous, withError: error, includeAppVersionParameter: true
+                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndContinuous, includeAppVersionParameter: true
             )
 
             await stop()
@@ -535,7 +546,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         var options = [String: NSObject]()
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
+        guard let authToken = try fetchAuthToken() else {
+            throw StartError.noAuthToken
+        }
+        options[NetworkProtectionOptionKey.authToken] = authToken
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 
@@ -575,7 +589,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
     }
 
-    /// Stops the VPN connection used for Network Protection
+    /// Stops the VPN connection
     ///
     @MainActor
     func stop() async {
@@ -583,15 +597,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             return
         }
 
-        await stop(tunnelManager: manager, disableOnDemand: true)
+        await stop(tunnelManager: manager)
     }
 
     @MainActor
-    private func stop(tunnelManager: NETunnelProviderManager, disableOnDemand: Bool) async {
-        if disableOnDemand {
-            // disable reconnect on demand if requested to stop
-            try? await self.disableOnDemand(tunnelManager: tunnelManager)
-        }
+    private func stop(tunnelManager: NETunnelProviderManager) async {
+        try? await self.disableOnDemand(tunnelManager: tunnelManager)
 
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
@@ -609,8 +620,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             return
         }
 
-        await stop(tunnelManager: manager, disableOnDemand: false)
+        await stop(tunnelManager: manager)
         await start()
+
+        // When restarting the tunnel we enable on-demand optimistically
+        try? await enableOnDemand(tunnelManager: manager)
     }
 
     // MARK: - On Demand & Kill Switch
@@ -732,6 +746,19 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }
     }
-}
 
+    private func fetchAuthToken() throws -> NSString? {
+#if SUBSCRIPTION
+        if let accessToken = accountManager.accessToken  {
+            os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
+            return Self.adaptAccessTokenForVPN(accessToken) as NSString?
+        }
 #endif
+        os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
+        return try tokenStore.fetchToken() as NSString?
+    }
+
+    private static func adaptAccessTokenForVPN(_ token: String) -> String {
+        "ddg:\(token)"
+    }
+}

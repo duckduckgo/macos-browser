@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import WebKit
 import BrowserServicesKit
+import Common
 
 protocol DBPUIScanOps: AnyObject {
     func startScan() -> Bool
@@ -35,6 +36,7 @@ final class DBPUIViewModel {
     private var communicationLayer: DBPUICommunicationLayer?
     private var webView: WKWebView?
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     init(dataManager: DataBrokerProtectionDataManaging,
          scheduler: DataBrokerProtectionScheduler,
@@ -77,6 +79,11 @@ extension DBPUIViewModel: DBPUIScanOps {
     }
 
     func updateCacheWithCurrentScans() async {
-        _ = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+        do {
+            try dataManager.prepareBrokerProfileQueryDataCache()
+        } catch {
+            os_log("DBPUIViewModel error: updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPUIViewModel.updateCacheWithCurrentScans"))
+        }
     }
 }

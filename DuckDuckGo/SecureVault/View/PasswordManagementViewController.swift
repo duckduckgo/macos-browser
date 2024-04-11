@@ -268,13 +268,12 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func promptForAuthenticationIfNecessary() {
-        let authenticator = DeviceAuthenticator.shared
-#if DEBUG
-        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+        guard NSApp.runType != .uiTests else {
             toggleLockScreen(hidden: true)
             return
         }
-#endif
+
+        let authenticator = DeviceAuthenticator.shared
         toggleLockScreen(hidden: !authenticator.requiresAuthentication)
 
         authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
@@ -819,10 +818,10 @@ final class PasswordManagementViewController: NSViewController {
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
-        NSMenu {
-            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin)).withImage(.loginGlyph)
-            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity)).withImage(.identityGlyph)
-            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard)).withImage(.creditCardGlyph)
+        return NSMenu {
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), target: self).withImage(.loginGlyph)
+            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), target: self).withImage(.identityGlyph)
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), target: self).withImage(.creditCardGlyph)
         }
     }
 

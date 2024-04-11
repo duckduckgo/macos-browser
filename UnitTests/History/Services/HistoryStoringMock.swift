@@ -28,8 +28,8 @@ final class HistoryStoringMock: HistoryStoring {
     }
 
     var cleanOldCalled = false
-    var cleanOldResult: Result<History, Error>?
-    func cleanOld(until date: Date) -> Future<History, Error> {
+    var cleanOldResult: Result<BrowsingHistory, Error>?
+    func cleanOld(until date: Date) -> Future<BrowsingHistory, Error> {
         cleanOldCalled = true
         return Future { [weak self] promise in
             guard let cleanOldResult = self?.cleanOldResult else {

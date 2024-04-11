@@ -21,7 +21,7 @@ import Subscription
 
 public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var title = UserText.shareModalTitle
-    public var description = UserText.shareModalDescription
+    public var description = UserText.shareModalDescription(platform: SubscriptionPurchaseEnvironment.current)
 
     private let subscriptionAppGroup: String
     private var actionHandlers: SubscriptionAccessActionHandlers
@@ -41,6 +41,12 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
 
     public func handleEmailAction() {
         let url: URL = hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription
+
+        if hasEmail {
+            actionHandlers.uiActionHandler(.postSubscriptionAddEmailClick)
+        } else {
+            actionHandlers.uiActionHandler(.addDeviceEnterEmail)
+        }
 
         Task {
             if SubscriptionPurchaseEnvironment.current == .appStore {

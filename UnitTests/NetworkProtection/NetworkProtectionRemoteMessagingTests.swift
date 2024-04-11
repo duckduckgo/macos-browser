@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -37,7 +35,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(visible: true)
+        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let messaging = DefaultNetworkProtectionRemoteMessaging(
             messageRequest: request,
@@ -67,7 +65,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(visible: true)
+        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         request.result = .success([])
         waitlistStorage.store(waitlistToken: "token")
@@ -103,7 +101,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(visible: true)
+        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let messages = [mockMessage(id: "123")]
 
@@ -144,7 +142,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(visible: true)
+        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         waitlistStorage.store(waitlistToken: "token")
         waitlistStorage.store(waitlistTimestamp: 123)
@@ -183,7 +181,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(visible: true)
+        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let dismissedMessage = mockMessage(id: "123")
         let activeMessage = mockMessage(id: "456")
@@ -212,7 +210,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(visible: true)
+        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let hiddenMessage = mockMessage(id: "123", daysSinceNetworkProtectionEnabled: 10)
         let activeMessage = mockMessage(id: "456")
@@ -238,7 +236,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(visible: false)
+        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
 
         let hiddenMessage = mockMessage(id: "123", requiresNetPAccess: true)
         try? storage.store(messages: [hiddenMessage])
@@ -262,7 +260,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let visibility = NetworkProtectionVisibilityMock(visible: true)
+        let visibility = NetworkProtectionVisibilityMock(isInstalled: false, visible: true)
 
         let message = mockMessage(id: "123", requiresNetPUsage: false, requiresNetPAccess: true)
         try? storage.store(messages: [message])
@@ -376,5 +374,3 @@ final class MockWaitlistActivationDateStore: WaitlistActivationDateStore {
     }
 
 }
-
-#endif

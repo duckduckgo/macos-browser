@@ -23,7 +23,7 @@ import SwiftUI
 import NetworkProtection
 import LoginItems
 
-/// Abstraction of the the Network Protection status bar menu with a simple interface.
+/// Abstraction of the the VPN status bar menu with a simple interface.
 ///
 @objc
 public final class StatusBarMenu: NSObject {
@@ -56,7 +56,9 @@ public final class StatusBarMenu: NSObject {
                 appLauncher: AppLaunching,
                 menuItems: @escaping () -> [MenuItem],
                 agentLoginItem: LoginItem?,
-                isMenuBarStatusView: Bool) {
+                isMenuBarStatusView: Bool,
+                userDefaults: UserDefaults,
+                uninstallHandler: @escaping () async -> Void) {
 
         self.model = model
         let statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -69,7 +71,10 @@ public final class StatusBarMenu: NSObject {
                                            appLauncher: appLauncher,
                                            menuItems: menuItems,
                                            agentLoginItem: agentLoginItem,
-                                           isMenuBarStatusView: isMenuBarStatusView)
+                                           isMenuBarStatusView: isMenuBarStatusView,
+                                           userDefaults: userDefaults,
+                                           uninstallHandler: uninstallHandler)
+
         popover.behavior = .transient
 
         super.init()

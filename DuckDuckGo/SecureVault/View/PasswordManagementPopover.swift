@@ -23,8 +23,6 @@ import SwiftUI
 
 final class PasswordManagementPopover: NSPopover {
 
-    private var cancellables = Set<AnyCancellable>()
-
     override init() {
         super.init()
 
@@ -60,23 +58,6 @@ final class PasswordManagementPopover: NSPopover {
 }
 
 extension PasswordManagementPopover: NSPopoverDelegate {
-
-    func popoverDidShow(_ notification: Notification) {
-        NotificationCenter.default.publisher(for: NSWindow.didResignMainNotification)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                guard let self = self, self.isShown else { return }
-
-                if !DeviceAuthenticator.shared.isAuthenticating {
-                    self.close()
-                }
-            }
-            .store(in: &cancellables)
-    }
-
-    func popoverShouldClose(_ popover: NSPopover) -> Bool {
-        return !DeviceAuthenticator.shared.isAuthenticating
-    }
 
     func popoverDidClose(_ notification: Notification) {
         if let window = viewController.view.window {

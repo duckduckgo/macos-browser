@@ -16,9 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION || DBP
-
-import Macros
 import SwiftUI
 import SwiftUIExtensions
 
@@ -85,10 +82,6 @@ private extension Text {
 
 }
 
-#endif
-
-#if NETWORK_PROTECTION
-
 struct NetworkProtectionTermsAndConditionsContentView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -154,12 +147,10 @@ struct NetworkProtectionTermsAndConditionsContentView: View {
 }
 
 struct NetworkProtectionWaitlistTermsAndConditionsViewData: WaitlistTermsAndConditionsViewData {
-    let title = "Network Protection Beta\nService Terms and Privacy Policy"
+    let title = "VPN Beta\nService Terms and Privacy Policy"
     let buttonCancelLabel = UserText.networkProtectionWaitlistButtonCancel
     let buttonAgreeAndContinueLabel = UserText.networkProtectionWaitlistButtonAgreeAndContinue
 }
-
-#endif
 
 #if DBP
 
@@ -186,7 +177,7 @@ struct DataBrokerProtectionTermsAndConditionsContentView: View {
                         .foregroundColor(Color.blue)
                         .underline(color: .blue)
                         .onTapGesture {
-                            let url = #URL("https://duckduckgo.com/privacy")
+                            let url = URL(string: "https://duckduckgo.com/privacy")!
                             WindowsManager.openNewWindow(with: url, source: .ui, isBurner: false)
                         }
                     Text(verbatim: "also applies here.")

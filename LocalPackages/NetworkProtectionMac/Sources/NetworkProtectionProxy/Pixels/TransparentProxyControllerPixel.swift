@@ -19,15 +19,17 @@
 import Foundation
 import PixelKit
 
-extension TransparentProxyController.StartError: PixelKitEventErrorDetails {
-    public var underlyingError: Error? {
+extension TransparentProxyController.StartError: CustomNSError {
+    public var errorUserInfo: [String: Any] {
         switch self {
         case .failedToLoadConfiguration(let underlyingError),
                 .failedToSaveConfiguration(let underlyingError),
                 .failedToStartProvider(let underlyingError):
-            return underlyingError
+            return [
+                NSUnderlyingErrorKey: underlyingError as NSError
+            ]
         default:
-            return nil
+            return [:]
         }
     }
 }

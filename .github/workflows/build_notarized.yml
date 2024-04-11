@@ -34,7 +34,7 @@ on:
         type: boolean
       asana-task-url:
         description: "Asana release task URL"
-        required: true
+        required: false
         type: string
       branch:
         description: "Branch name"

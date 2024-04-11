@@ -19,7 +19,6 @@
 import Combine
 import Common
 import Foundation
-import Macros
 import SwiftUI
 
 protocol DefaultBrowserProvider {
@@ -38,7 +37,7 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
     let bundleIdentifier: String
 
     var isDefault: Bool {
-        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: #URL("http://")),
+        guard let defaultBrowserURL = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "http://")!),
               let ddgBrowserURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
         else {
             return false
@@ -71,6 +70,8 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
 }
 
 final class DefaultBrowserPreferences: ObservableObject {
+
+    static let shared = DefaultBrowserPreferences()
 
     @Published private(set) var isDefault: Bool = false {
         didSet {
@@ -114,8 +115,34 @@ final class DefaultBrowserPreferences: ObservableObject {
 
         do {
             try defaultBrowserProvider.presentDefaultBrowserPrompt()
+            repeatCheckIfDefault()
         } catch {
             defaultBrowserProvider.openSystemPreferences()
+        }
+    }
+
+    var executionCount = 0
+    let maxNumberOfExecutions = 60
+    var timer: Timer?
+
+    // Monitors for changes in default browser setting over the next minute.
+    // The reason is there is no API to get a notification for this change.
+    private func repeatCheckIfDefault() {
+        timer?.invalidate()
+        executionCount = 0
+        timer = Timer.scheduledTimer(timeInterval: 1.0,
+                                     target: self,
+                                     selector: #selector(timerFired),
+                                     userInfo: nil,
+                                     repeats: true)
+    }
+
+    @objc private func timerFired() {
+        checkIfDefault()
+
+        executionCount += 1
+        if executionCount >= maxNumberOfExecutions {
+            timer?.invalidate()
         }
     }
 

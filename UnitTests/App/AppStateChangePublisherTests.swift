@@ -17,7 +17,6 @@
 //
 
 import Combine
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -217,7 +216,7 @@ final class AppStateChangePublisherTests: XCTestCase {
             }.store(in: &cancellables)
 
         WindowControllersManager.shared.mainWindowControllers[0].mainViewController.tabCollectionViewModel
-            .tabViewModel(at: 0)!.tab.url = #URL("https://duckduckgo.com")
+            .tabViewModel(at: 0)!.tab.url = URL(string: "https://duckduckgo.com")!
 
         waitForExpectations(timeout: 0.3, handler: nil)
     }

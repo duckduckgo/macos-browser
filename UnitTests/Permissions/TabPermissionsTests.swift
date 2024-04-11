@@ -17,7 +17,6 @@
 //
 
 import Combine
-import Macros
 import Navigation
 import XCTest
 
@@ -28,7 +27,7 @@ import XCTest
 final class TabPermissionsTests: XCTestCase {
 
     struct URLs {
-        let url = #URL("http://testhost.com/")
+        let url = URL(string: "http://testhost.com/")!
     }
     let urls = URLs()
 
@@ -82,7 +81,7 @@ final class TabPermissionsTests: XCTestCase {
 
         workspace.appUrl = Bundle.main.bundleURL
 
-        let externalUrl = #URL("testextapp://openapp?arg=1")
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
 
         let workspaceOpenCalledPromise = Future<URL, Never> { promise in
             workspace.onOpen = { url in
@@ -163,7 +162,7 @@ final class TabPermissionsTests: XCTestCase {
 
         workspace.appUrl = Bundle.main.bundleURL
 
-        let externalUrl = #URL("testextapp://openapp?arg=1")
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
 
         let workspaceOpenCalledPromise = Future<URL, Never> { promise in
             workspace.onOpen = { url in
@@ -212,7 +211,7 @@ final class TabPermissionsTests: XCTestCase {
             XCTFail("Unexpected query")
         }
 
-        let externalUrl2 = #URL("testextapp://openapp2?arg=2")
+        let externalUrl2 = URL(string: "testextapp://openapp2?arg=2")!
         tab.setUrl(externalUrl2, source: .link)
 
         let resultUrl2 = try await workspaceOpenCalledPromise2.value
@@ -233,7 +232,7 @@ final class TabPermissionsTests: XCTestCase {
 
         workspace.appUrl = Bundle.main.bundleURL
 
-        let externalUrl = #URL("testextapp://openapp?arg=1")
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
 
         let workspaceOpenCalledPromise = Future<URL, Never> { promise in
             workspace.onOpen = { url in
@@ -282,7 +281,7 @@ final class TabPermissionsTests: XCTestCase {
 
         workspace.appUrl = Bundle.main.bundleURL
 
-        let externalUrl = #URL("testextapp://openapp?arg=1")
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
 
         workspace.onOpen = { _ in
             XCTFail("Unexpected Workspace.open")
@@ -326,7 +325,7 @@ final class TabPermissionsTests: XCTestCase {
 
         workspace.appUrl = nil
 
-        let externalUrl = #URL("testextapp://openapp?arg=1")
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
 
         workspace.onOpen = { _ in
             XCTFail("Unexpected Workspace.open")
@@ -364,7 +363,7 @@ final class TabPermissionsTests: XCTestCase {
 
         workspace.appUrl = nil
 
-        let externalUrl = #URL("testextapp://openapp?arg=1")
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
 
         workspace.onOpen = { _ in
             XCTFail("Unexpected Workspace.open")
@@ -410,7 +409,7 @@ final class TabPermissionsTests: XCTestCase {
 
         let workspace = WorkspaceMock()
         workspace.appUrl = Bundle.main.bundleURL
-        let externalUrl = #URL("testextapp://openapp?arg=1")
+        let externalUrl = URL(string: "testextapp://openapp?arg=1")!
 
         eDidCancel = expectation(description: "didCancel external app should be called")
 

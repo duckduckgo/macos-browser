@@ -55,7 +55,7 @@ final class EncryptedHistoryStore: HistoryStoring {
         }
     }
 
-    func cleanOld(until date: Date) -> Future<History, Error> {
+    func cleanOld(until date: Date) -> Future<BrowsingHistory, Error> {
         return Future { [weak self] promise in
             self?.context.perform {
                 guard let self = self else {
@@ -108,13 +108,13 @@ final class EncryptedHistoryStore: HistoryStoring {
         return .success(())
     }
 
-    private func reload(_ context: NSManagedObjectContext) -> Result<History, Error> {
+    private func reload(_ context: NSManagedObjectContext) -> Result<BrowsingHistory, Error> {
         let fetchRequest = HistoryEntryManagedObject.fetchRequest() as NSFetchRequest<HistoryEntryManagedObject>
         fetchRequest.returnsObjectsAsFaults = false
         do {
             let historyEntries = try context.fetch(fetchRequest)
             os_log("%d entries loaded from history", log: .history, historyEntries.count)
-            let history = History(historyEntries: historyEntries)
+            let history = BrowsingHistory(historyEntries: historyEntries)
             return .success(history)
         } catch {
             Pixel.fire(.debug(event: .historyReloadFailed, error: error))
@@ -159,6 +159,7 @@ final class EncryptedHistoryStore: HistoryStoring {
     func save(entry: HistoryEntry) -> Future<[(id: Visit.ID, date: Date)], Error> {
         return Future { [weak self] promise in
             self?.context.perform { [weak self] in
+
                 guard let self = self else {
                     promise(.failure(HistoryStoreError.storeDeallocated))
                     return
@@ -174,6 +175,7 @@ final class EncryptedHistoryStore: HistoryStoring {
                     fetchedObjects = try self.context.fetch(fetchRequest)
                 } catch {
                     Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                    Pixel.fire(.debug(event: .historySaveFailedDaily, error: error), limitTo: .dailyFirst)
                     promise(.failure(error))
                     return
                 }
@@ -202,6 +204,7 @@ final class EncryptedHistoryStore: HistoryStoring {
                 switch insertionResult {
                 case .failure(let error):
                     Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                    Pixel.fire(.debug(event: .historySaveFailedDaily, error: error), limitTo: .dailyFirst)
                     context.reset()
                     promise(.failure(error))
                 case .success(let visitMOs):
@@ -209,6 +212,7 @@ final class EncryptedHistoryStore: HistoryStoring {
                         try self.context.save()
                     } catch {
                         Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                        Pixel.fire(.debug(event: .historySaveFailedDaily, error: error), limitTo: .dailyFirst)
                         context.reset()
                         promise(.failure(HistoryStoreError.savingFailed))
                         return
@@ -324,10 +328,10 @@ final class EncryptedHistoryStore: HistoryStoring {
 
 }
 
-fileprivate extension History {
+fileprivate extension BrowsingHistory {
 
     init(historyEntries: [HistoryEntryManagedObject]) {
-        self = historyEntries.reduce(into: History(), {
+        self = historyEntries.reduce(into: BrowsingHistory(), {
             if let historyEntry = HistoryEntry(historyEntryMO: $1) {
                 $0.append(historyEntry)
             }

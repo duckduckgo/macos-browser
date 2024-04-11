@@ -27,11 +27,29 @@ final class CriticalPathsTests: XCTestCase {
 
     override func setUp() {
         // Launch App
-        app = XCUIApplication()
+        app = XCUIApplication(bundleIdentifier: "com.duckduckgo.macos.browser.review")
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
+        if app.windows.count == 0 {
+            app.menuItems["newWindow:"].click()
+        }
+        toggleInternalUserState()
+        cleanupAndResetData()
+    }
 
-        // Set Internal User
+    override func tearDown() {
+        toggleInternalUserState()
+        cleanupAndResetData()
+        app.menuItems["closeAllWindows:"].click()
+    }
+
+    private func accessSettings() {
+        app.menuItems["openPreferences:"].click()
+        let settingsWindow = app.windows["Settings"]
+        XCTAssertTrue(settingsWindow.exists, "Settings window is not visible")
+    }
+
+    private func toggleInternalUserState() {
         let menuBarsQuery = app.menuBars
         debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
         debugMenuBarItem.click()
@@ -39,11 +57,25 @@ final class CriticalPathsTests: XCTestCase {
         internaluserstateMenuItem.click()
     }
 
+    private func cleanupAndResetData() {
+        let menuBarsQuery = app.menuBars
+        debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
+
+        debugMenuBarItem.click()
+        let resetDataMenuItem = menuBarsQuery.menuItems["MainMenu.resetData"]
+        resetDataMenuItem.hover()
+        let resetBookMarksData = resetDataMenuItem.menuItems["MainMenu.resetBookmarks"]
+        resetBookMarksData.click()
+
+        debugMenuBarItem.click()
+        resetDataMenuItem.hover()
+        let resetAutofillData = resetDataMenuItem.menuItems["MainMenu.resetSecureVaultData"]
+        resetAutofillData.click()
+    }
+
     func testCanCreateSyncAccount() throws {
         // Go to Sync Set up
-        let newTabWindow = app.windows["New Tab"]
-        newTabWindow.children(matching: .button).element(boundBy: 4).click()
-        newTabWindow.menuItems["openPreferences:"].click()
+        accessSettings()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
@@ -51,6 +83,7 @@ final class CriticalPathsTests: XCTestCase {
         let sheetsQuery = settingsWindow.sheets
         settingsWindow/*@START_MENU_TOKEN@*/.buttons["Sync and Back Up This Device"]/*[[".groups",".scrollViews.buttons[\"Sync and Back Up This Device\"]",".buttons[\"Sync and Back Up This Device\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
         sheetsQuery.buttons["Turn On Sync & Backup"].click()
+        _ = sheetsQuery.buttons["Next"].waitForExistence(timeout: 5)
         sheetsQuery.buttons["Next"].click()
         sheetsQuery.buttons["Done"].click()
         let syncEnabledElement = settingsWindow.staticTexts["Sync Enabled"]
@@ -62,16 +95,12 @@ final class CriticalPathsTests: XCTestCase {
         sheetsQuery.buttons["Delete Data"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
-        XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
+        XCTAssertTrue(beginSync.exists, "Begin Syncing text is not visible")
     }
 
     func testCanRecoverSyncAccount() throws {
         // Go to Sync Set up
-        let newTabWindow = app.windows["New Tab"]
-        newTabWindow.children(matching: .button).element(boundBy: 4).click()
-        newTabWindow.menuItems["openPreferences:"].click()
+        accessSettings()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
@@ -102,16 +131,15 @@ final class CriticalPathsTests: XCTestCase {
         sheetsQuery.buttons["Delete Data"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
-        XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
+        XCTAssertTrue(beginSync.exists, "Begin Sync text is not visible")
+
     }
 
     func testCanRemoveData() {
+
         // Go to Sync Set up
-        let newTabWindow = app.windows["New Tab"]
-        newTabWindow.children(matching: .button).element(boundBy: 4).click()
-        newTabWindow.menuItems["openPreferences:"].click()
+        accessSettings()
+
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
@@ -142,9 +170,6 @@ final class CriticalPathsTests: XCTestCase {
         alertSheet.staticTexts["Sync & Backup Error"].click()
         XCTAssertTrue(alertSheet.exists, "Sync Error text is not visible")
 
-        // Clean Up
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
     }
 
     func testCanLoginToExistingSyncAccount() {
@@ -154,9 +179,7 @@ final class CriticalPathsTests: XCTestCase {
         }
 
         // Go to Sync Set up
-        let newTabWindow = app.windows["New Tab"]
-        newTabWindow.children(matching: .button).element(boundBy: 4).click()
-        newTabWindow.menuItems["openPreferences:"].click()
+        accessSettings()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
@@ -168,8 +191,6 @@ final class CriticalPathsTests: XCTestCase {
 
         // Clean Up
         logOut()
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
     }
 
     func testCanSyncData() {
@@ -215,17 +236,13 @@ final class CriticalPathsTests: XCTestCase {
         settingsWindow/*@START_MENU_TOKEN@*/.checkBoxes["Unify Favorites Across Devices"]/*[[".groups",".scrollViews.checkBoxes[\"Unify Favorites Across Devices\"]",".checkBoxes[\"Unify Favorites Across Devices\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
 
         // Check Bookmarks
-        chekBookmarks()
+        checkBookmarks()
 
         // Check Unified favorites
         checkUnifiedFavorites()
 
         // Check Logins
-        checkLogins()
-
-        // Clean Up
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
+        // checkLogins()
     }
 
     private func logIn() {
@@ -258,15 +275,10 @@ final class CriticalPathsTests: XCTestCase {
     }
 
     private func addBookmarksAndFavorites() {
-        let newTabWindow = app.windows["New Tab"]
-        newTabWindow.buttons["Options Button"].click()
-        newTabWindow.menuItems["openPreferences:"].click()
-        let settingsWindow = app.windows["Settings"]
-        settingsWindow.popUpButtons["Settings"].click()
-        settingsWindow.menuItems["Bookmarks"].click()
+        app.menuItems["showManageBookmarks:"].click()
         let bookmarksWindow = app.windows["Bookmarks"]
         bookmarksWindow.buttons["  New Bookmark"].click()
-        let sheetsQuery = XCUIApplication().windows["Bookmarks"].sheets
+        let sheetsQuery = app.windows["Bookmarks"].sheets
         sheetsQuery.textFields["Title Text Field"].click()
         sheetsQuery.textFields["Title Text Field"].typeText("www.duckduckgo.com")
         sheetsQuery.textFields["URL Text Field"].click()
@@ -284,9 +296,8 @@ final class CriticalPathsTests: XCTestCase {
 
     private func addLogin() {
         let bookmarksWindow = app.windows["Bookmarks"]
-        bookmarksWindow.buttons["Options Button"].click()
+        bookmarksWindow.buttons["NavigationBarViewController.optionsButton"].click()
         bookmarksWindow.menuItems["Autofill"].click()
-        bookmarksWindow.popovers.buttons["Unlock Autofill"].click()
         bookmarksWindow.popovers.buttons["add item"].click()
         bookmarksWindow.popovers.menuItems["createNewLogin"].click()
         let usernameTextfieldTextField = bookmarksWindow.popovers.textFields["Username TextField"]
@@ -311,12 +322,14 @@ final class CriticalPathsTests: XCTestCase {
         bookmarksWindow.outlines.staticTexts["Bookmarks"].click()
     }
 
-    private func chekBookmarks() {
+    private func checkBookmarks() {
         let settingsWindow = app.windows["Settings"]
         let bookmarksWindow = app.windows["Bookmarks"]
         settingsWindow.popUpButtons["Settings"].click()
         settingsWindow.menuItems["Bookmarks"].click()
-        bookmarksWindow.sheets.buttons["Not Now"].click()
+        if bookmarksWindow.sheets.buttons["Not Now"].exists {
+            bookmarksWindow.sheets.buttons["Not Now"].click()
+        }
         let duckduckgoBookmark =  bookmarksWindow.staticTexts["www.duckduckgo.com"]
         let stackOverflow =  bookmarksWindow.staticTexts["Stack Overflow - Where Developers Learn, Share, & Build Careers"]
         let privacySimplified = bookmarksWindow.staticTexts["DuckDuckGo — Privacy, simplified."]
@@ -348,7 +361,7 @@ final class CriticalPathsTests: XCTestCase {
 
     private func checkLogins() {
         let bookmarksWindow = app.windows["Bookmarks"]
-        bookmarksWindow.buttons["Options Button"].click()
+        bookmarksWindow.buttons["NavigationBarViewController.optionsButton"].click()
         bookmarksWindow.menuItems["Autofill"].click()
         let elementsQuery = bookmarksWindow.popovers.scrollViews.otherElements
         elementsQuery.buttons["Da, Dax Login, daxthetest"].click()

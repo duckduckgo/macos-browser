@@ -53,8 +53,57 @@
         }
       }
     },
-    "-1 -> 0 ... 1" : {
-
+    " %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %@"
+          }
+        }
+      }
     },
     "**%lld** tracking attempts blocked" : {
       "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
@@ -268,6 +317,7 @@
       }
     },
     "••••••••••••" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -430,24 +480,6 @@
           }
         }
       }
-    },
-    "0->1->nil" : {
-
-    },
-    "10%" : {
-
-    },
-    "20%" : {
-
-    },
-    "50%" : {
-
-    },
-    "80%" : {
-
-    },
-    "100%" : {
-
     },
     "about.app_name" : {
       "comment" : "Application name to be displayed in the About dialog",
@@ -904,66 +936,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить в избранное"
-          }
-        }
-      }
-    },
-    "add.folder.name" : {
-      "comment" : "Add Folder popover: folder name text field title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name:"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Name:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nombre:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nom :"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nome:"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Naam:"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nazwa:"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nome:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Имя:"
           }
         }
       }
@@ -2027,9 +1999,6 @@
         }
       }
     },
-    "Animate" : {
-
-    },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
       "extractionState" : "extracted_with_value",
@@ -2932,7 +2901,7 @@
     },
     "autoconsent.title" : {
       "comment" : "Autoconsent settings section title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3706,6 +3675,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сбросить список исключений?"
+          }
+        }
+      }
+    },
+    "autofill.hide-card-cvv" : {
+      "comment" : "Tooltip for the Autofill panel's Hide CVV button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVV ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide CVV"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar CVV"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer CVV"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi CVV"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVV verbergen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryj CVV"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar CVV"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть CVV-код"
           }
         }
       }
@@ -5326,6 +5355,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки"
+          }
+        }
+      }
+    },
+    "autofill.show-card-cvv" : {
+      "comment" : "Tooltip for the Autofill panel's Show CVV button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVV anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show CVV"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar CVV"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher CVV"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra CVV"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVV weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż CVV"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar CVV"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать CVV-код"
           }
         }
       }
@@ -8959,7 +9048,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Add bookmark"
+            "value" : "Add Bookmark"
           }
         },
         "es" : {
@@ -9079,7 +9168,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Edit bookmark"
+            "value" : "Edit Bookmark"
           }
         },
         "es" : {
@@ -10954,6 +11043,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Контактная информация"
+          }
+        }
+      }
+    },
+    "context.menu.home.button.mode.hide" : {
+      "comment" : "Preferences > Home Button > None item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbergen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryj"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть"
+          }
+        }
+      }
+    },
+    "context.menu.home.button.mode.left" : {
+      "comment" : "Preferences > Home Button > left position item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links neben der Zurück-Schaltfläche anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show left of the back button"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar a la izquierda del botón Atrás"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la gauche du bouton de retour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra a sinistra del pulsante Indietro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links van de 'Terug'-knop weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż na lewo od przycisku Wstecz"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar à esquerda do botão de retrocesso"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать слева от кнопки «Назад»"
+          }
+        }
+      }
+    },
+    "context.menu.home.button.mode.right" : {
+      "comment" : "Preferences > Home Button > right position item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts neben der Schaltfläche „Neu laden“ anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show right of the reload button"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar a la derecha del botón Volver a cargar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la droite du bouton de rechargement"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra a destra del pulsante Ricarica"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts van de knop 'Opnieuw laden' weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż na prawo od przycisku ponownego ładowania"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar à direita do botão de recarga"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать справа от кнопки «Перезагрузить»"
           }
         }
       }
@@ -14395,66 +14664,6 @@
         }
       }
     },
-    "downloads.restart.item" : {
-      "comment" : "Contextual menu item in downloads manager to restart the download",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stopp"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Stop"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Detener"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arrêter"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Interrompi"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stoppen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zatrzymaj"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Parar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Остановить"
-          }
-        }
-      }
-    },
     "downloads.show-in-finder.item" : {
       "comment" : "Contextual menu item in downloads manager to show the downloaded file in Finder",
       "extractionState" : "extracted_with_value",
@@ -15626,66 +15835,6 @@
         }
       }
     },
-    "edit.folder" : {
-      "comment" : "Header of the view that edits a bookmark folder",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordner bearbeiten"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Edit Folder"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar carpeta"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifier le dossier"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifica cartella"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Map bewerken"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edytuj folder"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar pasta"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Изменить папку"
-          }
-        }
-      }
-    },
     "email.copied" : {
       "comment" : "Notification that the Private email address was copied to clipboard after the user generated a new address",
       "extractionState" : "extracted_with_value",
@@ -16042,6 +16191,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Включите защиту электронной почты"
+          }
+        }
+      }
+    },
+    "email.protection.explanation" : {
+      "comment" : "Email protection feature explanation in settings. The feature blocks email trackers and hides original email address.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Mail-Tracker blockieren und deine Adresse verbergen, ohne den E-Mail-Anbieter zu wechseln."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Block email trackers and hide your address without switching your email provider."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquea los rastreadores de correo electrónico y oculta tu dirección sin cambiar de proveedor de correo electrónico."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloquez les traqueurs d'e-mails et masquez votre adresse sans changer de fournisseur de messagerie."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocca i sistemi di tracciamento delle e-mail e nascondi il tuo indirizzo, senza cambiare il provider di posta elettronica."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blokkeer e-mailtrackers en verberg je adres zonder van e-mailprovider te wisselen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zablokuj mechanizmy śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bloqueia os rastreadores de e-mail e oculta o teu endereço sem alterares o teu fornecedor de e-mail."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы блокировать трекеры и скрывать свой адрес, вовсе не нужно менять почтовый сервис."
           }
         }
       }
@@ -19687,7 +19896,7 @@
     },
     "gpc.title" : {
       "comment" : "GPC settings title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -24115,6 +24324,126 @@
         }
       }
     },
+    "import.nodata.bookmarks.subtitle" : {
+      "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du %@ Lesezeichen hast, versuche stattdessen, sie manuell zu importieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If you have %@ bookmarks, try importing them manually instead."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si tienes %@ marcadores, intenta importarlos manualmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous avez %@ signets, essayez plutôt de les importer manuellement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se hai %@ segnalibri, prova a importarli manualmente."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je %@ bladwijzers hebt, probeer ze dan handmatig te importeren."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli masz zakładki %@, spróbuj zaimportować je ręcznie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se tens favoritos do %@, tenta importá-los manualmente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если у вас есть закладки в %@, попробуйте импортировать их вручную."
+          }
+        }
+      }
+    },
+    "import.nodata.passwords.subtitle" : {
+      "comment" : "Data import error subtitle: suggestion to import passwords manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du %@ Passwörter hast, versuche stattdessen, sie manuell zu importieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If you have %@ passwords, try importing them manually instead."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si tiene %@ contraseñas, intenta importarlas manualmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous avez %@ mots de passe, essayez plutôt de les importer manuellement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se hai %@ password, prova a importarle manualmente."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je %@ wachtwoorden hebt, probeer ze dan handmatig te importeren."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli masz hasła %@, spróbuj zaimportować je ręcznie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se tens palavras-passe do %@, tenta importá-las manualmente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если у вас есть пароли в %@, попробуйте импортировать их вручную."
+          }
+        }
+      }
+    },
     "import.onePassword.app.version.info" : {
       "comment" : "Instructions how to find an installed 1Password password manager app version.\n%1$s, %2$s - app name (1Password)",
       "extractionState" : "extracted_with_value",
@@ -24294,9 +24623,6 @@
           }
         }
       }
-    },
-    "Indeterminate (-1)" : {
-
     },
     "invite.dialog.get.started.button" : {
       "comment" : "Get Started button on an invite dialog",
@@ -24584,8 +24910,309 @@
         }
       }
     },
+    "letsmove.alert.message" : {
+      "comment" : "Message of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die DuckDuckGo-App muss sich im Ordner Anwendungen befinden, damit einige Funktionen richtig funktionieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The DuckDuckGo app needs to be in the Applications folder for some features to work properly."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La aplicación DuckDuckGo debe estar en la carpeta Aplicaciones para que algunas características funcionen correctamente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'application DuckDuckGo doit se trouver dans le dossier Applications pour que certaines fonctionnalités marchent correctement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affinché alcune funzionalità funzionino correttamente, l'app DuckDuckGo deve essere nella cartella Applicazioni."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige functies in de DuckDuckGo-app werken alleen goed als de app in de map 'Applications' staat."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplikacja DuckDuckGo musi znajdować się w folderze Aplikacje, aby zapewnić prawidłowe działanie określonych funkcji."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A aplicação DuckDuckGo tem de estar na pasta Aplicações para que algumas funcionalidades funcionem corretamente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для нормальной работы некоторых функций нужно, чтобы приложение DuckDuckGo находилось в папке «Приложения»."
+          }
+        }
+      }
+    },
+    "letsmove.alert.title" : {
+      "comment" : "Title of the alert shown if the app is launched not from the /Applications folder – suggesting to move it there",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast es fast geschafft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You‘re almost there"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya casi estamos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous y êtes presque !"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ci sei quasi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je bent er bijna"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prawie gotowe"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estás quase lá"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Почти готово"
+          }
+        }
+      }
+    },
+    "letsmove.could.not.move" : {
+      "comment" : "Error message when moving the app to the /Applications folder failed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konnte nicht in den Ordner „Anwendungen“ verschoben werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Could not move to Applications folder"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido mover a la carpeta Aplicaciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de déplacer vers le dossier Applications"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile passare alla cartella Applicazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kan de app niet verplaatsen naar de map 'Applications'"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie można przenieść do folderu Aplikacje"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível mover para a pasta Aplicações"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось перенести DuckDuckGo в папку «Приложения»"
+          }
+        }
+      }
+    },
+    "letsmove.dont.move.button" : {
+      "comment" : "Do Not Move to the /Applications folder button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht bewegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Do Not Move"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No mover"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne pas déplacer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non spostare"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niet verplaatsen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie przenoś"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não mover"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не переносить"
+          }
+        }
+      }
+    },
+    "letsmove.move.button" : {
+      "comment" : "Move the /Applications folder button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Ordner „Anwendungen“ verschieben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Move to Applications Folder"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a la carpeta Aplicaciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer vers le dossier Applications"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta nella cartella Applicazioni"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verplaatsen naar de map 'Applications'"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przenieś do folderu Aplikacje"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover para a pasta Aplicações"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перенести в папку «Приложения»"
+          }
+        }
+      }
+    },
     "Location:" : {
       "comment" : "Add Folder popover: parent folder picker title",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -27090,6 +27717,186 @@
         }
       }
     },
+    "main.menu.home.button.mode.hide" : {
+      "comment" : "Main Menu > View > Home Button > None item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbergen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryj"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть"
+          }
+        }
+      }
+    },
+    "main.menu.home.button.mode.left" : {
+      "comment" : "Main Menu > View > Home Button > left position item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links vom Zurück-Button anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Left of the Back Button"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar a la izquierda del botón Atrás"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la gauche du bouton Retour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra a sinistra del pulsante Indietro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links van de 'Terug'-knop weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż na lewo od przycisku Wstecz"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar à esquerda do botão Retroceder"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать слева от кнопки «Назад»"
+          }
+        }
+      }
+    },
+    "main.menu.home.button.mode.right" : {
+      "comment" : "Main Menu > View > Home Button > right position item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts vom Reload-Button anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Right of the Reload Button"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar a la derecha del botón Volver a cargar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la droite du bouton Recharger"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra a destra del pulsante Ricarica"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts van de knop 'Opnieuw laden' weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż na prawo od przycisku ponownego ładowania"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar à direita do botão Recarregar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать справа от кнопки «Перезагрузить»"
+          }
+        }
+      }
+    },
     "main.menu.show.downloads" : {
       "comment" : "Show Downloads Popover",
       "extractionState" : "extracted_with_value",
@@ -29509,7 +30316,7 @@
       }
     },
     "newTab.setup.survey.day.0.action" : {
-      "comment" : "Action title of the Day 0 durvey of the Set Up section in the home page",
+      "comment" : "Action title of the Day 0 survey of the Set Up section in the home page",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -29521,55 +30328,55 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Share Your Thoughts"
+            "value" : "Sign Up To Participate"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Comparte tus ideas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Partagez votre avis"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Comunicaci la tua opinione"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Deel je gedachten"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Podziel się przemyśleniami"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Partilha as tuas opiniões"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Поделиться соображениями"
           }
         }
       }
     },
     "newTab.setup.survey.day.0.summary" : {
-      "comment" : "Summary of the Day 0 durvey of the Set Up section in the home page",
+      "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -29581,48 +30388,48 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Take our short survey and help us build the best browser."
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Responde a nuestra breve encuesta y ayúdanos a crear el mejor navegador."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Répondez à notre courte enquête et aidez-nous à créer le meilleur navigateur."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Rispondi al nostro breve sondaggio e aiutaci a creare il browser migliore."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vul onze korte enquête in en help ons de beste browser te bouwen."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Weź udział w krótkiej ankiecie i pomóż nam opracować najlepszą przeglądarkę."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Responde ao nosso curto inquérito e ajuda-nos a criar o melhor navegador."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Пройдите короткий опрос и помогите DuckDuckGo стать лучшим из браузеров."
           }
         }
@@ -29641,48 +30448,48 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Tell Us What Brought You Here"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Cuéntanos qué te ha traído hasta aquí"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dites-nous ce qui vous amène ici"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Raccontaci cosa ti ha portato qui"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vertel ons wat je hier heeft gebracht"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Powiedz nam, co Cię tu sprowadziło"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Diz-nos o que te trouxe aqui"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Что привело вас к нам"
           }
         }
@@ -29690,7 +30497,7 @@
     },
     "newTab.setup.survey.day.7.action" : {
       "comment" : "Action title of the Day 7 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -29750,7 +30557,7 @@
     },
     "newTab.setup.survey.day.7.summary" : {
       "comment" : "Summary of the Day 7 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -29810,7 +30617,7 @@
     },
     "newTab.setup.survey.day.7.title" : {
       "comment" : "Title of the Day 7 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -29822,6 +30629,90 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Help Us Improve"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayúdanos a mejorar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aidez-nous à nous améliorer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aiutaci a migliorare"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help ons om te verbeteren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pomóż nam we wprowadzaniu ulepszeń"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajuda-nos a melhorar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помогите нам стать лучше"
+          }
+        }
+      }
+    },
+    "newTab.setup.survey.day.14.action" : {
+      "comment" : "Action title of the Day 14 survey of the Set Up section in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilf uns, uns zu verbessern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sign Up To Participate"
+          }
+        }
+      }
+    },
+    "newTab.setup.survey.day.14.summary" : {
+      "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        }
+      }
+    },
+    "newTab.setup.survey.day.14.title" : {
+      "comment" : "Title of the Day 14 durvey of the Set Up section in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "es" : {
@@ -29927,9 +30818,6 @@
           }
         }
       }
-    },
-    "nil->0->nil" : {
-
     },
     "no.access.to.downloads.folder.header" : {
       "comment" : "Header of the alert dialog warning the user they need to give the browser permission to access the Downloads folder",
@@ -31815,7 +32703,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apri collegamento in una nuova scheda"
+            "value" : "Apri link in una nuova scheda"
           }
         },
         "nl" : {
@@ -34104,7 +34992,7 @@
       }
     },
     "Passwords:" : {
-      "comment" : "Data import summary format of how many passwords (%lld) were successfully imported.",
+      "comment" : "Data import summary format of how many passwords were successfully imported.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -41830,7 +42718,7 @@
       }
     },
     "preferences.about" : {
-      "comment" : "Show about screen",
+      "comment" : "Title of the option to show the About screen",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -42309,8 +43197,128 @@
         }
       }
     },
+    "preferences.accessibility" : {
+      "comment" : "Title of the option to show the Accessibility browser preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Barrierefreiheit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accessibility"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accesibilidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibilité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibilità"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toegankelijkheid"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dostępność"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acessibilidade"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Универсальный доступ"
+          }
+        }
+      }
+    },
+    "preferences.always-on" : {
+      "comment" : "Status indicator of a browser privacy protection feature.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Immer aktiviert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Always On"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siempre activado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toujours activé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sempre attiva"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altijd aan"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zawsze włączone"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sempre ligada"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всегда включено"
+          }
+        }
+      }
+    },
     "preferences.appearance" : {
-      "comment" : "Show appearance preferences",
+      "comment" : "Title of the option to show the Appearance preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -42791,7 +43799,7 @@
     },
     "preferences.appearance.zoom" : {
       "comment" : "Zoom settings section title",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -42916,61 +43924,241 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autovervollständigen"
+            "value" : "Passwörter"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Autofill"
+            "value" : "Passwords"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autocompletar"
+            "value" : "Contraseñas"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saisie automatique"
+            "value" : "Mots de passe"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compilazione automatica"
+            "value" : "Password"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automatisch invullen"
+            "value" : "Wachtwoorden"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autouzupełnianie"
+            "value" : "Hasła"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preenchimento automático"
+            "value" : "Palavras-passe"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Автозаполнение"
+            "value" : "Пароли"
+          }
+        }
+      }
+    },
+    "preferences.autofill-enabled-for" : {
+      "comment" : "Label presented before the email account in email protection preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autovervollständigen in diesem Browser aktiviert für:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Autofill enabled in this browser for:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autocompletar habilitado en este navegador para:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La saisie automatique est activée dans ce navigateur pour :"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compilazione automatica abilitata in questo browser per:"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "'Automatisch aanvullen' is ingeschakeld in deze browser voor:"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autouzupełnianie włączone w tej przeglądarce dla:"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preenchimento automático ativado neste navegador para:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В этом браузере включено автозаполнение для:"
+          }
+        }
+      }
+    },
+    "preferences.cookie-pop-up-protection" : {
+      "comment" : "Title of the option to show the Cookie Pop-Up Protection preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cookie-Pop-up-Schutz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cookie Pop-Up Protection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protección contra ventanas emergentes de cookies"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protection contre les fenêtres contextuelles des cookies"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protezione pop-up dei cookie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bescherming tegen cookiepop-ups"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteção contra pop-ups de cookies"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Защита от всплывающих окон куки"
+          }
+        }
+      }
+    },
+    "preferences.data-clearing" : {
+      "comment" : "Title of the option to show the Data Clearing preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenlöschung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Data Clearing"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminación de datos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacement des données"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancellazione dati"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gegevens wissen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czyszczenie danych"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpeza de Dados"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистка данных"
           }
         }
       }
     },
     "preferences.default-browser" : {
-      "comment" : "Show default browser preferences",
+      "comment" : "Title of the option to show the Default Browser Preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43210,7 +44398,7 @@
       }
     },
     "preferences.downloads" : {
-      "comment" : "Show downloads browser preferences",
+      "comment" : "Title of the downloads browser preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43270,7 +44458,7 @@
       }
     },
     "preferences.duck-player" : {
-      "comment" : "Show Duck Player browser preferences",
+      "comment" : "Title of the option to show the Duck Player browser preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43329,8 +44517,128 @@
         }
       }
     },
+    "preferences.duckduckgo-on-other-platforms" : {
+      "comment" : "Button presented to users to navigate them to our product page which presents all other products for other platforms",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo auf anderen Plattformen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo on Other Platforms"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo en otras plataformas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo sur d'autres plateformes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo su altre piattaforme"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo op andere platforms"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo na innych platformach"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo Noutras Plataformas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo для других платформ"
+          }
+        }
+      }
+    },
+    "preferences.email-protection" : {
+      "comment" : "Title of the option to show the Email Protection preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Mail-Schutz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Email Protection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protección del correo electrónico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protection des e-mails"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protezione email"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mailbescherming"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ochrona poczty e-mail"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteção de e-mail"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Защита электронной почты"
+          }
+        }
+      }
+    },
     "preferences.general" : {
-      "comment" : "Show general preferences",
+      "comment" : "Title of the option to show the General preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43385,6 +44693,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Основные"
+          }
+        }
+      }
+    },
+    "preferences.main-settings" : {
+      "comment" : "Section header in Preferences for main settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haupteinstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Main Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes principales"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages principaux"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni principali"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoofdinstellingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustawienia główne"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definições Principais"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основные настройки"
+          }
+        }
+      }
+    },
+    "preferences.off" : {
+      "comment" : "Status indicator of a browser privacy protection feature.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Off"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disattivato"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uit"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wył."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desligado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выкл."
+          }
+        }
+      }
+    },
+    "preferences.on" : {
+      "comment" : "Status indicator of a browser privacy protection feature.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "On"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aan"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wł."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вкл."
           }
         }
       }
@@ -43451,7 +44939,7 @@
     },
     "preferences.privacy" : {
       "comment" : "Show privacy browser preferences",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -43505,6 +44993,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки конфиденциальности"
+          }
+        }
+      }
+    },
+    "preferences.privacy-protections" : {
+      "comment" : "The section header in Preferences representing browser features related to privacy protection",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Privacy Protections"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protecciones de privacidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protections de la confidentialité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protezioni della Privacy"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacybescherming"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mechanizmy Ochrony Prywatności"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteções de Privacidade"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Защита конфиденциальности"
+          }
+        }
+      }
+    },
+    "preferences.private-search" : {
+      "comment" : "Title of the option to show the Private Search preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private Suche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Private Search"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Búsqueda privada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recherche privée"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ricerca Privata"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privézoekopdracht"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prywatne wyszukiwanie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisa Privada"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Частный поиск"
           }
         }
       }
@@ -43629,8 +45237,68 @@
         }
       }
     },
+    "preferences.support" : {
+      "comment" : "Open support page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterstützung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Support"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aide"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supporto"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wsparcie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assistência"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поддержка"
+          }
+        }
+      }
+    },
     "preferences.sync" : {
-      "comment" : "Show sync preferences",
+      "comment" : "Title of the option to show the Sync preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43750,7 +45418,7 @@
       }
     },
     "preferences.vpn" : {
-      "comment" : "Show VPN preferences",
+      "comment" : "Title of the option to show the VPN preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -43805,6 +45473,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "VPN"
+          }
+        }
+      }
+    },
+    "preferences.web-tracking-protection" : {
+      "comment" : "Title of the option to show the Web Tracking Protection preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web Tracking Protection"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Web Tracking Protection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protección de rastreo en la web"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protection contre le pistage sur le Web"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protezione dal tracciamento web"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bescherming tegen webtracking"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ochrona przed śledzeniem w sieci"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteção contra rastreamento na internet"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Защита от отслеживания онлайн"
           }
         }
       }
@@ -43865,6 +45593,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Печать…"
+          }
+        }
+      }
+    },
+    "private.search.explenation" : {
+      "comment" : "feature explanation in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo Private Search ist deine Standardsuchmaschine – du kannst also das Web durchsuchen, ohne getrackt zu werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La búsqueda privada de DuckDuckGo es tu motor de búsqueda predeterminado para que puedas buscar en la web sin que te rastreen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo Private Search est votre moteur de recherche par défaut, qui vous permet d'effectuer des recherches sur le Web sans être suivi(e)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo Private Search è il tuo motore di ricerca predefinito, quindi puoi effettuare ricerche sul Web senza essere tracciato."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo Private Search is je standaardzoekmachine, zodat je op het web kunt zoeken zonder gevolgd te worden."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo Private Search to domyślna wyszukiwarka, dzięki której możesz wyszukiwać treści w sieci, unikając śledzenia."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo Private Search é o teu motor de pesquisa predefinido, para que possas pesquisar a web sem seres rastreado."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo Private Search — ваша поисковая система по умолчанию. Вы можете пользоваться поиском в интернете, не опасаясь слежки."
           }
         }
       }
@@ -44500,9 +46288,6 @@
           }
         }
       }
-    },
-    "Reset (nil)" : {
-
     },
     "restart.bitwarden" : {
       "comment" : "Button to restart Bitwarden application",
@@ -46611,9 +48396,6 @@
         }
       }
     },
-    "Slow animations" : {
-
-    },
     "Smart Copy/Paste" : {
       "comment" : "Main Menu Edit-Substitutions item",
       "localizations" : {
@@ -47666,59 +49448,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Версия браузера, из которого вы пытаетесь импортировать данные"
-          }
-        }
-      }
-    },
-    "Title:" : {
-      "comment" : "Add Bookmark dialog bookmark title field heading",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Titel:"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Título:"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Titre :"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Titolo:"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Titel:"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tytuł:"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Título:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Название:"
           }
         }
       }
@@ -49398,6 +51127,7 @@
     },
     "Try importing bookmarks manually instead." : {
       "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -49451,6 +51181,7 @@
     },
     "Try importing passwords manually instead." : {
       "comment" : "Data import error subtitle: suggestion to import Passwords manually by selecting a CSV or HTML file.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -50127,8 +51858,68 @@
         }
       }
     },
-    "web.tracking.protection.explenation" : {
+    "web.tracking.protection.explanation" : {
       "comment" : "feature explanation in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo blockiert beim Durchsuchen des Internets automatisch ausgeblendete Tracker."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo automatically blocks hidden trackers as you browse the web."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo bloquea automáticamente los rastreadores ocultos mientras navegas por la web."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo bloque automatiquement les traqueurs cachés lorsque vous naviguez sur le Web."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo blocca automaticamente i sistemi di tracciamento nascosti mentre navighi sul web."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo blokkeert automatisch verborgen trackers terwijl je op het web surft."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podczas przeglądania stron internetowych DuckDuckGo automatycznie blokuje ukryte mechanizmy śledzące."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo bloqueia automaticamente os rastreadores ocultos enquanto navegas na Internet."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты."
+          }
+        }
+      }
+    },
+    "web.tracking.protection.explenation" : {
+      "comment" : "Privacy feature explanation in the browser settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
@@ -50352,9 +52143,6 @@
           }
         }
       }
-    },
-    "Zero" : {
-
     },
     "zoom" : {
       "comment" : "Menu with Zooming commands",

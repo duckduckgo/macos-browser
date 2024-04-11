@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -56,7 +55,7 @@ final class WindowManagerStateRestorationTests: XCTestCase {
                 interactionStateData: "data".data(using: .utf8)!,
                 shouldLoadInBackground: false),
             Tab(),
-            Tab(content: .url(#URL("https://duckduckgo.com/?q=search&t=osx&ia=web"), source: .link),
+            Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search&t=osx&ia=web")!, source: .link),
                 title: "DDG search",
                 interactionStateData: "data 2".data(using: .utf8)!,
                 shouldLoadInBackground: false)
@@ -64,15 +63,15 @@ final class WindowManagerStateRestorationTests: XCTestCase {
         let tabs2 = [
             Tab(),
             Tab(),
-            Tab(content: .url(#URL("https://duckduckgo.com/?q=another_search&t=osx&ia=web"), source: .link),
+            Tab(content: .url(URL(string: "https://duckduckgo.com/?q=another_search&t=osx&ia=web")!, source: .link),
                 title: "DDG search",
                 interactionStateData: "data 3".data(using: .utf8)!,
                 shouldLoadInBackground: false)
         ]
         let pinnedTabs = [
-            Tab(content: .url(#URL("https://duck.com"), source: .link)),
-            Tab(content: .url(#URL("https://wikipedia.org"), source: .link)),
-            Tab(content: .url(#URL("https://duckduckgo.com/?q=search_in_pinned_tab&t=osx&ia=web"), source: .link),
+            Tab(content: .url(URL(string: "https://duck.com")!, source: .link)),
+            Tab(content: .url(URL(string: "https://wikipedia.org")!, source: .link)),
+            Tab(content: .url(URL(string: "https://duckduckgo.com/?q=search_in_pinned_tab&t=osx&ia=web")!, source: .link),
                 title: "DDG search",
                 interactionStateData: "data 4".data(using: .utf8)!,
                 shouldLoadInBackground: false)

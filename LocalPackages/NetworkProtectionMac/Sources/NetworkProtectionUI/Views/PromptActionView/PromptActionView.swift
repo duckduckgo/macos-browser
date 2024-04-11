@@ -30,35 +30,6 @@ fileprivate extension View {
             .foregroundColor(Color(.defaultText))
     }
 
-    @ViewBuilder
-    func applyStepButtonAttributes(colorScheme: ColorScheme) -> some View {
-        switch colorScheme {
-        case .dark:
-            self.buttonStyle(.plain)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 0)
-                .frame(height: 20, alignment: .center)
-                .background(Color(.onboardingButtonBackgroundColor))
-                .cornerRadius(5)
-                .shadow(color: .black.opacity(0.2), radius: 0.5, x: 0, y: 1)
-                .shadow(color: .black.opacity(0.05), radius: 0.5, x: 0, y: 0)
-                .shadow(color: .black.opacity(0.1), radius: 0, x: 0, y: 0)
-        default:
-            self.buttonStyle(.plain)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 0)
-                .frame(height: 20, alignment: .center)
-                .background(Color(.onboardingButtonBackgroundColor))
-                .cornerRadius(5)
-                .shadow(color: .black.opacity(0.1), radius: 0.5, x: 0, y: 1)
-                .shadow(color: .black.opacity(0.05), radius: 0.5, x: 0, y: 0)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 5)
-                        .inset(by: -0.25)
-                        .stroke(.black.opacity(0.1), lineWidth: 0.5)
-                )
-        }
-    }
 }
 
 struct PromptActionView: View {
@@ -95,7 +66,7 @@ struct PromptActionView: View {
                         .multilineText()
 
                         Button(model.actionTitle, action: model.action)
-                            .applyStepButtonAttributes(colorScheme: colorScheme)
+                            .keyboardShortcut(.defaultAction)
                             .padding(.top, 3)
                     }
 

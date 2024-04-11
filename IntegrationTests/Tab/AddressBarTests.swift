@@ -460,7 +460,6 @@ class AddressBarTests: XCTestCase {
     }
 
     func testWhenTabReloaded_addressBarIsDeactivated() async throws {
-        throw XCTSkip("https://app.asana.com/0/0/1206791095409241/1206794776988117/f")
         let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .webViewUpdated), webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
         window = WindowsManager.openNewWindow(with: viewModel)!
@@ -781,18 +780,4 @@ class AddressBarTests: XCTestCase {
         XCTAssertEqual(window2.firstResponder, window2)
     }
 
-}
-
-protocol MainActorPerformer {
-    func perform(_ closure: @MainActor () -> Void)
-}
-struct OnMainActor: MainActorPerformer {
-    private init() {}
-
-    static func instance() -> MainActorPerformer { OnMainActor() }
-
-    @MainActor(unsafe)
-    func perform(_ closure: @MainActor () -> Void) {
-        closure()
-    }
 }

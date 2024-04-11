@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Macros
 import PrivacyDashboard
 import XCTest
 
@@ -26,8 +25,8 @@ import XCTest
 class WebsiteBreakageReportTests: XCTestCase {
 
     func testCommonSetOfFields() throws {
-        let breakage = WebsiteBreakage(
-            siteUrl: #URL("https://example.test/"),
+        let breakage = BrokenSiteReport(
+            siteUrl: URL(string: "https://example.test/")!,
             category: "contentIsMissing",
             description: nil,
             osVersion: "12.3.0",
@@ -47,7 +46,13 @@ class WebsiteBreakageReportTests: XCTestCase {
             protectionsState: true,
             reportFlow: .appMenu,
             errors: nil,
-            httpStatusCodes: nil
+            httpStatusCodes: nil,
+            openerContext: nil,
+            vpnOn: false,
+            jsPerformance: nil,
+            userRefreshCount: 0,
+            didOpenReportInfo: false,
+            toggleReportCounter: nil
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -69,8 +74,8 @@ class WebsiteBreakageReportTests: XCTestCase {
     }
 
     func testThatNativeAppSpecificFieldsAreReported() throws {
-        let breakage = WebsiteBreakage(
-            siteUrl: #URL("http://unsafe.example.test/path/to/thing.html"),
+        let breakage = BrokenSiteReport(
+            siteUrl: URL(string: "http://unsafe.example.test/path/to/thing.html")!,
             category: "videoOrImagesDidntLoad",
             description: nil,
             osVersion: "12",
@@ -90,7 +95,13 @@ class WebsiteBreakageReportTests: XCTestCase {
             protectionsState: true,
             reportFlow: .appMenu,
             errors: nil,
-            httpStatusCodes: nil
+            httpStatusCodes: nil,
+            openerContext: nil,
+            vpnOn: false,
+            jsPerformance: nil,
+            userRefreshCount: 0,
+            didOpenReportInfo: false,
+            toggleReportCounter: nil
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -120,7 +131,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         params["test"] = "1"
         let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
                                                      queryParameters: params,
-                                                     allowedQueryReservedCharacters: WebsiteBreakage.allowedQueryReservedCharacters)
+                                                     allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         return configuration.request
     }
 }

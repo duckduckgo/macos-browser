@@ -47,6 +47,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
+
 #if DEBUG && SUBSCRIPTION
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
@@ -144,7 +145,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     }()
 
     private func handleControllerEvent(_ event: TransparentProxyController.Event) {
-        PixelKit.fire(event)
+
     }
 
     @MainActor
@@ -200,6 +201,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         VPNAppEventsHandler(tunnelController: tunnelController)
     }()
 
+    private lazy var vpnUninstaller: VPNUninstaller = {
+        VPNUninstaller(networkExtensionController: networkExtensionController, vpnConfigurationManager: VPNConfigurationManager())
+    }()
+
     /// The status bar NetworkProtection menu
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
@@ -237,6 +242,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .showSettings)
                     }),
+                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
+                        await self?.appLauncher.launchApp(withCommand: .showFAQ)
+                    }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .justOpen)
                     }),
@@ -246,68 +254,83 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 ]
             },
             agentLoginItem: nil,
-            isMenuBarStatusView: true)
+            isMenuBarStatusView: true,
+            userDefaults: .netP,
+            uninstallHandler: { [weak self] in
+                guard let self else { return }
+                await self.vpnUninstaller.uninstall(includingSystemExtension: true)
+            }
+        )
     }
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
+#if SUBSCRIPTION
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
+#endif
 
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
 
         setupMenuVisibility()
 
-        bouncer.requireAuthTokenOrKillApp()
+        Task { @MainActor in
+            // The reason we want to await for this is that nothing else should be executed
+            // if the app should quit.
+            await bouncer.requireAuthTokenOrKillApp(controller: tunnelController)
 
-        // Initialize lazy properties
-        _ = tunnelControllerIPCService
-        _ = vpnProxyLauncher
+            // Initialize lazy properties
+            _ = tunnelControllerIPCService
+            _ = vpnProxyLauncher
 
-        let dryRun: Bool
+            let dryRun: Bool
 
 #if DEBUG
-        dryRun = true
+            dryRun = true
 #else
-        dryRun = false
+            dryRun = false
 #endif
 
-        let pixelSource: String
+            let pixelSource: String
 
 #if NETP_SYSTEM_EXTENSION
-        pixelSource = "vpnAgent"
+            pixelSource = "vpnAgent"
 #else
-        pixelSource = "vpnAgentAppStore"
+            pixelSource = "vpnAgentAppStore"
 #endif
 
-        PixelKit.setUp(dryRun: dryRun,
-                       appVersion: AppVersion.shared.versionNumber,
-                       source: pixelSource,
-                       defaultHeaders: [:],
-                       log: .networkProtectionPixel,
-                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
+            PixelKit.setUp(dryRun: dryRun,
+                           appVersion: AppVersion.shared.versionNumber,
+                           source: pixelSource,
+                           defaultHeaders: [:],
+                           log: .networkProtectionPixel,
+                           defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
-            let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
-            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
-            let request = APIRequest(configuration: configuration)
+                let url = URL.pixelUrl(forPixelNamed: pixelName)
+                let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
+                let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+                let request = APIRequest(configuration: configuration)
 
-            request.fetch { _, error in
-                onComplete(error == nil, error)
+                request.fetch { _, error in
+                    onComplete(error == nil, error)
+                }
             }
-        }
 
-        vpnAppEventsHandler.appDidFinishLaunching()
+            vpnAppEventsHandler.appDidFinishLaunching()
 
-        let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
-        let launchedOnStartup = launchInformation.wasLaunchedByStartup
-        launchInformation.update()
+            let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
+            let launchedOnStartup = launchInformation.wasLaunchedByStartup
+            launchInformation.update()
 
-        if launchedOnStartup {
-            Task {
-                let isConnected = await tunnelController.isConnected
+            setUpSubscriptionMonitoring()
 
-                if !isConnected && tunnelSettings.connectOnLogin {
-                    await tunnelController.start()
+            if launchedOnStartup {
+                Task {
+                    let isConnected = await tunnelController.isConnected
+
+                    if !isConnected && tunnelSettings.connectOnLogin {
+                        await tunnelController.start()
+                    }
                 }
             }
         }
@@ -330,6 +353,41 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }.store(in: &cancellables)
+    }
+
+    private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
+
+    private func setUpSubscriptionMonitoring() {
+#if SUBSCRIPTION
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        guard accountManager.isUserAuthenticated else { return }
+        let entitlementsCheck = {
+            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        }
+
+        Task {
+            await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { [weak self] result in
+                switch result {
+                case .validEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = false
+                case .invalidEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = true
+                    PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndContinuous)
+
+                    guard let self else { return }
+                    Task {
+                        let isConnected = await self.tunnelController.isConnected
+                        if isConnected {
+                            await self.tunnelController.stop()
+                            DistributedNotificationCenter.default().post(.showExpiredEntitlementNotification)
+                        }
+                    }
+                case .error:
+                    break
+                }
+            }
+        }
+#endif
     }
 }
 

@@ -18,7 +18,6 @@
 
 import Configuration
 import Foundation
-import Macros
 
 struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
@@ -52,14 +51,14 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         // URLs for privacyConfiguration and trackerDataSet shall match the ones in update_embedded.sh. 
         // Danger checks that the URLs match on every PR. If the code changes, the regex that Danger uses may need an update.
         switch configuration {
-        case .bloomFilterBinary: return #URL("https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")
-        case .bloomFilterSpec: return #URL("https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")
-        case .bloomFilterExcludedDomains: return #URL("https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")
-        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? #URL("https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")
-        case .surrogates: return #URL("https://staticcdn.duckduckgo.com/surrogates.txt")
-        case .trackerDataSet: return #URL("https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json")
+        case .bloomFilterBinary: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!
+        case .bloomFilterSpec: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!
+        case .bloomFilterExcludedDomains: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!
+        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
+        case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
+        case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json")!
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
-        case .FBConfig: return #URL("https://staticcdn.duckduckgo.com/useragents/")
+        case .FBConfig: return URL(string: "https://staticcdn.duckduckgo.com/useragents/")!
         }
     }
 

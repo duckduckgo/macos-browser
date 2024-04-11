@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Macros
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
@@ -52,12 +51,12 @@ extension Preferences {
                             Text(UserText.duckDuckGo).font(.companyName)
 #endif
                             Text(UserText.privacySimplified).font(.privacySimplified)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.leading)
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                                 .onTapGesture(count: 12) {
-#if NETWORK_PROTECTION
                                     model.displayNetPInvite()
-#endif
                                 }
                                 .contextMenu(ContextMenu(menuItems: {
                                     Button(UserText.copy, action: {
@@ -69,11 +68,11 @@ extension Preferences {
                     .padding(.bottom, 8)
 
                     TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
-                        model.openURL(.aboutDuckDuckGo)
+                        model.openNewTab(with: .aboutDuckDuckGo)
                     }
 
                     TextButton(UserText.privacyPolicy) {
-                        model.openURL(.privacyPolicy)
+                        model.openNewTab(with: .privacyPolicy)
                     }
 
                     #if FEEDBACK
@@ -97,7 +96,7 @@ extension Preferences {
 
     struct UnsupportedDeviceInfoBox: View {
 
-        static let softwareUpdateURL = #URL("x-apple.systempreferences:com.apple.preferences.softwareupdate")
+        static let softwareUpdateURL = URL(string: "x-apple.systempreferences:com.apple.preferences.softwareupdate")!
 
         var wide: Bool
 

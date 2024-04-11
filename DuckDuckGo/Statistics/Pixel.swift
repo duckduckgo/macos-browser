@@ -30,7 +30,7 @@ final class Pixel {
         if dryRun {
             shared = Pixel(store: LocalPixelDataStore.shared) { event, params, _, _, onComplete in
                 let params = params.filter { key, _ in !["appVersion", "test"].contains(key) }
-                os_log(.debug, log: .pixel, "%{public}@ %{public}@", event.name.replacingOccurrences(of: "_", with: "."), params)
+                os_log(.debug, log: .pixel, "Pixel dry fire: %{public}@ %{public}@", event.name.replacingOccurrences(of: "_", with: "."), params.isEmpty ? "" : params.debugDescription)
                 // simulate server response time for Dry Run mode
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     onComplete(nil)
@@ -91,7 +91,10 @@ final class Pixel {
         self.sendRequest = requestSender
     }
 
-    private static let moreInfoHeader: HTTPHeaders = [APIRequest.HTTPHeaderField.moreInfo: "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString]
+    private static let pixelRequestHeaders: HTTPHeaders = [
+        APIRequest.HTTPHeaderField.moreInfo: "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString,
+        "X-DuckDuckGo-Client": "macOS"
+    ]
 
     // Temporary for activation pixels
     static private var aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
@@ -103,7 +106,7 @@ final class Pixel {
               withAdditionalParameters parameters: [String: String]? = nil,
               allowedQueryReservedCharacters: CharacterSet? = nil,
               includeAppVersionParameter: Bool = true,
-              withHeaders headers: APIRequest.Headers = APIRequest.Headers(additionalHeaders: moreInfoHeader),
+              withHeaders headers: APIRequest.Headers = APIRequest.Headers(additionalHeaders: pixelRequestHeaders),
               onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         func repetition() -> Event.Repetition {
@@ -154,6 +157,9 @@ final class Pixel {
                           onComplete: onComplete)
     }
 
+    func clearRepetitions(for event: Pixel.Event) {
+        store().removeValue(forKey: event.name)
+    }
 }
 
 public func pixelAssertionFailure(_ message: @autoclosure () -> String = String(), file: StaticString = #fileID, line: UInt = #line) {

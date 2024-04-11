@@ -26,6 +26,8 @@ extension Bundle {
         static let buildNumber = kCFBundleVersionKey as String
         static let versionNumber = "CFBundleShortVersionString"
         static let displayName = "CFBundleDisplayName"
+        static let documentTypes = "CFBundleDocumentTypes"
+        static let typeExtensions = "CFBundleTypeExtensions"
         static let vpnMenuAgentBundleId = "AGENT_BUNDLE_ID"
         static let vpnMenuAgentProductName = "AGENT_PRODUCT_NAME"
 
@@ -95,17 +97,7 @@ extension Bundle {
 #endif
 
     func appGroup(bundle: BundleGroup) -> String {
-        var appGroupName: String
-
-        switch bundle {
-        case .dbp:
-            appGroupName = "DBP_APP_GROUP"
-        case .netP:
-            appGroupName = "NETP_APP_GROUP"
-        case .subs:
-            appGroupName = "SUBSCRIPTION_APP_GROUP"
-        }
-
+        let appGroupName = bundle.appGroupKey
         guard let appGroup = object(forInfoDictionaryKey: appGroupName) as? String else {
             fatalError("Info.plist is missing \(appGroupName)")
         }
@@ -125,10 +117,29 @@ extension Bundle {
         return path.hasPrefix(applicationsPath)
     }
 
+    var documentTypes: [[String: Any]] {
+        infoDictionary?[Keys.documentTypes] as? [[String: Any]] ?? []
+    }
+
+    var fileTypeExtensions: Set<String> {
+        documentTypes.reduce(into: []) { $0.formUnion($1[Keys.typeExtensions] as? [String] ?? []) }
+    }
+
 }
 
 enum BundleGroup {
     case netP
     case dbp
     case subs
+
+    var appGroupKey: String {
+        switch self {
+        case .dbp:
+            return "DBP_APP_GROUP"
+        case .netP:
+            return "NETP_APP_GROUP"
+        case .subs:
+            return "SUBSCRIPTION_APP_GROUP"
+        }
+    }
 }

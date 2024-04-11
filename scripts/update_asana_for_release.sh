@@ -22,7 +22,7 @@ set -e -o pipefail
 
 workspace_id="137249556945"
 asana_api_url="https://app.asana.com/api/1.0"
-task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
+task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)(:?/f)?$'
 default_incidents_parent_task_id="1135688560894081"
 default_current_objectives_project_id="72649045549333"
 cwd="$(dirname "${BASH_SOURCE[0]}")"

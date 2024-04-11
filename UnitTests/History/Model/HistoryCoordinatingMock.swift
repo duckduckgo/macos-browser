@@ -28,7 +28,7 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         onCleanFinished()
     }
 
-    var history: History?
+    var history: BrowsingHistory?
     var allHistoryVisits: [Visit]?
     @Published private(set) var historyDictionary: [URL: HistoryEntry]?
     var historyDictionaryPublisher: Published<[URL: HistoryEntry]?>.Publisher { $historyDictionary }

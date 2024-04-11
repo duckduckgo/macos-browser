@@ -59,9 +59,11 @@ final class SafariBookmarksReader {
 
     private let safariBookmarksFileURL: URL
     private var currentOperationType: ImportError.OperationType = .readPlist
+    private let otherBookmarksFolderTitle: String
 
-    init(safariBookmarksFileURL: URL) {
+    init(safariBookmarksFileURL: URL, otherBookmarksFolderTitle: String = UserText.otherBookmarksImportedFolderTitle) {
         self.safariBookmarksFileURL = safariBookmarksFileURL
+        self.otherBookmarksFolderTitle = otherBookmarksFolderTitle
     }
 
     func readBookmarks() -> DataImportResult<ImportedBookmarks> {
@@ -118,7 +120,7 @@ final class SafariBookmarksReader {
 
         }
 
-        let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: UserText.otherBookmarksImportedFolderTitle, type: .folder, urlString: nil, children: otherBookmarks)
+        let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: self.otherBookmarksFolderTitle, type: .folder, urlString: nil, children: otherBookmarks)
         let emptyFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar", type: .folder, urlString: nil, children: [])
 
         let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder, syncedBookmarks: nil)

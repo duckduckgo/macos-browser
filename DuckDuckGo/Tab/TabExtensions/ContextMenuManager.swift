@@ -234,7 +234,7 @@ private extension ContextMenuManager {
     }
 
     func bookmarkPageMenuItem() -> NSMenuItem {
-        NSMenuItem(title: UserText.bookmarkPage, action: #selector(MainViewController.bookmarkThisPage), target: nil, keyEquivalent: "")
+        NSMenuItem(title: UserText.bookmarkPage, action: #selector(MainViewController.bookmarkThisPage), target: nil, keyEquivalent: "").withAccessibilityIdentifier("ContextMenuManager.bookmarkPageMenuItem")
     }
 
     func openLinkInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {

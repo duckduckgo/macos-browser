@@ -17,20 +17,14 @@
 //
 
 import Foundation
-
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
 
 enum PinnableView: String {
     case autofill
     case bookmarks
     case downloads
     case homeButton
-
-#if NETWORK_PROTECTION
     case networkProtection
-#endif
 }
 
 protocol PinningManager {
@@ -45,11 +39,7 @@ protocol PinningManager {
 
 final class LocalPinningManager: PinningManager {
 
-#if NETWORK_PROTECTION
     static let shared = LocalPinningManager(networkProtectionFeatureActivation: NetworkProtectionKeychainTokenStore())
-#else
-    static let shared = LocalPinningManager()
-#endif
 
     static let pinnedViewChangedNotificationViewTypeKey = "pinning.pinnedViewChanged.viewType"
 
@@ -59,13 +49,11 @@ final class LocalPinningManager: PinningManager {
     @UserDefaultsWrapper(key: .manuallyToggledPinnedViews, defaultValue: [])
     private var manuallyToggledPinnedViewsStrings: [String]
 
-#if NETWORK_PROTECTION
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 
     init(networkProtectionFeatureActivation: NetworkProtectionFeatureActivation) {
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
     }
-#endif
 
     func togglePinning(for view: PinnableView) {
         flagAsManuallyToggled(view)
@@ -104,6 +92,7 @@ final class LocalPinningManager: PinningManager {
             return
         }
 
+        manuallyToggledPinnedViewsStrings.removeAll(where: { $0 == view.rawValue })
         pinnedViewStrings.removeAll(where: { $0 == view.rawValue })
 
         NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [
@@ -121,10 +110,8 @@ final class LocalPinningManager: PinningManager {
         case .bookmarks: return isPinned(.bookmarks) ? UserText.hideBookmarksShortcut : UserText.showBookmarksShortcut
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
         case .homeButton: return ""
-#if NETWORK_PROTECTION
         case .networkProtection:
             return isPinned(.networkProtection) ? UserText.hideNetworkProtectionShortcut : UserText.showNetworkProtectionShortcut
-#endif
         }
     }
 
@@ -133,7 +120,7 @@ final class LocalPinningManager: PinningManager {
     /// This method is useful for knowing if the view was manually toggled.
     /// It's particularly useful for initializing a pin to a certain value at a certain point during the execution of code,
     /// only if the user hasn't explicitly specified a desired state.
-    /// As an example: this is used in Network Protection for pinning the icon to the navigation bar the first time the
+    /// As an example: this is used in the VPN for pinning the icon to the navigation bar the first time the
     /// feature is enabled.
     ///
     func wasManuallyToggled(_ view: PinnableView) -> Bool {

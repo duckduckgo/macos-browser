@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -38,13 +37,13 @@ final class FireproofDomainsTests: XCTestCase {
     func testWhenFireproofDomainsContainsFireproofedDomainThenIsURLFireproofReturnsTrue() {
         XCTAssertFalse(logins.isFireproof(fireproofDomain: "example.com"))
         logins.add(domain: "example.com")
-        XCTAssertTrue(logins.isURLFireproof(url: #URL("http://www.example.com/example")))
+        XCTAssertTrue(logins.isURLFireproof(url: URL(string: "http://www.example.com/example")!))
     }
 
     func testWhenFireproofDomainsDoesNotContainDomainThenIsURLFireproofReturnsFalse() {
         XCTAssertFalse(logins.isFireproof(fireproofDomain: "thisisexample.com"))
         logins.add(domain: "thisisexample.com")
-        XCTAssertFalse(logins.isURLFireproof(url: #URL("http://www.example.com/example")))
+        XCTAssertFalse(logins.isURLFireproof(url: URL(string: "http://www.example.com/example")!))
     }
 
     func testWhenFireproofDomainsContainsCookieDomainThenIsCookieDomainFireproofReturnsTrue() {

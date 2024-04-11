@@ -46,7 +46,7 @@ protocol FaviconManagement: AnyObject {
     func burnDomains(_ domains: Set<String>,
                      exceptBookmarks bookmarkManager: BookmarkManager,
                      exceptSavedLogins: Set<String>,
-                     exceptExistingHistory history: History,
+                     exceptExistingHistory history: BrowsingHistory,
                      tld: TLD,
                      completion: @escaping @MainActor () -> Void)
 
@@ -245,7 +245,7 @@ final class FaviconManager: FaviconManagement {
     nonisolated func burnDomains(_ baseDomains: Set<String>,
                                  exceptBookmarks bookmarkManager: BookmarkManager,
                                  exceptSavedLogins: Set<String> = [],
-                                 exceptExistingHistory history: History,
+                                 exceptExistingHistory history: BrowsingHistory,
                                  tld: TLD,
                                  completion: @escaping @MainActor () -> Void) {
         let existingHistoryDomains = Set(history.compactMap { $0.url.host })

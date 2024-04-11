@@ -18,8 +18,6 @@
 
 import Common
 import Foundation
-
-#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
 import NetworkExtension
@@ -27,7 +25,7 @@ import SystemExtensions
 import LoginItems
 import NetworkProtectionIPC
 
-/// Utility code to help implement our debug menu options for Network Protection.
+/// Utility code to help implement our debug menu options for the VPN.
 ///
 final class NetworkProtectionDebugUtilities {
 
@@ -48,7 +46,7 @@ final class NetworkProtectionDebugUtilities {
         self.loginItemsManager = loginItemsManager
         self.settings = settings
 
-        let ipcClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId)
+        let ipcClient = TunnelControllerIPCClient()
 
         self.ipcClient = ipcClient
         self.networkProtectionFeatureDisabler = NetworkProtectionFeatureDisabler(ipcClient: ipcClient)
@@ -71,6 +69,7 @@ final class NetworkProtectionDebugUtilities {
 
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+        UserDefaults.netP.networkProtectionEntitlementsExpired = false
     }
 
     func removeSystemExtensionAndAgents() async throws {
@@ -86,5 +85,3 @@ final class NetworkProtectionDebugUtilities {
         try await ipcClient.debugCommand(.expireRegistrationKey)
     }
 }
-
-#endif

@@ -18,7 +18,6 @@
 
 import Combine
 import Common
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -39,7 +38,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
     @MainActor
     override func setUp() async throws {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         window = WindowsManager.openNewWindow(with: .none)!
 
@@ -52,7 +51,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         window.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
@@ -62,8 +61,8 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let url = #URL("http://privacy-test-pages.site/privacy-protections/https-upgrades/")
-        let upgradableUrl = #URL("http://good.third-party.site/privacy-protections/https-upgrades/frame.html")
+        let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-upgrades/")!
+        let upgradableUrl = URL(string: "http://good.third-party.site/privacy-protections/https-upgrades/frame.html")!
         let upgradedUrl = try? await AppPrivacyFeatures.shared.httpsUpgrade.upgrade(url: upgradableUrl).get()
         XCTAssertEqual(upgradedUrl, upgradableUrl.toHttps()!, "URL not upgraded")
 
@@ -101,7 +100,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
 
         let fileUrl = try await downloadTaskFuture.value.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
 
         struct Results: Decodable {
             struct Result: Decodable {
@@ -122,7 +121,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let url = #URL("http://privacy-test-pages.site/privacy-protections/https-loop-protection/")
+        let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-loop-protection/")!
 
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
@@ -179,7 +178,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
 
         let fileUrl = try await downloadTaskFuture.value.output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
 
         struct Results: Decodable {
             struct Result: Decodable {
@@ -194,8 +193,8 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let connectionUpgradedTo = try await connectionUpgradedPromise.value
 
         XCTAssertNotNil(upgradeNavigation)
-        XCTAssertEqual(upgradeNavigation?.value, #URL("http://good.third-party.site/privacy-protections/https-loop-protection/http-only.html"))
-        XCTAssertEqual(connectionUpgradedTo, #URL("https://good.third-party.site/privacy-protections/https-loop-protection/http-only.html"))
+        XCTAssertEqual(upgradeNavigation?.value, URL(string: "http://good.third-party.site/privacy-protections/https-loop-protection/http-only.html")!)
+        XCTAssertEqual(connectionUpgradedTo, URL(string: "https://good.third-party.site/privacy-protections/https-loop-protection/http-only.html")!)
     }
 
 }

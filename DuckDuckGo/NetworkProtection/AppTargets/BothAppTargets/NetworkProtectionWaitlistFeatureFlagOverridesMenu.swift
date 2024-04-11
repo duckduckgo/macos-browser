@@ -16,15 +16,13 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Foundation
 import NetworkProtection
 import NetworkProtectionUI
 import SwiftUI
 
-/// Implements the logic for Network Protection's simulate failures menu.
+/// Implements the logic for the VPN's simulate failures menu.
 ///
 @MainActor
 final class NetworkProtectionWaitlistFeatureFlagOverridesMenu: NSMenu {
@@ -148,9 +146,9 @@ final class NetworkProtectionWaitlistFeatureFlagOverridesMenu: NSMenu {
         let alert = NSAlert()
         alert.messageText = "Override to OFF value?"
         alert.informativeText = """
-        This will potentially disable Network Protection and erase your invitation.
+        This will potentially disable DuckDuckGo VPN and erase your invitation.
 
-        You can re-enable Network Protection after reverting this change.
+        You can re-enable DuckDuckGo VPN after reverting this change.
 
         Please click 'Cancel' if you're unsure.
         """
@@ -165,6 +163,4 @@ final class NetworkProtectionWaitlistFeatureFlagOverridesMenu: NSMenu {
 #Preview {
     return MenuPreview(menu: NetworkProtectionWaitlistFeatureFlagOverridesMenu())
 }
-#endif
-
 #endif

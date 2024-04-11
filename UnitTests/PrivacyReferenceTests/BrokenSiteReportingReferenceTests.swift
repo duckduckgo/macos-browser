@@ -53,7 +53,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
         params["test"] = "1"
         let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
                                                      queryParameters: params,
-                                                     allowedQueryReservedCharacters: WebsiteBreakage.allowedQueryReservedCharacters)
+                                                     allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         return configuration.request
     }
 
@@ -74,22 +74,28 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                 errors = errs.map { MockError($0) }
             }
 
-            let breakage = WebsiteBreakage(siteUrl: test.siteURL,
-                                           category: test.category,
-                                           description: test.providedDescription,
-                                           osVersion: test.os ?? "",
-                                           manufacturer: "Apple",
-                                           upgradedHttps: test.wasUpgraded,
-                                           tdsETag: test.blocklistVersion,
-                                           blockedTrackerDomains: test.blockedTrackers,
-                                           installedSurrogates: test.surrogates,
-                                           isGPCEnabled: test.gpcEnabled ?? false,
-                                           ampURL: "",
-                                           urlParametersRemoved: false,
-                                           protectionsState: test.protectionsEnabled,
-                                           reportFlow: .appMenu,
-                                           errors: errors,
-                                           httpStatusCodes: test.httpErrorCodes ?? [])
+            let breakage = BrokenSiteReport(siteUrl: test.siteURL,
+                                            category: test.category,
+                                            description: test.providedDescription,
+                                            osVersion: test.os ?? "",
+                                            manufacturer: "Apple",
+                                            upgradedHttps: test.wasUpgraded,
+                                            tdsETag: test.blocklistVersion,
+                                            blockedTrackerDomains: test.blockedTrackers,
+                                            installedSurrogates: test.surrogates,
+                                            isGPCEnabled: test.gpcEnabled ?? false,
+                                            ampURL: "",
+                                            urlParametersRemoved: false,
+                                            protectionsState: test.protectionsEnabled,
+                                            reportFlow: .appMenu,
+                                            errors: errors,
+                                            httpStatusCodes: test.httpErrorCodes ?? [],
+                                            openerContext: nil,
+                                            vpnOn: false,
+                                            jsPerformance: nil,
+                                            userRefreshCount: 0,
+                                            didOpenReportInfo: false,
+                                            toggleReportCounter: nil)
 
             let request = makeURLRequest(with: breakage.requestParameters)
 

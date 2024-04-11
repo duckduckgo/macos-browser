@@ -44,9 +44,11 @@ final class BookmarkHTMLReader {
     }
 
     private var currentOperationType: ImportError.OperationType = .parseXml
+    private let otherBookmarksFolderTitle: String
 
-    init(bookmarksFileURL: URL) {
+    init(bookmarksFileURL: URL, otherBookmarksFolderTitle: String = UserText.otherBookmarksImportedFolderTitle) {
         self.bookmarksFileURL = bookmarksFileURL
+        self.otherBookmarksFolderTitle = otherBookmarksFolderTitle
     }
 
     func readBookmarks() -> DataImportResult<HTMLImportedBookmarks> {
@@ -114,7 +116,7 @@ final class BookmarkHTMLReader {
             bookmarkBar = firstFolder
         }
 
-        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: UserText.otherBookmarksImportedFolderTitle, children: other)
+        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: otherBookmarksFolderTitle, children: other)
         let allBookmarks = ImportedBookmarks(topLevelFolders: .init(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks, syncedBookmarks: nil))
         let result = HTMLImportedBookmarks(source: importSource, bookmarks: allBookmarks)
 

@@ -124,14 +124,6 @@ extension Pixel.Event {
              .duckPlayerSettingAlways,
              .duckPlayerSettingNever,
              .duckPlayerSettingBackToDefault,
-             .networkProtectionWaitlistEntryPointMenuItemDisplayed,
-             .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
-             .networkProtectionWaitlistNotificationShown,
-             .networkProtectionWaitlistNotificationTapped,
-             .networkProtectionWaitlistTermsAndConditionsDisplayed,
-             .networkProtectionWaitlistTermsAndConditionsAccepted,
-             .networkProtectionWaitlistUserActive,
-             .networkProtectionWaitlistIntroDisplayed,
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
@@ -165,7 +157,58 @@ extension Pixel.Event {
              .dataBrokerDisableAndDeleteDaily,
              .dataBrokerEnableLoginItemDaily,
              .dataBrokerDisableLoginItemDaily,
-             .dataBrokerResetLoginItemDaily:
+             .dataBrokerResetLoginItemDaily,
+             .defaultRequestedFromHomepage,
+             .defaultRequestedFromHomepageSetupView,
+             .defaultRequestedFromSettings,
+             .defaultRequestedFromOnboarding,
+             .privacyProFeatureEnabled,
+             .privacyProBetaUserThankYouVPN,
+             .privacyProBetaUserThankYouDBP,
+             .privacyProSubscriptionActive,
+             .privacyProOfferScreenImpression,
+             .privacyProPurchaseAttempt,
+             .privacyProPurchaseFailure,
+             .privacyProPurchaseFailureStoreError,
+             .privacyProPurchaseFailureBackendError,
+             .privacyProPurchaseFailureAccountNotCreated,
+             .privacyProPurchaseSuccess,
+             .privacyProRestorePurchaseOfferPageEntry,
+             .privacyProRestorePurchaseSettingsMenuEntry,
+             .privacyProRestorePurchaseEmailStart,
+             .privacyProRestorePurchaseStoreStart,
+             .privacyProRestorePurchaseEmailSuccess,
+             .privacyProRestorePurchaseStoreSuccess,
+             .privacyProRestorePurchaseStoreFailureNotFound,
+             .privacyProRestorePurchaseStoreFailureOther,
+             .privacyProRestoreAfterPurchaseAttempt,
+             .privacyProSubscriptionActivated,
+             .privacyProWelcomeAddDevice,
+             .privacyProSettingsAddDevice,
+             .privacyProAddDeviceEnterEmail,
+             .privacyProWelcomeVPN,
+             .privacyProWelcomePersonalInformationRemoval,
+             .privacyProWelcomeIdentityRestoration,
+             .privacyProSubscriptionSettings,
+             .privacyProVPNSettings,
+             .privacyProPersonalInformationRemovalSettings,
+             .privacyProIdentityRestorationSettings,
+             .privacyProSubscriptionManagementEmail,
+             .privacyProSubscriptionManagementPlanBilling,
+             .privacyProSubscriptionManagementRemoval,
+             .privacyProRestorePurchaseClick,
+             .protectionToggledOffBreakageReport,
+             .toggleProtectionsDailyCount,
+             .toggleReportDoNotSend,
+             .toggleReportDismiss,
+             .privacyProOfferMonthlyPriceClick,
+             .privacyProOfferYearlyPriceClick,
+             .privacyProAddEmailSuccess,
+             .privacyProWelcomeFAQClick,
+             .privacyProPurchaseStripeSuccess,
+             .passwordImportKeychainPrompt,
+             .passwordImportKeychainPromptDenied,
+             .installationAttribution:
             return nil
         }
     }
@@ -195,6 +238,9 @@ extension Pixel.Event.Debug {
                 .fileStoreWriteFailed,
                 .fileMoveToDownloadsFailed,
                 .fileGetDownloadLocationFailed,
+                .fileAccessRelatedItemFailed,
+                .fileDownloadCreatePresentersFailed,
+                .downloadResumeDataCodingFailed,
                 .suggestionsFetchFailed,
                 .appOpenURLFailed,
                 .appStateRestorationFailed,
@@ -210,6 +256,7 @@ extension Pixel.Event.Debug {
                 .historyCleanEntriesFailed,
                 .historyCleanVisitsFailed,
                 .historySaveFailed,
+                .historySaveFailedDaily,
                 .historyInsertVisitFailed,
                 .historyRemoveVisitsFailed,
                 .emailAutofillKeychainError,
@@ -309,11 +356,11 @@ extension Error {
         let nsError = self as NSError
 
         params[PixelKit.Parameters.errorCode] = "\(nsError.code)"
-        params[PixelKit.Parameters.errorDesc] = nsError.domain
+        params[PixelKit.Parameters.errorDomain] = nsError.domain
 
         if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
             params[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            params[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
+            params[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
         }
 
         if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {

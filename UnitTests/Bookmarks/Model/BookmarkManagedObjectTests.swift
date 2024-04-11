@@ -17,7 +17,6 @@
 //
 
 import CoreData
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -85,7 +84,7 @@ class BookmarkManagedObjectTests: XCTestCase {
                                            insertInto: context)
 
         folder.id = id
-        folder.urlEncrypted = #URL("https://example.com") as NSObject
+        folder.urlEncrypted = URL(string: "https://example.com")! as NSObject
         folder.titleEncrypted = "Folder" as NSObject
         folder.isFolder = true
         folder.dateAdded = NSDate.now
@@ -143,7 +142,7 @@ class BookmarkManagedObjectTests: XCTestCase {
                                              insertInto: context)
 
         bookmark.id = id
-        bookmark.urlEncrypted = #URL("https://example.com") as NSObject
+        bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
         bookmark.titleEncrypted = "Bookmark" as NSObject
         bookmark.isFolder = false
         bookmark.dateAdded = NSDate.now
@@ -180,7 +179,7 @@ class BookmarkManagedObjectTests: XCTestCase {
                                              insertInto: context)
 
         bookmark.id = id
-        bookmark.urlEncrypted = #URL("https://example.com") as NSObject
+        bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
         bookmark.titleEncrypted = "Bookmark" as NSObject
         bookmark.isFolder = false
         bookmark.dateAdded = NSDate.now
@@ -214,7 +213,7 @@ class BookmarkManagedObjectTests: XCTestCase {
                                              insertInto: context)
 
         bookmark.id = id
-        bookmark.urlEncrypted = #URL("https://example.com") as NSObject
+        bookmark.urlEncrypted = URL(string: "https://example.com")! as NSObject
         bookmark.titleEncrypted = "Bookmark" as NSObject
         bookmark.isFolder = false
         bookmark.dateAdded = NSDate.now

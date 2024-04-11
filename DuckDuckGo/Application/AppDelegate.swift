@@ -25,24 +25,22 @@ import Configuration
 import CoreData
 import DDGSync
 import History
-import Macros
 import Networking
 import Persistence
 import PixelKit
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
+import Lottie
 
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
 
 #if SUBSCRIPTION
 import Subscription
 #endif
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
@@ -82,8 +80,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-#if NETWORK_PROTECTION && SUBSCRIPTION
-    private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+#if SUBSCRIPTION
+    // Needs to be lazy as indirectly depends on AppDelegate
+    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
 #endif
 
 #if DBP && SUBSCRIPTION
@@ -180,9 +179,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
 #endif
 
-        featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
-                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+        featureFlagger = DefaultFeatureFlagger(
+            internalUserDecider: internalUserDecider,
+            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        )
 
+#if SUBSCRIPTION
+    #if APPSTORE || !STRIPE
+        SubscriptionPurchaseEnvironment.current = .appStore
+    #else
+        SubscriptionPurchaseEnvironment.current = .stripe
+    #endif
+#endif
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -192,8 +200,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
 #if SPARKLE
-        updateController = UpdateController(internalUserDecider: internalUserDecider)
-        stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+        if NSApp.runType != .uiTests {
+            updateController = UpdateController(internalUserDecider: internalUserDecider)
+            stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+        }
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
@@ -212,11 +222,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
+
+        // Force use of .mainThread to prevent high WindowServer Usage
+        // Pending Fix with newer Lottie versions
+        // https://app.asana.com/0/1177771139624306/1207024603216659/f
+        LottieConfiguration.shared.renderingEngine = .mainThread
+
         if case .normal = NSApp.runType {
             FaviconManager.shared.loadFavicons()
         }
         ConfigurationManager.shared.start()
-        FileDownloadManager.shared.delegate = self
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
@@ -237,6 +252,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         statisticsLoader?.load()
 
         startupSync()
+
+#if SUBSCRIPTION
+        let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
+
+        let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
+                                                     defaultValue: defaultEnvironment).wrappedValue
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
+
+        Task {
+            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+            if let token = accountManager.accessToken {
+                _ = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
+                _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
+            }
+        }
+#endif
 
         if [.normal, .uiTests].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
@@ -262,14 +293,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-#if NETWORK_PROTECTION && SUBSCRIPTION
+#if SUBSCRIPTION
         networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 #endif
 
-#if NETWORK_PROTECTION
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
-#endif
 
 #if DBP && SUBSCRIPTION
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
@@ -280,33 +309,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if SUBSCRIPTION
-        Task {
-            let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
 
-            let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
-                                                         defaultValue: defaultEnvironment).wrappedValue
-            SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
-
-    #if APPSTORE || !STRIPE
-            SubscriptionPurchaseEnvironment.current = .appStore
-    #else
-            SubscriptionPurchaseEnvironment.current = .stripe
-    #endif
-            let accountManager = AccountManager()
-            do {
-                try accountManager.migrateAccessTokenToNewStore()
-            } catch {
-                if let error = error as? AccountManager.MigrationError {
-                    switch error {
-                    case AccountManager.MigrationError.migrationFailed:
-                        os_log(.default, log: .subscription, "Access token migration failed")
-                    case AccountManager.MigrationError.noMigrationNeeded:
-                        os_log(.default, log: .subscription, "No access token migration needed")
-                    }
-                }
-            }
-            await accountManager.checkSubscriptionState()
-        }
 #endif
     }
 
@@ -316,23 +319,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-#if NETWORK_PROTECTION
         NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
             // Do nothing when code fetching fails, as the app will try again later
         }
 
         NetworkProtectionAppEvents().applicationDidBecomeActive()
-#endif
 
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidBecomeActive()
 #endif
+
+        AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
+
+        updateSubscriptionStatus()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if !FileDownloadManager.shared.downloads.isEmpty {
             // if there‘re downloads without location chosen yet (save dialog should display) - ignore them
-            if FileDownloadManager.shared.downloads.contains(where: { $0.location.destinationURL != nil }) {
+            if FileDownloadManager.shared.downloads.contains(where: { $0.state.isDownloading }) {
                 let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
                 if alert.runModal() == .cancel {
                     return .terminateCancel
@@ -344,20 +349,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
-    }
-
-    func askUserToGrantAccessToDestination(_ folderUrl: URL) {
-        if FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.lastPathComponent == folderUrl.lastPathComponent {
-            let alert = NSAlert.noAccessToDownloads()
-            if alert.runModal() != .cancel {
-                let preferencesLink = #URL("x-apple.systempreferences:com.apple.preference.security?Privacy_DownloadsFolder")
-                NSWorkspace.shared.open(preferencesLink)
-                return
-            }
-        } else {
-            let alert = NSAlert.noAccessToSelectedFolder()
-            alert.runModal()
-        }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -383,7 +374,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     private static func setUpPixelKit(dryRun: Bool) {
-#if NETWORK_PROTECTION
 #if APPSTORE
         let source = "browser-appstore"
 #else
@@ -406,7 +396,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 onComplete(error == nil, error)
             }
         }
-#endif
     }
 
     // MARK: - Sync
@@ -561,7 +550,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 }
 
-#if NETWORK_PROTECTION || DBP
+func updateSubscriptionStatus() {
+#if SUBSCRIPTION
+    Task {
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+
+        guard let token = accountManager.accessToken else { return }
+
+        if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+            if subscription.isActive {
+                DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
+            }
+        }
+
+        _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
+    }
+#endif
+}
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
@@ -576,14 +581,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
 
-#if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
                     NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }
-#endif
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
@@ -596,5 +598,3 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 
 }
-
-#endif

@@ -16,15 +16,13 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Foundation
 import NetworkProtection
 import NetworkProtectionUI
 import SwiftUI
 
-/// Implements the logic for Network Protection's onboarding menu.
+/// Implements the logic for the VPN's onboarding menu.
 ///
 @MainActor
 final class NetworkProtectionOnboardingMenu: NSMenu {
@@ -80,6 +78,4 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
 #Preview {
     return MenuPreview(menu: NetworkProtectionOnboardingMenu())
 }
-#endif
-
 #endif

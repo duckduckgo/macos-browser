@@ -23,9 +23,7 @@ import Common
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
-    var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
-    var defaultPageZoom: CGFloat { get set }
     var favoritesDisplayMode: String? { get set }
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
@@ -39,14 +37,8 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
     @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
     var showFullURL: Bool
 
-    @UserDefaultsWrapper(key: .showAutocompleteSuggestions, defaultValue: true)
-    var showAutocompleteSuggestions: Bool
-
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     var currentThemeName: String
-
-    @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
-    var defaultPageZoom: CGFloat
 
     @UserDefaultsWrapper(key: .favoritesDisplayMode, defaultValue: FavoritesDisplayMode.displayNative(.desktop).description)
     var favoritesDisplayMode: String?
@@ -83,27 +75,6 @@ enum HomeButtonPosition: String, CaseIterable {
     case hidden
     case left
     case right
-}
-
-enum DefaultZoomValue: CGFloat, CaseIterable {
-    case percent50 = 0.5
-    case percent75 = 0.75
-    case percent85 = 0.85
-    case percent100 = 1.0
-    case percent115 = 1.15
-    case percent125 = 1.25
-    case percent150 = 1.50
-    case percent175 = 1.75
-    case percent200 = 2.0
-    case percent250 = 2.5
-    case percent300 = 3.0
-
-    var displayString: String {
-        let percentage = (self.rawValue * 100).rounded()
-        return String(format: "%.0f%%", percentage)
-    }
-
-    var index: Int {DefaultZoomValue.allCases.firstIndex(of: self) ?? 3}
 }
 
 enum ThemeName: String, Equatable, CaseIterable {
@@ -164,6 +135,7 @@ final class AppearancePreferences: ObservableObject {
 
     struct Notifications {
         static let showBookmarksBarSettingChanged = NSNotification.Name("ShowBookmarksBarSettingChanged")
+        static let bookmarksBarSettingAppearanceChanged = NSNotification.Name("BookmarksBarSettingAppearanceChanged")
     }
 
     static let shared = AppearancePreferences()
@@ -181,21 +153,9 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var showAutocompleteSuggestions: Bool {
-        didSet {
-            persistor.showAutocompleteSuggestions = showAutocompleteSuggestions
-        }
-    }
-
     @Published var favoritesDisplayMode: FavoritesDisplayMode {
         didSet {
             persistor.favoritesDisplayMode = favoritesDisplayMode.description
-        }
-    }
-
-    @Published var defaultPageZoom: DefaultZoomValue {
-        didSet {
-            persistor.defaultPageZoom = defaultPageZoom.rawValue
         }
     }
 
@@ -238,6 +198,7 @@ final class AppearancePreferences: ObservableObject {
     @Published var bookmarksBarAppearance: BookmarksBarAppearance {
         didSet {
             persistor.bookmarksBarAppearance = bookmarksBarAppearance
+            NotificationCenter.default.post(name: Notifications.bookmarksBarSettingAppearanceChanged, object: nil)
         }
     }
 
@@ -248,8 +209,10 @@ final class AppearancePreferences: ObservableObject {
     }
 
     var isContinueSetUpAvailable: Bool {
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
-        return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp)
+        return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp) && osVersion.majorVersion >= 12
     }
 
     func updateUserInterfaceStyle() {
@@ -260,12 +223,10 @@ final class AppearancePreferences: ObservableObject {
         self.persistor = persistor
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
-        showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible
-        defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition

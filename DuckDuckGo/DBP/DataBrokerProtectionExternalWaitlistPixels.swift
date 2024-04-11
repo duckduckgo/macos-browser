@@ -40,7 +40,6 @@ struct DataBrokerProtectionExternalWaitlistPixels {
             let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
             DailyPixel.fire(pixel: pixel,
                             frequency: frequency,
-                            includeAppVersionParameter: true,
                             withAdditionalParameters: [
                                 "isInternalUser": isInternalUser.description
                             ]

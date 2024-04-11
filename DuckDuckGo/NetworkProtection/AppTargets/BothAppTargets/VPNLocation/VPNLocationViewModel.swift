@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Combine
 import NetworkProtection
@@ -75,14 +73,15 @@ final class VPNLocationViewModel: ObservableObject {
     }
 
     func onNearestItemSelection() async {
-        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount)
         selectedLocation = .nearest
         await reloadList()
     }
 
     func onCountryItemSelection(id: String, cityId: String? = nil) async {
-        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount, includeAppVersionParameter: true)
-        let location = NetworkProtectionSelectedLocation(country: id, city: cityId)
+        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount)
+        let city = cityId == VPNCityItemModel.nearest.id ? nil : cityId
+        let location = NetworkProtectionSelectedLocation(country: id, city: city)
         selectedLocation = .location(location)
         await reloadList()
     }
@@ -95,7 +94,7 @@ final class VPNLocationViewModel: ObservableObject {
     private func reloadList() async {
         guard let locations = try? await locationListRepository.fetchLocationList().sortedByName() else { return }
         if locations.isEmpty {
-            DailyPixel.fire(pixel: .networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount)
         }
         let isNearestSelected = selectedLocation == .nearest
         self.isNearestSelected = isNearestSelected
@@ -185,18 +184,6 @@ extension VPNCityItemModel {
     }
 }
 
-extension NetworkProtectionLocationListCompositeRepository {
-    convenience init() {
-        let settings = VPNSettings(defaults: .netP)
-        self.init(
-            environment: settings.selectedEnvironment,
-            tokenStore: NetworkProtectionKeychainTokenStore(),
-            errorEvents: .networkProtectionAppDebugEvents,
-            isSubscriptionEnabled: false
-        )
-    }
-}
-
 extension VPNLocationViewModel {
     convenience init() {
         let locationListRepository = NetworkProtectionLocationListCompositeRepository()
@@ -220,5 +207,3 @@ private extension String {
         Locale.current.localizedString(forRegionCode: self) ?? ""
     }
 }
-
-#endif

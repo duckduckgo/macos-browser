@@ -21,15 +21,13 @@ import Foundation
 
 class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
+    var mockedCurrentTab: Tab?
+
     var hasItemsToTheRight = false
     var audioState: WKWebView.AudioState = .notSupported
 
     func tabBarViewItem(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem, isMouseOver: Bool) {
 
-    }
-
-    func tabBarViewItemCanBePinned(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
-        return true
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
@@ -48,12 +46,24 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
+    func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
+        mockedCurrentTab?.content.canBeDuplicated ?? true
+    }
+
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
     }
 
+    func tabBarViewItemCanBePinned(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
+        mockedCurrentTab?.content.canBePinned ?? true
+    }
+
     func tabBarViewItemPinAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
+    }
+
+    func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
+        mockedCurrentTab?.content.canBeBookmarked ?? true
     }
 
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {

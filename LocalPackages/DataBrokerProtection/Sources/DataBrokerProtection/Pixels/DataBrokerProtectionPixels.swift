@@ -26,6 +26,7 @@ enum ErrorCategory: Equatable {
     case validationError
     case clientError(httpCode: Int)
     case serverError(httpCode: Int)
+    case databaseError(domain: String, code: Int)
     case unclassified
 
     var toString: String {
@@ -35,6 +36,7 @@ enum ErrorCategory: Equatable {
         case .unclassified: return "unclassified"
         case .clientError(let httpCode): return "client-error-\(httpCode)"
         case .serverError(let httpCode): return "server-error-\(httpCode)"
+        case .databaseError(let domain, let code): return "database-error-\(domain)-\(code)"
         }
     }
 }
@@ -53,9 +55,18 @@ public enum DataBrokerProtectionPixels {
         static let errorDetailsKey = "error_details"
         static let pattern = "pattern"
         static let isParent = "is_parent"
+        static let actionIDKey = "action_id"
+        static let hadNewMatch = "had_new_match"
+        static let hadReAppereance = "had_re-appearance"
+        static let scanCoverage = "scan_coverage"
+        static let removals = "removals"
+        static let environmentKey = "environment"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
+    case generalError(error: Error, functionOccurredIn: String)
+    case secureVaultInitError(error: Error)
+    case secureVaultError(error: Error)
     case parentChildMatches(parent: String, child: String, value: Int)
 
     // Stage Pixels
@@ -69,11 +80,12 @@ public enum DataBrokerProtectionPixels {
     case optOutEmailConfirm(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutValidate(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutFinish(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutFillForm(dataBroker: String, attemptId: UUID, duration: Double)
 
     // Process Pixels
     case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double, tries: Int, emailPattern: String?)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double, brokerType: DataBrokerHierarchy)
-    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String, tries: Int, emailPattern: String?)
+    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String, tries: Int, emailPattern: String?, actionID: String?)
 
     // Backgrond Agent events
     case backgroundAgentStarted
@@ -115,6 +127,17 @@ public enum DataBrokerProtectionPixels {
     case dailyActiveUser
     case weeklyActiveUser
     case monthlyActiveUser
+
+    // KPIs - events
+    case weeklyReportScanning(hadNewMatch: Bool, hadReAppereance: Bool, scanCoverage: String)
+    case weeklyReportRemovals(removals: Int)
+    case scanningEventNewMatch
+    case scanningEventReAppearance
+
+    // Web UI - loading errors
+    case webUILoadingStarted(environment: String)
+    case webUILoadingFailed(errorCategory: String)
+    case webUILoadingSuccess(environment: String)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -133,6 +156,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .optOutEmailConfirm: return "m_mac_dbp_macos_optout_stage_email-confirm"
         case .optOutValidate: return "m_mac_dbp_macos_optout_stage_validate"
         case .optOutFinish: return "m_mac_dbp_macos_optout_stage_finish"
+        case .optOutFillForm: return "m_mac_dbp_macos_optout_stage_fill-form"
 
             // Process Pixels
         case .optOutSubmitSuccess: return "m_mac_dbp_macos_optout_process_submit-success"
@@ -146,6 +170,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
             // Debug Pixels
         case .error: return "m_mac_data_broker_error"
+        case .generalError: return "m_mac_data_broker_error"
+        case .secureVaultInitError: return "m_mac_dbp_secure_vault_init_error"
+        case .secureVaultError: return "m_mac_dbp_secure_vault_error"
 
         case .backgroundAgentStarted: return "m_mac_dbp_background-agent_started"
         case .backgroundAgentStartedStoppingDueToAnotherInstanceRunning: return "m_mac_dbp_background-agent_started_stopping-due-to-another-instance-running"
@@ -187,6 +214,15 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .dailyActiveUser: return "m_mac_dbp_engagement_dau"
         case .weeklyActiveUser: return "m_mac_dbp_engagement_wau"
         case .monthlyActiveUser: return "m_mac_dbp_engagement_mau"
+
+        case .weeklyReportScanning: return "m_mac_dbp_event_weekly-report_scanning"
+        case .weeklyReportRemovals: return "m_mac_dbp_event_weekly-report_removals"
+        case .scanningEventNewMatch: return "m_mac_dbp_event_scanning-events_new-match"
+        case .scanningEventReAppearance: return "m_mac_dbp_event_scanning-events_re-appearance"
+
+        case .webUILoadingStarted: return "m_mac_dbp_web_ui_loading_started"
+        case .webUILoadingSuccess: return "m_mac_dbp_web_ui_loading_success"
+        case .webUILoadingFailed: return "m_mac_dbp_web_ui_loading_failed"
         }
     }
 
@@ -205,6 +241,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             } else {
                 return ["dataBroker": dataBroker, "name": error.name]
             }
+        case .generalError(_, let functionOccurredIn):
+            return ["functionOccurredIn": functionOccurredIn]
         case .parentChildMatches(let parent, let child, let value):
             return ["parent": parent, "child": child, "value": String(value)]
         case .optOutStart(let dataBroker, let attemptId):
@@ -227,6 +265,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutFinish(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
+        case .optOutFillForm(let dataBroker, let attemptId, let duration):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutSubmitSuccess(let dataBroker, let attemptId, let duration, let tries, let pattern):
             var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries)]
             if let pattern = pattern {
@@ -235,12 +275,27 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return params
         case .optOutSuccess(let dataBroker, let attemptId, let duration, let type):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.isParent: String(type.rawValue)]
-        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage, let tries, let pattern):
+        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage, let tries, let pattern, let actionID):
             var params = [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage, Consts.triesKey: String(tries)]
             if let pattern = pattern {
                 params[Consts.pattern] = pattern
             }
+
+            if let actionID = actionID {
+                params[Consts.actionIDKey] = actionID
+            }
+
             return params
+        case .weeklyReportScanning(let hadNewMatch, let hadReAppereance, let scanCoverage):
+            return [Consts.hadNewMatch: hadNewMatch ? "1" : "0", Consts.hadReAppereance: hadReAppereance ? "1" : "0", Consts.scanCoverage: scanCoverage.description]
+        case .weeklyReportRemovals(let removals):
+            return [Consts.removals: String(removals)]
+        case .webUILoadingStarted(let environment):
+            return [Consts.environmentKey: environment]
+        case .webUILoadingSuccess(let environment):
+            return [Consts.environmentKey: environment]
+        case .webUILoadingFailed(let error):
+            return [Consts.errorCategoryKey: error]
         case .backgroundAgentStarted,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
@@ -256,7 +311,13 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                 .dailyActiveUser,
                 .weeklyActiveUser,
-                .monthlyActiveUser:
+                .monthlyActiveUser,
+
+                .scanningEventNewMatch,
+                .scanningEventReAppearance,
+
+                .secureVaultInitError,
+                .secureVaultError:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -287,6 +348,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
+            case .generalError(let error, _):
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .secureVaultInitError(let error),
+                    .secureVaultError(let error):
+                PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerScanAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
@@ -303,6 +369,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutValidate,
                     .optOutFinish,
                     .optOutSubmitSuccess,
+                    .optOutFillForm,
                     .optOutSuccess,
                     .optOutFailure,
                     .backgroundAgentStarted,
@@ -330,7 +397,14 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
                     .dailyActiveUser,
                     .weeklyActiveUser,
-                    .monthlyActiveUser:
+                    .monthlyActiveUser,
+                    .weeklyReportScanning,
+                    .weeklyReportRemovals,
+                    .scanningEventNewMatch,
+                    .scanningEventReAppearance,
+                    .webUILoadingFailed,
+                    .webUILoadingStarted,
+                    .webUILoadingSuccess:
 
                 PixelKit.fire(event)
             }

@@ -16,8 +16,12 @@
 //  limitations under the License.
 //
 
-import Macros
 import XCTest
+
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -140,12 +144,58 @@ final class TabBarViewItemTests: XCTestCase {
 
         // Update url
         let tab = Tab()
-        tab.url = #URL("https://www.apple.com")
+        tab.url = URL(string: "https://www.apple.com")!
+        delegate.mockedCurrentTab = tab
         let vm = TabViewModel(tab: tab)
         tabBarViewItem.subscribe(to: vm, tabCollectionViewModel: TabCollectionViewModel())
         // update menu
         tabBarViewItem.menuNeedsUpdate(menu)
         let item = menu.items .first { $0.title == UserText.fireproofSite }
         XCTAssertTrue(item?.isEnabled ?? false)
+
+        let duplicateItem = menu.items.first { $0.title == UserText.duplicateTab }
+        XCTAssertTrue(duplicateItem?.isEnabled ?? false)
+
+        let pinItem = menu.items.first { $0.title == UserText.pinTab }
+        XCTAssertTrue(pinItem?.isEnabled ?? false)
+
+        let bookmarkItem = menu.items.first { $0.title == UserText.bookmarkThisPage }
+        XCTAssertTrue(bookmarkItem?.isEnabled ?? false)
     }
+
+#if SUBSCRIPTION
+    func testSubscriptionTabDisabledItems() {
+        // Set up fake views for the TabBarViewItems
+        let textField = NSTextField()
+        let imageView = NSImageView()
+        let constraints = NSLayoutConstraint()
+        let button = NSButton()
+        let mouseButton = MouseOverButton()
+        tabBarViewItem.titleTextField = textField
+        tabBarViewItem.faviconImageView = imageView
+        tabBarViewItem.faviconWrapperView = imageView
+        tabBarViewItem.titleTextFieldLeadingConstraint = constraints
+        tabBarViewItem.permissionButton = button
+        tabBarViewItem.tabLoadingPermissionLeadingConstraint = constraints
+        tabBarViewItem.closeButton = mouseButton
+
+        // Update url
+        let tab = Tab(content: .subscription(.subscriptionPurchase))
+        delegate.mockedCurrentTab = tab
+        let vm = TabViewModel(tab: tab)
+        tabBarViewItem.subscribe(to: vm, tabCollectionViewModel: TabCollectionViewModel())
+        // update menu
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        let duplicateItem = menu.items.first { $0.title == UserText.duplicateTab }
+        XCTAssertFalse(duplicateItem?.isEnabled ?? true)
+
+        let pinItem = menu.items.first { $0.title == UserText.pinTab }
+        XCTAssertFalse(pinItem?.isEnabled ?? true)
+
+        let bookmarkItem = menu.items.first { $0.title == UserText.bookmarkThisPage }
+        XCTAssertFalse(bookmarkItem?.isEnabled ?? true)
+    }
+#endif
+
 }

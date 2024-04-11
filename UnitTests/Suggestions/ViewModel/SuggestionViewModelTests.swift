@@ -16,8 +16,7 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
-import Macros
+import Suggestions
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -123,7 +122,7 @@ final class SuggestionViewModelTests: XCTestCase {
     }
 
     func testWhenSuggestionIsBookmark_ThenStringIsTitle() {
-        let url = #URL("https://spreadprivacy.com")
+        let url = URL(string: "https://spreadprivacy.com")!
         let title = "Title"
         let suggestion = Suggestion.bookmark(title: title, url: url, isFavorite: true, allowedInTopHits: true)
         let suggestionViewModel = SuggestionViewModel(suggestion: suggestion, userStringValue: "")

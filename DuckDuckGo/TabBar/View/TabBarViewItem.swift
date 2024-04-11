@@ -30,7 +30,9 @@ protocol TabBarViewItemDelegate: AnyObject {
 
     func tabBarViewItem(_ tabBarViewItem: TabBarViewItem, isMouseOver: Bool)
 
+    func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool
+    func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
@@ -505,6 +507,7 @@ extension TabBarViewItem: NSMenuDelegate {
     private func addDuplicateMenuItem(to menu: NSMenu) {
         let duplicateMenuItem = NSMenuItem(title: UserText.duplicateTab, action: #selector(duplicateAction(_:)), keyEquivalent: "")
         duplicateMenuItem.target = self
+        duplicateMenuItem.isEnabled = delegate?.tabBarViewItemCanBeDuplicated(self) ?? false
         menu.addItem(duplicateMenuItem)
     }
 
@@ -518,6 +521,7 @@ extension TabBarViewItem: NSMenuDelegate {
     private func addBookmarkMenuItem(to menu: NSMenu) {
         let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(bookmarkThisPageAction(_:)), keyEquivalent: "")
         bookmarkMenuItem.target = self
+        bookmarkMenuItem.isEnabled = delegate?.tabBarViewItemCanBeBookmarked(self) ?? false
         menu.addItem(bookmarkMenuItem)
     }
 

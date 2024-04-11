@@ -29,7 +29,7 @@ let package = Package(
             targets: ["DataBrokerProtection"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "120.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "133.1.0"),
         .package(path: "../PixelKit"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../XPCHelper"),
@@ -55,7 +55,6 @@ let package = Package(
             dependencies: [
                 "DataBrokerProtection",
                 "BrowserServicesKit",
-                .product(name: "Macros", package: "apple-toolbox"),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         )

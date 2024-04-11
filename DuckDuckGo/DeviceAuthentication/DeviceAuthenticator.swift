@@ -154,6 +154,11 @@ final class DeviceAuthenticator: UserAuthenticating {
     }
 
     func authenticateUser(reason: AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
+        guard NSApp.runType != .uiTests else {
+            result(.success)
+            return
+        }
+
         let needsAuthenticationForCreditCardsAutofill = reason == .autofillCreditCards && isCreditCardTimeIntervalExpired()
         let needsAuthenticationForSyncSettings = reason == .syncSettings && isSyncSettingsTimeIntervalExpired()
         let needsAuthenticationForDeleteAllPasswords = reason == .deleteAllPasswords

@@ -38,7 +38,23 @@ final class AddBookmarkPopoverViewModel: ObservableObject {
         }
     }
 
+    @Published var isBookmarkFavorite: Bool {
+        didSet {
+            bookmark.isFavorite = isBookmarkFavorite
+            bookmarkManager.update(bookmark: bookmark)
+        }
+    }
+
+    @Published var bookmarkTitle: String {
+        didSet {
+            bookmark.title = bookmarkTitle.trimmingWhitespace()
+            bookmarkManager.update(bookmark: bookmark)
+        }
+    }
+
     @Published var addFolderViewModel: AddBookmarkFolderPopoverViewModel?
+
+    let isDefaultActionButtonDisabled: Bool = false
 
     private var bookmarkListCancellable: AnyCancellable?
 
@@ -47,6 +63,7 @@ final class AddBookmarkPopoverViewModel: ObservableObject {
         self.bookmarkManager = bookmarkManager
         self.bookmark = bookmark
         self.bookmarkTitle = bookmark.title
+        self.isBookmarkFavorite = bookmark.isFavorite
 
         bookmarkListCancellable = bookmarkManager.listPublisher
             .receive(on: DispatchQueue.main)
@@ -74,12 +91,6 @@ final class AddBookmarkPopoverViewModel: ObservableObject {
         dismiss()
     }
 
-    func favoritesButtonAction() {
-        bookmark.isFavorite.toggle()
-
-        bookmarkManager.update(bookmark: bookmark)
-    }
-
     func addFolderButtonAction() {
         addFolderViewModel = .init(bookmark: bookmark, bookmarkManager: bookmarkManager) { [bookmark, bookmarkManager, weak self] newFolder in
             if let newFolder {
@@ -96,14 +107,6 @@ final class AddBookmarkPopoverViewModel: ObservableObject {
 
     private func resetAddFolderState() {
         addFolderViewModel = nil
-    }
-
-    @Published var bookmarkTitle: String {
-        didSet {
-            bookmark.title = bookmarkTitle.trimmingWhitespace()
-
-            bookmarkManager.update(bookmark: bookmark)
-        }
     }
 
 }

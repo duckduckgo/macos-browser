@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -29,20 +28,20 @@ class RecentlyVisitedSiteModelTests: XCTestCase {
     }
 
     func testWhenOriginalURLIsHTTPS_ThenModelURLIsHTTPS() {
-        assertModelWithURL(#URL("https://example.com"), matches: #URL("https://example.com"), expectedDomain: "example.com")
+        assertModelWithURL(URL(string: "https://example.com")!, matches: URL(string: "https://example.com")!, expectedDomain: "example.com")
     }
 
     func testWhenOriginalURLIsHTTP_ThenModelURLIsHTTP() {
-        assertModelWithURL(#URL("http://example.com"), matches: #URL("http://example.com"), expectedDomain: "example.com")
+        assertModelWithURL(URL(string: "http://example.com")!, matches: URL(string: "http://example.com")!, expectedDomain: "example.com")
     }
 
     func testWhenOriginalURLContainsAdditionalInformation_ThenModelURLOnlyUsesSchemeAndHost() {
-        assertModelWithURL(#URL("http://example.com/path?test=true#fragment"), matches: #URL("http://example.com"), expectedDomain: "example.com")
-        assertModelWithURL(#URL("https://example.com/path?test=true#fragment"), matches: #URL("https://example.com"), expectedDomain: "example.com")
+        assertModelWithURL(URL(string: "http://example.com/path?test=true#fragment")!, matches: URL(string: "http://example.com")!, expectedDomain: "example.com")
+        assertModelWithURL(URL(string: "https://example.com/path?test=true#fragment")!, matches: URL(string: "https://example.com")!, expectedDomain: "example.com")
     }
 
     func testWhenOriginalURLContainsWWW_ThenDomainDoesNotIncludeIt() {
-        assertModelWithURL(#URL("http://www.example.com"), matches: #URL("http://www.example.com"), expectedDomain: "example.com")
+        assertModelWithURL(URL(string: "http://www.example.com")!, matches: URL(string: "http://www.example.com")!, expectedDomain: "example.com")
     }
 
     func testWhenDuckPlayerIsEnabled_ThenDuckPlayerURLSetsDomainPlaceholder() {

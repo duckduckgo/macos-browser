@@ -35,35 +35,40 @@ struct EmailData: Decodable {
 }
 
 protocol EmailServiceProtocol {
-    func getEmail(dataBrokerURL: String?) async throws -> EmailData
+    func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int,
                              pollingInterval: TimeInterval,
+                             attemptId: UUID,
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL
 }
 
 struct EmailService: EmailServiceProtocol {
     private struct Constants {
-        static let baseUrl = "https://dbp.duckduckgo.com/dbp/em/v0"
+        static let endpointSubPath = "/dbp/em/v0"
     }
 
     public let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let settings: DataBrokerProtectionSettings
 
     init(urlSession: URLSession = URLSession.shared,
-         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase()) {
+         redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
+         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
+        self.settings = settings
     }
 
-    func getEmail(dataBrokerURL: String? = nil) async throws -> EmailData {
-        var urlString = Constants.baseUrl + "/generate"
+    func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData {
+        var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
+        urlComponents?.path = "\(Constants.endpointSubPath)/generate"
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "dataBroker", value: dataBrokerURL),
+            URLQueryItem(name: "attemptId", value: attemptId.uuidString)
+        ]
 
-        if let dataBrokerValue = dataBrokerURL {
-            urlString += "?dataBroker=\(dataBrokerValue)"
-        }
-
-        guard let url = URL(string: urlString) else {
+        guard let url = urlComponents?.url else {
             throw EmailError.cantGenerateURL
         }
 
@@ -83,10 +88,11 @@ struct EmailService: EmailServiceProtocol {
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int = 100,
                              pollingInterval: TimeInterval = 30,
+                             attemptId: UUID,
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
         let pollingTimeInNanoSecondsSeconds = UInt64(pollingInterval * 1000) * NSEC_PER_MSEC
 
-        guard let emailResult = try? await extractEmailLink(email: email) else {
+        guard let emailResult = try? await extractEmailLink(email: email, attemptId: attemptId) else {
             throw EmailError.cantFindEmail
         }
 
@@ -112,18 +118,27 @@ struct EmailService: EmailServiceProtocol {
             return try await getConfirmationLink(from: email,
                                                  numberOfRetries: numberOfRetries - 1,
                                                  pollingInterval: pollingInterval,
+                                                 attemptId: attemptId,
                                                  shouldRunNextStep: shouldRunNextStep)
         case .unknown:
             throw EmailError.unknownStatusReceived(email: email)
         }
     }
 
-    private func extractEmailLink(email: String) async throws -> EmailResponse {
-        guard let url = URL(string: Constants.baseUrl + "/links?e=\(email)") else {
+    private func extractEmailLink(email: String, attemptId: UUID) async throws -> EmailResponse {
+        var urlComponents = URLComponents(url: settings.selectedEnvironment.endpointURL, resolvingAgainstBaseURL: true)
+        urlComponents?.path = "\(Constants.endpointSubPath)/links"
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "e", value: email),
+            URLQueryItem(name: "attemptId", value: attemptId.uuidString)
+        ]
+
+        guard let url = urlComponents?.url else {
             throw EmailError.cantGenerateURL
         }
 
         var request = URLRequest(url: url)
+
         let authHeader = try await redeemUseCase.getAuthHeader()
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
 

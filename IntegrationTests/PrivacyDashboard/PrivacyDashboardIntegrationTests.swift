@@ -18,7 +18,6 @@
 
 import Combine
 import Common
-import Macros
 import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -34,7 +33,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
     @MainActor
     override func setUp() {
         // disable GPC redirects
-        PrivacySecurityPreferences.shared.gpcEnabled = false
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = false
 
         window = WindowsManager.openNewWindow(with: .none)!
     }
@@ -44,7 +43,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
         window.close()
         window = nil
 
-        PrivacySecurityPreferences.shared.gpcEnabled = true
+        WebTrackingProtectionPreferences.shared.isGPCEnabled = true
     }
 
     // MARK: - Tests
@@ -67,7 +66,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .promise()
 
         // load the test page
-        let url = #URL("http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")
+        let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")!
         _=await tab.setUrl(url, source: .link)?.result
 
         let trackersCount = try await trackersCountPromise.value
