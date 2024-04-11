@@ -431,6 +431,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - Start/Stop Tunnel
 
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+
         super.stopTunnel(with: reason) {
             Task {
                 completionHandler()

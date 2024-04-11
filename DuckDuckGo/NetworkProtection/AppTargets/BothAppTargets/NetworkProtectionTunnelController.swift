@@ -417,32 +417,24 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 // to go to System Settings to allow the extension
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case SystemExtensionRequestError.unknownRequestResult:
-                // Intentional no-op: let's not show an error to the user when the
-                // error would not help resolve the user's problems.  I'm leaving the
-                // commented implementation since that helps explain this comment.
-                //
-                //controllerErrorStore.lastErrorMessage = "There as an unexpected error. Please try again."
-                break
-            case SystemExtensionRequestError.willActivateAfterReboot:
+                controllerErrorStore.lastErrorMessage = "There as an unexpected error. Please try again."
+            case OSSystemExtensionError.extensionNotFound,
+                SystemExtensionRequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
             default:
-                // Intentional no-op: we're not showing unsanitized errors to the user.
-                // I'm leaving the commented implementation since that helps explain
-                // this comment.
-                //
-                //controllerErrorStore.lastErrorMessage = error.localizedDescription
-                break
+                controllerErrorStore.lastErrorMessage = error.localizedDescription
             }
 
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure,
+                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure(error),
                 frequency: .standard,
-                withError: error,
                 includeAppVersionParameter: true
             )
 
             throw error
         }
+
+        self.controllerErrorStore.lastErrorMessage = nil
 
         // We'll only update to completed if we were showing the onboarding step to
         // allow the system extension.  Otherwise we may override the allow-VPN
