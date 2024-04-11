@@ -17,3 +17,4 @@ jobs:
           days-before-close: 7
           stale-pr-label: stale
           exempt-draft-pr: true
+          remove-pr-stale-when-updated: true
