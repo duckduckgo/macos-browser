@@ -1041,7 +1041,7 @@ struct UserText {
     static let burnDataOnQuit = NSLocalizedString("burn.data.on.quit", value: "Clear Data upon Quitting", comment: "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.")
     static let burnDataOnQuitExplanation = NSLocalizedString("burn.data.on.quit.explanation", value: "Data from \"Fireproofed\" sites won't be cleared, keeping your essential logins and preferences intact.", comment: "Explanation of a setting which configures clearing data automatically after quitting the app.")
     static let warnBeforeQuit = NSLocalizedString("warn.before.quit", value: "Warn before Quit", comment: "Label after the checkbox in Settings which configures a warning before clearing data on the application termination.")
-    static let warnBeforeQuitDialogHeader = NSLocalizedString("warn.before.quit.dialog.header", value: "Quit the application and \nclear all dara?", comment: "A header of warning before clearing data on the application termination.")
+    static let warnBeforeQuitDialogHeader = NSLocalizedString("warn.before.quit.dialog.header", value: "Quit the application and \nclear all data?", comment: "A header of warning before clearing data on the application termination.")
     static let warnBeforeQuitDialogMessage = NSLocalizedString("warn.before.quit.dialog.message", value: "Cookies and site data for all sites will be cleared, unless the site is Fireproof.", comment: "A warning before clearing data on the application termination.")
 
     static func disableBurnOnQuitToEnableSessionRestore() -> String {
