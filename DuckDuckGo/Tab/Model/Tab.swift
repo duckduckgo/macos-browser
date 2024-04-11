@@ -341,7 +341,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
 
-    private(set) var tunnelController: NetworkProtectionIPCTunnelController?
+    private(set) var tunnelController: NetworkProtectionIPCTunnelController
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -510,6 +510,10 @@ protocol NewWindowPolicyDecisionMaker {
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager))
 
+        let ipcClient = TunnelControllerIPCClient()
+        ipcClient.register()
+        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+
         super.init()
         tabGetter = { [weak self] in self }
         userContentController.map(userContentControllerPromise.fulfill)
@@ -527,17 +531,6 @@ protocol NewWindowPolicyDecisionMaker {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 self?.onDuckDuckGoEmailSignOut(notification)
-            }
-
-        netPOnboardStatusCancellabel = DefaultNetworkProtectionVisibility().onboardStatusPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] onboardingStatus in
-                guard onboardingStatus == .completed else { return }
-
-                let ipcClient = TunnelControllerIPCClient()
-                ipcClient.register()
-
-                self?.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
             }
 
         self.audioState = webView.audioState()
@@ -1070,8 +1063,11 @@ protocol NewWindowPolicyDecisionMaker {
 
         let source = content.source
         if url.isFileURL {
+            // WebKit won‘t load local page‘s external resouces even with `allowingReadAccessTo` provided
+            // this could be fixed using a custom scheme handler loading local resources in future.
+            let readAccessScopeURL = url
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
+                .loadFileURL(url, allowingReadAccessTo: readAccessScopeURL, withExpectedNavigationType: source.navigationType)
         }
 
         var request = URLRequest(url: url, cachePolicy: source.cachePolicy)
@@ -1129,7 +1125,12 @@ protocol NewWindowPolicyDecisionMaker {
         // only restore session from interactionStateData passed to Tab.init
         guard case .loadCachedFromTabContent(let interactionStateData) = self.interactionState else { return false }
 
-        if let url = content.urlForWebView, url.isFileURL {
+        switch content.urlForWebView {
+        case .some(let url) where url.isFileURL:
+#if APPSTORE
+            guard url.isWritableLocation() else { fallthrough }
+#endif
+
             // request file system access before restoration
             webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .loadFileURL(url, allowingReadAccessTo: url)?
@@ -1138,7 +1139,8 @@ protocol NewWindowPolicyDecisionMaker {
                 }, navigationDidFail: { [weak self] _, _ in
                     self?.restoreInteractionState(with: interactionStateData)
                 })
-        } else {
+
+        default:
             restoreInteractionState(with: interactionStateData)
         }
 
@@ -1169,8 +1171,6 @@ protocol NewWindowPolicyDecisionMaker {
 
     private var webViewCancellables = Set<AnyCancellable>()
     private var emailDidSignOutCancellable: AnyCancellable?
-
-    private var netPOnboardStatusCancellabel: AnyCancellable?
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
@@ -1456,7 +1456,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             }
         }
 
-        if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {
+        if navigation.url.isDuckDuckGoSearch, tunnelController.isConnected == true {
             DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount)
         }
     }

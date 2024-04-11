@@ -71,6 +71,10 @@ extension String {
         return result
     }
 
+    func replacingInvalidFileNameCharacters(with replacement: String = "_") -> String {
+        replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]", with: replacement, options: .regularExpression)
+    }
+
     init(_ staticString: StaticString) {
         self = staticString.withUTF8Buffer {
             String(decoding: $0, as: UTF8.self)

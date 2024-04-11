@@ -186,8 +186,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
 #endif
 
-        featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
-                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+        featureFlagger = DefaultFeatureFlagger(
+            internalUserDecider: internalUserDecider,
+            privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+        )
 
 #if SUBSCRIPTION
     #if APPSTORE || !STRIPE
@@ -227,6 +229,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
+
+        // Force use of .mainThread to prevent high WindowServer Usage
+        // Pending Fix with newer Lottie versions
+        // https://app.asana.com/0/1177771139624306/1207024603216659/f
+        LottieConfiguration.shared.renderingEngine = .mainThread
+
         if case .normal = NSApp.runType {
             FaviconManager.shared.loadFavicons()
         }

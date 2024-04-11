@@ -270,7 +270,7 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(.bookmarks)
             .withSubmenu(bookmarksSubMenu)
-
+            .withAccessibilityIdentifier("MoreOptionsMenu.openBookmarks")
         addItem(withTitle: UserText.downloads, action: #selector(openDownloads), keyEquivalent: "j")
             .targetting(self)
             .withImage(.downloads)
@@ -641,6 +641,7 @@ final class BookmarksSubMenu: NSMenu {
         let bookmarkPageItem = addItem(withTitle: UserText.bookmarkThisPage, action: #selector(MoreOptionsMenu.bookmarkPage(_:)), keyEquivalent: "d")
             .withModifierMask([.command])
             .targetting(target)
+            .withAccessibilityIdentifier("MoreOptionsMenu.bookmarkPage")
 
         bookmarkPageItem.isEnabled = tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
 

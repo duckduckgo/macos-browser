@@ -32,6 +32,7 @@ final class MainViewController: NSViewController {
     let findInPageViewController: FindInPageViewController
     let fireViewController: FireViewController
     let bookmarksBarViewController: BookmarksBarViewController
+    private let bookmarksBarVisibilityManager: BookmarksBarVisibilityManager
 
     let tabCollectionViewModel: TabCollectionViewModel
     let isBurner: Bool
@@ -60,6 +61,7 @@ final class MainViewController: NSViewController {
         self.isBurner = tabCollectionViewModel.isBurner
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+        bookmarksBarVisibilityManager = BookmarksBarVisibilityManager(selectedTabPublisher: tabCollectionViewModel.$selectedTabViewModel.eraseToAnyPublisher())
 
         let networkProtectionPopoverManager: NetPPopoverManager = {
 #if DEBUG
@@ -124,7 +126,7 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToMouseTrackingArea()
         subscribeToSelectedTabViewModel()
-        subscribeToAppSettingsNotifications()
+        subscribeToBookmarkBarVisibility()
         subscribeToFirstResponder()
         mainView.findInPageContainerView.applyDropShadow()
 
@@ -171,9 +173,6 @@ final class MainViewController: NSViewController {
 
             resizeNavigationBar(isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
                                 animated: false)
-
-            let bookmarksBarVisible = AppearancePreferences.shared.showBookmarksBar
-            updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
         }
 
         updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
@@ -314,11 +313,13 @@ final class MainViewController: NSViewController {
             .store(in: &tabViewModelCancellables)
     }
 
-    private func subscribeToAppSettingsNotifications() {
-        bookmarksBarVisibilityChangedCancellable = NotificationCenter.default
-            .publisher(for: AppearancePreferences.Notifications.showBookmarksBarSettingChanged)
-            .sink { [weak self] _ in
-                self?.updateBookmarksBarViewVisibility(visible: AppearancePreferences.shared.showBookmarksBar)
+    private func subscribeToBookmarkBarVisibility() {
+        bookmarksBarVisibilityChangedCancellable = bookmarksBarVisibilityManager
+            .$isBookmarksBarVisible
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isBookmarksBarVisible in
+                self?.updateBookmarksBarViewVisibility(visible: isBookmarksBarVisible)
             }
     }
 
@@ -335,7 +336,6 @@ final class MainViewController: NSViewController {
                 defer { lastTabContent = content }
 
                 resizeNavigationBar(isHomePage: content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
-                updateBookmarksBar(content)
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
             }
             .store(in: &self.tabViewModelCancellables)
@@ -352,14 +352,6 @@ final class MainViewController: NSViewController {
         // when window first responder is reset (to the window): activate Tab Content View
         if view.window?.firstResponder === view.window {
             browserTabViewController.adjustFirstResponder()
-        }
-    }
-
-    private func updateBookmarksBar(_ content: Tab.TabContent, _ prefs: AppearancePreferences = AppearancePreferences.shared) {
-        if content.isUrl && prefs.bookmarksBarAppearance == .newTabOnly {
-            updateBookmarksBarViewVisibility(visible: false)
-        } else if prefs.showBookmarksBar {
-            updateBookmarksBarViewVisibility(visible: true)
         }
     }
 

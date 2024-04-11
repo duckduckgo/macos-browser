@@ -87,7 +87,14 @@ final class DataBrokerProtectionEventPixels {
     }
 
     private func fireWeeklyReportPixels() {
-        let data = database.fetchAllBrokerProfileQueryData()
+        let data: [BrokerProfileQueryData]
+
+        do {
+            data = try database.fetchAllBrokerProfileQueryData()
+        } catch {
+            os_log("Database error: when attempting to fireWeeklyReportPixels, error: %{public}@", log: .error, error.localizedDescription)
+            return
+        }
         let dataInThePastWeek = data.filter(hadScanThisWeek(_:))
 
         var newMatchesFoundInTheLastWeek = 0

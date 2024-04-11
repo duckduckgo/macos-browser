@@ -75,7 +75,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let e = expectation(description: "download added")
         var id: UUID!
         let c = coordinator.updates.sink { kind, item in
-            if kind == .added {
+            if case .added = kind {
                 e.fulfill()
                 id = item.identifier
             }
@@ -153,9 +153,10 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
 
         let c = coordinator.updates.sink { (kind, item) in
-            if kind == .added {
+            if case .added = kind {
                 expectations[item.identifier]!.fulfill()
-            } else if kind != .updated {
+            } else if case .updated = kind {
+            } else {
                 XCTFail("unexpected \(kind) \(item.fileName)")
             }
         }
@@ -217,7 +218,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let taskCompleted = expectation(description: "item updated")
         var c: AnyCancellable!
         c = coordinator.updates.sink { (kind, item) in
-            guard kind == .updated, item.progress == nil else { return }
+            guard case .updated = kind, item.progress == nil else { return }
 
             taskCompleted.fulfill()
 
@@ -267,7 +268,9 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let taskCompleted = expectation(description: "location updated")
         var c: AnyCancellable!
         c = coordinator.updates.sink { (kind, item) in
-            XCTAssertEqual(kind, .updated)
+            if case .updated = kind { } else {
+                XCTFail("\(kind) is not .updated")
+            }
             guard item.destinationURL != nil, item.tempURL != nil else { return }
 
             XCTAssertEqual(item.destinationURL, self.destURL)
@@ -328,7 +331,9 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let itemUpdated = expectation(description: "item updated")
         let c = coordinator.updates.sink { (kind, item) in
-            XCTAssertEqual(kind, .updated)
+            if case .updated = kind { } else {
+                XCTFail("\(kind) is not .updated")
+            }
             itemUpdated.fulfill()
 
             XCTAssertEqual(item.destinationURL, item.destinationURL)
@@ -386,7 +391,9 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let itemUpdated = expectation(description: "item updated")
         let c = coordinator.updates.sink { (kind, item) in
-            XCTAssertEqual(kind, .updated)
+            if case .updated = kind { } else {
+                XCTFail("\(kind) is not .updated")
+            }
             itemUpdated.fulfill()
 
             XCTAssertEqual(item.destinationURL, item.destinationURL)
@@ -444,7 +451,9 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let itemUpdated = expectation(description: "item updated")
         let c = coordinator.updates.sink { (kind, item) in
-            XCTAssertEqual(kind, .updated)
+            if case .updated = kind { } else {
+                XCTFail("\(kind) is not .updated")
+            }
             itemUpdated.fulfill()
 
             XCTAssertEqual(item.destinationURL, item.destinationURL)
@@ -467,7 +476,9 @@ final class DownloadListCoordinatorTests: XCTestCase {
 
         let itemRemoved = expectation(description: "item removed")
         let c = coordinator.updates.sink { (kind, item) in
-            XCTAssertEqual(kind, .removed)
+            if case .removed = kind { } else {
+                XCTFail("\(kind) is not .updated")
+            }
             itemRemoved.fulfill()
 
             XCTAssertEqual(item.identifier, id)
@@ -499,7 +510,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let e1 = expectation(description: "download stopped")
         e1.expectedFulfillmentCount = 2
         var c = coordinator.updates.sink { (kind, item) in
-            guard kind == .updated, item.progress == nil else { return }
+            guard case .updated = kind, item.progress == nil else { return }
             e1.fulfill()
             XCTAssertNotEqual(item.identifier, keptId)
         }
@@ -509,7 +520,7 @@ final class DownloadListCoordinatorTests: XCTestCase {
         let e2 = expectation(description: "item removed")
         e2.expectedFulfillmentCount = 2
         c = coordinator.updates.sink { (kind, item) in
-            guard kind == .removed else { return }
+            guard case .removed = kind else { return }
             e2.fulfill()
             XCTAssertNotEqual(item.identifier, keptId)
         }

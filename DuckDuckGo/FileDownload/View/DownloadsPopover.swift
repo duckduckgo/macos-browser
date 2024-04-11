@@ -38,7 +38,7 @@ final class DownloadsPopover: NSPopover {
     // swiftlint:enable force_cast
 
     private func setupContentController() {
-        let controller = DownloadsViewController.create()
+        let controller = DownloadsViewController()
         contentViewController = controller
     }
 
