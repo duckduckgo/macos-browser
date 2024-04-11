@@ -31,7 +31,7 @@ public enum DataBrokerProtectionSchedulerStatus: Codable {
 public class DataBrokerProtectionSchedulerErrorCollection: NSObject, NSSecureCoding {
     /*
      This needs to be an NSObject (rather than a struct) so it can be represented in Objective C
-     for the IPC layer
+     and confrom to NSSecureCoding for the IPC layer.
      */
 
     private enum NSSecureCodingKeys {
