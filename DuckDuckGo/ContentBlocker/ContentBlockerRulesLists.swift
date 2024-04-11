@@ -27,23 +27,6 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         static let clickToLoadRulesListName = "ClickToLoad"
     }
 
-    static var fbTrackerDataFile: Data = {
-        do {
-            let url = Bundle.main.url(forResource: "fb-tds", withExtension: "json")!
-            return try Data(contentsOf: url)
-        } catch {
-            fatalError("Failed to load FB-TDS")
-        }
-    }()
-
-    static var fbTrackerDataSet: TrackerRadarKit.TrackerData = {
-        do {
-            return try JSONDecoder().decode(TrackerData.self, from: fbTrackerDataFile)
-        } catch {
-            fatalError("Failed to JSON decode FB-TDS")
-        }
-    }()
-
     func MD5(data: Data) -> String {
         let digest = Insecure.MD5.hash(data: data)
 

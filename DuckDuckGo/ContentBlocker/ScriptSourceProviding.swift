@@ -96,7 +96,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
 
         let ctlTrackerData = (contentBlockingManager.currentRules.first(where: {
             $0.name == ContentBlockerRulesLists.Constants.clickToLoadRulesListName
-        })?.trackerData) ?? ContentBlockerRulesLists.fbTrackerDataSet
+        })?.trackerData)
 
         return DefaultContentBlockerUserScriptConfig(privacyConfiguration: privacyConfigurationManager.privacyConfig,
                                                      trackerData: trackerData,
