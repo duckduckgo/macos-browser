@@ -64,7 +64,7 @@ jobs:
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
-        export CI=true
+        export CI=false
         export CONFIGURATION=Review 
         export DERIVED_DATA_PATH="$(pwd)/DerivedData"
         set -o pipefail && xcodebuild test \
