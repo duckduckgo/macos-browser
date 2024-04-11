@@ -58,7 +58,7 @@ extension FBProtectionTabExtension {
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
         let privacyConfiguration = privacyConfigurationManager.privacyConfig
 
-        let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: url.host)
+        let featureEnabled = privacyConfiguration.isFeature(.clickToLoad, enabledForDomain: url.host)
         setFBProtection(enable: featureEnabled)
     }
 
