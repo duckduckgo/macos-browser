@@ -26,6 +26,8 @@ extension Bundle {
         static let buildNumber = kCFBundleVersionKey as String
         static let versionNumber = "CFBundleShortVersionString"
         static let displayName = "CFBundleDisplayName"
+        static let documentTypes = "CFBundleDocumentTypes"
+        static let typeExtensions = "CFBundleTypeExtensions"
         static let vpnMenuAgentBundleId = "AGENT_BUNDLE_ID"
         static let vpnMenuAgentProductName = "AGENT_PRODUCT_NAME"
 
@@ -113,6 +115,14 @@ extension Bundle {
 
         let path = self.bundlePath
         return path.hasPrefix(applicationsPath)
+    }
+
+    var documentTypes: [[String: Any]] {
+        infoDictionary?[Keys.documentTypes] as? [[String: Any]] ?? []
+    }
+
+    var fileTypeExtensions: Set<String> {
+        documentTypes.reduce(into: []) { $0.formUnion($1[Keys.typeExtensions] as? [String] ?? []) }
     }
 
 }

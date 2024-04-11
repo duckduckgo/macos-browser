@@ -483,6 +483,13 @@ extension URL {
         }
     }
 
+    var isDirectory: Bool {
+        var isDirectory: ObjCBool = false
+        guard isFileURL,
+              FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else { return false }
+        return isDirectory.boolValue
+    }
+
     mutating func setFileHidden(_ hidden: Bool) throws {
         var resourceValues = URLResourceValues()
         resourceValues.isHidden = true
