@@ -28,6 +28,10 @@ fileprivate extension Font {
             .system(size: 13, weight: .regular, design: .default)
         }
 
+        static var dataVolume: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
         static var location: Font {
             .system(size: 13, weight: .regular, design: .default)
         }
@@ -64,7 +68,7 @@ private enum Opacity {
         colorScheme == .light ? Double(0.6) : Double(0.5)
     }
 
-    static func location(colorScheme: ColorScheme) -> Double {
+    static func dataVolume(colorScheme: ColorScheme) -> Double {
         colorScheme == .light ? Double(0.6) : Double(0.5)
     }
 
@@ -90,6 +94,12 @@ fileprivate extension View {
     func applyConnectionStatusDetailAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.connectionStatusDetail(colorScheme: colorScheme))
             .font(.NetworkProtection.connectionStatusDetail)
+            .foregroundColor(Color(.defaultText))
+    }
+
+    func applyDataVolumeAttributes(colorScheme: ColorScheme) -> some View {
+        opacity(Opacity.dataVolume(colorScheme: colorScheme))
+            .font(.NetworkProtection.dataVolume)
             .foregroundColor(Color(.defaultText))
     }
 
@@ -253,7 +263,7 @@ public struct TunnelControllerView: View {
                                 .applyLocationAttributes()
                                 .foregroundColor(.white)
                         } else {
-                            Text(model.formattedLocation)
+                            Text(model.formattedLocation(colorScheme: colorScheme))
                                 .applyLocationAttributes()
                         }
                     } else {
@@ -279,7 +289,7 @@ public struct TunnelControllerView: View {
             connectionStatusRow(title: UserText.networkProtectionStatusViewIPAddress,
                                 details: model.serverAddress)
 
-            dataVolumeRow(title: UserText.vpnDataVolume, details: model.dataVolume)
+            dataVolumeRow(title: UserText.vpnDataVolume, dataVolume: model.formattedDataVolume)
 
             dividerRow()
         }
@@ -335,7 +345,7 @@ public struct TunnelControllerView: View {
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
     }
 
-    private func dataVolumeRow(title: String, details: TunnelControllerViewModel.FormattedDataVolume) -> some View {
+    private func dataVolumeRow(title: String, dataVolume: TunnelControllerViewModel.FormattedDataVolume) -> some View {
         HStack(spacing: 0) {
             Text(title)
                 .applyLabelAttributes(colorScheme: colorScheme)
@@ -345,12 +355,13 @@ public struct TunnelControllerView: View {
 
             Group {
                 Image(NetworkProtectionAsset.dataReceived)
-                Text(details.received)
+                Text(dataVolume.dataReceived)
                 Image(NetworkProtectionAsset.dataSent)
                     .padding(.leading, 4)
-                Text(details.sent)
+                Text(dataVolume.dataSent)
             }
-            .foregroundColor(Color(.defaultText).opacity(0.6))
+            .applyDataVolumeAttributes(colorScheme: colorScheme)
+            .fixedSize()
         }
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
     }

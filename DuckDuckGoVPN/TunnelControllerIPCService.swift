@@ -33,7 +33,6 @@ final class TunnelControllerIPCService {
     private let networkExtensionController: NetworkExtensionController
     private let server: NetworkProtectionIPC.TunnelControllerIPCServer
     private let statusReporter: NetworkProtectionStatusReporter
-    private lazy var dataVolumeMonitor = NetworkProtectionDataVolumeMonitor()
     private var cancellables = Set<AnyCancellable>()
     private let defaults: UserDefaults
 
@@ -50,7 +49,6 @@ final class TunnelControllerIPCService {
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
-        subscribeToDataVolumeUpdates()
         subscribeToServerChanges()
 
         server.serverDelegate = self
@@ -85,38 +83,6 @@ final class TunnelControllerIPCService {
                 self?.server.statusChanged(status)
             }
             .store(in: &cancellables)
-    }
-
-    private func subscribeToDataVolumeUpdates() {
-        statusReporter.statusObserver.publisher
-            .subscribe(on: DispatchQueue.main)
-            .map { connectionStatus in
-                guard case .connected = connectionStatus else { return false }
-                return true
-            }
-            .sink { isConnected in
-                Task { [weak self] in
-                    guard let self else { return }
-                    if !isConnected {
-                        await self.dataVolumeMonitor.stop()
-                    } else {
-                        await self.startDataVolumeMonitor()
-                    }
-                }
-            }
-            .store(in: &cancellables)
-    }
-
-    private func startDataVolumeMonitor() async {
-        guard await !dataVolumeMonitor.isStarted else { return }
-        await dataVolumeMonitor.start(with: tunnelController) { [weak self] result in
-            switch result {
-            case .failure:
-                break
-            case .success(let dataVolume):
-                self?.server.dataVolumeUpdated(dataVolume)
-            }
-        }
     }
 }
 
