@@ -60,8 +60,8 @@ public class DataBrokerProtectionSchedulerErrorCollection: NSObject, NSSecureCod
     }
 
     public required init?(coder: NSCoder) {
-        oneTimeError = coder.decodeObject(forKey: NSSecureCodingKeys.oneTimeError) as? Error
-        operationErrors = coder.decodeObject(forKey: NSSecureCodingKeys.operationErrors) as? [Error]
+        oneTimeError = coder.decodeObject(of: NSError.self, forKey: NSSecureCodingKeys.oneTimeError)
+        operationErrors = coder.decodeArrayOfObjects(ofClass: NSError.self, forKey: NSSecureCodingKeys.operationErrors)
     }
 }
 
