@@ -36,7 +36,7 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
             persistor.burnDataOnQuitEnabled = isBurnDataOnQuitEnabled
             NotificationCenter.default.post(name: .burnDataOnQuitDidChange,
                                             object: nil,
-                                            userInfo: [Self.burnOnQuitNotificationKey: isBurnDataOnQuitEnabled])
+                                            userInfo: nil)
         }
     }
 
@@ -44,13 +44,6 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
     var isWarnBeforeClearingEnabled: Bool {
         didSet {
             persistor.warnBeforeClearingEnabled = isWarnBeforeClearingEnabled
-        }
-    }
-
-    @Published
-    var clearDataAfter: ClearDataAfterOption = .quittingAppOnly {
-        didSet {
-            persistor.clearDataAfter = clearDataAfter
         }
     }
 
@@ -73,7 +66,6 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
         isLoginDetectionEnabled = persistor.loginDetectionEnabled
         isBurnDataOnQuitEnabled = persistor.burnDataOnQuitEnabled
         isWarnBeforeClearingEnabled = persistor.warnBeforeClearingEnabled
-        clearDataAfter = persistor.clearDataAfter
     }
 
     private var persistor: FireButtonPreferencesPersistor
@@ -83,7 +75,6 @@ protocol FireButtonPreferencesPersistor {
     var loginDetectionEnabled: Bool { get set }
     var burnDataOnQuitEnabled: Bool { get set }
     var warnBeforeClearingEnabled: Bool { get set }
-    var clearDataAfter: ClearDataAfterOption { get set }
 }
 
 struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersistor {
@@ -97,27 +88,6 @@ struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersisto
     @UserDefaultsWrapper(key: .warnBeforeClearingEnabled, defaultValue: false)
     var warnBeforeClearingEnabled: Bool
 
-    @UserDefaultsWrapper(key: .clearDataAfter, defaultValue: .quittingAppOnly)
-    var clearDataAfter: ClearDataAfterOption
-
-}
-
-enum ClearDataAfterOption: String, CaseIterable {
-    case quittingAppOnly
-    case quittingApp30MinutesOfInactivity
-    case quittingApp2HoursOfInactivity
-    case quittingApp8HoursOfInactivity
-    case quittingApp1DayOfInactivity
-
-    var timeInterval: TimeInterval? {
-        switch self {
-        case .quittingAppOnly: return nil
-        case .quittingApp30MinutesOfInactivity: return 30 * 60
-        case .quittingApp2HoursOfInactivity: return 2 * 60 * 60
-        case .quittingApp8HoursOfInactivity: return 8 * 60 * 60
-        case .quittingApp1DayOfInactivity: return 24 * 60 * 60
-        }
-    }
 }
 
 extension Notification.Name {

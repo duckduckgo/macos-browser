@@ -10609,18 +10609,6 @@
         }
       }
     },
-    "clear.data.after" : {
-      "comment" : "A label for a setting to automatically clear data after some delay",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear Data After:"
-          }
-        }
-      }
-    },
     "close.other.tabs" : {
       "comment" : "Menu item",
       "extractionState" : "extracted_with_value",
@@ -44834,66 +44822,6 @@
         }
       }
     },
-    "quitting.app.1.day.of.inactivity" : {
-      "comment" : "A label describing an option to clear data automatically only upon quitting the app or after 1 day of inactivity",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Quitting App, 1 Day of Inactivity"
-          }
-        }
-      }
-    },
-    "quitting.app.2.hours.of.inactivity" : {
-      "comment" : "A label describing an option to clear data automatically only upon quitting the app or after 2 hours of inactivity",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Quitting App, 2 Hours of Inactivity"
-          }
-        }
-      }
-    },
-    "quitting.app.8.hours.of.inactivity" : {
-      "comment" : "A label describing an option to clear data automatically only upon quitting the app or after 8 hours of inactivity",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Quitting App, 8 Hours of Inactivity"
-          }
-        }
-      }
-    },
-    "quitting.app.30.minutes.of.inactivity" : {
-      "comment" : "A label describing an option to clear data automatically only upon quitting the app or after 30 minutes of inactivity",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Quitting App, 30 Minutes of Inactivity"
-          }
-        }
-      }
-    },
-    "quitting.app.only" : {
-      "comment" : "A label describing an option to clear data automatically only upon quitting the app",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Quitting App Only"
-          }
-        }
-      }
-    },
     "Recently Closed" : {
       "comment" : "Main Menu History item",
       "localizations" : {
@@ -50841,6 +50769,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Warn before Quit"
+          }
+        }
+      }
+    },
+    "warn.before.quit.dialog.header" : {
+      "comment" : "A header of warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quit the application and \nclear all dara?"
+          }
+        }
+      }
+    },
+    "warn.before.quit.dialog.message" : {
+      "comment" : "A warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cookies and site data for all sites will be cleared, unless the site is Fireproof."
           }
         }
       }

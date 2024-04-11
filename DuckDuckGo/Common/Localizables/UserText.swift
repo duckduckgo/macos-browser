@@ -1041,16 +1041,9 @@ struct UserText {
     static let burnDataOnQuit = NSLocalizedString("burn.data.on.quit", value: "Clear Data upon Quitting", comment: "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.")
     static let burnDataOnQuitExplanation = NSLocalizedString("burn.data.on.quit.explanation", value: "Data from \"Fireproofed\" sites won't be cleared, keeping your essential logins and preferences intact.", comment: "Explanation of a setting which configures clearing data automatically after quitting the app.")
     static let warnBeforeQuit = NSLocalizedString("warn.before.quit", value: "Warn before Quit", comment: "Label after the checkbox in Settings which configures a warning before clearing data on the application termination.")
-    static let clearDataAfter = NSLocalizedString("clear.data.after", value: "Clear Data After:", comment: "A label for a setting to automatically clear data after some delay")
-    static func clearDataAfter(for option: ClearDataAfterOption) -> String {
-        switch option {
-        case .quittingAppOnly: return NSLocalizedString("quitting.app.only", value: "Quitting App Only", comment: "A label describing an option to clear data automatically only upon quitting the app")
-        case .quittingApp30MinutesOfInactivity: return NSLocalizedString("quitting.app.30.minutes.of.inactivity", value: "Quitting App, 30 Minutes of Inactivity", comment: "A label describing an option to clear data automatically only upon quitting the app or after 30 minutes of inactivity")
-        case .quittingApp2HoursOfInactivity: return NSLocalizedString("quitting.app.2.hours.of.inactivity", value: "Quitting App, 2 Hours of Inactivity", comment: "A label describing an option to clear data automatically only upon quitting the app or after 2 hours of inactivity")
-        case .quittingApp8HoursOfInactivity: return NSLocalizedString("quitting.app.8.hours.of.inactivity", value: "Quitting App, 8 Hours of Inactivity", comment: "A label describing an option to clear data automatically only upon quitting the app or after 8 hours of inactivity")
-        case .quittingApp1DayOfInactivity: return NSLocalizedString("quitting.app.1.day.of.inactivity", value: "Quitting App, 1 Day of Inactivity", comment: "A label describing an option to clear data automatically only upon quitting the app or after 1 day of inactivity")
-        }
-    }
+    static let warnBeforeQuitDialogHeader = NSLocalizedString("warn.before.quit.dialog.header", value: "Quit the application and \nclear all dara?", comment: "A header of warning before clearing data on the application termination.")
+    static let warnBeforeQuitDialogMessage = NSLocalizedString("warn.before.quit.dialog.message", value: "Cookies and site data for all sites will be cleared, unless the site is Fireproof.", comment: "A warning before clearing data on the application termination.")
+
     static func disableBurnOnQuitToEnableSessionRestore() -> String {
         let localized = NSLocalizedString("disable.burn.on.quit.to.enable.session.restore",
                                           value: "Disable the %@ setting to enable session restore on startup.",

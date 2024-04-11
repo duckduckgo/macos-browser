@@ -46,18 +46,22 @@ final class StartupPreferences: ObservableObject, PreferencesTabOpening {
     private let pinningManager: LocalPinningManager
     private var persistor: StartupPreferencesPersistor
     private var pinnedViewsNotificationCancellable: AnyCancellable?
+    private var dataClearingPreferences: DataClearingPreferences
     private var dataClearingPreferencesNotificationCancellable: AnyCancellable?
 
     init(pinningManager: LocalPinningManager = LocalPinningManager.shared,
-         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared)) {
+         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared),
+         dataClearingPreferences: DataClearingPreferences = DataClearingPreferences.shared) {
         self.pinningManager = pinningManager
         self.persistor = persistor
+        self.dataClearingPreferences = dataClearingPreferences
         restorePreviousSession = persistor.restorePreviousSession
         launchToCustomHomePage = persistor.launchToCustomHomePage
         customHomePageURL = persistor.customHomePageURL
         updateHomeButtonState()
         listenToPinningManagerNotifications()
         listenToDataClearingPreferencesNotifications()
+        checkDataClearingStatus()
     }
 
     @Published var restorePreviousSession: Bool {
@@ -131,15 +135,18 @@ final class StartupPreferences: ObservableObject, PreferencesTabOpening {
         }
     }
 
+    private func checkDataClearingStatus() {
+        if dataClearingPreferences.isBurnDataOnQuitEnabled {
+            restorePreviousSession = false
+        }
+    }
+
     private func listenToDataClearingPreferencesNotifications() {
-        dataClearingPreferencesNotificationCancellable = NotificationCenter.default.publisher(for: .burnDataOnQuitDidChange).sink { [weak self] notification in
-            guard let self = self,
-                  let isBurnDataOnQuitEnabled = notification.userInfo?[DataClearingPreferences.burnOnQuitNotificationKey] as? Bool else {
+        dataClearingPreferencesNotificationCancellable = NotificationCenter.default.publisher(for: .burnDataOnQuitDidChange).sink { [weak self] _ in
+            guard let self = self else {
                 return
             }
-            if isBurnDataOnQuitEnabled {
-                self.restorePreviousSession = false
-            }
+            self.checkDataClearingStatus()
         }
     }
 

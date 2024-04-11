@@ -309,9 +309,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #endif
 
-        burnOnQuitHandler = BurnOnQuitHandler(preferences: .shared, fireViewModel: FireCoordinator.fireViewModel)
-        burnOnQuitHandler.burnOnStartIfNeeded()
-        burnOnQuitHandler.resetTheFlag()
+        setUpBurnOnQuitHandler()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -335,12 +333,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
 
         updateSubscriptionStatus()
-
-        burnOnQuitHandler.applicationDidBecomeActive()
-    }
-
-    func applicationWillResignActive(_ notification: Notification) {
-        burnOnQuitHandler.applicationWillResignActive()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -357,13 +349,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         }
         stateRestorationManager?.applicationWillTerminate()
 
-        if burnOnQuitHandler.shouldBurnOnQuit {
-            burnOnQuitHandler.onBurnOnQuitCompleted = {
-                NSApplication.shared.reply(toApplicationShouldTerminate: true)
-            }
-            burnOnQuitHandler.burnOnQuit()
-
-            return .terminateLater
+        // Handling of "Burn on quit"
+        if let terminationReply = burnOnQuitHandler.terminationReply() {
+            return terminationReply
         }
 
         return .terminateNow
@@ -579,6 +567,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
         if Pixel.isNewUser {
             Pixel.fire(.importDataInitial, limitTo: .initial)
+        }
+    }
+
+    private func setUpBurnOnQuitHandler() {
+        burnOnQuitHandler = BurnOnQuitHandler(preferences: .shared, fireViewModel: FireCoordinator.fireViewModel)
+        burnOnQuitHandler.burnOnStartIfNeeded()
+        burnOnQuitHandler.resetTheFlag()
+        burnOnQuitHandler.onBurnOnQuitCompleted = {
+            NSApplication.shared.reply(toApplicationShouldTerminate: true)
         }
     }
 

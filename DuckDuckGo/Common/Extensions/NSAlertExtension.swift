@@ -224,8 +224,8 @@ extension NSAlert {
 
     static func burnOnQuitAlert() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Clear data and \nclose all tabs before closing?"
-        alert.informativeText = "Cookies and site data for all sites will be cleared, unless the site is Fireproof."
+        alert.messageText = UserText.warnBeforeQuitDialogHeader
+        alert.informativeText = UserText.warnBeforeQuitDialogMessage
         alert.alertStyle = .warning
         alert.icon = .burnAlert
         alert.addButton(withTitle: UserText.clear)

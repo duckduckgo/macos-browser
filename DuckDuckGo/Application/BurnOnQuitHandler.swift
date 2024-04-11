@@ -31,7 +31,7 @@ final class BurnOnQuitHandler {
 
     // MARK: - Burn On Quit
 
-    var shouldBurnOnQuit: Bool {
+    private var shouldBurnOnQuit: Bool {
         return preferences.isBurnDataOnQuitEnabled
     }
 
@@ -39,20 +39,19 @@ final class BurnOnQuitHandler {
         return preferences.isWarnBeforeClearingEnabled
     }
 
-    // Completion handler for all quit tasks
     var onBurnOnQuitCompleted: (() -> Void)?
 
     @MainActor
-    func burnOnQuit() {
-        guard shouldBurnOnQuit else { return }
+    private func burnOnQuit() -> NSApplication.TerminateReply {
+        guard shouldBurnOnQuit else {
+            return .terminateNow
+        }
 
         if shouldWarnOnBurn {
             let alert = NSAlert.burnOnQuitAlert()
             let response = alert.runModal()
             guard response == .alertFirstButtonReturn else {
-                appTerminationHandledCorrectly = true
-                onBurnOnQuitCompleted?()
-                return
+                return .terminateCancel
             }
         }
 
@@ -60,6 +59,17 @@ final class BurnOnQuitHandler {
             self?.appTerminationHandledCorrectly = true
             self?.onBurnOnQuitCompleted?()
         }
+
+        return .terminateLater
+    }
+
+    @MainActor
+    func terminationReply() -> NSApplication.TerminateReply? {
+        if shouldBurnOnQuit {
+            return burnOnQuit()
+        }
+
+        return nil
     }
 
     // MARK: - Burn On Start
@@ -81,38 +91,6 @@ final class BurnOnQuitHandler {
         guard preferences.isBurnDataOnQuitEnabled, shouldBurnOnStart else { return }
 
         fireViewModel.fire.burnAll()
-    }
-
-    // MARK: - Burn After
-
-    private var inactivityTimer: Timer?
-
-    var shouldBurnAfterDelay: Bool {
-        preferences.isBurnDataOnQuitEnabled && preferences.clearDataAfter.timeInterval != nil
-    }
-
-    var burnTimeInterval: Double? {
-        preferences.clearDataAfter.timeInterval
-    }
-
-    func applicationDidBecomeActive() {
-        // Cancel the burn timer if the app becomes active
-        inactivityTimer?.invalidate()
-        inactivityTimer = nil
-    }
-
-    func applicationWillResignActive() {
-        guard shouldBurnAfterDelay, let interval = burnTimeInterval else { return }
-
-        inactivityTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
-            self?.performBurnAfterDelay()
-        }
-    }
-
-    private func performBurnAfterDelay() {
-        DispatchQueue.main.async { [weak self] in
-            self?.fireViewModel.fire.burnAll()
-        }
     }
 
 }

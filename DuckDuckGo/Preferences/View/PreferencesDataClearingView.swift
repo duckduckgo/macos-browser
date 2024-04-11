@@ -42,16 +42,6 @@ extension Preferences {
                         .padding(.leading, 16)
                     }
 
-                    PreferencePaneSubSection {
-                        Picker(UserText.clearDataAfter, selection: $model.clearDataAfter) {
-                            ForEach(ClearDataAfterOption.allCases, id: \.self) { option in
-                                Text(UserText.clearDataAfter(for: option)).tag(option)
-                            }
-                        }
-                        .fixedSize()
-                        .disabled(!model.isBurnDataOnQuitEnabled)
-                    }
-
                 }
 
                 // SECTION 2: Fireproof Site
