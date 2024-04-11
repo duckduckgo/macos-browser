@@ -38,9 +38,31 @@ jobs:
   #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   #     AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
 
+  export-testserver:
+    name: Export tests server
+    runs-on: macos-13-xlarge
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Build test server
+      run: |
+        set -o pipefail && xcodebuild build \
+          -scheme "tests-server" \
+          -derivedDataPath DerivedData \
+          -configuration Review 
+  
+    - name: Upload tests-server
+      uses: actions/upload-artifact@v4
+      with:
+        name: tests-server
+        path: DerivedData/Build/Products/Review/tests-server
+
   ui-tests-legacy-os:
     name: UI Tests legacy OS
-#    needs: create-notarized-app
+    needs: [ export-testserver ]
 
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -93,13 +115,17 @@ jobs:
         NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}
         NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
 
-    # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
+    - name: Unzip and Copy tests-server to /DerivedData                         
+      run: |
+        ls -R
+        cp  "tests-server" "../DerivedData/Build/Products/Review/tests-server"
 
+    # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
     - name: Build test runner 
       run: |
-        ls -latr DerivedData/SourcePackages/repositories
         rm -rf LocalPackages
         rm -rf /Users/runner/work/macos-browser/macos-browser/DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved 
+        sed -i '' '/\/\* Begin XCSwiftPackageProductDependency section \*\//,/\/\* End XCSwiftPackageProductDependency section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
         sed -i '' '/\/\* Begin XCRemoteSwiftPackageReference section \*\//,/\/\* End XCRemoteSwiftPackageReference section \*\//d' DuckDuckGo.xcodeproj/project.pbxproj
         set -o pipefail && xcodebuild build-for-testing \
           -scheme "UI Tests Legacy" \
