@@ -280,9 +280,10 @@ public struct TunnelControllerView: View {
                 .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
 
-            connectionStatusRow(icon: .ipAddressIcon,
-                                title: UserText.networkProtectionStatusViewIPAddress,
+            connectionStatusRow(title: UserText.networkProtectionStatusViewIPAddress,
                                 details: model.serverAddress)
+
+            dataVolumeRow(title: UserText.vpnDataVolume, details: model.dataVolume)
 
             dividerRow()
         }
@@ -322,11 +323,8 @@ public struct TunnelControllerView: View {
         .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
     }
 
-    private func connectionStatusRow(icon: NetworkProtectionAsset, title: String, details: String) -> some View {
+    private func connectionStatusRow(title: String, details: String) -> some View {
         HStack(spacing: 0) {
-            Image(icon)
-                .padding([.trailing], 8)
-
             Text(title)
                 .applyLabelAttributes(colorScheme: colorScheme)
                 .fixedSize()
@@ -337,6 +335,26 @@ public struct TunnelControllerView: View {
                 .makeSelectable()
                 .applyConnectionStatusDetailAttributes(colorScheme: colorScheme)
                 .fixedSize()
+        }
+        .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
+    }
+
+    private func dataVolumeRow(title: String, details: TunnelControllerViewModel.FormattedDataVolume) -> some View {
+        HStack(spacing: 0) {
+            Text(title)
+                .applyLabelAttributes(colorScheme: colorScheme)
+                .fixedSize()
+
+            Spacer(minLength: 2)
+
+            Group {
+                Image(NetworkProtectionAsset.dataReceived)
+                Text(details.received)
+                Image(NetworkProtectionAsset.dataSent)
+                    .padding(.leading, 4)
+                Text(details.sent)
+            }
+            .foregroundColor(Color(.defaultText).opacity(0.6))
         }
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
     }
