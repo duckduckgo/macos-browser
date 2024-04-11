@@ -710,10 +710,11 @@ final class NavigationBarViewController: NSViewController {
         }
 
         popovers.passwordManagementDomain = nil
-        guard let url = url, let domain = url.host else {
+        guard let url = url, let hostAndPort = url.hostAndPort() else {
             return
         }
-        popovers.passwordManagementDomain = domain
+
+        popovers.passwordManagementDomain = hostAndPort
     }
 
     private func updateHomeButton() {

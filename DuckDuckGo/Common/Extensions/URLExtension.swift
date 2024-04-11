@@ -278,6 +278,14 @@ extension URL {
         return string
     }
 
+    func hostAndPort() -> String? {
+        guard let host else { return nil }
+
+        guard let port = port else { return host }
+
+        return "\(host):\(port)"
+    }
+
 #if !SANDBOX_TEST_TOOL
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
         let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
