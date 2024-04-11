@@ -118,7 +118,7 @@ jobs:
     - name: Unzip and Copy tests-server to /DerivedData                         
       run: |
         ls -R
-        cp  tests-server "../DerivedData/Build/Products/Review/"
+        cp  tests-server/tests-server "../DerivedData/Build/Products/Review/"
 
     # This first bit is a hack to stop the app building package dependencies that isn't needed by the test runner
     - name: Build test runner 
