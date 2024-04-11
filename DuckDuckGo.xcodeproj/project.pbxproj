@@ -8893,6 +8893,7 @@
 				CBCCF59F2996681700C02DFE /* Assert Xcode version */,
 				378E2798296F6D1D00FCADA2 /* Validate PRODUCT_NAME */,
 				3706FA79293F65D500E42796 /* Check Embedded Config URLs */,
+				B6E6BA192BA2D8BE008AA7E1 /* Run swiftlint */,
 				3706FA7A293F65D500E42796 /* Sources */,
 				3706FCA6293F65D500E42796 /* Frameworks */,
 				3706FCB1293F65D500E42796 /* Resources */,
@@ -8901,9 +8902,9 @@
 			buildRules = (
 			);
 			dependencies = (
+				B637D1BD2BC6AE6200C7DCA7 /* PBXTargetDependency */,
 				4BBA2D2B2B6AD01E00F6A470 /* PBXTargetDependency */,
 				4BBA2D292B6ACD4D00F6A470 /* PBXTargetDependency */,
-				B69D061C2A4C0BC10032D14D /* PBXTargetDependency */,
 				4B5F14FE2A1529230060320F /* PBXTargetDependency */,
 			);
 			name = "DuckDuckGo Privacy Browser App Store";
@@ -8978,7 +8979,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B69D061A2A4C0AD80032D14D /* PBXTargetDependency */,
 				B6EC37F429B5DA94001ACE79 /* PBXTargetDependency */,
 				37079A95294236FA0031BB3C /* PBXTargetDependency */,
 			);
@@ -9001,7 +9001,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B6F997C12B8F35F800476735 /* PBXTargetDependency */,
 				376113D62B29CD6800E794BB /* PBXTargetDependency */,
 			);
 			name = "SyncE2EUITests App Store";
@@ -9023,7 +9022,6 @@
 			);
 			dependencies = (
 				B6CAC23F2B8F0ECA006CD402 /* PBXTargetDependency */,
-				B69D06162A4C0ACD0032D14D /* PBXTargetDependency */,
 				B6EC37F229B5DA8F001ACE79 /* PBXTargetDependency */,
 			);
 			name = "Integration Tests";
@@ -9048,7 +9046,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B6080B9F2B20AF7B00B418EF /* PBXTargetDependency */,
 			);
 			name = NetworkProtectionSystemExtension;
 			packageProductDependencies = (
@@ -9076,7 +9073,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B6080BA32B20AF8300B418EF /* PBXTargetDependency */,
 				7BEC18312AD5DA3300D30536 /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoVPN;
@@ -9111,7 +9107,6 @@
 			dependencies = (
 				7BDA36F82B7E082100AD5388 /* PBXTargetDependency */,
 				4BA7C4DF2B3F6F4900AFE511 /* PBXTargetDependency */,
-				B6080BA52B20AF8800B418EF /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoVPNAppStore;
 			packageProductDependencies = (
@@ -9139,7 +9134,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B6080BA12B20AF7F00B418EF /* PBXTargetDependency */,
 				4B4BEC4A2A11B627001D9AC5 /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoNotifications;
@@ -9162,7 +9156,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B6080B9D2B20AF7700B418EF /* PBXTargetDependency */,
 				4B4D60532A0B29CB00BCD287 /* PBXTargetDependency */,
 			);
 			name = NetworkProtectionAppExtension;
@@ -9183,6 +9176,7 @@
 			buildPhases = (
 				4B9579432AC7AE700062CA31 /* Assert Xcode version */,
 				4B9579442AC7AE700062CA31 /* Check Embedded Config URLs */,
+				B6409DC22BC7BC8E00D66F9E /* Run swiftlint */,
 				4B9579452AC7AE700062CA31 /* Sources */,
 				4B957BD42AC7AE700062CA31 /* Frameworks */,
 				4B957BEC2AC7AE700062CA31 /* Resources */,
@@ -9193,6 +9187,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6409DC42BC7BD0D00D66F9E /* PBXTargetDependency */,
 				4B9579262AC7AE700062CA31 /* PBXTargetDependency */,
 				31C6E9AB2B0C07A30086DC30 /* PBXTargetDependency */,
 			);
@@ -9243,7 +9238,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B6F997BF2B8F35F400476735 /* PBXTargetDependency */,
 			);
 			name = SyncE2EUITests;
 			packageProductDependencies = (
@@ -9264,7 +9258,6 @@
 			);
 			dependencies = (
 				EE02D41E2BB460B500DBE6B3 /* PBXTargetDependency */,
-				B6F997BD2B8F35EF00476735 /* PBXTargetDependency */,
 			);
 			name = "UI Tests";
 			packageProductDependencies = (
@@ -9310,7 +9303,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B6080BA92B20AF8F00B418EF /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoDBPBackgroundAgent;
 			packageProductDependencies = (
@@ -9334,7 +9326,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				B6080BAB2B20AF9200B418EF /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoDBPBackgroundAgentAppStore;
 			packageProductDependencies = (
@@ -9352,6 +9343,7 @@
 			buildPhases = (
 				CBCCF59E299667B700C02DFE /* Assert Xcode version */,
 				3705272528992C8A000C06A2 /* Check Embedded Config URLs */,
+				B6409DC52BC7BD1F00D66F9E /* Run swiftlint */,
 				AA585D7A248FD31100E9A3E2 /* Sources */,
 				AA585D7B248FD31100E9A3E2 /* Frameworks */,
 				AA585D7C248FD31100E9A3E2 /* Resources */,
@@ -9361,8 +9353,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				B637D1BB2BC6AE5600C7DCA7 /* PBXTargetDependency */,
 				7B4627742B9AF2C8004ACE0B /* PBXTargetDependency */,
-				B6F997BB2B8F353F00476735 /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				31C6E9AD2B0C07BA0086DC30 /* PBXTargetDependency */,
 			);
@@ -9417,7 +9409,6 @@
 			dependencies = (
 				B6E6BA1D2BA2E049008AA7E1 /* PBXTargetDependency */,
 				B6CAC23D2B8F0EC6006CD402 /* PBXTargetDependency */,
-				B69D06142A4C0AC50032D14D /* PBXTargetDependency */,
 			);
 			name = "Unit Tests";
 			packageProductDependencies = (
@@ -10053,7 +10044,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
+			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
 		};
 		4B9579442AC7AE700062CA31 /* Check Embedded Config URLs */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -10188,6 +10179,44 @@
 			shellPath = /bin/sh;
 			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/ContentScopeScripts_ContentScopeScripts.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/DataBrokerProtection_DataBrokerProtection.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
 		};
+		B6409DC22BC7BC8E00D66F9E /* Run swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run swiftlint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n${BUILT_PRODUCTS_DIR}/SwiftLintTool\n";
+		};
+		B6409DC52BC7BD1F00D66F9E /* Run swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run swiftlint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n${BUILT_PRODUCTS_DIR}/SwiftLintTool\n";
+		};
 		B6AEB5532BA3029B00781A09 /* Cleanup entitlements */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -10225,6 +10254,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "FRAMEWORKS_DIR=\"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nDYLIB_TARGET_PATH=\"${FRAMEWORKS_DIR}/libswift_Concurrency.dylib\"\n\nif [ ! -e \"${DYLIB_TARGET_PATH}\" ]; then\n\n    DYLIB_PATH=$(find \"${TOOLCHAIN_DIR}/usr/lib\" -path \"*/${HOST_PLATFORM}/libswift_Concurrency.dylib\")\n    echo \"copy ${DYLIB_PATH} to ${DYLIB_TARGET_PATH}\"\n\n    mkdir -p \"${FRAMEWORKS_DIR}\"\n    cp \"${DYLIB_PATH}\" \"${DYLIB_TARGET_PATH}\" || exit 1\n\nelse\n    echo \"${DYLIB_TARGET_PATH} exists 👌\"\nfi\n";
+		};
+		B6E6BA192BA2D8BE008AA7E1 /* Run swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run swiftlint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n${BUILT_PRODUCTS_DIR}/SwiftLintTool\n";
 		};
 		B6F2C8722A7A4C7D000498CF /* Make /Applications symlink, remove app on Clean build */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -13509,49 +13557,17 @@
 			target = 4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */;
 			targetProxy = 7BEC18302AD5DA3300D30536 /* PBXContainerItemProxy */;
 		};
-		B6080B9D2B20AF7700B418EF /* PBXTargetDependency */ = {
+		B637D1BB2BC6AE5600C7DCA7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
+			productRef = B637D1BA2BC6AE5600C7DCA7 /* SwiftLintTool */;
 		};
-		B6080B9F2B20AF7B00B418EF /* PBXTargetDependency */ = {
+		B637D1BD2BC6AE6200C7DCA7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
+			productRef = B637D1BC2BC6AE6200C7DCA7 /* SwiftLintTool */;
 		};
-		B6080BA12B20AF7F00B418EF /* PBXTargetDependency */ = {
+		B6409DC42BC7BD0D00D66F9E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
-		};
-		B6080BA32B20AF8300B418EF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
-		};
-		B6080BA52B20AF8800B418EF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
-		};
-		B6080BA92B20AF8F00B418EF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
-		};
-		B6080BAB2B20AF9200B418EF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
-		};
-		B69D06142A4C0AC50032D14D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
-		};
-		B69D06162A4C0ACD0032D14D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
-		};
-		B69D061A2A4C0AD80032D14D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
-		};
-		B69D061C2A4C0BC10032D14D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
+			productRef = B6409DC32BC7BD0D00D66F9E /* SwiftLintTool */;
 		};
 		B6AEB5552BA3042300781A09 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -13582,22 +13598,6 @@
 			isa = PBXTargetDependency;
 			target = B6EC37E729B5DA2A001ACE79 /* tests-server */;
 			targetProxy = B6EC37F329B5DA94001ACE79 /* PBXContainerItemProxy */;
-		};
-		B6F997BB2B8F353F00476735 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BA2B8F353F00476735 /* SwiftLintPlugin */;
-		};
-		B6F997BD2B8F35EF00476735 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BC2B8F35EF00476735 /* SwiftLintPlugin */;
-		};
-		B6F997BF2B8F35F400476735 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997BE2B8F35F400476735 /* SwiftLintPlugin */;
-		};
-		B6F997C12B8F35F800476735 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6F997C02B8F35F800476735 /* SwiftLintPlugin */;
 		};
 		EE02D41E2BB460B500DBE6B3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -14495,8 +14495,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 133.1.0;
+				kind = revision;
+				revision = 94c7c307d4d51806d9b62db35c4f9dee9346c5ab;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -14543,8 +14543,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/apple-toolbox.git";
 			requirement = {
-				kind = exactVersion;
-				version = 2.0.0;
+				kind = revision;
+				revision = 3c4e94b43a587decdf5d0862c224161298b4bc27;
 			};
 		};
 		F1D43AF12B98E47800BAB743 /* XCRemoteSwiftPackageReference "BareBonesBrowser" */ = {
@@ -15132,6 +15132,21 @@
 			package = AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
 		};
+		B637D1BA2BC6AE5600C7DCA7 /* SwiftLintTool */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = SwiftLintTool;
+		};
+		B637D1BC2BC6AE6200C7DCA7 /* SwiftLintTool */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = SwiftLintTool;
+		};
+		B6409DC32BC7BD0D00D66F9E /* SwiftLintTool */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
+			productName = SwiftLintTool;
+		};
 		B65CD8CA2B316DF100A595BB /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
@@ -15201,26 +15216,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Configuration;
-		};
-		B6F997BA2B8F353F00476735 /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6F997BC2B8F35EF00476735 /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6F997BE2B8F35F400476735 /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6F997C02B8F35F800476735 /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B6F997B92B8F352500476735 /* XCRemoteSwiftPackageReference "apple-toolbox" */;
-			productName = "plugin:SwiftLintPlugin";
 		};
 		CBC83E3529B63D380008E19C /* Configuration */ = {
 			isa = XCSwiftPackageProductDependency;
