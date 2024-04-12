@@ -45,7 +45,8 @@ final class WebView: WKWebView {
         super.init(frame: frame, configuration: configuration)
 
         // suppress Tracking Area events while loading
-        isLoadingCancellable = self.observe(\.isLoading, options: [.new]) { [weak suppressor=trackingAreas.first?.proxyOwner] _, c in
+        let suppressor = suppressor=trackingAreas.first?.trackingAreaSuppressor
+        isLoadingCancellable = self.observe(\.isLoading, options: [.new]) { [weak suppressor] _, c in
             suppressor?.isSuppressingMouseEvents = c.newValue /* isLoading */ ?? false
         }
     }
@@ -398,15 +399,15 @@ extension NSTrackingArea {
         var owner = owner
         if owner?.className == "WKMouseTrackingObserver" {
             let helper = TrackingAreaSuppressor(owner: owner)
-            self.proxyOwner = helper
+            self.trackingAreaSuppressor = helper
             owner = helper
         }
 
         return self.swizzled_init(rect: rect, options: options, owner: owner, userInfo: userInfo) /* call original */
     }
 
-    private static let proxyOwnerKey = UnsafeRawPointer(bitPattern: "proxyHandlerKey".hashValue)!
-    fileprivate private(set) var proxyOwner: TrackingAreaSuppressor? {
+    private static let trackingAreaSuppressorKey = UnsafeRawPointer(bitPattern: "trackingAreaSuppressorKey".hashValue)!
+    fileprivate private(set) var trackingAreaSuppressor: TrackingAreaSuppressor? {
         get {
             objc_getAssociatedObject(self, Self.proxyOwnerKey) as? TrackingAreaSuppressor
         }
