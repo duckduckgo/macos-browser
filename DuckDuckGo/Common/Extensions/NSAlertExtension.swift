@@ -218,11 +218,31 @@ extension NSAlert {
     static func autoClearAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.warnBeforeQuitDialogHeader
-        //TODO checkbox
         alert.alertStyle = .warning
         alert.icon = .burnAlert
-        alert.addButton(withTitle: UserText.clear)
+        alert.addButton(withTitle: UserText.clearAndQuit)
         alert.addButton(withTitle: UserText.cancel)
+
+        // Create a checkbox
+        let checkbox = NSButton(checkboxWithTitle: UserText.warnBeforeQuitDialogCheckboxMessage,
+                                target: DataClearingPreferences.shared,
+                                action: #selector(DataClearingPreferences.toggleWarnBeforeClearing))
+        checkbox.state = DataClearingPreferences.shared.isWarnBeforeClearingEnabled ? .on : .off
+        checkbox.translatesAutoresizingMaskIntoConstraints = false
+
+        // Create a container view for the checkbox with custom padding
+        let containerView = NSView(frame: NSRect(x: 0, y: 0, width: 224, height: 25))
+        containerView.addSubview(checkbox)
+
+        // Constraints for the checkbox within the container
+        NSLayoutConstraint.activate([
+            checkbox.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            checkbox.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: -10) // Slightly up for better visual alignment
+        ])
+
+        // Set the container view as the accessoryView
+        alert.accessoryView = containerView
+
         return alert
     }
 

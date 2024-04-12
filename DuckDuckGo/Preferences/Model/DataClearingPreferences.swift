@@ -46,6 +46,10 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
         }
     }
 
+    @objc func toggleWarnBeforeClearing() {
+        isWarnBeforeClearingEnabled = !isWarnBeforeClearingEnabled
+    }
+
     @MainActor
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()

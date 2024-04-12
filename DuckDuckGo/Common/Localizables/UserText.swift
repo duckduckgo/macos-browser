@@ -53,6 +53,7 @@ struct UserText {
     static let pasteAndGo = NSLocalizedString("paste.and.go", value: "Paste & Go", comment: "Paste & Go button")
     static let pasteAndSearch = NSLocalizedString("paste.and.search", value: "Paste & Search", comment: "Paste & Search button")
     static let clear = NSLocalizedString("clear", value: "Clear", comment: "Clear button")
+    static let clearAndQuit = NSLocalizedString("clear.and.quit", value: "Clear and Quit", comment: "button to Clear data and quit the application")
     static let `continue` = NSLocalizedString("`continue`", value: "Continue", comment: "Continue button")
     static let bookmarkDialogAdd = NSLocalizedString("bookmark.dialog.add", value: "Add", comment: "Button to confim a bookmark creation")
     static let newFolderDialogAdd = NSLocalizedString("folder.dialog.add", value: "Add", comment: "Button to confim a bookmark folder creation")

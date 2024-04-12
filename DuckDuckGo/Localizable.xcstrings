@@ -10718,6 +10718,18 @@
         }
       }
     },
+    "clear.and.quit" : {
+      "comment" : "button to Clear data and quit the application",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear and Quit"
+          }
+        }
+      }
+    },
     "close.other.tabs" : {
       "comment" : "Menu item",
       "extractionState" : "extracted_with_value",
