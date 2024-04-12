@@ -24,11 +24,7 @@ import WebKit
 extension WKWebView {
 
     var suggestedFilename: String? {
-        guard let title = self.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]",
-                                                           with: "_",
-                                                           options: .regularExpression),
-              !title.isEmpty
-        else {
+        guard let title = self.title?.replacingInvalidFileNameCharacters(), !title.isEmpty else {
             return url?.suggestedFilename
         }
         return title.appending(".html")

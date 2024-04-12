@@ -108,15 +108,15 @@ extension Preferences {
                     // MARK: Location
                     PreferencePaneSubSection {
                         Text(UserText.downloadsLocation).bold()
+
                         HStack {
                             NSPathControlView(url: downloadsModel.selectedDownloadLocation)
-#if !APPSTORE
                             Button(UserText.downloadsChangeDirectory) {
                                 downloadsModel.presentDownloadDirectoryPanel()
                             }
-#endif
                         }
                         .disabled(downloadsModel.alwaysRequestDownloadLocation)
+
                         ToggleMenuItem(UserText.downloadsAlwaysAsk,
                                        isOn: $downloadsModel.alwaysRequestDownloadLocation)
                     }

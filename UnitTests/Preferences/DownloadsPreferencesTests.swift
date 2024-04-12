@@ -142,7 +142,7 @@ class DownloadsPreferencesTests: XCTestCase {
 
         preferences.selectedDownloadLocation = invalidDownloadLocationURL
 
-        XCTAssertEqual(preferences.effectiveDownloadLocation, testDirectory)
+        XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
     }
 
     func testWhenGettingSelectedDownloadLocationAndSelectedLocationIsInaccessibleThenDefaultDownloadLocationIsReturned() {
@@ -213,18 +213,15 @@ class DownloadsPreferencesTests: XCTestCase {
         XCTAssertNil(preferences.lastUsedCustomDownloadLocation)
     }
 
-    func testWhenInvalidLastUsedCustomDownloadLocationIsSet_oldValueIsPreserved() {
+    func testWhenInvalidLastUsedCustomDownloadLocationIsSet_lastUsedCustomLocationIsNil() {
         let testDirectory = createTemporaryTestDirectory()
         let persistor = DownloadsPreferencesPersistorMock(selectedDownloadLocation: nil)
         let preferences = DownloadsPreferences(persistor: persistor)
 
-        let valuesBeforeChange = persistor.values()
         preferences.lastUsedCustomDownloadLocation = testDirectory
         preferences.lastUsedCustomDownloadLocation = testDirectory.appendingPathComponent("non-existent-dir")
 
-        let valuesAfterChange = persistor.values()
-        XCTAssertEqual(valuesBeforeChange.difference(from: valuesAfterChange), ["\(\DownloadsPreferencesPersistorMock.lastUsedCustomDownloadLocation)".pathExtension])
-        XCTAssertEqual(preferences.lastUsedCustomDownloadLocation, testDirectory)
+        XCTAssertNil(preferences.lastUsedCustomDownloadLocation)
     }
 
     func testWhenLastUsedCustomDownloadLocationIsReset_nilIsReturned() {

@@ -80,7 +80,8 @@ final class VPNLocationViewModel: ObservableObject {
 
     func onCountryItemSelection(id: String, cityId: String? = nil) async {
         DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount)
-        let location = NetworkProtectionSelectedLocation(country: id, city: cityId)
+        let city = cityId == VPNCityItemModel.nearest.id ? nil : cityId
+        let location = NetworkProtectionSelectedLocation(country: id, city: city)
         selectedLocation = .location(location)
         await reloadList()
     }
