@@ -4925,9 +4925,14 @@
             "exceptions": [],
             "state": "enabled",
             "settings": {
-                "surveyCardDay0": "enabled",
-                "surveyCardDay7": "disabled",
-                "surveyCardDay14": "enabled"
+                "permanentSurvey": {
+                    "state" : "internal",
+                    "localization": "disabled",
+                    "url": "https://selfserve.decipherinc.com/survey/selfserve/32ab/240404?list=2",
+                    "firstDay": 5,
+                    "lastDay": 8,
+                    "sharePercentage": 60
+                }
             },
             "hash": "eb826d9079211f30d624211f44aed184"
         },

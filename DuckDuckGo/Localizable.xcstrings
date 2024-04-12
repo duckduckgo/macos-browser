@@ -30195,6 +30195,42 @@
         }
       }
     },
+    "newTab.setup.permanent.survey.action" : {
+      "comment" : "Action title of the permanent survey of the Set Up section in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Share Your Thoughts"
+          }
+        }
+      }
+    },
+    "newTab.setup.permanent.survey.summary" : {
+      "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Take our short survey and help us build the best browser."
+          }
+        }
+      }
+    },
+    "newTab.setup.permanent.survey.title" : {
+      "comment" : "Title of the permanent survey in the Set Up section in the home page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Help Us Improve"
+          }
+        }
+      }
+    },
     "newTab.setup.remove.item" : {
       "comment" : "Action title on the action menu of the set up cards card of the SetUp section in the home page to remove the item",
       "extractionState" : "extracted_with_value",
@@ -30317,7 +30353,7 @@
     },
     "newTab.setup.survey.day.0.action" : {
       "comment" : "Action title of the Day 0 survey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30377,7 +30413,7 @@
     },
     "newTab.setup.survey.day.0.summary" : {
       "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30437,7 +30473,7 @@
     },
     "newTab.setup.survey.day.0.title" : {
       "comment" : "Title of the Day 0 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30677,7 +30713,7 @@
     },
     "newTab.setup.survey.day.14.action" : {
       "comment" : "Action title of the Day 14 survey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30693,21 +30729,9 @@
         }
       }
     },
-    "newTab.setup.survey.day.14.summary" : {
-      "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Join an interview with a member of our research team to help us build the best browser."
-          }
-        }
-      }
-    },
     "newTab.setup.survey.day.14.title" : {
       "comment" : "Title of the Day 14 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -31001,7 +31025,7 @@
     },
     "no.access.to.selected.folder" : {
       "comment" : "Alert presented to user if the app doesn't have rights to access selected folder",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -31061,7 +31085,7 @@
     },
     "no.access.to.selected.folder.header" : {
       "comment" : "Header of the alert dialog informing user about failed download",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
