@@ -35,8 +35,17 @@ final class AutoClearHandler {
     func handleAppTermination() -> NSApplication.TerminateReply? {
         guard preferences.isAutoClearEnabled else { return nil }
 
-        if preferences.isWarnBeforeClearingEnabled, !confirmAutoClear() {
-            return .terminateCancel
+        if preferences.isWarnBeforeClearingEnabled {
+            switch confirmAutoClear() {
+            case .alertFirstButtonReturn:
+                performAutoClear()
+                return .terminateLater
+            case .alertSecondButtonReturn:
+                appTerminationHandledCorrectly = true
+                return .terminateNow
+            default:
+                return .terminateCancel
+            }
         }
 
         performAutoClear()
@@ -49,10 +58,10 @@ final class AutoClearHandler {
 
     // MARK: - Private
 
-    private func confirmAutoClear() -> Bool {
+    private func confirmAutoClear() -> NSApplication.ModalResponse {
         let alert = NSAlert.autoClearAlert()
         let response = alert.runModal()
-        return response == .alertFirstButtonReturn
+        return response
     }
 
     @MainActor

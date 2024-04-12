@@ -10719,7 +10719,7 @@
       }
     },
     "clear.and.quit" : {
-      "comment" : "button to Clear data and quit the application",
+      "comment" : "Button to clear data and quit the application",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -45761,6 +45761,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выйти"
+          }
+        }
+      }
+    },
+    "quit.without.clearing" : {
+      "comment" : "Button to quit the application without clearing data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quit without Clearing"
           }
         }
       }
