@@ -27,6 +27,8 @@ enum UITests {
         static let elementExistence: Double = 5.0
         /// The fire animation time has environmental dependencies, so we want to wait for completion so we don't try to type into it
         static let fireAnimation: Double = 30.0
+        /// When we are clicking on TCC dialogs from the system, we will wait for them to appear
+        static let sleepTimeForTCCDialogAppearance: UInt32 = 2
     }
 
     /// A page simple enough to test favorite, bookmark, and history storage
@@ -87,5 +89,14 @@ enum UITests {
         let openVanillaBrowser = app.menuItems["MainMenu.openVanillaBrowser"]
         openVanillaBrowser.clickAfterExistenceTestSucceeds()
         app.typeKey("w", modifierFlags: [.command, .option])
+    }
+    
+    /// Avoid some first-run states that we aren't testing.
+    static func firstRun() {
+        let app = XCUIApplication()
+        app.launch()
+        app.typeKey("n", modifierFlags: .command)
+        app.typeKey("w", modifierFlags: [.command, .option])
+        app.terminate()
     }
 }
