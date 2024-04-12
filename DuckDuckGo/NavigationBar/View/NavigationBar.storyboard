@@ -770,6 +770,7 @@
                                                     <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Camera-Tab-Blocked"/>
                                                     <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Camera-Icon"/>
                                                 </userDefinedRuntimeAttributes>
+                                                <accessibility identifier="NavigationBarViewController.PermissionButton"/>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qqY-h9-UQ7" userLabel="Popups Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="96" y="0.0" width="32" height="32"/>
