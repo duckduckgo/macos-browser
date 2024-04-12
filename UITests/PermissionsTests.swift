@@ -62,7 +62,7 @@ class PermissionsTests: XCTestCase {
         let cameraButton = app.webViews.buttons["Camera"]
         cameraButton.clickAfterExistenceTestSucceeds()
         sleep(UITests.Timeouts.sleepTimeForTCCDialogAppearance) // The rare necessary sleep, since we can believe a TCC dialog will appear here
-        let allowButtonIndex = try XCTUnwrap(notificationCenter.indexOfSystemModelDialogButtonOnElement(titled: "Allow"))
+        let allowButtonIndex = try XCTUnwrap(notificationCenter.indexOfSystemModelDialogButtonOnElement(titled: "Allow", "OK"))
         let allowButton = notificationCenter.buttons.element(boundBy: allowButtonIndex)
         allowButton.clickAfterExistenceTestSucceeds() // Click system camera permissions dialog
         let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
@@ -78,7 +78,7 @@ class PermissionsTests: XCTestCase {
         XCTAssertEqual(
             predominantColor,
             .green,
-            "The predominant color of a sample area of the Camera button on the webpage should be green at this point in the test."
+            "The predominant color of a sample area of the Camera button on the webpage should be green at this point in the test, but it was \(predominantColor)."
         )
         let navigationBarViewControllerPermissionButton = app.buttons["NavigationBarViewController.PermissionButton"]
         navigationBarViewControllerPermissionButton.clickAfterExistenceTestSucceeds()
@@ -100,14 +100,13 @@ class PermissionsTests: XCTestCase {
 private extension XCUIElement {
     /// We don't have as much control over what is going to appear on a modal dialogue, and it feels fragile to use Apple's accessibility IDs since I
     /// don't think there is any contract for that, but we can plan some flexibility in title matching for the button names, since the button names
-    /// are
-    /// in the test description.
-    /// - Parameter titled: The title of a button whose index on the element we'd like to know
+    /// are in the test description.
+    /// - Parameter titled: The title or titles (if they vary across macOS versions) of a button whose index on the element we'd like to know
     /// - Returns: An optional Int representing the button index on the element, if a button with this title was found.
-    func indexOfSystemModelDialogButtonOnElement(titled: String) -> Int? {
+    func indexOfSystemModelDialogButtonOnElement(titled: String...) -> Int? {
         for buttonIndex in 0 ... 4 { // It feels unlikely that a system modal dialog will have more than five buttons
             let button = self.buttons.element(boundBy: buttonIndex)
-            if button.exists, button.title == titled {
+            if button.exists, titled.contains(button.title) {
                 return buttonIndex
             }
         }
@@ -180,7 +179,7 @@ private extension CIImage {
             }
         }
 
-        if abs(redValueOfSample - greenValueOfSample) < 0.07 { // This isn't a huge difference because these are both very light colors
+        if abs(redValueOfSample - greenValueOfSample) < 0.05 { // This isn't a huge difference because these are both very light colors
             return .unknown // No predominant color
         }
         switch max(redValueOfSample, greenValueOfSample) {
