@@ -25,6 +25,7 @@ class AddressBarKeyboardShortcutsTests: XCTestCase {
 
     private var addressBarTextField: XCUIElement!
     override class func setUp() {
+        UITests.firstRun()
         UITests.setAutocompleteToggleBeforeTestcaseRuns(false) // We don't want changes in the address bar that we don't create
     }
 

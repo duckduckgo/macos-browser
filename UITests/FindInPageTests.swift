@@ -26,6 +26,7 @@ class FindInPageTests: XCTestCase {
     private let minimumExpectedMatchingPixelsInFindHighlight = 150
 
     override class func setUp() {
+        UITests.firstRun()
         saveLocalHTML()
     }
 
@@ -99,7 +100,10 @@ class FindInPageTests: XCTestCase {
             "Local \"Lorem Ipsum\" web page didn't load with the expected title in a reasonable timeframe. If this is unexpected, it can also be due to the timeout being too short."
         )
         let optionsButton = app.windows.buttons["NavigationBarViewController.optionsButton"]
-        XCTAssertTrue(optionsButton.waitForExistence(timeout: UITests.Timeouts.elementExistence), "Couldn't find options item in a reasonable timeframe.")
+        XCTAssertTrue(
+            optionsButton.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "Couldn't find options item in a reasonable timeframe."
+        )
         optionsButton.click()
 
         let findInPageMoreOptionsMenuItem = app.menuItems["MoreOptionsMenu.findInPage"]
