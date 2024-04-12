@@ -41,7 +41,7 @@ final class WebView: WKWebView {
         /// swizzle NSTrackingArea.init method to insert TrackingAreaSuppressor proxy owner
         /// it will disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
         /// see https://app.asana.com/0/1177771139624306/1206990108527681/f
-        _=NSTrackingArea.swizzleStartStopAccessingSecurityScopedResourceOnce
+        _=NSTrackingArea.swizzleInitWithRectOptionsOwnerUserInfoOnce
         super.init(frame: frame, configuration: configuration)
 
         // suppress Tracking Area events while loading
@@ -390,7 +390,7 @@ extension NSTrackingArea {
         class_getInstanceMethod(NSTrackingArea.self, #selector(NSTrackingArea.swizzled_init(rect:options:owner:userInfo:)))!
     }()
 
-    fileprivate static let swizzleStartStopAccessingSecurityScopedResourceOnce: Void = {
+    fileprivate static let swizzleInitWithRectOptionsOwnerUserInfoOnce: Void = {
         method_exchangeImplementations(originalInitWithRectOptionsOwnerUserInfo, swizzledInitWithRectOptionsOwnerUserInfo)
     }()
 
