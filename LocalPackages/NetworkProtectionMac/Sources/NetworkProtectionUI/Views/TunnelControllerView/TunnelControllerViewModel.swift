@@ -23,7 +23,7 @@ import SwiftUI
 
 @MainActor
 public final class TunnelControllerViewModel: ObservableObject {
-    public struct FormattedDataVolume {
+    public struct FormattedDataVolume: Equatable {
         public let dataSent: String
         public let dataReceived: String
     }
