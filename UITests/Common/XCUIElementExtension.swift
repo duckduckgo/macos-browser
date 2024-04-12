@@ -63,6 +63,14 @@ extension XCUIElement {
         }
     }
 
+    func typeURLAfterExistenceTestSucceeds(_ url: URL, pressingEnter: Bool = true) {
+        XCTAssertTrue(
+            self.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The address bar instance \(self.debugDescription) didn't load with the expected title in a reasonable timeframe."
+        )
+        self.typeURL(url, pressingEnter: pressingEnter)
+    }
+
     func clickAfterExistenceTestSucceeds() {
         XCTAssertTrue(
             self.waitForExistence(timeout: UITests.Timeouts.elementExistence),
