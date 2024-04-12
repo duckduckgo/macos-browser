@@ -2544,6 +2544,8 @@
 		9FA5A0A52BC8F34900153786 /* BookmarkFoldersStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A42BC8F34900153786 /* BookmarkFoldersStore.swift */; };
 		9FA5A0A62BC8F34900153786 /* BookmarkFoldersStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A42BC8F34900153786 /* BookmarkFoldersStore.swift */; };
 		9FA5A0A72BC8F34900153786 /* BookmarkFoldersStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A42BC8F34900153786 /* BookmarkFoldersStore.swift */; };
+		9FA5A0A92BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A82BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift */; };
+		9FA5A0AA2BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A82BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift */; };
 		9FA5A0B02BC9039200153786 /* BookmarkFolderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0AC2BC9037A00153786 /* BookmarkFolderStoreMock.swift */; };
 		9FA5A0B12BC9039300153786 /* BookmarkFolderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0AC2BC9037A00153786 /* BookmarkFolderStoreMock.swift */; };
 		9FA75A3E2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */; };
@@ -4272,6 +4274,7 @@
 		9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogStackedContentView.swift; sourceTree = "<group>"; };
 		9FA173EA2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogView.swift; sourceTree = "<group>"; };
 		9FA5A0A42BC8F34900153786 /* BookmarkFoldersStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFoldersStore.swift; sourceTree = "<group>"; };
+		9FA5A0A82BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsViewModelTests.swift; sourceTree = "<group>"; };
 		9FA5A0AC2BC9037A00153786 /* BookmarkFolderStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFolderStoreMock.swift; sourceTree = "<group>"; };
 		9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuFactoryTests.swift; sourceTree = "<group>"; };
 		9FBD84512BB3AACB00220859 /* AttributionOriginFileProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributionOriginFileProvider.swift; sourceTree = "<group>"; };
@@ -7050,6 +7053,7 @@
 				9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */,
 				9F2606092B85C20400819292 /* AddEditBookmarkDialogViewModelTests.swift */,
 				9F26060D2B85E17D00819292 /* AddEditBookmarkDialogCoordinatorViewModelTests.swift */,
+				9FA5A0A82BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -11091,6 +11095,7 @@
 				3706FDF5293F661700E42796 /* StartupPreferencesTests.swift in Sources */,
 				3706FDF6293F661700E42796 /* DuckPlayerTests.swift in Sources */,
 				3706FDF7293F661700E42796 /* WebViewExtensionTests.swift in Sources */,
+				9FA5A0AA2BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift in Sources */,
 				56534DEE29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */,
 				3706FDF8293F661700E42796 /* FileStoreTests.swift in Sources */,
 				5603D90729B7B746007F9F01 /* MockTabViewItemDelegate.swift in Sources */,
@@ -13162,6 +13167,7 @@
 				4B9292BD2667103100AD2C21 /* BookmarkOutlineViewDataSourceTests.swift in Sources */,
 				C17CA7B22B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */,
 				4BF6961D28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift in Sources */,
+				9FA5A0A92BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift in Sources */,
 				B6619F062B17138D00CD9186 /* DataImportSourceViewModelTests.swift in Sources */,
 				4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,

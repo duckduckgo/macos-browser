@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct WebsiteInfo {
+struct WebsiteInfo: Equatable {
     let url: URL
     let title: String?
 

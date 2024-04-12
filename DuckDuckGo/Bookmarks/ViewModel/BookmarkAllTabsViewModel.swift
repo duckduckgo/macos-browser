@@ -90,7 +90,6 @@ final class BookmarkAllTabsViewModel: BookmarkAllTabsDialogEditing {
 
         // Dismiss the view
         dismiss()
-
     }
 }
 
