@@ -347,7 +347,7 @@ extension WebView /* _WKFindDelegate */ {
 }
 
 /// used to suppress mouseEntered/mouseMoved/mouseExited events while Web View is loading
-final private class TrackingAreaSuppressor {
+final private class TrackingAreaSuppressor: NSObject {
 
     private weak var owner: AnyObject?
 
@@ -355,10 +355,6 @@ final private class TrackingAreaSuppressor {
 
     init(owner: AnyObject? = nil) {
         self.owner = owner
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     @objc(mouseEntered:)
