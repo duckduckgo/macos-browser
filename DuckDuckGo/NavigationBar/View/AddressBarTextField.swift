@@ -332,9 +332,10 @@ final class AddressBarTextField: NSTextField {
         }
 
 #if APPSTORE
-        if providedUrl.isFileURL, let window = self.window {
-            let alert = NSAlert.cannotOpenFileAlert()
-            alert.beginSheetModal(for: window) { response in
+        if providedUrl.isFileURL, !providedUrl.isWritableLocation(), // is sandbox extension available for the file?
+           let window = self.window {
+
+            NSAlert.cannotOpenFileAlert().beginSheetModal(for: window) { response in
                 switch response {
                 case .alertSecondButtonReturn:
                     WindowControllersManager.shared.show(url: URL.ddgLearnMore, source: .ui, newTab: false)
@@ -344,6 +345,7 @@ final class AddressBarTextField: NSTextField {
                     return
                 }
             }
+            return
         }
 #endif
 

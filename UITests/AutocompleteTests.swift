@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import Common
 import XCTest
 
 class AutocompleteTests: XCTestCase {

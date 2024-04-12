@@ -20,58 +20,157 @@ import Cocoa
 import Combine
 
 protocol DownloadsViewControllerDelegate: AnyObject {
-
     func clearDownloadsActionTriggered()
-
 }
 
 final class DownloadsViewController: NSViewController {
 
     static let preferredContentSize = CGSize(width: 420, height: 500)
 
-    static func create() -> Self {
-        let storyboard = NSStoryboard(name: "Downloads", bundle: nil)
-        // swiftlint:disable force_cast
-        let controller = storyboard.instantiateInitialController() as! Self
-        controller.loadView()
-        // swiftlint:enable force_cast
-        return controller
-    }
+    private lazy var titleLabel = NSTextField(string: UserText.downloadsDialogTitle)
 
-    @IBOutlet weak var openItem: NSMenuItem!
-    @IBOutlet weak var showInFinderItem: NSMenuItem!
-    @IBOutlet weak var copyDownloadLinkItem: NSMenuItem!
-    @IBOutlet weak var openWebsiteItem: NSMenuItem!
-    @IBOutlet weak var removeFromListItem: NSMenuItem!
-    @IBOutlet weak var stopItem: NSMenuItem!
-    @IBOutlet weak var restartItem: NSMenuItem!
-    @IBOutlet weak var clearAllItem: NSMenuItem!
+    private lazy var openDownloadsFolderButton = MouseOverButton(image: .openDownloadsFolder, target: self, action: #selector(openDownloadsFolderAction))
+    private lazy var clearDownloadsButton = MouseOverButton(image: .clearDownloads, target: self, action: #selector(clearDownloadsAction))
 
-    @IBOutlet weak var titleLabel: NSTextField!
-
-    @IBOutlet var openDownloadsFolderButton: NSButton!
-    @IBOutlet var clearDownloadsButton: NSButton!
-
-    @IBOutlet var contextMenu: NSMenu!
-    @IBOutlet var tableView: NSTableView!
-    @IBOutlet var tableViewHeightConstraint: NSLayoutConstraint?
+    private lazy var scrollView = NSScrollView()
+    private lazy var tableView = NSTableView()
+    private var tableViewHeightConstraint: NSLayoutConstraint!
     private var cellIndexToUnselect: Int?
 
     weak var delegate: DownloadsViewControllerDelegate?
 
-    var viewModel = DownloadListViewModel()
-    var downloadsCancellable: AnyCancellable?
+    private let viewModel: DownloadListViewModel
+    private var downloadsCancellable: AnyCancellable?
+
+    init(viewModel: DownloadListViewModel? = nil) {
+        self.viewModel = viewModel ?? DownloadListViewModel()
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        self.viewModel = DownloadListViewModel()
+        super.init(coder: coder)
+    }
+
+    override func loadView() { // swiftlint:disable:this function_body_length
+        view = NSView()
+
+        view.addSubview(titleLabel)
+        view.addSubview(openDownloadsFolderButton)
+        view.addSubview(clearDownloadsButton)
+        view.addSubview(scrollView)
+
+        titleLabel.isSelectable = false
+        titleLabel.isEditable = false
+        titleLabel.isBordered = false
+        titleLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        titleLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.drawsBackground = false
+        titleLabel.font = .preferredFont(forTextStyle: .title3)
+        titleLabel.textColor = .labelColor
+
+        openDownloadsFolderButton.translatesAutoresizingMaskIntoConstraints = false
+        openDownloadsFolderButton.alignment = .center
+        openDownloadsFolderButton.bezelStyle = .shadowlessSquare
+        openDownloadsFolderButton.isBordered = false
+        openDownloadsFolderButton.imagePosition = .imageOnly
+        openDownloadsFolderButton.imageScaling = .scaleProportionallyDown
+        openDownloadsFolderButton.toolTip = UserText.openDownloadsFolderTooltip
+        openDownloadsFolderButton.cornerRadius = 4
+        openDownloadsFolderButton.backgroundInset = CGPoint(x: 2, y: 2)
+        openDownloadsFolderButton.normalTintColor = .button
+        openDownloadsFolderButton.mouseDownColor = .buttonMouseDown
+        openDownloadsFolderButton.mouseOverColor = .buttonMouseOver
+
+        clearDownloadsButton.translatesAutoresizingMaskIntoConstraints = false
+        clearDownloadsButton.alignment = .center
+        clearDownloadsButton.bezelStyle = .shadowlessSquare
+        clearDownloadsButton.isBordered = false
+        clearDownloadsButton.imagePosition = .imageOnly
+        clearDownloadsButton.imageScaling = .scaleProportionallyDown
+        clearDownloadsButton.toolTip = UserText.clearDownloadHistoryTooltip
+        clearDownloadsButton.cornerRadius = 4
+        clearDownloadsButton.backgroundInset = CGPoint(x: 2, y: 2)
+        clearDownloadsButton.normalTintColor = .button
+        clearDownloadsButton.mouseDownColor = .buttonMouseDown
+        clearDownloadsButton.mouseOverColor = .buttonMouseOver
+
+        scrollView.autohidesScrollers = true
+        scrollView.borderType = .noBorder
+        scrollView.hasHorizontalScroller = false
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.usesPredominantAxisScrolling = false
+        scrollView.automaticallyAdjustsContentInsets = false
+
+        let clipView = NSClipView()
+        clipView.documentView = tableView
+
+        clipView.autoresizingMask = [.width, .height]
+        clipView.drawsBackground = false
+        clipView.frame = CGRect(x: 0, y: 0, width: 420, height: 440)
+
+        tableView.addTableColumn(NSTableColumn())
+
+        tableView.headerView = nil
+        tableView.backgroundColor = .clear
+        tableView.gridColor = .clear
+        tableView.style = .fullWidth
+        tableView.rowHeight = 60
+        tableView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        tableView.allowsMultipleSelection = false
+        tableView.doubleAction = #selector(DownloadsViewController.doubleClickAction)
+        tableView.target = self
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.menu = setUpContextMenu()
+
+        scrollView.contentView = clipView
+
+        let separator = NSBox()
+        separator.boxType = .separator
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(separator)
+
+        setupLayout(separator: separator)
+    }
+
+    private func setupLayout(separator: NSBox) {
+        tableViewHeightConstraint = scrollView.heightAnchor.constraint(equalToConstant: 440)
+
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
+
+            openDownloadsFolderButton.widthAnchor.constraint(equalToConstant: 32),
+            openDownloadsFolderButton.heightAnchor.constraint(equalToConstant: 32),
+            openDownloadsFolderButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 8),
+            openDownloadsFolderButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+
+            clearDownloadsButton.widthAnchor.constraint(equalToConstant: 32),
+            clearDownloadsButton.heightAnchor.constraint(equalToConstant: 32),
+            clearDownloadsButton.leadingAnchor.constraint(equalTo: openDownloadsFolderButton.trailingAnchor),
+            view.trailingAnchor.constraint(equalTo: clearDownloadsButton.trailingAnchor, constant: 11),
+            clearDownloadsButton.centerYAnchor.constraint(equalTo: openDownloadsFolderButton.centerYAnchor),
+
+            view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 44),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+
+            separator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            separator.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -2),
+            separator.topAnchor.constraint(equalTo: view.topAnchor, constant: 43),
+
+            tableViewHeightConstraint
+        ])
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupDragAndDrop()
-        setUpStrings()
-
-        openDownloadsFolderButton.toolTip = UserText.openDownloadsFolderTooltip
-        clearDownloadsButton.toolTip = UserText.clearDownloadHistoryTooltip
-
         preferredContentSize = Self.preferredContentSize
+        setupDragAndDrop()
     }
 
     override func viewWillAppear() {
@@ -116,16 +215,21 @@ final class DownloadsViewController: NSViewController {
         downloadsCancellable = nil
     }
 
-    private func setUpStrings() {
-        titleLabel.stringValue = UserText.downloadsDialogTitle
-        openItem.title = UserText.downloadsOpenItem
-        showInFinderItem.title = UserText.downloadsShowInFinderItem
-        copyDownloadLinkItem.title = UserText.downloadsCopyLinkItem
-        openWebsiteItem.title = UserText.downloadsOpenWebsiteItem
-        removeFromListItem.title = UserText.downloadsRemoveFromListItem
-        stopItem.title = UserText.downloadsStopItem
-        restartItem.title = UserText.downloadsRestartItem
-        clearAllItem.title = UserText.downloadsClearAllItem
+    private func setUpContextMenu() -> NSMenu {
+        let menu = NSMenu {
+            NSMenuItem(title: UserText.downloadsOpenItem, action: #selector(openDownloadAction), target: self)
+            NSMenuItem(title: UserText.downloadsShowInFinderItem, action: #selector(revealDownloadAction), target: self)
+            NSMenuItem.separator()
+            NSMenuItem(title: UserText.downloadsCopyLinkItem, action: #selector(copyDownloadLinkAction), target: self)
+            NSMenuItem(title: UserText.downloadsOpenWebsiteItem, action: #selector(openOriginatingWebsiteAction), target: self)
+            NSMenuItem.separator()
+            NSMenuItem(title: UserText.downloadsRemoveFromListItem, action: #selector(removeDownloadAction), target: self)
+            NSMenuItem(title: UserText.downloadsStopItem, action: #selector(cancelDownloadAction), target: self)
+            NSMenuItem(title: UserText.downloadsRestartItem, action: #selector(restartDownloadAction), target: self)
+            NSMenuItem(title: UserText.downloadsClearAllItem, action: #selector(clearDownloadsAction), target: self)
+        }
+        menu.delegate = self
+        return menu
     }
 
     private func index(for sender: Any) -> Int? {
@@ -156,63 +260,64 @@ final class DownloadsViewController: NSViewController {
 
     // MARK: User Actions
 
-    @IBAction func openDownloadsFolderAction(_ sender: Any) {
+    @objc func openDownloadsFolderAction(_ sender: Any) {
         let prefs = DownloadsPreferences.shared
+        let downloads = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
         var url: URL?
         var itemToSelect: URL?
 
         if prefs.alwaysRequestDownloadLocation {
-            url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+            url = prefs.lastUsedCustomDownloadLocation
 
+            // reveal the last completed download
             if let lastDownloaded = viewModel.items.first/* last added */(where: {
                 // should still exist
-                $0.localURL != nil && FileManager.default.fileExists(atPath: $0.localURL!.deletingLastPathComponent().path)
+                if let url = $0.localURL, FileManager.default.fileExists(atPath: url.path) { true } else { false }
             }),
                let lastDownloadedURL = lastDownloaded.localURL,
-               // if no downloads are from the default Downloads folder - open the last downloaded item folder
                !viewModel.items.contains(where: { $0.localURL?.deletingLastPathComponent().path == url?.path  }) || url == nil {
 
                 url = lastDownloadedURL.deletingLastPathComponent()
                 // select last downloaded item
                 itemToSelect = lastDownloadedURL
 
-            } /* else fallback to default User‘s Downloads */
+            } /* else fallback to the last location chosen in the Save Panel */
 
         } else {
             // open preferred downlod location
-            url = prefs.effectiveDownloadLocation ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+            url = prefs.effectiveDownloadLocation
         }
 
-        guard let url else { return }
+        let folder = url ?? downloads
+
+        _=NSWorkspace.shared.selectFile(itemToSelect?.path, inFileViewerRootedAtPath: folder.path)
+        // hack for the sandboxed environment:
+        // when we have no permission to open a folder we don‘t have access to
+        // try to guess a file that would most probably exist and reveal it: it‘s the ".DS_Store" file
+        || NSWorkspace.shared.selectFile(folder.appendingPathComponent(".DS_Store").path, inFileViewerRootedAtPath: folder.path)
+        // fallback to default Downloads folder
+        || NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: downloads.path)
 
         self.dismiss()
-        NSWorkspace.shared.selectFile(itemToSelect?.path, inFileViewerRootedAtPath: url.path)
     }
 
-    @IBAction func clearDownloadsAction(_ sender: Any) {
+    @objc func clearDownloadsAction(_ sender: Any) {
         viewModel.cleanupInactiveDownloads()
         self.dismiss()
         delegate?.clearDownloadsActionTriggered()
     }
 
-    @IBAction func openDownloadedFileAction(_ sender: Any) {
-        guard let index = index(for: sender),
-              let url = viewModel.items[safe: index]?.localURL
-        else { return }
-        NSWorkspace.shared.open(url)
-    }
-
-    @IBAction func cancelDownloadAction(_ sender: Any) {
+    @objc func cancelDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
         viewModel.cancelDownload(at: index)
     }
 
-    @IBAction func removeDownloadAction(_ sender: Any) {
+    @objc func removeDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
         viewModel.removeDownload(at: index)
     }
 
-    @IBAction func revealDownloadAction(_ sender: Any) {
+    @objc func revealDownloadAction(_ sender: Any) {
         guard let index = index(for: sender),
               let url = viewModel.items[safe: index]?.localURL
         else { return }
@@ -220,7 +325,7 @@ final class DownloadsViewController: NSViewController {
         NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
-    func openDownloadAction(_ sender: Any) {
+    @objc func openDownloadAction(_ sender: Any) {
         guard let index = index(for: sender),
               let url = viewModel.items[safe: index]?.localURL
         else { return }
@@ -228,12 +333,12 @@ final class DownloadsViewController: NSViewController {
         NSWorkspace.shared.open(url)
     }
 
-    @IBAction func restartDownloadAction(_ sender: Any) {
+    @objc func restartDownloadAction(_ sender: Any) {
         guard let index = index(for: sender) else { return }
         viewModel.restartDownload(at: index)
     }
 
-    @IBAction func copyDownloadLinkAction(_ sender: Any) {
+    @objc func copyDownloadLinkAction(_ sender: Any) {
         guard let index = index(for: sender),
               let url = viewModel.items[safe: index]?.url
         else { return }
@@ -241,7 +346,7 @@ final class DownloadsViewController: NSViewController {
         NSPasteboard.general.copy(url)
     }
 
-    @IBAction func openOriginatingWebsiteAction(_ sender: Any) {
+    @objc func openOriginatingWebsiteAction(_ sender: Any) {
         guard let index = index(for: sender),
               let url = viewModel.items[safe: index]?.websiteURL
         else { return }
@@ -250,7 +355,7 @@ final class DownloadsViewController: NSViewController {
         WindowControllersManager.shared.show(url: url, source: .historyEntry, newTab: true)
     }
 
-    @IBAction func doubleClickAction(_ sender: Any) {
+    @objc func doubleClickAction(_ sender: Any) {
         if index(for: sender) != nil {
             openDownloadAction(sender)
         } else {
@@ -279,7 +384,7 @@ extension DownloadsViewController: NSMenuDelegate {
 
         for menuItem in menu.items {
             switch menuItem.action {
-            case #selector(openDownloadedFileAction(_:)),
+            case #selector(openDownloadAction(_:)),
                  #selector(revealDownloadAction(_:)):
                 if case .complete(.some(let url)) = item.state,
                    FileManager.default.fileExists(atPath: url.path) {
@@ -322,20 +427,17 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        let identifier: NSUserInterfaceItemIdentifier
         if viewModel.items.isEmpty {
-            identifier = .noDownloadsCell
-        } else if viewModel.items.indices.contains(row) {
-            identifier = .downloadCell
-        } else {
-            identifier = .openDownloadsCell
-        }
-        let cell = tableView.makeView(withIdentifier: identifier, owner: nil)
-        if identifier == .downloadCell {
-            cell?.menu = contextMenu
-        }
+            return tableView.makeView(withIdentifier: .init(NoDownloadsCellView.className()), owner: self) as? NoDownloadsCellView
+            ?? NoDownloadsCellView(identifier: .init(NoDownloadsCellView.className()))
 
-        return cell
+        } else if viewModel.items.indices.contains(row) {
+            return tableView.makeView(withIdentifier: .init(DownloadsCellView.className()), owner: self) as? DownloadsCellView
+            ?? DownloadsCellView(identifier: .init(DownloadsCellView.className()))
+        } else {
+            return tableView.makeView(withIdentifier: .init(OpenDownloadsCellView.className()), owner: self) as? OpenDownloadsCellView
+            ?? OpenDownloadsCellView(identifier: .init(OpenDownloadsCellView.className()))
+        }
     }
 
     func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
@@ -380,27 +482,15 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
 
 }
 
-private extension NSUserInterfaceItemIdentifier {
-    static let downloadCell = NSUserInterfaceItemIdentifier(rawValue: "cell")
-    static let noDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "NoDownloads")
-    static let openDownloadsCell = NSUserInterfaceItemIdentifier(rawValue: "OpenDownloads")
-}
+#if DEBUG
+@available(macOS 14.0, *)
+#Preview(traits: .fixedLayout(width: DownloadsViewController.preferredContentSize.width, height: DownloadsViewController.preferredContentSize.height)) { {
 
-final class NoDownloadViewCell: NSTableCellView {
-    @IBOutlet weak var openFolderButton: LinkButton!
-    @IBOutlet weak var titleLabel: NSTextField!
-
-    override func awakeFromNib() {
-        titleLabel.stringValue = UserText.downloadsNoRecentDownload
-        openFolderButton.title = UserText.downloadsOpenDownloadsFolder
+    let store = DownloadListStoreMock()
+    store.fetchBlock = { completion in
+        completion(.success(previewDownloadListItems))
     }
-}
-
-final class OpenDownloadViewCell: NSTableCellView {
-    @IBOutlet weak var openFolderButton: LinkButton!
-
-    override func awakeFromNib() {
-        openFolderButton.title = UserText.downloadsOpenDownloadsFolder
-    }
-
-}
+    let viewModel = DownloadListViewModel(coordinator: DownloadListCoordinator(store: store))
+    return DownloadsViewController(viewModel: viewModel)
+}() }
+#endif
