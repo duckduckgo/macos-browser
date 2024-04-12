@@ -421,7 +421,7 @@ class ChallangeSender: URLAuthenticationChallengeSender {
 }
 
 class MockFeatureFlagger: FeatureFlagger {
-    func isFeatureOn<F>(forProvider: F) -> Bool where F : BrowserServicesKit.FeatureFlagSourceProviding {
+    func isFeatureOn<F>(forProvider: F) -> Bool where F: BrowserServicesKit.FeatureFlagSourceProviding {
         return true
     }
 }
