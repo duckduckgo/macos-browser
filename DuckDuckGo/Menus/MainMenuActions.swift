@@ -508,7 +508,8 @@ extension MainViewController {
     }
 
     @objc func bookmarkAllOpenTabs(_ sender: Any) {
-        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(url: []).show()
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
     }
 
     @objc func favoriteThisPage(_ sender: Any) {

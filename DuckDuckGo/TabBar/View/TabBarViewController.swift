@@ -1054,7 +1054,8 @@ extension TabBarViewController: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: TabBarViewItem) {
-        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(url: []).show()
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {

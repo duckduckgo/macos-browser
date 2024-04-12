@@ -22,25 +22,39 @@ import Combine
 @MainActor
 protocol BookmarkAllTabsDialogEditing: BookmarksDialogViewModel {
     var folderName: String { get set }
+    var educationalMessage: String { get }
+    var folderNameFieldTitle: String { get }
+    var locationFieldTitle: String { get }
 }
 
 final class BookmarkAllTabsViewModel: BookmarkAllTabsDialogEditing {
+    private static let dateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
+        return formatter
+    }()
+
     private let websites: [WebsiteInfo]
     private let bookmarkManager: BookmarkManager
 
-    private var cancellables: Set<AnyCancellable> = []
+    private var folderCancellable: AnyCancellable?
 
-    @Published private(set) var folders: [FolderViewModel] = []
+    @Published private(set) var folders: [FolderViewModel]
     @Published var selectedFolder: BookmarkFolder?
     @Published var folderName: String
 
-    let title = ""
-    let cancelActionTitle = ""
-    let defaultActionTitle = ""
+    var title: String {
+        String(format: UserText.Bookmarks.Dialog.Title.bookmarkOpenTabs, websites.count)
+    }
+    let cancelActionTitle = UserText.cancel
+    let defaultActionTitle = UserText.Bookmarks.Dialog.Action.addAllBookmarks
+    let educationalMessage = UserText.Bookmarks.Dialog.Message.bookmarkOpenTabsEducational
+    let folderNameFieldTitle = UserText.Bookmarks.Dialog.Field.folderName
+    let locationFieldTitle = UserText.Bookmarks.Dialog.Field.location
     let isOtherActionDisabled = false
 
     var isDefaultActionDisabled: Bool {
-        !folderName.trimmingWhitespace().isEmpty
+        folderName.trimmingWhitespace().isEmpty
     }
 
     init(
@@ -51,12 +65,10 @@ final class BookmarkAllTabsViewModel: BookmarkAllTabsDialogEditing {
         self.websites = websites
         self.bookmarkManager = bookmarkManager
 
-        let date = ISO8601DateFormatter().string(from: dateProvider())
-        folderName = date + " - \(websites.count) Tabs"
-    }
-
-    func addFolderAction() {
-        
+        let dateString = Self.dateFormatter.string(from: dateProvider())
+        folderName = String(format: UserText.Bookmarks.Dialog.Value.folderName, dateString, websites.count)
+        folders = .init(bookmarkManager.list)
+        bind()
     }
 
     func cancel(dismiss: () -> Void) {
@@ -66,4 +78,18 @@ final class BookmarkAllTabsViewModel: BookmarkAllTabsDialogEditing {
     func addOrSave(dismiss: () -> Void) {
         dismiss()
     }
+}
+
+// MARK: - Private
+
+private extension BookmarkAllTabsViewModel {
+
+    func bind() {
+        folderCancellable = bookmarkManager.listPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] bookmarkList in
+                self?.folders = .init(bookmarkList)
+            })
+    }
+
 }

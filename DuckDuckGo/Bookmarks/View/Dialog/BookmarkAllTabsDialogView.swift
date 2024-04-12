@@ -19,62 +19,6 @@
 import SwiftUI
 
 struct BookmarkAllTabsDialogView: ModalView {
-    @ObservedObject private var viewModel: BookmarkAllTabsViewModel
-
-    init(viewModel: BookmarkAllTabsViewModel) {
-        self.viewModel = viewModel
-    }
-
-    var body: some View {
-        BookmarkDialogContainerView(
-            title: viewModel.title,
-            middleSection: {
-                Text(verbatim: "These bookmarks will be saved in a new folder:")
-                BookmarkDialogStackedContentView(
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.name,
-                        content: TextField("", text: $viewModel.folderName)
-                            .focusedOnAppear()
-                            .accessibilityIdentifier("bookmark.add.name.textfield")
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .font(.system(size: 14))
-                    ),
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.location,
-                        content: BookmarkDialogFolderManagementView(
-                            folders: viewModel.folders,
-                            selectedFolder: $viewModel.selectedFolder,
-                            onActionButton: viewModel.addFolderAction
-                        )
-                    )
-                )
-            },
-            bottomSection: {
-                BookmarkDialogButtonsView(
-                    viewState: .init(.compressed),
-                    otherButtonAction: .init(
-                        title: viewModel.cancelActionTitle,
-                        isDisabled: viewModel.isOtherActionDisabled,
-                        action: viewModel.cancel
-                    ),
-                    defaultButtonAction: .init(
-                        title: viewModel.defaultActionTitle,
-                        keyboardShortCut: .defaultAction,
-                        isDisabled: viewModel.isDefaultActionDisabled,
-                        action: viewModel.addOrSave
-                    )
-                )
-            }
-        )
-        .frame(width: 448, height: 241)
-    }
-}
-
-//#Preview {
-//    BookmarkAllTabsDialogView()
-//}
-
-struct BookmarkAllTabsCoordinatorView: ModalView {
     @ObservedObject private var viewModel: BookmarkAllTabsDialogCoordinatorViewModel<BookmarkAllTabsViewModel, AddEditBookmarkFolderDialogViewModel>
 
     init(viewModel: BookmarkAllTabsDialogCoordinatorViewModel<BookmarkAllTabsViewModel, AddEditBookmarkFolderDialogViewModel>) {
@@ -94,7 +38,49 @@ struct BookmarkAllTabsCoordinatorView: ModalView {
     }
 
     private var bookmarkAllTabsView: some View {
-        BookmarkAllTabsDialogView(viewModel: viewModel.bookmarkModel)
+        BookmarkDialogContainerView(
+            title: viewModel.bookmarkModel.title,
+            middleSection: {
+                Text(viewModel.bookmarkModel.educationalMessage)
+                    .foregroundColor(.secondary)
+                    .fontWeight(.light)
+                BookmarkDialogStackedContentView(
+                    .init(
+                        title: UserText.Bookmarks.Dialog.Field.folderName,
+                        content: TextField("", text: $viewModel.bookmarkModel.folderName)
+                            .focusedOnAppear()
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .font(.system(size: 14))
+                    ),
+                    .init(
+                        title: UserText.Bookmarks.Dialog.Field.location,
+                        content: BookmarkDialogFolderManagementView(
+                            folders: viewModel.bookmarkModel.folders,
+                            selectedFolder: $viewModel.bookmarkModel.selectedFolder,
+                            onActionButton: viewModel.addFolderAction
+                        )
+                    )
+                )
+            },
+            bottomSection: {
+                BookmarkDialogButtonsView(
+                    viewState: .init(.compressed),
+                    otherButtonAction: .init(
+                        title: viewModel.bookmarkModel.cancelActionTitle,
+                        isDisabled: viewModel.bookmarkModel.isOtherActionDisabled,
+                        action: viewModel.bookmarkModel.cancel
+                    ),
+                    defaultButtonAction: .init(
+                        title: viewModel.bookmarkModel.defaultActionTitle,
+                        keyboardShortCut: .defaultAction,
+                        isDisabled: viewModel.bookmarkModel.isDefaultActionDisabled,
+                        action: viewModel.bookmarkModel.addOrSave
+                    )
+                )
+            }
+
+        )
+        .frame(width: 448)
     }
 
     private var addFolderView: some View {
@@ -106,11 +92,45 @@ struct BookmarkAllTabsCoordinatorView: ModalView {
             selectedFolder: $viewModel.folderModel.selectedFolder,
             cancelActionTitle: viewModel.folderModel.cancelActionTitle,
             isCancelActionDisabled: viewModel.folderModel.isOtherActionDisabled,
-            cancelAction: viewModel.folderModel.cancel(dismiss:),
+            cancelAction: { _ in
+                viewModel.dismissAction()
+            },
             defaultActionTitle: viewModel.folderModel.defaultActionTitle,
             isDefaultActionDisabled: viewModel.folderModel.isDefaultActionDisabled,
-            defaultAction: viewModel.folderModel.addOrSave
+            defaultAction: { _ in
+                viewModel.folderModel.addOrSave {
+                    viewModel.dismissAction()
+                }
+            }
         )
         .frame(width: 448, height: 210)
     }
+}
+
+#Preview("Bookmark All Tabs - Light") {
+    let parentFolder = BookmarkFolder(id: "7", title: "DuckDuckGo")
+    let bookmark = Bookmark(id: "1", url: "www.duckduckgo.com", title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "7")
+    let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [bookmark, parentFolder]))
+    bookmarkManager.loadBookmarks()
+    let websitesInfo: [WebsiteInfo] = [
+        .init(.init(content: .url(URL.duckDuckGo, credential: nil, source: .ui)))!,
+        .init(.init(content: .url(URL.duckDuckGoEmail, credential: nil, source: .ui)))!,
+    ]
+
+    return BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo, bookmarkManager: bookmarkManager)
+        .preferredColorScheme(.light)
+}
+
+#Preview("Bookmark All Tabs - Dark") {
+    let parentFolder = BookmarkFolder(id: "7", title: "DuckDuckGo")
+    let bookmark = Bookmark(id: "1", url: "www.duckduckgo.com", title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "7")
+    let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [bookmark, parentFolder]))
+    bookmarkManager.loadBookmarks()
+    let websitesInfo: [WebsiteInfo] = [
+        .init(.init(content: .url(URL.duckDuckGo, credential: nil, source: .ui)))!,
+        .init(.init(content: .url(URL.duckDuckGoEmail, credential: nil, source: .ui)))!,
+    ]
+
+    return BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo, bookmarkManager: bookmarkManager)
+        .preferredColorScheme(.dark)
 }
