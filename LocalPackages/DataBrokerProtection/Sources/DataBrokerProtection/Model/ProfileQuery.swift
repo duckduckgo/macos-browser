@@ -80,7 +80,7 @@ extension ProfileQuery: Equatable {
         return
             lhs.firstName.lowercased() == rhs.firstName.lowercased() &&
             lhs.lastName.lowercased() == rhs.lastName.lowercased() &&
-            lhs.middleName?.lowercased() == rhs.middleName?.lowercased() &&
+            lhs.middleName.ifBlankReturnNil == rhs.middleName.ifBlankReturnNil &&
             lhs.suffix?.lowercased() == rhs.suffix?.lowercased() &&
             lhs.city.lowercased() == rhs.city.lowercased() &&
             lhs.state.lowercased() == rhs.state.lowercased() &&
@@ -91,6 +91,18 @@ extension ProfileQuery: Equatable {
             lhs.fullName.lowercased() == rhs.fullName.lowercased() &&
             lhs.age == rhs.age &&
             lhs.addresses == rhs.addresses
+    }
+}
+
+extension Optional where Wrapped == String {
+
+    // If string is blank returns nil, if not it returns its current value.
+    var ifBlankReturnNil: String? {
+        guard let nonNilString = self else {
+            return nil
+        }
+
+        return nonNilString.isBlank ? nil : nonNilString.lowercased()
     }
 }
 
