@@ -62,7 +62,10 @@ class PermissionsTests: XCTestCase {
         let cameraButton = app.webViews.buttons["Camera"]
         cameraButton.clickAfterExistenceTestSucceeds()
         sleep(UITests.Timeouts.sleepTimeForTCCDialogAppearance) // The rare necessary sleep, since we can believe a TCC dialog will appear here
-        let allowButtonIndex = try XCTUnwrap(notificationCenter.indexOfSystemModelDialogButtonOnElement(titled: "Allow", "OK"))
+        let allowButtonIndex = try XCTUnwrap(notificationCenter.indexOfSystemModelDialogButtonOnElement(
+            titled: "Allow",
+            "OK"
+        )) // If this TCC "allow" button has four different titles on four different macOS versions, you can use them all here.
         let allowButton = notificationCenter.buttons.element(boundBy: allowButtonIndex)
         allowButton.clickAfterExistenceTestSucceeds() // Click system camera permissions dialog
         let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
@@ -101,7 +104,8 @@ private extension XCUIElement {
     /// We don't have as much control over what is going to appear on a modal dialogue, and it feels fragile to use Apple's accessibility IDs since I
     /// don't think there is any contract for that, but we can plan some flexibility in title matching for the button names, since the button names
     /// are in the test description.
-    /// - Parameter titled: The title or titles (if they vary across macOS versions) of a button whose index on the element we'd like to know
+    /// - Parameter titled: The title or titles (if they vary across macOS versions) of a button whose index on the element we'd like to know,
+    /// variadic
     /// - Returns: An optional Int representing the button index on the element, if a button with this title was found.
     func indexOfSystemModelDialogButtonOnElement(titled: String...) -> Int? {
         for buttonIndex in 0 ... 4 { // It feels unlikely that a system modal dialog will have more than five buttons
@@ -118,10 +122,12 @@ private extension XCUIElement {
 private enum PredominantColor {
     case red
     case green
-    case unknown
 }
 
 private extension NSImage {
+    /// Trim NSImage to sample
+    /// - Parameter rect: the sample size to trim to
+    /// - Returns: The trimmed NSImage
     func trim(to rect: CGRect) -> NSImage {
         let result = NSImage(size: rect.size)
         result.lockFocus()
@@ -135,9 +141,11 @@ private extension NSImage {
 }
 
 private extension CIImage {
-    /// Evaluate a sample of a webpage button to see what its predominant color tone is
+    /// Evaluate a sample of a webpage button to see what its predominant color tone is. Assumes it is being run on a button that is expected to be
+    /// either green or red (otherwise we are starting to think into `https://permission.site`'s potential implementation errors, which I don't think
+    /// should be part of this test case scope).
     /// - Returns: .red, .green, or .unknown.
-    func predominantColor() throws -> PredominantColor {
+    func predominantColor() throws -> PredominantColor? {
         var redValueOfSample = 0.0
         var greenValueOfSample = 0.0
 
@@ -151,11 +159,11 @@ private extension CIImage {
 
             guard let filter = CIFilter(name: "CIAreaAverage", parameters: [kCIInputImageKey: self, kCIInputExtentKey: extentVector])
             else { XCTFail("It wasn't possible to set the CIFilter for the predominant color channel check")
-                return .unknown
+                return nil
             }
             guard let outputImage = filter.outputImage
             else { XCTFail("It wasn't possible to set the output image for the predominant color channel check")
-                return .unknown
+                return nil
             }
 
             var bitmap = [UInt8](repeating: 0, count: 4)
@@ -169,26 +177,22 @@ private extension CIImage {
                 format: .RGBA8,
                 colorSpace: nil
             )
-            switch channel {
-            case 0:
+            if channel == 0 {
                 redValueOfSample = Double(bitmap[channel]) / Double(255)
-            case 1:
+            } else if channel == 1 {
                 greenValueOfSample = Double(bitmap[channel]) / Double(255)
-            default:
-                break
             }
         }
 
-        if abs(redValueOfSample - greenValueOfSample) < 0.05 { // This isn't a huge difference because these are both very light colors
-            return .unknown // No predominant color
+        let tooSimilar = abs(redValueOfSample - greenValueOfSample) < 0.05 // This isn't a huge difference because these are both very light colors
+        let alike = redValueOfSample == greenValueOfSample
+        if tooSimilar {
+            XCTFail(
+                "It wasn't possible to get the predominant color of the button because the two channel values of red (\(redValueOfSample)) and green (\(greenValueOfSample)) were \(alike ? "the same." : "too close in value.")"
+            )
+            return nil
         }
-        switch max(redValueOfSample, greenValueOfSample) {
-        case redValueOfSample:
-            return .red
-        case greenValueOfSample:
-            return .green
-        default:
-            return .unknown
-        }
+
+        return max(redValueOfSample, greenValueOfSample) == redValueOfSample ? .red : .green
     }
 }
