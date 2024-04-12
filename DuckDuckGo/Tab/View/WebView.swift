@@ -409,10 +409,10 @@ extension NSTrackingArea {
     private static let trackingAreaSuppressorKey = UnsafeRawPointer(bitPattern: "trackingAreaSuppressorKey".hashValue)!
     fileprivate private(set) var trackingAreaSuppressor: TrackingAreaSuppressor? {
         get {
-            objc_getAssociatedObject(self, Self.proxyOwnerKey) as? TrackingAreaSuppressor
+            objc_getAssociatedObject(self, Self.trackingAreaSuppressorKey) as? TrackingAreaSuppressor
         }
         set {
-            objc_setAssociatedObject(self, Self.proxyOwnerKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, Self.trackingAreaSuppressorKey, newValue, .OBJC_ASSOCIATION_RETAIN)
         }
     }
 
