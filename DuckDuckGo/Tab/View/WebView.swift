@@ -17,7 +17,6 @@
 //
 
 import Cocoa
-import Combine
 import WebKit
 
 protocol WebViewContextMenuDelegate: AnyObject {
@@ -35,7 +34,7 @@ final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
     weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
-    private var isLoadingCancellable: Cancellable?
+    private var isLoadingObserver: Any?
 
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         /// swizzle NSTrackingArea.init method to insert TrackingAreaSuppressor proxy owner
@@ -46,7 +45,7 @@ final class WebView: WKWebView {
 
         // suppress Tracking Area events while loading
         let suppressor = suppressor=trackingAreas.first?.trackingAreaSuppressor
-        isLoadingCancellable = self.observe(\.isLoading, options: [.new]) { [weak suppressor] _, c in
+        isLoadingObserver = self.observe(\.isLoading, options: [.new]) { [weak suppressor] _, c in
             suppressor?.isSuppressingMouseEvents = c.newValue /* isLoading */ ?? false
         }
     }
