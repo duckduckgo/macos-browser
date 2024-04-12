@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import Navigation
+import Common
 import WebKit
 import XCTest
 
@@ -36,7 +37,8 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         mockWebViewPublisher = PassthroughSubject<WKWebView, Never>()
         scriptPublisher = PassthroughSubject<MockSSLErrorPageScriptProvider, Never>()
         credentialCreator = MockCredentialCreator()
-        errorPageExtention = ErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator)
+        let featureFlagger = MockFeatureFlagger()
+        errorPageExtention = ErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger)
     }
 
     override func tearDownWithError() throws {
@@ -63,12 +65,13 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.webView = mockWebView
         let error = WKError(_nsError: NSError(domain: "com.example.error", code: NSURLErrorServerCertificateUntrusted, userInfo: ["_kCFStreamErrorCodeKey": -9814, "NSErrorFailingURLKey": URL(string: errorURLString)!]))
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [], isCurrent: true, isCommitted: true)
+        let eTldPlus1 = TLD().eTLDplus1(errorURLString) ?? errorURLString
 
         // WHEN
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        let expectedSpecificMessage = SSLErrorType.expired.specificMessage(for: errorURLString).replacingOccurrences(of: "</b>", with: "<\\/b>")
+        let expectedSpecificMessage = SSLErrorType.expired.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
         XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
     }
 
@@ -78,12 +81,13 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.webView = mockWebView
         let error = WKError(_nsError: NSError(domain: "com.example.error", code: NSURLErrorServerCertificateUntrusted, userInfo: ["_kCFStreamErrorCodeKey": -9807, "NSErrorFailingURLKey": URL(string: errorURLString)!]))
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [], isCurrent: true, isCommitted: true)
+        let eTldPlus1 = TLD().eTLDplus1(errorURLString) ?? errorURLString
 
         // WHEN
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        let expectedSpecificMessage = SSLErrorType.selfSigned.specificMessage(for: errorURLString).replacingOccurrences(of: "</b>", with: "<\\/b>")
+        let expectedSpecificMessage = SSLErrorType.selfSigned.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
         XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
     }
 
@@ -93,12 +97,13 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         errorPageExtention.webView = mockWebView
         let error = WKError(_nsError: NSError(domain: "com.example.error", code: NSURLErrorServerCertificateUntrusted, userInfo: ["_kCFStreamErrorCodeKey": -9843, "NSErrorFailingURLKey": URL(string: errorURLString)!]))
         let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [], isCurrent: true, isCommitted: true)
+        let eTldPlus1 = TLD().eTLDplus1(errorURLString) ?? errorURLString
 
         // WHEN
         errorPageExtention.navigation(navigation, didFailWith: error)
 
         // THEN
-        let expectedSpecificMessage = SSLErrorType.wrongHost.specificMessage(for: errorURLString).replacingOccurrences(of: "</b>", with: "<\\/b>")
+        let expectedSpecificMessage = SSLErrorType.wrongHost.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
         XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
 
     }
@@ -413,4 +418,11 @@ class ChallangeSender: URLAuthenticationChallengeSender {
         return false
     }
     var description: String = ""
+}
+
+
+class MockFeatureFlagger: FeatureFlagger {
+    func isFeatureOn<F>(forProvider: F) -> Bool where F : BrowserServicesKit.FeatureFlagSourceProviding {
+        return true
+    }
 }
