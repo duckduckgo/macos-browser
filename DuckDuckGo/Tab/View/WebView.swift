@@ -30,6 +30,7 @@ protocol WebViewInteractionEventsDelegate: AnyObject {
     func webView(_ webView: WebView, scrollWheel event: NSEvent)
 }
 
+@objc(DuckDuckGo_WebView)
 final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?

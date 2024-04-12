@@ -40,6 +40,8 @@ final class BookmarkOutlineCellView: NSTableCellView {
 
     init(identifier: NSUserInterfaceItemIdentifier) {
         super.init(frame: .zero)
+        self.identifier = identifier
+
         setupUI()
     }
 
@@ -82,6 +84,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         faviconImageView.imageScaling = .scaleProportionallyDown
         faviconImageView.wantsLayer = true
         faviconImageView.layer?.cornerRadius = 2.0
+        faviconImageView.setAccessibilityIdentifier("BookmarkOutlineCellView.favIconImageView")
 
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.isEditable = false

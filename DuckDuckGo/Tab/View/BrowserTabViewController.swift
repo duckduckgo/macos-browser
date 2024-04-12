@@ -425,6 +425,7 @@ final class BrowserTabViewController: NSViewController {
             tabViewModel.tab.downloads?.savePanelDialogPublisher ?? Just(nil).eraseToAnyPublisher()
         )
         .map { $1 ?? $0 }
+        .removeDuplicates()
         .sink { [weak self] dialog in
             self?.show(dialog)
         }
@@ -916,6 +917,15 @@ extension BrowserTabViewController: TabDelegate {
     // MARK: - Dialogs
 
     fileprivate func show(_ dialog: Tab.UserDialog?) {
+        guard activeUserDialogCancellable == nil || dialog == nil else {
+            // first hide a displayed dialog before showing another one
+            activeUserDialogCancellable = nil
+            DispatchQueue.main.async { [weak self] in
+                self?.show(dialog)
+            }
+            return
+        }
+
         switch dialog?.dialog {
         case .basicAuthenticationChallenge(let query):
             activeUserDialogCancellable = showBasicAuthenticationChallenge(with: query)
@@ -964,13 +974,28 @@ extension BrowserTabViewController: TabDelegate {
                                                                  suggestedFilename: request.parameters.suggestedFilename,
                                                                  directoryURL: directoryURL)
 
-        savePanel.beginSheetModal(for: window) { [weak request] response in
+        savePanel.beginSheetModal(for: window) { [weak request, weak self] response in
             switch response {
             case .abort:
                 // panel not closed by user but by a tab switching
                 return
             case .OK:
-                guard let url = savePanel.url else { fallthrough }
+                guard let self,
+                      let window = view.window,
+                      let url = savePanel.url else { fallthrough }
+
+                do {
+                    // validate selected URL is writable
+                    try FileManager.default.checkWritability(url)
+                } catch {
+                    // hide the save panel
+                    self.activeUserDialogCancellable = nil
+                    NSAlert(error: error).beginSheetModal(for: window) { [weak self] _ in
+                        guard let self, let request else { return }
+                        self.activeUserDialogCancellable = showSavePanel(with: request)
+                    }
+                    return
+                }
                 request?.submit( (url, savePanel.selectedFileType) )
             default:
                 request?.submit(nil)
