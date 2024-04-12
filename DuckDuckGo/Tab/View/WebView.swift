@@ -41,7 +41,7 @@ final class WebView: WKWebView {
 
     override func addTrackingArea(_ trackingArea: NSTrackingArea) {
         var trackingArea = trackingArea
-        /// swizzle NSTrackingArea.init method to insert TrackingAreaSuppressor proxy owner
+        /// replace NSTrackingArea with owner proxied with TrackingAreaSuppressor.
         /// it will disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
         /// see https://app.asana.com/0/1177771139624306/1206990108527681/f
         if let mouseTrackingObserver = trackingArea.owner, mouseTrackingObserver.className == "WKMouseTrackingObserver" {
