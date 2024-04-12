@@ -29,7 +29,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
 
     var mockWebViewPublisher: PassthroughSubject<WKWebView, Never>!
     var scriptPublisher: PassthroughSubject<MockSSLErrorPageScriptProvider, Never>!
-    var errorPageExtention: ErrorPageTabExtension!
+    var errorPageExtention: SSLErrorPageTabExtension!
     var credentialCreator: MockCredentialCreator!
     let errorURLString = "com.example.error"
 
@@ -38,7 +38,7 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         scriptPublisher = PassthroughSubject<MockSSLErrorPageScriptProvider, Never>()
         credentialCreator = MockCredentialCreator()
         let featureFlagger = MockFeatureFlagger()
-        errorPageExtention = ErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger)
+        errorPageExtention = SSLErrorPageTabExtension(webViewPublisher: mockWebViewPublisher, scriptsPublisher: scriptPublisher, urlCredentialCreator: credentialCreator, featureFlagger: featureFlagger)
     }
 
     override func tearDownWithError() throws {
@@ -106,22 +106,6 @@ final class ErrorPageTabExtensionTest: XCTestCase {
         let expectedSpecificMessage = SSLErrorType.wrongHost.specificMessage(for: errorURLString, eTldPlus1: eTldPlus1).replacingOccurrences(of: "</b>", with: "<\\/b>").escapedUnicodeHtmlString()
         XCTAssertTrue(mockWebView.capturedHTML.contains(expectedSpecificMessage))
 
-    }
-
-    @MainActor func testWhenGenericError_ThenExpectedErrorPageIsShown() {
-        // GIVEN
-        let mockWebView = MockWKWebView(url: URL(string: errorURLString)!)
-        errorPageExtention.webView = mockWebView
-        let errorDescription = "some error"
-        let error = WKError(_nsError: NSError(domain: "com.example.error", code: NSURLErrorUnknown, userInfo: ["_kCFStreamErrorCodeKey": -9843, "NSErrorFailingURLKey": URL(string: errorURLString)!, NSLocalizedDescriptionKey: errorDescription]))
-        let navigation = Navigation(identity: .init(nil), responders: .init(), state: .started, redirectHistory: [], isCurrent: true, isCommitted: true)
-
-        // WHEN
-        errorPageExtention.navigation(navigation, didFailWith: error)
-
-        // THEN
-        XCTAssertTrue(mockWebView.capturedHTML.contains("DuckDuckGo can’t load this page."))
-        XCTAssertTrue(mockWebView.capturedHTML.contains(errorDescription))
     }
 
     @MainActor func test_WhenUserScriptsPublisherPublishSSLErrorPageScript_ThenErrorPageExtensionIsSetAsUserScriptDelegate() {

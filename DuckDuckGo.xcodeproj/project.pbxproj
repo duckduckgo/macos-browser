@@ -2197,9 +2197,9 @@
 		569277C529DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */; };
 		56B234BF2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */; };
 		56B234C02A84EFD800F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */; };
-		56BA1E752BAAF70F001CF69F /* ErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* ErrorPageTabExtension.swift */; };
-		56BA1E762BAAF70F001CF69F /* ErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* ErrorPageTabExtension.swift */; };
-		56BA1E772BAAF70F001CF69F /* ErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* ErrorPageTabExtension.swift */; };
+		56BA1E752BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */; };
+		56BA1E762BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */; };
+		56BA1E772BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */; };
 		56BA1E7F2BAB2D29001CF69F /* ErrorPageTabExtensionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E7C2BAB290E001CF69F /* ErrorPageTabExtensionTest.swift */; };
 		56BA1E802BAB2E43001CF69F /* ErrorPageTabExtensionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E7C2BAB290E001CF69F /* ErrorPageTabExtensionTest.swift */; };
 		56BA1E822BAC506F001CF69F /* SSLErrorPageUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BA1E812BAC506F001CF69F /* SSLErrorPageUserScript.swift */; };
@@ -4079,7 +4079,7 @@
 		569277C029DDCBB500B633EF /* HomePageContinueSetUpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageContinueSetUpModel.swift; sourceTree = "<group>"; };
 		569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueSetUpModelTests.swift; sourceTree = "<group>"; };
 		56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarUrlExtensionsTests.swift; sourceTree = "<group>"; };
-		56BA1E742BAAF70F001CF69F /* ErrorPageTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorPageTabExtension.swift; sourceTree = "<group>"; };
+		56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLErrorPageTabExtension.swift; sourceTree = "<group>"; };
 		56BA1E7C2BAB290E001CF69F /* ErrorPageTabExtensionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorPageTabExtensionTest.swift; sourceTree = "<group>"; };
 		56BA1E812BAC506F001CF69F /* SSLErrorPageUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLErrorPageUserScript.swift; sourceTree = "<group>"; };
 		56BA1E862BAC8239001CF69F /* SSLErrorPageUserScriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSLErrorPageUserScriptTests.swift; sourceTree = "<group>"; };
@@ -8436,7 +8436,7 @@
 				B66260E529ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift */,
 				B66260DC29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift */,
 				B626A76C29928B1600053070 /* TestsClosureNavigationResponder.swift */,
-				56BA1E742BAAF70F001CF69F /* ErrorPageTabExtension.swift */,
+				56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */,
 			);
 			path = TabExtensions;
 			sourceTree = "<group>";
@@ -10558,7 +10558,7 @@
 				3706FB35293F65D500E42796 /* FlatButton.swift in Sources */,
 				3706FB36293F65D500E42796 /* PinnedTabView.swift in Sources */,
 				3706FB37293F65D500E42796 /* DataEncryption.swift in Sources */,
-				56BA1E762BAAF70F001CF69F /* ErrorPageTabExtension.swift in Sources */,
+				56BA1E762BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */,
 				4B9DB0362A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				37197EA82942443D00394917 /* BrowserTabViewController.swift in Sources */,
 				3706FB39293F65D500E42796 /* PrivacyDashboardPopover.swift in Sources */,
@@ -11829,7 +11829,7 @@
 				4B957A272AC7AE700062CA31 /* PrivacyDashboardPopover.swift in Sources */,
 				4B957A282AC7AE700062CA31 /* TestsClosureNavigationResponder.swift in Sources */,
 				4B957A292AC7AE700062CA31 /* RootView.swift in Sources */,
-				56BA1E772BAAF70F001CF69F /* ErrorPageTabExtension.swift in Sources */,
+				56BA1E772BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */,
 				4B37EE7C2B4CFF8000A89A61 /* HomePageRemoteMessagingRequest.swift in Sources */,
 				4B957A2A2AC7AE700062CA31 /* AddressBarTextField.swift in Sources */,
 				4B957A2B2AC7AE700062CA31 /* FocusRingView.swift in Sources */,
@@ -12832,7 +12832,7 @@
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
 				7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */,
 				B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */,
-				56BA1E752BAAF70F001CF69F /* ErrorPageTabExtension.swift in Sources */,
+				56BA1E752BAAF70F001CF69F /* SSLErrorPageTabExtension.swift in Sources */,
 				85589E8227BBB8630038AD11 /* HomePageView.swift in Sources */,
 				B6BF5D932947199A006742B1 /* SerpHeadersNavigationResponder.swift in Sources */,
 				569277C129DDCBB500B633EF /* HomePageContinueSetUpModel.swift in Sources */,

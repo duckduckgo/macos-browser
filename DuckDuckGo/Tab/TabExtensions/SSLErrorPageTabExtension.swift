@@ -1,5 +1,5 @@
 //
-//  ErrorPageTabExtension.swift
+//  SSLErrorPageTabExtension.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -29,7 +29,7 @@ protocol SSLErrorPageScriptProvider {
 
 extension UserScripts: SSLErrorPageScriptProvider {}
 
-final class ErrorPageTabExtension {
+final class SSLErrorPageTabExtension {
     weak var webView: ErrorPageTabExtensionNavigationDelegate?
     private weak var sslErrorPageUserScript: SSLErrorPageUserScript?
     private var shouldBypassSSLError = false
@@ -79,11 +79,12 @@ final class ErrorPageTabExtension {
 
 }
 
-extension ErrorPageTabExtension: NavigationResponder {
+extension SSLErrorPageTabExtension: NavigationResponder {
     @MainActor
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         let url = error.failingUrl ?? navigation.url
         guard navigation.isCurrent else { return }
+        guard error.errorCode != NSURLErrorCannotFindHost else { return }
 
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
@@ -94,8 +95,6 @@ extension ErrorPageTabExtension: NavigationResponder {
                let errorCode = error.userInfo["_kCFStreamErrorCodeKey"] as? Int {
                 sslErrorPageUserScript?.failingURL = url
                 loadSSLErrorHTML(url: url, alternate: shouldPerformAlternateNavigation, errorCode: errorCode)
-            } else {
-                loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
             }
         }
     }
@@ -117,7 +116,7 @@ extension ErrorPageTabExtension: NavigationResponder {
     }
 }
 
-extension ErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
+extension SSLErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
     func leaveSite() {
         guard webView?.canGoBack == true else {
             webView?.close()
@@ -134,14 +133,14 @@ extension ErrorPageTabExtension: SSLErrorPageUserScriptDelegate {
 
 protocol ErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
 
-extension ErrorPageTabExtension: TabExtension, ErrorPageTabExtensionProtocol {
+extension SSLErrorPageTabExtension: TabExtension, ErrorPageTabExtensionProtocol {
     typealias PublicProtocol = ErrorPageTabExtensionProtocol
     func getPublicProtocol() -> PublicProtocol { self }
 }
 
 extension TabExtensions {
     var errorPage: ErrorPageTabExtensionProtocol? {
-        resolve(ErrorPageTabExtension.self)
+        resolve(SSLErrorPageTabExtension.self)
     }
 }
 
