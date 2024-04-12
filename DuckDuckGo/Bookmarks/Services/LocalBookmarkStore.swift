@@ -679,6 +679,10 @@ final class LocalBookmarkStore: BookmarkStore {
 
     }
 
+    func bookmarkAll(websitesInfo: [WebsiteInfo], withinParentFolder parent: ParentFolderType) {
+        // TODO: https://app.asana.com/0/0/1207032959154802/f
+    }
+
     // MARK: - Import
 
     /// Imports bookmarks into the Core Data store from an `ImportedBookmarks` object.
