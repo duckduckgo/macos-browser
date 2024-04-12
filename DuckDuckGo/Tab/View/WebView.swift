@@ -392,12 +392,17 @@ extension NSTrackingArea {
 
     @objc private dynamic func swizzled_init(rect: NSRect, options: NSTrackingArea.Options, owner: AnyObject?, userInfo: NSDictionary) -> AnyObject? {
         var owner = owner
+        var trackingAreaSuppressor: TrackingAreaSuppressor?
         if owner?.className == "WKMouseTrackingObserver" {
-            let helper = TrackingAreaSuppressor(owner: owner)
-            self.trackingAreaSuppressor = helper
-            owner = helper
+            trackingAreaSuppressor = TrackingAreaSuppressor(owner: owner)
+            owner = trackingAreaSuppressor
         }
 
+        defer {
+            if let trackingAreaSuppressor {
+                self.trackingAreaSuppressor = trackingAreaSuppressor
+            }
+        }
         return self.swizzled_init(rect: rect, options: options, owner: owner, userInfo: userInfo) /* call original */
     }
 
