@@ -24,7 +24,7 @@ final class SecureVaultErrorReporter: SecureVaultErrorReporting {
     static let shared = SecureVaultErrorReporter()
     private init() {}
 
-    func secureVaultInitFailed(_ error: SecureStorageError) {
+    func secureVaultError(_ error: SecureStorageError) {
         guard NSApp.runType.requiresEnvironment else { return }
 
         switch error {

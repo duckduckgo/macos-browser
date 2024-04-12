@@ -30,7 +30,7 @@ final class DataBrokerProtectionSecureVaultErrorReporter: SecureVaultErrorReport
         self.pixelHandler = pixelHandler
     }
 
-    func secureVaultInitFailed(_ error: SecureStorageError) {
+    func secureVaultError(_ error: SecureStorageError) {
         switch error {
         case .initFailed, .failedToOpenDatabase:
             pixelHandler.fire(.secureVaultInitError(error: error))
