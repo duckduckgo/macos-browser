@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
@@ -59,7 +57,7 @@ extension NetworkProtectionKeychainTokenStore {
 
     convenience init(isSubscriptionEnabled: Bool) {
 #if SUBSCRIPTION
-        let accessTokenProvider: () -> String? = { AccountManager().accessToken }
+        let accessTokenProvider: () -> String? = { AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).accessToken }
 #else
         let accessTokenProvider: () -> String? = { return nil }
 #endif
@@ -95,5 +93,3 @@ extension TunnelControllerIPCClient {
         self.init(machServiceName: Bundle.main.vpnMenuAgentBundleId)
     }
 }
-
-#endif

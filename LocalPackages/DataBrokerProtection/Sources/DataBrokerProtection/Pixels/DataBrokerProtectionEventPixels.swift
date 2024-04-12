@@ -87,7 +87,14 @@ final class DataBrokerProtectionEventPixels {
     }
 
     private func fireWeeklyReportPixels() {
-        let data = database.fetchAllBrokerProfileQueryData()
+        let data: [BrokerProfileQueryData]
+
+        do {
+            data = try database.fetchAllBrokerProfileQueryData()
+        } catch {
+            os_log("Database error: when attempting to fireWeeklyReportPixels, error: %{public}@", log: .error, error.localizedDescription)
+            return
+        }
         let dataInThePastWeek = data.filter(hadScanThisWeek(_:))
 
         var newMatchesFoundInTheLastWeek = 0
@@ -120,7 +127,7 @@ final class DataBrokerProtectionEventPixels {
             percentageOfBrokersScanned = (totalBrokersInTheLastWeek * 100) / totalBrokers
         }
 
-        handler.fire(.weeklyReportScanning(hadNewMatch: newMatchesFoundInTheLastWeek > 0, hadReAppereance: reAppereancesInTheLastWeek > 0, scanCoverage: percentageOfBrokersScanned))
+        handler.fire(.weeklyReportScanning(hadNewMatch: newMatchesFoundInTheLastWeek > 0, hadReAppereance: reAppereancesInTheLastWeek > 0, scanCoverage: percentageOfBrokersScanned.toString))
         handler.fire(.weeklyReportRemovals(removals: removalsInTheLastWeek))
     }
 
@@ -137,6 +144,22 @@ final class DataBrokerProtectionEventPixels {
             return differenceInDays >= 7
         } else {
             return false
+        }
+    }
+}
+
+private extension Int {
+    var toString: String {
+        if self < 25 {
+            return "0-25"
+        } else if self < 50 {
+            return "25-50"
+        } else if self < 75 {
+            return "50-75"
+        } else if self <= 100 {
+            return "75-100"
+        } else {
+            return "error"
         }
     }
 }

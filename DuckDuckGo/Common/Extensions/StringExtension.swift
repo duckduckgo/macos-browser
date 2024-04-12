@@ -71,6 +71,10 @@ extension String {
         return result
     }
 
+    func replacingInvalidFileNameCharacters(with replacement: String = "_") -> String {
+        replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]", with: replacement, options: .regularExpression)
+    }
+
     init(_ staticString: StaticString) {
         self = staticString.withUTF8Buffer {
             String(decoding: $0, as: UTF8.self)
@@ -107,6 +111,15 @@ extension String {
 
     var pathExtension: String {
         (self as NSString).pathExtension
+    }
+
+    func appendingPathComponent(_ component: String) -> String {
+        (self as NSString).appendingPathComponent(component)
+    }
+
+    func appendingPathExtension(_ pathExtension: String?) -> String {
+        guard let pathExtension, !pathExtension.isEmpty else { return self }
+        return self + "." + pathExtension
     }
 
     // MARK: - Mutating

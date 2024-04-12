@@ -148,6 +148,47 @@ enum UserText {
     static let credentialsLimitExceededDescription = NSLocalizedString("prefrences.sync.credentials-limit-exceeded-description", bundle: Bundle.module, value: "Logins limit exceeded. Delete some to resume syncing.", comment: "Description for sync credentials limits exceeded warning")
     static let bookmarksLimitExceededAction = NSLocalizedString("prefrences.sync.bookmarks-limit-exceeded-action", bundle: Bundle.module, value: "Manage Bookmarks", comment: "Button title for sync bookmarks limits exceeded warning to go to manage bookmarks")
     static let credentialsLimitExceededAction = NSLocalizedString("prefrences.sync.credentials-limit-exceeded-action", bundle: Bundle.module, value: "Manage passwords…", comment: "Button title for sync credentials limits exceeded warning to go to manage passwords")
+    static let invalidBookmarksPresentTitle = NSLocalizedString("prefrences.sync.invalid-bookmarks-present-title", bundle: Bundle.module, value: "Some bookmarks are not syncing due to excessively long content in certain fields.", comment: "Alert title for invalid bookmarks being filtered out of synced data")
+    static let invalidCredentialsPresentTitle = NSLocalizedString("prefrences.sync.invalid-credentials-present-title", bundle: Bundle.module, value: "Some logins are not syncing due to excessively long content in certain fields.", comment: "Alert title for invalid logins being filtered out of synced data")
+
+    static func invalidBookmarksPresentDescription(_ invalidItemTitle: String, numberOfInvalidItems: Int) -> String {
+        guard numberOfInvalidItems > 1 else {
+            let message = NSLocalizedString(
+                "prefrences.sync.invalid-bookmarks-present-description-one",
+                bundle: Bundle.module,
+                value: "Your bookmark for %@ can't sync because one of its fields exceeds the character limit.",
+                comment: "Alert message for 1 invalid bookmark being filtered out of synced data"
+            )
+            return String(format: message, invalidItemTitle)
+        }
+        let message = NSLocalizedString(
+            "prefrences.sync.invalid-bookmarks-present-description-many",
+            bundle: Bundle.module,
+            value: "Some bookmarks (%d) can't sync because some of their fields exceed the character limit.",
+            comment: "Alert message for multiple invalid bookmark being filtered out of synced data"
+        )
+        return String(format: message, numberOfInvalidItems)
+    }
+
+    static func invalidCredentialsPresentDescription(_ invalidItemTitle: String, numberOfInvalidItems: Int) -> String {
+        guard numberOfInvalidItems > 1 else {
+            let message = NSLocalizedString(
+                "prefrences.sync.invalid-credentials-present-description-one",
+                bundle: Bundle.module,
+                value: "Your password for %@ can't sync because one of its fields exceeds the character limit.",
+                comment: "Alert message for 1 invalid login being filtered out of synced data"
+            )
+            return String(format: message, invalidItemTitle)
+        }
+        let message = NSLocalizedString(
+            "prefrences.sync.invalid-credentials-present-description-many",
+            bundle: Bundle.module,
+            value: "Some passwords (n) can't sync because some of their fields exceed the character limit.",
+            comment: "Alert message for multiple invalid logins being filtered out of synced data"
+        )
+        return String(format: message, numberOfInvalidItems)
+    }
+
     static let syncErrorAlertTitle = NSLocalizedString("alert.sync-error", bundle: Bundle.module, value: "Sync & Backup Error", comment: "Title for sync error alert")
     static let unableToSyncToServerDescription = NSLocalizedString("alert.unable-to-sync-to-server-description", bundle: Bundle.module, value: "Unable to connect to the server.", comment: "Description for unable to sync to server error")
     static let unableToSyncWithAnotherDeviceDescription = NSLocalizedString("alert.unable-to-sync-with-another-device-description", bundle: Bundle.module, value: "Unable to Sync with another device.", comment: "Description for unable to sync with another device error")

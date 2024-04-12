@@ -23,6 +23,7 @@ import WebKit
 import Configuration
 import History
 import PixelKit
+import Subscription
 
 // Actions are sent to objects of responder chain
 
@@ -317,7 +318,13 @@ extension MainViewController {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
             return
         }
-        addressBarTextField.makeMeFirstResponder()
+
+        // If the address bar is already the first responder it means that the user is editing the URL and wants to select the whole url.
+        if addressBarTextField.isFirstResponder {
+            addressBarTextField.selectText(nil)
+        } else {
+            addressBarTextField.makeMeFirstResponder()
+        }
     }
 
     @objc func closeTab(_ sender: Any?) {
@@ -385,7 +392,7 @@ extension MainViewController {
             }
             navigationBarViewController.view.window?.makeKeyAndOrderFront(nil)
         }
-        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
+        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: sender is NSMenuItem /* keep button visible for some time on Cmd+J */)
     }
 
     @objc func toggleBookmarksBarFromMenu(_ sender: Any) {
@@ -415,9 +422,7 @@ extension MainViewController {
     }
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
-#if NETWORK_PROTECTION
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
-#endif
     }
 
     // MARK: - History
@@ -718,12 +723,19 @@ extension MainViewController {
         let state = internalUserDecider.isInternalUser
         internalUserDecider.debugSetInternalUserState(!state)
 
-        clearPrivacyProState()
+        if !DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            // We only clear PPro state when it's not available, as otherwise
+            // there should be no state to clear.  Clearing PPro state can
+            // trigger notifications which we want to avoid unless
+            // necessary.
+            clearPrivacyProState()
+        }
     }
 
     /// Clears the PrivacyPro state to make testing easier.
     ///
     private func clearPrivacyProState() {
+        AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).signOut()
         resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
 
@@ -896,6 +908,9 @@ extension MainViewController: NSMenuItemValidation {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        guard fireViewController.fireViewModel.fire.burningData == nil else {
+            return true
+        }
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):

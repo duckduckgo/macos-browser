@@ -16,14 +16,13 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Networking
 import UserNotifications
 import NetworkProtection
 import BrowserServicesKit
 import Common
+import Subscription
 
 protocol WaitlistConstants {
     static var identifier: String { get }
@@ -206,36 +205,22 @@ struct NetworkProtectionWaitlist: Waitlist {
     }
 
     func fetchNetworkProtectionInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
+        // Never fetch the invite code if the Privacy Pro flag is enabled:
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            completion(nil)
+            return
+        }
+
         self.fetchInviteCodeIfAvailable { error in
             if let error {
-                // Check for users who have waitlist state but have no auth token, for example if the redeem call fails.
-                let networkProtectionKeyStore = NetworkProtectionKeychainTokenStore()
-                let configManager = ContentBlocking.shared.privacyConfigurationManager
-                let waitlistBetaActive = configManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive)
-
-                if let inviteCode = waitlistStorage.getWaitlistInviteCode(),
-                   !networkProtectionKeyStore.isFeatureActivated,
-                   waitlistBetaActive {
-                    Task { @MainActor in
-                        do {
-                            try await networkProtectionCodeRedemption.redeem(inviteCode)
-                            NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-                            completion(nil)
-                        } catch {
-                            completion(.failure(error))
-                        }
-                    }
-                } else {
-                    completion(error)
-                }
+                // Do nothing if the app fails to fetch, as the waitlist is being phased out
+                completion(error)
             } else if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
                 Task { @MainActor in
                     do {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-                        sendInviteCodeAvailableNotification {
-                            DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
-                        }
+                        sendInviteCodeAvailableNotification(completion: nil)
                         completion(nil)
                     } catch {
                         assertionFailure("Failed to redeem invite code")
@@ -250,8 +235,6 @@ struct NetworkProtectionWaitlist: Waitlist {
     }
 
 }
-
-#endif
 
 #if DBP
 
@@ -299,7 +282,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
     }
 
     func redeemDataBrokerProtectionInviteCodeIfAvailable() async throws {
-        if DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
+        if DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist || DefaultDataBrokerProtectionFeatureVisibility().isPrivacyProEnabled() {
             return
         }
 

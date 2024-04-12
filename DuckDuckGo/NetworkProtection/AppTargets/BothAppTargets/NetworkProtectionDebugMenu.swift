@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Common
 import Foundation
@@ -183,7 +181,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         preferredServerMenu.autoenablesItems = false
         populateNetworkProtectionEnvironmentListMenuItems()
-        populateNetworkProtectionServerListMenuItems()
+        Task {
+            try? await populateNetworkProtectionServerListMenuItems()
+        }
         populateNetworkProtectionRegistrationKeyValidityMenuItems()
 
         excludedRoutesMenu.delegate = self
@@ -344,9 +344,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
         ]
     }
 
-    private func populateNetworkProtectionServerListMenuItems() {
-        let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
-        let servers = (try? networkProtectionServerStore.storedNetworkProtectionServerList()) ?? []
+    @MainActor
+    private func populateNetworkProtectionServerListMenuItems() async throws {
+        let servers = try await NetworkProtectionDeviceManager.create().refreshServerList()
 
         preferredServerAutomaticItem.target = self
         if servers.isEmpty {
@@ -618,9 +618,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         Task {
             _ = try await NetworkProtectionDeviceManager.create().refreshServerList()
-            await MainActor.run {
-                populateNetworkProtectionServerListMenuItems()
-            }
+            try? await populateNetworkProtectionServerListMenuItems()
+
             settings.selectedServer = .automatic
         }
     }
@@ -666,6 +665,4 @@ extension NetworkProtectionDebugMenu: NSMenuDelegate {
 #Preview {
     return MenuPreview(menu: NetworkProtectionDebugMenu())
 }
-#endif
-
 #endif

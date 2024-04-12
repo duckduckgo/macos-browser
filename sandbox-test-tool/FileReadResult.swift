@@ -1,5 +1,5 @@
 //
-//  AccountManagerExtension.swift
+//  FileReadResult.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,13 +16,23 @@
 //  limitations under the License.
 //
 
-#if SUBSCRIPTION
 import Foundation
-import Subscription
 
-public extension AccountManager {
-    convenience init() {
-        self.init(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+struct FileReadResult: Codable {
+
+    let path: String
+    let data: String
+    let bookmark: Data?
+
+    static func decode(from string: String) throws -> FileReadResult {
+        try JSONDecoder().decode(Self.self, from: string.data(using: .utf8)!)
     }
+
+    func encoded() -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let json = try? encoder.encode(self)
+        return String(data: json!, encoding: .utf8)!
+    }
+
 }
-#endif

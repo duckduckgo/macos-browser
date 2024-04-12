@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "918c7ef70f70ca2c62ef781dd6aae8d53cf15db4",
-        "version" : "129.1.6"
+        "revision" : "bc70d1a27263cc97a4060ac9e73ec10929c28a29",
+        "version" : "134.0.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "2f44185cca2edefbae7557393a61a23c282abbf8",
-        "version" : "5.7.0"
+        "revision" : "62d5dc3d02f6a8347dc5f0b52162a0107d38b74c",
+        "version" : "5.8.0"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "6493e296934bf09277c03df45f11f4619711cb24",
-        "version" : "10.2.0"
+        "revision" : "6053999d6af384a716ab0ce7205dbab5d70ed1b3",
+        "version" : "11.0.1"
       }
     },
     {
@@ -64,12 +64,12 @@
       }
     },
     {
-      "identity" : "lottie-ios",
+      "identity" : "lottie-spm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/lottie-ios.git",
+      "location" : "https://github.com/airbnb/lottie-spm.git",
       "state" : {
-        "revision" : "abf5510e261c85ffddd29de0bca9b72592ea2bdd",
-        "version" : "3.3.0"
+        "revision" : "3bd43e12d6fb54654366a61f7cfaca787318b8ce",
+        "version" : "4.4.1"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "43a6e1c1864846679a254e60c91332c3fbd922ee",
-        "version" : "3.3.0"
+        "revision" : "620921fea14569eb00745cb5a44890d5890d99ec",
+        "version" : "3.4.0"
       }
     },
     {

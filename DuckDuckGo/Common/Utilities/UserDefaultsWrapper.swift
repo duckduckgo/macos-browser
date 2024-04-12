@@ -23,6 +23,7 @@ extension UserDefaults {
     /// The app group's shared UserDefaults
     static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
     static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
+    static let subs = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .subs))!
 }
 
 @propertyWrapper
@@ -151,7 +152,6 @@ public struct UserDefaultsWrapper<T> {
 
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
         case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
-        case dataBrokerProtectionCleanedUpFromWaitlistToPrivacyPro = "data-broker-protection.cleaned-up-from-waitlist-to-privacy-pro"
 
         // VPN
 

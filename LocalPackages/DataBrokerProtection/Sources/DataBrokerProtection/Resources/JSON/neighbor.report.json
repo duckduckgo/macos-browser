@@ -1,7 +1,7 @@
 {
   "name": "Neighbor Report",
   "url": "neighbor.report",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "addedDatetime": 1703570400000,
   "steps": [
     {
@@ -10,12 +10,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "22f67a44-d538-48a0-b6f4-c783123c6dfa",
+          "id": "6e589101-df53-4af7-bf6a-41376927f6ec",
           "url": "https://neighbor.report/${firstName}-${lastName}/${state|stateFull|hyphenated}/${city|hyphenated}"
         },
         {
           "actionType": "extract",
-          "id": "14ff868b-b6cc-485e-a5cf-93357a63c2ac",
+          "id": "1ec79c67-40b0-4f91-baf8-996073109092",
           "selector": ".lstd",
           "profile": {
             "name": {
@@ -53,12 +53,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "477f4e90-686c-400e-8d45-65749ff60b5d",
+          "id": "d894a462-02c3-4f2a-966d-44aea2fbb6d4",
           "url": "https://neighbor.report/remove"
         },
         {
           "actionType": "fillForm",
-          "id": "335b078c-d27f-4045-8a36-2cc0c125d271",
+          "id": "7fbaf65f-c130-494b-8f61-a77cebb422f4",
           "selector": ".form-horizontal",
           "elements": [
             {
@@ -77,17 +77,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "0ed843a1-2788-454c-a666-17906d2991cb",
+          "id": "23d6eb3e-2cfd-45f8-a0ca-b2168605173e",
           "selector": ".recaptcha-div"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "e6f3b3c5-e61c-4e75-878d-cecbaae26013",
+          "id": "f0ea9801-8b8d-4e27-bd3f-bba0cdb4bf4a",
           "selector": ".recaptcha-div"
         },
         {
           "actionType": "click",
-          "id": "8544dcb5-5bd7-4045-91a8-23bbfad7bfc8",
+          "id": "2aa19f1d-1dbf-4465-8e40-857311bf7f37",
           "elements": [
             {
               "type": "button",
@@ -96,8 +96,19 @@
           ]
         },
         {
+          "actionType": "expectation",
+          "id": "2f4f23f8-4599-48a6-a52c-3ed630114a90",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Remove persons"
+            }
+          ]
+        },
+        {
           "actionType": "click",
-          "id": "6748ca30-0044-4e9a-8a35-5d686359688c",
+          "id": "1f411b2e-9f93-4519-ae35-7c0411b535e1",
           "elements": [
             {
               "type": "button",
@@ -111,7 +122,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "a56fcc4c-fdd4-4d92-96b3-a8b89d10ca80",
+          "id": "2bf0a2dd-7d16-4d40-9091-61c96a1e6949",
           "expectations": [
             {
               "type": "text",

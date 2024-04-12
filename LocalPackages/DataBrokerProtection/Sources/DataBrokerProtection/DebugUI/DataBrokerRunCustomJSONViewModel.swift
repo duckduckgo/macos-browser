@@ -174,7 +174,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         self.contentScopeProperties = contentScopeProperties
 
         let fileResources = FileResources()
-        self.brokers = fileResources.fetchBrokerFromResourceFiles() ?? [DataBroker]()
+        self.brokers = (try? fileResources.fetchBrokerFromResourceFiles()) ?? [DataBroker]()
     }
 
     func runAllBrokers() {
@@ -197,7 +197,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                             semaphore.signal()
                         }
                         do {
-                            return try await debugScanOperation.run(inputValue: (), stageCalculator: FakeStageDurationCalculator(), showWebView: false)
+                            return try await debugScanOperation.run(inputValue: (), showWebView: false)
                         } catch {
                             return DebugScanReturnValue(brokerURL: "ERROR - with broker: \(queryData.dataBroker.name)", extractedProfiles: [ExtractedProfile](), brokerProfileQueryData: queryData)
                         }
@@ -344,8 +344,11 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                 self.selectedDataBroker = dataBroker
                 let brokerProfileQueryData = createBrokerProfileQueryData(for: dataBroker)
                 let runner = runnerProvider.getOperationRunner()
+                let group = DispatchGroup()
 
                 for query in brokerProfileQueryData {
+                    group.enter()
+
                     Task {
                         do {
                             let extractedProfiles = try await runner.scan(query, stageCalculator: FakeStageDurationCalculator(), showWebView: true) { true }
@@ -357,9 +360,16 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                                                                    extractedProfile: extractedProfile))
                                 }
                             }
+                            group.leave()
                         } catch {
                             print("Error when scanning: \(error)")
+                            group.leave()
                         }
+                    }
+                }
+                group.notify(queue: .main) {
+                    if self.results.count == 0 {
+                        self.showNoResultsAlert()
                     }
                 }
             } catch {
@@ -466,6 +476,8 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 }
 
 final class FakeStageDurationCalculator: StageDurationCalculator {
+    var attemptId: UUID = UUID()
+
     func durationSinceLastStage() -> Double {
         0.0
     }

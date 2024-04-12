@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
 import Common
 import Foundation
 import LoginItems
@@ -84,7 +83,7 @@ final class NetworkProtectionAppEvents {
             await featureVisibility.disableIfUserHasNoAccess()
 
 #if SUBSCRIPTION
-            _ = await AccountManager().hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            await AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).refreshSubscriptionAndEntitlements()
 #endif
         }
     }
@@ -118,5 +117,3 @@ final class NetworkProtectionAppEvents {
         }
     }
 }
-
-#endif

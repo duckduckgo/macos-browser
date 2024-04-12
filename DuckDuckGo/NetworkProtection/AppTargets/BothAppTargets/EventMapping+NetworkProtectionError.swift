@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Common
 import Foundation
 import NetworkProtection
@@ -74,17 +72,11 @@ extension EventMapping where Event == NetworkProtectionError {
                 .couldNotGetPeerHostName,
                 .couldNotGetInterfaceAddressRange,
                 .failedToEncodeRegisterKeyRequest,
-                .noServerListFound,
                 .serverListInconsistency,
                 .failedToFetchRegisteredServers,
                 .failedToFetchServerList,
                 .failedToParseServerListResponse,
                 .failedToParseRegisteredServersResponse,
-                .failedToEncodeServerList,
-                .failedToDecodeServerList,
-                .failedToWriteServerList,
-                .couldNotCreateServerListDirectory,
-                .failedToReadServerList,
                 .wireGuardCannotLocateTunnelFileDescriptor,
                 .wireGuardInvalidState,
                 .wireGuardDnsResolution,
@@ -99,7 +91,6 @@ extension EventMapping where Event == NetworkProtectionError {
             frequency = .standard
             return
         case .vpnAccessRevoked:
-            // todo
             return
         }
 
@@ -107,5 +98,3 @@ extension EventMapping where Event == NetworkProtectionError {
         PixelKit.fire(debugEvent, frequency: .standard, includeAppVersionParameter: true)
     }
 }
-
-#endif

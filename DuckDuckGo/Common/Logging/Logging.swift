@@ -25,6 +25,7 @@ extension OSLog {
     enum AppCategories: String, CaseIterable {
         case atb = "ATB"
         case config = "Configuration Downloading"
+        case downloads = "Downloads"
         case fire = "Fire"
         case dataImportExport = "Data Import/Export"
         case pixel = "Pixel"
@@ -53,6 +54,7 @@ extension OSLog {
 
     @OSLogWrapper(.atb) static var atb
     @OSLogWrapper(.config) static var config
+    @OSLogWrapper(.downloads) static var downloads
     @OSLogWrapper(.fire) static var fire
     @OSLogWrapper(.dataImportExport) static var dataImportExport
     @OSLogWrapper(.pixel) static var pixel
@@ -138,3 +140,45 @@ func logOrAssertionFailure(_ message: String) {
     os_log("%{public}s", type: .error, message)
 #endif
 }
+
+#if DEBUG
+
+func breakByRaisingSigInt(_ description: String, file: StaticString = #file, line: Int = #line) {
+    let fileLine = "\(("\(file)" as NSString).lastPathComponent):\(line)"
+    os_log("""
+
+
+    ------------------------------------------------------------------------------------------------------
+        BREAK at %s:
+    ------------------------------------------------------------------------------------------------------
+
+    %s
+
+        Hit Continue (^⌘Y) to continue program execution
+    ------------------------------------------------------------------------------------------------------
+
+    """, type: .debug, fileLine, description.components(separatedBy: "\n").map { "    " + $0.trimmingWhitespace() }.joined(separator: "\n"))
+    raise(SIGINT)
+}
+
+// get symbol from stack trace for a caller of a calling method
+func callingSymbol() -> String {
+    let stackTrace = Thread.callStackSymbols
+    // find `callingSymbol` itself or dispatch_once_callout
+    var callingSymbolIdx = stackTrace.firstIndex(where: { $0.contains("_dispatch_once_callout") })
+    ?? stackTrace.firstIndex(where: { $0.contains("callingSymbol") })!
+    // procedure calling `callingSymbol`
+    callingSymbolIdx += 1
+
+    var symbolName: String
+    repeat {
+        // caller for the procedure
+        callingSymbolIdx += 1
+        let line = stackTrace[callingSymbolIdx].replacingOccurrences(of: Bundle.main.executableURL!.lastPathComponent, with: "DDG")
+        symbolName = String(line.split(separator: " ", maxSplits: 3)[3]).components(separatedBy: " + ")[0]
+    } while stackTrace[callingSymbolIdx - 1].contains(symbolName.dropping(suffix: "To")) // skip objc wrappers
+
+    return symbolName
+}
+
+#endif

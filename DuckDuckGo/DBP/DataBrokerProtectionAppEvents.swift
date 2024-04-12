@@ -37,7 +37,9 @@ struct DataBrokerProtectionAppEvents {
 
         guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
-        guard featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() else {
+        /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
+        /// since the waitlist flag might have been turned off
+        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
             featureVisibility.disableAndDeleteForWaitlistUsers()
             return
         }
@@ -47,8 +49,8 @@ struct DataBrokerProtectionAppEvents {
 
             // If we don't have profileQueries it means there's no user profile saved in our DB
             // In this case, let's disable the agent and delete any left-over data because there's nothing for it to do
-            let profileQueries = await DataBrokerProtectionManager.shared.dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
-            if profileQueries.count > 0 {
+            if let profileQueries = try? DataBrokerProtectionManager.shared.dataManager.fetchBrokerProfileQueryData(ignoresCache: true),
+               profileQueries.count > 0 {
                 restartBackgroundAgent(loginItemsManager: loginItemsManager)
             } else {
                 featureVisibility.disableAndDeleteForWaitlistUsers()
@@ -62,7 +64,9 @@ struct DataBrokerProtectionAppEvents {
 
         guard !featureVisibility.cleanUpDBPForPrivacyProIfNecessary() else { return }
 
-        guard featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() else {
+        /// If the user is not in the waitlist and Privacy Pro flag is false, we want to remove the data for waitlist users
+        /// since the waitlist flag might have been turned off
+        if !featureVisibility.isFeatureVisible() && !featureVisibility.isPrivacyProEnabled() {
             featureVisibility.disableAndDeleteForWaitlistUsers()
             return
         }

@@ -102,11 +102,8 @@ enum Preferences {
                     AppearanceView(model: .shared)
                 case .dataClearing:
                     DataClearingView(model: DataClearingPreferences.shared)
-
-#if NETWORK_PROTECTION
                 case .vpn:
                     VPNView(model: VPNPreferencesModel())
-#endif
 
 #if SUBSCRIPTION
                 case .subscription:
@@ -122,12 +119,8 @@ enum Preferences {
                     // Opens a new tab
                     Spacer()
                 case .about:
-#if NETWORK_PROTECTION
                     let netPInvitePresenter = NetworkProtectionInvitePresenter()
                     AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
-#else
-                    AboutView(model: AboutModel())
-#endif
                 }
             }
             .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
@@ -161,7 +154,7 @@ enum Preferences {
                     case .activateAddEmailClick:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
                     case .postSubscriptionAddEmailClick:
-                        Pixel.fire(.privacyProWelcomeAddDevice, limitTo: .initial)
+                        Pixel.fire(.privacyProSubscriptionManagementEmail, limitTo: .initial)
                     case .restorePurchaseStoreClick:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
                     case .addToAnotherDeviceClick:

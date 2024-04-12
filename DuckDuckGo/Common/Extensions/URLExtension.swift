@@ -79,6 +79,7 @@ extension URL {
 
     // MARK: - Factory
 
+#if !SANDBOX_TEST_TOOL
     static func makeSearchUrl(from searchQuery: String) -> URL? {
         let trimmedQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -124,6 +125,7 @@ extension URL {
 
         return url
     }
+#endif
 
     static let blankPage = URL(string: "about:blank")!
 
@@ -136,9 +138,11 @@ extension URL {
 
     static let dataBrokerProtection = URL(string: "duck://dbp")!
 
+#if !SANDBOX_TEST_TOOL
     static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
         return settings.appendingPathComponent(pane.rawValue)
     }
+#endif
 
     enum Invalid {
         static let aboutNewtab = URL(string: "about:newtab")!
@@ -274,6 +278,7 @@ extension URL {
         return string
     }
 
+#if !SANDBOX_TEST_TOOL
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
         let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
         let hasInputWww = input.dropping(prefix: self.separatedScheme ?? "").hasOrIsPrefix(of: URL.HostPrefix.www.rawValue)
@@ -284,6 +289,7 @@ extension URL {
                              needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
+#endif
 
     /// Tries to use the file name part of the URL, if available, adjusting for content type, if available.
     var suggestedFilename: String? {
@@ -365,6 +371,10 @@ extension URL {
 
     static var privacyPolicy: URL {
         return URL(string: "https://duckduckgo.com/privacy")!
+    }
+
+    static var privacyPro: URL {
+        return URL(string: "https://duckduckgo.com/pro")!
     }
 
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
@@ -458,6 +468,57 @@ extension URL {
         }
 
     }
+
+    var isFileHidden: Bool {
+        get throws {
+            try self.resourceValues(forKeys: [.isHiddenKey]).isHidden ?? false
+        }
+    }
+
+    var isDirectory: Bool {
+        var isDirectory: ObjCBool = false
+        guard isFileURL,
+              FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else { return false }
+        return isDirectory.boolValue
+    }
+
+    mutating func setFileHidden(_ hidden: Bool) throws {
+        var resourceValues = URLResourceValues()
+        resourceValues.isHidden = true
+        try setResourceValues(resourceValues)
+    }
+
+    /// Check if location pointed by the URL is writable
+    /// - Note: if there‘s no file at the URL, it will try to create a file and then remove it
+    func isWritableLocation() -> Bool {
+        do {
+            try FileManager.default.checkWritability(self)
+            return true
+        } catch {
+            return false
+        }
+    }
+
+#if DEBUG && APPSTORE
+    /// sandbox extension URL access should be stopped after SecurityScopedFileURLController is deallocated - this function validates it and breaks if the file is still writable
+    func ensureUrlIsNotWritable(or handler: () -> Void) {
+        let fm = FileManager.default
+        // is the URL ~/Downloads?
+        if self.resolvingSymlinksInPath() == fm.urls(for: .downloadsDirectory, in: .userDomainMask).first!.resolvingSymlinksInPath() {
+            assert(isWritableLocation())
+            return
+        }
+        // is parent directory writable (e.g. ~/Downloads)?
+        if fm.isWritableFile(atPath: self.deletingLastPathComponent().path)
+            // trashed files are still accessible for some reason even after stopping access
+            || fm.isInTrash(self)
+            // other file is being saved at the same URL
+            || NSURL.activeSecurityScopedUrlUsages.contains(where: { $0.url !== self as NSURL && $0.url == self as NSURL })
+            || !isWritableLocation() { return }
+
+        handler()
+    }
+#endif
 
     // MARK: - System Settings
 

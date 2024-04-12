@@ -29,12 +29,18 @@ final class StatisticsLoader {
 
     private let statisticsStore: StatisticsStore
     private let emailManager: EmailManager
+    private let attributionPixelHandler: AttributionsPixelHandler
     private let parser = AtbParser()
     private var isAppRetentionRequestInProgress = false
 
-    init(statisticsStore: StatisticsStore = LocalStatisticsStore(), emailManager: EmailManager = EmailManager()) {
+    init(
+        statisticsStore: StatisticsStore = LocalStatisticsStore(),
+        emailManager: EmailManager = EmailManager(),
+        attributionPixelHandler: AttributionsPixelHandler = InstallationAttributionPixelHandler()
+    ) {
         self.statisticsStore = statisticsStore
         self.emailManager = emailManager
+        self.attributionPixelHandler = attributionPixelHandler
     }
 
     func refreshRetentionAtb(isSearch: Bool, completion: @escaping Completion = {}) {
@@ -94,6 +100,7 @@ final class StatisticsLoader {
 
             if let data = response?.data, let atb = try? self.parser.convert(fromJsonData: data) {
                 self.requestExti(atb: atb, completion: completion)
+                self.attributionPixelHandler.fireInstallationAttributionPixel()
             } else {
                 completion()
             }

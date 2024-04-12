@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import NetworkProtection
 import PixelKit
 import PixelKitTestingUtilities
@@ -78,7 +76,7 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
         fire(NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_controller_start_failure",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionControllerStartSuccess,
@@ -92,7 +90,7 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
         fire(NetworkProtectionPixelEvent.networkProtectionTunnelStartFailure(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_tunnel_start_failure",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionTunnelStartSuccess,
@@ -106,7 +104,7 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
         fire(NetworkProtectionPixelEvent.networkProtectionTunnelUpdateFailure(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_tunnel_update_failure",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionTunnelUpdateSuccess,
@@ -164,7 +162,7 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
         fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToFetchServerList(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_backend_api_error_failed_to_fetch_server_list",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToParseServerListResponse,
@@ -178,7 +176,7 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
         fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToFetchRegisteredServers(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_backend_api_error_failed_to_fetch_registered_servers",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToParseRegisteredServersResponse,
@@ -196,49 +194,29 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
         fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToRedeemInviteCode(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_backend_api_error_failed_to_redeem_invite_code",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToParseRedeemResponse(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_backend_api_error_parsing_redeem_response_failed",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToFetchLocations(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_backend_api_error_failed_to_fetch_location_list",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionClientFailedToParseLocationsResponse(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_backend_api_error_parsing_location_list_response_failed",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionClientInvalidAuthToken,
              and: .expect(pixelName: "m_mac_netp_backend_api_error_invalid_auth_token"),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionServerListStoreFailedToEncodeServerList,
-             and: .expect(pixelName: "m_mac_netp_storage_error_failed_to_encode_server_list"),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionServerListStoreFailedToDecodeServerList,
-             and: .expect(pixelName: "m_mac_netp_storage_error_failed_to_decode_server_list"),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionServerListStoreFailedToWriteServerList(TestError.testError),
-             and: .expect(pixelName: "m_mac_netp_storage_error_server_list_file_system_write_failed",
-                          error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
-             file: #filePath,
-             line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionServerListStoreFailedToReadServerList(TestError.testError),
-             and: .expect(pixelName: "m_mac_netp_storage_error_server_list_file_system_read_failed",
-                          error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: "field"),
@@ -297,7 +275,7 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
         fire(NetworkProtectionPixelEvent.networkProtectionWireguardErrorCannotSetNetworkSettings(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_wireguard_error_cannot_set_network_settings",
                                  error: TestError.testError,
-                                 underlyingError: TestError.underlyingError),
+                                 underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionWireguardErrorCannotStartWireguardBackend(code: 1),
@@ -322,17 +300,19 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
         fire(NetworkProtectionPixelEvent.networkProtectionRekeyFailure(TestError.testError),
              and: .expect(pixelName: "m_mac_netp_rekey_failure",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError),
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure,
-             and: .expect(pixelName: "m_mac_netp_system_extension_activation_failure"),
+        fire(NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure(TestError.testError),
+             and: .expect(pixelName: "m_mac_netp_system_extension_activation_failure",
+                          error: TestError.testError,
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionUnhandledError(function: "function", line: 1, error: TestError.testError),
              and: .expect(pixelName: "m_mac_netp_unhandled_error",
                           error: TestError.testError,
-                          underlyingError: TestError.underlyingError,
+                          underlyingErrors: [TestError.underlyingError],
                           customFields: [
                             PixelKit.Parameters.function: "function",
                             PixelKit.Parameters.line: "1",
@@ -341,5 +321,3 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
              line: #line)
     }
 }
-
-#endif

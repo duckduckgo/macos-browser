@@ -165,14 +165,6 @@ extension Pixel {
         case vpnBreakageReport(category: String, description: String, metadata: String)
 
         // VPN
-        case networkProtectionWaitlistUserActive
-        case networkProtectionWaitlistEntryPointMenuItemDisplayed
-        case networkProtectionWaitlistEntryPointToolbarButtonDisplayed
-        case networkProtectionWaitlistIntroDisplayed
-        case networkProtectionWaitlistNotificationShown
-        case networkProtectionWaitlistNotificationTapped
-        case networkProtectionWaitlistTermsAndConditionsDisplayed
-        case networkProtectionWaitlistTermsAndConditionsAccepted
         case networkProtectionRemoteMessageDisplayed(messageID: String)
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
@@ -277,6 +269,9 @@ extension Pixel {
         case passwordImportKeychainPrompt
         case passwordImportKeychainPromptDenied
 
+        // Tracks installation without tracking retention.
+        case installationAttribution
+
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
             /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
@@ -303,7 +298,10 @@ extension Pixel {
 
             case fileStoreWriteFailed
             case fileMoveToDownloadsFailed
+            case fileAccessRelatedItemFailed
             case fileGetDownloadLocationFailed
+            case fileDownloadCreatePresentersFailed
+            case downloadResumeDataCodingFailed
 
             case suggestionsFetchFailed
             case appOpenURLFailed
@@ -328,6 +326,7 @@ extension Pixel {
             case historyCleanEntriesFailed
             case historyCleanVisitsFailed
             case historySaveFailed
+            case historySaveFailedDaily
             case historyInsertVisitFailed
             case historyRemoveVisitsFailed
 
@@ -567,22 +566,6 @@ extension Pixel.Event {
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
 
-        case .networkProtectionWaitlistUserActive:
-            return "m_mac_netp_waitlist_user_active"
-        case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
-            return "m_mac_netp_imp_settings_entry_menu_item"
-        case .networkProtectionWaitlistEntryPointToolbarButtonDisplayed:
-            return "m_mac_netp_imp_settings_entry_toolbar_button"
-        case .networkProtectionWaitlistIntroDisplayed:
-            return "m_mac_netp_imp_intro_screen"
-        case .networkProtectionWaitlistNotificationShown:
-            return "m_mac_netp_ev_waitlist_notification_shown"
-        case .networkProtectionWaitlistNotificationTapped:
-            return "m_mac_netp_ev_waitlist_notification_launched"
-        case .networkProtectionWaitlistTermsAndConditionsDisplayed:
-            return "m_mac_netp_imp_terms"
-        case .networkProtectionWaitlistTermsAndConditionsAccepted:
-            return "m_mac_netp_ev_terms_accepted"
         case .networkProtectionRemoteMessageDisplayed(let messageID):
             return "m_mac_netp_remote_message_displayed_\(messageID)"
         case .networkProtectionRemoteMessageDismissed(let messageID):
@@ -710,6 +693,9 @@ extension Pixel.Event {
         // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
         case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
+
+        // Installation Attribution
+        case .installationAttribution: return "m_mac_install"
         }
     }
 }
@@ -774,6 +760,12 @@ extension Pixel.Event.Debug {
             return "df"
         case .fileGetDownloadLocationFailed:
             return "dl"
+        case .fileAccessRelatedItemFailed:
+            return "dari"
+        case .fileDownloadCreatePresentersFailed:
+            return "dfpf"
+        case .downloadResumeDataCodingFailed:
+            return "drdc"
 
         case .suggestionsFetchFailed:
             return "sgf"
@@ -825,6 +817,8 @@ extension Pixel.Event.Debug {
             return "history_clean_visits_failed"
         case .historySaveFailed:
             return "history_save_failed"
+        case .historySaveFailedDaily:
+            return "history_save_failed_daily"
         case .historyInsertVisitFailed:
             return "history_insert_visit_failed"
         case .historyRemoveVisitsFailed:

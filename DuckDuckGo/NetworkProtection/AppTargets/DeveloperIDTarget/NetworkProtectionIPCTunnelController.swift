@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Common
 import Foundation
 import NetworkProtection
@@ -83,7 +81,7 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
     // MARK: - Login Items Manager
 
     private func enableLoginItems() async throws -> Bool {
-        guard try await featureVisibility.isFeatureEnabled() else {
+        guard try await featureVisibility.canStartVPN() else {
             // We shouldn't enable the menu app is the VPN feature is disabled.
             return false
         }
@@ -92,5 +90,3 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
         return true
     }
 }
-
-#endif

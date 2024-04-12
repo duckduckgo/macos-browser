@@ -38,8 +38,10 @@ extension NSAlert {
         alert.informativeText = UserText.clearAllDataDescription
         alert.alertStyle = .warning
         alert.icon = .burnAlert
-        alert.addButton(withTitle: UserText.clear)
-        alert.addButton(withTitle: UserText.cancel)
+        let clearButton = alert.addButton(withTitle: UserText.clear)
+        let cancelButton = alert.addButton(withTitle: UserText.cancel)
+        clearButton.setAccessibilityIdentifier("ClearAllHistoryAndDataAlert.clearButton")
+        cancelButton.setAccessibilityIdentifier("ClearAllHistoryAndDataAlert.cancelButton")
         return alert
     }
 
@@ -131,15 +133,6 @@ extension NSAlert {
         alert.informativeText = UserText.noAccessToDownloadsFolder
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.openSystemPreferences)
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
-    static func noAccessToSelectedFolder() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.noAccessToSelectedFolderHeader
-        alert.informativeText = UserText.noAccessToSelectedFolder
-        alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.cancel)
         return alert
     }
