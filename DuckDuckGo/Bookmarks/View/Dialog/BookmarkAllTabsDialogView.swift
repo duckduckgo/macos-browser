@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 struct BookmarkAllTabsDialogView: ModalView {
     @ObservedObject private var viewModel: BookmarkAllTabsDialogCoordinatorViewModel<BookmarkAllTabsViewModel, AddEditBookmarkFolderDialogViewModel>
@@ -42,6 +43,8 @@ struct BookmarkAllTabsDialogView: ModalView {
             title: viewModel.bookmarkModel.title,
             middleSection: {
                 Text(viewModel.bookmarkModel.educationalMessage)
+                    .multilineText()
+                    .multilineTextAlignment(.leading)
                     .foregroundColor(.secondary)
                     .fontWeight(.light)
                 BookmarkDialogStackedContentView(
