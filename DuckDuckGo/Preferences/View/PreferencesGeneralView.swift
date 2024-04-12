@@ -45,12 +45,12 @@ extension Preferences {
                                 .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.reopenAllWindowsFromLastSession")
                         }, label: {})
                         .pickerStyle(.radioGroup)
-                        .disabled(dataClearingModel.isBurnDataOnQuitEnabled)
+                        .disabled(dataClearingModel.isAutoClearEnabled)
                         .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
                         .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
-                        if dataClearingModel.isBurnDataOnQuitEnabled {
+                        if dataClearingModel.isAutoClearEnabled {
                             VStack(alignment: .leading, spacing: 1) {
-                                TextMenuItemCaption(UserText.disableBurnOnQuitToEnableSessionRestore())
+                                TextMenuItemCaption(UserText.disableAutoClearToEnableSessionRestore())
                                 TextButton(UserText.showDataClearingSettings()) {
                                     startupModel.show(url: .settingsPane(.dataClearing))
                                 }

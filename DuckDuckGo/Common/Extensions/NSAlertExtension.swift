@@ -215,10 +215,10 @@ extension NSAlert {
         return alert
     }
 
-    static func burnOnQuitAlert() -> NSAlert {
+    static func autoClearAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.warnBeforeQuitDialogHeader
-        alert.informativeText = UserText.warnBeforeQuitDialogMessage
+        //TODO checkbox
         alert.alertStyle = .warning
         alert.icon = .burnAlert
         alert.addButton(withTitle: UserText.clear)

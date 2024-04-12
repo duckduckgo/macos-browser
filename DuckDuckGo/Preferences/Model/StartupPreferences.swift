@@ -136,13 +136,13 @@ final class StartupPreferences: ObservableObject, PreferencesTabOpening {
     }
 
     private func checkDataClearingStatus() {
-        if dataClearingPreferences.isBurnDataOnQuitEnabled {
+        if dataClearingPreferences.isAutoClearEnabled {
             restorePreviousSession = false
         }
     }
 
     private func listenToDataClearingPreferencesNotifications() {
-        dataClearingPreferencesNotificationCancellable = NotificationCenter.default.publisher(for: .burnDataOnQuitDidChange).sink { [weak self] _ in
+        dataClearingPreferencesNotificationCancellable = NotificationCenter.default.publisher(for: .autoClearDidChange).sink { [weak self] _ in
             guard let self = self else {
                 return
             }

@@ -2359,6 +2359,18 @@
         }
       }
     },
+    "auto.clear" : {
+      "comment" : "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Auto-Clear"
+          }
+        }
+      }
+    },
     "autoconsent.checkbox.title" : {
       "comment" : "Autoconsent settings checkbox title",
       "extractionState" : "extracted_with_value",
@@ -5600,13 +5612,13 @@
       }
     },
     "automatically.clear.data" : {
-      "comment" : "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.",
+      "comment" : "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Automatically Clear"
+            "value" : "Automatically clear browsing data when DuckDuckGo quits"
           }
         }
       }
@@ -9880,30 +9892,6 @@
         }
       }
     },
-    "burn.data.on.quit" : {
-      "comment" : "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Clear Data upon Quitting"
-          }
-        }
-      }
-    },
-    "burn.data.on.quit.explanation" : {
-      "comment" : "Explanation of a setting which configures clearing data automatically after quitting the app.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Data from \"Fireproofed\" sites won't be cleared, keeping your essential logins and preferences intact."
-          }
-        }
-      }
-    },
     "burner.homepage.description.1" : {
       "comment" : "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.",
       "extractionState" : "extracted_with_value",
@@ -12848,7 +12836,7 @@
         }
       }
     },
-    "disable.burn.on.quit.to.enable.session.restore" : {
+    "disable.auto.clear.to.enable.session.restore" : {
       "comment" : "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit",
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -51713,7 +51701,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Warn before Quit"
+            "value" : "Warn me that data will be cleared when quitting"
+          }
+        }
+      }
+    },
+    "warn.before.quit.dialog.checkbox.message" : {
+      "comment" : "A label after checkbox to configure the warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warn me every time"
           }
         }
       }
@@ -51725,19 +51725,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Quit the application and \nclear all data?"
-          }
-        }
-      }
-    },
-    "warn.before.quit.dialog.message" : {
-      "comment" : "A warning before clearing data on the application termination.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Cookies and site data for all sites will be cleared, unless the site is Fireproof."
+            "value" : "Clear browsing data and quit\nDuckDuckGo?"
           }
         }
       }

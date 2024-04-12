@@ -29,16 +29,13 @@ extension Preferences {
             PreferencePane(UserText.dataClearing) {
 
                 // SECTION 1: Automatically Clear Data
-                PreferencePaneSection(UserText.automaticallyClearData) {
+                PreferencePaneSection(UserText.autoClear) {
 
                     PreferencePaneSubSection {
-                        ToggleMenuItem(UserText.burnDataOnQuit, isOn: $model.isBurnDataOnQuitEnabled)
-                        VStack(alignment: .leading, spacing: 1) {
-                            TextMenuItemCaption(UserText.burnDataOnQuitExplanation)
-                        }
+                        ToggleMenuItem(UserText.automaticallyClearData, isOn: $model.isAutoClearEnabled)
                         ToggleMenuItem(UserText.warnBeforeQuit,
                                        isOn: $model.isWarnBeforeClearingEnabled)
-                        .disabled(!model.isBurnDataOnQuitEnabled)
+                        .disabled(!model.isAutoClearEnabled)
                         .padding(.leading, 16)
                     }
 

@@ -1,5 +1,5 @@
 //
-//  BurnOnQuitHandler.swift
+//  AutoClearHandler.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Foundation
 import Combine
 
-final class BurnOnQuitHandler {
+final class AutoClearHandler {
 
     private let preferences: DataClearingPreferences
     private let fireViewModel: FireViewModel
@@ -29,17 +29,17 @@ final class BurnOnQuitHandler {
         self.fireViewModel = fireViewModel
     }
 
-    var onBurnOnQuitCompleted: (() -> Void)?
+    var onAutoClearCompleted: (() -> Void)?
 
     @MainActor
     func handleAppTermination() -> NSApplication.TerminateReply? {
-        guard preferences.isBurnDataOnQuitEnabled else { return nil }
+        guard preferences.isAutoClearEnabled else { return nil }
 
-        if preferences.isWarnBeforeClearingEnabled, !confirmBurnOnQuit() {
+        if preferences.isWarnBeforeClearingEnabled, !confirmAutoClear() {
             return .terminateCancel
         }
 
-        performBurnOnQuit()
+        performAutoClear()
         return .terminateLater
     }
 
@@ -49,17 +49,17 @@ final class BurnOnQuitHandler {
 
     // MARK: - Private
 
-    private func confirmBurnOnQuit() -> Bool {
-        let alert = NSAlert.burnOnQuitAlert()
+    private func confirmAutoClear() -> Bool {
+        let alert = NSAlert.autoClearAlert()
         let response = alert.runModal()
         return response == .alertFirstButtonReturn
     }
 
     @MainActor
-    private func performBurnOnQuit() {
+    private func performAutoClear() {
         fireViewModel.fire.burnAll { [weak self] in
             self?.appTerminationHandledCorrectly = true
-            self?.onBurnOnQuitCompleted?()
+            self?.onAutoClearCompleted?()
         }
     }
 
@@ -72,7 +72,7 @@ final class BurnOnQuitHandler {
     @MainActor
     @discardableResult
     func burnOnStartIfNeeded() -> Bool {
-        let shouldBurnOnStart = preferences.isBurnDataOnQuitEnabled && !appTerminationHandledCorrectly
+        let shouldBurnOnStart = preferences.isAutoClearEnabled && !appTerminationHandledCorrectly
         guard shouldBurnOnStart else { return false }
 
         fireViewModel.fire.burnAll()

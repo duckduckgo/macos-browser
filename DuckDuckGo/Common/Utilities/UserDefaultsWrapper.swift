@@ -55,7 +55,7 @@ public struct UserDefaultsWrapper<T> {
         case grammarCheckEnabledOnce = "grammar.check.enabled.once"
 
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
-        case burnDataOnQuitEnabled = "preferences.burn-data-on-quit-enabled"
+        case autoClearEnabled = "preferences.auto-clear-enabled"
         case warnBeforeClearingEnabled = "preferences.warn-before-clearing-enabled"
         case clearDataAfter = "preferences.clear-data-after"
         case gpcEnabled = "preferences.gpc-enabled"

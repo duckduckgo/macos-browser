@@ -1045,18 +1045,17 @@ struct UserText {
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
     static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button.", comment: "Fireproofing mechanism explanation")
     static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites…", comment: "Fireproof settings button caption")
-    static let automaticallyClearData = NSLocalizedString("automatically.clear.data", value: "Automatically Clear", comment: "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.")
-    static let burnDataOnQuit = NSLocalizedString("burn.data.on.quit", value: "Clear Data upon Quitting", comment: "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.")
-    static let burnDataOnQuitExplanation = NSLocalizedString("burn.data.on.quit.explanation", value: "Data from \"Fireproofed\" sites won't be cleared, keeping your essential logins and preferences intact.", comment: "Explanation of a setting which configures clearing data automatically after quitting the app.")
-    static let warnBeforeQuit = NSLocalizedString("warn.before.quit", value: "Warn before Quit", comment: "Label after the checkbox in Settings which configures a warning before clearing data on the application termination.")
-    static let warnBeforeQuitDialogHeader = NSLocalizedString("warn.before.quit.dialog.header", value: "Quit the application and \nclear all data?", comment: "A header of warning before clearing data on the application termination.")
-    static let warnBeforeQuitDialogMessage = NSLocalizedString("warn.before.quit.dialog.message", value: "Cookies and site data for all sites will be cleared, unless the site is Fireproof.", comment: "A warning before clearing data on the application termination.")
+    static let autoClear = NSLocalizedString("auto.clear", value: "Auto-Clear", comment: "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.")
+    static let automaticallyClearData = NSLocalizedString("automatically.clear.data", value: "Automatically clear browsing data when DuckDuckGo quits", comment: "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.")
+    static let warnBeforeQuit = NSLocalizedString("warn.before.quit", value: "Warn me that data will be cleared when quitting", comment: "Label after the checkbox in Settings which configures a warning before clearing data on the application termination.")
+    static let warnBeforeQuitDialogHeader = NSLocalizedString("warn.before.quit.dialog.header", value: "Clear browsing data and quit\nDuckDuckGo?", comment: "A header of warning before clearing data on the application termination.")
+    static let warnBeforeQuitDialogCheckboxMessage = NSLocalizedString("warn.before.quit.dialog.checkbox.message", value: "Warn me every time", comment: "A label after checkbox to configure the warning before clearing data on the application termination.")
 
-    static func disableBurnOnQuitToEnableSessionRestore() -> String {
-        let localized = NSLocalizedString("disable.burn.on.quit.to.enable.session.restore",
+    static func disableAutoClearToEnableSessionRestore() -> String {
+        let localized = NSLocalizedString("disable.auto.clear.to.enable.session.restore",
                                           value: "Disable the %@ setting to enable session restore on startup.",
                                           comment: "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit")
-        return String(format: localized, automaticallyClearData)
+        return String(format: localized, autoClear)
     }
     static func showDataClearingSettings() -> String {
         let localized = NSLocalizedString("show.data.clearing.settings",

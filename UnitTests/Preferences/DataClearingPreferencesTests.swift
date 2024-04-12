@@ -21,7 +21,7 @@ import XCTest
 
 class MockFireButtonPreferencesPersistor: FireButtonPreferencesPersistor {
 
-    var burnDataOnQuitEnabled: Bool = false
+    var autoClearEnabled: Bool = false
     var warnBeforeClearingEnabled: Bool = false
     var loginDetectionEnabled: Bool = false
 

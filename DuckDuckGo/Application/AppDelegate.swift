@@ -70,7 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let internalUserDecider: InternalUserDecider
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
-    private var burnOnQuitHandler: BurnOnQuitHandler!
+    private var autoClearHandler: AutoClearHandler!
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
@@ -313,7 +313,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #endif
 
-        setUpBurnOnQuitHandler()
+        setUpAutoClearHandler()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -352,7 +352,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         stateRestorationManager?.applicationWillTerminate()
 
         // Handling of "Burn on quit"
-        if let terminationReply = burnOnQuitHandler.handleAppTermination() {
+        if let terminationReply = autoClearHandler.handleAppTermination() {
             return terminationReply
         }
 
@@ -556,11 +556,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func setUpBurnOnQuitHandler() {
-        burnOnQuitHandler = BurnOnQuitHandler(preferences: .shared, fireViewModel: FireCoordinator.fireViewModel)
-        burnOnQuitHandler.burnOnStartIfNeeded()
-        burnOnQuitHandler.resetTheFlag()
-        burnOnQuitHandler.onBurnOnQuitCompleted = {
+    private func setUpAutoClearHandler() {
+        autoClearHandler = AutoClearHandler(preferences: .shared, fireViewModel: FireCoordinator.fireViewModel)
+        autoClearHandler.burnOnStartIfNeeded()
+        autoClearHandler.resetTheFlag()
+        autoClearHandler.onAutoClearCompleted = {
             NSApplication.shared.reply(toApplicationShouldTerminate: true)
         }
     }

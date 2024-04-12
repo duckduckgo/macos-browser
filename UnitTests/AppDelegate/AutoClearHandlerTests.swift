@@ -1,5 +1,5 @@
 //
-//  BurnOnQuitHandlerTests.swift
+//  AutoClearHandlerTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -22,9 +22,9 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
-class BurnOnQuitHandlerTests: XCTestCase {
+class AutoClearHandlerTests: XCTestCase {
 
-    var handler: BurnOnQuitHandler!
+    var handler: AutoClearHandler!
     var preferences: DataClearingPreferences!
     var fireViewModel: FireViewModel!
 
@@ -33,7 +33,7 @@ class BurnOnQuitHandlerTests: XCTestCase {
         let persistor = MockFireButtonPreferencesPersistor()
         preferences = DataClearingPreferences(persistor: persistor)
         fireViewModel = FireViewModel(fire: Fire(tld: ContentBlocking.shared.tld))
-        handler = BurnOnQuitHandler(preferences: preferences, fireViewModel: fireViewModel)
+        handler = AutoClearHandler(preferences: preferences, fireViewModel: fireViewModel)
     }
 
     override func tearDown() {
@@ -44,7 +44,7 @@ class BurnOnQuitHandlerTests: XCTestCase {
     }
 
     func testWhenBurningEnabledAndNoWarningRequiredThenTerminateLaterIsReturned() {
-            preferences.isBurnDataOnQuitEnabled = true
+            preferences.isAutoClearEnabled = true
             preferences.isWarnBeforeClearingEnabled = false
 
             let response = handler.handleAppTermination()
@@ -53,7 +53,7 @@ class BurnOnQuitHandlerTests: XCTestCase {
         }
 
         func testWhenBurningDisabledThenNoTerminationResponse() {
-            preferences.isBurnDataOnQuitEnabled = false
+            preferences.isAutoClearEnabled = false
 
             let response = handler.handleAppTermination()
 
@@ -61,14 +61,14 @@ class BurnOnQuitHandlerTests: XCTestCase {
         }
 
         func testWhenBurningEnabledAndFlagFalseThenBurnOnStartTriggered() {
-            preferences.isBurnDataOnQuitEnabled = true
+            preferences.isAutoClearEnabled = true
             handler.resetTheFlag()
 
             XCTAssertTrue(handler.burnOnStartIfNeeded())
         }
 
         func testWhenBurningDisabledThenBurnOnStartNotTriggered() {
-            preferences.isBurnDataOnQuitEnabled = false
+            preferences.isAutoClearEnabled = false
             handler.resetTheFlag()
 
             XCTAssertFalse(handler.burnOnStartIfNeeded())

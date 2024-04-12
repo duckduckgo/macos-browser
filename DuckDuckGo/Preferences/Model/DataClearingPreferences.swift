@@ -20,7 +20,6 @@ import Foundation
 
 final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
 
-    static let burnOnQuitNotificationKey = "isBurnDataOnQuitEnabled"
     static let shared = DataClearingPreferences()
 
     @Published
@@ -31,10 +30,10 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
     }
 
     @Published
-    var isBurnDataOnQuitEnabled: Bool {
+    var isAutoClearEnabled: Bool {
         didSet {
-            persistor.burnDataOnQuitEnabled = isBurnDataOnQuitEnabled
-            NotificationCenter.default.post(name: .burnDataOnQuitDidChange,
+            persistor.autoClearEnabled = isAutoClearEnabled
+            NotificationCenter.default.post(name: .autoClearDidChange,
                                             object: nil,
                                             userInfo: nil)
         }
@@ -64,7 +63,7 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
     init(persistor: FireButtonPreferencesPersistor = FireButtonPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         isLoginDetectionEnabled = persistor.loginDetectionEnabled
-        isBurnDataOnQuitEnabled = persistor.burnDataOnQuitEnabled
+        isAutoClearEnabled = persistor.autoClearEnabled
         isWarnBeforeClearingEnabled = persistor.warnBeforeClearingEnabled
     }
 
@@ -73,7 +72,7 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
 
 protocol FireButtonPreferencesPersistor {
     var loginDetectionEnabled: Bool { get set }
-    var burnDataOnQuitEnabled: Bool { get set }
+    var autoClearEnabled: Bool { get set }
     var warnBeforeClearingEnabled: Bool { get set }
 }
 
@@ -82,8 +81,8 @@ struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersisto
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: false)
     var loginDetectionEnabled: Bool
 
-    @UserDefaultsWrapper(key: .burnDataOnQuitEnabled, defaultValue: false)
-    var burnDataOnQuitEnabled: Bool
+    @UserDefaultsWrapper(key: .autoClearEnabled, defaultValue: false)
+    var autoClearEnabled: Bool
 
     @UserDefaultsWrapper(key: .warnBeforeClearingEnabled, defaultValue: false)
     var warnBeforeClearingEnabled: Bool
@@ -91,5 +90,5 @@ struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersisto
 }
 
 extension Notification.Name {
-    static let burnDataOnQuitDidChange = Notification.Name("burnDataOnQuitDidChange")
+    static let autoClearDidChange = Notification.Name("autoClearDidChange")
 }
