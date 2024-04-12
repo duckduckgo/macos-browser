@@ -251,12 +251,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .showFAQ)
                     }),
+                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
+                        await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                    }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .justOpen)
                     }),
-                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .shareFeedback)
-                    })
                 ]
             },
             agentLoginItem: nil,
