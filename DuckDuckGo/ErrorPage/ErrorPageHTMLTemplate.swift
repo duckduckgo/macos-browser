@@ -144,7 +144,6 @@ public enum SSLErrorType {
     }
 
     func specificMessage(for domain: String, eTldPlus1: String) -> String {
-        let tld = TLD()
         let boldDomain = "<span style=\"font-weight: 600;\">\(domain)</span>"
         let boldETldPlus1 = "<span style=\"font-weight: 600;\">\(eTldPlus1)</span>"
         switch self {
