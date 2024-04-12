@@ -36,37 +36,27 @@ final class WebView: WKWebView {
     weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
 
     private var isLoadingObserver: Any?
-    private var trackingAreaSuppressor: TrackingAreaSuppressor?
-    private var proxiedTrackingArea: NSTrackingArea?
 
     override func addTrackingArea(_ trackingArea: NSTrackingArea) {
-        var trackingArea = trackingArea
-        /// replace NSTrackingArea with owner proxied with TrackingAreaSuppressor.
-        /// it will disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
+        /// disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
         /// see https://app.asana.com/0/1177771139624306/1206990108527681/f
-        if let mouseTrackingObserver = trackingArea.owner, mouseTrackingObserver.className == "WKMouseTrackingObserver" {
-            let suppressor = TrackingAreaSuppressor(owner: mouseTrackingObserver)
-            suppressor.isSuppressingMouseEvents = self.trackingAreaSuppressor?.isSuppressingMouseEvents ?? false
-            self.trackingAreaSuppressor = suppressor
-
+        if trackingArea.owner?.className == "WKMouseTrackingObserver" {
             // suppress Tracking Area events while loading
-            isLoadingObserver = self.observe(\.isLoading, options: [.new]) { [weak suppressor] _, c in
-                suppressor?.isSuppressingMouseEvents = c.newValue /* isLoading */ ?? false
+            isLoadingObserver = self.observe(\.isLoading, options: [.new]) { [weak self, trackingArea] _, c in
+                if c.newValue /* isLoading */ ?? false {
+                    guard let self, self.trackingAreas.contains(trackingArea) else { return }
+                    removeTrackingArea(trackingArea)
+                } else {
+                    guard let self, !self.trackingAreas.contains(trackingArea) else { return }
+                    superAddTrackingArea(trackingArea)
+                }
             }
-
-            trackingArea = NSTrackingArea(rect: trackingArea.rect, options: trackingArea.options, owner: suppressor, userInfo: trackingArea.userInfo)
-            self.proxiedTrackingArea = trackingArea
         }
         super.addTrackingArea(trackingArea)
     }
 
-    override func removeTrackingArea(_ trackingArea: NSTrackingArea) {
-        var trackingArea = trackingArea
-        if trackingArea.owner?.className == "WKMouseTrackingObserver", let proxiedTrackingArea {
-            trackingArea = proxiedTrackingArea
-            self.proxiedTrackingArea = nil
-        }
-        super.removeTrackingArea(trackingArea)
+    private func superAddTrackingArea(_ trackingArea: NSTrackingArea) {
+        super.addTrackingArea(trackingArea)
     }
 
     override var isInFullScreenMode: Bool {
@@ -356,37 +346,6 @@ extension WebView /* _WKFindDelegate */ {
             self.findInPageCompletionHandler = nil
             findInPageCompletionHandler(.notFound)
         }
-    }
-
-}
-
-/// used to suppress mouseEntered/mouseMoved/mouseExited events while Web View is loading
-final private class TrackingAreaSuppressor: NSObject {
-
-    private weak var owner: AnyObject?
-
-    var isSuppressingMouseEvents = false
-
-    init(owner: AnyObject? = nil) {
-        self.owner = owner
-    }
-
-    @objc(mouseEntered:)
-    func mouseEntered(with event: NSEvent) {
-        guard !isSuppressingMouseEvents else { return }
-        _=owner?.perform(#selector(mouseEntered), with: event)
-    }
-
-    @objc(mouseExited:)
-    func mouseExited(with event: NSEvent) {
-        guard !isSuppressingMouseEvents else { return }
-        _=owner?.perform(#selector(mouseExited), with: event)
-    }
-
-    @objc(mouseMoved:)
-    func mouseMoved(with event: NSEvent) {
-        guard !isSuppressingMouseEvents else { return }
-        _=owner?.perform(#selector(mouseMoved), with: event)
     }
 
 }
