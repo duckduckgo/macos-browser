@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "4699a5ff3d0669736e87f6da808884f245d80ede",
-        "version" : "133.1.0"
+        "branch" : "anh/netp/location-selection",
+        "revision" : "dc6725de9e7019ef7e2b0bb7438b9d98010808f8"
       }
     },
     {
