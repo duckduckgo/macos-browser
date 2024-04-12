@@ -119,6 +119,30 @@
         }
       }
     },
+    "alert.sync-device-auth-error" : {
+      "comment" : "Title for an error alert",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup Error"
+          }
+        }
+      }
+    },
+    "alert.sync-device-auth-error-button" : {
+      "comment" : "Button Title of an error alert",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Go to Settings"
+          }
+        }
+      }
+    },
     "alert.sync-error" : {
       "comment" : "Title for sync error alert",
       "extractionState" : "extracted_with_value",
@@ -175,6 +199,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка синхронизации и резервного копирования"
+          }
+        }
+      }
+    },
+    "alert.unable-to-authenticate-device" : {
+      "comment" : "Description for  unable to authenticate error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A device password is required to use Sync & Backup."
           }
         }
       }
