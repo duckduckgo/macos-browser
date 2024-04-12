@@ -44,7 +44,7 @@ final class WebView: WKWebView {
         super.init(frame: frame, configuration: configuration)
 
         // suppress Tracking Area events while loading
-        let suppressor = suppressor=trackingAreas.first?.trackingAreaSuppressor
+        let suppressor = trackingAreas.first?.trackingAreaSuppressor
         isLoadingObserver = self.observe(\.isLoading, options: [.new]) { [weak suppressor] _, c in
             suppressor?.isSuppressingMouseEvents = c.newValue /* isLoading */ ?? false
         }
