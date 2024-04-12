@@ -34,24 +34,39 @@ final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
     weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
-    private var isLoadingObserver: Any?
 
-    override init(frame: CGRect, configuration: WKWebViewConfiguration) {
+    private var isLoadingObserver: Any?
+    private var trackingAreaSuppressor: TrackingAreaSuppressor?
+    private var proxiedTrackingArea: NSTrackingArea?
+
+    override func addTrackingArea(_ trackingArea: NSTrackingArea) {
+        var trackingArea = trackingArea
         /// swizzle NSTrackingArea.init method to insert TrackingAreaSuppressor proxy owner
         /// it will disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
         /// see https://app.asana.com/0/1177771139624306/1206990108527681/f
-        _=NSTrackingArea.swizzleInitWithRectOptionsOwnerUserInfoOnce
-        super.init(frame: frame, configuration: configuration)
+        if let mouseTrackingObserver = trackingArea.owner, mouseTrackingObserver.className == "WKMouseTrackingObserver" {
+            let suppressor = TrackingAreaSuppressor(owner: mouseTrackingObserver)
+            suppressor.isSuppressingMouseEvents = self.trackingAreaSuppressor?.isSuppressingMouseEvents ?? false
+            self.trackingAreaSuppressor = suppressor
 
-        // suppress Tracking Area events while loading
-        let suppressor = trackingAreas.first?.trackingAreaSuppressor
-        isLoadingObserver = self.observe(\.isLoading, options: [.new]) { [weak suppressor] _, c in
-            suppressor?.isSuppressingMouseEvents = c.newValue /* isLoading */ ?? false
+            // suppress Tracking Area events while loading
+            isLoadingObserver = self.observe(\.isLoading, options: [.new]) { [weak suppressor] _, c in
+                suppressor?.isSuppressingMouseEvents = c.newValue /* isLoading */ ?? false
+            }
+
+            trackingArea = NSTrackingArea(rect: trackingArea.rect, options: trackingArea.options, owner: suppressor, userInfo: trackingArea.userInfo)
+            self.proxiedTrackingArea = trackingArea
         }
+        super.addTrackingArea(trackingArea)
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("\(Self.self): Bad initializer")
+    override func removeTrackingArea(_ trackingArea: NSTrackingArea) {
+        var trackingArea = trackingArea
+        if trackingArea.owner?.className == "WKMouseTrackingObserver", let proxiedTrackingArea {
+            trackingArea = proxiedTrackingArea
+            self.proxiedTrackingArea = nil
+        }
+        super.removeTrackingArea(trackingArea)
     }
 
     override var isInFullScreenMode: Bool {
@@ -372,48 +387,6 @@ final private class TrackingAreaSuppressor: NSObject {
     func mouseMoved(with event: NSEvent) {
         guard !isSuppressingMouseEvents else { return }
         _=owner?.perform(#selector(mouseMoved), with: event)
-    }
-
-}
-
-/// adding the TrackingAreaSuppressor proxy object as a WebView‘s Tracking Area owner
-extension NSTrackingArea {
-
-    private static let originalInitWithRectOptionsOwnerUserInfo = {
-        class_getInstanceMethod(NSTrackingArea.self, #selector(NSTrackingArea.init(rect:options:owner:userInfo:)))!
-    }()
-    private static let swizzledInitWithRectOptionsOwnerUserInfo = {
-        class_getInstanceMethod(NSTrackingArea.self, #selector(NSTrackingArea.swizzled_init(rect:options:owner:userInfo:)))!
-    }()
-
-    fileprivate static let swizzleInitWithRectOptionsOwnerUserInfoOnce: Void = {
-        method_exchangeImplementations(originalInitWithRectOptionsOwnerUserInfo, swizzledInitWithRectOptionsOwnerUserInfo)
-    }()
-
-    @objc private dynamic func swizzled_init(rect: NSRect, options: NSTrackingArea.Options, owner: AnyObject?, userInfo: NSDictionary) -> AnyObject? {
-        var owner = owner
-        var trackingAreaSuppressor: TrackingAreaSuppressor?
-        if owner?.className == "WKMouseTrackingObserver" {
-            trackingAreaSuppressor = TrackingAreaSuppressor(owner: owner)
-            owner = trackingAreaSuppressor
-        }
-
-        defer {
-            if let trackingAreaSuppressor {
-                self.trackingAreaSuppressor = trackingAreaSuppressor
-            }
-        }
-        return self.swizzled_init(rect: rect, options: options, owner: owner, userInfo: userInfo) /* call original */
-    }
-
-    private static let trackingAreaSuppressorKey = UnsafeRawPointer(bitPattern: "trackingAreaSuppressorKey".hashValue)!
-    fileprivate private(set) var trackingAreaSuppressor: TrackingAreaSuppressor? {
-        get {
-            objc_getAssociatedObject(self, Self.trackingAreaSuppressorKey) as? TrackingAreaSuppressor
-        }
-        set {
-            objc_setAssociatedObject(self, Self.trackingAreaSuppressorKey, newValue, .OBJC_ASSOCIATION_RETAIN)
-        }
     }
 
 }
