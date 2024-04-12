@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 import WebKit
 
 protocol WebViewContextMenuDelegate: AnyObject {
@@ -34,6 +35,24 @@ final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
     weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
+    private var isLoadingCancellable: Cancellable?
+
+    override init(frame: CGRect, configuration: WKWebViewConfiguration) {
+        /// swizzle NSTrackingArea.init method to insert TrackingAreaSuppressor proxy owner
+        /// it will disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
+        /// see https://app.asana.com/0/1177771139624306/1206990108527681/f
+        _=NSTrackingArea.swizzleStartStopAccessingSecurityScopedResourceOnce
+        super.init(frame: frame, configuration: configuration)
+
+        // suppress Tracking Area events while loading
+        isLoadingCancellable = self.observe(\.isLoading, options: [.new]) { [weak suppressor=trackingAreas.first?.proxyOwner] _, c in
+            suppressor?.isSuppressingMouseEvents = c.newValue /* isLoading */ ?? false
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
 
     override var isInFullScreenMode: Bool {
         if #available(macOS 13.0, *) {
@@ -321,6 +340,78 @@ extension WebView /* _WKFindDelegate */ {
         if let findInPageCompletionHandler {
             self.findInPageCompletionHandler = nil
             findInPageCompletionHandler(.notFound)
+        }
+    }
+
+}
+
+/// used to suppress mouseEntered/mouseMoved/mouseExited events while Web View is loading
+final private class TrackingAreaSuppressor {
+
+    private weak var owner: AnyObject?
+
+    var isSuppressingMouseEvents = false
+
+    init(owner: AnyObject? = nil) {
+        self.owner = owner
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    @objc(mouseEntered:)
+    func mouseEntered(with event: NSEvent) {
+        guard !isSuppressingMouseEvents else { return }
+        _=owner?.perform(#selector(mouseEntered), with: event)
+    }
+
+    @objc(mouseExited:)
+    func mouseExited(with event: NSEvent) {
+        guard !isSuppressingMouseEvents else { return }
+        _=owner?.perform(#selector(mouseExited), with: event)
+    }
+
+    @objc(mouseMoved:)
+    func mouseMoved(with event: NSEvent) {
+        guard !isSuppressingMouseEvents else { return }
+        _=owner?.perform(#selector(mouseMoved), with: event)
+    }
+
+}
+
+/// adding the TrackingAreaSuppressor proxy object as a WebView‘s Tracking Area owner
+extension NSTrackingArea {
+
+    private static let originalInitWithRectOptionsOwnerUserInfo = {
+        class_getInstanceMethod(NSTrackingArea.self, #selector(NSTrackingArea.init(rect:options:owner:userInfo:)))!
+    }()
+    private static let swizzledInitWithRectOptionsOwnerUserInfo = {
+        class_getInstanceMethod(NSTrackingArea.self, #selector(NSTrackingArea.swizzled_init(rect:options:owner:userInfo:)))!
+    }()
+
+    fileprivate static let swizzleStartStopAccessingSecurityScopedResourceOnce: Void = {
+        method_exchangeImplementations(originalInitWithRectOptionsOwnerUserInfo, swizzledInitWithRectOptionsOwnerUserInfo)
+    }()
+
+    @objc private dynamic func swizzled_init(rect: NSRect, options: NSTrackingArea.Options, owner: AnyObject?, userInfo: NSDictionary) -> AnyObject? {
+        var owner = owner
+        if owner?.className == "WKMouseTrackingObserver" {
+            let helper = TrackingAreaSuppressor(owner: owner)
+            self.proxyOwner = helper
+            owner = helper
+        }
+
+        return self.swizzled_init(rect: rect, options: options, owner: owner, userInfo: userInfo) /* call original */
+    }
+
+    private static let proxyOwnerKey = UnsafeRawPointer(bitPattern: "proxyHandlerKey".hashValue)!
+    fileprivate private(set) var proxyOwner: TrackingAreaSuppressor? {
+        get {
+            objc_getAssociatedObject(self, Self.proxyOwnerKey) as? TrackingAreaSuppressor
+        }
+        set {
+            objc_setAssociatedObject(self, Self.proxyOwnerKey, newValue, .OBJC_ASSOCIATION_RETAIN)
         }
     }
 
