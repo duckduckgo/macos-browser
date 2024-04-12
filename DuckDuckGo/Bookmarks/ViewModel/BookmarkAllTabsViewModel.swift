@@ -35,6 +35,7 @@ final class BookmarkAllTabsViewModel: BookmarkAllTabsDialogEditing {
     }()
 
     private let websites: [WebsiteInfo]
+    private let foldersStore: BookmarkFoldersStore
     private let bookmarkManager: BookmarkManager
 
     private var folderCancellable: AnyCancellable?
@@ -59,15 +60,19 @@ final class BookmarkAllTabsViewModel: BookmarkAllTabsDialogEditing {
 
     init(
         websites: [WebsiteInfo],
+        foldersStore: BookmarkFoldersStore,
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
         dateProvider: () -> Date = Date.init
     ) {
         self.websites = websites
+        self.foldersStore = foldersStore
         self.bookmarkManager = bookmarkManager
 
         let dateString = Self.dateFormatter.string(from: dateProvider())
         folderName = String(format: UserText.Bookmarks.Dialog.Value.folderName, dateString, websites.count)
         folders = .init(bookmarkManager.list)
+        // TODO: Get Folder id from Folders Store and retrieve folder from Bookmark manager https://app.asana.com/0/0/1207032959154796/f
+
         bind()
     }
 
@@ -76,7 +81,16 @@ final class BookmarkAllTabsViewModel: BookmarkAllTabsDialogEditing {
     }
 
     func addOrSave(dismiss: () -> Void) {
+        // Save last used folder
+        foldersStore.lastBookmarkAllTabsFolderIdUsed = selectedFolder?.id
+
+        // Save all bookmarks
+        let parentFolder: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
+        bookmarkManager.bookmarkAll(websitesInfo: websites, withinParentFolder: parentFolder)
+
+        // Dismiss the view
         dismiss()
+
     }
 }
 

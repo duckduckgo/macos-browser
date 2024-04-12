@@ -46,7 +46,7 @@ protocol BookmarkManager: AnyObject {
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
-
+    func bookmarkAll(websitesInfo: [WebsiteInfo], withinParentFolder: ParentFolderType)
     func handleFavoritesAfterDisablingSync()
 
     // Wrapper definition in a protocol is not supported yet
@@ -346,6 +346,10 @@ final class LocalBookmarkManager: BookmarkManager {
         requestSync()
 
         return results
+    }
+
+    func bookmarkAll(websitesInfo: [WebsiteInfo], withinParentFolder: ParentFolderType) {
+        // TODO: https://app.asana.com/0/0/1207032959154802/f
     }
 
     // MARK: - Sync

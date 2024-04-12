@@ -79,7 +79,7 @@ enum BookmarksDialogViewFactory {
         let viewModel = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
         return makeAddEditBookmarkDialogView(viewModel: viewModel, bookmarkManager: bookmarkManager)
     }
-    
+
     /// Creates an instance of AddEditBookmarkDialogView for adding Bookmarks for all the open Tabs.
     /// - Parameters:
     ///   - websitesInfo: A list of websites to add as bookmarks.
@@ -87,7 +87,7 @@ enum BookmarksDialogViewFactory {
     /// - Returns: An instance of BookmarkAllTabsDialogView
     static func makeBookmarkAllOpenTabsView(websitesInfo: [WebsiteInfo], bookmarkManager: LocalBookmarkManager = .shared) -> BookmarkAllTabsDialogView {
         let addFolderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
-        let bookmarkAllTabsViewModel = BookmarkAllTabsViewModel(websites: websitesInfo, bookmarkManager: bookmarkManager)
+        let bookmarkAllTabsViewModel = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: UserDefaultsBookmarkFoldersStore(), bookmarkManager: bookmarkManager)
         let viewModel = BookmarkAllTabsDialogCoordinatorViewModel(bookmarkModel: bookmarkAllTabsViewModel, folderModel: addFolderViewModel)
         return BookmarkAllTabsDialogView(viewModel: viewModel)
     }
