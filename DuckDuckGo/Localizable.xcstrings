@@ -31103,7 +31103,7 @@
     },
     "no.access.to.selected.folder" : {
       "comment" : "Alert presented to user if the app doesn't have rights to access selected folder",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -31163,7 +31163,7 @@
     },
     "no.access.to.selected.folder.header" : {
       "comment" : "Header of the alert dialog informing user about failed download",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
