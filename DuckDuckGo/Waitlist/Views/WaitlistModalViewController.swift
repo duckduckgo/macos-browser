@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import SwiftUI
 import UserNotifications
@@ -107,5 +105,3 @@ struct WaitlistModalDismisser {
         }
     }
 }
-
-#endif

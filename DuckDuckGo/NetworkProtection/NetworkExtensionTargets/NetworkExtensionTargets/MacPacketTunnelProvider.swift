@@ -151,7 +151,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionActiveUser,
                 frequency: .dailyOnly,
-                withAdditionalParameters: ["cohort": PixelKit.dateString(for: defaults.vpnFirstEnabled)],
+                withAdditionalParameters: [PixelKit.Parameters.vpnCohort: PixelKit.cohort(from: defaults.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
         case .reportConnectionAttempt(attempt: let attempt):
             switch attempt {

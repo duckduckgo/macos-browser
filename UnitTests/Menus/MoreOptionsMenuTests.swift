@@ -16,14 +16,13 @@
 //  limitations under the License.
 //
 
+import Combine
+import NetworkProtection
+import NetworkProtectionUI
 import XCTest
 
 #if SUBSCRIPTION
 import Subscription
-#endif
-
-#if NETWORK_PROTECTION
-import NetworkProtection
 #endif
 
 @testable import DuckDuckGo_Privacy_Browser
@@ -35,27 +34,18 @@ final class MoreOptionsMenuTests: XCTestCase {
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     @MainActor
     lazy var moreOptionMenu: MoreOptionsMenu! = {
-#if NETWORK_PROTECTION
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: passwordManagerCoordinator,
                                    networkProtectionFeatureVisibility: networkProtectionVisibilityMock,
                                    sharingMenu: NSMenu(),
                                    internalUserDecider: internalUserDecider)
-#else
-        let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                   passwordManagerCoordinator: passwordManagerCoordinator,
-                                   sharingMenu: NSMenu(),
-                                   internalUserDecider: internalUserDecider)
-#endif
         menu.actionDelegate = capturingActionDelegate
         return menu
     }()
 
     var internalUserDecider: InternalUserDeciderMock!
 
-#if NETWORK_PROTECTION
     var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
-#endif
 
     @MainActor
     override func setUp() {
@@ -65,9 +55,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
 
-#if NETWORK_PROTECTION
         networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(isInstalled: false, visible: false)
-#endif
     }
 
     @MainActor
@@ -81,18 +69,11 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     @MainActor
     func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsEnabled() {
-#if NETWORK_PROTECTION
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
                                          networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
                                          sharingMenu: NSMenu(),
                                          internalUserDecider: internalUserDecider)
-#else
-        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                         passwordManagerCoordinator: passwordManagerCoordinator,
-                                         sharingMenu: NSMenu(),
-                                         internalUserDecider: internalUserDecider)
-#endif
 
         XCTAssertEqual(moreOptionMenu.items[0].title, UserText.sendFeedback)
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
@@ -108,7 +89,6 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
 
-#if NETWORK_PROTECTION
         if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
             XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
             XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.networkProtection))
@@ -121,26 +101,15 @@ final class MoreOptionsMenuTests: XCTestCase {
             XCTAssertTrue(moreOptionMenu.items[15].isSeparatorItem)
             XCTAssertEqual(moreOptionMenu.items[16].title, UserText.settings)
         }
-#else
-        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
-#endif
     }
 
     @MainActor
     func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsDisabled() {
-#if NETWORK_PROTECTION
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
                                          networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: false),
                                          sharingMenu: NSMenu(),
                                          internalUserDecider: internalUserDecider)
-#else
-        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                         passwordManagerCoordinator: passwordManagerCoordinator,
-                                         sharingMenu: NSMenu(),
-                                         internalUserDecider: internalUserDecider)
-#endif
 
         XCTAssertEqual(moreOptionMenu.items[0].title, UserText.sendFeedback)
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
@@ -196,8 +165,10 @@ final class MoreOptionsMenuTests: XCTestCase {
 
 }
 
-#if NETWORK_PROTECTION
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
+    var onboardStatusPublisher: AnyPublisher<NetworkProtectionUI.OnboardingStatus, Never> {
+        Just(.default).eraseToAnyPublisher()
+    }
 
     var isInstalled: Bool
     var visible: Bool
@@ -239,4 +210,3 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return false
     }
 }
-#endif

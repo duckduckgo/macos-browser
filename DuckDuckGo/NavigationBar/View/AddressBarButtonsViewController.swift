@@ -272,7 +272,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updateBookmarkButtonVisibility() {
         guard view.window?.isPopUpWindow == false else { return }
-        bookmarkButton.setAccessibilityIdentifier("Bookmarks Button")
+        bookmarkButton.setAccessibilityIdentifier("AddressBarButtonsViewController.bookmarkButton")
         let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
         var showBookmarkButton: Bool {
             guard let tabViewModel, tabViewModel.canBeBookmarked else { return false }
@@ -553,7 +553,13 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func setupAnimationViews() {
-        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?, animationName: String, renderingEngine: Lottie.RenderingEngineOption = .automatic) -> LottieAnimationView {
+
+        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?,
+                                               animationName: String,
+                                               // Default use of .mainThread to prevent high WindowServer Usage
+                                               // Pending Fix with newer Lottie versions
+                                               // https://app.asana.com/0/1177771139624306/1207024603216659/f
+                                               renderingEngine: Lottie.RenderingEngineOption = .mainThread) -> LottieAnimationView {
             if let animationView = animationView, animationView.identifier?.rawValue == animationName {
                 return animationView
             }
@@ -727,15 +733,18 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
         if let url = tabViewModel?.tab.content.url,
-           isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
+           isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url)
+        {
             bookmarkButton.image = .bookmarkFilled
             bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
             bookmarkButton.toolTip = UserText.editBookmarkTooltip
+            bookmarkButton.setAccessibilityValue("Bookmarked")
         } else {
             bookmarkButton.mouseOverTintColor = nil
             bookmarkButton.image = .bookmark
             bookmarkButton.contentTintColor = nil
             bookmarkButton.toolTip = UserText.addBookmarkTooltip
+            bookmarkButton.setAccessibilityValue("Unbookmarked")
         }
     }
 

@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Combine
 import SwiftUI
@@ -420,16 +418,16 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case SystemExtensionRequestError.unknownRequestResult:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionUnknownActivationError
-            case SystemExtensionRequestError.willActivateAfterReboot:
+            case OSSystemExtensionError.extensionNotFound,
+                SystemExtensionRequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
             default:
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
             }
 
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure,
+                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure(error),
                 frequency: .standard,
-                withError: error,
                 includeAppVersionParameter: true
             )
 
@@ -764,5 +762,3 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         "ddg:\(token)"
     }
 }
-
-#endif
