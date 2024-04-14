@@ -7432,6 +7432,18 @@
         }
       }
     },
+    "bookmark.all.tabs" : {
+      "comment" : "Menu item for bookmarking all the open tabs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark All Tabs…"
+          }
+        }
+      }
+    },
     "bookmark.dialog.add" : {
       "comment" : "Button to confim a bookmark creation",
       "extractionState" : "extracted_with_value",

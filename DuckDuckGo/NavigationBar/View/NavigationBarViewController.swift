@@ -1005,6 +1005,11 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
 
+    func optionsButtonMenuRequestedBookmarkAllOpenTabs(_ sender: NSMenuItem) {
+        // TODO: https://app.asana.com/0/0/1207032400501907/f
+        print(#function)
+    }
+
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
         popovers.showBookmarkListPopover(usingView: bookmarkListButton,
                                          withDelegate: self,

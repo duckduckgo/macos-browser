@@ -465,6 +465,7 @@ struct UserText {
     static let editFavorite = NSLocalizedString("edit.favorite", value: "Edit Favorite", comment: "Header of the view that edits a favorite bookmark")
     static let removeFromFavorites = NSLocalizedString("remove.from.favorites", value: "Remove from Favorites", comment: "Button for removing bookmarks from favorites")
     static let bookmarkThisPage = NSLocalizedString("bookmark.this.page", value: "Bookmark This Page", comment: "Menu item for bookmarking current page")
+    static let bookmarkAllTabs = NSLocalizedString("bookmark.all.tabs", value: "Bookmark All Tabs…", comment: "Menu item for bookmarking all the open tabs")
     static let bookmarksShowToolbarPanel = NSLocalizedString("bookmarks.show-toolbar-panel", value: "Open Bookmarks Panel", comment: "Menu item for opening the bookmarks panel")
     static let bookmarksManageBookmarks = NSLocalizedString("bookmarks.manage-bookmarks", value: "Manage Bookmarks", comment: "Menu item for opening the bookmarks management interface")
     static let bookmarkImportedFromFolder = NSLocalizedString("bookmarks.imported.from.folder", value: "Imported from", comment: "Name of the folder the imported bookmarks are saved into")

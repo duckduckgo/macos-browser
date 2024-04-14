@@ -507,6 +507,11 @@ extension MainViewController {
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
 
+    @objc func bookmarkAllOpenTabs(_ sender: Any) {
+        // TODO: https://app.asana.com/0/0/1207032400501907/f
+        print(#function)
+    }
+
     @objc func favoriteThisPage(_ sender: Any) {
         guard let tabIndex = getActiveTabAndIndex()?.index else { return }
         if tabCollectionViewModel.selectedTabIndex != tabIndex {
@@ -947,6 +952,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return activeTabViewModel?.canBeBookmarked == true
+        case #selector(MainViewController.bookmarkAllOpenTabs(_:)):
+            return tabCollectionViewModel.canBookmarkAllOpenTabs()
         case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
             return true
