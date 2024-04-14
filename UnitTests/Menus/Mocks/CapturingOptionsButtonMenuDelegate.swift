@@ -23,6 +23,7 @@ class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
 
     var optionsButtonMenuRequestedPreferencesCalled = false
     var optionsButtonMenuRequestedAppearancePreferencesCalled = false
+    var optionsButtonMenuRequestedBookmarkAllOpenTabsCalled = false
 
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu) {
 
@@ -34,6 +35,10 @@ class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem) {
 
+    }
+
+    func optionsButtonMenuRequestedBookmarkAllOpenTabs(_ sender: NSMenuItem) {
+        optionsButtonMenuRequestedBookmarkAllOpenTabsCalled = true
     }
 
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {

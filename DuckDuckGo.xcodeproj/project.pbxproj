@@ -1730,6 +1730,8 @@
 		9F982F0E2B8224BF00231028 /* AddEditBookmarkFolderDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F982F0C2B8224BE00231028 /* AddEditBookmarkFolderDialogViewModel.swift */; };
 		9F982F132B822B7B00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */; };
 		9F982F142B822C7400231028 /* AddEditBookmarkFolderDialogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */; };
+		9F9C49F62BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F52BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift */; };
+		9F9C49F72BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F52BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift */; };
 		9FA173DA2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
 		9FA173DB2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
 		9FA173DF2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */; };
@@ -3433,6 +3435,7 @@
 		9F872DA22B90920F00138637 /* BookmarkFolderInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFolderInfo.swift; sourceTree = "<group>"; };
 		9F982F0C2B8224BE00231028 /* AddEditBookmarkFolderDialogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkFolderDialogViewModel.swift; sourceTree = "<group>"; };
 		9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkFolderDialogViewModelTests.swift; sourceTree = "<group>"; };
+		9F9C49F52BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoreOptionsMenu+BookmarksTests.swift"; sourceTree = "<group>"; };
 		9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogContainerView.swift; sourceTree = "<group>"; };
 		9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogButtonsView.swift; sourceTree = "<group>"; };
 		9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogFolderManagementView.swift; sourceTree = "<group>"; };
@@ -4615,6 +4618,7 @@
 				566B195F29CDB7A9007E38F4 /* Mocks */,
 				378205FA283C277800D1D4AA /* MainMenuTests.swift */,
 				566B195C29CDB692007E38F4 /* MoreOptionsMenuTests.swift */,
+				9F9C49F52BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift */,
 			);
 			path = Menus;
 			sourceTree = "<group>";
@@ -10261,6 +10265,7 @@
 				566B196429CDB824007E38F4 /* MoreOptionsMenuTests.swift in Sources */,
 				9F0A2CF92B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift in Sources */,
 				3706FE56293F661700E42796 /* FaviconManagerMock.swift in Sources */,
+				9F9C49F72BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift in Sources */,
 				3706FE57293F661700E42796 /* LocalPinningManagerTests.swift in Sources */,
 				3706FE58293F661700E42796 /* HistoryStoreTests.swift in Sources */,
 				3706FE59293F661700E42796 /* EncryptionKeyGeneratorTests.swift in Sources */,
@@ -11496,6 +11501,7 @@
 				85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */,
 				9F180D122B69C665000D695F /* DownloadsTabExtensionMock.swift in Sources */,
 				AA91F83927076F1900771A0D /* PrivacyIconViewModelTests.swift in Sources */,
+				9F9C49F62BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift in Sources */,
 				4B723E0726B0003E00E14D75 /* CSVImporterTests.swift in Sources */,
 				4BCF15EC2ABB9AF80083F6DF /* NetworkProtectionRemoteMessageTests.swift in Sources */,
 				B62EB47C25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift in Sources */,
