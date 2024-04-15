@@ -27,8 +27,6 @@ enum UITests {
         static let elementExistence: Double = 5.0
         /// The fire animation time has environmental dependencies, so we want to wait for completion so we don't try to type into it
         static let fireAnimation: Double = 30.0
-        /// When we are clicking on TCC dialogs from the system, we will wait for them to appear
-        static let sleepTimeForTCCDialogAppearance: UInt32 = 2
     }
 
     /// A page simple enough to test favorite, bookmark, and history storage
