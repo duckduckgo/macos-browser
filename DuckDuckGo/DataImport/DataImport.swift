@@ -658,8 +658,7 @@ struct LoginImporterError: DataImportError {
                  .noL2Key,
                  .duplicateRecord,
                  .generalCryptoError,
-                 .encodingFailed,
-                 .keychainMigrationFailed:
+                 .encodingFailed:
                 return secureStorageError
             }
         default:
@@ -688,8 +687,7 @@ struct LoginImporterError: DataImportError {
                  .noL2Key,
                  .duplicateRecord,
                  .generalCryptoError,
-                 .encodingFailed,
-                 .keychainMigrationFailed:
+                 .encodingFailed:
                 return .decryptionError
             }
         }

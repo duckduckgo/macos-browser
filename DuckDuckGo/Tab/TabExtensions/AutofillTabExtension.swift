@@ -162,8 +162,8 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         }
     }
 
-    func secureVaultError(_ error: SecureStorageError) {
-        SecureVaultErrorReporter.shared.secureVaultError(error)
+    func secureVaultInitFailed(_ error: SecureStorageError) {
+        SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
