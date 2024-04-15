@@ -57,6 +57,7 @@ class PermissionsTests: XCTestCase {
 
         app.resetAuthorizationStatus(for: .camera) // These resets work much better before launch.
         app.resetAuthorizationStatus(for: .microphone)
+
         app.launch()
         app.activate()
         historyMenuBarItem.clickAfterExistenceTestSucceeds()
@@ -94,7 +95,7 @@ class PermissionsTests: XCTestCase {
         let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
         permissionsPopoverAllowButton.clickAfterExistenceTestSucceeds()
         var websitePermissionsColorIsGreen = false
-        for attempt in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
+        for _ in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
             websitePermissionsColorIsGreen = try websitePermissionsButtonIsExpectedColor(cameraButton, is: .green)
             if websitePermissionsColorIsGreen {
                 break
@@ -145,7 +146,7 @@ class PermissionsTests: XCTestCase {
         )
 
         var websitePermissionsColorIsRed = false
-        for attempt in 1 ... 4 {
+        for _ in 1 ... 4 {
             websitePermissionsColorIsRed = try websitePermissionsButtonIsExpectedColor(cameraButton, is: .red)
             if websitePermissionsColorIsRed {
                 break
@@ -183,7 +184,7 @@ class PermissionsTests: XCTestCase {
         let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
         permissionsPopoverAllowButton.clickAfterExistenceTestSucceeds()
         var websitePermissionsColorIsGreen = false
-        for attempt in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
+        for _ in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
             websitePermissionsColorIsGreen = try websitePermissionsButtonIsExpectedColor(cameraButton, is: .green)
             if websitePermissionsColorIsGreen {
                 break
@@ -251,7 +252,7 @@ class PermissionsTests: XCTestCase {
         let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
         permissionsPopoverAllowButton.clickAfterExistenceTestSucceeds()
         var websitePermissionsColorIsGreen = false
-        for attempt in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
+        for _ in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
             websitePermissionsColorIsGreen = try websitePermissionsButtonIsExpectedColor(microphoneButton, is: .green)
             if websitePermissionsColorIsGreen {
                 break
@@ -302,7 +303,7 @@ class PermissionsTests: XCTestCase {
         )
 
         var websitePermissionsColorIsRed = false
-        for attempt in 1 ... 4 {
+        for _ in 1 ... 4 {
             websitePermissionsColorIsRed = try websitePermissionsButtonIsExpectedColor(microphoneButton, is: .red)
             if websitePermissionsColorIsRed {
                 break
@@ -340,7 +341,7 @@ class PermissionsTests: XCTestCase {
         let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
         permissionsPopoverAllowButton.clickAfterExistenceTestSucceeds()
         var websitePermissionsColorIsGreen = false
-        for attempt in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
+        for _ in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
             websitePermissionsColorIsGreen = try websitePermissionsButtonIsExpectedColor(microphoneButton, is: .green)
             if websitePermissionsColorIsGreen {
                 break
@@ -383,6 +384,97 @@ class PermissionsTests: XCTestCase {
             notificationCenter.buttons.firstMatch.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "Even if we click the button for the denied resource many times, when we are on a site where we have set \"always deny\" for the resource, the TCC dialog permission alert will not be on the screen"
         )
+        XCTAssert(
+            permissionsPopoverAllowButton.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
+            "Even if we click the button for the denied resource many times, when we are on a site where we have set \"always deny\" for the resource, the permission popover will not be on the screen"
+        )
+    }
+
+    func test_locationPermissions_whenAccepted_showCorrectStateInBrowser() throws {
+        addressBarTextField.typeURLAfterExistenceTestSucceeds(permissionsSiteURL)
+
+        let locationButton = app.webViews.buttons["Location"]
+        locationButton.clickAfterExistenceTestSucceeds()
+        let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
+        permissionsPopoverAllowButton.clickAfterExistenceTestSucceeds()
+        var websitePermissionsColorIsGreen = false
+        for _ in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
+            websitePermissionsColorIsGreen = try websitePermissionsButtonIsExpectedColor(locationButton, is: .green)
+            if websitePermissionsColorIsGreen {
+                break
+            }
+            usleep(500_000)
+        }
+        XCTAssertTrue(
+            websitePermissionsColorIsGreen,
+            "After a few attempts to wait for permissions.site to update their button animation after the TCC dialog, their button has to be green."
+        )
+
+        let navigationBarViewControllerPermissionButton = app.buttons["NavigationBarViewController.geolocationPermissionButton"]
+        navigationBarViewControllerPermissionButton.clickAfterExistenceTestSucceeds()
+
+        let permissionContextMenuAlwaysAsk = app.menuItems["PermissionContextMenu.alwaysAsk"]
+        XCTAssertTrue(
+            permissionContextMenuAlwaysAsk.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "permissionContextMenuAlwaysAsk didn't exist in a reasonable timeframe."
+        )
+        let permissionContextMenuAlwaysAskValue = try XCTUnwrap(permissionContextMenuAlwaysAsk.value as? String)
+        XCTAssertEqual(
+            permissionContextMenuAlwaysAskValue,
+            "selected",
+            "The \"always ask\" menu item of the permission context menu has to be the selected item."
+        )
+    }
+
+    func test_locationPermissions_whenAlwaysDenyIsSelected_alwaysDenies() throws {
+        addressBarTextField.typeURLAfterExistenceTestSucceeds(permissionsSiteURL)
+
+        let locationButton = app.webViews.buttons["Location"]
+        locationButton.clickAfterExistenceTestSucceeds()
+
+        let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
+        permissionsPopoverAllowButton.clickAfterExistenceTestSucceeds()
+        var websitePermissionsColorIsGreen = false
+        for _ in 1 ... 4 { // permission.site updates this color a bit slowly and we have no control over it, so we try a few times.
+            websitePermissionsColorIsGreen = try websitePermissionsButtonIsExpectedColor(locationButton, is: .green)
+            if websitePermissionsColorIsGreen {
+                break
+            }
+            usleep(500_000)
+        }
+        XCTAssertTrue(
+            websitePermissionsColorIsGreen,
+            "After a few attempts to wait for permissions.site to update their button animation after the TCC dialog, their button has to be green."
+        )
+
+        let navigationBarViewControllerPermissionButton = app.buttons["NavigationBarViewController.geolocationPermissionButton"]
+        navigationBarViewControllerPermissionButton.clickAfterExistenceTestSucceeds()
+
+        let permissionContextMenuAlwaysAsk = app.menuItems["PermissionContextMenu.alwaysAsk"]
+        XCTAssertTrue(
+            permissionContextMenuAlwaysAsk.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "permissionContextMenuAlwaysAsk didn't exist in a reasonable timeframe."
+        )
+        let permissionContextMenuAlwaysAskValue = try XCTUnwrap(permissionContextMenuAlwaysAsk.value as? String)
+        XCTAssertEqual(
+            permissionContextMenuAlwaysAskValue,
+            "selected",
+            "The \"always ask\" menu item of the permission context menu has to be the selected item."
+        )
+
+        let permissionContextMenuAlwaysDeny = app.menuItems["PermissionContextMenu.alwaysDeny"]
+        permissionContextMenuAlwaysDeny.clickAfterExistenceTestSucceeds()
+        app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Enforce a single window
+        app.typeKey("n", modifierFlags: .command)
+        addressBarTextField.typeURL(permissionsSiteURL)
+        for _ in 1 ... 4 {
+            locationButton.clickAfterExistenceTestSucceeds()
+        }
+        XCTAssertTrue(
+            try websitePermissionsButtonIsExpectedColor(locationButton, is: .red),
+            "Even if we click the button for the denied resource many times, when we are on a site where we have set \"always deny\" for the resource, the permission button will remain red"
+        )
+
         XCTAssert(
             permissionsPopoverAllowButton.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
             "Even if we click the button for the denied resource many times, when we are on a site where we have set \"always deny\" for the resource, the permission popover will not be on the screen"
