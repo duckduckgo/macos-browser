@@ -34,10 +34,7 @@ import UserNotifications
 import Lottie
 
 import NetworkProtection
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -80,12 +77,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-#if SUBSCRIPTION
     // Needs to be lazy as indirectly depends on AppDelegate
     private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
-#endif
 
-#if DBP && SUBSCRIPTION
+#if DBP
     private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
 #endif
 
@@ -175,13 +170,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
         )
 
-#if SUBSCRIPTION
     #if APPSTORE || !STRIPE
         SubscriptionPurchaseEnvironment.current = .appStore
     #else
         SubscriptionPurchaseEnvironment.current = .stripe
     #endif
-#endif
     }
 
     static func configurePixelKit() {
@@ -253,7 +246,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         startupSync()
 
-#if SUBSCRIPTION
         let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
 
         let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
@@ -267,7 +259,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
             }
         }
-#endif
 
         if [.normal, .uiTests].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
@@ -293,23 +284,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-#if SUBSCRIPTION
         networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
-#endif
 
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 
-#if DBP && SUBSCRIPTION
+#if DBP
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 #endif
 
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
-#endif
-
-#if SUBSCRIPTION
-
 #endif
     }
 
@@ -549,7 +534,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 func updateSubscriptionStatus() {
-#if SUBSCRIPTION
     Task {
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
@@ -563,7 +547,6 @@ func updateSubscriptionStatus() {
 
         _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
     }
-#endif
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {

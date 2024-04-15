@@ -155,7 +155,6 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseSubscriptionPage),
                                                name: .subscriptionPageCloseAndOpenPreferences,
@@ -164,7 +163,6 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onSubscriptionAccountDidSignOut),
                                                name: .accountDidSignOut,
                                                object: nil)
-#endif
     }
 
     @objc
@@ -226,7 +224,6 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
     @objc
     private func onCloseSubscriptionPage(_ notification: Notification) {
         guard let activeTab = tabViewModel?.tab else { return }
@@ -254,8 +251,6 @@ final class BrowserTabViewController: NSViewController {
             }
         }
     }
-
-#endif
 
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel

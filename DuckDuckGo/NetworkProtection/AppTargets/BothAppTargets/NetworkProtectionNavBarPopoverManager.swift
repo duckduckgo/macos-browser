@@ -23,10 +23,7 @@ import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
