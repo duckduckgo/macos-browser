@@ -20,9 +20,9 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct BookmarkAllTabsDialogView: ModalView {
-    @ObservedObject private var viewModel: BookmarkAllTabsDialogCoordinatorViewModel<BookmarkAllTabsViewModel, AddEditBookmarkFolderDialogViewModel>
+    @ObservedObject private var viewModel: BookmarkAllTabsDialogCoordinatorViewModel<BookmarkAllTabsDialogViewModel, AddEditBookmarkFolderDialogViewModel>
 
-    init(viewModel: BookmarkAllTabsDialogCoordinatorViewModel<BookmarkAllTabsViewModel, AddEditBookmarkFolderDialogViewModel>) {
+    init(viewModel: BookmarkAllTabsDialogCoordinatorViewModel<BookmarkAllTabsDialogViewModel, AddEditBookmarkFolderDialogViewModel>) {
         self.viewModel = viewModel
     }
 

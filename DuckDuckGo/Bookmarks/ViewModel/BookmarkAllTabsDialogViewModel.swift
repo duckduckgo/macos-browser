@@ -1,5 +1,5 @@
 //
-//  BookmarkAllTabsViewModel.swift
+//  BookmarkAllTabsDialogViewModel.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -27,7 +27,7 @@ protocol BookmarkAllTabsDialogEditing: BookmarksDialogViewModel {
     var locationFieldTitle: String { get }
 }
 
-final class BookmarkAllTabsViewModel: BookmarkAllTabsDialogEditing {
+final class BookmarkAllTabsDialogViewModel: BookmarkAllTabsDialogEditing {
     private static let dateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
@@ -95,7 +95,7 @@ final class BookmarkAllTabsViewModel: BookmarkAllTabsDialogEditing {
 
 // MARK: - Private
 
-private extension BookmarkAllTabsViewModel {
+private extension BookmarkAllTabsDialogViewModel {
 
     func bind() {
         folderCancellable = bookmarkManager.listPublisher

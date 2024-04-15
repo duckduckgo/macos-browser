@@ -87,7 +87,7 @@ enum BookmarksDialogViewFactory {
     /// - Returns: An instance of BookmarkAllTabsDialogView
     static func makeBookmarkAllOpenTabsView(websitesInfo: [WebsiteInfo], bookmarkManager: LocalBookmarkManager = .shared) -> BookmarkAllTabsDialogView {
         let addFolderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
-        let bookmarkAllTabsViewModel = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: UserDefaultsBookmarkFoldersStore(), bookmarkManager: bookmarkManager)
+        let bookmarkAllTabsViewModel = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: UserDefaultsBookmarkFoldersStore(), bookmarkManager: bookmarkManager)
         let viewModel = BookmarkAllTabsDialogCoordinatorViewModel(bookmarkModel: bookmarkAllTabsViewModel, folderModel: addFolderViewModel)
         return BookmarkAllTabsDialogView(viewModel: viewModel)
     }

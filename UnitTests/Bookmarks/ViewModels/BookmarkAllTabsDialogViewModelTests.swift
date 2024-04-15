@@ -1,5 +1,5 @@
 //
-//  BookmarkAllTabsViewModelTests.swift
+//  BookmarkAllTabsDialogViewModelTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
-final class BookmarkAllTabsViewModelTests: XCTestCase {
+final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
     private var bookmarkManager: LocalBookmarkManager!
     private var bookmarkStoreMock: BookmarkStoreMock!
     private var foldersStoreMock: BookmarkFolderStoreMock!
@@ -46,7 +46,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenTitleIsCalledThenItReflectsThenNumberOfWebsites() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo, occurrences: 10)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // WHEN
         let title = sut.title
@@ -58,7 +58,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenCancelActionTitleIsCalledThenItReturnsTheRightTitle() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // WHEN
         let title = sut.cancelActionTitle
@@ -70,7 +70,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenEducationalMessageIsCalledThenItReturnsTheRightMessage() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // WHEN
         let title = sut.educationalMessage
@@ -82,7 +82,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenDefaultActionTitleIsCalledThenItReturnsTheRightTitle() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // WHEN
         let title = sut.defaultActionTitle
@@ -94,7 +94,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenFolderNameFieldTitleIsCalledThenItReturnsTheRightTitle() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // WHEN
         let title = sut.folderNameFieldTitle
@@ -106,7 +106,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenLocationFieldTitleIsCalledThenItReturnsTheRightTitle() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // WHEN
         let title = sut.locationFieldTitle
@@ -121,7 +121,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
         // GIVEN
         let date = Date(timeIntervalSince1970: 1712902304) // 12th of April 2024
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo, occurrences: 5)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager, dateProvider: { date })
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager, dateProvider: { date })
 
         // WHEN
         let result = sut.folderName
@@ -136,7 +136,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
         bookmarkStoreMock.bookmarks = [folder]
         bookmarkManager.loadBookmarks()
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // WHEN
         let result = sut.folders
@@ -163,7 +163,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
         bookmarkStoreMock.bookmarks = [folder]
         bookmarkManager.loadBookmarks()
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         XCTAssertEqual(sut.folders.count, 1)
         XCTAssertEqual(sut.folders.first?.entity, folder)
 
@@ -193,7 +193,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenIsOtherActionDisabledCalledThenReturnFalse() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // WHEN
         let result = sut.isOtherActionDisabled
@@ -205,7 +205,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenFolderNameIsEmptyDefaultActionIsDisabled() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         sut.folderName = ""
 
         // WHEN
@@ -218,7 +218,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenFolderNameIsNotEmptyDefaultActionIsEnabled() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         sut.folderName = "TEST"
 
         // WHEN
@@ -231,7 +231,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenCancelIsCalledThenDismissIsCalled() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         var didCallDismiss = false
 
         // WHEN
@@ -246,7 +246,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenAddOrSaveIsCalledAndSelectedFolderIsNilThenBookmarkStoreIsAskedToBookmarkWebsitesInfoInRootFolder() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         sut.selectedFolder = nil
         XCTAssertFalse(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
         XCTAssertNil(bookmarkStoreMock.capturedWebsitesInfo)
@@ -266,7 +266,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
         // GIVEN
         let folder = BookmarkFolder(id: "ABCDE", title: "Saved Tabs")
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         sut.selectedFolder = folder
         XCTAssertFalse(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
         XCTAssertNil(bookmarkStoreMock.capturedWebsitesInfo)
@@ -284,7 +284,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
     func testWhenAddOrSaveIsCalledThenDismissIsCalled() {
         // GIVEN
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
-        let sut = BookmarkAllTabsViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         var didCallDismiss = false
 
         // WHEN
@@ -300,7 +300,7 @@ final class BookmarkAllTabsViewModelTests: XCTestCase {
 
 // MARK: - Private
 
-private extension BookmarkAllTabsViewModelTests {
+private extension BookmarkAllTabsDialogViewModelTests {
 
     func makeWebsitesInfo(url: URL, occurrences: Int = 1) -> [WebsiteInfo] {
         (1...occurrences)

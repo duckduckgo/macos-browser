@@ -2520,9 +2520,9 @@
 		9F9C49F92BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */; };
 		9F9C49FA2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */; };
 		9F9C49FB2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */; };
-		9F9C49FD2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */; };
-		9F9C49FE2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */; };
-		9F9C49FF2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */; };
+		9F9C49FD2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsDialogViewModel.swift */; };
+		9F9C49FE2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsDialogViewModel.swift */; };
+		9F9C49FF2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsDialogViewModel.swift */; };
 		9F9C4A012BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */; };
 		9F9C4A022BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */; };
 		9F9C4A032BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */; };
@@ -2544,8 +2544,8 @@
 		9FA5A0A52BC8F34900153786 /* BookmarkFoldersStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A42BC8F34900153786 /* BookmarkFoldersStore.swift */; };
 		9FA5A0A62BC8F34900153786 /* BookmarkFoldersStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A42BC8F34900153786 /* BookmarkFoldersStore.swift */; };
 		9FA5A0A72BC8F34900153786 /* BookmarkFoldersStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A42BC8F34900153786 /* BookmarkFoldersStore.swift */; };
-		9FA5A0A92BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A82BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift */; };
-		9FA5A0AA2BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A82BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift */; };
+		9FA5A0A92BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A82BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift */; };
+		9FA5A0AA2BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0A82BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift */; };
 		9FA5A0B02BC9039200153786 /* BookmarkFolderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0AC2BC9037A00153786 /* BookmarkFolderStoreMock.swift */; };
 		9FA5A0B12BC9039300153786 /* BookmarkFolderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0AC2BC9037A00153786 /* BookmarkFolderStoreMock.swift */; };
 		9FA75A3E2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */; };
@@ -4266,7 +4266,7 @@
 		9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkFolderDialogViewModelTests.swift; sourceTree = "<group>"; };
 		9F9C49F52BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoreOptionsMenu+BookmarksTests.swift"; sourceTree = "<group>"; };
 		9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogView.swift; sourceTree = "<group>"; };
-		9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsViewModel.swift; sourceTree = "<group>"; };
+		9F9C49FC2BC7E9820099738D /* BookmarkAllTabsDialogViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogViewModel.swift; sourceTree = "<group>"; };
 		9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogCoordinatorViewModel.swift; sourceTree = "<group>"; };
 		9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogContainerView.swift; sourceTree = "<group>"; };
 		9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogButtonsView.swift; sourceTree = "<group>"; };
@@ -4274,7 +4274,7 @@
 		9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogStackedContentView.swift; sourceTree = "<group>"; };
 		9FA173EA2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogView.swift; sourceTree = "<group>"; };
 		9FA5A0A42BC8F34900153786 /* BookmarkFoldersStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFoldersStore.swift; sourceTree = "<group>"; };
-		9FA5A0A82BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsViewModelTests.swift; sourceTree = "<group>"; };
+		9FA5A0A82BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogViewModelTests.swift; sourceTree = "<group>"; };
 		9FA5A0AC2BC9037A00153786 /* BookmarkFolderStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFolderStoreMock.swift; sourceTree = "<group>"; };
 		9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuFactoryTests.swift; sourceTree = "<group>"; };
 		9FBD84512BB3AACB00220859 /* AttributionOriginFileProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributionOriginFileProvider.swift; sourceTree = "<group>"; };
@@ -7053,7 +7053,7 @@
 				9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */,
 				9F2606092B85C20400819292 /* AddEditBookmarkDialogViewModelTests.swift */,
 				9F26060D2B85E17D00819292 /* AddEditBookmarkDialogCoordinatorViewModelTests.swift */,
-				9FA5A0A82BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift */,
+				9FA5A0A82BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -7854,7 +7854,7 @@
 				9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */,
 				9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */,
 				9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */,
-				9F9C49FC2BC7E9820099738D /* BookmarkAllTabsViewModel.swift */,
+				9F9C49FC2BC7E9820099738D /* BookmarkAllTabsDialogViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -10937,7 +10937,7 @@
 				3706FC50293F65D500E42796 /* FeedbackWindow.swift in Sources */,
 				3706FC51293F65D500E42796 /* RecentlyVisitedView.swift in Sources */,
 				B645D8F729FA95440024461F /* WKProcessPoolExtension.swift in Sources */,
-				9F9C49FE2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */,
+				9F9C49FE2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */,
 				9F514F922B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */,
 				3706FC52293F65D500E42796 /* MouseOverAnimationButton.swift in Sources */,
 				B60293E72BA19ECD0033186B /* NetPPopoverManagerMock.swift in Sources */,
@@ -11095,7 +11095,7 @@
 				3706FDF5293F661700E42796 /* StartupPreferencesTests.swift in Sources */,
 				3706FDF6293F661700E42796 /* DuckPlayerTests.swift in Sources */,
 				3706FDF7293F661700E42796 /* WebViewExtensionTests.swift in Sources */,
-				9FA5A0AA2BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift in Sources */,
+				9FA5A0AA2BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift in Sources */,
 				56534DEE29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */,
 				3706FDF8293F661700E42796 /* FileStoreTests.swift in Sources */,
 				5603D90729B7B746007F9F01 /* MockTabViewItemDelegate.swift in Sources */,
@@ -12114,7 +12114,7 @@
 				4B957B352AC7AE700062CA31 /* PreferencesAutofillView.swift in Sources */,
 				4B957B362AC7AE700062CA31 /* BurnerHomePageView.swift in Sources */,
 				4B957B372AC7AE700062CA31 /* UserText+PasswordManager.swift in Sources */,
-				9F9C49FF2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */,
+				9F9C49FF2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */,
 				4B957B382AC7AE700062CA31 /* LoadingProgressView.swift in Sources */,
 				7BEC20472B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift in Sources */,
 				4B957B392AC7AE700062CA31 /* StatisticsStore.swift in Sources */,
@@ -12887,7 +12887,7 @@
 				AAD86E52267A0DFF005C11BE /* UpdateController.swift in Sources */,
 				85A0118225AF60E700FA6A0C /* FindInPageModel.swift in Sources */,
 				7BA7CC4E2AD11F6F0042E5CE /* NetworkProtectionIPCTunnelController.swift in Sources */,
-				9F9C49FD2BC7E9830099738D /* BookmarkAllTabsViewModel.swift in Sources */,
+				9F9C49FD2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */,
 				4B9292A226670D2A00AD2C21 /* PseudoFolder.swift in Sources */,
 				1DDD3EC42B84F96B004CBF2B /* CookiePopupProtectionPreferences.swift in Sources */,
 				4BCF15D92ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift in Sources */,
@@ -13167,7 +13167,7 @@
 				4B9292BD2667103100AD2C21 /* BookmarkOutlineViewDataSourceTests.swift in Sources */,
 				C17CA7B22B9B5317008EC3C1 /* MockAutofillPopoverPresenter.swift in Sources */,
 				4BF6961D28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift in Sources */,
-				9FA5A0A92BC900FC00153786 /* BookmarkAllTabsViewModelTests.swift in Sources */,
+				9FA5A0A92BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift in Sources */,
 				B6619F062B17138D00CD9186 /* DataImportSourceViewModelTests.swift in Sources */,
 				4BBF0917282DD6EF00EE1418 /* TemporaryFileHandlerTests.swift in Sources */,
 				B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */,
