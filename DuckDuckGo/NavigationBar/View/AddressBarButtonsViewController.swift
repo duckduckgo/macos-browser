@@ -553,7 +553,13 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func setupAnimationViews() {
-        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?, animationName: String, renderingEngine: Lottie.RenderingEngineOption = .automatic) -> LottieAnimationView {
+
+        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?,
+                                               animationName: String,
+                                               // Default use of .mainThread to prevent high WindowServer Usage
+                                               // Pending Fix with newer Lottie versions
+                                               // https://app.asana.com/0/1177771139624306/1207024603216659/f
+                                               renderingEngine: Lottie.RenderingEngineOption = .mainThread) -> LottieAnimationView {
             if let animationView = animationView, animationView.identifier?.rawValue == animationName {
                 return animationView
             }
@@ -793,11 +799,12 @@ final class AddressBarButtonsViewController: NSViewController {
             guard let host = url.host else { break }
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
+            let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
 
             let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
             let isUnprotected = configuration.isUserUnprotected(domain: host)
 
-            let isShieldDotVisible = isNotSecure || isUnprotected
+            let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
             privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
 

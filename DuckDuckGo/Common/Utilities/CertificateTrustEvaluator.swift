@@ -1,5 +1,7 @@
-
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//
+//  CertificateTrustEvaluator.swift
+//
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -14,9 +16,17 @@
 //  limitations under the License.
 //
 
-// tests-server is a command-line tool used for Integration Tests HTTP requests mocking (see tests-server/main.swift)
-#include "../Common.xcconfig"
+import Foundation
 
-PRODUCT_NAME = $(TARGET_NAME);
-CODE_SIGNING_ALLOWED[config=Review][sdk=macosx*] = NO
-CODE_SIGNING_ALLOWED[config=CI][sdk=macosx*] = NO
+protocol CertificateTrustEvaluating {
+    func evaluateCertificateTrust(trust: SecTrust?) -> Bool?
+}
+
+struct CertificateTrustEvaluator: CertificateTrustEvaluating {
+    func evaluateCertificateTrust(trust: SecTrust?) -> Bool? {
+        var error: CFError?
+        guard let trust else { return nil }
+        let result = SecTrustEvaluateWithError(trust, &error)
+        return result
+    }
+}

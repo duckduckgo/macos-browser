@@ -340,6 +340,8 @@ protocol NewWindowPolicyDecisionMaker {
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
+    private let certificateTrustEvaluator: CertificateTrustEvaluating
+    var isCertificateValid: Bool?
 
     private(set) var tunnelController: NetworkProtectionIPCTunnelController
 
@@ -382,7 +384,8 @@ protocol NewWindowPolicyDecisionMaker {
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
-                     startupPreferences: StartupPreferences = StartupPreferences.shared
+                     startupPreferences: StartupPreferences = StartupPreferences.shared,
+                     certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator()
     ) {
 
         let duckPlayer = duckPlayer
@@ -421,7 +424,8 @@ protocol NewWindowPolicyDecisionMaker {
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
                   webViewSize: webViewSize,
-                  startupPreferences: startupPreferences)
+                  startupPreferences: startupPreferences,
+                  certificateTrustEvaluator: certificateTrustEvaluator)
     }
 
     @MainActor
@@ -451,7 +455,8 @@ protocol NewWindowPolicyDecisionMaker {
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
          webViewSize: CGSize,
-         startupPreferences: StartupPreferences
+         startupPreferences: StartupPreferences,
+         certificateTrustEvaluator: CertificateTrustEvaluating
     ) {
 
         self.content = content
@@ -467,6 +472,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.interactionState = interactionStateData.map(InteractionState.loadCachedFromTabContent) ?? .none
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
+        self.certificateTrustEvaluator = certificateTrustEvaluator
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
@@ -1218,7 +1224,13 @@ protocol NewWindowPolicyDecisionMaker {
 
         webView.publisher(for: \.serverTrust)
             .sink { [weak self] serverTrust in
-                self?.privacyInfo?.serverTrust = serverTrust
+                guard let self else { return }
+                self.isCertificateValid = self.certificateTrustEvaluator.evaluateCertificateTrust(trust: serverTrust)
+                if self.isCertificateValid == true {
+                    self.privacyInfo?.serverTrust = serverTrust
+                } else {
+                    self.privacyInfo?.serverTrust = nil
+                }
             }
             .store(in: &webViewCancellables)
 
@@ -1477,10 +1489,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         invalidateInteractionStateData()
 
-        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
-           // don‘t show an error page if the error was already handled
-           // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-           self.content.urlForWebView == url {
+        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled, error.errorCode != NSURLErrorServerCertificateUntrusted,
+                   // don‘t show an error page if the error was already handled
+                   // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
+            self.content.urlForWebView == url {
 
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML

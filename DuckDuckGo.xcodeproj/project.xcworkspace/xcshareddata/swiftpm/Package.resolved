@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "39d74829150a9ecffea2f503c01851e54eda8ad1",
-        "version" : "133.0.1"
+        "revision" : "90e789b95403481e7c2f0e4aa661890d4252f0e6",
+        "version" : "134.1.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "62d5dc3d02f6a8347dc5f0b52162a0107d38b74c",
-        "version" : "5.8.0"
+        "revision" : "1bb3bc5eb565735051f342a87b5405d4374876c7",
+        "version" : "5.12.0"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "620921fea14569eb00745cb5a44890d5890d99ec",
-        "version" : "3.4.0"
+        "revision" : "14b13d0c3db38f471ce4ba1ecb502ee1986c84d7",
+        "version" : "3.5.0"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "47d3d90aee3c52b6f61d04ceae426e607df62347",
-        "version" : "2.5.2"
+        "revision" : "0a4caaf7a81eea2cece651ef4b17331fa0634dff",
+        "version" : "2.6.0"
       }
     },
     {
@@ -138,7 +138,7 @@
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax.git",
+      "location" : "https://github.com/apple/swift-syntax",
       "state" : {
         "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
         "version" : "509.1.1"
