@@ -85,6 +85,9 @@ extension Tab: NavigationResponder {
             // Tab Snapshots
             .weak(nullable: self.tabSnapshots),
 
+            // Error Page
+            .weak(nullable: self.errorPage),
+
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)
         )

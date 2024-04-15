@@ -85,7 +85,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionRekeyCompleted
     case networkProtectionRekeyFailure(_ error: Error)
 
-    case networkProtectionSystemExtensionActivationFailure
+    case networkProtectionSystemExtensionActivationFailure(_ error: Error)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
@@ -311,7 +311,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionClientFailedToParseRedeemResponse(let error),
                 .networkProtectionWireguardErrorCannotSetNetworkSettings(let error),
                 .networkProtectionRekeyFailure(let error),
-                .networkProtectionUnhandledError(_, _, let error):
+                .networkProtectionUnhandledError(_, _, let error),
+                .networkProtectionSystemExtensionActivationFailure(let error):
             return error
         default:
             return nil

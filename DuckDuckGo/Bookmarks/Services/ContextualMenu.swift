@@ -122,7 +122,7 @@ private extension ContextualMenu {
             moveToEndMenuItem(entity: bookmark, parent: parent),
             NSMenuItem.separator(),
             addFolderMenuItem(folder: parent),
-            manageBookmarksMenuItem()
+            manageBookmarksMenuItem(),
         ]
     }
 
