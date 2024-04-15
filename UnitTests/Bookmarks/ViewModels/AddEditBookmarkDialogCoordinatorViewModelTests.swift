@@ -125,5 +125,44 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarkViewModelMock.selectedFolder, folder)
     }
 
-}
+    // MARK: - Integration Test
 
+    func testWhenAddFolderMultipleTimesThenFolderListIsUpdatedAndSelectedFolderIsNil() {
+        // GIVEN
+        let expectation = self.expectation(description: #function)
+        let folder = BookmarkFolder(id: "1", title: "Folder")
+        bookmarkViewModelMock.selectedFolder = folder
+        let bookmarkStoreMock = BookmarkStoreMock()
+        bookmarkStoreMock.bookmarks = [folder]
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
+        let folderModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
+        let sut = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModelMock, folderModel: folderModel)
+        let c = folderModel.$folders
+            .dropFirst(2) // Not interested in the first two events. 1.subscribing to $folders and 2. subscribing to $list.
+            .sink { folders in
+                expectation.fulfill()
+        }
+
+        XCTAssertNil(folderModel.selectedFolder)
+
+        // Tap Add Folder
+        sut.addFolderAction()
+        XCTAssertEqual(sut.viewState, .folder)
+        XCTAssertTrue(folderModel.folderName.isEmpty)
+        XCTAssertEqual(folderModel.selectedFolder, folder)
+
+        // Create a new folder
+        folderModel.folderName = #function
+        folderModel.addOrSave {}
+
+        // Add folder again
+        sut.addFolderAction()
+
+        // THEN
+        withExtendedLifetime(c) {}
+        waitForExpectations(timeout: 1.0)
+        XCTAssertEqual(sut.viewState, .folder)
+        XCTAssertTrue(folderModel.folderName.isEmpty)
+    }
+}
