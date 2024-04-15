@@ -604,6 +604,12 @@ extension BWManager: BWCommunicatorDelegate {
     }
 
     func bitwardenCommunicator(_ bitwardenCommunicator: BWCommunication, didReceiveMessageData messageData: Data) {
+
+        //TODO REMOVE
+        print("RECEIVED!----------------------")
+        print(String(data: messageData, encoding: .utf8))
+        print("----------------------")
+
         guard let response = BWResponse(from: messageData) else {
             logOrAssertionFailure("BWManager: Can't decode the message")
             return
