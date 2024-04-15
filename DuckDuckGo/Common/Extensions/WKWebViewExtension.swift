@@ -132,7 +132,7 @@ extension WKWebView {
         }
         set {
             // swizzle the method to call `_setPageMuted:` without performSelector: usage (as there‘s a non-object argument to pass)
-            guard Self.swizzleSetPageMuted else { return }
+            guard Self.swizzleSetPageMutedOnce else { return }
             self.mediaMutedState = newValue // call the original
         }
     }
@@ -147,7 +147,7 @@ extension WKWebView {
         return true
     }()
 
-    static private let swizzleSetPageMuted: Bool = {
+    static private let swizzleSetPageMutedOnce: Bool = {
         guard let originalMethod = class_getInstanceMethod(WKWebView.self, Selector.setPageMuted),
               let swizzledMethod = class_getInstanceMethod(WKWebView.self, #selector(setter: mediaMutedState)) else {
             assertionFailure("WKWebView does not respond to selector _setPageMuted:")
