@@ -124,7 +124,7 @@ final class LocalBitwardenInstallationService: BWInstallationService {
     private func isIntegrationEnabled(in dataFileURL: URL) -> Bool {
         do {
             let dataFile = try String(contentsOf: dataFileURL)
-            return dataFile.range(of: "\"enableDuckDuckGoBrowserIntegration\": true") != nil
+            return dataFile.range(of: "enableDuckDuckGoBrowserIntegration\": true") != nil
         } catch {
             return false
         }
