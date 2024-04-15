@@ -61,7 +61,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
 
     @MainActor
     func start() async {
-        try? await pixelKit?.fire(StartAttempt.begin)
+        pixelKit?.fire(StartAttempt.begin)
 
         do {
             guard try await enableLoginItems() else {
@@ -70,16 +70,16 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
             }
 
             ipcClient.start()
-            try? await pixelKit?.fire(StartAttempt.success, frequency: .dailyAndContinuous)
+            pixelKit?.fire(StartAttempt.success, frequency: .dailyAndContinuous)
         } catch {
             os_log("🔴 IPC Controller found en error when starting the VPN: \(error)", log: .networkProtection)
-            try? await pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndContinuous)
+            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndContinuous)
         }
     }
 
     @MainActor
     func stop() async {
-        try? await pixelKit?.fire(StopAttempt.begin)
+        pixelKit?.fire(StopAttempt.begin)
 
         do {
             guard try await enableLoginItems() else {
@@ -88,10 +88,10 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
             }
 
             ipcClient.stop()
-            try? await pixelKit?.fire(StopAttempt.success, frequency: .dailyAndContinuous)
+            pixelKit?.fire(StopAttempt.success, frequency: .dailyAndContinuous)
         } catch {
             os_log("🔴 IPC Controller found en error when starting the VPN: \(error)", log: .networkProtection)
-            try? await pixelKit?.fire(StopAttempt.failure(error), frequency: .dailyAndContinuous)
+            pixelKit?.fire(StopAttempt.failure(error), frequency: .dailyAndContinuous)
         }
     }
 

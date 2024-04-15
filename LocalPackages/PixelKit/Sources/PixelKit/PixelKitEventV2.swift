@@ -39,32 +39,20 @@ public protocol PixelKitEventV2: PixelKitEvent {
 /// and the call to `fire` should process those properties to serialize in the requests.
 ///
 public protocol PixelFiring {
-    @discardableResult
-    func fire(_ event: PixelKitEventV2) async throws -> Bool
+    func fire(_ event: PixelKitEventV2)
 
-    @discardableResult
     func fire(_ event: PixelKitEventV2,
-              frequency: PixelKit.Frequency) async throws -> Bool
+              frequency: PixelKit.Frequency)
 }
 
 extension PixelKit: PixelFiring {
-    @discardableResult
-    public func fire(_ event: PixelKitEventV2) async throws -> Bool {
-        try await fire(event, frequency: .standard)
+    public func fire(_ event: PixelKitEventV2) {
+        fire(event, frequency: .standard)
     }
 
-    @discardableResult
     public func fire(_ event: PixelKitEventV2,
-                     frequency: PixelKit.Frequency) async throws -> Bool {
-        try await withCheckedThrowingContinuation { continuation in
-            fire(event, frequency: frequency) { fired, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
+                     frequency: PixelKit.Frequency) {
 
-                continuation.resume(returning: fired)
-            }
-        }
+        fire(event, frequency: frequency, onComplete: { _, _ in })
     }
 }

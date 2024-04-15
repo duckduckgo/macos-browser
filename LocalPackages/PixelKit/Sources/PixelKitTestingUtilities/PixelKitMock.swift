@@ -33,14 +33,13 @@ public final class PixelKitMock: PixelFiring {
         self.expectedFireCalls = expectedFireCalls
     }
 
-    public func fire(_ event: PixelKitEventV2) async throws -> Bool {
-        try await fire(event, frequency: .standard)
+    public func fire(_ event: PixelKitEventV2) {
+        fire(event, frequency: .standard)
     }
 
-    public func fire(_ event: PixelKitEventV2, frequency: PixelKit.Frequency) async throws -> Bool {
+    public func fire(_ event: PixelKitEventV2, frequency: PixelKit.Frequency) {
         let fireCall = ExpectedFireCall(pixel: event, frequency: frequency)
         actualFireCalls.append(fireCall)
-        return true
     }
 
     public var expectationsMet: Bool {
