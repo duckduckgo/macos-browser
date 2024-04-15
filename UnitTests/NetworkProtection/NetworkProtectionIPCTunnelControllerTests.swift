@@ -19,12 +19,14 @@
 import Combine
 import Foundation
 import NetworkProtection
+import PixelKit
+import PixelKitTestingUtilities
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
 
-    final class AttemptHandler: VPNStartAttemptHandling, VPNStopAttemptHandling {
+    final class AttemptHandler {
 
         enum ExpectedResult {
             case success
@@ -73,54 +75,70 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
     // MARK: - Tunnel Start Tests
 
     func testStartTunnelSuccess() async {
+        let pixelKit = PixelKitMock(expecting: [
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.begin, frequency: .standard),
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.success, frequency: .dailyAndContinuous)
+        ])
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
             loginItemsManager: MockLoginItemsManager(mockResult: .success),
-            ipcClient: MockIPCClient())
-        let attemptHandler = AttemptHandler(expectedResult: .success)
+            ipcClient: MockIPCClient(),
+            pixelKit: pixelKit)
 
-        await controller.start(attemptHandler: attemptHandler)
+        await controller.start()
 
-        XCTAssertTrue(attemptHandler.expectationsMet)
+        XCTAssertTrue(pixelKit.expectationsMet)
     }
 
     func testStartTunnelLoginItemFailure() async {
         let error = NSError(domain: "test", code: 1)
+        let pixelKit = PixelKitMock(expecting: [
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.begin, frequency: .standard),
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.failure(error), frequency: .dailyAndContinuous)
+        ])
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
             loginItemsManager: MockLoginItemsManager(mockResult: .failure(error)),
-            ipcClient: MockIPCClient())
-        let attemptHandler = AttemptHandler(expectedResult: .failure(error))
+            ipcClient: MockIPCClient(),
+            pixelKit: pixelKit)
 
-        await controller.start(attemptHandler: attemptHandler)
+        await controller.start()
 
-        XCTAssertTrue(attemptHandler.expectationsMet)
+        XCTAssertTrue(pixelKit.expectationsMet)
     }
 
     // MARK: - Tunnel Stop Tests
 
     func testStopTunnelSuccess() async {
+        let pixelKit = PixelKitMock(expecting: [
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.begin, frequency: .standard),
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.success, frequency: .dailyAndContinuous)
+        ])
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
             loginItemsManager: MockLoginItemsManager(mockResult: .success),
-            ipcClient: MockIPCClient())
-        let attemptHandler = AttemptHandler(expectedResult: .success)
+            ipcClient: MockIPCClient(),
+            pixelKit: pixelKit)
 
-        await controller.stop(attemptHandler: attemptHandler)
+        await controller.stop()
 
-        XCTAssertTrue(attemptHandler.expectationsMet)
+        XCTAssertTrue(pixelKit.expectationsMet)
     }
 
     func testStopTunnelLoginItemFailure() async {
         let error = NSError(domain: "test", code: 1)
+        let pixelKit = PixelKitMock(expecting: [
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.begin, frequency: .standard),
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.failure(error), frequency: .dailyAndContinuous)
+        ])
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
             loginItemsManager: MockLoginItemsManager(mockResult: .failure(error)),
-            ipcClient: MockIPCClient())
-        let attemptHandler = AttemptHandler(expectedResult: .failure(error))
+            ipcClient: MockIPCClient(),
+            pixelKit: pixelKit)
 
-        await controller.stop(attemptHandler: attemptHandler)
+        await controller.stop()
 
-        XCTAssertTrue(attemptHandler.expectationsMet)
+        XCTAssertTrue(pixelKit.expectationsMet)
     }
 }
