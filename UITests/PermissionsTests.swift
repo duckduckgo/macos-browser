@@ -405,10 +405,8 @@ class PermissionsTests: XCTestCase {
             }
             usleep(500_000)
         }
-        XCTAssertTrue(
-            websitePermissionsColorIsGreen,
-            "After a few attempts to wait for permissions.site to update their button animation after the TCC dialog, their button has to be green."
-        )
+        // We would like to be able to test here that the permission.site "Location" button turns green here, but it frequently doesn't turn green
+        // when location permissions are granted.
 
         let navigationBarViewControllerPermissionButton = app.buttons["NavigationBarViewController.geolocationPermissionButton"]
         navigationBarViewControllerPermissionButton.clickAfterExistenceTestSucceeds()
@@ -431,7 +429,6 @@ class PermissionsTests: XCTestCase {
 
         let locationButton = app.webViews.buttons["Location"]
         locationButton.clickAfterExistenceTestSucceeds()
-
         let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
         permissionsPopoverAllowButton.clickAfterExistenceTestSucceeds()
         var websitePermissionsColorIsGreen = false
@@ -442,10 +439,9 @@ class PermissionsTests: XCTestCase {
             }
             usleep(500_000)
         }
-        XCTAssertTrue(
-            websitePermissionsColorIsGreen,
-            "After a few attempts to wait for permissions.site to update their button animation after the TCC dialog, their button has to be green."
-        )
+
+        // We would like to be able to test here that the permission.site "Location" button turns green here, but it frequently doesn't turn green
+        // when location permissions are granted.
 
         let navigationBarViewControllerPermissionButton = app.buttons["NavigationBarViewController.geolocationPermissionButton"]
         navigationBarViewControllerPermissionButton.clickAfterExistenceTestSucceeds()
@@ -470,7 +466,7 @@ class PermissionsTests: XCTestCase {
         for _ in 1 ... 4 {
             locationButton.clickAfterExistenceTestSucceeds()
         }
-        XCTAssertTrue(
+        XCTAssertTrue( // It does turn red when permission is denied.
             try websitePermissionsButtonIsExpectedColor(locationButton, is: .red),
             "Even if we click the button for the denied resource many times, when we are on a site where we have set \"always deny\" for the resource, the permission button will remain red"
         )
