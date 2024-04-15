@@ -26,52 +26,6 @@ import XCTest
 
 final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
 
-    final class AttemptHandler {
-
-        enum ExpectedResult {
-            case success
-            case failure(_ error: Error)
-        }
-
-        private var beginCallCount = 0
-        private var successCallCount = 0
-        private var failureCallCount = 0
-        private var error: Error?
-        private let expectedResult: ExpectedResult
-
-        init(expectedResult: ExpectedResult) {
-            self.expectedResult = expectedResult
-        }
-
-        func begin() {
-            beginCallCount += 1
-        }
-
-        func success() {
-            successCallCount += 1
-        }
-
-        func failure(_ error: Error) {
-            failureCallCount += 1
-            self.error = error
-        }
-
-        var expectationsMet: Bool {
-            switch expectedResult {
-            case .success:
-                return beginCallCount == 1 && successCallCount == 1 && failureCallCount == 0
-            case .failure(let error):
-                guard let expectedNSError = self.error as? NSError else {
-                    return false
-                }
-
-                let nsError = error as NSError
-
-                return beginCallCount == 1 && successCallCount == 0 && failureCallCount == 1 && nsError == expectedNSError
-            }
-        }
-    }
-
     // MARK: - Tunnel Start Tests
 
     func testStartTunnelSuccess() async {
