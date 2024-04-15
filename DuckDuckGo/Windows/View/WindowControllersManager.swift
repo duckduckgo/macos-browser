@@ -237,6 +237,13 @@ extension WindowControllersManager {
         }
     }
 
+    func showNewWindow() {
+        guard WindowControllersManager.shared.lastKeyMainWindowController == nil else { return }
+        let tabCollection = TabCollection(tabs: [])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        _ = WindowsManager.openNewWindow(with: tabCollectionViewModel)
+    }
+
     func showLocationPickerSheet() {
         let locationsViewController = VPNLocationsHostingViewController()
         let locationsWindowController = locationsViewController.wrappedInWindowController()

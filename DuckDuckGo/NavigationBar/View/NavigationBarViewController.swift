@@ -972,6 +972,7 @@ extension NavigationBarViewController: NSMenuDelegate {
             .store(in: &cancellables)
 
         networkProtectionButtonModel.$showButton
+            .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] show in
                 let isPopUpWindow = self?.view.window?.isPopUpWindow ?? false
