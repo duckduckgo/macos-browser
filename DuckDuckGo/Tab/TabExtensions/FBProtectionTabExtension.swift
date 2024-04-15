@@ -54,16 +54,16 @@ final class FBProtectionTabExtension {
 
 extension FBProtectionTabExtension {
 
-    private func enableFBProtection(for url: URL) {
+    private func setFBProtection(for url: URL) {
         // Enable/disable FBProtection only after UserScripts are installed (awaitContentBlockingAssetsInstalled)
         let privacyConfiguration = privacyConfigurationManager.privacyConfig
 
         let featureEnabled = privacyConfiguration.isFeature(.clickToLoad, enabledForDomain: url.host)
-        setFBProtection(enable: featureEnabled)
+        enableFBProtection(enable: featureEnabled)
     }
 
     @discardableResult
-    private func setFBProtection(enable: Bool) -> Bool {
+    private func enableFBProtection(enable: Bool) -> Bool {
         if #unavailable(OSX 11) {  // disable CTL for Catalina and earlier
             return false
         }
@@ -101,7 +101,7 @@ extension FBProtectionTabExtension: ClickToLoadUserScriptDelegate {
             return true
         }
 
-        if setFBProtection(enable: false) {
+        if enableFBProtection(enable: false) {
             return true
         } else {
             return false
@@ -116,7 +116,7 @@ extension FBProtectionTabExtension: NavigationResponder {
         if navigationAction.navigationType == NavigationType.other && navigationAction.isUserInitiated == false {
             return .next
         }
-        enableFBProtection(for: navigationAction.url)
+        setFBProtection(for: navigationAction.url)
         return .next
     }
 
