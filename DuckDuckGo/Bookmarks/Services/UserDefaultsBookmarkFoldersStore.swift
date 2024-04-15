@@ -1,5 +1,5 @@
 //
-//  BookmarkFoldersStore.swift
+//  UserDefaultsBookmarkFoldersStore.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,13 +18,15 @@
 
 import Foundation
 
+/// A type used to provide the ID of the folder where all tabs were last saved.
 protocol BookmarkFoldersStore: AnyObject {
+    /// The ID of the folder where all bookmarks from the last session were saved.
     var lastBookmarkAllTabsFolderIdUsed: String? { get set }
 }
 
 final class UserDefaultsBookmarkFoldersStore: BookmarkFoldersStore {
 
-    private enum Keys {
+    enum Keys {
         static let bookmarkAllTabsFolderUsedKey = "bookmarks.all-tabs.last-used-folder"
     }
 
