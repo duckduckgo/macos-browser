@@ -724,6 +724,7 @@
                                                     <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Geolocation-Icon"/>
                                                     <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Geolocation-Icon"/>
                                                 </userDefinedRuntimeAttributes>
+                                                <accessibility identifier="NavigationBarViewController.geolocationPermissionButton"/>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uao-nC-0co" userLabel="Microphone Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="32" y="0.0" width="32" height="32"/>
@@ -747,6 +748,7 @@
                                                     <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Microphone-Icon"/>
                                                     <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Microphone-Icon"/>
                                                 </userDefinedRuntimeAttributes>
+                                                <accessibility identifier="NavigationBarViewController.microphonePermissionButton"/>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C2L-f9-L3r" userLabel="Camera Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="64" y="0.0" width="32" height="32"/>
@@ -770,7 +772,7 @@
                                                     <userDefinedRuntimeAttribute type="image" keyPath="disabledImage" value="Camera-Tab-Blocked"/>
                                                     <userDefinedRuntimeAttribute type="image" keyPath="mutedImage" value="Camera-Icon"/>
                                                 </userDefinedRuntimeAttributes>
-                                                <accessibility identifier="NavigationBarViewController.PermissionButton"/>
+                                                <accessibility identifier="NavigationBarViewController.cameraPermissionButton"/>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qqY-h9-UQ7" userLabel="Popups Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="96" y="0.0" width="32" height="32"/>
@@ -790,6 +792,7 @@
                                                         <color key="value" name="ButtonMouseDownColor"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <accessibility identifier="NavigationBarViewController.popupsPermissionButton"/>
                                             </button>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gGA-Yv-pnz" userLabel="External Scheme Button" customClass="PermissionButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="128" y="0.0" width="32" height="32"/>
