@@ -46,7 +46,7 @@ struct BookmarkAllTabsDialogView: ModalView {
                     .multilineText()
                     .multilineTextAlignment(.leading)
                     .foregroundColor(.secondary)
-                    .fontWeight(.light)
+                    .font(.system(size: 11))
                 BookmarkDialogStackedContentView(
                     .init(
                         title: UserText.Bookmarks.Dialog.Field.folderName,
