@@ -250,7 +250,7 @@ class FindInPageTests: XCTestCase {
         XCTAssertEqual(statusFieldTextContent, "1 of 4", "Unexpected status field text content after a \"Find in Page\" operation.")
 
         let webViewWithSelectedWordsScreenshot = loremIpsumWebView.screenshot()
-        let highlightedPixelsInScreenshot = webViewWithSelectedWordsScreenshot.image.matchingPixels(of: .findHighlightColor)
+        let highlightedPixelsInScreenshot = try XCTUnwrap(webViewWithSelectedWordsScreenshot.image.matchingPixels(of: .findHighlightColor))
         XCTAssertGreaterThan(
             highlightedPixelsInScreenshot.count,
             minimumExpectedMatchingPixelsInFindHighlight,
@@ -283,7 +283,7 @@ class FindInPageTests: XCTestCase {
         // Note: the following is not a localized test element, but it should have a localization strategy.
         XCTAssertEqual(statusFieldTextContent, "1 of 4", "Unexpected status field text content after a \"Find in Page\" operation.")
         let findInPageScreenshot = loremIpsumWebView.screenshot()
-        let highlightedPixelsInFindScreenshot = findInPageScreenshot.image.matchingPixels(of: .findHighlightColor)
+        let highlightedPixelsInFindScreenshot = try XCTUnwrap(findInPageScreenshot.image.matchingPixels(of: .findHighlightColor))
         let findHighlightPoints = Set(highlightedPixelsInFindScreenshot.map { $0.point }) // Coordinates of highlighted pixels in the find screenshot
 
         let findNextMenuBarItem = app.menuItems["MainMenu.findNext"]
@@ -300,8 +300,9 @@ class FindInPageTests: XCTestCase {
         )
         XCTAssertEqual(updatedStatusFieldTextContent, "2 of 4", "Unexpected status field text content after a \"Find Next\" operation.")
         let findNextScreenshot = loremIpsumWebView.screenshot()
-        let highlightedPixelsInFindNextScreenshot = Set(findNextScreenshot.image
-            .matchingPixels(of: .findHighlightColor)) // Coordinates of highlighted pixels in the find next screenshot
+        let highlightedPixelsInFindNextScreenshot =
+            try XCTUnwrap(Set(findNextScreenshot.image
+                    .matchingPixels(of: .findHighlightColor))) // Coordinates of highlighted pixels in the find next screenshot
         let findNextHighlightPoints = highlightedPixelsInFindNextScreenshot.map { $0.point }
         let pixelSetIntersection = findHighlightPoints
             .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should not have many elements
@@ -342,7 +343,7 @@ class FindInPageTests: XCTestCase {
         // Note: the following is not a localized test element, but it should have a localization strategy.
         XCTAssertEqual(statusFieldTextContent, "1 of 4", "Unexpected status field text content after a \"Find in Page\" operation.")
         let findInPageScreenshot = loremIpsumWebView.screenshot()
-        let highlightedPixelsInFindScreenshot = findInPageScreenshot.image.matchingPixels(of: .findHighlightColor)
+        let highlightedPixelsInFindScreenshot = try XCTUnwrap(findInPageScreenshot.image.matchingPixels(of: .findHighlightColor))
         let findHighlightPoints = Set(highlightedPixelsInFindScreenshot.map { $0.point }) // Coordinates of highlighted pixels in the find screenshot
         let findInPageNextButton = app.windows.buttons["FindInPageController.nextButton"]
         XCTAssertTrue(
@@ -359,7 +360,7 @@ class FindInPageTests: XCTestCase {
         )
         XCTAssertEqual(updatedStatusFieldTextContent, "2 of 4", "Unexpected status field text content after a \"Find Next\" operation.")
         let findNextScreenshot = loremIpsumWebView.screenshot()
-        let highlightedPixelsInFindNextScreenshot = findNextScreenshot.image.matchingPixels(of: .findHighlightColor)
+        let highlightedPixelsInFindNextScreenshot = try XCTUnwrap(findNextScreenshot.image.matchingPixels(of: .findHighlightColor))
         let findNextHighlightPoints = highlightedPixelsInFindNextScreenshot.map { $0.point }
         let pixelSetIntersection = findHighlightPoints
             .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should not have many elements
@@ -401,7 +402,7 @@ class FindInPageTests: XCTestCase {
         // Note: the following is not a localized test element, but it should have a localization strategy.
         XCTAssertEqual(statusFieldTextContent, "1 of 4", "Unexpected status field text content after a \"Find in Page\" operation.")
         let findInPageScreenshot = loremIpsumWebView.screenshot()
-        let highlightedPixelsInFindScreenshot = findInPageScreenshot.image.matchingPixels(of: .findHighlightColor)
+        let highlightedPixelsInFindScreenshot = try XCTUnwrap(findInPageScreenshot.image.matchingPixels(of: .findHighlightColor))
         let findHighlightPoints = Set(highlightedPixelsInFindScreenshot.map { $0.point }) // Coordinates of highlighted pixels in the find screenshot
         app.typeKey("g", modifierFlags: [.command])
         let updatedStatusField = app.textFields["FindInPageController.statusField"]
@@ -413,7 +414,7 @@ class FindInPageTests: XCTestCase {
 
         XCTAssertEqual(updatedStatusFieldTextContent, "2 of 4", "Unexpected status field text content after a \"Find Next\" operation.")
         let findNextScreenshot = loremIpsumWebView.screenshot()
-        let highlightedPixelsInFindNextScreenshot = findNextScreenshot.image.matchingPixels(of: .findHighlightColor)
+        let highlightedPixelsInFindNextScreenshot = try XCTUnwrap(findNextScreenshot.image.matchingPixels(of: .findHighlightColor))
         let findNextHighlightPoints = highlightedPixelsInFindNextScreenshot.map { $0.point }
         let pixelSetIntersection = findHighlightPoints
             .intersection(findNextHighlightPoints) // If the highlighted text has moved as expected, this should not have many elements
@@ -492,21 +493,19 @@ private extension NSImage {
     /// Find matching pixels in an NSImage for a specific NSColor
     /// - Parameter colorToMatch: the NSColor to match
     /// - Returns: An array of Pixel structs
-    func matchingPixels(of colorToMatch: NSColor) -> [Pixel] {
-        let cgImage = cgImage(forProposedRect: nil, context: nil, hints: nil)
-        XCTAssertNotNil(cgImage, "It wasn't possible to obtain the CGImage of the NSImage.")
-        let bitmap = NSBitmapImageRep(cgImage: cgImage!)
+    func matchingPixels(of colorToMatch: NSColor) throws -> [Pixel] {
+        let cgImage = try XCTUnwrap(
+            cgImage(forProposedRect: nil, context: nil, hints: nil),
+            "It wasn't possible to obtain the CGImage of the NSImage."
+        )
+        let bitmap = NSBitmapImageRep(cgImage: cgImage)
         let colorSpace = bitmap.colorSpace
-
-        XCTAssertNotNil(
+        let colorToMatchWithColorSpace = try XCTUnwrap(
             colorToMatch.usingColorSpace(colorSpace),
             "It wasn't possible to get the color to match in the local colorspace."
-        )
-        let colorToMatchWithColorSpace = colorToMatch
-            .usingColorSpace(colorSpace)! // Compare the color we want to look for in the image after it is in the same colorspace as the image
+        ) // Compare the color we want to look for in the image after it is in the same colorspace as the image
 
-        XCTAssertNotNil(bitmap.bitmapData, "It wasn't possible to obtain the bitmapData of the bitmap.")
-        var bitmapData: UnsafeMutablePointer<UInt8> = bitmap.bitmapData!
+        var bitmapData: UnsafeMutablePointer<UInt8> = try XCTUnwrap(bitmap.bitmapData, "It wasn't possible to obtain the bitmapData of the bitmap.")
         var redInImage, greenInImage, blueInImage, alphaInImage: UInt8
 
         let redToMatch = UInt8(colorToMatchWithColorSpace.redComponent * 255.999999) // color components in 0-255 values in this colorspace
