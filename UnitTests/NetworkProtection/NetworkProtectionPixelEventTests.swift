@@ -352,11 +352,11 @@ final class NetworkProtectionPixelEventTests: XCTestCase {
                           underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
-        fire(NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure,
+        fire(NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure(TestError.testError),
              frequency: .dailyAndCount,
-             and: .expect(pixelName: "m_mac_netp_system_extension_activation_failure"),
-             error: TestError.testError,
-             underlyingErrors: [TestError.underlyingError]),
+             and: .expect(pixelName: "m_mac_netp_system_extension_activation_failure",
+                          error: TestError.testError,
+                          underlyingErrors: [TestError.underlyingError]),
              file: #filePath,
              line: #line)
         fire(NetworkProtectionPixelEvent.networkProtectionUnhandledError(function: "function", line: 1, error: TestError.testError),
