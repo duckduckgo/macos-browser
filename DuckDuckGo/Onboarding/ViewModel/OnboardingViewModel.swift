@@ -151,8 +151,8 @@ final class OnboardingViewModel: ObservableObject {
             }
             return false
         }) {
+            let appDict = recentApps[recentAppIndex]
             // Move from recent to persistent
-            let appDict = recentApps.remove(at: recentAppIndex)
             persistentApps.append(appDict)
         } else {
             // Create the dictionary for the current application if not found in recent apps
@@ -163,6 +163,15 @@ final class OnboardingViewModel: ObservableObject {
         // Update the plist
         dockPlistDict["persistent-apps"] = persistentApps as AnyObject?
         dockPlistDict["recent-apps"] = recentApps as AnyObject?
+
+        // Mofidy the mod-count
+        if let modCount = dockPlistDict["mod-count"] as? Int {
+            dockPlistDict["mod-count"] = (modCount + 1) as AnyObject?
+        } else {
+            assertionFailure("mod-count modification failed")
+        }
+
+        // Write
         do {
             try (dockPlistDict as NSDictionary).write(to: dockPlistURL)
         } catch {
@@ -170,7 +179,7 @@ final class OnboardingViewModel: ObservableObject {
         }
 
         // Restart the Dock to apply changes
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.restartDock()
         }
     }
