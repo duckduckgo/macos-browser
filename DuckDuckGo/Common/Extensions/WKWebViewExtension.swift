@@ -29,7 +29,7 @@ extension WKWebView {
         return false
     }
 
-    enum AudioState: UInt {
+    enum AudioState {
         case muted
         case unmuted
 
