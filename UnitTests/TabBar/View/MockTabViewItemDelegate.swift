@@ -24,7 +24,7 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     var mockedCurrentTab: Tab?
 
     var hasItemsToTheRight = false
-    var audioState: WKWebView.AudioState = .notSupported
+    var audioState: WKWebView.AudioState?
 
     func tabBarViewItem(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem, isMouseOver: Bool) {
 
@@ -86,7 +86,7 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState {
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
         return audioState
     }
 
@@ -99,7 +99,7 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     }
 
     func clear() {
-        self.audioState = .notSupported
+        self.audioState = nil
     }
 
 }
