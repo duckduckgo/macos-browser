@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import UserScript
 import WebKit
+import Subscription
 
 @MainActor
 final class UserScripts: UserScriptsProvider {
@@ -45,15 +46,16 @@ final class UserScripts: UserScriptsProvider {
     let autoconsentUserScript: UserScriptWithAutoconsent
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
+    let sslErrorPageUserScript: SSLErrorPageUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
-        let privacySettings = PrivacySecurityPreferences.shared
+        let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
         let privacyConfig = sourceProvider.privacyConfigurationManager.privacyConfig
         let sessionKey = sourceProvider.sessionKey ?? ""
-        let prefs = ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
+        let prefs = ContentScopeProperties(gpcEnabled: isGPCEnabled,
                                                 sessionKey: sessionKey,
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig))
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
@@ -63,14 +65,16 @@ final class UserScripts: UserScriptsProvider {
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
+        sslErrorPageUserScript = SSLErrorPageUserScript()
+
+        specialPages = SpecialPagesUserScript()
+
         if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
             youtubePlayerUserScript = YoutubePlayerUserScript()
-            specialPages = SpecialPagesUserScript()
         } else {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil
-            specialPages = nil
         }
 
         userScripts.append(autoconsentUserScript)
@@ -79,15 +83,18 @@ final class UserScripts: UserScriptsProvider {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
 
-        if let youtubePlayerUserScript {
-            if let specialPages = specialPages {
-                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
-                userScripts.append(specialPages)
+        if let specialPages = specialPages {
+            if let sslErrorPageUserScript {
+                specialPages.registerSubfeature(delegate: sslErrorPageUserScript)
             }
+            if let youtubePlayerUserScript {
+                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
+            }
+            userScripts.append(specialPages)
         }
 
 #if SUBSCRIPTION
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
             userScripts.append(subscriptionPagesUserScript)
 

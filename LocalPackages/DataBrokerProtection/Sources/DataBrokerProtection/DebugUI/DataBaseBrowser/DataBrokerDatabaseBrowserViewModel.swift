@@ -31,7 +31,7 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
             self.selectedTable = tables.first
             self.dataManager = nil
         } else {
-            self.dataManager = DataBrokerProtectionDataManager()
+            self.dataManager = DataBrokerProtectionDataManager(pixelHandler: DataBrokerProtectionPixelsHandler())
             self.tables = [DataBrokerDatabaseBrowserData.Table]()
             self.selectedTable = nil
             updateTables()
@@ -48,7 +48,10 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         guard let dataManager = self.dataManager else { return }
 
         Task {
-            let data = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+            guard let data = try? dataManager.fetchBrokerProfileQueryData(ignoresCache: true) else {
+                assertionFailure("DataManager error during DataBrokerDatavaseBrowserViewModel.updateTables")
+                return
+            }
 
             let profileBrokers = data.map { $0.dataBroker }
             let dataBrokers = Array(Set(profileBrokers)).sorted { $0.id ?? 0 < $1.id ?? 0 }

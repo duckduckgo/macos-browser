@@ -44,7 +44,9 @@ public struct SystemExtensionManager {
         self.workspace = workspace
     }
 
-    public func activate(waitingForUserApproval: @escaping () -> Void) async throws {
+    /// - Returns: The system extension version.
+    /// 
+    public func activate(waitingForUserApproval: @escaping () -> Void) async throws -> String {
         /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
         ///     Background: For a lot of users, the system won't show the system-extension-blocked alert if there's a previous request
         ///         to activate the extension.  You can see active requests in your console using command `systemextensionsctl list`.
@@ -62,11 +64,14 @@ public struct SystemExtensionManager {
             openSystemSettingsSecurity()
         }
 
-        return try await SystemExtensionRequest.activationRequest(
+        let activationRequest = SystemExtensionRequest.activationRequest(
             forExtensionWithIdentifier: extensionBundleID,
             manager: manager,
             waitingForUserApproval: waitingForUserApproval)
-        .submit()
+
+        try await activationRequest.submit()
+
+        return activationRequest.version ?? "unknown"
     }
 
     public func deactivate() async throws {
@@ -113,6 +118,7 @@ final class SystemExtensionRequest: NSObject {
     private let request: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
     private let waitingForUserApproval: (() -> Void)?
+    private(set) var version: String?
 
     private var continuation: CheckedContinuation<Void, Error>?
 
@@ -144,12 +150,30 @@ final class SystemExtensionRequest: NSObject {
             manager.submitRequest(request)
         }
     }
+
+    private func updateVersion(to version: String) {
+        self.version = version
+    }
+
+    private func updateVersionNumberIfMissing() {
+        guard version == nil,
+              let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
+            return
+        }
+
+        var extensionVersion = versionString
+
+        if let buildString = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String {
+            extensionVersion = extensionVersion + "." + buildString
+        }
+    }
 }
 
 extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
 
     func request(_ request: OSSystemExtensionRequest, actionForReplacingExtension existing: OSSystemExtensionProperties, withExtension ext: OSSystemExtensionProperties) -> OSSystemExtensionRequest.ReplacementAction {
 
+        updateVersion(to: ext.bundleShortVersion + "." + ext.bundleVersion)
         return .replace
     }
 
@@ -160,6 +184,7 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
     func request(_ request: OSSystemExtensionRequest, didFinishWithResult result: OSSystemExtensionRequest.Result) {
         switch result {
         case .completed:
+            updateVersionNumberIfMissing()
             continuation?.resume()
         case .willCompleteAfterReboot:
             continuation?.resume(throwing: SystemExtensionRequestError.willActivateAfterReboot)

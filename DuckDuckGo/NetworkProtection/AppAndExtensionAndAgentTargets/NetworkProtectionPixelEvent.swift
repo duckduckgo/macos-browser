@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import PixelKit
 import NetworkProtection
@@ -69,11 +67,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionClientFailedToParseLocationsResponse(_ error: Error?)
     case networkProtectionClientInvalidAuthToken
 
-    case networkProtectionServerListStoreFailedToEncodeServerList
-    case networkProtectionServerListStoreFailedToDecodeServerList
-    case networkProtectionServerListStoreFailedToWriteServerList(_ error: Error)
-    case networkProtectionServerListStoreFailedToReadServerList(_ error: Error)
-
     case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
     case networkProtectionKeychainReadError(field: String, status: Int32)
     case networkProtectionKeychainWriteError(field: String, status: Int32)
@@ -92,7 +85,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionRekeyCompleted
     case networkProtectionRekeyFailure(_ error: Error)
 
-    case networkProtectionSystemExtensionActivationFailure
+    case networkProtectionSystemExtensionActivationFailure(_ error: Error)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
@@ -207,18 +200,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionClientInvalidAuthToken:
             return "netp_backend_api_error_invalid_auth_token"
 
-        case .networkProtectionServerListStoreFailedToEncodeServerList:
-            return "netp_storage_error_failed_to_encode_server_list"
-
-        case .networkProtectionServerListStoreFailedToDecodeServerList:
-            return "netp_storage_error_failed_to_decode_server_list"
-
-        case .networkProtectionServerListStoreFailedToWriteServerList:
-            return "netp_storage_error_server_list_file_system_write_failed"
-
-        case .networkProtectionServerListStoreFailedToReadServerList:
-            return "netp_storage_error_server_list_file_system_read_failed"
-
         case .networkProtectionKeychainErrorFailedToCastKeychainValueToData:
             return "netp_keychain_error_failed_to_cast_keychain_value_to_data"
 
@@ -297,12 +278,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 PixelKit.Parameters.errorCode: String(status)
             ]
 
-        case .networkProtectionServerListStoreFailedToWriteServerList(let error):
-            return error.pixelParameters
-
-        case .networkProtectionServerListStoreFailedToReadServerList(let error):
-            return error.pixelParameters
-
         case .networkProtectionClientFailedToFetchServerList(let error):
             return error?.pixelParameters
 
@@ -349,8 +324,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
              .networkProtectionClientInvalidInviteCode,
              .networkProtectionClientFailedToEncodeRedeemRequest,
              .networkProtectionClientInvalidAuthToken,
-             .networkProtectionServerListStoreFailedToEncodeServerList,
-             .networkProtectionServerListStoreFailedToDecodeServerList,
              .networkProtectionNoAuthTokenFoundError,
              .networkProtectionRekeyAttempt,
              .networkProtectionRekeyCompleted,
@@ -409,8 +382,6 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionClientFailedToEncodeRedeemRequest,
                 .networkProtectionClientInvalidInviteCode,
                 .networkProtectionClientInvalidAuthToken,
-                .networkProtectionServerListStoreFailedToEncodeServerList,
-                .networkProtectionServerListStoreFailedToDecodeServerList,
                 .networkProtectionKeychainErrorFailedToCastKeychainValueToData,
                 .networkProtectionKeychainReadError,
                 .networkProtectionKeychainWriteError,
@@ -422,8 +393,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionWireguardErrorCannotStartWireguardBackend,
                 .networkProtectionNoAuthTokenFoundError,
                 .networkProtectionRekeyAttempt,
-                .networkProtectionRekeyCompleted,
-                .networkProtectionSystemExtensionActivationFailure:
+                .networkProtectionRekeyCompleted:
             return nil
         case .networkProtectionClientFailedToRedeemInviteCode(let error),
                 .networkProtectionClientFailedToFetchLocations(let error),
@@ -435,14 +405,11 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionTunnelStartFailure(let error),
                 .networkProtectionTunnelUpdateFailure(let error),
                 .networkProtectionClientFailedToParseRedeemResponse(let error),
-                .networkProtectionServerListStoreFailedToWriteServerList(let error),
-                .networkProtectionServerListStoreFailedToReadServerList(let error),
                 .networkProtectionWireguardErrorCannotSetNetworkSettings(let error),
                 .networkProtectionRekeyFailure(let error),
-                .networkProtectionUnhandledError(_, _, let error):
+                .networkProtectionUnhandledError(_, _, let error),
+                .networkProtectionSystemExtensionActivationFailure(let error):
             return error
         }
     }
 }
-
-#endif

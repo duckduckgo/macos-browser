@@ -25,14 +25,12 @@ import Navigation
 import UserScript
 import WebKit
 import History
+import PrivacyDashboard
+import NetworkProtection
+import NetworkProtectionIPC
 
 #if SUBSCRIPTION
 import Subscription
-#endif
-
-#if NETWORK_PROTECTION
-import NetworkProtection
-import NetworkProtectionIPC
 #endif
 
 // swiftlint:disable file_length
@@ -342,10 +340,10 @@ protocol NewWindowPolicyDecisionMaker {
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
+    private let certificateTrustEvaluator: CertificateTrustEvaluating
+    var isCertificateValid: Bool?
 
-#if NETWORK_PROTECTION
-    private var tunnelController: NetworkProtectionIPCTunnelController?
-#endif
+    private(set) var tunnelController: NetworkProtectionIPCTunnelController
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -386,7 +384,8 @@ protocol NewWindowPolicyDecisionMaker {
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
-                     startupPreferences: StartupPreferences = StartupPreferences.shared
+                     startupPreferences: StartupPreferences = StartupPreferences.shared,
+                     certificateTrustEvaluator: CertificateTrustEvaluating = CertificateTrustEvaluator()
     ) {
 
         let duckPlayer = duckPlayer
@@ -425,7 +424,8 @@ protocol NewWindowPolicyDecisionMaker {
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
                   webViewSize: webViewSize,
-                  startupPreferences: startupPreferences)
+                  startupPreferences: startupPreferences,
+                  certificateTrustEvaluator: certificateTrustEvaluator)
     }
 
     @MainActor
@@ -455,7 +455,8 @@ protocol NewWindowPolicyDecisionMaker {
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
          webViewSize: CGSize,
-         startupPreferences: StartupPreferences
+         startupPreferences: StartupPreferences,
+         certificateTrustEvaluator: CertificateTrustEvaluating
     ) {
 
         self.content = content
@@ -471,6 +472,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.interactionState = interactionStateData.map(InteractionState.loadCachedFromTabContent) ?? .none
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
+        self.certificateTrustEvaluator = certificateTrustEvaluator
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
@@ -514,6 +516,10 @@ protocol NewWindowPolicyDecisionMaker {
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager))
 
+        let ipcClient = TunnelControllerIPCClient()
+        ipcClient.register()
+        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+
         super.init()
         tabGetter = { [weak self] in self }
         userContentController.map(userContentControllerPromise.fulfill)
@@ -532,20 +538,6 @@ protocol NewWindowPolicyDecisionMaker {
             .sink { [weak self] notification in
                 self?.onDuckDuckGoEmailSignOut(notification)
             }
-
-#if NETWORK_PROTECTION
-        netPOnboardStatusCancellabel = DefaultNetworkProtectionVisibility().onboardStatusPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] onboardingStatus in
-                guard onboardingStatus == .completed else { return }
-
-                let machServiceName = Bundle.main.vpnMenuAgentBundleId
-                let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
-                ipcClient.register()
-
-                self?.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-            }
-#endif
 
         self.audioState = webView.audioState()
         addDeallocationChecks(for: webView)
@@ -778,6 +770,10 @@ protocol NewWindowPolicyDecisionMaker {
 
     @Published private(set) var lastWebError: Error?
     @Published private(set) var lastHttpStatusCode: Int?
+
+    @Published private(set) var inferredOpenerContext: BrokenSiteReport.OpenerContext?
+    @Published private(set) var refreshCountSinceLoad: Int = 0
+    private (set) var performanceMetrics: PerformanceMetricsSubfeature?
 
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var loadingProgress: Double = 0.0
@@ -1028,6 +1024,8 @@ protocol NewWindowPolicyDecisionMaker {
             return nil
         }
 
+        refreshCountSinceLoad += 1
+
         self.content = content.forceReload()
         if webView.url == nil, content.isUrl {
             // load from cache or interactionStateData when called by lazy loader
@@ -1071,8 +1069,11 @@ protocol NewWindowPolicyDecisionMaker {
 
         let source = content.source
         if url.isFileURL {
+            // WebKit won‘t load local page‘s external resouces even with `allowingReadAccessTo` provided
+            // this could be fixed using a custom scheme handler loading local resources in future.
+            let readAccessScopeURL = url
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
+                .loadFileURL(url, allowingReadAccessTo: readAccessScopeURL, withExpectedNavigationType: source.navigationType)
         }
 
         var request = URLRequest(url: url, cachePolicy: source.cachePolicy)
@@ -1130,7 +1131,12 @@ protocol NewWindowPolicyDecisionMaker {
         // only restore session from interactionStateData passed to Tab.init
         guard case .loadCachedFromTabContent(let interactionStateData) = self.interactionState else { return false }
 
-        if let url = content.urlForWebView, url.isFileURL {
+        switch content.urlForWebView {
+        case .some(let url) where url.isFileURL:
+#if APPSTORE
+            guard url.isWritableLocation() else { fallthrough }
+#endif
+
             // request file system access before restoration
             webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .loadFileURL(url, allowingReadAccessTo: url)?
@@ -1139,7 +1145,8 @@ protocol NewWindowPolicyDecisionMaker {
                 }, navigationDidFail: { [weak self] _, _ in
                     self?.restoreInteractionState(with: interactionStateData)
                 })
-        } else {
+
+        default:
             restoreInteractionState(with: interactionStateData)
         }
 
@@ -1170,10 +1177,6 @@ protocol NewWindowPolicyDecisionMaker {
 
     private var webViewCancellables = Set<AnyCancellable>()
     private var emailDidSignOutCancellable: AnyCancellable?
-
-#if NETWORK_PROTECTION
-    private var netPOnboardStatusCancellabel: AnyCancellable?
-#endif
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
@@ -1222,7 +1225,13 @@ protocol NewWindowPolicyDecisionMaker {
 
         webView.publisher(for: \.serverTrust)
             .sink { [weak self] serverTrust in
-                self?.privacyInfo?.serverTrust = serverTrust
+                guard let self else { return }
+                self.isCertificateValid = self.certificateTrustEvaluator.evaluateCertificateTrust(trust: serverTrust)
+                if self.isCertificateValid == true {
+                    self.privacyInfo?.serverTrust = serverTrust
+                } else {
+                    self.privacyInfo?.serverTrust = nil
+                }
             }
             .store(in: &webViewCancellables)
 
@@ -1287,6 +1296,9 @@ extension Tab: UserContentControllerDelegate {
         userScripts.faviconScript.delegate = self
         userScripts.pageObserverScript.delegate = self
         userScripts.printingUserScript.delegate = self
+
+        performanceMetrics = PerformanceMetricsSubfeature(targetWebview: webView)
+        userScripts.contentScopeUserScriptIsolated.registerSubfeature(delegate: performanceMetrics!)
     }
 
 }
@@ -1357,10 +1369,31 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         committedURL = navigation.url
     }
 
+    func resetRefreshCountIfNeeded(action: NavigationAction) {
+        switch action.navigationType {
+        case .reload, .other:
+            break
+        default:
+            refreshCountSinceLoad = 0
+        }
+    }
+
+    func setOpenerContextIfNeeded(action: NavigationAction) {
+        switch action.navigationType {
+        case .linkActivated, .formSubmitted:
+            inferredOpenerContext = .navigation
+        default:
+            break
+        }
+    }
+
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // allow local file navigations
         if navigationAction.url.isFileURL { return .allow }
+
+        resetRefreshCountIfNeeded(action: navigationAction)
+        setOpenerContextIfNeeded(action: navigationAction)
 
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if let mainFrame = navigationAction.mainFrameTarget,
@@ -1416,6 +1449,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             error = nil
         }
 
+        if inferredOpenerContext != .external {
+            inferredOpenerContext = nil
+        }
+
         invalidateInteractionStateData()
     }
 
@@ -1425,11 +1462,15 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
 
-#if NETWORK_PROTECTION
-        if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {
+        Task { @MainActor in
+            if await webView.isCurrentSiteReferredFromDuckDuckGo {
+                inferredOpenerContext = .serp
+            }
+        }
+
+        if navigation.url.isDuckDuckGoSearch, tunnelController.isConnected == true {
             DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount)
         }
-#endif
     }
 
     @MainActor
@@ -1449,10 +1490,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         invalidateInteractionStateData()
 
-        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
-           // don‘t show an error page if the error was already handled
-           // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-           self.content.urlForWebView == url {
+        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled, error.errorCode != NSURLErrorServerCertificateUntrusted,
+                   // don‘t show an error page if the error was already handled
+                   // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
+            self.content.urlForWebView == url {
 
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML

@@ -23,7 +23,7 @@ private class XPCConnectionsManager: NSObject, NSXPCListenerDelegate {
 
     private let clientInterface: NSXPCInterface
     private let serverInterface: NSXPCInterface
-    private let queue: DispatchQueue
+    fileprivate let queue: DispatchQueue
     weak var delegate: AnyObject?
 
     /// The active connections
@@ -135,16 +135,18 @@ extension XPCServer {
     }
 
     public func forEachClient(do callback: @escaping (ClientInterface) -> Void) {
-        for connection in connectionsManager.connections {
-            let client: ClientInterface
+        connectionsManager.queue.async {
+            for connection in self.connectionsManager.connections {
+                let client: ClientInterface
 
-            do {
-                client = try self.client(for: connection)
-            } catch {
-                continue
+                do {
+                    client = try self.client(for: connection)
+                } catch {
+                    continue
+                }
+
+                callback(client)
             }
-
-            callback(client)
         }
     }
 }

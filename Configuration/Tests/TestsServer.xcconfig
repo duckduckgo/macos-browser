@@ -18,3 +18,5 @@
 #include "../Common.xcconfig"
 
 PRODUCT_NAME = $(TARGET_NAME);
+CODE_SIGNING_ALLOWED[config=Review][sdk=macosx*] = NO
+CODE_SIGNING_ALLOWED[config=CI][sdk=macosx*] = NO

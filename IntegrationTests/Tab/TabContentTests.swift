@@ -220,7 +220,7 @@ class TabContentTests: XCTestCase {
             return
         }
 
-        // wait for print dialog to appear
+        // wait for save dialog to appear
         let eSaveDialogShown = expectation(description: "Save dialog shown")
         let getSaveDialog = Task { @MainActor in
             while true {
@@ -234,6 +234,9 @@ class TabContentTests: XCTestCase {
 
         XCTAssertNotNil(saveAsMenuItem.action)
         XCTAssertNotNil(saveAsMenuItem.pdfHudRepresentedObject)
+
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
+        persistor.lastUsedCustomDownloadLocation = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0].path
 
         // Click Save As…
         _=saveAsMenuItem.action.map { action in
@@ -274,7 +277,7 @@ class TabContentTests: XCTestCase {
         let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
-        // wait for print dialog to appear
+        // wait for save dialog to appear
         let eSaveDialogShown = expectation(description: "Save dialog shown")
         let getSaveDialog = Task { @MainActor in
             while true {
@@ -285,6 +288,9 @@ class TabContentTests: XCTestCase {
                 try await Task.sleep(interval: 0.01)
             }
         }
+
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
+        persistor.lastUsedCustomDownloadLocation = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0].path
 
         // Hit Cmd+S
         let keyDown = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: [.command], timestamp: 0, windowNumber: window.windowNumber, context: nil, characters: "s", charactersIgnoringModifiers: "s", isARepeat: false, keyCode: UInt16(kVK_ANSI_S))!

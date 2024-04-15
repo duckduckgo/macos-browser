@@ -16,36 +16,52 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
+import Common
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 
 final class NetworkProtectionIPCTunnelController: TunnelController {
 
+    private let featureVisibility: NetworkProtectionFeatureVisibility
     private let loginItemsManager: LoginItemsManager
     private let ipcClient: NetworkProtectionIPCClient
 
-    init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
+    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         loginItemsManager: LoginItemsManager = LoginItemsManager(),
          ipcClient: NetworkProtectionIPCClient) {
 
+        self.featureVisibility = featureVisibility
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
     }
 
     @MainActor
     func start() async {
-        enableLoginItems()
+        do {
+            guard try await enableLoginItems() else {
+                os_log("🔴 IPC Controller refusing to start the VPN menu app.  Not authorized.", log: .networkProtection)
+                return
+            }
 
-        ipcClient.start()
+            ipcClient.start()
+        } catch {
+            os_log("🔴 IPC Controller found en error when starting the VPN: \(error)", log: .networkProtection)
+        }
     }
 
     @MainActor
     func stop() async {
-        enableLoginItems()
+        do {
+            guard try await enableLoginItems() else {
+                os_log("🔴 IPC Controller refusing to start the VPN.  Not authorized.", log: .networkProtection)
+                return
+            }
 
-        ipcClient.stop()
+            ipcClient.stop()
+        } catch {
+            os_log("🔴 IPC Controller found en error when starting the VPN: \(error)", log: .networkProtection)
+        }
     }
 
     /// Queries VPN to know if it's connected.
@@ -64,9 +80,13 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
 
     // MARK: - Login Items Manager
 
-    private func enableLoginItems() {
+    private func enableLoginItems() async throws -> Bool {
+        guard try await featureVisibility.canStartVPN() else {
+            // We shouldn't enable the menu app is the VPN feature is disabled.
+            return false
+        }
+
         loginItemsManager.enableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
+        return true
     }
 }
-
-#endif

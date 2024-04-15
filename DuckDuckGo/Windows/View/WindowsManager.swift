@@ -61,7 +61,8 @@ final class WindowsManager {
                              contentSize: NSSize? = nil,
                              showWindow: Bool = true,
                              popUp: Bool = false,
-                             lazyLoadTabs: Bool = false) -> MainWindow? {
+                             lazyLoadTabs: Bool = false,
+                             isMiniaturized: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel,
                                                  popUp: popUp,
                                                  burnerMode: burnerMode,
@@ -70,6 +71,8 @@ final class WindowsManager {
         if let contentSize {
             mainWindowController.window?.setContentSize(contentSize)
         }
+
+        mainWindowController.window?.setIsMiniaturized(isMiniaturized)
 
         if let droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -114,7 +117,8 @@ final class WindowsManager {
                              popUp: popUp)
     }
 
-    class func openNewWindow(with initialUrl: URL, source: Tab.TabContent.URLSource, isBurner: Bool, parentTab: Tab? = nil) {
+    @discardableResult
+    class func openNewWindow(with initialUrl: URL, source: Tab.TabContent.URLSource, isBurner: Bool, parentTab: Tab? = nil) -> MainWindow? {
         openNewWindow(with: Tab(content: .contentFromURL(initialUrl, source: source), parentTab: parentTab, shouldLoadInBackground: true, burnerMode: BurnerMode(isBurner: isBurner)))
     }
 

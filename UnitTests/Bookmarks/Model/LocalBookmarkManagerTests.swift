@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 
 import XCTest
@@ -155,6 +156,26 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssert(bookmarkManager.isUrlBookmarked(url: newBookmark!.urlObject!))
         XCTAssert(bookmarkManager.isUrlBookmarked(url: newURL))
         XCTAssert(bookmarkStoreMock.updateBookmarkCalled)
+    }
+
+    func testWhenBookmarkFolderIsUpdatedAndMoved_ThenManagerUpdatesItAlsoInStore() throws {
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let parent = BookmarkFolder(id: "1", title: "Parent")
+        let folder = BookmarkFolder(id: "2", title: "Child")
+        var bookmarkList: BookmarkList?
+        let cancellable = bookmarkManager.listPublisher
+            .dropFirst()
+            .sink { list in
+            bookmarkList = list
+        }
+
+        bookmarkManager.update(folder: folder, andMoveToParent: .parent(uuid: parent.id))
+
+        withExtendedLifetime(cancellable) {}
+        XCTAssertTrue(bookmarkStoreMock.updateFolderAndMoveToParentCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolder, folder)
+        XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: parent.id))
+        XCTAssertNotNil(bookmarkList)
     }
 
 }

@@ -26,6 +26,7 @@ enum ErrorCategory: Equatable {
     case validationError
     case clientError(httpCode: Int)
     case serverError(httpCode: Int)
+    case databaseError(domain: String, code: Int)
     case unclassified
 
     var toString: String {
@@ -35,6 +36,7 @@ enum ErrorCategory: Equatable {
         case .unclassified: return "unclassified"
         case .clientError(let httpCode): return "client-error-\(httpCode)"
         case .serverError(let httpCode): return "server-error-\(httpCode)"
+        case .databaseError(let domain, let code): return "database-error-\(domain)-\(code)"
         }
     }
 }
@@ -58,9 +60,13 @@ public enum DataBrokerProtectionPixels {
         static let hadReAppereance = "had_re-appearance"
         static let scanCoverage = "scan_coverage"
         static let removals = "removals"
+        static let environmentKey = "environment"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
+    case generalError(error: Error, functionOccurredIn: String)
+    case secureVaultInitError(error: Error)
+    case secureVaultError(error: Error)
     case parentChildMatches(parent: String, child: String, value: Int)
 
     // Stage Pixels
@@ -123,10 +129,15 @@ public enum DataBrokerProtectionPixels {
     case monthlyActiveUser
 
     // KPIs - events
-    case weeklyReportScanning(hadNewMatch: Bool, hadReAppereance: Bool, scanCoverage: Int)
+    case weeklyReportScanning(hadNewMatch: Bool, hadReAppereance: Bool, scanCoverage: String)
     case weeklyReportRemovals(removals: Int)
     case scanningEventNewMatch
     case scanningEventReAppearance
+
+    // Web UI - loading errors
+    case webUILoadingStarted(environment: String)
+    case webUILoadingFailed(errorCategory: String)
+    case webUILoadingSuccess(environment: String)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -159,6 +170,9 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
             // Debug Pixels
         case .error: return "m_mac_data_broker_error"
+        case .generalError: return "m_mac_data_broker_error"
+        case .secureVaultInitError: return "m_mac_dbp_secure_vault_init_error"
+        case .secureVaultError: return "m_mac_dbp_secure_vault_error"
 
         case .backgroundAgentStarted: return "m_mac_dbp_background-agent_started"
         case .backgroundAgentStartedStoppingDueToAnotherInstanceRunning: return "m_mac_dbp_background-agent_started_stopping-due-to-another-instance-running"
@@ -205,6 +219,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .weeklyReportRemovals: return "m_mac_dbp_event_weekly-report_removals"
         case .scanningEventNewMatch: return "m_mac_dbp_event_scanning-events_new-match"
         case .scanningEventReAppearance: return "m_mac_dbp_event_scanning-events_re-appearance"
+
+        case .webUILoadingStarted: return "m_mac_dbp_web_ui_loading_started"
+        case .webUILoadingSuccess: return "m_mac_dbp_web_ui_loading_success"
+        case .webUILoadingFailed: return "m_mac_dbp_web_ui_loading_failed"
         }
     }
 
@@ -223,6 +241,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             } else {
                 return ["dataBroker": dataBroker, "name": error.name]
             }
+        case .generalError(_, let functionOccurredIn):
+            return ["functionOccurredIn": functionOccurredIn]
         case .parentChildMatches(let parent, let child, let value):
             return ["parent": parent, "child": child, "value": String(value)]
         case .optOutStart(let dataBroker, let attemptId):
@@ -267,9 +287,15 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
             return params
         case .weeklyReportScanning(let hadNewMatch, let hadReAppereance, let scanCoverage):
-            return [Consts.hadNewMatch: hadNewMatch.description, Consts.hadReAppereance: hadReAppereance.description, Consts.scanCoverage: scanCoverage.description]
+            return [Consts.hadNewMatch: hadNewMatch ? "1" : "0", Consts.hadReAppereance: hadReAppereance ? "1" : "0", Consts.scanCoverage: scanCoverage.description]
         case .weeklyReportRemovals(let removals):
             return [Consts.removals: String(removals)]
+        case .webUILoadingStarted(let environment):
+            return [Consts.environmentKey: environment]
+        case .webUILoadingSuccess(let environment):
+            return [Consts.environmentKey: environment]
+        case .webUILoadingFailed(let error):
+            return [Consts.errorCategoryKey: error]
         case .backgroundAgentStarted,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
@@ -286,8 +312,12 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .dailyActiveUser,
                 .weeklyActiveUser,
                 .monthlyActiveUser,
+
                 .scanningEventNewMatch,
-                .scanningEventReAppearance:
+                .scanningEventReAppearance,
+
+                .secureVaultInitError,
+                .secureVaultError:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -317,6 +347,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
         super.init { event, _, _, _ in
             switch event {
             case .error(let error, _):
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .generalError(let error, _):
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .secureVaultInitError(let error),
+                    .secureVaultError(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerScanAllBrokersCompletion(error: let error),
@@ -366,7 +401,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .weeklyReportScanning,
                     .weeklyReportRemovals,
                     .scanningEventNewMatch,
-                    .scanningEventReAppearance:
+                    .scanningEventReAppearance,
+                    .webUILoadingFailed,
+                    .webUILoadingStarted,
+                    .webUILoadingSuccess:
 
                 PixelKit.fire(event)
             }

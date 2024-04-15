@@ -780,6 +780,58 @@ class AddressBarTests: XCTestCase {
         XCTAssertEqual(window2.firstResponder, window2)
     }
 
+    func test_WhenSiteCertificateNil_ThenAddressBarShowsStandardShieldIcon() async throws {
+        // GIVEN
+        let expectedImage = NSImage(named: "Shield")!
+        let evaluator = MockCertificateEvaluator()
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+
+        // WHEN
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        _=try await tabLoadedPromise.value
+
+        // THEN
+        let shieldImage = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.privacyEntryPointButton.image!
+        XCTAssertTrue(shieldImage.isEqualToImage(expectedImage))
+    }
+
+    func test_WhenSiteCertificateValid_ThenAddressBarShowsStandardShieldIcon() async throws {
+        // GIVEN
+        let expectedImage = NSImage(named: "Shield")!
+        let evaluator = MockCertificateEvaluator()
+        evaluator.isValidCertificate = true
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+
+        // WHEN
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        _=try await tabLoadedPromise.value
+
+        // THEN
+        let shieldImage = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.privacyEntryPointButton.image!
+        XCTAssertTrue(shieldImage.isEqualToImage(expectedImage))
+    }
+
+    func test_WhenSiteCertificateInvalid_ThenAddressBarShowsDottedShieldIcon() async throws {
+        // GIVEN
+        let expectedImage = NSImage(named: "ShieldDot")!
+        let evaluator = MockCertificateEvaluator()
+        evaluator.isValidCertificate = false
+        let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .userEntered("")), certificateTrustEvaluator: evaluator)
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        let tabLoadedPromise = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+
+        // WHEN
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        _=try await tabLoadedPromise.value
+
+        // THEN
+        let shieldImage = mainViewController.navigationBarViewController.addressBarViewController!.addressBarButtonsViewController!.privacyEntryPointButton.image!
+        XCTAssertTrue(shieldImage.isEqualToImage(expectedImage))
+    }
 }
 
 protocol MainActorPerformer {
@@ -793,5 +845,31 @@ struct OnMainActor: MainActorPerformer {
     @MainActor(unsafe)
     func perform(_ closure: @MainActor () -> Void) {
         closure()
+    }
+}
+
+extension NSImage {
+    func pngData() -> Data? {
+        guard let tiffRepresentation = self.tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) else {
+            return nil
+        }
+        return bitmapImage.representation(using: .png, properties: [:])
+    }
+
+    func isEqualToImage(_ image: NSImage) -> Bool {
+        guard let data1 = self.pngData(),
+              let data2 = image.pngData() else {
+            return false
+        }
+        return data1 == data2
+    }
+}
+
+class MockCertificateEvaluator: CertificateTrustEvaluating {
+    var isValidCertificate: Bool?
+
+    func evaluateCertificateTrust(trust: SecTrust?) -> Bool? {
+        return isValidCertificate
     }
 }

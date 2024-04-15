@@ -21,10 +21,7 @@ import SwiftUI
 import SwiftUIExtensions
 import Combine
 import DDGSync
-
-#if NETWORK_PROTECTION
 import NetworkProtection
-#endif
 
 final class PreferencesViewController: NSViewController {
 

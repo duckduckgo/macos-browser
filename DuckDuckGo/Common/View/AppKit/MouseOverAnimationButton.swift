@@ -78,16 +78,16 @@ final class MouseOverAnimationButton: AddressBarButton {
     }
 
     struct AnimationViews {
-        let aqua: AnimationView
-        let dark: AnimationView
+        let aqua: LottieAnimationView
+        let dark: LottieAnimationView
     }
 
     private var animationViewCache: AnimationViews?
 
     private func loadAnimationViews() {
         guard let animationNames = animationNames,
-              let aquaAnimationView = AnimationView(named: animationNames.aqua),
-              let darkAnimationView = AnimationView(named: animationNames.dark) else {
+              let aquaAnimationView = LottieAnimationView(named: animationNames.aqua),
+              let darkAnimationView = LottieAnimationView(named: animationNames.dark) else {
             assertionFailure("Missing animation names or animation files in the bundle")
             return
         }
@@ -97,7 +97,7 @@ final class MouseOverAnimationButton: AddressBarButton {
             dark: darkAnimationView)
     }
 
-    private var currentAnimationView: AnimationView?
+    private var currentAnimationView: LottieAnimationView?
 
     private func updateAnimationView() {
         guard let animationViewCache = animationViewCache else {
@@ -105,12 +105,12 @@ final class MouseOverAnimationButton: AddressBarButton {
         }
 
         let isAquaMode = NSApp.effectiveAppearance.name == .aqua
-        let newAnimationView: AnimationView
+        let newAnimationView: LottieAnimationView
         // Animation view causes problems in tests
         if case .normal = NSApp.runType {
             newAnimationView = isAquaMode ? animationViewCache.aqua : animationViewCache.dark
         } else {
-            newAnimationView = AnimationView()
+            newAnimationView = LottieAnimationView()
         }
 
         guard currentAnimationView?.identifier != newAnimationView.identifier else {

@@ -30,7 +30,7 @@ enum UserText {
 
     static let personalInformationRemovalServiceTitle = NSLocalizedString("subscription.preferences.services.personal.information.removal.title", value: "Personal Information Removal", comment: "Title for the Personal Information Removal service listed in the subscription preferences pane")
     static let personalInformationRemovalServiceDescription = NSLocalizedString("subscription.preferences.services.personal.information.removal.description", value: "Find and remove your personal information from sites that store and sell it.", comment: "Description for the Personal Information Removal service listed in the subscription preferences pane")
-    static let personalInformationRemovalServiceButtonTitle = NSLocalizedString("subscription.preferences.services.personal.information.removal.button.title", value: "Get Started", comment: "Title for the Personal Information Removal service button to open its settings")
+    static let personalInformationRemovalServiceButtonTitle = NSLocalizedString("subscription.preferences.services.personal.information.removal.button.title", value: "Open", comment: "Title for the Personal Information Removal service button to open its settings")
 
     static let identityTheftRestorationServiceTitle = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.title", value: "Identity Theft Restoration", comment: "Title for the Identity Theft Restoration service listed in the subscription preferences pane")
     static let identityTheftRestorationServiceDescription = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.description", value: "Restore stolen accounts and financial losses in the event of identity theft.", comment: "Description for the Identity Theft Restoration service listed in the subscription preferences pane")
@@ -103,9 +103,9 @@ enum UserText {
     static func activateModalDescription(platform: SubscriptionPurchaseEnvironment.Environment) -> String {
         switch platform {
         case .appStore:
-            NSLocalizedString("subscription.appstore.activate.modal.description", value: "Access your subscription on other devices via Apple ID or an email address.", comment: "Activate subscription modal view subtitle description")
+            NSLocalizedString("subscription.appstore.activate.modal.description", value: "Access your Privacy Pro subscription on this device via Apple ID or an email address.", comment: "Activate subscription modal view subtitle description")
         case .stripe:
-            NSLocalizedString("subscription.activate.modal.description", value: "Access your subscription on other devices via an email address.", comment: "Activate subscription modal view subtitle description")
+            NSLocalizedString("subscription.activate.modal.description", value: "Access your Privacy Pro subscription via an email address.", comment: "Activate subscription modal view subtitle description")
         }
     }
 
@@ -137,6 +137,7 @@ enum UserText {
     // MARK: - Alerts
     static let okButtonTitle = NSLocalizedString("subscription.alert.button.ok", value: "OK", comment: "Alert button for confirming it")
     static let cancelButtonTitle = NSLocalizedString("subscription.alert.button.cancel", value: "Cancel", comment: "Alert button for dismissing it")
+    static let continueButtonTitle = NSLocalizedString("subscription.alert.button.retry", value: "Continue", comment: "Alert button for continue action")
     static let viewPlansButtonTitle = NSLocalizedString("subscription.alert.button.view.plans", value: "View Plans", comment: "Alert button for viewing subscription plans")
     static let restoreButtonTitle = NSLocalizedString("subscription.alert.button.restore", value: "Restore", comment: "Alert button for restoring past subscription purchases")
 
@@ -151,4 +152,6 @@ enum UserText {
 
     static let subscriptionFoundAlertTitle = NSLocalizedString("subscription.alert.subscription.found.title", value: "Subscription Found", comment: "Alert title when subscription was found")
     static let subscriptionFoundAlertDescription = NSLocalizedString("subscription.alert.subscription.found.description", value: "We found a subscription associated with this Apple ID.", comment: "Alert message when subscription was found")
+
+    static let subscriptionAppleIDSyncFailedAlertTitle = NSLocalizedString("subscription.alert.subscription.apple-id.sync-failed.title", value: "Something Went Wrong When Syncing Your Apple ID", comment: "Alert message when the subscription failed to restore")
 }

@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Combine
 import Foundation
@@ -38,8 +36,9 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
-    // MARK: - NetP Icon publisher
+    // MARK: - VPN
 
+    private let vpnVisibility: NetworkProtectionFeatureVisibility
     private let iconPublisher: NetworkProtectionIconPublisher
     private var iconPublisherCancellable: AnyCancellable?
 
@@ -72,10 +71,12 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     init(popoverManager: NetPPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
+         vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
          statusReporter: NetworkProtectionStatusReporter,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         self.popoverManager = popoverManager
+        self.vpnVisibility = vpnVisibility
         self.networkProtectionStatusReporter = statusReporter
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.pinningManager = pinningManager
@@ -100,9 +101,11 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     private func setupIconSubscription() {
-        iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
-            self?.buttonImage = self?.buttonImageFromWaitlistState(icon: icon)
-        }
+        iconPublisherCancellable = iconPublisher.$icon
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] icon in
+                self?.buttonImage = self?.buttonImageFromWaitlistState(icon: icon)
+            }
     }
 
     /// Temporary override used for the NetP waitlist beta, as a different asset is used for users who are invited to join the beta but haven't yet accepted.
@@ -112,14 +115,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 #if DEBUG
         guard [.normal, .integrationTests].contains(NSApp.runType) else { return NSImage() }
 #endif
-
-        if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-            return .networkProtectionAvailableButton
-        }
-
-        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            return .image(for: icon)!
-        }
 
         return .image(for: icon)!
     }
@@ -175,12 +170,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     @MainActor
     func updateVisibility() {
         // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
-        let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
-        if networkProtectionVisibility.isNetworkProtectionVisible() {
+        if vpnVisibility.isNetworkProtectionBetaVisible() {
             if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
-                                frequency: .dailyOnly,
-                                includeAppVersionParameter: true)
                 showButton = true
                 return
             }
@@ -223,5 +214,3 @@ extension NetworkProtectionNavBarButtonModel: NSPopoverDelegate {
         updateVisibility()
     }
 }
-
-#endif

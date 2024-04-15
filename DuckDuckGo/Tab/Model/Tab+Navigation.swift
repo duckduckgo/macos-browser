@@ -70,6 +70,8 @@ extension Tab: NavigationResponder {
             // add extra headers to SERP requests
             .struct(SerpHeadersNavigationResponder()),
 
+            .struct(RedirectNavigationResponder()),
+
             // ensure Content Blocking Rules are applied before navigation
             .weak(nullable: self.contentBlockingAndSurrogates),
             // update click-to-load state
@@ -82,6 +84,9 @@ extension Tab: NavigationResponder {
 
             // Tab Snapshots
             .weak(nullable: self.tabSnapshots),
+
+            // Error Page
+            .weak(nullable: self.errorPage),
 
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)

@@ -47,6 +47,7 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         super.init()
         self.delegate = _delegate
+
 #if DEBUG && SUBSCRIPTION
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
@@ -144,7 +145,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     }()
 
     private func handleControllerEvent(_ event: TransparentProxyController.Event) {
-        PixelKit.fire(event)
+
     }
 
     @MainActor
@@ -200,6 +201,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         VPNAppEventsHandler(tunnelController: tunnelController)
     }()
 
+    private lazy var vpnUninstaller: VPNUninstaller = {
+        VPNUninstaller(networkExtensionController: networkExtensionController, vpnConfigurationManager: VPNConfigurationManager())
+    }()
+
     /// The status bar NetworkProtection menu
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
@@ -249,12 +254,21 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 ]
             },
             agentLoginItem: nil,
-            isMenuBarStatusView: true)
+            isMenuBarStatusView: true,
+            userDefaults: .netP,
+            uninstallHandler: { [weak self] in
+                guard let self else { return }
+                await self.vpnUninstaller.uninstall(includingSystemExtension: true)
+            }
+        )
     }
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
+#if SUBSCRIPTION
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
+#endif
 
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
 
@@ -308,6 +322,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             let launchedOnStartup = launchInformation.wasLaunchedByStartup
             launchInformation.update()
 
+            setUpSubscriptionMonitoring()
+
             if launchedOnStartup {
                 Task {
                     let isConnected = await tunnelController.isConnected
@@ -337,6 +353,41 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }.store(in: &cancellables)
+    }
+
+    private lazy var entitlementMonitor = NetworkProtectionEntitlementMonitor()
+
+    private func setUpSubscriptionMonitoring() {
+#if SUBSCRIPTION
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        guard accountManager.isUserAuthenticated else { return }
+        let entitlementsCheck = {
+            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+        }
+
+        Task {
+            await entitlementMonitor.start(entitlementCheck: entitlementsCheck) { [weak self] result in
+                switch result {
+                case .validEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = false
+                case .invalidEntitlement:
+                    UserDefaults.netP.networkProtectionEntitlementsExpired = true
+                    PixelKit.fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown, frequency: .dailyAndContinuous)
+
+                    guard let self else { return }
+                    Task {
+                        let isConnected = await self.tunnelController.isConnected
+                        if isConnected {
+                            await self.tunnelController.stop()
+                            DistributedNotificationCenter.default().post(.showExpiredEntitlementNotification)
+                        }
+                    }
+                case .error:
+                    break
+                }
+            }
+        }
+#endif
     }
 }
 

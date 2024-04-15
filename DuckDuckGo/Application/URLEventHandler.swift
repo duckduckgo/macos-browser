@@ -20,9 +20,7 @@ import Common
 import Foundation
 import AppKit
 
-#if NETWORK_PROTECTION
 import NetworkProtectionUI
-#endif
 
 #if DBP
 import DataBrokerProtection
@@ -104,11 +102,9 @@ final class URLEventHandler {
     }
 
     private static func openURL(_ url: URL) {
-#if NETWORK_PROTECTION
         if url.scheme?.isNetworkProtectionScheme == true {
             handleNetworkProtectionURL(url)
         }
-#endif
 
 #if DBP
         if url.scheme?.isDataBrokerProtectionScheme == true {
@@ -116,17 +112,26 @@ final class URLEventHandler {
         }
 #endif
 
-#if NETWORK_PROTECTION || DBP
+        if url.isFileURL && url.pathExtension == WebKitDownloadTask.downloadExtension {
+            guard let mainViewController = {
+                if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
+                    return mainWindowController.mainViewController
+                }
+                return WindowsManager.openNewWindow(with: .newtab, source: .ui, isBurner: false)?.contentViewController as? MainViewController
+            }() else { return }
+
+            if !mainViewController.navigationBarViewController.isDownloadsPopoverShown {
+                mainViewController.navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
+            }
+
+            return
+        }
+
         if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
             WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
             WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
         }
-#else
-        WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
-#endif
     }
-
-#if NETWORK_PROTECTION
 
     /// Handles NetP URLs
     ///
@@ -140,11 +145,18 @@ final class URLEventHandler {
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
         case AppLaunchCommand.shareFeedback.launchURL:
             WindowControllersManager.shared.showShareFeedbackModal()
+        case AppLaunchCommand.justOpen.launchURL:
+            WindowControllersManager.shared.showNewWindow()
         case AppLaunchCommand.showVPNLocations.launchURL:
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
             WindowControllersManager.shared.showLocationPickerSheet()
-        case AppLaunchCommand.moveAppToApplications.launchURL:
+#if SUBSCRIPTION
+        case AppLaunchCommand.showPrivacyPro.launchURL:
+            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            Pixel.fire(.privacyProOfferScreenImpression)
+#endif
 #if !APPSTORE && !DEBUG
+        case AppLaunchCommand.moveAppToApplications.launchURL:
             // this should be run after NSApplication.shared is set
             PFMoveToApplicationsFolderIfNecessary(false)
 #endif
@@ -152,8 +164,6 @@ final class URLEventHandler {
             return
         }
     }
-
-#endif
 
 #if DBP
     /// Handles DBP URLs

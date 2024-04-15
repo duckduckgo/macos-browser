@@ -90,11 +90,11 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var buttonsContainer: NSStackView!
 
     @IBOutlet weak var animationWrapperView: NSView!
-    var trackerAnimationView1: AnimationView!
-    var trackerAnimationView2: AnimationView!
-    var trackerAnimationView3: AnimationView!
-    var shieldAnimationView: AnimationView!
-    var shieldDotAnimationView: AnimationView!
+    var trackerAnimationView1: LottieAnimationView!
+    var trackerAnimationView2: LottieAnimationView!
+    var trackerAnimationView3: LottieAnimationView!
+    var shieldAnimationView: LottieAnimationView!
+    var shieldDotAnimationView: LottieAnimationView!
     @IBOutlet weak var notificationAnimationView: NavigationBarBadgeAnimationView!
 
     @IBOutlet weak var permissionButtons: NSView!
@@ -272,7 +272,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updateBookmarkButtonVisibility() {
         guard view.window?.isPopUpWindow == false else { return }
-        bookmarkButton.setAccessibilityIdentifier("Bookmarks Button")
+        bookmarkButton.setAccessibilityIdentifier("AddressBarButtonsViewController.bookmarkButton")
         let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
         var showBookmarkButton: Bool {
             guard let tabViewModel, tabViewModel.canBeBookmarked else { return false }
@@ -532,13 +532,13 @@ final class AddressBarButtonsViewController: NSViewController {
         externalSchemeButton.sendAction(on: .leftMouseDown)
     }
 
-    private var animationViewCache = [String: AnimationView]()
-    private func getAnimationView(for animationName: String) -> AnimationView? {
+    private var animationViewCache = [String: LottieAnimationView]()
+    private func getAnimationView(for animationName: String) -> LottieAnimationView? {
         if let animationView = animationViewCache[animationName] {
             return animationView
         }
 
-        guard let animationView = AnimationView(named: animationName,
+        guard let animationView = LottieAnimationView(named: animationName,
                                                 imageProvider: trackerAnimationImageProvider) else {
             assertionFailure("Missing animation file")
             return nil
@@ -553,20 +553,27 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func setupAnimationViews() {
-        func addAndLayoutAnimationViewIfNeeded(animationView: AnimationView?, animationName: String) -> AnimationView {
+
+        func addAndLayoutAnimationViewIfNeeded(animationView: LottieAnimationView?,
+                                               animationName: String,
+                                               // Default use of .mainThread to prevent high WindowServer Usage
+                                               // Pending Fix with newer Lottie versions
+                                               // https://app.asana.com/0/1177771139624306/1207024603216659/f
+                                               renderingEngine: Lottie.RenderingEngineOption = .mainThread) -> LottieAnimationView {
             if let animationView = animationView, animationView.identifier?.rawValue == animationName {
                 return animationView
             }
 
             animationView?.removeFromSuperview()
 
-            let newAnimationView: AnimationView
+            let newAnimationView: LottieAnimationView
             // For unknown reason, this caused infinite execution of various unit tests.
             if NSApp.runType.requiresEnvironment {
-                newAnimationView = getAnimationView(for: animationName) ?? AnimationView()
+                newAnimationView = getAnimationView(for: animationName) ?? LottieAnimationView()
             } else {
-                newAnimationView = AnimationView()
+                newAnimationView = LottieAnimationView()
             }
+            newAnimationView.configuration = LottieConfiguration(renderingEngine: renderingEngine)
             animationWrapperView.addAndLayout(newAnimationView)
             newAnimationView.isHidden = true
             return newAnimationView
@@ -575,11 +582,14 @@ final class AddressBarButtonsViewController: NSViewController {
         let isAquaMode = NSApp.effectiveAppearance.name == .aqua
 
         trackerAnimationView1 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView1,
-                                                                  animationName: isAquaMode ? "trackers-1" : "dark-trackers-1")
+                                                                  animationName: isAquaMode ? "trackers-1" : "dark-trackers-1",
+                                                                  renderingEngine: .mainThread)
         trackerAnimationView2 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView2,
-                                                                  animationName: isAquaMode ? "trackers-2" : "dark-trackers-2")
+                                                                  animationName: isAquaMode ? "trackers-2" : "dark-trackers-2",
+                                                                  renderingEngine: .mainThread)
         trackerAnimationView3 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView3,
-                                                                  animationName: isAquaMode ? "trackers-3" : "dark-trackers-3")
+                                                                  animationName: isAquaMode ? "trackers-3" : "dark-trackers-3",
+                                                                  renderingEngine: .mainThread)
         shieldAnimationView = addAndLayoutAnimationViewIfNeeded(animationView: shieldAnimationView,
                                                                 animationName: isAquaMode ? "shield" : "dark-shield")
         shieldDotAnimationView = addAndLayoutAnimationViewIfNeeded(animationView: shieldDotAnimationView,
@@ -723,15 +733,18 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
         if let url = tabViewModel?.tab.content.url,
-           isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
+           isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url)
+        {
             bookmarkButton.image = .bookmarkFilled
             bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
             bookmarkButton.toolTip = UserText.editBookmarkTooltip
+            bookmarkButton.setAccessibilityValue("Bookmarked")
         } else {
             bookmarkButton.mouseOverTintColor = nil
             bookmarkButton.image = .bookmark
             bookmarkButton.contentTintColor = nil
             bookmarkButton.toolTip = UserText.addBookmarkTooltip
+            bookmarkButton.setAccessibilityValue("Unbookmarked")
         }
     }
 
@@ -786,11 +799,12 @@ final class AddressBarButtonsViewController: NSViewController {
             guard let host = url.host else { break }
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
+            let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
 
             let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
             let isUnprotected = configuration.isUserUnprotected(domain: host)
 
-            let isShieldDotVisible = isNotSecure || isUnprotected
+            let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
             privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
 
@@ -819,7 +833,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 break
             }
 
-            var animationView: AnimationView
+            var animationView: LottieAnimationView
             if url.scheme == "http" {
                 animationView = shieldDotAnimationView
             } else {
@@ -838,7 +852,7 @@ final class AddressBarButtonsViewController: NSViewController {
             let lastTrackerImages = PrivacyIconViewModel.trackerImages(from: trackerInfo)
             trackerAnimationImageProvider.lastTrackerImages = lastTrackerImages
 
-            let trackerAnimationView: AnimationView?
+            let trackerAnimationView: LottieAnimationView?
             switch lastTrackerImages.count {
             case 0: trackerAnimationView = nil
             case 1: trackerAnimationView = trackerAnimationView1
@@ -862,7 +876,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private func stopAnimations(trackerAnimations: Bool = true,
                                 shieldAnimations: Bool = true,
                                 badgeAnimations: Bool = true) {
-        func stopAnimation(_ animationView: AnimationView) {
+        func stopAnimation(_ animationView: LottieAnimationView) {
             if animationView.isAnimationPlaying || !animationView.isHidden {
                 animationView.isHidden = true
                 animationView.stop()

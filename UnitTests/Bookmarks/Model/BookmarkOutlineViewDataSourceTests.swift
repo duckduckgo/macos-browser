@@ -110,7 +110,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController)
 
-        let pasteboardFolder = PasteboardFolder(id: UUID().uuidString, name: "Pasteboard Folder")
+        let pasteboardFolder = PasteboardFolder(folder: .init(id: UUID().uuidString, title: "Pasteboard Folder"))
         let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
 
         XCTAssertEqual(result, .move)
@@ -130,7 +130,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController)
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
 
-        let pasteboardFolder = PasteboardFolder(id: mockDestinationFolder.id, name: "Pasteboard Folder")
+        let pasteboardFolder = PasteboardFolder(folder: mockDestinationFolder)
         let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
 
         XCTAssertEqual(result, .none)
@@ -153,10 +153,62 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let mockDestinationNode = treeController.node(representing: childFolder)!
 
         // Simulate dragging the root folder onto the child folder:
-        let draggedFolder = PasteboardFolder(id: rootFolder.id, name: "Root")
+        let draggedFolder = PasteboardFolder(folder: rootFolder)
         let result = dataSource.validateDrop(for: [draggedFolder], destination: mockDestinationNode)
 
         XCTAssertEqual(result, .none)
+    }
+
+    func testWhenCellFiresDelegate_ThenOnMenuRequestedActionShouldFire() throws {
+        // GIVEN
+        let mockFolder = BookmarkFolder.mock
+        let mockOutlineView = NSOutlineView(frame: .zero)
+        let treeController = createTreeController(with: [mockFolder])
+        let mockFolderNode = treeController.node(representing: mockFolder)!
+        var didFireClosure = false
+        var capturedCell: BookmarkOutlineCellView?
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController) { cell in
+            didFireClosure = true
+            capturedCell = cell
+        }
+        let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
+
+        // WHEN
+        cell.delegate?.outlineCellViewRequestedMenu(cell)
+
+        // THEN
+        XCTAssertTrue(didFireClosure)
+        XCTAssertEqual(cell, capturedCell)
+    }
+
+    func testWhenShowMenuButtonOnHoverIsTrue_ThenCellShouldHaveShouldMenuButtonFlagTrue() throws {
+        // GIVEN
+        let mockFolder = BookmarkFolder.mock
+        let mockOutlineView = NSOutlineView(frame: .zero)
+        let treeController = createTreeController(with: [mockFolder])
+        let mockFolderNode = treeController.node(representing: mockFolder)!
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .bookmarksAndFolders, bookmarkManager: LocalBookmarkManager(), treeController: treeController, showMenuButtonOnHover: true)
+
+        // WHEN
+        let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
+
+        // THEN
+        XCTAssertTrue(cell.shouldShowMenuButton)
+    }
+
+    func testWhenShowMenuButtonOnHoverIsFalse_ThenCellShouldHaveShouldMenuButtonFlagFalse() throws {
+        // GIVEN
+        let mockFolder = BookmarkFolder.mock
+        let mockOutlineView = NSOutlineView(frame: .zero)
+        let treeController = createTreeController(with: [mockFolder])
+        let mockFolderNode = treeController.node(representing: mockFolder)!
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController, showMenuButtonOnHover: false)
+
+        // WHEN
+        let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
+
+        // THEN
+        XCTAssertFalse(cell.shouldShowMenuButton)
     }
 
     // MARK: - Private

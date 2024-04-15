@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NetworkProtection
 import NetworkProtectionUI
 
 #if NETP_SYSTEM_EXTENSION
@@ -32,11 +33,13 @@ final class NetworkExtensionController {
 
 #if NETP_SYSTEM_EXTENSION
     private let systemExtensionManager: SystemExtensionManager
+    private let defaults: UserDefaults
 #endif
 
-    init(extensionBundleID: String) {
+    init(extensionBundleID: String, defaults: UserDefaults = .netP) {
 #if NETP_SYSTEM_EXTENSION
         systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionBundleID)
+        self.defaults = defaults
 #endif
     }
 
@@ -46,10 +49,12 @@ extension NetworkExtensionController {
 
     func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
 #if NETP_SYSTEM_EXTENSION
-        try await systemExtensionManager.activate(
+        let extensionVersion = try await systemExtensionManager.activate(
             waitingForUserApproval: waitingForUserApproval)
 
-        try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
+        NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
+
+        try await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
 #endif
     }
 

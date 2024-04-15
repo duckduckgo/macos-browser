@@ -25,52 +25,31 @@ import SwiftUIExtensions
 extension Preferences {
 
     struct GeneralView: View {
-        @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
         @ObservedObject var startupModel: StartupPreferences
+        @ObservedObject var downloadsModel: DownloadsPreferences
+        @ObservedObject var searchModel: SearchPreferences
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
             PreferencePane(UserText.general) {
 
-                // SECTION 1: Default Browser
-                PreferencePaneSection(UserText.defaultBrowser) {
-
-                    PreferencePaneSubSection {
-                        HStack {
-                            if defaultBrowserModel.isDefault {
-                                Image(.solidCheckmark)
-                                Text(UserText.isDefaultBrowser)
-                            } else {
-                                Image(.warning).foregroundColor(Color(.linkBlue))
-                                Text(UserText.isNotDefaultBrowser)
-                                Button(action: {
-                                    defaultBrowserModel.becomeDefault()
-                                }) {
-                                    Text(UserText.makeDefaultBrowser)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .multilineTextAlignment(.center)
-                                        .lineLimit(2)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // SECTION 2: On Startup
+                // SECTION 1: On Startup
                 PreferencePaneSection(UserText.onStartup) {
 
                     PreferencePaneSubSection {
                         Picker(selection: $startupModel.restorePreviousSession, content: {
                             Text(UserText.showHomePage).tag(false)
-                                .padding(.bottom, 4)
+                                .padding(.bottom, 4).accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.openANewWindow")
                             Text(UserText.reopenAllWindowsFromLastSession).tag(true)
+                                .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.reopenAllWindowsFromLastSession")
                         }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                            .pickerStyle(.radioGroup)
+                            .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                            .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
                     }
                 }
 
-                // SECTION 3: Home Page
+                // SECTION 2: Home Page
                 PreferencePaneSection(UserText.homePage) {
 
                     PreferencePaneSubSection {
@@ -103,7 +82,7 @@ extension Preferences {
                                     Text(UserText.homeButtonMode(for: position)).tag(position)
                                 }
                             }
-                            .scaledToFit()
+                            .fixedSize()
                             .onChange(of: startupModel.homeButtonPosition) { _ in
                                 startupModel.updateHomeButton()
                             }
@@ -114,6 +93,34 @@ extension Preferences {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
+                // SECTION 3: Search Settings
+                PreferencePaneSection(UserText.privateSearch) {
+                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions).accessibilityIdentifier("PreferencesGeneralView.showAutocompleteSuggestions")
+                }
+
+                // SECTION 4: Downloads
+                PreferencePaneSection(UserText.downloads) {
+                    PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,
+                                       isOn: $downloadsModel.shouldOpenPopupOnCompletion)
+                    }.padding(.bottom, 5)
+
+                    // MARK: Location
+                    PreferencePaneSubSection {
+                        Text(UserText.downloadsLocation).bold()
+
+                        HStack {
+                            NSPathControlView(url: downloadsModel.selectedDownloadLocation)
+                            Button(UserText.downloadsChangeDirectory) {
+                                downloadsModel.presentDownloadDirectoryPanel()
+                            }
+                        }
+                        .disabled(downloadsModel.alwaysRequestDownloadLocation)
+
+                        ToggleMenuItem(UserText.downloadsAlwaysAsk,
+                                       isOn: $downloadsModel.alwaysRequestDownloadLocation)
+                    }
+                }
             }
         }
     }

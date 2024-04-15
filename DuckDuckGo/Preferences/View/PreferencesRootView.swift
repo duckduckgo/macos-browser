@@ -21,6 +21,7 @@ import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
+import BrowserServicesKit
 
 #if SUBSCRIPTION
 import Subscription
@@ -30,9 +31,16 @@ import SubscriptionUI
 enum Preferences {
 
     enum Const {
-        static let sidebarWidth: CGFloat = 256
+        static var sidebarWidth: CGFloat {
+            switch Locale.current.languageCode {
+            case "en":
+                return 310
+            default:
+                return 355
+            }
+        }
         static let paneContentWidth: CGFloat = 524
-        static let panePaddingHorizontal: CGFloat = 48
+        static let panePaddingHorizontal: CGFloat = 40
         static let panePaddingVertical: CGFloat = 40
     }
 
@@ -55,51 +63,10 @@ enum Preferences {
         var body: some View {
             HStack(spacing: 0) {
                 Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
-
                 Color(NSColor.separatorColor).frame(width: 1)
-
                 ScrollView(.vertical) {
                     HStack(spacing: 0) {
-                        VStack(alignment: .leading) {
-
-                            switch model.selectedPane {
-                            case .general:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences.shared)
-                            case .sync:
-                                SyncView()
-                            case .appearance:
-                                AppearanceView(model: .shared)
-                            case .privacy:
-                                PrivacyView(model: PrivacyPreferencesModel())
-
-#if NETWORK_PROTECTION
-                            case .vpn:
-                                VPNView(model: VPNPreferencesModel())
-#endif
-
-#if SUBSCRIPTION
-                            case .subscription:
-                                SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
-#endif
-                            case .autofill:
-                                AutofillView(model: AutofillPreferencesModel())
-                            case .downloads:
-                                DownloadsView(model: .shared)
-                            case .duckPlayer:
-                                DuckPlayerView(model: .shared)
-                            case .about:
-#if NETWORK_PROTECTION
-                                let netPInvitePresenter = NetworkProtectionInvitePresenter()
-                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
-#else
-                                AboutView(model: AboutModel())
-#endif
-                            }
-                        }
-                        .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
-                        .padding(.vertical, Const.panePaddingVertical)
-                        .padding(.horizontal, Const.panePaddingHorizontal)
-
+                        contentView
                         Spacer()
                     }
                 }
@@ -109,8 +76,59 @@ enum Preferences {
             .background(Color.preferencesBackground)
         }
 
+        @ViewBuilder
+        var contentView: some View {
+            VStack(alignment: .leading) {
+                switch model.selectedPane {
+                case .defaultBrowser:
+                    DefaultBrowserView(defaultBrowserModel: DefaultBrowserPreferences.shared,
+                                       status: PrivacyProtectionStatus.status(for: .defaultBrowser))
+                case .privateSearch:
+                    PrivateSearchView(model: SearchPreferences.shared)
+                case .webTrackingProtection:
+                    WebTrackingProtectionView(model: WebTrackingProtectionPreferences.shared)
+                case .cookiePopupProtection:
+                    CookiePopupProtectionView(model: CookiePopupProtectionPreferences.shared)
+                case .emailProtection:
+                    EmailProtectionView(emailManager: EmailManager())
+                case .general:
+                    GeneralView(startupModel: StartupPreferences.shared,
+                                downloadsModel: DownloadsPreferences.shared,
+                                searchModel: SearchPreferences.shared)
+                case .sync:
+                    SyncView()
+                case .appearance:
+                    AppearanceView(model: .shared)
+                case .dataClearing:
+                    DataClearingView(model: DataClearingPreferences.shared)
+                case .vpn:
+                    VPNView(model: VPNPreferencesModel())
+
 #if SUBSCRIPTION
-        // swiftlint:disable:next cyclomatic_complexity
+                case .subscription:
+                    SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
+#endif
+                case .autofill:
+                    AutofillView(model: AutofillPreferencesModel())
+                case .accessibility:
+                    AccessibilityView(model: AccessibilityPreferences.shared)
+                case .duckPlayer:
+                    DuckPlayerView(model: .shared)
+                case .otherPlatforms:
+                    // Opens a new tab
+                    Spacer()
+                case .about:
+                    let netPInvitePresenter = NetworkProtectionInvitePresenter()
+                    AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
+                }
+            }
+            .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
+            .padding(.vertical, Const.panePaddingVertical)
+            .padding(.horizontal, Const.panePaddingHorizontal)
+        }
+
+#if SUBSCRIPTION
+        // swiftlint:disable:next cyclomatic_complexity function_body_length
         private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
                 DispatchQueue.main.async {
@@ -135,7 +153,7 @@ enum Preferences {
                     case .activateAddEmailClick:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
                     case .postSubscriptionAddEmailClick:
-                        Pixel.fire(.privacyProWelcomeAddDevice, limitTo: .initial)
+                        Pixel.fire(.privacyProSubscriptionManagementEmail, limitTo: .initial)
                     case .restorePurchaseStoreClick:
                         DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
                     case .addToAnotherDeviceClick:
@@ -154,7 +172,14 @@ enum Preferences {
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
-                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow { _ in }
+                    Task {
+                        guard let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
+                              let windowControllerManager = WindowControllersManager.shared.lastKeyMainWindowController else {
+                            return
+                        }
+
+                        await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
+                    }
                 }
             },
                                                                       openURLHandler: openURL,
@@ -166,29 +191,5 @@ enum Preferences {
                                                 subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }
 #endif
-    }
-}
-
-struct SyncView: View {
-
-    var body: some View {
-        if let syncService = NSApp.delegateTyped.syncService, let syncDataProviders = NSApp.delegateTyped.syncDataProviders {
-            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService, syncBookmarksAdapter: syncDataProviders.bookmarksAdapter))
-                .onAppear {
-                    requestSync()
-                }
-        } else {
-            FailedAssertionView("Failed to initialize Sync Management View")
-        }
-    }
-
-    private func requestSync() {
-        Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
-                return
-            }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-            syncService.scheduler.notifyDataChanged()
-        }
     }
 }

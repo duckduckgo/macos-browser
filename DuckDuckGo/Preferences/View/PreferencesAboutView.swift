@@ -56,9 +56,7 @@ extension Preferences {
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
                                 .onTapGesture(count: 12) {
-#if NETWORK_PROTECTION
                                     model.displayNetPInvite()
-#endif
                                 }
                                 .contextMenu(ContextMenu(menuItems: {
                                     Button(UserText.copy, action: {
@@ -70,11 +68,11 @@ extension Preferences {
                     .padding(.bottom, 8)
 
                     TextButton(UserText.moreAt(url: model.displayableAboutURL)) {
-                        model.openURL(.aboutDuckDuckGo)
+                        model.openNewTab(with: .aboutDuckDuckGo)
                     }
 
                     TextButton(UserText.privacyPolicy) {
-                        model.openURL(.privacyPolicy)
+                        model.openNewTab(with: .privacyPolicy)
                     }
 
                     #if FEEDBACK

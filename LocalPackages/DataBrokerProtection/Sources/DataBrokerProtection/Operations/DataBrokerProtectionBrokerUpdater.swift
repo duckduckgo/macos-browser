@@ -20,10 +20,14 @@ import Foundation
 import Common
 
 protocol ResourcesRepository {
-    func fetchBrokerFromResourceFiles() -> [DataBroker]?
+    func fetchBrokerFromResourceFiles() throws -> [DataBroker]?
 }
 
 final class FileResources: ResourcesRepository {
+
+    enum FileResourcesError: Error {
+        case bundleResourceURLNil
+    }
 
     private let fileManager: FileManager
 
@@ -31,9 +35,11 @@ final class FileResources: ResourcesRepository {
         self.fileManager = fileManager
     }
 
-    func fetchBrokerFromResourceFiles() -> [DataBroker]? {
+    func fetchBrokerFromResourceFiles() throws -> [DataBroker]? {
         guard let resourceURL = Bundle.module.resourceURL else {
-            return nil
+            assertionFailure()
+            os_log("DataBrokerProtectionUpdater: error FileResources fetchBrokerFromResourceFiles, error: Bundle.module.resourceURL is nil", log: .error)
+            throw FileResourcesError.bundleResourceURLNil
         }
 
         do {
@@ -47,10 +53,10 @@ final class FileResources: ResourcesRepository {
                 $0.isJSON && !$0.hasFakePrefix
             }
 
-            return brokerJSONFiles.map(DataBroker.initFromResource(_:))
+            return try brokerJSONFiles.map(DataBroker.initFromResource(_:))
         } catch {
-            os_log("Error fetching brokers JSON files from resources", log: .dataBrokerProtection)
-            return nil
+            os_log("DataBrokerProtectionUpdater: error FileResources error: fetchBrokerFromResourceFiles, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
     }
 }
@@ -97,15 +103,18 @@ public struct DataBrokerProtectionBrokerUpdater {
     private let resources: ResourcesRepository
     private let vault: any DataBrokerProtectionSecureVault
     private let appVersion: AppVersionNumberProvider
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     init(repository: BrokerUpdaterRepository = BrokerUpdaterUserDefaults(),
          resources: ResourcesRepository = FileResources(),
          vault: any DataBrokerProtectionSecureVault,
-         appVersion: AppVersionNumberProvider = AppVersionNumber()) {
+         appVersion: AppVersionNumberProvider = AppVersionNumber(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
         self.repository = repository
         self.resources = resources
         self.vault = vault
         self.appVersion = appVersion
+        self.pixelHandler = pixelHandler
     }
 
     public static func provide() -> DataBrokerProtectionBrokerUpdater? {
@@ -118,13 +127,22 @@ public struct DataBrokerProtectionBrokerUpdater {
     }
 
     public func updateBrokers() {
-        guard let brokers = resources.fetchBrokerFromResourceFiles() else { return }
+        let brokers: [DataBroker]?
+        do {
+            brokers = try resources.fetchBrokerFromResourceFiles()
+        } catch {
+            os_log("DataBrokerProtectionBrokerUpdater updateBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
+            return
+        }
+        guard let brokers = brokers else { return }
 
         for broker in brokers {
             do {
                 try update(broker)
             } catch {
                 os_log("Error updating broker: %{public}@, with version: %{public}@", log: .dataBrokerProtection, broker.name, broker.version)
+                pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionBrokerUpdater.updateBrokers"))
             }
         }
     }

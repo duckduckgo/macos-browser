@@ -26,7 +26,7 @@ class AutoconsentMessageProtocolTests: XCTestCase {
     let userScript = AutoconsentUserScript(
         scriptSource: ScriptSourceProvider(configStorage: MockConfigurationStore(),
                                            privacyConfigurationManager: MockPrivacyConfigurationManager(),
-                                           privacySettings: PrivacySecurityPreferences.shared, // todo: mock
+                                           webTrackingProtectionPreferences: WebTrackingProtectionPreferences.shared, // mock
                                            contentBlockingManager: ContentBlockerRulesManagerMock(),
                                            trackerDataManager: TrackerDataManager(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
                                                                                   data: ConfigurationStore.shared.loadData(for: .trackerDataSet),
@@ -38,7 +38,7 @@ class AutoconsentMessageProtocolTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        PrivacySecurityPreferences.shared.autoconsentEnabled = true
+        CookiePopupProtectionPreferences.shared.isAutoconsentEnabled = true
     }
 
     func replyToJson(msg: Any) -> String {

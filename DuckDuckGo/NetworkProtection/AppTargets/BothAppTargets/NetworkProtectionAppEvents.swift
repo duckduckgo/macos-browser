@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
 import Common
 import Foundation
 import LoginItems
@@ -24,6 +23,7 @@ import NetworkProtection
 import NetworkProtectionUI
 import NetworkProtectionIPC
 import NetworkExtension
+import Subscription
 
 /// Implements the sequence of steps that the VPN needs to execute when the App starts up.
 ///
@@ -47,8 +47,15 @@ final class NetworkProtectionAppEvents {
     // MARK: - Feature Visibility
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
+    private let featureDisabler: NetworkProtectionFeatureDisabling
+    private let defaults: UserDefaults
 
-    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()) {
+    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+         featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         defaults: UserDefaults = .netP) {
+
+        self.defaults = defaults
+        self.featureDisabler = featureDisabler
         self.featureVisibility = featureVisibility
     }
 
@@ -58,8 +65,9 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            if featureVisibility.shouldUninstallAutomatically() {
-                featureVisibility.disableForAllUsers()
+            let disabled = await featureVisibility.disableIfUserHasNoAccess()
+
+            guard !disabled else {
                 return
             }
 
@@ -71,26 +79,21 @@ final class NetworkProtectionAppEvents {
     /// Call this method when the app becomes active to run the associated NetP logic.
     ///
     func applicationDidBecomeActive() {
-        guard featureVisibility.isNetworkProtectionVisible() else {
-            featureVisibility.disableForAllUsers()
-            return
+        Task { @MainActor in
+            await featureVisibility.disableIfUserHasNoAccess()
         }
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
-        let versionStore = NetworkProtectionLastVersionRunStore()
-
-        // should‘ve been run at least once with NetP enabled
-        guard versionStore.lastVersionRun != nil else {
-            os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
-            return
-        }
-
         // We want to restart the VPN menu app to make sure it's always on the latest.
         restartNetworkProtectionMenu(using: loginItemsManager)
     }
 
     private func restartNetworkProtectionMenu(using loginItemsManager: LoginItemsManager) {
+        guard loginItemsManager.isAnyEnabled(LoginItemsManager.networkProtectionLoginItems) else {
+            return
+        }
+
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
 
@@ -110,5 +113,3 @@ final class NetworkProtectionAppEvents {
         }
     }
 }
-
-#endif

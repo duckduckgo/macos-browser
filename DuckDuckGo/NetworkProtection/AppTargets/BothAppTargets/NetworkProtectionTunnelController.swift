@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Combine
 import SwiftUI
@@ -32,6 +30,10 @@ import PixelKit
 #if NETP_SYSTEM_EXTENSION
 import SystemExtensionManager
 import SystemExtensions
+#endif
+
+#if SUBSCRIPTION
+import Subscription
 #endif
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
@@ -71,6 +73,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
+
+#if SUBSCRIPTION
+    // MARK: - Subscriptions
+
+    private let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+#endif
 
     // MARK: - Debug Options Support
 
@@ -410,16 +418,16 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case SystemExtensionRequestError.unknownRequestResult:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionUnknownActivationError
-            case SystemExtensionRequestError.willActivateAfterReboot:
+            case OSSystemExtensionError.extensionNotFound,
+                SystemExtensionRequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
             default:
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
             }
 
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure,
+                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure(error),
                 frequency: .standard,
-                withError: error,
                 includeAppVersionParameter: true
             )
 
@@ -538,7 +546,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         var options = [String: NSObject]()
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
-        guard let authToken = try tokenStore.fetchToken() as NSString? else {
+        guard let authToken = try fetchAuthToken() else {
             throw StartError.noAuthToken
         }
         options[NetworkProtectionOptionKey.authToken] = authToken
@@ -589,15 +597,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             return
         }
 
-        await stop(tunnelManager: manager, disableOnDemand: true)
+        await stop(tunnelManager: manager)
     }
 
     @MainActor
-    private func stop(tunnelManager: NETunnelProviderManager, disableOnDemand: Bool) async {
-        if disableOnDemand {
-            // disable reconnect on demand if requested to stop
-            try? await self.disableOnDemand(tunnelManager: tunnelManager)
-        }
+    private func stop(tunnelManager: NETunnelProviderManager) async {
+        try? await self.disableOnDemand(tunnelManager: tunnelManager)
 
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
@@ -615,8 +620,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             return
         }
 
-        await stop(tunnelManager: manager, disableOnDemand: false)
+        await stop(tunnelManager: manager)
         await start()
+
+        // When restarting the tunnel we enable on-demand optimistically
+        try? await enableOnDemand(tunnelManager: manager)
     }
 
     // MARK: - On Demand & Kill Switch
@@ -738,6 +746,19 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }
     }
-}
 
+    private func fetchAuthToken() throws -> NSString? {
+#if SUBSCRIPTION
+        if let accessToken = accountManager.accessToken  {
+            os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
+            return Self.adaptAccessTokenForVPN(accessToken) as NSString?
+        }
 #endif
+        os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
+        return try tokenStore.fetchToken() as NSString?
+    }
+
+    private static func adaptAccessTokenForVPN(_ token: String) -> String {
+        "ddg:\(token)"
+    }
+}

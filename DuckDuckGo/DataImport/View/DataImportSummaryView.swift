@@ -33,6 +33,8 @@ struct DataImportSummaryView: View {
         self.model = model
     }
 
+    private let zeroString = "0"
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             {
@@ -61,7 +63,7 @@ struct DataImportSummaryView: View {
                     }
                     if summary.duplicate > 0 {
                         HStack {
-                            failureImage()
+                            skippedImage()
                             Text("Duplicate Bookmarks Skipped:",
                                  comment: "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.")
                             + Text(" " as String)
@@ -78,6 +80,15 @@ struct DataImportSummaryView: View {
                         }
                     }
 
+                case (.bookmarks, .failure(let error)) where error.errorType == .noData:
+                    HStack {
+                        skippedImage()
+                        Text("Bookmarks:",
+                             comment: "Data import summary format of how many bookmarks were successfully imported.")
+                        + Text(" " as String)
+                        + Text(zeroString).bold()
+                    }
+
                 case (.bookmarks, .failure):
                     HStack {
                         failureImage()
@@ -85,11 +96,21 @@ struct DataImportSummaryView: View {
                              comment: "Data import summary message of failed bookmarks import.")
                     }
 
-                case (.passwords, .failure):
-                    HStack {
-                        failureImage()
-                        Text("Password import failed.",
-                             comment: "Data import summary message of failed passwords import.")
+                case (.passwords, .failure(let error)):
+                    if error.errorType == .noData {
+                        HStack {
+                            skippedImage()
+                            Text("Passwords:",
+                                 comment: "Data import summary format of how many passwords were successfully imported.")
+                            + Text(" " as String)
+                            + Text(zeroString).bold()
+                        }
+                    } else {
+                        HStack {
+                            failureImage()
+                            Text("Password import failed.",
+                                 comment: "Data import summary message of failed passwords import.")
+                        }
                     }
 
                 case (.passwords, .success(let summary)):
@@ -123,6 +144,11 @@ private func successImage() -> some View {
 
 private func failureImage() -> some View {
     Image(.error)
+        .frame(width: 16, height: 16)
+}
+
+private func skippedImage() -> some View {
+    Image(.skipped)
         .frame(width: 16, height: 16)
 }
 

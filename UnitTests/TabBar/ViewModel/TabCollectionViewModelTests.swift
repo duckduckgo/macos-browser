@@ -138,9 +138,9 @@ final class TabCollectionViewModelTests: XCTestCase {
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .settings(pane: .appearance)))
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
 
-        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.settings(pane: .privacy)))
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.settings(pane: .general)))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
-        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .settings(pane: .privacy))
+        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .settings(pane: .general))
     }
 
     func testWhenPreferencesTabIsPresentThenOpeningPreferencesWithAnyPaneDoesNotUpdatePaneOnExistingTab() {

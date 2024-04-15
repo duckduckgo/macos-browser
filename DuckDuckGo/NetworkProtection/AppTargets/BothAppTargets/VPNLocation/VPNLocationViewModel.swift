@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Combine
 import NetworkProtection
@@ -82,7 +80,8 @@ final class VPNLocationViewModel: ObservableObject {
 
     func onCountryItemSelection(id: String, cityId: String? = nil) async {
         DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount)
-        let location = NetworkProtectionSelectedLocation(country: id, city: cityId)
+        let city = cityId == VPNCityItemModel.nearest.id ? nil : cityId
+        let location = NetworkProtectionSelectedLocation(country: id, city: city)
         selectedLocation = .location(location)
         await reloadList()
     }
@@ -185,18 +184,6 @@ extension VPNCityItemModel {
     }
 }
 
-extension NetworkProtectionLocationListCompositeRepository {
-    convenience init() {
-        let settings = VPNSettings(defaults: .netP)
-        self.init(
-            environment: settings.selectedEnvironment,
-            tokenStore: NetworkProtectionKeychainTokenStore(),
-            errorEvents: .networkProtectionAppDebugEvents,
-            isSubscriptionEnabled: false
-        )
-    }
-}
-
 extension VPNLocationViewModel {
     convenience init() {
         let locationListRepository = NetworkProtectionLocationListCompositeRepository()
@@ -220,5 +207,3 @@ private extension String {
         Locale.current.localizedString(forRegionCode: self) ?? ""
     }
 }
-
-#endif

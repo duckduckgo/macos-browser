@@ -67,7 +67,7 @@ extension UserText {
     // "network.protection.system.extension.unknown.activation.error" - Message shown to users when they try to enable NetP and there is an unexpected activation error.
     static let networkProtectionUnknownActivationError = "There as an unexpected error. Please try again."
     // "network.protection.system.extension.please.reboot" - Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation
-    static let networkProtectionPleaseReboot = "Please reboot to activate the VPN"
+    static let networkProtectionPleaseReboot = "VPN update available. Restart your Mac to reconnect."
 }
 
 // MARK: - VPN Waitlist
@@ -385,3 +385,23 @@ extension UserText {
     static let dataBrokerProtectionWaitlistButtonAgreeAndContinue = "Agree and Continue"
 }
 #endif
+
+// MARK: - Thank You Modals
+
+extension UserText {
+    static let dbpThankYouTitle = "Personal Information Removal early access is over"
+    static let dbpThankYouSubtitle = "Thank you for being a tester!"
+    static let dbpThankYouBody1 = "To continue using Personal Information Removal, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code THANKYOU"
+
+    static let vpnThankYouTitle = "DuckDuckGo VPN early access is over"
+    static let vpnThankYouSubtitle = "Thank you for being a tester!"
+    static let vpnThankYouBody1 = "To continue using the VPN, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code THANKYOU"
+
+#if APPSTORE
+    static let dbpThankYouBody2 = "Offer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. testers when you download from duckduckgo.com/app"
+    static let vpnThankYouBody2 = "Offer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. testers when you download from duckduckgo.com/app"
+#else
+    static let dbpThankYouBody2 = "Offer redeemable for a limited time in the desktop version of the DuckDuckGo browser by U.S. beta testers only."
+    static let vpnThankYouBody2 = "Offer redeemable for a limited time in the desktop version of the DuckDuckGo browser by U.S. beta testers only."
+#endif
+}

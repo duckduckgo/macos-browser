@@ -50,10 +50,10 @@ PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent macos
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent.review macos
 
-FEATURE_FLAGS[arch=*][sdk=*] = NETWORK_PROTECTION
-FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETWORK_PROTECTION
-FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETWORK_PROTECTION
-FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETWORK_PROTECTION
+FEATURE_FLAGS[arch=*][sdk=*] = SUBSCRIPTION
+FEATURE_FLAGS[config=CI][arch=*][sdk=*] = SUBSCRIPTION
+FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = SUBSCRIPTION
+FEATURE_FLAGS[config=Review][arch=*][sdk=*] = SUBSCRIPTION
 
 ENABLE_APP_SANDBOX = YES
 SWIFT_OBJC_BRIDGING_HEADER =

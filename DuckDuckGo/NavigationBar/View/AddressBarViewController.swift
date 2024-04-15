@@ -99,6 +99,7 @@ final class AddressBarViewController: NSViewController {
         view.layer?.masksToBounds = false
 
         addressBarTextField.placeholderString = UserText.addressBarPlaceholder
+        addressBarTextField.setAccessibilityIdentifier("AddressBarViewController.addressBarTextField")
 
         updateView()
         // only activate active text field leading constraint on its appearance to avoid constraint conflicts
@@ -520,7 +521,7 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 fileprivate extension NSView {
 
     var shouldShowArrowCursor: Bool {
-        self is NSButton || self is AnimationView
+        self is NSButton || self is LottieAnimationView
     }
 
 }

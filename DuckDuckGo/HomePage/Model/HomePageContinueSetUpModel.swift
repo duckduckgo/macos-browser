@@ -20,11 +20,8 @@ import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
-
-#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
-#endif
 
 extension HomePage.Models {
 
@@ -71,7 +68,6 @@ extension HomePage.Models {
         private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
-        private let privacyPreferences: PrivacySecurityPreferences
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
         private let randomNumberGenerator: RandomNumberGenerating
 
@@ -128,6 +124,8 @@ extension HomePage.Models {
 
         lazy var statisticsStore: StatisticsStore = LocalStatisticsStore()
 
+        lazy var waitlistBetaThankYouPresenter = WaitlistThankYouPromptPresenter()
+
         lazy var listOfFeatures = isFirstSession ? firstRunFeatures : randomisedFeatures
 
         private var featuresMatrix: [[FeatureType]] = [[]] {
@@ -142,7 +140,6 @@ extension HomePage.Models {
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
-             privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              homePageRemoteMessaging: HomePageRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
@@ -151,7 +148,6 @@ extension HomePage.Models {
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
-            self.privacyPreferences = privacyPreferences
             self.duckPlayerPreferences = duckPlayerPreferences
             self.homePageRemoteMessaging = homePageRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager
@@ -168,6 +164,7 @@ extension HomePage.Models {
             switch featureType {
             case .defaultBrowser:
                 do {
+                    Pixel.fire(.defaultRequestedFromHomepageSetupView)
                     try defaultBrowserProvider.presentDefaultBrowserPrompt()
                 } catch {
                     defaultBrowserProvider.openSystemPreferences()
@@ -194,9 +191,18 @@ extension HomePage.Models {
 #if DBP
                 DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
 #endif
+            case .vpnThankYou:
+                guard let window = NSApp.keyWindow,
+                      case .normal = NSApp.runType else { return }
+                waitlistBetaThankYouPresenter.presentVPNThankYouPrompt(in: window)
+            case .pirThankYou:
+                guard let window = NSApp.keyWindow,
+                      case .normal = NSApp.runType else { return }
+                waitlistBetaThankYouPresenter.presentPIRThankYouPrompt(in: window)
             }
         }
 
+        // swiftlint:disable:next cyclomatic_complexity
         func removeItem(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
@@ -212,10 +218,8 @@ extension HomePage.Models {
             case .surveyDay14:
                 shouldShowSurveyDay14 = false
             case .networkProtectionRemoteMessage(let message):
-#if NETWORK_PROTECTION
                 homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: message)
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
-#endif
             case .dataBrokerProtectionRemoteMessage(let message):
 #if DBP
                 homePageRemoteMessaging.dataBrokerProtectionRemoteMessaging.dismiss(message: message)
@@ -223,6 +227,10 @@ extension HomePage.Models {
 #endif
             case .dataBrokerProtectionWaitlistInvited:
                 shouldShowDBPWaitlistInvitedCardUI = false
+            case .vpnThankYou:
+                waitlistBetaThankYouPresenter.didDismissVPNThankYouCard()
+            case .pirThankYou:
+                waitlistBetaThankYouPresenter.didDismissPIRThankYouCard()
             }
             refreshFeaturesMatrix()
         }
@@ -244,7 +252,6 @@ extension HomePage.Models {
             }
 #endif
 
-#if NETWORK_PROTECTION
             for message in homePageRemoteMessaging.networkProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.networkProtectionRemoteMessage(message))
                 DailyPixel.fire(
@@ -252,7 +259,14 @@ extension HomePage.Models {
                     frequency: .dailyOnly
                 )
             }
-#endif
+
+            if waitlistBetaThankYouPresenter.canShowVPNCard {
+                features.append(.vpnThankYou)
+            }
+
+            if waitlistBetaThankYouPresenter.canShowPIRCard {
+                features.append(.pirThankYou)
+            }
 
             for feature in listOfFeatures {
                 switch feature {
@@ -281,7 +295,11 @@ extension HomePage.Models {
                     if shouldSurveyDay14BeVisible {
                         features.append(feature)
                     }
-                case .networkProtectionRemoteMessage, .dataBrokerProtectionRemoteMessage, .dataBrokerProtectionWaitlistInvited:
+                case .networkProtectionRemoteMessage,
+                        .dataBrokerProtectionRemoteMessage,
+                        .dataBrokerProtectionWaitlistInvited,
+                        .vpnThankYou,
+                        .pirThankYou:
                     break // Do nothing, these messages get appended first
                 }
             }
@@ -420,7 +438,6 @@ extension HomePage.Models {
         }
 
         @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
-#if NETWORK_PROTECTION
             guard let actionType = remoteMessage.action.actionType else {
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
                 homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
@@ -442,7 +459,6 @@ extension HomePage.Models {
                     refreshFeaturesMatrix()
                 }
             }
-#endif
         }
 
         @MainActor private func handle(remoteMessage: DataBrokerProtectionRemoteMessage) {
@@ -491,6 +507,8 @@ extension HomePage.Models {
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
         case dataBrokerProtectionRemoteMessage(DataBrokerProtectionRemoteMessage)
         case dataBrokerProtectionWaitlistInvited
+        case vpnThankYou
+        case pirThankYou
 
         var title: String {
             switch self {
@@ -512,6 +530,10 @@ extension HomePage.Models {
                 return message.cardTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Personal Information Removal"
+            case .vpnThankYou:
+                return "Thanks for testing DuckDuckGo VPN!"
+            case .pirThankYou:
+                return "Thanks for testing Personal Information Removal!"
             }
         }
 
@@ -535,6 +557,10 @@ extension HomePage.Models {
                 return message.cardDescription
             case .dataBrokerProtectionWaitlistInvited:
                 return "You're invited to try Personal Information Removal beta!"
+            case .vpnThankYou:
+                return "To keep using it, subscribe to DuckDuckGo Privacy Pro."
+            case .pirThankYou:
+                return "To keep using it, subscribe to DuckDuckGo Privacy Pro."
             }
         }
 
@@ -558,6 +584,10 @@ extension HomePage.Models {
                 return message.action.actionTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Get Started"
+            case .vpnThankYou:
+                return "See Special Offer For Testers"
+            case .pirThankYou:
+                return "See Special Offer For Testers"
             }
         }
 
@@ -583,6 +613,10 @@ extension HomePage.Models {
                 return .dbpInformationRemover.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
                 return .dbpInformationRemover.resized(to: iconSize)!
+            case .vpnThankYou:
+                return .vpnEnded.resized(to: iconSize)!
+            case .pirThankYou:
+                return .dbpInformationRemover.resized(to: iconSize)!
             }
         }
     }
@@ -606,32 +640,23 @@ extension HomePage.Models {
 struct HomePageRemoteMessaging {
 
     static func defaultMessaging() -> HomePageRemoteMessaging {
-#if NETWORK_PROTECTION && DBP
+#if DBP
         return HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: .netP,
             dataBrokerProtectionRemoteMessaging: DefaultDataBrokerProtectionRemoteMessaging(),
             dataBrokerProtectionUserDefaults: .dbp
         )
-#elseif NETWORK_PROTECTION
+#else
         return HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
             networkProtectionUserDefaults: .netP
         )
-#elseif DBP
-        return HomePageRemoteMessaging(
-            dataBrokerProtectionRemoteMessaging: DefaultDataBrokerProtectionRemoteMessaging(),
-            dataBrokerProtectionUserDefaults: .dbp
-        )
-#else
-        return HomePageRemoteMessaging()
 #endif
     }
 
-#if NETWORK_PROTECTION
     let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
     let networkProtectionUserDefaults: UserDefaults
-#endif
 
 #if DBP
     let dataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging

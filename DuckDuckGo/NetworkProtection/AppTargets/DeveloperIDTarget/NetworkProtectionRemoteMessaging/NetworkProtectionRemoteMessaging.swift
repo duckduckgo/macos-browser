@@ -19,8 +19,6 @@
 import Foundation
 import Networking
 
-#if NETWORK_PROTECTION
-
 protocol NetworkProtectionRemoteMessaging {
 
     func fetchRemoteMessages(completion: (() -> Void)?)
@@ -133,7 +131,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
 
             // Next, check if the message requires access to NetP but it's not visible:
-            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isNetworkProtectionVisible() {
+            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isNetworkProtectionBetaVisible() {
                 return false
             }
 
@@ -178,5 +176,3 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
 }
-
-#endif
