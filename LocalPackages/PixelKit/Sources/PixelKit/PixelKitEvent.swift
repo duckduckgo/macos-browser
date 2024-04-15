@@ -31,7 +31,6 @@ public final class DebugEvent: PixelKitEvent {
     public enum EventType {
         case assertionFailure(message: String, file: StaticString, line: UInt)
         case custom(_ event: PixelKitEvent)
-        case customV2(_ event: PixelKitEventV2)
     }
 
     public let eventType: EventType
@@ -47,18 +46,11 @@ public final class DebugEvent: PixelKitEvent {
         self.error = error
     }
 
-    public init(_ event: PixelKitEventV2) {
-        self.eventType = .customV2(event)
-        self.error = event.error
-    }
-
     public var name: String {
         switch eventType {
         case .assertionFailure:
             return "assertion_failure"
         case .custom(let event):
-            return event.name
-        case .customV2(let event):
             return event.name
         }
     }
