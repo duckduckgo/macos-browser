@@ -65,7 +65,8 @@ class PermissionsTests: XCTestCase {
         let allowButtonIndex = try XCTUnwrap(notificationCenter.indexOfSystemModelDialogButtonOnElement(
             titled: "Allow",
             "OK"
-        )) // If this TCC "allow" button has four different titles on four different macOS versions, you can use them all here.
+        )) // You can add any titles you see this permission dialog using on any tested macOS versions, because it is evaluated by a variadic
+        // function.
         let allowButton = notificationCenter.buttons.element(boundBy: allowButtonIndex)
         allowButton.clickAfterExistenceTestSucceeds() // Click system camera permissions dialog
         let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
@@ -96,6 +97,52 @@ class PermissionsTests: XCTestCase {
             permissionContextMenuAlwaysAskValue,
             "selected",
             "The \"always ask\" menu item of the permission context menu has to be the selected item."
+        )
+    }
+
+    func test_cameraPermissions_withDeniedTCCChallenge_showCorrectStateInBrowser() throws {
+        let url = try XCTUnwrap(URL(string: "https://permission.site/"))
+        app.resetAuthorizationStatus(for: .camera)
+        XCTAssertTrue(
+            addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The address bar text field didn't become available in a reasonable timeframe."
+        )
+        addressBarTextField.typeURLAfterExistenceTestSucceeds(url)
+
+        let cameraButton = app.webViews.buttons["Camera"]
+        cameraButton.clickAfterExistenceTestSucceeds()
+        sleep(UITests.Timeouts.sleepTimeForTCCDialogAppearance) // The rare necessary sleep, since we can believe a TCC dialog will appear here
+        let allowButtonIndex = try XCTUnwrap(notificationCenter.indexOfSystemModelDialogButtonOnElement(
+            titled: "Deny",
+            "No", "Cancel", "Don’t Allow", "Don't Allow"
+        )) // You can add any titles you see this permission dialog using on any tested macOS versions, because it is evaluated by a variadic
+        // function.
+        let allowButton = notificationCenter.buttons.element(boundBy: allowButtonIndex)
+        allowButton.clickAfterExistenceTestSucceeds() // Click system camera permissions dialog
+
+        let permissionsPopoverAllowButton = app.popovers.buttons["PermissionAuthorizationViewController.allowButton"]
+        XCTAssertTrue( // Prove that the browser's permission popover does not appear
+            permissionsPopoverAllowButton.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
+            "The permissions popover in the browser should not appear when camera permission has been denied."
+        )
+        let cameraButtonScreenshot = cameraButton.screenshot().image
+        let trimmedCameraButton = cameraButtonScreenshot.trim(to: CGRect(
+            x: 10,
+            y: 10,
+            width: 20,
+            height: 20
+        )) // A sample of the button that we are going to analyze for its predominant color tone.
+
+        let predominantColor = try XCTUnwrap(trimmedCameraButton.ciImage(with: nil).predominantColor())
+        XCTAssertEqual(
+            predominantColor,
+            .red,
+            "The predominant color of a sample area of the Camera button on the webpage should be red at this point in the test, but it was \(predominantColor)."
+        )
+        let navigationBarViewControllerPermissionButton = app.buttons["NavigationBarViewController.PermissionButton"]
+        XCTAssertTrue( // Prove that the browser's permission button does not appear
+            navigationBarViewControllerPermissionButton.waitForNonExistence(timeout: UITests.Timeouts.elementExistence),
+            "The permissions button in the browser should not appear when camera permission has been denied."
         )
     }
 }
@@ -142,14 +189,17 @@ private extension NSImage {
 
 private extension CIImage {
     /// Evaluate a sample of a webpage button to see what its predominant color tone is. Assumes it is being run on a button that is expected to be
-    /// either green or red (otherwise we are starting to think into `https://permission.site`'s potential implementation errors, which I don't think
-    /// should be part of this test case scope).
-    /// - Returns: .red, .green, or .unknown.
+    /// either green or red (otherwise we are starting to think into `https://permission.site`'s potential implementation errors or surprise cases,
+    /// which I don't think should be part of this test case scope which tests UIs from three responsible organizatons in which the tested UIs, in
+    /// order
+    /// of importance, should be: this browser, macOS, permission.site)).
+    /// - Returns: .red, .green or nil in the event of an error (but it will always verbosely fail the test before returning nil, so in practice, if
+    /// the test is still in progress, it has returned a color.)
     func predominantColor() throws -> PredominantColor? {
         var redValueOfSample = 0.0
         var greenValueOfSample = 0.0
 
-        for channel in 0 ... 1 {
+        for channel in 0 ... 1 { // We are only checking the first two channels
             let extentVector = CIVector(
                 x: self.extent.origin.x,
                 y: self.extent.origin.y,
@@ -166,21 +216,21 @@ private extension CIImage {
                 return nil
             }
 
-            var bitmap = [UInt8](repeating: 0, count: 4)
-            let null = try XCTUnwrap(kCFNull, "Could not unwrap singleton null instance")
-            let context = CIContext(options: [.workingColorSpace: null])
-            context.render(
+            var outputBitmap = [UInt8](repeating: 0, count: 4)
+            let nullSingletonInstance = try XCTUnwrap(kCFNull, "Could not unwrap singleton null instance")
+            let outputRenderContext = CIContext(options: [.workingColorSpace: nullSingletonInstance])
+            outputRenderContext.render(
                 outputImage,
-                toBitmap: &bitmap,
+                toBitmap: &outputBitmap,
                 rowBytes: 4,
                 bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
                 format: .RGBA8,
                 colorSpace: nil
             )
             if channel == 0 {
-                redValueOfSample = Double(bitmap[channel]) / Double(255)
+                redValueOfSample = Double(outputBitmap[channel]) / Double(255)
             } else if channel == 1 {
-                greenValueOfSample = Double(bitmap[channel]) / Double(255)
+                greenValueOfSample = Double(outputBitmap[channel]) / Double(255)
             }
         }
 
