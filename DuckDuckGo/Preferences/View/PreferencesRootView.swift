@@ -22,11 +22,8 @@ import SwiftUI
 import SwiftUIExtensions
 import SyncUI
 import BrowserServicesKit
-
-#if SUBSCRIPTION
 import Subscription
 import SubscriptionUI
-#endif
 
 enum Preferences {
 
@@ -48,16 +45,11 @@ enum Preferences {
 
         @ObservedObject var model: PreferencesSidebarModel
 
-#if SUBSCRIPTION
         var subscriptionModel: PreferencesSubscriptionModel?
-#endif
 
         init(model: PreferencesSidebarModel) {
             self.model = model
-
-#if SUBSCRIPTION
             self.subscriptionModel = makeSubscriptionViewModel()
-#endif
         }
 
         var body: some View {
@@ -103,11 +95,8 @@ enum Preferences {
                     DataClearingView(model: DataClearingPreferences.shared)
                 case .vpn:
                     VPNView(model: VPNPreferencesModel())
-
-#if SUBSCRIPTION
                 case .subscription:
                     SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
-#endif
                 case .autofill:
                     AutofillView(model: AutofillPreferencesModel())
                 case .accessibility:
@@ -127,7 +116,6 @@ enum Preferences {
             .padding(.horizontal, Const.panePaddingHorizontal)
         }
 
-#if SUBSCRIPTION
         // swiftlint:disable:next cyclomatic_complexity function_body_length
         private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
@@ -190,6 +178,5 @@ enum Preferences {
                                                 sheetActionHandler: sheetActionHandler,
                                                 subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }
-#endif
     }
 }

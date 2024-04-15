@@ -25,11 +25,8 @@ import SwiftUI
 import WebKit
 import Configuration
 import NetworkProtection
-
-#if SUBSCRIPTION
 import Subscription
 import SubscriptionUI
-#endif
 
 // swiftlint:disable:next type_body_length
 @MainActor final class MainMenu: NSMenu {
@@ -613,7 +610,6 @@ import SubscriptionUI
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
-#if SUBSCRIPTION
             let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
 
@@ -632,7 +628,6 @@ import SubscriptionUI
             },
                 subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)
             )
-#endif
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }

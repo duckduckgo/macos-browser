@@ -28,10 +28,7 @@ import History
 import PrivacyDashboard
 import NetworkProtection
 import NetworkProtectionIPC
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 // swiftlint:disable file_length
 
@@ -137,7 +134,6 @@ protocol NewWindowPolicyDecisionMaker {
             default: break
             }
 
-#if SUBSCRIPTION
             if let url {
                 if url.isChild(of: URL.subscriptionBaseURL) {
                     if SubscriptionPurchaseEnvironment.currentServiceEnvironment == .staging, url.getParameter(named: "environment") == nil {
@@ -148,7 +144,6 @@ protocol NewWindowPolicyDecisionMaker {
                     return .identityTheftRestoration(url)
                 }
             }
-#endif
 
             if let settingsPane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .settings(pane: settingsPane)

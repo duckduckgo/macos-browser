@@ -1123,7 +1123,6 @@ struct UserText {
         }
     }
 
-#if SUBSCRIPTION
     // Key: "subscription.menu.item"
     // Comment: "Title for Subscription item in the options menu"
     static let subscriptionOptionsMenuItem = "Privacy Pro"
@@ -1145,5 +1144,4 @@ struct UserText {
     // Key: "subscription.progress.view.completing.purchase"
     // Comment: "Progress view title when completing the purchase"
     static let completingPurchaseTitle = "Completing purchase..."
-#endif
 }

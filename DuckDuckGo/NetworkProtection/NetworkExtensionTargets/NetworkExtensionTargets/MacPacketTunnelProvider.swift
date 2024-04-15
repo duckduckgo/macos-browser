@@ -23,10 +23,7 @@ import NetworkProtection
 import NetworkExtension
 import Networking
 import PixelKit
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
@@ -286,7 +283,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                                                            isSubscriptionEnabled: isSubscriptionEnabled,
                                                                            accessTokenProvider: { nil }
         )
-#if SUBSCRIPTION
 
         let accountManager = AccountManager(subscriptionAppGroup: Self.subscriptionsAppGroup, accessTokenStorage: tokenStore)
 
@@ -294,9 +290,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let entitlementsCheck = {
             await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
-#else
-        let entitlementsCheck: (() async -> Result<Bool, Error>)? = nil
-#endif
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
