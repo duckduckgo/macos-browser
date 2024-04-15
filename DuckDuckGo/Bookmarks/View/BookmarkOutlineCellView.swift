@@ -142,7 +142,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
             favoriteImageView.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
             favoriteImageView.trailingAnchor.constraint(equalTo: menuButton.trailingAnchor),
             favoriteImageView.heightAnchor.constraint(equalToConstant: 15),
-            favoriteImageView.widthAnchor.constraint(equalToConstant: 15)
+            favoriteImageView.widthAnchor.constraint(equalToConstant: 15),
         ])
 
         faviconImageView.setContentHuggingPriority(NSLayoutConstraint.Priority(rawValue: 251), for: .horizontal)
@@ -214,7 +214,7 @@ extension BookmarkOutlineCellView {
                 BookmarkOutlineCellView(identifier: .init("id")),
                 BookmarkOutlineCellView(identifier: .init("id")),
                 BookmarkOutlineCellView(identifier: .init("id")),
-                BookmarkOutlineCellView(identifier: .init("id"))
+                BookmarkOutlineCellView(identifier: .init("id")),
             ]
 
             let stackView = NSStackView(views: cells as [NSView])

@@ -199,7 +199,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
             emptyStateTitle.widthAnchor.constraint(equalToConstant: 192),
 
             emptyStateImageView.widthAnchor.constraint(equalToConstant: 128),
-            emptyStateImageView.heightAnchor.constraint(equalToConstant: 96)
+            emptyStateImageView.heightAnchor.constraint(equalToConstant: 96),
         ])
 
     }
