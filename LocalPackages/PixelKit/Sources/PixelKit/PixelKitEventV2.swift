@@ -47,7 +47,6 @@ public protocol PixelFiring {
               frequency: PixelKit.Frequency) async throws -> Bool
 }
 
-
 extension PixelKit: PixelFiring {
     @discardableResult
     public func fire(_ event: PixelKitEventV2) async throws -> Bool {

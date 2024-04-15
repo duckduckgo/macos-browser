@@ -1,5 +1,5 @@
 //
-//  PixelFireMock.swift
+//  PixelKitMock.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
