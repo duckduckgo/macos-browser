@@ -16,4 +16,28 @@
 //  limitations under the License.
 //
 
-import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
+
+final class AddEditBookmarkDialogViewModelMock: BookmarkDialogEditing {
+    var bookmarkName: String = ""
+    var bookmarkURLPath: String = ""
+    var isBookmarkFavorite: Bool = false
+    var isURLFieldHidden: Bool = false
+    var title: String = ""
+    var folders: [DuckDuckGo_Privacy_Browser.FolderViewModel] = []
+    var selectedFolder: DuckDuckGo_Privacy_Browser.BookmarkFolder? {
+        didSet {
+            selectedFolderExpectation?.fulfill()
+        }
+    }
+    var cancelActionTitle: String = ""
+    var isOtherActionDisabled: Bool = false
+    var defaultActionTitle: String = ""
+    var isDefaultActionDisabled: Bool = false
+
+    func cancel(dismiss: () -> Void) {}
+    func addOrSave(dismiss: () -> Void) {}
+
+    var selectedFolderExpectation: XCTestExpectation?
+}

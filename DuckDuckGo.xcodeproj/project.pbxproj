@@ -2471,6 +2471,14 @@
 		9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 9DEF97E02B06C4EE00764F03 /* Networking */; };
 		9F0A2CF82B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0A2CF72B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift */; };
 		9F0A2CF92B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0A2CF72B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift */; };
+		9F0FFFB42BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FFFB32BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift */; };
+		9F0FFFB52BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FFFB32BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift */; };
+		9F0FFFB82BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FFFB72BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift */; };
+		9F0FFFB92BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FFFB72BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift */; };
+		9F0FFFBB2BCCAEC2007C87DD /* AddEditBookmarkFolderDialogViewModelMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FFFBA2BCCAEC2007C87DD /* AddEditBookmarkFolderDialogViewModelMock.swift */; };
+		9F0FFFBC2BCCAEC2007C87DD /* AddEditBookmarkFolderDialogViewModelMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FFFBA2BCCAEC2007C87DD /* AddEditBookmarkFolderDialogViewModelMock.swift */; };
+		9F0FFFBE2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FFFBD2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift */; };
+		9F0FFFBF2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FFFBD2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift */; };
 		9F180D0F2B69C553000D695F /* Tab+WKUIDelegateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F180D0E2B69C553000D695F /* Tab+WKUIDelegateTests.swift */; };
 		9F180D102B69C553000D695F /* Tab+WKUIDelegateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F180D0E2B69C553000D695F /* Tab+WKUIDelegateTests.swift */; };
 		9F180D122B69C665000D695F /* DownloadsTabExtensionMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F180D112B69C665000D695F /* DownloadsTabExtensionMock.swift */; };
@@ -4246,6 +4254,10 @@
 		9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPMocks.swift; sourceTree = "<group>"; };
 		9DB6E7222AA0DA7A00A17F3C /* LoginItems */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LoginItems; sourceTree = "<group>"; };
 		9F0A2CF72B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseBookmarkEntityTests.swift; sourceTree = "<group>"; };
+		9F0FFFB32BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogCoordinatorViewModelTests.swift; sourceTree = "<group>"; };
+		9F0FFFB72BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogViewModelMock.swift; sourceTree = "<group>"; };
+		9F0FFFBA2BCCAEC2007C87DD /* AddEditBookmarkFolderDialogViewModelMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkFolderDialogViewModelMock.swift; sourceTree = "<group>"; };
+		9F0FFFBD2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogViewModelMock.swift; sourceTree = "<group>"; };
 		9F180D0E2B69C553000D695F /* Tab+WKUIDelegateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+WKUIDelegateTests.swift"; sourceTree = "<group>"; };
 		9F180D112B69C665000D695F /* DownloadsTabExtensionMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsTabExtensionMock.swift; sourceTree = "<group>"; };
 		9F2606092B85C20400819292 /* AddEditBookmarkDialogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogViewModelTests.swift; sourceTree = "<group>"; };
@@ -7039,6 +7051,16 @@
 			path = DuckDuckGoDBPBackgroundAgent;
 			sourceTree = "<group>";
 		};
+		9F0FFFB62BCCAE80007C87DD /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				9F0FFFB72BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift */,
+				9F0FFFBA2BCCAEC2007C87DD /* AddEditBookmarkFolderDialogViewModelMock.swift */,
+				9F0FFFBD2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
 		9F872D9B2B9058B000138637 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -7050,9 +7072,11 @@
 		9F982F102B82264400231028 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				9F0FFFB62BCCAE80007C87DD /* Mocks */,
 				9F982F112B82268F00231028 /* AddEditBookmarkFolderDialogViewModelTests.swift */,
 				9F2606092B85C20400819292 /* AddEditBookmarkDialogViewModelTests.swift */,
 				9F26060D2B85E17D00819292 /* AddEditBookmarkDialogCoordinatorViewModelTests.swift */,
+				9F0FFFB32BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift */,
 				9FA5A0A82BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift */,
 			);
 			path = ViewModels;
@@ -11062,6 +11086,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F0FFFB92BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift in Sources */,
 				3706FDDA293F661700E42796 /* EmbeddedTrackerDataTests.swift in Sources */,
 				3706FDDB293F661700E42796 /* AutofillPreferencesTests.swift in Sources */,
 				3706FDDC293F661700E42796 /* FileManagerExtensionTests.swift in Sources */,
@@ -11186,10 +11211,12 @@
 				B630E80129C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */,
 				3706FE31293F661700E42796 /* TabCollectionViewModelDelegateMock.swift in Sources */,
 				3706FE32293F661700E42796 /* BookmarksHTMLReaderTests.swift in Sources */,
+				9F0FFFBC2BCCAEC2007C87DD /* AddEditBookmarkFolderDialogViewModelMock.swift in Sources */,
 				3706FE33293F661700E42796 /* FireTests.swift in Sources */,
 				B60C6F8229B1B4AD007BFAA8 /* TestRunHelper.swift in Sources */,
 				567DA94029E8045D008AC5EE /* MockEmailStorage.swift in Sources */,
 				317295D32AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift in Sources */,
+				9F0FFFB52BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift in Sources */,
 				3706FE34293F661700E42796 /* PermissionStoreTests.swift in Sources */,
 				3706FE35293F661700E42796 /* ThirdPartyBrowserTests.swift in Sources */,
 				1DFAB5232A8983E100A0F7F6 /* SetExtensionTests.swift in Sources */,
@@ -11261,6 +11288,7 @@
 				3706FE5F293F661700E42796 /* CrashReportTests.swift in Sources */,
 				B60C6F7F29B1B41D007BFAA8 /* TestRunHelperInitializer.m in Sources */,
 				4B9DB0592A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift in Sources */,
+				9F0FFFBF2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift in Sources */,
 				3706FE61293F661700E42796 /* PinnedTabsViewModelTests.swift in Sources */,
 				3706FE62293F661700E42796 /* PasswordManagementListSectionTests.swift in Sources */,
 				3706FE63293F661700E42796 /* RecentlyClosedCoordinatorMock.swift in Sources */,
@@ -13238,6 +13266,7 @@
 				4B723E0726B0003E00E14D75 /* CSVImporterTests.swift in Sources */,
 				4BCF15EC2ABB9AF80083F6DF /* NetworkProtectionRemoteMessageTests.swift in Sources */,
 				B62EB47C25BAD3BB005745C6 /* WKWebViewPrivateMethodsAvailabilityTests.swift in Sources */,
+				9F0FFFBB2BCCAEC2007C87DD /* AddEditBookmarkFolderDialogViewModelMock.swift in Sources */,
 				4BBC16A527C488C900E00A38 /* DeviceAuthenticatorTests.swift in Sources */,
 				4B3F641E27A8D3BD00E0C118 /* BrowserProfileTests.swift in Sources */,
 				B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */,
@@ -13289,6 +13318,7 @@
 				B6106BB126A7D8720013B453 /* PermissionStoreTests.swift in Sources */,
 				4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */,
 				4B98D27C28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift in Sources */,
+				9F0FFFBE2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift in Sources */,
 				B60C6F7E29B1B41D007BFAA8 /* TestRunHelperInitializer.m in Sources */,
 				37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */,
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
@@ -13339,6 +13369,7 @@
 				AABAF59C260A7D130085060C /* FaviconManagerMock.swift in Sources */,
 				1DFAB5222A8983DE00A0F7F6 /* SetExtensionTests.swift in Sources */,
 				4BF6962028BEEE8B00D402D4 /* LocalPinningManagerTests.swift in Sources */,
+				9F0FFFB82BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift in Sources */,
 				AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */,
 				9F180D0F2B69C553000D695F /* Tab+WKUIDelegateTests.swift in Sources */,
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
@@ -13348,6 +13379,7 @@
 				4BBF09232830812900EE1418 /* FileSystemDSL.swift in Sources */,
 				4B9DB05C2A983B55000927DB /* WaitlistViewModelTests.swift in Sources */,
 				1D1C36E329FAE8DA001FA40C /* FaviconManagerTests.swift in Sources */,
+				9F0FFFB42BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift in Sources */,
 				4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */,
 				4B70C00227B0793D000386ED /* CrashReportTests.swift in Sources */,
 				B6656E0D2B29C733008798A1 /* FileImportViewLocalizationTests.swift in Sources */,

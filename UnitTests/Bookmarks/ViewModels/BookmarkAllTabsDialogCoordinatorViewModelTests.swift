@@ -44,84 +44,86 @@ final class BookmarkAllTabsDialogCoordinatorViewModelTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-//    func testShouldReturnViewStateBookmarkWhenInit() {
-//        XCTAssertEqual(sut.viewState, .bookmark)
-//    }
-//
-//    func testShouldReturnViewStateBookmarkWhenDismissActionIsCalled() {
-//        // GIVEN
-//        sut.addFolderAction()
-//        XCTAssertEqual(sut.viewState, .folder)
-//
-//        // WHEN
-//        sut.dismissAction()
-//
-//        // THEN
-//        XCTAssertEqual(sut.viewState, .bookmark)
-//
-//    }
-//
-//    func testShouldSetSelectedFolderOnFolderViewModelAndReturnFolderViewStateWhenAddFolderActionIsCalled() {
-//        // GIVEN
-//        let folder = BookmarkFolder(id: "1", title: "Folder")
-//        bookmarkViewModelMock.selectedFolder = folder
-//        XCTAssertNil(bookmarkFolderViewModelMock.selectedFolder)
-//
-//        // WHEN
-//        sut.addFolderAction()
-//
-//        // THEN
-//        XCTAssertEqual(bookmarkFolderViewModelMock.selectedFolder, folder)
-//    }
-//
-//    func testShouldReceiveEventsWhenBookmarkModelChanges() {
-//        // GIVEN
-//        let expectation = self.expectation(description: #function)
-//        var didCallChangeValue = false
-//        sut.objectWillChange.sink { _ in
-//            didCallChangeValue = true
-//            expectation.fulfill()
-//        }
-//        .store(in: &cancellables)
-//
-//        // WHEN
-//        sut.bookmarkModel.objectWillChange.send()
-//
-//        // THEN
-//        waitForExpectations(timeout: 1.0)
-//        XCTAssertTrue(didCallChangeValue)
-//    }
-//
-//    func testShouldReceiveEventsWhenBookmarkFolderModelChanges() {
-//        // GIVEN
-//        let expectation = self.expectation(description: #function)
-//        var didCallChangeValue = false
-//        sut.objectWillChange.sink { _ in
-//            didCallChangeValue = true
-//            expectation.fulfill()
-//        }
-//        .store(in: &cancellables)
-//
-//        // WHEN
-//        sut.folderModel.objectWillChange.send()
-//
-//        // THEN
-//        waitForExpectations(timeout: 1.0)
-//        XCTAssertTrue(didCallChangeValue)
-//    }
-//
-//    func testShouldSetSelectedFolderOnBookmarkViewModelWhenAddFolderPublisherSendsEvent() {
-//        // GIVEN
-//        let expectation = self.expectation(description: #function)
-//        bookmarkViewModelMock.selectedFolderExpectation = expectation
-//        let folder = BookmarkFolder(id: "ABCDE", title: #function)
-//        XCTAssertNil(bookmarkViewModelMock.selectedFolder)
-//
-//        // WHEN
-//        sut.folderModel.subject.send(folder)
-//
-//        // THEN
-//        waitForExpectations(timeout: 1.0)
-//        XCTAssertEqual(bookmarkViewModelMock.selectedFolder, folder)
-//    }
+    func testWhenInitThenViewStateIsBookmarkAllTabs() {
+        XCTAssertEqual(sut.viewState, .bookmarkAllTabs)
+    }
+
+    func testWhenDismissActionIsCalledThenViewStateIsBookmarkAllTabs() {
+        // GIVEN
+        sut.addFolderAction()
+        XCTAssertEqual(sut.viewState, .addFolder)
+
+        // WHEN
+        sut.dismissAction()
+
+        // THEN
+        XCTAssertEqual(sut.viewState, .bookmarkAllTabs)
+
+    }
+
+    func testWhenAddFolderActionIsCalledThenSetSelectedFolderOnFolderViewModelIsCalledAndReturnAddFolderViewState() {
+        // GIVEN
+        let folder = BookmarkFolder(id: "1", title: "Folder")
+        bookmarkAllTabsViewModelMock.selectedFolder = folder
+        XCTAssertNil(bookmarkFolderViewModelMock.selectedFolder)
+        XCTAssertEqual(sut.viewState, .bookmarkAllTabs)
+
+        // WHEN
+        sut.addFolderAction()
+
+        // THEN
+        XCTAssertEqual(bookmarkFolderViewModelMock.selectedFolder, folder)
+        XCTAssertEqual(sut.viewState, .addFolder)
+    }
+
+    func testWhenBookmarkModelChangesThenReceiveEvent() {
+        // GIVEN
+        let expectation = self.expectation(description: #function)
+        var didCallChangeValue = false
+        sut.objectWillChange.sink { _ in
+            didCallChangeValue = true
+            expectation.fulfill()
+        }
+        .store(in: &cancellables)
+
+        // WHEN
+        sut.bookmarkModel.objectWillChange.send()
+
+        // THEN
+        waitForExpectations(timeout: 1.0)
+        XCTAssertTrue(didCallChangeValue)
+    }
+
+    func testWhenBookmarkFolderModelChangesThenReceiveEvent() {
+        // GIVEN
+        let expectation = self.expectation(description: #function)
+        var didCallChangeValue = false
+        sut.objectWillChange.sink { _ in
+            didCallChangeValue = true
+            expectation.fulfill()
+        }
+        .store(in: &cancellables)
+
+        // WHEN
+        sut.folderModel.objectWillChange.send()
+
+        // THEN
+        waitForExpectations(timeout: 1.0)
+        XCTAssertTrue(didCallChangeValue)
+    }
+
+    func testWhenAddFolderPublisherSendsEventThenSelectedFolderOnBookmarkAllTabsViewModelIsSet() {
+        // GIVEN
+        let expectation = self.expectation(description: #function)
+        bookmarkAllTabsViewModelMock.selectedFolderExpectation = expectation
+        let folder = BookmarkFolder(id: "ABCDE", title: #function)
+        XCTAssertNil(bookmarkAllTabsViewModelMock.selectedFolder)
+
+        // WHEN
+        sut.folderModel.subject.send(folder)
+
+        // THEN
+        waitForExpectations(timeout: 1.0)
+        XCTAssertEqual(bookmarkAllTabsViewModelMock.selectedFolder, folder)
+    }
 }
