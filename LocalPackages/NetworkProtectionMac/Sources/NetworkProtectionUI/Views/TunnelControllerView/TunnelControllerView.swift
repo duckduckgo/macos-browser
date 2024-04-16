@@ -252,8 +252,13 @@ public struct TunnelControllerView: View {
                             .background(Color(hex: "B2B2B2").opacity(0.3))
                             .clipShape(Circle())
                     } else if model.wantsNearestLocation {
-                        Image(NetworkProtectionAsset.nearestAvailable)
-                            .frame(width: 26, height: 26)
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "B2B2B2").opacity(0.3))
+                                .frame(width: 26, height: 26)
+                            Image(NetworkProtectionAsset.nearestAvailable)
+                                .frame(width: 16, height: 16)
+                        }
                     }
                     if #available(macOS 12, *) {
                         if isHovered {
