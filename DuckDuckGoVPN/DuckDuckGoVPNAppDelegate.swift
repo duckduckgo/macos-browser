@@ -256,6 +256,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             agentLoginItem: nil,
             isMenuBarStatusView: true,
             userDefaults: .netP,
+            locationFormatter: DefaultVPNLocationFormatter(),
             uninstallHandler: { [weak self] in
                 guard let self else { return }
                 await self.vpnUninstaller.uninstall(includingSystemExtension: true)

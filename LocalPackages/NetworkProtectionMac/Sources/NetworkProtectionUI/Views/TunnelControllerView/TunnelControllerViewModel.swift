@@ -52,6 +52,10 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let statusReporter: NetworkProtectionStatusReporter
 
+    private let vpnSettings: VPNSettings
+
+    private let locationFormatter: VPNLocationFormatting
+
     private let appLauncher: AppLaunching
 
     // MARK: - Misc
@@ -73,17 +77,22 @@ public final class TunnelControllerViewModel: ObservableObject {
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
                 runLoopMode: RunLoop.Mode? = nil,
+                vpnSettings: VPNSettings,
+                locationFormatter: VPNLocationFormatting,
                 appLauncher: AppLaunching) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher
         self.statusReporter = statusReporter
         self.runLoopMode = runLoopMode
+        self.vpnSettings = vpnSettings
+        self.locationFormatter = locationFormatter
         self.appLauncher = appLauncher
 
         connectionStatus = statusReporter.statusObserver.recentValue
         internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
-        internalServerLocation = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation
+        internalServerAttributes = statusReporter.serverInfoObserver.recentValue.serverLocation
+        internalServerLocation = internalServerAttributes?.serverLocation
 
         // Particularly useful when unit testing with an initial status of our choosing.
         refreshInternalIsRunning()
@@ -140,7 +149,8 @@ public final class TunnelControllerViewModel: ObservableObject {
 
             Task { @MainActor in
                 self.internalServerAddress = serverInfo.serverAddress
-                self.internalServerLocation = serverInfo.serverLocation?.serverLocation
+                self.internalServerAttributes = serverInfo.serverLocation
+                self.internalServerLocation = self.internalServerAttributes?.serverLocation
             }
         }
             .store(in: &cancellables)
@@ -429,6 +439,32 @@ public final class TunnelControllerViewModel: ObservableObject {
         default:
             return UserText.networkProtectionServerLocationUnknown
         }
+    }
+
+    @Published
+    private var internalServerAttributes: NetworkProtectionServerInfo.ServerAttributes?
+
+    var wantsNearestLocation: Bool {
+        guard case .nearest = vpnSettings.selectedLocation else { return false }
+        return true
+    }
+
+    var emoji: String? {
+        locationFormatter.emoji(for: internalServerAttributes?.country,
+                                preferredLocation: vpnSettings.selectedLocation)
+    }
+
+    var plainLocation: String {
+        locationFormatter.string(from: internalServerLocation,
+                                 preferredLocation: vpnSettings.selectedLocation)
+    }
+
+    @available(macOS 12, *)
+    var formattedLocation: AttributedString {
+        locationFormatter.string(from: internalServerLocation,
+                                 preferredLocation: vpnSettings.selectedLocation,
+                                 locationTextColor: Color(.defaultText),
+                                 preferredLocationTextColor: Color(.defaultText).opacity(0.6))
     }
 
     // MARK: - Toggling VPN

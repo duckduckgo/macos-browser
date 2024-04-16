@@ -42,6 +42,7 @@ public final class StatusBarMenu: NSObject {
     private let agentLoginItem: LoginItem?
     private let isMenuBarStatusView: Bool
     private let userDefaults: UserDefaults
+    private let locationFormatter: VPNLocationFormatting
     private let uninstallHandler: () async -> Void
 
     // MARK: - NetP Icon publisher
@@ -68,6 +69,7 @@ public final class StatusBarMenu: NSObject {
                 agentLoginItem: LoginItem?,
                 isMenuBarStatusView: Bool,
                 userDefaults: UserDefaults,
+                locationFormatter: VPNLocationFormatting,
                 uninstallHandler: @escaping () async -> Void) {
 
         self.model = model
@@ -83,6 +85,7 @@ public final class StatusBarMenu: NSObject {
         self.agentLoginItem = agentLoginItem
         self.isMenuBarStatusView = isMenuBarStatusView
         self.userDefaults = userDefaults
+        self.locationFormatter = locationFormatter
         self.uninstallHandler = uninstallHandler
 
         super.init()
@@ -136,6 +139,7 @@ public final class StatusBarMenu: NSObject {
                                                agentLoginItem: agentLoginItem,
                                                isMenuBarStatusView: isMenuBarStatusView,
                                                userDefaults: userDefaults,
+                                               locationFormatter: locationFormatter,
                                                uninstallHandler: uninstallHandler)
             popover?.behavior = .transient
 
