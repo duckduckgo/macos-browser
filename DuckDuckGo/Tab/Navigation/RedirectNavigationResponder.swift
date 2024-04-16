@@ -40,7 +40,7 @@ struct RedirectNavigationResponder: NavigationResponder {
             let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
 
-            return isPurchasePageRedirectActive ? URL.subscriptionPurchase : nil
+            return isPurchasePageRedirectActive ? URL.subscriptionBaseURL : nil
         }
 
         return nil
