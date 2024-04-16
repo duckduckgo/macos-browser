@@ -160,7 +160,7 @@ public final class PixelKit {
         self.dateGenerator = dateGenerator
         self.defaults = defaults
         self.fireRequest = fireRequest
-        logger.debug("👾 PixelKit initialised: dryRun: \(self.dryRun) appVersion: \(self.appVersion) source: \(self.source ?? "-") defaultHeaders: \(self.defaultHeaders) pixelCalendar: \(self.pixelCalendar)")
+        logger.debug("👾 PixelKit initialised: dryRun: \(self.dryRun, privacy: .public) appVersion: \(self.appVersion, privacy: .public) source: \(self.source ?? "-", privacy: .public) defaultHeaders: \(self.defaultHeaders, privacy: .public) pixelCalendar: \(self.pixelCalendar, privacy: .public)")
     }
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
@@ -248,14 +248,14 @@ public final class PixelKit {
     /// If the pixel name ends with the forbiddenString then an error is logged or an assertion failure is fired in debug
     func reportErrorIf(pixel: String, endsWith forbiddenString: String) {
         if pixel.hasSuffix(forbiddenString) {
-            logger.error("Pixel \(pixel) must not end with \(forbiddenString)")
+            logger.error("Pixel \(pixel, privacy: .public) must not end with \(forbiddenString, privacy: .public)")
             assertionFailure("Pixel \(pixel) must not end with \(forbiddenString)")
         }
     }
 
     private func printDebugInfo(pixelName: String, frequency: Frequency, parameters: [String: String], skipped: Bool = false) {
         let params = parameters.filter { key, _ in !["test"].contains(key) }
-        logger.debug("👾[\(frequency.description)-\(skipped ? "Skipped" : "Fired")] \(pixelName) \(params)")
+        logger.debug("👾[\(frequency.description, privacy: .public)-\(skipped ? "Skipped" : "Fired", privacy: .public)] \(pixelName, privacy: .public) \(params, privacy: .public)")
     }
 
     private func fireRequestWrapper(
@@ -434,7 +434,7 @@ public final class PixelKit {
         for (key, _) in self.defaults.dictionaryRepresentation() {
             if key.hasPrefix(Self.storageKeyPrefixLegacy) || key.hasPrefix(Self.storageKeyPrefix) {
                 self.defaults.removeObject(forKey: key)
-                self.logger.debug("🚮 Removing from storage \(key)")
+                self.logger.debug("🚮 Removing from storage \(key, privacy: .public)")
             }
         }
     }
