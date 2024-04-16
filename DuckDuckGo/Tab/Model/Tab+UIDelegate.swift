@@ -154,6 +154,8 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     @MainActor
     private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
+        // disable opening 'javascript:' links in new tab
+        guard navigationAction.request.url?.navigationalScheme != .javascript else { return nil }
 
         let tab = Tab(content: .none,
                       webViewConfiguration: configuration,
