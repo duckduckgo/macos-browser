@@ -80,7 +80,6 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
         guard let token = authenticationRepository.getAccessToken() else {
             return nil
         }
-return nil
         return "bearer \(token)"
     }
 }
