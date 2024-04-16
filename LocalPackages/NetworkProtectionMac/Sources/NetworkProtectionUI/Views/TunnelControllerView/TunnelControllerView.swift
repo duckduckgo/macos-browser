@@ -256,8 +256,15 @@ public struct TunnelControllerView: View {
                             Circle()
                                 .fill(Color(hex: "B2B2B2").opacity(0.3))
                                 .frame(width: 26, height: 26)
-                            Image(NetworkProtectionAsset.nearestAvailable)
-                                .frame(width: 16, height: 16)
+                            if isHovered {
+                                Image(NetworkProtectionAsset.nearestAvailable)
+                                    .renderingMode(.template)
+                                    .foregroundColor(.white)
+                                    .frame(width: 16, height: 16)
+                            } else {
+                                Image(NetworkProtectionAsset.nearestAvailable)
+                                    .frame(width: 16, height: 16)
+                            }
                         }
                     }
                     if #available(macOS 12, *) {
