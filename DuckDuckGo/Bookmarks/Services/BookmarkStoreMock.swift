@@ -104,6 +104,15 @@ public final class BookmarkStoreMock: BookmarkStore {
         capturedBookmark = bookmark
     }
 
+    var bookmarkFolderWithIdCalled = false
+    var capturedFolderId: String?
+    var bookmarkFolder: BookmarkFolder?
+    func bookmarkFolder(withId id: String) -> BookmarkFolder? {
+        bookmarkFolderWithIdCalled = true
+        capturedFolderId = id
+        return bookmarkFolder
+    }
+
     var updateFolderCalled = false
     func update(folder: BookmarkFolder) {
         updateFolderCalled = true

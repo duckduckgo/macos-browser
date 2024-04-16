@@ -1071,6 +1071,63 @@ final class LocalBookmarkStoreTests: XCTestCase {
         }
     }
 
+    // MARK: - Retrieve Bookmark Folder
+
+    func testWhenFetchingBookmarkFolderWithId_AndFolderExist_ThenFolderIsReturned() async {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let folderId = "ABCDE"
+        let folder = BookmarkFolder(id: folderId, title: "Test")
+        _ = await sut.save(folder: folder, parent: nil)
+
+        // WHEN
+        let result = sut.bookmarkFolder(withId: folderId)
+
+        // THEN
+        XCTAssertEqual(result, folder)
+    }
+
+    func testWhenFetchingBookmarkFolderWithId_AndFolderDoesNotExist_ThenNilIsReturned() {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let folderId = "ABCDE"
+
+        // WHEN
+        let result = sut.bookmarkFolder(withId: folderId)
+
+        // THEN
+        XCTAssertNil(result)
+    }
+
+    func testWhenFetchingBookmarkFolderWithId_AndFolderHasBeenMoved_ThenFolderIsStillReturned() async {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let folderId = "ABCDE"
+        let folder1 = BookmarkFolder(id: UUID().uuidString, title: "Test")
+        let folder2 = BookmarkFolder(id: folderId, title: "Test")
+        let expectedFolder = BookmarkFolder(id: folderId, title: "Test", parentFolderUUID: folder1.id)
+        _ = await sut.save(folder: folder1, parent: nil)
+        _ = await sut.save(folder: folder2, parent: nil)
+
+        // WHEN
+        let firstFetchResult = sut.bookmarkFolder(withId: folderId)
+
+        // THEN
+        XCTAssertEqual(firstFetchResult, folder2)
+
+        // Move folder
+        _ = await sut.move(objectUUIDs: [folder2.id], toIndex: nil, withinParentFolder: .parent(uuid: folder1.id))
+
+        // WHEN
+        let secondFetchResult = sut.bookmarkFolder(withId: folderId)
+
+        // THEN
+        XCTAssertEqual(secondFetchResult, expectedFolder)
+    }
+
     // MARK: Import
 
     func testWhenBookmarksAreImported_AndNoDuplicatesExist_ThenBookmarksAreImported() {
