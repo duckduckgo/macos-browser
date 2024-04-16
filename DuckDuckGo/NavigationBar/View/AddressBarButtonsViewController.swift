@@ -49,6 +49,7 @@ final class AddressBarButtonsViewController: NSViewController {
         return permissionAuthorizationPopover ?? {
             let popover = PermissionAuthorizationPopover()
             self.permissionAuthorizationPopover = popover
+            popover.setAccessibilityIdentifier("AddressBarButtonsViewController.permissionAuthorizationPopover")
             return popover
         }()
     }
@@ -799,11 +800,12 @@ final class AddressBarButtonsViewController: NSViewController {
             guard let host = url.host else { break }
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
+            let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
 
             let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
             let isUnprotected = configuration.isUserUnprotected(domain: host)
 
-            let isShieldDotVisible = isNotSecure || isUnprotected
+            let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
             privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
 

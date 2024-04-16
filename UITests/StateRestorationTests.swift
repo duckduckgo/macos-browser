@@ -30,6 +30,10 @@ class StateRestorationTests: XCTestCase {
     private var openANewWindowPreference: XCUIElement!
     private var reopenAllWindowsFromLastSessionPreference: XCUIElement!
 
+    override class func setUp() {
+        UITests.firstRun()
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()

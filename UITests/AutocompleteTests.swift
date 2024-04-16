@@ -32,6 +32,7 @@ class AutocompleteTests: XCTestCase {
     private var siteTitleForHistorySite: String!
 
     override class func setUp() {
+        UITests.firstRun()
         UITests.setAutocompleteToggleBeforeTestcaseRuns(true) // These tests require autocomplete to be on
     }
 

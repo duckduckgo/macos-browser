@@ -88,4 +88,17 @@ enum UITests {
         openVanillaBrowser.clickAfterExistenceTestSucceeds()
         app.typeKey("w", modifierFlags: [.command, .option])
     }
+
+    /// Avoid some first-run states that we aren't testing.
+    static func firstRun() {
+        let notificationCenter = XCUIApplication(bundleIdentifier: "com.apple.UserNotificationCenter")
+        if notificationCenter.exists { // If tests-server is asking for network permissions, deny them.
+            notificationCenter.typeKey(.escape, modifierFlags: [])
+        }
+        let app = XCUIApplication()
+        app.launch()
+        app.typeKey("n", modifierFlags: .command)
+        app.typeKey("w", modifierFlags: [.command, .option])
+        app.terminate()
+    }
 }
