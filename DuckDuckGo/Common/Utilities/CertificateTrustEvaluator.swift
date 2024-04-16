@@ -19,13 +19,13 @@
 import Foundation
 
 protocol CertificateTrustEvaluating {
-    func evaluateCertificateTrust(trust: SecTrust?) -> Bool?
+    func evaluateCertificateTrust(trust: SecTrust?) async -> Bool?
 }
 
 struct CertificateTrustEvaluator: CertificateTrustEvaluating {
-    func evaluateCertificateTrust(trust: SecTrust?) -> Bool? {
+    func evaluateCertificateTrust(trust: SecTrust?) async -> Bool? {
         var error: CFError?
-        guard let trust else { return nil }
+        guard let trust = trust else { return nil }
         let result = SecTrustEvaluateWithError(trust, &error)
         return result
     }
