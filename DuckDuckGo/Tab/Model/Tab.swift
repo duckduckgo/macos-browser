@@ -238,7 +238,8 @@ protocol NewWindowPolicyDecisionMaker {
                                                        cbaTimeReporter: cbaTimeReporter,
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager,
-                                                       certificateTrustEvaluator: certificateTrustEvaluator))
+                                                       certificateTrustEvaluator: certificateTrustEvaluator,
+                                                       tunnelController: tunnelController))
 
         super.init()
         tabGetter = { [weak self] in self }
