@@ -178,6 +178,46 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertNotNil(bookmarkList)
     }
 
+    func testWhenGetBookmarkFolderIsCalledThenAskBookmarkStoreToRetrieveFolder() throws {
+        // GIVEN
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        XCTAssertFalse(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedFolderId)
+
+        // WHEN
+        _ = bookmarkManager.getBookmarkFolder(withId: #function)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolderId, #function)
+    }
+
+    func testWhenGetBookmarkFolderIsCalledAndFolderExistsInStoreThenBookmarkStoreReturnsFolder() throws {
+        // GIVEN
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let folder = BookmarkFolder(id: "1", title: "Test")
+        bookmarkStoreMock.bookmarkFolder = folder
+
+        // WHEN
+        let result = bookmarkManager.getBookmarkFolder(withId: #function)
+
+        // THEN
+        XCTAssertEqual(result, folder)
+    }
+
+    func testWhenGetBookmarkFolderIsCalledAndFolderDoesNotExistInStoreThenBookmarkStoreReturnsNil() throws {
+        // GIVEN
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let folder = BookmarkFolder(id: "1", title: "Test")
+        bookmarkStoreMock.bookmarkFolder = nil
+
+        // WHEN
+        let result = bookmarkManager.getBookmarkFolder(withId: #function)
+
+        // THEN
+        XCTAssertNil(result)
+    }
+
 }
 
 fileprivate extension LocalBookmarkManager {

@@ -41,6 +41,10 @@ class MockBookmarkManager: BookmarkManager {
         return nil
     }
 
+    func getBookmarkFolder(withId id: String) -> DuckDuckGo_Privacy_Browser.BookmarkFolder? {
+        return nil
+    }
+
     func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> DuckDuckGo_Privacy_Browser.Bookmark? {
         return nil
     }
