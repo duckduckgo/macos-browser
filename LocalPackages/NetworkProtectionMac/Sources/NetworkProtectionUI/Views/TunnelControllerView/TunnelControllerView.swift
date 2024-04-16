@@ -365,12 +365,15 @@ public struct TunnelControllerView: View {
 
             Group {
                 Image(NetworkProtectionAsset.dataReceived)
+                    .frame(width: 12, height: 12)
                 Text(dataVolume.dataReceived)
+                    .applyDataVolumeAttributes(colorScheme: colorScheme)
                 Image(NetworkProtectionAsset.dataSent)
+                    .frame(width: 12, height: 12)
                     .padding(.leading, 4)
                 Text(dataVolume.dataSent)
+                    .applyDataVolumeAttributes(colorScheme: colorScheme)
             }
-            .applyDataVolumeAttributes(colorScheme: colorScheme)
             .fixedSize()
         }
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
