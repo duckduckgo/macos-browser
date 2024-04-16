@@ -141,20 +141,24 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     private func mergeTrackerDataSets(rules: [ContentBlockerRulesManager.Rules]) -> (trackerData: TrackerData, encodedTrackerData: String) {
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
         let tdsIndex = contentBlockingManager.currentRules.firstIndex(where: { $0.name == tdsName})
-
-        let cnames = rules[tdsIndex!].trackerData.cnames
+        
         var combinedTrackers: [String: KnownTracker] = [:]
         var combinedEntities: [String: Entity] = [:]
         var combinedDomains: [String: String] = [:]
-        rules.forEach { ruleSet in
-            ruleSet.trackerData.trackers.forEach { key, value in
-                combinedTrackers[key] = value
-            }
-            ruleSet.trackerData.entities.forEach { key, value in
-                combinedEntities[key] = value
-            }
-            ruleSet.trackerData.domains.forEach { key, value in
-                combinedDomains[key] = value
+        var cnames: [TrackerData.CnameDomain: TrackerData.TrackerDomain]? = [:]
+
+        if tdsIndex != nil {
+            cnames = rules[tdsIndex!].trackerData.cnames
+            rules.forEach { ruleSet in
+                ruleSet.trackerData.trackers.forEach { key, value in
+                    combinedTrackers[key] = value
+                }
+                ruleSet.trackerData.entities.forEach { key, value in
+                    combinedEntities[key] = value
+                }
+                ruleSet.trackerData.domains.forEach { key, value in
+                    combinedDomains[key] = value
+                }
             }
         }
 
