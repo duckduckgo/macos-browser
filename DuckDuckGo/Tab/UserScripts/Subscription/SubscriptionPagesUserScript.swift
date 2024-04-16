@@ -78,7 +78,7 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 /// Use Subscription sub-feature
 ///
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
     var featureName = "useSubscription"
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
         .exact(hostname: "duckduckgo.com"),
