@@ -158,6 +158,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         let tab = Tab(content: .none,
                       webViewConfiguration: configuration,
                       parentTab: self,
+                      securityOrigin: navigationAction.safeSourceFrame.map { SecurityOrigin($0.securityOrigin) },
                       burnerMode: burnerMode,
                       canBeClosedWithBack: kind.isSelectedTab,
                       webViewSize: webView.superview?.bounds.size ?? .zero)
