@@ -1,5 +1,5 @@
 //
-//  ExtractedProfileTests.swift
+//  ProfileQueryTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
