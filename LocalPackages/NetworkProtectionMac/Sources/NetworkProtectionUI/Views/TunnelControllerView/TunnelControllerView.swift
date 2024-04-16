@@ -352,7 +352,7 @@ public struct TunnelControllerView: View {
                 .applyConnectionStatusDetailAttributes(colorScheme: colorScheme)
                 .fixedSize()
         }
-        .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
+        .padding(EdgeInsets(top: 6, leading: 10, bottom: 0, trailing: 9))
     }
 
     private func dataVolumeRow(title: String, dataVolume: TunnelControllerViewModel.FormattedDataVolume) -> some View {
