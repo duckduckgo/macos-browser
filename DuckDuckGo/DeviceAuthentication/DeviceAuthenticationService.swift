@@ -21,6 +21,7 @@ import Foundation
 enum DeviceAuthenticationResult {
     case success
     case failure
+    case noAuthAvailable
 
     var authenticated: Bool {
         return self == .success

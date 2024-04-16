@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
+import WebKit
 
 final class TabViewModel {
 
@@ -203,6 +204,7 @@ final class TabViewModel {
             .sink { [weak self] _ in
                 self?.updateTitle()
                 self?.updateFavicon()
+                self?.updateCanBeBookmarked()
             }.store(in: &cancellables)
     }
 
@@ -293,7 +295,11 @@ final class TabViewModel {
         switch tab.content {
         // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
         case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
-            title = UserText.tabErrorTitle
+            if tab.error?.errorCode == NSURLErrorServerCertificateUntrusted {
+                title = UserText.sslErrorPageTabTitle
+            } else {
+                title = UserText.tabErrorTitle
+            }
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
         case .settings:
@@ -326,10 +332,9 @@ final class TabViewModel {
 
     private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
-            favicon = .alertCircleColor16
+            favicon = errorFaviconToShow(error: tab.error)
             return
         }
-
         switch tab.content {
         case .dataBrokerProtection:
             favicon = Favicon.dataBrokerProtection
@@ -366,6 +371,13 @@ final class TabViewModel {
     func reload() {
         tab.reload()
         updateAddressBarStrings()
+    }
+
+    private func errorFaviconToShow(error: WKError?) -> NSImage {
+        if error?.errorCode == NSURLErrorServerCertificateUntrusted {
+            return .redAlertCircle16
+        }
+        return.alertCircleColor16
     }
 
     // MARK: - Privacy icon animation

@@ -122,7 +122,7 @@ final class PinnedTabsViewModel: ObservableObject {
             audioStateView = .muted
         case .unmuted:
             audioStateView = .unmuted
-        case .notSupported:
+        case .none:
             audioStateView = .notSupported
         }
     }

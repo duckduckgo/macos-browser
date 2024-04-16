@@ -185,6 +185,11 @@ extension TabExtensionsBuilder {
                                    scriptsPublisher: userScripts.compactMap { $0 },
                                    webViewPublisher: args.webViewFuture)
         }
+
+        add {
+            SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
+                                  scriptsPublisher: userScripts.compactMap { $0 })
+        }
     }
 
 }

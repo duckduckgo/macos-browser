@@ -107,15 +107,16 @@ final class WebViewMock: WKWebView {
         stopMediaCaptureHandler?()
     }
 
-    var mediaMutedStateValue = _WKMediaMutedState()
-    override func _mediaMutedState() -> _WKMediaMutedState {
-        mediaMutedStateValue
-    }
-
+    var mediaMutedStateValue: _WKMediaMutedState = []
     var setPageMutedHandler: ((_WKMediaMutedState) -> Void)?
-    override func _setPageMuted(_ mutedState: _WKMediaMutedState) {
-        mediaMutedStateValue = mutedState
-        setPageMutedHandler?(mutedState)
+    override var mediaMutedState: _WKMediaMutedState {
+        get {
+            mediaMutedStateValue
+        }
+        set {
+            mediaMutedStateValue = newValue
+            setPageMutedHandler?(newValue)
+        }
     }
 
     var setCameraCaptureStateHandler: ((Bool?) -> Void)?
