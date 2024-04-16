@@ -61,6 +61,8 @@ public enum DataBrokerProtectionPixels {
         static let scanCoverage = "scan_coverage"
         static let removals = "removals"
         static let environmentKey = "environment"
+        static let wasOnWaitlist = "was_on_waitlist"
+        static let httpCode = "http_code"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -138,6 +140,10 @@ public enum DataBrokerProtectionPixels {
     case webUILoadingStarted(environment: String)
     case webUILoadingFailed(errorCategory: String)
     case webUILoadingSuccess(environment: String)
+
+    // Backend service errors
+    case generateEmailHTTPErrorDaily(statusCode: Int, environment: String, wasOnWaitlist: Bool)
+    case emptyAccessTokenDaily(environment: String, wasOnWaitlist: Bool)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -223,6 +229,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .webUILoadingStarted: return "m_mac_dbp_web_ui_loading_started"
         case .webUILoadingSuccess: return "m_mac_dbp_web_ui_loading_success"
         case .webUILoadingFailed: return "m_mac_dbp_web_ui_loading_failed"
+
+            // Backend service errors
+        case .generateEmailHTTPErrorDaily: return "m_mac_dbp_service_email-generate-http-error"
+        case .emptyAccessTokenDaily: return "m_mac_dbp_service_empty-auth-token"
         }
     }
 
@@ -336,6 +346,13 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries)]
         case .scanError(let dataBroker, let duration, let category, let details):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.errorCategoryKey: category, Consts.errorDetailsKey: details]
+        case .generateEmailHTTPErrorDaily(let statusCode, let environment, let wasOnWaitlist):
+            return [Consts.environmentKey: environment,
+                    Consts.httpCode: String(statusCode),
+                    Consts.wasOnWaitlist: String(wasOnWaitlist)]
+        case .emptyAccessTokenDaily(let environment, let wasOnWaitlist):
+            return [Consts.environmentKey: environment,
+                    Consts.wasOnWaitlist: String(wasOnWaitlist)]
         }
     }
 }
@@ -346,6 +363,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
     public init() {
         super.init { event, _, _, _ in
             switch event {
+            case .generateEmailHTTPErrorDaily:
+                PixelKit.fire(event, frequency: .dailyOnly)
+            case .emptyAccessTokenDaily:
+                PixelKit.fire(event, frequency: .dailyOnly)
             case .error(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .generalError(let error, _):

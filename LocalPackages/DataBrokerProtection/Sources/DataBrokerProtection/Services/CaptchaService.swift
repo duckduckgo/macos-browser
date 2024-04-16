@@ -125,13 +125,19 @@ struct CaptchaService: CaptchaServiceProtocol {
     private let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let settings: DataBrokerProtectionSettings
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let servicePixel: DataBrokerProtectionBackendServicePixels
 
     init(urlSession: URLSession = URLSession.shared,
          redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
-         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
+         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
         self.settings = settings
+        self.pixelHandler = pixelHandler
+        self.servicePixel = DataBrokerProtectionBackendServicePixels(pixelHandler: pixelHandler,
+                                                                     settings: settings)
     }
 
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
@@ -182,7 +188,12 @@ struct CaptchaService: CaptchaServiceProtocol {
 
         os_log("Submitting captcha request ...", log: .service)
         var request = URLRequest(url: url)
-        let authHeader = try await redeemUseCase.getAuthHeader()
+
+        guard let authHeader = redeemUseCase.getAuthHeader() else {
+            servicePixel.fireEmptyAccessToken(callSite: .submitCaptchaInformationRequest)
+            throw AuthenticationError.noAuthToken
+        }
+
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
@@ -257,7 +268,11 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        let authHeader = try await redeemUseCase.getAuthHeader()
+        guard let authHeader = redeemUseCase.getAuthHeader() else {
+            servicePixel.fireEmptyAccessToken(callSite: .submitCaptchaToBeResolvedRequest)
+            throw AuthenticationError.noAuthToken
+        }
+
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "GET"

@@ -34,15 +34,14 @@ public protocol DataBrokerProtectionRedeemUseCase {
 
     /// Returns the auth header needed for the authenticated endpoints.
     ///
-    /// In case there is no auth header present, tries to fetch a new access token with the saved invite code.
-    ///
-    /// - Returns: `String` a string that contains the bearer access token
-    func getAuthHeader() async throws -> String
+    /// - Returns: `String` a string that contains the bearer access token or nil
+    func getAuthHeader() -> String?
 }
 
 public protocol AuthenticationRepository {
     func getInviteCode() -> String?
     func getAccessToken() -> String?
+    func getWaitlistTimestamp() -> Int?
 
     func save(accessToken: String)
     func save(inviteCode: String)
@@ -77,19 +76,12 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
         authenticationRepository.save(accessToken: accessToken)
     }
 
-    public func getAuthHeader() async throws -> String {
-        var accessToken = authenticationRepository.getAccessToken() ?? ""
-
-        if accessToken.isEmpty {
-            guard let inviteCode = authenticationRepository.getInviteCode() else {
-                throw AuthenticationError.noInviteCode
-            }
-
-            accessToken = try await authenticationService.redeem(inviteCode: inviteCode)
-            authenticationRepository.save(accessToken: accessToken)
+    public func getAuthHeader() -> String? {
+        guard let token = authenticationRepository.getAccessToken() else {
+            return nil
         }
-
-        return "bearer \(accessToken)"
+return nil
+        return "bearer \(token)"
     }
 }
 
@@ -97,6 +89,7 @@ public final class KeychainAuthenticationData: AuthenticationRepository {
     enum DBPWaitlistKeys: String {
         case accessTokenKey = "dbp:accessTokenKey"
         case inviteCodeKey = "dbp:inviteCodeKey"
+        case waitlistTimestamp = "databrokerprotection.timestamp"
     }
 
     /// Hack to stop the bleeding on https://app.asana.com/0/1203581873609357/1206097441142301/f
@@ -125,6 +118,11 @@ public final class KeychainAuthenticationData: AuthenticationRepository {
 
     public func save(inviteCode: String) {
         add(string: inviteCode, forField: .inviteCodeKey)
+    }
+
+    public func getWaitlistTimestamp() -> Int? {
+        guard let timestampString = getString(forField: .waitlistTimestamp) else { return nil }
+        return Int(timestampString)
     }
 
     public func reset() {
@@ -199,6 +197,7 @@ public final class KeychainAuthenticationData: AuthenticationRepository {
 public enum AuthenticationError: Error, Equatable {
     case noInviteCode
     case cantGenerateURL
+    case noAuthToken
     case issueRedeemingInviteCode(error: String)
 }
 
