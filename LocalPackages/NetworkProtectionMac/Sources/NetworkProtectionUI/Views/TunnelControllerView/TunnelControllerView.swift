@@ -74,7 +74,6 @@ private enum Opacity {
 
     static let content = Double(0.58)
     static let label = Double(0.9)
-    static let description = Double(0.9)
     static let link = Double(1)
 
     static func sectionHeader(colorScheme: ColorScheme) -> Double {
@@ -113,10 +112,9 @@ fileprivate extension View {
             .foregroundColor(Color(.defaultText))
     }
 
-    func applyDescriptionAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.description)
-            .font(.NetworkProtection.description)
-            .foregroundColor(Color(.defaultText))
+    func applyDescriptionAttributes() -> some View {
+        font(.NetworkProtection.description)
+            .foregroundColor(Color(.secondaryText))
     }
 
     func applyLabelAttributes(colorScheme: ColorScheme) -> some View {
@@ -200,7 +198,7 @@ public struct TunnelControllerView: View {
             Text(model.isToggleOn.wrappedValue ? UserText.networkProtectionStatusHeaderMessageOn : UserText.networkProtectionStatusHeaderMessageOff)
                 .multilineText()
                 .multilineTextAlignment(.center)
-                .applyDescriptionAttributes(colorScheme: colorScheme)
+                .applyDescriptionAttributes()
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
         }
