@@ -299,7 +299,7 @@ extension UserText {
     // "vpn.location.description.nearest" - Nearest city setting description
     static let vpnLocationNearest = "Nearest"
     // "vpn.location.description.nearest.available" - Nearest available location setting description
-    static let vpnLocationNearestAvailable = "Nearest available"
+    static let vpnLocationNearestAvailable = "Nearest Location"
     // "vpn.location.nearest.available.title" - Subtitle underneath the nearest available vpn location preference text.
     static let vpnLocationNearestAvailableSubtitle = "Automatically connect to the nearest server we can find."
 
