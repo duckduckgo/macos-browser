@@ -1226,11 +1226,7 @@ protocol NewWindowPolicyDecisionMaker {
             .sink { [weak self] serverTrust in
                 Task { [weak self] in
                     guard let self = self else { return }
-                    let isValid = await self.certificateTrustEvaluator.evaluateCertificateTrust(trust: serverTrust)
-                    await MainActor.run {
-                        self.isCertificateValid = isValid
-                        self.updatePrivacyInfo(with: serverTrust, isValid: isValid ?? false)
-                    }
+                    await self.updatePrivacyInfo(with: serverTrust)
                 }
             }
             .store(in: &webViewCancellables)
@@ -1245,12 +1241,15 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
-    private func updatePrivacyInfo(with trust: SecTrust?, isValid: Bool) {
-
-        if isValid {
-            self.privacyInfo?.serverTrust = trust
-        } else {
-            self.privacyInfo?.serverTrust = nil
+    private func updatePrivacyInfo(with trust: SecTrust?) async {
+        let isValid = await self.certificateTrustEvaluator.evaluateCertificateTrust(trust: trust)
+        await MainActor.run {
+            self.isCertificateValid = isValid
+            if isValid ?? false {
+                self.privacyInfo?.serverTrust = trust
+            } else {
+                self.privacyInfo?.serverTrust = nil
+            }
         }
     }
 
