@@ -27,18 +27,25 @@ import PrivacyDashboard
 final class PrivacyDashboardTabExtension {
 
     private let contentBlocking: any ContentBlockingProtocol
+    private let certificateTrustEvaluator: CertificateTrustEvaluating
 
     @Published private(set) var privacyInfo: PrivacyInfo?
+
+    private(set) var isCertificateValid: Bool?
 
     private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
 
     private var cancellables = Set<AnyCancellable>()
 
     init(contentBlocking: some ContentBlockingProtocol,
+         certificateTrustEvaluator: CertificateTrustEvaluating,
          autoconsentUserScriptPublisher: some Publisher<UserScriptWithAutoconsent?, Never>,
          didUpgradeToHttpsPublisher: some Publisher<URL, Never>,
-         trackersPublisher: some Publisher<DetectedTracker, Never>) {
+         trackersPublisher: some Publisher<DetectedTracker, Never>,
+         webViewPublisher: some Publisher<WKWebView, Never>) {
+
         self.contentBlocking = contentBlocking
+        self.certificateTrustEvaluator = certificateTrustEvaluator
 
         autoconsentUserScriptPublisher.sink { [weak self] autoconsentUserScript in
             autoconsentUserScript?.delegate = self
@@ -61,6 +68,21 @@ final class PrivacyDashboardTabExtension {
                 self.privacyInfo?.trackerInfo.addDetectedTracker(tracker.request, onPageWithURL: url)
             }
         }.store(in: &cancellables)
+
+        webViewPublisher.map {
+            $0.publisher(for: \.serverTrust)
+        }
+        .switchToLatest()
+        .sink { [weak self] serverTrust in
+            guard let self else { return }
+            self.isCertificateValid = self.certificateTrustEvaluator.evaluateCertificateTrust(trust: serverTrust)
+            if self.isCertificateValid == true {
+                self.privacyInfo?.serverTrust = serverTrust
+            } else {
+                self.privacyInfo?.serverTrust = nil
+            }
+        }
+        .store(in: &cancellables)
     }
 
 }
@@ -159,6 +181,7 @@ extension PrivacyDashboardTabExtension: AutoconsentUserScriptDelegate {
 protocol PrivacyDashboardProtocol: AnyObject, NavigationResponder {
     var privacyInfo: PrivacyInfo? { get }
     var privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never> { get }
+    var isCertificateValid: Bool? { get }
 
     func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?)
 }
@@ -184,6 +207,10 @@ extension Tab {
 
     func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {
         self.privacyDashboard?.setMainFrameConnectionUpgradedTo(upgradedUrl)
+    }
+
+    var isCertificateValid: Bool? {
+        self.privacyDashboard?.isCertificateValid
     }
 
 }
