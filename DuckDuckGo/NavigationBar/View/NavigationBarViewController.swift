@@ -612,9 +612,9 @@ final class NavigationBarViewController: NSViewController {
             logoWidth.constant = sizeClass.logoWidth
         }
 
-        let heightChange: DispatchWorkItem
-        if animated {
-            heightChange = DispatchWorkItem {
+        let heightChange: () -> Void
+        if animated && view.window != nil {
+            heightChange = {
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.1
                     performResize()
@@ -631,12 +631,18 @@ final class NavigationBarViewController: NSViewController {
             self.daxFadeInAnimation = fadeIn
         } else {
             daxLogo.alphaValue = sizeClass.isLogoVisible ? 1 : 0
-            heightChange = DispatchWorkItem {
+            heightChange = {
                 performResize()
             }
         }
-        DispatchQueue.main.async(execute: heightChange)
-        self.heightChangeAnimation = heightChange
+        if view.window == nil {
+            // update synchronously for off-screen view
+            heightChange()
+        } else {
+            let dispatchItem = DispatchWorkItem(block: heightChange)
+            DispatchQueue.main.async(execute: dispatchItem)
+            self.heightChangeAnimation = dispatchItem
+        }
     }
 
     private func subscribeToDownloads() {
