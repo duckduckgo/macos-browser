@@ -153,7 +153,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertNil(bookmarkStoreMock.capturedFolderId)
 
         // WHEN
-        let sut = BookmarkAllTabsDialogViewModel(websites: makeWebsitesInfo(url: .duckDuckGo), foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        _ = BookmarkAllTabsDialogViewModel(websites: makeWebsitesInfo(url: .duckDuckGo), foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // THEN
         XCTAssertFalse(bookmarkStoreMock.bookmarkFolderWithIdCalled)
@@ -166,7 +166,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertNil(bookmarkStoreMock.capturedFolderId)
 
         // WHEN
-        let sut = BookmarkAllTabsDialogViewModel(websites: makeWebsitesInfo(url: .duckDuckGo), foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+        _ = BookmarkAllTabsDialogViewModel(websites: makeWebsitesInfo(url: .duckDuckGo), foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
 
         // THEN
         XCTAssertTrue(bookmarkStoreMock.bookmarkFolderWithIdCalled)
@@ -302,7 +302,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         sut.selectedFolder = nil
         XCTAssertFalse(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
-        XCTAssertNil(bookmarkStoreMock.capturedWebsitesInfo)
+        XCTAssertNil(bookmarkStoreMock.capturedBookmarks)
         XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
 
         // WHEN
@@ -310,7 +310,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertTrue(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
-        XCTAssertEqual(bookmarkStoreMock.capturedWebsitesInfo, websitesInfo)
+        XCTAssertEqual(bookmarkStoreMock.capturedBookmarks?.compactMap(\.urlObject), websitesInfo.map(\.url))
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
 
     }
@@ -322,7 +322,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         sut.selectedFolder = folder
         XCTAssertFalse(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
-        XCTAssertNil(bookmarkStoreMock.capturedWebsitesInfo)
+        XCTAssertNil(bookmarkStoreMock.capturedBookmarks)
         XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
 
         // WHEN
@@ -330,7 +330,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertTrue(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
-        XCTAssertEqual(bookmarkStoreMock.capturedWebsitesInfo, websitesInfo)
+        XCTAssertEqual(bookmarkStoreMock.capturedBookmarks?.compactMap(\.urlObject), websitesInfo.map(\.url))
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: "ABCDE"))
     }
 

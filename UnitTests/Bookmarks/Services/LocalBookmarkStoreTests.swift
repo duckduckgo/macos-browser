@@ -261,6 +261,72 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
+    func testWhenMultipleBookmarksAreAddedToANewFolderInRootFolder_ThenTheNewFolderIsCreated_AndBoomarksAreAddedToTheFolder() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let newFolderName = "Bookmark All Open Tabs"
+        let bookmarksToInsert = makeBookmarksMock(occurrences: 50)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        var topLevelEntities = try await sut.loadAll(type: .topLevelEntities).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+        XCTAssertEqual(topLevelEntities.count, 0)
+
+        // WHEN
+        sut.save(bookmarks: bookmarksToInsert, inNewFolderNamed: newFolderName, withinParentFolder: .root)
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        topLevelEntities = try await sut.loadAll(type: .topLevelEntities).get()
+        let bookmarks = try XCTUnwrap(bookmarksEntity as? [Bookmark])
+        let folders = try XCTUnwrap(topLevelEntities as? [BookmarkFolder])
+        let folder = try XCTUnwrap(folders.first)
+        XCTAssertEqual(bookmarksEntity.count, 50)
+        XCTAssertEqual(folders.count, 1)
+        XCTAssertEqual(folder.parentFolderUUID, BookmarkEntity.Constants.rootFolderID)
+        XCTAssertEqual(folder.title, newFolderName)
+        XCTAssertEqual(Set(folder.children), Set(bookmarks))
+        bookmarks.forEach { bookmark in
+            XCTAssertEqual(bookmark.parentFolderUUID, folder.id)
+        }
+    }
+
+    func testWhenMultipleBookmarksAreAddedToANewFolderInSubfolder_ThenTheNewFolderIsCreated_AndBoomarksAreAddedToTheFolder() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let newFolderName = "Bookmark All Open Tabs"
+        let bookmarksToInsert = makeBookmarksMock(occurrences: 50)
+        let parentFolderToInsert = BookmarkFolder(id: "ABCDE", title: "Subfolder")
+        _ = await sut.save(folder: parentFolderToInsert, parent: nil)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        var topLevelEntities = try await sut.loadAll(type: .topLevelEntities).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+        XCTAssertEqual(topLevelEntities.count, 1)
+        XCTAssertEqual(topLevelEntities.first, parentFolderToInsert)
+        XCTAssertEqual((topLevelEntities.first as? BookmarkFolder)?.parentFolderUUID, BookmarkEntity.Constants.rootFolderID)
+
+        // WHEN
+        sut.save(bookmarks: bookmarksToInsert, inNewFolderNamed: newFolderName, withinParentFolder: .parent(uuid: parentFolderToInsert.id))
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        topLevelEntities = try await sut.loadAll(type: .topLevelEntities).get()
+        let bookmarks = try XCTUnwrap(bookmarksEntity as? [Bookmark])
+        let folders = try XCTUnwrap(topLevelEntities as? [BookmarkFolder])
+        let parentFolder = try XCTUnwrap(folders.first)
+        let subFolder = try XCTUnwrap(parentFolder.children.first as? BookmarkFolder)
+        XCTAssertEqual(bookmarksEntity.count, 50)
+        XCTAssertEqual(folders.count, 1)
+        XCTAssertEqual(parentFolder.title, parentFolderToInsert.title)
+        XCTAssertEqual(parentFolder.children.count, 1)
+        XCTAssertEqual(subFolder.title, newFolderName)
+        XCTAssertEqual(Set(subFolder.children), Set(bookmarks))
+        bookmarks.forEach { bookmark in
+            XCTAssertEqual(bookmark.parentFolderUUID, subFolder.id)
+        }
+    }
+
     // MARK: Moving Bookmarks/Folders
 
     func testWhenMovingBookmarkWithinParentCollection_AndIndexIsValid_ThenBookmarkIsMoved() async {
@@ -1301,6 +1367,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks, syncedBookmarks: nil)
 
         return ImportedBookmarks(topLevelFolders: topLevelFolders)
+    }
+
+    func makeBookmarksMock(occurrences: Int = 1) -> [Bookmark] {
+        (1...occurrences).map { index in
+            Bookmark(id: UUID().uuidString, url: "https://example\(index).com", title: "Example \(index)", isFavorite: false)
+        }
     }
 
 }

@@ -340,6 +340,24 @@ final class LocalBookmarkStore: BookmarkStore {
         })
     }
 
+    func save(bookmarks: [Bookmark], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType) {
+        do {
+            try applyChangesAndSave { context in
+                // Fetch Parent folder
+                let parentFolder = try bookmarkEntity(for: parent, in: context)
+                // Create new Folder for all bookmarks
+                let newFolderMO = BookmarkEntity.makeFolder(title: folderName, parent: parentFolder, context: context)
+                // Save the bookmarks
+                bookmarks.forEach { bookmark in
+                    let bookmarkMO = BookmarkEntity.makeBookmark(title: bookmark.title, url: bookmark.url, parent: newFolderMO, context: context)
+                    bookmarkMO.uuid = bookmark.id
+                }
+            }
+        } catch {
+            commonOnSaveErrorHandler(error)
+        }
+    }
+
     func remove(objectsWithUUIDs identifiers: [String], completion: @escaping (Bool, Error?) -> Void) {
 
         applyChangesAndSave(changes: { [weak self] context in
@@ -712,10 +730,6 @@ final class LocalBookmarkStore: BookmarkStore {
 
     }
 
-    func bookmarkAll(websitesInfo: [WebsiteInfo], withinParentFolder parent: ParentFolderType) {
-        // TODO: https://app.asana.com/0/0/1207032959154802/f
-    }
-
     // MARK: - Import
 
     /// Imports bookmarks into the Core Data store from an `ImportedBookmarks` object.
@@ -1035,23 +1049,7 @@ private extension LocalBookmarkStore {
     }
 
     func move(entities: [BookmarkEntity], toIndex index: Int?, withinParentFolderType type: ParentFolderType, in context: NSManagedObjectContext) throws {
-        guard let rootFolder = bookmarksRoot(in: context) else {
-            throw BookmarkStoreError.missingRoot
-        }
-
-        let newParentFolder: BookmarkEntity
-
-        switch type {
-        case .root: newParentFolder = rootFolder
-        case .parent(let newParentUUID):
-            let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: newParentUUID)
-
-            if let fetchedParent = try context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
-                newParentFolder = fetchedParent
-            } else {
-                throw BookmarkStoreError.missingEntity
-            }
-        }
+        let newParentFolder = try bookmarkEntity(for: type, in: context)
 
         if let index = index, index < newParentFolder.childrenArray.count {
             self.move(entities: entities, to: index, within: newParentFolder)
@@ -1061,6 +1059,28 @@ private extension LocalBookmarkStore {
                 newParentFolder.addToChildren(bookmarkManagedObject)
             }
         }
+    }
+
+    func bookmarkEntity(for parentFolderType: ParentFolderType, in context: NSManagedObjectContext) throws -> BookmarkEntity {
+        guard let rootFolder = bookmarksRoot(in: context) else {
+            throw BookmarkStoreError.missingRoot
+        }
+
+        let parentFolder: BookmarkEntity
+
+        switch parentFolderType {
+        case .root:
+            parentFolder = rootFolder
+        case let .parent(parentUUID):
+            let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: parentUUID)
+
+            if let fetchedParent = try context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
+                parentFolder = fetchedParent
+            } else {
+                throw BookmarkStoreError.missingEntity
+            }
+        }
+        return parentFolder
     }
 
 }
