@@ -36,7 +36,6 @@ let package = Package(
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../LoginItems"),
         .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "2.0.0"),
-        .package(path: "../PixelKit"),
     ],
     targets: [
         // MARK: - NetworkProtectionIPC
@@ -59,7 +58,6 @@ let package = Package(
             name: "NetworkProtectionProxy",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
-                .product(name: "PixelKit", package: "PixelKit"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
@@ -73,9 +71,9 @@ let package = Package(
             name: "NetworkProtectionUI",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "LoginItems", package: "LoginItems"),
-                .product(name: "PixelKit", package: "PixelKit"),
             ],
             resources: [
                 .copy("Resources/Assets.xcassets")
@@ -92,7 +90,7 @@ let package = Package(
                 "NetworkProtectionUI",
                 .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit"),
                 .product(name: "LoginItems", package: "LoginItems"),
-                .product(name: "PixelKitTestingUtilities", package: "PixelKit"),
+                .product(name: "PixelKitTestingUtilities", package: "BrowserServicesKit"),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
         ),

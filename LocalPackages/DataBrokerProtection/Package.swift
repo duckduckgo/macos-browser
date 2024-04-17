@@ -30,7 +30,6 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "134.1.0-1"),
-        .package(path: "../PixelKit"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../XPCHelper"),
         .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "2.0.0"),
@@ -40,9 +39,9 @@ let package = Package(
             name: "DataBrokerProtection",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
-                .product(name: "PixelKit", package: "PixelKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .byName(name: "XPCHelper"),
+                .product(name: "PixelKitTestingUtilities", package: "BrowserServicesKit"),
             ],
             resources: [.process("Resources")],
             swiftSettings: [

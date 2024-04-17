@@ -24,7 +24,11 @@ let package = Package(
             ],
             resources: [
                 .process("Resources")
-            ]),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ]
+        ),
         .testTarget(
             name: "SubscriptionUITests",
             dependencies: ["SubscriptionUI"]),

@@ -1128,7 +1128,6 @@
 		4B1E6EF227AB5E5D00F51793 /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */; };
 		4B25375B2A11BE7300610219 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B4D603E2A0B290200BCD287 /* NetworkExtension.framework */; };
 		4B2537722A11BF8B00610219 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B25376F2A11BF8B00610219 /* main.swift */; };
-		4B2537772A11BFE100610219 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B2537762A11BFE100610219 /* PixelKit */; };
 		4B25377A2A11C01700610219 /* UserText+NetworkProtectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D607C2A0B29FA00BCD287 /* UserText+NetworkProtectionExtensions.swift */; };
 		4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */; };
 		4B2975992828285900187C4E /* FirefoxKeyReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */; };
@@ -1203,7 +1202,6 @@
 		4B4BEC482A11B61F001D9AC5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B4BEC342A11B509001D9AC5 /* Assets.xcassets */; };
 		4B4D603F2A0B290200BCD287 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B4D603E2A0B290200BCD287 /* NetworkExtension.framework */; };
 		4B4D60892A0B2A1C00BCD287 /* NetworkProtectionUNNotificationsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60762A0B29FA00BCD287 /* NetworkProtectionUNNotificationsPresenter.swift */; };
-		4B4D60982A0B2A5C00BCD287 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B4D60972A0B2A5C00BCD287 /* PixelKit */; };
 		4B4D609F2A0B2C7300BCD287 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
 		4B4D60A02A0B2D5B00BCD287 /* Bundle+VPN.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D605E2A0B29FA00BCD287 /* Bundle+VPN.swift */; };
 		4B4D60A12A0B2D6100BCD287 /* NetworkProtectionOptionKeyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D605F2A0B29FA00BCD287 /* NetworkProtectionOptionKeyExtension.swift */; };
@@ -1273,8 +1271,6 @@
 		4B7534CC2A1FD7EA00158A99 /* NetworkProtectionInviteDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606C2A0B29FA00BCD287 /* NetworkProtectionInviteDialog.swift */; };
 		4B7A57CF279A4EF300B1C70E /* ChromiumPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromiumPreferences.swift */; };
 		4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */; };
-		4B81AD352B29512B00706C96 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 4B81AD342B29512B00706C96 /* PixelKitTestingUtilities */; };
-		4B81AD372B29513100706C96 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 4B81AD362B29513100706C96 /* PixelKitTestingUtilities */; };
 		4B85A48028821CC500FC4C39 /* NSPasteboardItemExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B85A47F28821CC500FC4C39 /* NSPasteboardItemExtension.swift */; };
 		4B8A4DFF27C83B29005F40E8 /* SaveIdentityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */; };
 		4B8A4E0127C8447E005F40E8 /* SaveIdentityPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */; };
@@ -2228,8 +2224,6 @@
 		7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
-		7B5DD69A2AE51FFA001DE99C /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B5DD6992AE51FFA001DE99C /* PixelKit */; };
-		7B5F9A752AE2BE4E002AEBC0 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B5F9A742AE2BE4E002AEBC0 /* PixelKit */; };
 		7B624F172BA25C1F00A6C544 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7B624F162BA25C1F00A6C544 /* NetworkProtectionUI */; };
 		7B7DFB202B7E736B009EA1A3 /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		7B7DFB222B7E7473009EA1A3 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 7B7DFB212B7E7473009EA1A3 /* Networking */; };
@@ -2247,7 +2241,6 @@
 		7B97CD5E2B7E0BEA004FEF43 /* OptionalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */; };
 		7B97CD5F2B7E0BF7004FEF43 /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */; };
 		7B97CD602B7E0C2E004FEF43 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
-		7B97CD622B7E0C4B004FEF43 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B97CD612B7E0C4B004FEF43 /* PixelKit */; };
 		7BA076BB2B65D61400D7FB72 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA076BA2B65D61400D7FB72 /* NetworkProtectionProxy */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */; };
@@ -2306,8 +2299,6 @@
 		7BEEA5122AD1235B00A9E72B /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5112AD1235B00A9E72B /* NetworkProtectionIPC */; };
 		7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5132AD1236300A9E72B /* NetworkProtectionIPC */; };
 		7BEEA5162AD1236E00A9E72B /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5152AD1236E00A9E72B /* NetworkProtectionUI */; };
-		7BFCB74E2ADE7E1A00DA3EA7 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BFCB74D2ADE7E1A00DA3EA7 /* PixelKit */; };
-		7BFCB7502ADE7E2300DA3EA7 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BFCB74F2ADE7E2300DA3EA7 /* PixelKit */; };
 		7BFE95522A9DF1CE0081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift */; };
 		7BFE95542A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */; };
 		7BFE95552A9DF2990081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */; };
@@ -2436,8 +2427,6 @@
 		98A50964294B691800D10880 /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 98A50963294B691800D10880 /* Persistence */; };
 		98A95D88299A2DF900B9B81A /* BookmarkMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A95D87299A2DF900B9B81A /* BookmarkMigrationTests.swift */; };
 		98EB5D1027516A4800681FE6 /* AppPrivacyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */; };
-		9D6983F92AC773C3002C02FC /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D6983F82AC773C3002C02FC /* PixelKit */; };
-		9D6983FB2AC773C8002C02FC /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D6983FA2AC773C8002C02FC /* PixelKit */; };
 		9D9AE8692AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */; };
 		9D9AE86B2AA76CF90026E7DC /* LoginItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */; };
 		9D9AE86C2AA76D1B0026E7DC /* LoginItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */; };
@@ -3350,6 +3339,17 @@
 		EEDE50122BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */; };
 		EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
+		F13F29AB2BD027C800E07527 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F13F29AA2BD027C800E07527 /* PixelKit */; };
+		F13F29AD2BD027F900E07527 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F13F29AC2BD027F900E07527 /* PixelKit */; };
+		F13F29AF2BD0280000E07527 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F13F29AE2BD0280000E07527 /* PixelKit */; };
+		F13F29B12BD0280A00E07527 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F13F29B02BD0280A00E07527 /* PixelKit */; };
+		F13F29B52BD0298700E07527 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F13F29B42BD0298700E07527 /* PixelKit */; };
+		F13F29BD2BD02A9200E07527 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F13F29BC2BD02A9200E07527 /* PixelKit */; };
+		F13F29C12BD02AB400E07527 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F13F29C02BD02AB400E07527 /* PixelKit */; };
+		F13F29C52BD02AC700E07527 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F13F29C42BD02AC700E07527 /* PixelKit */; };
+		F14B648A2BD0243F00098E00 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F14B64892BD0243F00098E00 /* PixelKit */; };
+		F14B648C2BD0244900098E00 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F14B648B2BD0244900098E00 /* PixelKit */; };
+		F14B648E2BD0245000098E00 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F14B648D2BD0245000098E00 /* PixelKitTestingUtilities */; };
 		F188267C2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */; };
 		F188267D2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */; };
 		F188267E2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */; };
@@ -4037,7 +4037,6 @@
 		4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessagingTests.swift; sourceTree = "<group>"; };
 		4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleableScrollView.swift; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
-		4BE15DB12A0B0DD500898243 /* PixelKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = PixelKit; sourceTree = "<group>"; };
 		4BE344ED2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNFeedbackFormViewModelTests.swift; sourceTree = "<group>"; };
 		4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePaymentMethodPopover.swift; sourceTree = "<group>"; };
 		4BE4005427CF3F19007D3161 /* SavePaymentMethodViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePaymentMethodViewController.swift; sourceTree = "<group>"; };
@@ -4828,6 +4827,7 @@
 		EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+VPNAgentConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
+		F14B64882BD023F000098E00 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPixel.swift; sourceTree = "<group>"; };
 		F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyProPixel.swift; sourceTree = "<group>"; };
 		F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PixelKit+Assertion.swift"; sourceTree = "<group>"; };
@@ -4847,7 +4847,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				373FB4B32B4D6C4B004C88D6 /* PreferencesViews in Frameworks */,
-				7B5F9A752AE2BE4E002AEBC0 /* PixelKit in Frameworks */,
 				4BF97AD32B43C43F00EB4240 /* NetworkProtectionUI in Frameworks */,
 				7B1459572B7D43E500047F2C /* NetworkProtectionProxy in Frameworks */,
 				B6F7128229F6820A00594A45 /* QuickLookUI.framework in Frameworks */,
@@ -4871,6 +4870,7 @@
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
 				3706FCAB293F65D500E42796 /* TrackerRadarKit in Frameworks */,
 				85E2BBD02B8F534A00DBEC7A /* History in Frameworks */,
+				F14B648C2BD0244900098E00 /* PixelKit in Frameworks */,
 				4BF97AD52B43C43F00EB4240 /* NetworkProtection in Frameworks */,
 				3739326529AE4B39009346AE /* DDGSync in Frameworks */,
 				37DF000729F9C061002B7D3E /* SyncDataProviders in Frameworks */,
@@ -4886,7 +4886,6 @@
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
 				B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
-				4B81AD372B29513100706C96 /* PixelKitTestingUtilities in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4921,8 +4920,8 @@
 			files = (
 				37269F012B332FC8005E8E46 /* Common in Frameworks */,
 				EE7295E92A545BC4008C0991 /* NetworkProtection in Frameworks */,
-				4B2537772A11BFE100610219 /* PixelKit in Frameworks */,
 				7B37C7A52BAA32A50062546A /* Subscription in Frameworks */,
+				F13F29AB2BD027C800E07527 /* PixelKit in Frameworks */,
 				7BBE2B7B2B61663C00697445 /* NetworkProtectionProxy in Frameworks */,
 				4B2D062C2A11C0E100DE1F49 /* Networking in Frameworks */,
 				4B25375B2A11BE7300610219 /* NetworkExtension.framework in Frameworks */,
@@ -4933,12 +4932,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F13F29C12BD02AB400E07527 /* PixelKit in Frameworks */,
 				4B41EDAB2B1544B2001EEDF4 /* LoginItems in Frameworks */,
 				7B00997D2B6508B700FE7C31 /* NetworkProtectionProxy in Frameworks */,
 				7BEEA5122AD1235B00A9E72B /* NetworkProtectionIPC in Frameworks */,
 				7BA7CC5F2AD1210C0042E5CE /* Networking in Frameworks */,
 				7BEEA5162AD1236E00A9E72B /* NetworkProtectionUI in Frameworks */,
-				7BFCB74E2ADE7E1A00DA3EA7 /* PixelKit in Frameworks */,
 				EE7295ED2A545C0A008C0991 /* NetworkProtection in Frameworks */,
 				EE2F9C5B2B90F2FF00D45FC9 /* Subscription in Frameworks */,
 				7BEC182F2AD5D8DC00D30536 /* SystemExtensionManager in Frameworks */,
@@ -4949,9 +4948,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7BFCB7502ADE7E2300DA3EA7 /* PixelKit in Frameworks */,
 				4BCBE45C2BA7E18500FC75A1 /* Subscription in Frameworks */,
 				7BA7CC612AD1211C0042E5CE /* Networking in Frameworks */,
+				F13F29C52BD02AC700E07527 /* PixelKit in Frameworks */,
 				7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */,
 				7B00997F2B6508C200FE7C31 /* NetworkProtectionProxy in Frameworks */,
 				EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */,
@@ -4964,6 +4963,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F13F29B52BD0298700E07527 /* PixelKit in Frameworks */,
 				7B624F172BA25C1F00A6C544 /* NetworkProtectionUI in Frameworks */,
 				37269F052B3332C2005E8E46 /* Common in Frameworks */,
 			);
@@ -4973,9 +4973,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F13F29BD2BD02A9200E07527 /* PixelKit in Frameworks */,
 				37269EFF2B332FBB005E8E46 /* Common in Frameworks */,
 				EE7295E72A545BBB008C0991 /* NetworkProtection in Frameworks */,
-				4B4D60982A0B2A5C00BCD287 /* PixelKit in Frameworks */,
 				4B4D60AF2A0C837F00BCD287 /* Networking in Frameworks */,
 				7B25856E2BA2F2ED00D49F79 /* NetworkProtectionUI in Frameworks */,
 				4B4D603F2A0B290200BCD287 /* NetworkExtension.framework in Frameworks */,
@@ -5010,6 +5010,7 @@
 				85E2BBD22B8F536F00DBEC7A /* History in Frameworks */,
 				4B957BE62AC7AE700062CA31 /* PrivacyDashboard in Frameworks */,
 				9FF5214A2BAA90C400B9819B /* Lottie in Frameworks */,
+				F13F29B12BD0280A00E07527 /* PixelKit in Frameworks */,
 				7B8C083C2AE1268E00F4C67F /* PixelKit in Frameworks */,
 				85D44B8A2BA08D3B001B4AB5 /* Suggestions in Frameworks */,
 				4B957BE72AC7AE700062CA31 /* SyncDataProviders in Frameworks */,
@@ -5043,7 +5044,6 @@
 			files = (
 				7BDA36E62B7E037100AD5388 /* NetworkExtension.framework in Frameworks */,
 				7B97CD592B7E0B57004FEF43 /* NetworkProtectionProxy in Frameworks */,
-				7B97CD622B7E0C4B004FEF43 /* PixelKit in Frameworks */,
 				7B7DFB222B7E7473009EA1A3 /* Networking in Frameworks */,
 				7B97CD5B2B7E0B85004FEF43 /* Common in Frameworks */,
 			);
@@ -5053,8 +5053,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F13F29AD2BD027F900E07527 /* PixelKit in Frameworks */,
 				9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */,
-				9D6983F92AC773C3002C02FC /* PixelKit in Frameworks */,
 				9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5063,7 +5063,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9D6983FB2AC773C8002C02FC /* PixelKit in Frameworks */,
+				F13F29AF2BD0280000E07527 /* PixelKit in Frameworks */,
 				315A023F2B6421AE00BFA577 /* Networking in Frameworks */,
 				9D9AE8FB2AAA3AD90026E7DC /* DataBrokerProtection in Frameworks */,
 			);
@@ -5081,7 +5081,6 @@
 				EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
 				987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */,
-				7B5DD69A2AE51FFA001DE99C /* PixelKit in Frameworks */,
 				1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */,
 				31A3A4E32B0C115F0021063C /* DataBrokerProtection in Frameworks */,
 				378F44E429B4BDE900899924 /* SwiftUIExtensions in Frameworks */,
@@ -5092,6 +5091,7 @@
 				37269EFB2B332F9E005E8E46 /* Common in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
 				1EA7B8D52B7E078C000330A4 /* Subscription in Frameworks */,
+				F14B648A2BD0243F00098E00 /* PixelKit in Frameworks */,
 				B6B77BE8297973D4001E68A1 /* Navigation in Frameworks */,
 				3739326729AE4B42009346AE /* DDGSync in Frameworks */,
 				7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */,
@@ -5112,10 +5112,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F14B648E2BD0245000098E00 /* PixelKitTestingUtilities in Frameworks */,
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
 				B65CD8CB2B316DF100A595BB /* SnapshotTesting in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
-				4B81AD352B29512B00706C96 /* PixelKitTestingUtilities in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5547,7 +5547,6 @@
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
 				7B25FE322AD12C990012AFAB /* NetworkProtectionMac */,
-				4BE15DB12A0B0DD500898243 /* PixelKit */,
 				378F44E229B4B7B600899924 /* SwiftUIExtensions */,
 				37BA812B29B3CB8A0053F1A3 /* SyncUI */,
 				1E862A882A9FC01200F84D4B /* SubscriptionUI */,
@@ -7216,6 +7215,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				F14B64882BD023F000098E00 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -8932,6 +8932,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13F29B92BD02A8300E07527 /* PBXTargetDependency */,
 				4BBA2D2B2B6AD01E00F6A470 /* PBXTargetDependency */,
 				4BBA2D292B6ACD4D00F6A470 /* PBXTargetDependency */,
 				B69D061C2A4C0BC10032D14D /* PBXTargetDependency */,
@@ -8953,7 +8954,6 @@
 				B6EC37FE29B8D915001ACE79 /* Configuration */,
 				37DF000629F9C061002B7D3E /* SyncDataProviders */,
 				9DC70B192AA1FA5B005A844B /* LoginItems */,
-				7B5F9A742AE2BE4E002AEBC0 /* PixelKit */,
 				37269EFC2B332FAC005E8E46 /* Common */,
 				372217812B33380700B8E9C2 /* TestUtils */,
 				4BF97AD02B43C43F00EB4240 /* NetworkProtectionIPC */,
@@ -8968,6 +8968,7 @@
 				85D44B872BA08D30001B4AB5 /* Suggestions */,
 				4BCBE4592BA7E17800FC75A1 /* Subscription */,
 				9FF521472BAA909C00B9819B /* Lottie */,
+				F14B648B2BD0244900098E00 /* PixelKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -8991,7 +8992,6 @@
 			packageProductDependencies = (
 				3706FDD6293F661700E42796 /* OHHTTPStubs */,
 				3706FDD8293F661700E42796 /* OHHTTPStubsSwift */,
-				4B81AD362B29513100706C96 /* PixelKitTestingUtilities */,
 				B65CD8CE2B316E0200A595BB /* SnapshotTesting */,
 			);
 			productName = DuckDuckGoTests;
@@ -9079,16 +9079,17 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13F29BF2BD02AA200E07527 /* PBXTargetDependency */,
 				B6080B9F2B20AF7B00B418EF /* PBXTargetDependency */,
 			);
 			name = NetworkProtectionSystemExtension;
 			packageProductDependencies = (
-				4B2537762A11BFE100610219 /* PixelKit */,
 				4B2D062B2A11C0E100DE1F49 /* Networking */,
 				EE7295E82A545BC4008C0991 /* NetworkProtection */,
 				37269F002B332FC8005E8E46 /* Common */,
 				7BBE2B7A2B61663C00697445 /* NetworkProtectionProxy */,
 				7B37C7A42BAA32A50062546A /* Subscription */,
+				F13F29AA2BD027C800E07527 /* PixelKit */,
 			);
 			productName = NetworkProtectionSystemExtension;
 			productReference = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.vpn.network-extension.debug.systemextension */;
@@ -9107,6 +9108,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13F29C32BD02ABD00E07527 /* PBXTargetDependency */,
 				B6080BA32B20AF8300B418EF /* PBXTargetDependency */,
 				7BEC18312AD5DA3300D30536 /* PBXTargetDependency */,
 			);
@@ -9117,10 +9119,10 @@
 				7BEEA5112AD1235B00A9E72B /* NetworkProtectionIPC */,
 				7BEEA5152AD1236E00A9E72B /* NetworkProtectionUI */,
 				7BEC182E2AD5D8DC00D30536 /* SystemExtensionManager */,
-				7BFCB74D2ADE7E1A00DA3EA7 /* PixelKit */,
 				4B41EDAA2B1544B2001EEDF4 /* LoginItems */,
 				7B00997C2B6508B700FE7C31 /* NetworkProtectionProxy */,
 				EE2F9C5A2B90F2FF00D45FC9 /* Subscription */,
+				F13F29C02BD02AB400E07527 /* PixelKit */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo VPN.app */;
@@ -9140,6 +9142,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13F29C72BD02ACF00E07527 /* PBXTargetDependency */,
 				7BDA36F82B7E082100AD5388 /* PBXTargetDependency */,
 				4BA7C4DF2B3F6F4900AFE511 /* PBXTargetDependency */,
 				B6080BA52B20AF8800B418EF /* PBXTargetDependency */,
@@ -9150,10 +9153,10 @@
 				EE7295EE2A545C12008C0991 /* NetworkProtection */,
 				7BA7CC602AD1211C0042E5CE /* Networking */,
 				7BEEA5132AD1236300A9E72B /* NetworkProtectionIPC */,
-				7BFCB74F2ADE7E2300DA3EA7 /* PixelKit */,
 				7B00997E2B6508C200FE7C31 /* NetworkProtectionProxy */,
 				4BA7C4DC2B3F64E500AFE511 /* LoginItems */,
 				4BCBE45B2BA7E18500FC75A1 /* Subscription */,
+				F13F29C42BD02AC700E07527 /* PixelKit */,
 			);
 			productName = DuckDuckGoAgentAppStore;
 			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGo VPN App Store.app */;
@@ -9170,6 +9173,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13F29B32BD0296F00E07527 /* PBXTargetDependency */,
 				B6080BA12B20AF7F00B418EF /* PBXTargetDependency */,
 				4B4BEC4A2A11B627001D9AC5 /* PBXTargetDependency */,
 			);
@@ -9177,6 +9181,7 @@
 			packageProductDependencies = (
 				37269F042B3332C2005E8E46 /* Common */,
 				7B624F162BA25C1F00A6C544 /* NetworkProtectionUI */,
+				F13F29B42BD0298700E07527 /* PixelKit */,
 			);
 			productName = DuckDuckGoNotifications;
 			productReference = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */;
@@ -9193,16 +9198,17 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13F29BB2BD02A8C00E07527 /* PBXTargetDependency */,
 				B6080B9D2B20AF7700B418EF /* PBXTargetDependency */,
 				4B4D60532A0B29CB00BCD287 /* PBXTargetDependency */,
 			);
 			name = NetworkProtectionAppExtension;
 			packageProductDependencies = (
-				4B4D60972A0B2A5C00BCD287 /* PixelKit */,
 				4B4D60AE2A0C837F00BCD287 /* Networking */,
 				EE7295E62A545BBB008C0991 /* NetworkProtection */,
 				37269EFE2B332FBB005E8E46 /* Common */,
 				7B25856D2BA2F2ED00D49F79 /* NetworkProtectionUI */,
+				F13F29BC2BD02A9200E07527 /* PixelKit */,
 			);
 			productName = NetworkProtectionAppExtension;
 			productReference = 4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */;
@@ -9224,6 +9230,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13F29C92BD02AE000E07527 /* PBXTargetDependency */,
 				4B9579262AC7AE700062CA31 /* PBXTargetDependency */,
 				31C6E9AB2B0C07A30086DC30 /* PBXTargetDependency */,
 			);
@@ -9258,6 +9265,7 @@
 				F1D43AF62B98E48F00BAB743 /* BareBonesBrowserKit */,
 				85D44B892BA08D3B001B4AB5 /* Suggestions */,
 				9FF521492BAA90C400B9819B /* Lottie */,
+				F13F29B02BD0280A00E07527 /* PixelKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -9322,7 +9330,6 @@
 			packageProductDependencies = (
 				7B97CD582B7E0B57004FEF43 /* NetworkProtectionProxy */,
 				7B97CD5A2B7E0B85004FEF43 /* Common */,
-				7B97CD612B7E0C4B004FEF43 /* PixelKit */,
 				7B7DFB212B7E7473009EA1A3 /* Networking */,
 			);
 			productName = VPNProxyExtension;
@@ -9346,8 +9353,8 @@
 			name = DuckDuckGoDBPBackgroundAgent;
 			packageProductDependencies = (
 				9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */,
-				9D6983F82AC773C3002C02FC /* PixelKit */,
 				9DEF97E02B06C4EE00764F03 /* Networking */,
+				F13F29AC2BD027F900E07527 /* PixelKit */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */;
@@ -9370,8 +9377,8 @@
 			name = DuckDuckGoDBPBackgroundAgentAppStore;
 			packageProductDependencies = (
 				9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */,
-				9D6983FA2AC773C8002C02FC /* PixelKit */,
 				315A023E2B6421AE00BFA577 /* Networking */,
+				F13F29AE2BD0280000E07527 /* PixelKit */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */;
@@ -9392,6 +9399,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F13F29B72BD02A7500E07527 /* PBXTargetDependency */,
 				7B4627742B9AF2C8004ACE0B /* PBXTargetDependency */,
 				B6F997BB2B8F353F00476735 /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
@@ -9418,7 +9426,6 @@
 				9DB6E7232AA0DC5800A17F3C /* LoginItems */,
 				7B31FD8B2AD125620086AA24 /* NetworkProtectionIPC */,
 				7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */,
-				7B5DD6992AE51FFA001DE99C /* PixelKit */,
 				31A3A4E22B0C115F0021063C /* DataBrokerProtection */,
 				37269EFA2B332F9E005E8E46 /* Common */,
 				3722177F2B3337FE00B8E9C2 /* TestUtils */,
@@ -9430,6 +9437,7 @@
 				F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */,
 				85D44B852BA08D29001B4AB5 /* Suggestions */,
 				9FF521452BAA908500B9819B /* Lottie */,
+				F14B64892BD0243F00098E00 /* PixelKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -9454,8 +9462,8 @@
 			packageProductDependencies = (
 				B6DA44162616C13800DD1EC2 /* OHHTTPStubs */,
 				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
-				4B81AD342B29512B00706C96 /* PixelKitTestingUtilities */,
 				B65CD8CA2B316DF100A595BB /* SnapshotTesting */,
+				F14B648D2BD0245000098E00 /* PixelKitTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -13648,6 +13656,38 @@
 			target = B6EC37E729B5DA2A001ACE79 /* tests-server */;
 			targetProxy = EE02D41D2BB460B500DBE6B3 /* PBXContainerItemProxy */;
 		};
+		F13F29B32BD0296F00E07527 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F13F29B22BD0296F00E07527 /* PixelKit */;
+		};
+		F13F29B72BD02A7500E07527 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F13F29B62BD02A7500E07527 /* PixelKit */;
+		};
+		F13F29B92BD02A8300E07527 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F13F29B82BD02A8300E07527 /* PixelKit */;
+		};
+		F13F29BB2BD02A8C00E07527 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F13F29BA2BD02A8C00E07527 /* PixelKit */;
+		};
+		F13F29BF2BD02AA200E07527 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F13F29BE2BD02AA200E07527 /* PixelKit */;
+		};
+		F13F29C32BD02ABD00E07527 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F13F29C22BD02ABD00E07527 /* PixelKit */;
+		};
+		F13F29C72BD02ACF00E07527 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F13F29C62BD02ACF00E07527 /* PixelKit */;
+		};
+		F13F29C92BD02AE000E07527 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F13F29C82BD02AE000E07527 /* PixelKit */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -14794,10 +14834,6 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Navigation;
 		};
-		4B2537762A11BFE100610219 /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKit;
-		};
 		4B2D062B2A11C0E100DE1F49 /* Networking */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
@@ -14819,10 +14855,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtection;
 		};
-		4B4D60972A0B2A5C00BCD287 /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKit;
-		};
 		4B4D60AE2A0C837F00BCD287 /* Networking */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
@@ -14839,14 +14871,6 @@
 		4B5F14FD2A1529230060320F /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:InputFilesChecker";
-		};
-		4B81AD342B29512B00706C96 /* PixelKitTestingUtilities */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKitTestingUtilities;
-		};
-		4B81AD362B29513100706C96 /* PixelKitTestingUtilities */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKitTestingUtilities;
 		};
 		4B9579292AC7AE700062CA31 /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -14989,14 +15013,6 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Subscription;
 		};
-		7B5DD6992AE51FFA001DE99C /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKit;
-		};
-		7B5F9A742AE2BE4E002AEBC0 /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKit;
-		};
 		7B624F162BA25C1F00A6C544 /* NetworkProtectionUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtectionUI;
@@ -15022,10 +15038,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Common;
-		};
-		7B97CD612B7E0C4B004FEF43 /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKit;
 		};
 		7BA076BA2B65D61400D7FB72 /* NetworkProtectionProxy */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -15068,14 +15080,6 @@
 		7BEEA5152AD1236E00A9E72B /* NetworkProtectionUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtectionUI;
-		};
-		7BFCB74D2ADE7E1A00DA3EA7 /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKit;
-		};
-		7BFCB74F2ADE7E2300DA3EA7 /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKit;
 		};
 		85D44B852BA08D29001B4AB5 /* Suggestions */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -15126,14 +15130,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Persistence;
-		};
-		9D6983F82AC773C3002C02FC /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKit;
-		};
-		9D6983FA2AC773C8002C02FC /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PixelKit;
 		};
 		9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -15305,6 +15301,90 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = NetworkProtection;
+		};
+		F13F29AA2BD027C800E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F13F29AC2BD027F900E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F13F29AE2BD0280000E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F13F29B02BD0280A00E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F13F29B22BD0296F00E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PixelKit;
+		};
+		F13F29B42BD0298700E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F13F29B62BD02A7500E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PixelKit;
+		};
+		F13F29B82BD02A8300E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PixelKit;
+		};
+		F13F29BA2BD02A8C00E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PixelKit;
+		};
+		F13F29BC2BD02A9200E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F13F29BE2BD02AA200E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PixelKit;
+		};
+		F13F29C02BD02AB400E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F13F29C22BD02ABD00E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PixelKit;
+		};
+		F13F29C42BD02AC700E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F13F29C62BD02ACF00E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PixelKit;
+		};
+		F13F29C82BD02AE000E07527 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = PixelKit;
+		};
+		F14B64892BD0243F00098E00 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F14B648B2BD0244900098E00 /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		F14B648D2BD0245000098E00 /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
 		};
 		F1D43AF22B98E47800BAB743 /* BareBonesBrowserKit */ = {
 			isa = XCSwiftPackageProductDependency;
