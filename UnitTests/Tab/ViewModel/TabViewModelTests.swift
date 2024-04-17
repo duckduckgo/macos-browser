@@ -85,7 +85,7 @@ final class TabViewModelTests: XCTestCase {
 
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
-            XCTAssertEqual(tabViewModel.passiveAddressBarAttributedString.string, urlString)
+            XCTAssertEqual(tabViewModel.passiveAddressBarString, urlString)
             addressBarStringExpectation.fulfill()
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
@@ -103,7 +103,7 @@ final class TabViewModelTests: XCTestCase {
 
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
-            XCTAssertEqual(tabViewModel.passiveAddressBarAttributedString.string, "data:")
+            XCTAssertEqual(tabViewModel.passiveAddressBarString, "data:")
             addressBarStringExpectation.fulfill()
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
