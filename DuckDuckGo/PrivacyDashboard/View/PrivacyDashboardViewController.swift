@@ -22,6 +22,7 @@ import Combine
 import BrowserServicesKit
 import PrivacyDashboard
 import Common
+import PixelKit
 
 protocol PrivacyDashboardViewControllerSizeDelegate: AnyObject {
 
@@ -44,30 +45,27 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private let brokenSiteReporter: BrokenSiteReporter = {
         BrokenSiteReporter(pixelHandler: { parameters in
-            Pixel.fire(
-                .brokenSiteReport,
-                withAdditionalParameters: parameters,
-                allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters
-            )
+            PixelKit.fire(GeneralPixel.brokenSiteReport,
+                          withAdditionalParameters: parameters,
+                          allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         }, keyValueStoring: UserDefaults.standard)
     }()
 
     private let toggleProtectionsOffReporter: BrokenSiteReporter = {
         BrokenSiteReporter(pixelHandler: { parameters in
-            Pixel.fire(
-                .protectionToggledOffBreakageReport,
-                withAdditionalParameters: parameters,
-                allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
+            PixelKit.fire(GeneralPixel.protectionToggledOffBreakageReport,
+                          withAdditionalParameters: parameters,
+                          allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         }, keyValueStoring: UserDefaults.standard)
     }()
 
     private let toggleReportEvents = EventMapping<ToggleReportEvents> { event, _, parameters, _ in
-        let domainEvent: Pixel.Event
+        let domainEvent: GeneralPixel
         switch event {
         case .toggleReportDismiss: domainEvent = .toggleReportDismiss
         case .toggleReportDoNotSend: domainEvent = .toggleReportDoNotSend
         }
-        Pixel.fire(domainEvent, withAdditionalParameters: parameters)
+        PixelKit.fire(domainEvent, withAdditionalParameters: parameters)
     }
 
     private let permissionHandler = PrivacyDashboardPermissionHandler()
@@ -177,10 +175,10 @@ final class PrivacyDashboardViewController: NSViewController {
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         if state.isProtected && configuration.isUserUnprotected(domain: domain) {
             configuration.userEnabledProtection(forDomain: domain)
-            Pixel.fire(.dashboardProtectionAllowlistRemove(triggerOrigin: state.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
+            PixelKit.fire(GeneralPixel.dashboardProtectionAllowlistRemove(triggerOrigin: state.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
         } else {
             configuration.userDisabledProtection(forDomain: domain)
-            Pixel.fire(.dashboardProtectionAllowlistAdd(triggerOrigin: state.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
+            PixelKit.fire(GeneralPixel.dashboardProtectionAllowlistAdd(triggerOrigin: state.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
@@ -193,7 +191,7 @@ final class PrivacyDashboardViewController: NSViewController {
 extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 
     func privacyDashboardControllerDidRequestShowReportBrokenSite(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController) {
-        // Not used in macOS: Pixel.fire(.privacyDashboardReportBrokenSite)
+        // Not used in macOS: PixelKit.fire(GeneralPixel.privacyDashboardReportBrokenSite)
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController,
@@ -339,14 +337,14 @@ extension PrivacyDashboardViewController {
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.url?.host)
 
-        let webVitals = await calculateWebVitals(performanceMetrics: currentTab.performanceMetrics, privacyConfig: configuration)
+        let webVitals = await calculateWebVitals(performanceMetrics: currentTab.brokenSiteInfo?.performanceMetrics, privacyConfig: configuration)
 
         var errors: [Error]?
         var statusCodes: [Int]?
-        if let error = currentTab.lastWebError {
+        if let error = currentTab.brokenSiteInfo?.lastWebError {
             errors = [error]
         }
-        if let httpStatusCode = currentTab.lastHttpStatusCode {
+        if let httpStatusCode = currentTab.brokenSiteInfo?.lastHttpStatusCode {
             statusCodes = [httpStatusCode]
         }
 
@@ -366,10 +364,10 @@ extension PrivacyDashboardViewController {
                                                reportFlow: source,
                                                errors: errors,
                                                httpStatusCodes: statusCodes,
-                                               openerContext: currentTab.inferredOpenerContext,
-                                               vpnOn: currentTab.tunnelController.isConnected,
+                                               openerContext: currentTab.brokenSiteInfo?.inferredOpenerContext,
+                                               vpnOn: currentTab.networkProtection?.tunnelController.isConnected ?? false,
                                                jsPerformance: webVitals,
-                                               userRefreshCount: currentTab.refreshCountSinceLoad,
+                                               userRefreshCount: currentTab.brokenSiteInfo?.refreshCountSinceLoad ?? -1,
                                                didOpenReportInfo: didOpenReportInfo,
                                                toggleReportCounter: toggleReportCounter)
         return websiteBreakage

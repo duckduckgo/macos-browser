@@ -61,10 +61,12 @@ final class VPNPrivacyProPixelTests: XCTestCase {
     ///
     func testVPNPixelFireExpectations() {
         fire(VPNPrivacyProPixel.vpnAccessRevokedDialogShown,
+             frequency: .dailyAndCount,
              and: .expect(pixelName: "m_mac_vpn_access_revoked_dialog_shown"),
              file: #filePath,
              line: #line)
         fire(VPNPrivacyProPixel.vpnBetaStoppedWhenPrivacyProEnabled,
+             frequency: .dailyAndCount,
              and: .expect(pixelName: "m_mac_vpn_beta_stopped_when_privacy_pro_enabled"),
              file: #filePath,
              line: #line)

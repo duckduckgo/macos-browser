@@ -1,7 +1,7 @@
 //
-//  PixelEvent.swift
+//  GeneralPixel.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,427 +16,303 @@
 //  limitations under the License.
 //
 
-import Foundation
-import BrowserServicesKit
-import Bookmarks
-import Configuration
-import DDGSync
+import AppKit
 import PixelKit
-
-extension Pixel {
-
-    indirect enum Event {
-        /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
-        /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
-        /// nothing breaks in the migration towards `PixelKit`.
-        case pixelKitEvent(_ event: PixelKitEvent)
-
-        case crash
-
-        case brokenSiteReport
-
-        enum OnboardingShown: String, CustomStringConvertible {
-            var description: String { rawValue }
-
-            init(_ value: Bool) {
-                if value {
-                    self = .onboardingShown
-                } else {
-                    self = .regularNavigation
-                }
-            }
-            case onboardingShown = "onboarding-shown"
-            case regularNavigation = "regular-nav"
-        }
-
-        enum WaitResult: String, CustomStringConvertible {
-            var description: String { rawValue }
-
-            case closed
-            case quit
-            case success
-        }
-
-        enum CompileRulesWaitTime: String, CustomStringConvertible {
-            var description: String { rawValue }
-
-            case noWait = "0"
-            case lessThan1s = "1"
-            case lessThan5s = "5"
-            case lessThan10s = "10"
-            case lessThan20s = "20"
-            case lessThan40s = "40"
-            case more = "more"
-        }
-
-        case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
-        static func compileRulesWait(onboardingShown: Bool, waitTime interval: TimeInterval, result: WaitResult) -> Event {
-            let waitTime: CompileRulesWaitTime
-            switch interval {
-            case 0:
-                waitTime = .noWait
-            case ...1:
-                waitTime = .lessThan1s
-            case ...5:
-                waitTime = .lessThan5s
-            case ...10:
-                waitTime = .lessThan10s
-            case ...20:
-                waitTime = .lessThan20s
-            case ...40:
-                waitTime = .lessThan40s
-            default:
-                waitTime = .more
-            }
-            return .compileRulesWait(onboardingShown: OnboardingShown(onboardingShown),
-                                     waitTime: waitTime,
-                                     result: result)
-        }
-
-        case launchInitial(cohort: String)
-
-        case serp
-        case serpInitial(cohort: String)
-        case serpDay21to27(cohort: String)
-
-        case dailyOsVersionCounter
-
-        case dataImportFailed(source: DataImport.Source, sourceVersion: String?, error: any DataImportError)
-
-        case formAutofilled(kind: FormAutofillKind)
-        case autofillItemSaved(kind: FormAutofillKind)
-
-        case autofillLoginsSaveLoginModalExcludeSiteConfirmed
-        case autofillLoginsSettingsResetExcludedDisplayed
-        case autofillLoginsSettingsResetExcludedConfirmed
-        case autofillLoginsSettingsResetExcludedDismissed
-
-        case bitwardenPasswordAutofilled
-        case bitwardenPasswordSaved
-
-        case ampBlockingRulesCompilationFailed
-
-        case adClickAttributionDetected
-        case adClickAttributionActive
-        case adClickAttributionPageLoads
-
-        case emailEnabled
-        case emailDisabled
-        case emailUserPressedUseAddress
-        case emailUserPressedUseAlias
-        case emailUserCreatedAlias
-
-        case jsPixel(_ pixel: AutofillUserScript.JSPixel)
-
-        case debug(event: Debug, error: Error? = nil)
-
-        // Activation Points
-        case newTabInitial
-        case emailEnabledInitial
-        case watchInDuckPlayerInitial
-        case setAsDefaultInitial
-        case importDataInitial
-
-        // New Tab section removed
-        case favoriteSectionHidden
-        case recentActivitySectionHidden
-        case continueSetUpSectionHidden
-
-        // Fire Button
-        case fireButtonFirstBurn
-        case fireButton(option: FireButtonOption)
-
-        // Duck Player
-        case duckPlayerDailyUniqueView
-        case duckPlayerViewFromYoutubeViaMainOverlay
-        case duckPlayerViewFromYoutubeViaHoverButton
-        case duckPlayerViewFromYoutubeAutomatic
-        case duckPlayerViewFromSERP
-        case duckPlayerViewFromOther
-        case duckPlayerSettingAlways
-        case duckPlayerSettingNever
-        case duckPlayerSettingBackToDefault
-
-        // Dashboard
-        case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
-        case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
-
-        // VPN
-        case vpnBreakageReport(category: String, description: String, metadata: String)
-
-        // VPN
-        case networkProtectionRemoteMessageDisplayed(messageID: String)
-        case networkProtectionRemoteMessageDismissed(messageID: String)
-        case networkProtectionRemoteMessageOpened(messageID: String)
-        case networkProtectionEnabledOnSearch
-        case networkProtectionGeoswitchingOpened
-        case networkProtectionGeoswitchingSetNearest
-        case networkProtectionGeoswitchingSetCustom
-        case networkProtectionGeoswitchingNoLocations
-
-        // Sync
-        case syncSignupDirect
-        case syncSignupConnect
-        case syncLogin
-        case syncDaily
-        case syncDuckAddressOverride
-        case syncSuccessRateDaily
-        case syncLocalTimestampResolutionTriggered(Feature)
-        case syncBookmarksCountLimitExceededDaily
-        case syncCredentialsCountLimitExceededDaily
-        case syncBookmarksRequestSizeLimitExceededDaily
-        case syncCredentialsRequestSizeLimitExceededDaily
-
-        // DataBroker Protection Waitlist
-        case dataBrokerProtectionWaitlistUserActive
-        case dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed
-        case dataBrokerProtectionWaitlistIntroDisplayed
-        case dataBrokerProtectionWaitlistNotificationShown
-        case dataBrokerProtectionWaitlistNotificationTapped
-        case dataBrokerProtectionWaitlistCardUITapped
-        case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
-        case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
-        case dataBrokerProtectionRemoteMessageDisplayed(messageID: String)
-        case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
-        case dataBrokerProtectionRemoteMessageOpened(messageID: String)
-
-        // Login Item events
-        case dataBrokerEnableLoginItemDaily
-        case dataBrokerDisableLoginItemDaily
-        case dataBrokerResetLoginItemDaily
-        case dataBrokerDisableAndDeleteDaily
-
-        // DataBrokerProtection Other
-        case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
-
-        // Subscription
-        case privacyProFeatureEnabled
-        case privacyProBetaUserThankYouVPN
-        case privacyProBetaUserThankYouDBP
-        case privacyProSubscriptionActive
-        case privacyProOfferScreenImpression
-        case privacyProPurchaseAttempt
-        case privacyProPurchaseFailure
-        case privacyProPurchaseFailureStoreError
-        case privacyProPurchaseFailureBackendError
-        case privacyProPurchaseFailureAccountNotCreated
-        case privacyProPurchaseSuccess
-        case privacyProRestorePurchaseOfferPageEntry
-        case privacyProRestorePurchaseClick
-        case privacyProRestorePurchaseSettingsMenuEntry
-        case privacyProRestorePurchaseEmailStart
-        case privacyProRestorePurchaseStoreStart
-        case privacyProRestorePurchaseEmailSuccess
-        case privacyProRestorePurchaseStoreSuccess
-        case privacyProRestorePurchaseStoreFailureNotFound
-        case privacyProRestorePurchaseStoreFailureOther
-        case privacyProRestoreAfterPurchaseAttempt
-        case privacyProSubscriptionActivated
-        case privacyProWelcomeAddDevice
-        case privacyProSettingsAddDevice
-        case privacyProAddDeviceEnterEmail
-        case privacyProWelcomeVPN
-        case privacyProWelcomePersonalInformationRemoval
-        case privacyProWelcomeIdentityRestoration
-        case privacyProSubscriptionSettings
-        case privacyProVPNSettings
-        case privacyProPersonalInformationRemovalSettings
-        case privacyProIdentityRestorationSettings
-        case privacyProSubscriptionManagementEmail
-        case privacyProSubscriptionManagementPlanBilling
-        case privacyProSubscriptionManagementRemoval
-        case privacyProPurchaseStripeSuccess
-        // Web pixels
-        case privacyProOfferMonthlyPriceClick
-        case privacyProOfferYearlyPriceClick
-        case privacyProAddEmailSuccess
-        case privacyProWelcomeFAQClick
-
-        case dailyPixel(Event, isFirst: Bool)
-
-        // Default Browser
-        case defaultRequestedFromHomepage
-        case defaultRequestedFromHomepageSetupView
-        case defaultRequestedFromSettings
-        case defaultRequestedFromOnboarding
-
-        case protectionToggledOffBreakageReport
-        case toggleProtectionsDailyCount
-        case toggleReportDoNotSend
-        case toggleReportDismiss
-
-        // Password Import Keychain Prompt
-        case passwordImportKeychainPrompt
-        case passwordImportKeychainPromptDenied
-
-        // Tracks installation without tracking retention.
-        case installationAttribution
-
-        enum Debug {
-            /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
-            /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
-            /// nothing breaks in the migration towards `PixelKit`.
-            case pixelKitEvent(_ event: PixelKitEvent)
-
-            case assertionFailure(message: String, file: StaticString, line: UInt)
-
-            case dbMakeDatabaseError
-            case dbContainerInitializationError
-            case dbInitializationError
-            case dbSaveExcludedHTTPSDomainsError
-            case dbSaveBloomFilterError
-
-            case configurationFetchError
-
-            case trackerDataParseFailed
-            case trackerDataReloadFailed
-            case trackerDataCouldNotBeLoaded
-
-            case privacyConfigurationParseFailed
-            case privacyConfigurationReloadFailed
-            case privacyConfigurationCouldNotBeLoaded
-
-            case fileStoreWriteFailed
-            case fileMoveToDownloadsFailed
-            case fileAccessRelatedItemFailed
-            case fileGetDownloadLocationFailed
-            case fileDownloadCreatePresentersFailed
-            case downloadResumeDataCodingFailed
-
-            case suggestionsFetchFailed
-            case appOpenURLFailed
-            case appStateRestorationFailed
-
-            case contentBlockingErrorReportingIssue
-
-            case contentBlockingCompilationFailed(listType: CompileRulesListType,
-                                                  component: ContentBlockerDebugEvents.Component)
-
-            case contentBlockingCompilationTime
-
-            case secureVaultInitError
-            case secureVaultError
-
-            case feedbackReportingFailed
-
-            case blankNavigationOnBurnFailed
-
-            case historyRemoveFailed
-            case historyReloadFailed
-            case historyCleanEntriesFailed
-            case historyCleanVisitsFailed
-            case historySaveFailed
-            case historySaveFailedDaily
-            case historyInsertVisitFailed
-            case historyRemoveVisitsFailed
-
-            case emailAutofillKeychainError
-
-            case bookmarksStoreRootFolderMigrationFailed
-            case bookmarksStoreFavoritesFolderMigrationFailed
-
-            case adAttributionCompilationFailedForAttributedRulesList
-            case adAttributionGlobalAttributedRulesDoNotExist
-            case adAttributionDetectionHeuristicsDidNotMatchDomain
-            case adAttributionLogicUnexpectedStateOnRulesCompiled
-            case adAttributionLogicUnexpectedStateOnInheritedAttribution
-            case adAttributionLogicUnexpectedStateOnRulesCompilationFailed
-            case adAttributionDetectionInvalidDomainInParameter
-            case adAttributionLogicRequestingAttributionTimedOut
-            case adAttributionLogicWrongVendorOnSuccessfulCompilation
-            case adAttributionLogicWrongVendorOnFailedCompilation
-
-            case webKitDidTerminate
-
-            case removedInvalidBookmarkManagedObjects
-
-            case bitwardenNotResponding
-            case bitwardenRespondedCannotDecryptUnique(repetition: Repetition = .init(key: "bitwardenRespondedCannotDecryptUnique"))
-            case bitwardenHandshakeFailed
-            case bitwardenDecryptionOfSharedKeyFailed
-            case bitwardenStoringOfTheSharedKeyFailed
-            case bitwardenCredentialRetrievalFailed
-            case bitwardenCredentialCreationFailed
-            case bitwardenCredentialUpdateFailed
-            case bitwardenRespondedWithError
-            case bitwardenNoActiveVault
-            case bitwardenParsingFailed
-            case bitwardenStatusParsingFailed
-            case bitwardenHmacComparisonFailed
-            case bitwardenDecryptionFailed
-            case bitwardenSendingOfMessageFailed
-            case bitwardenSharedKeyInjectionFailed
-
-            case updaterAborted
-            case userSelectedToSkipUpdate
-            case userSelectedToInstallUpdate
-            case userSelectedToDismissUpdate
-
-            case faviconDecryptionFailedUnique
-            case downloadListItemDecryptionFailedUnique
-            case historyEntryDecryptionFailedUnique
-            case permissionDecryptionFailedUnique
-
-            // Errors from Bookmarks Module
-            case missingParent
-            case bookmarksSaveFailed
-            case bookmarksSaveFailedOnImport
-
-            case bookmarksCouldNotLoadDatabase
-            case bookmarksCouldNotPrepareDatabase
-            case bookmarksMigrationAlreadyPerformed
-            case bookmarksMigrationFailed
-            case bookmarksMigrationCouldNotPrepareDatabase
-            case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
-            case bookmarksMigrationCouldNotRemoveOldStore
-            case bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders
-
-            case syncSentUnauthenticatedRequest
-            case syncMetadataCouldNotLoadDatabase
-            case syncBookmarksProviderInitializationFailed
-            case syncBookmarksFailed
-            case syncCredentialsProviderInitializationFailed
-            case syncCredentialsFailed
-            case syncSettingsFailed
-            case syncSettingsMetadataUpdateFailed
-            case syncSignupError
-            case syncLoginError
-            case syncLogoutError
-            case syncUpdateDeviceError
-            case syncRemoveDeviceError
-            case syncDeleteAccountError
-            case syncLoginExistingAccountError
-            case syncCannotCreateRecoveryPDF
-
-            case bookmarksCleanupFailed
-            case bookmarksCleanupAttemptedWhileSyncWasEnabled
-            case favoritesCleanupFailed
-            case bookmarksFaviconsFetcherStateStoreInitializationFailed
-            case bookmarksFaviconsFetcherFailed
-
-            case credentialsDatabaseCleanupFailed
-            case credentialsCleanupAttemptedWhileSyncWasEnabled
-
-            case invalidPayload(Configuration)
-
-            case burnerTabMisplaced
-
-            case networkProtectionRemoteMessageFetchingFailed
-            case networkProtectionRemoteMessageStorageFailed
-            case dataBrokerProtectionRemoteMessageFetchingFailed
-            case dataBrokerProtectionRemoteMessageStorageFailed
-
-            case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
-        }
-    }
-}
-
-extension Pixel.Event {
+import BrowserServicesKit
+import DDGSync
+import Configuration
+
+// swiftlint:disable:next type_body_length
+enum GeneralPixel: PixelKitEventV2 {
+
+    case crash
+    case brokenSiteReport
+    case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
+    case launchInitial(cohort: String)
+
+    case serp
+    case serpInitial(cohort: String)
+    case serpDay21to27(cohort: String)
+
+    case dailyOsVersionCounter
+
+    case dataImportFailed(source: DataImport.Source, sourceVersion: String?, error: any DataImportError)
+
+    case formAutofilled(kind: FormAutofillKind)
+    case autofillItemSaved(kind: FormAutofillKind)
+
+    case autofillLoginsSaveLoginModalExcludeSiteConfirmed
+    case autofillLoginsSettingsResetExcludedDisplayed
+    case autofillLoginsSettingsResetExcludedConfirmed
+    case autofillLoginsSettingsResetExcludedDismissed
+
+    case bitwardenPasswordAutofilled
+    case bitwardenPasswordSaved
+
+    case ampBlockingRulesCompilationFailed
+
+    case adClickAttributionDetected
+    case adClickAttributionActive
+    case adClickAttributionPageLoads
+
+    case emailEnabled
+    case emailDisabled
+    case emailUserPressedUseAddress
+    case emailUserPressedUseAlias
+    case emailUserCreatedAlias
+
+    case jsPixel(_ pixel: AutofillUserScript.JSPixel)
+
+    // Activation Points
+    case newTabInitial
+    case emailEnabledInitial
+    case watchInDuckPlayerInitial
+    case setAsDefaultInitial
+    case importDataInitial
+
+    // New Tab section removed
+    case favoriteSectionHidden
+    case recentActivitySectionHidden
+    case continueSetUpSectionHidden
+
+    // Fire Button
+    case fireButtonFirstBurn
+    case fireButton(option: FireButtonOption)
+
+    // Duck Player
+    case duckPlayerDailyUniqueView
+    case duckPlayerViewFromYoutubeViaMainOverlay
+    case duckPlayerViewFromYoutubeViaHoverButton
+    case duckPlayerViewFromYoutubeAutomatic
+    case duckPlayerViewFromSERP
+    case duckPlayerViewFromOther
+    case duckPlayerSettingAlways
+    case duckPlayerSettingNever
+    case duckPlayerSettingBackToDefault
+
+    // Dashboard
+    case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
+    case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
+
+    // VPN
+    case vpnBreakageReport(category: String, description: String, metadata: String)
+
+    // VPN
+    case networkProtectionRemoteMessageDisplayed(messageID: String)
+    case networkProtectionRemoteMessageDismissed(messageID: String)
+    case networkProtectionRemoteMessageOpened(messageID: String)
+    case networkProtectionEnabledOnSearch
+    case networkProtectionGeoswitchingOpened
+    case networkProtectionGeoswitchingSetNearest
+    case networkProtectionGeoswitchingSetCustom
+    case networkProtectionGeoswitchingNoLocations
+
+    // Sync
+    case syncSignupDirect
+    case syncSignupConnect
+    case syncLogin
+    case syncDaily
+    case syncDuckAddressOverride
+    case syncSuccessRateDaily
+    case syncLocalTimestampResolutionTriggered(Feature)
+    case syncBookmarksCountLimitExceededDaily
+    case syncCredentialsCountLimitExceededDaily
+    case syncBookmarksRequestSizeLimitExceededDaily
+    case syncCredentialsRequestSizeLimitExceededDaily
+
+    // DataBroker Protection Waitlist
+    case dataBrokerProtectionWaitlistUserActive
+    case dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed
+    case dataBrokerProtectionWaitlistIntroDisplayed
+    case dataBrokerProtectionWaitlistNotificationShown
+    case dataBrokerProtectionWaitlistNotificationTapped
+    case dataBrokerProtectionWaitlistCardUITapped
+    case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
+    case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
+    case dataBrokerProtectionRemoteMessageDisplayed(messageID: String)
+    case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
+    case dataBrokerProtectionRemoteMessageOpened(messageID: String)
+
+    // Login Item events
+    case dataBrokerEnableLoginItemDaily
+    case dataBrokerDisableLoginItemDaily
+    case dataBrokerResetLoginItemDaily
+    case dataBrokerDisableAndDeleteDaily
+
+    // DataBrokerProtection Other
+    case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
+
+    // Default Browser
+    case defaultRequestedFromHomepage
+    case defaultRequestedFromHomepageSetupView
+    case defaultRequestedFromSettings
+    case defaultRequestedFromOnboarding
+
+    case protectionToggledOffBreakageReport
+    case toggleProtectionsDailyCount
+    case toggleReportDoNotSend
+    case toggleReportDismiss
+
+    // Password Import Keychain Prompt
+    case passwordImportKeychainPrompt
+    case passwordImportKeychainPromptDenied
+
+    // MARK: - Debug
+
+    case assertionFailure(message: String, file: StaticString, line: UInt)
+
+    case dbMakeDatabaseError(error: Error?)
+    case dbContainerInitializationError(error: Error)
+    case dbInitializationError(error: Error)
+    case dbSaveExcludedHTTPSDomainsError(error: Error?)
+    case dbSaveBloomFilterError(error: Error?)
+
+    case configurationFetchError(error: Error)
+
+    case trackerDataParseFailed
+    case trackerDataReloadFailed
+    case trackerDataCouldNotBeLoaded
+
+    case privacyConfigurationParseFailed
+    case privacyConfigurationReloadFailed
+    case privacyConfigurationCouldNotBeLoaded
+
+    case fileStoreWriteFailed
+    case fileMoveToDownloadsFailed
+    case fileAccessRelatedItemFailed
+    case fileGetDownloadLocationFailed
+    case fileDownloadCreatePresentersFailed
+    case downloadResumeDataCodingFailed
+
+    case suggestionsFetchFailed
+    case appOpenURLFailed
+    case appStateRestorationFailed
+
+    case contentBlockingErrorReportingIssue
+
+    case contentBlockingCompilationFailed(listType: CompileRulesListType, component: ContentBlockerDebugEvents.Component)
+
+    case contentBlockingCompilationTime
+
+    case secureVaultInitError(error: Error)
+    case secureVaultError(error: Error)
+
+    case feedbackReportingFailed
+
+    case blankNavigationOnBurnFailed
+
+    case historyRemoveFailed
+    case historyReloadFailed
+    case historyCleanEntriesFailed
+    case historyCleanVisitsFailed
+    case historySaveFailed
+    case historySaveFailedDaily
+    case historyInsertVisitFailed
+    case historyRemoveVisitsFailed
+
+    case emailAutofillKeychainError
+
+    case bookmarksStoreRootFolderMigrationFailed
+    case bookmarksStoreFavoritesFolderMigrationFailed
+
+    case adAttributionCompilationFailedForAttributedRulesList
+    case adAttributionGlobalAttributedRulesDoNotExist
+    case adAttributionDetectionHeuristicsDidNotMatchDomain
+    case adAttributionLogicUnexpectedStateOnRulesCompiled
+    case adAttributionLogicUnexpectedStateOnInheritedAttribution
+    case adAttributionLogicUnexpectedStateOnRulesCompilationFailed
+    case adAttributionDetectionInvalidDomainInParameter
+    case adAttributionLogicRequestingAttributionTimedOut
+    case adAttributionLogicWrongVendorOnSuccessfulCompilation
+    case adAttributionLogicWrongVendorOnFailedCompilation
+
+    case webKitDidTerminate
+
+    case removedInvalidBookmarkManagedObjects
+
+    case bitwardenNotResponding
+    case bitwardenRespondedCannotDecrypt
+    case bitwardenHandshakeFailed
+    case bitwardenDecryptionOfSharedKeyFailed
+    case bitwardenStoringOfTheSharedKeyFailed
+    case bitwardenCredentialRetrievalFailed
+    case bitwardenCredentialCreationFailed
+    case bitwardenCredentialUpdateFailed
+    case bitwardenRespondedWithError
+    case bitwardenNoActiveVault
+    case bitwardenParsingFailed
+    case bitwardenStatusParsingFailed
+    case bitwardenHmacComparisonFailed
+    case bitwardenDecryptionFailed
+    case bitwardenSendingOfMessageFailed
+    case bitwardenSharedKeyInjectionFailed
+
+    case updaterAborted
+    case userSelectedToSkipUpdate
+    case userSelectedToInstallUpdate
+    case userSelectedToDismissUpdate
+
+    case faviconDecryptionFailedUnique
+    case downloadListItemDecryptionFailedUnique
+    case historyEntryDecryptionFailedUnique
+    case permissionDecryptionFailedUnique
+
+    // Errors from Bookmarks Module
+    case missingParent
+    case bookmarksSaveFailed
+    case bookmarksSaveFailedOnImport
+
+    case bookmarksCouldNotLoadDatabase(error: Error?)
+    case bookmarksCouldNotPrepareDatabase
+    case bookmarksMigrationAlreadyPerformed
+    case bookmarksMigrationFailed
+    case bookmarksMigrationCouldNotPrepareDatabase
+    case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
+    case bookmarksMigrationCouldNotRemoveOldStore
+    case bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders
+
+    case syncSentUnauthenticatedRequest
+    case syncMetadataCouldNotLoadDatabase
+    case syncBookmarksProviderInitializationFailed
+    case syncBookmarksFailed
+    case syncCredentialsProviderInitializationFailed
+    case syncCredentialsFailed
+    case syncSettingsFailed
+    case syncSettingsMetadataUpdateFailed
+    case syncSignupError(error: Error)
+    case syncLoginError(error: Error)
+    case syncLogoutError(error: Error)
+    case syncUpdateDeviceError(error: Error)
+    case syncRemoveDeviceError(error: Error)
+    case syncDeleteAccountError(error: Error)
+    case syncLoginExistingAccountError(error: Error)
+    case syncCannotCreateRecoveryPDF
+
+    case bookmarksCleanupFailed
+    case bookmarksCleanupAttemptedWhileSyncWasEnabled
+    case favoritesCleanupFailed
+    case bookmarksFaviconsFetcherStateStoreInitializationFailed
+    case bookmarksFaviconsFetcherFailed
+
+    case credentialsDatabaseCleanupFailed
+    case credentialsCleanupAttemptedWhileSyncWasEnabled
+
+    case invalidPayload(Configuration) // BSK>Configuration
+
+    case burnerTabMisplaced
+
+    case networkProtectionRemoteMessageFetchingFailed
+    case networkProtectionRemoteMessageStorageFailed
+    case dataBrokerProtectionRemoteMessageFetchingFailed
+    case dataBrokerProtectionRemoteMessageStorageFailed
+
+    case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
+
+    // Tracks installation without tracking retention.
+    case installationAttribution
 
     var name: String {
         switch self {
-        case .pixelKitEvent(let event):
-            return event.name
 
         case .crash:
             return "m_mac_crash"
@@ -478,9 +354,6 @@ extension Pixel.Event {
 
         case .bitwardenPasswordSaved:
             return "m_mac_bitwarden_save_password"
-
-        case .debug(event: let event, error: _):
-            return "m_mac_debug_\(event.name)"
 
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
@@ -625,8 +498,6 @@ extension Pixel.Event {
         case .dataBrokerResetLoginItemDaily: return "m_mac_dbp_daily_login-item_reset"
         case .dataBrokerDisableAndDeleteDaily: return "m_mac_dbp_daily_disable-and-delete"
 
-        case .dailyPixel(let pixel, isFirst: let isFirst):
-            return pixel.name + (isFirst ? "_d" : "_c")
         case .networkProtectionGeoswitchingOpened:
             return "m_mac_netp_imp_geoswitching_c"
         case .networkProtectionGeoswitchingSetNearest:
@@ -641,88 +512,16 @@ extension Pixel.Event {
         case .defaultRequestedFromSettings: return "m_mac_default_requested_from_settings"
         case .defaultRequestedFromOnboarding: return "m_mac_default_requested_from_onboarding"
 
-            // MARK: - Subscription
-        case .privacyProFeatureEnabled: return
-            "m_mac_\(appDistribution)_privacy-pro_feature_enabled"
-        case .privacyProBetaUserThankYouVPN: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_vpn"
-        case .privacyProBetaUserThankYouDBP: return "m_mac_\(appDistribution)_privacy-pro_promotion-dialog_shown_dbp"
-        case .privacyProSubscriptionActive: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_active"
-        case .privacyProOfferScreenImpression: return "m_mac_\(appDistribution)_privacy-pro_offer_screen_impression"
-        case .privacyProPurchaseAttempt: return "m_mac_\(appDistribution)_privacy-pro_terms-conditions_subscribe_click"
-        case .privacyProPurchaseFailure: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_failure_other"
-        case .privacyProPurchaseFailureStoreError: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_failure_store"
-        case .privacyProPurchaseFailureBackendError: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_failure_backend"
-        case .privacyProPurchaseFailureAccountNotCreated: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_failure_account-creation"
-        case .privacyProPurchaseSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_success"
-        case .privacyProRestorePurchaseOfferPageEntry: return "m_mac_\(appDistribution)_privacy-pro_offer_restore-purchase_click"
-        case .privacyProRestorePurchaseClick: return "m_mac_\(appDistribution)_privacy-pro_settings_restore-purchase_click"
-        case .privacyProRestorePurchaseSettingsMenuEntry: return "m_mac_\(appDistribution)_privacy-pro_settings_restore-purchase_click"
-        case .privacyProRestorePurchaseEmailStart: return "m_mac_\(appDistribution)_privacy-pro_activate-subscription_enter-email_click"
-        case .privacyProRestorePurchaseStoreStart: return "m_mac_\(appDistribution)_privacy-pro_activate-subscription_restore-purchase_click"
-        case .privacyProRestorePurchaseEmailSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-restore-using-email_success"
-        case .privacyProRestorePurchaseStoreSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-restore-using-store_success"
-        case .privacyProRestorePurchaseStoreFailureNotFound: return "m_mac_\(appDistribution)_privacy-pro_subscription-restore-using-store_failure_not-found"
-        case .privacyProRestorePurchaseStoreFailureOther: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-restore-using-store_failure_other"
-        case .privacyProRestoreAfterPurchaseAttempt: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-restore-after-purchase-attempt_success"
-        case .privacyProSubscriptionActivated: return "m_mac_\(appDistribution)_privacy-pro_app_subscription_activated_u"
-        case .privacyProWelcomeAddDevice: return "m_mac_\(appDistribution)_privacy-pro_welcome_add-device_click_u"
-        case .privacyProSettingsAddDevice: return "m_mac_\(appDistribution)_privacy-pro_settings_add-device_click"
-        case .privacyProAddDeviceEnterEmail: return "m_mac_\(appDistribution)_privacy-pro_add-device_enter-email_click"
-        case .privacyProWelcomeVPN: return "m_mac_\(appDistribution)_privacy-pro_welcome_vpn_click_u"
-        case .privacyProWelcomePersonalInformationRemoval: return "m_mac_\(appDistribution)_privacy-pro_welcome_personal-information-removal_click_u"
-        case .privacyProWelcomeIdentityRestoration: return "m_mac_\(appDistribution)_privacy-pro_welcome_identity-theft-restoration_click_u"
-        case .privacyProSubscriptionSettings: return "m_mac_\(appDistribution)_privacy-pro_settings_screen_impression"
-        case .privacyProVPNSettings: return "m_mac_\(appDistribution)_privacy-pro_settings_vpn_click"
-        case .privacyProPersonalInformationRemovalSettings: return "m_mac_\(appDistribution)_privacy-pro_settings_personal-information-removal_click"
-        case .privacyProIdentityRestorationSettings: return "m_mac_\(appDistribution)_privacy-pro_settings_identity-theft-restoration_click"
-        case .privacyProSubscriptionManagementEmail: return "m_mac_\(appDistribution)_privacy-pro_manage-email_edit_click"
-        case .privacyProSubscriptionManagementPlanBilling: return "m_mac_\(appDistribution)_privacy-pro_settings_change-plan-or-billing_click"
-        case .privacyProSubscriptionManagementRemoval: return "m_mac_\(appDistribution)_privacy-pro_settings_remove-from-device_click"
-        case .privacyProPurchaseStripeSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_subscription-purchase_stripe_success"
-            // Web
-        case .privacyProOfferMonthlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_monthly-price_click"
-        case .privacyProOfferYearlyPriceClick: return "m_mac_\(appDistribution)_privacy-pro_offer_yearly-price_click"
-        case .privacyProAddEmailSuccess: return "m_mac_\(appDistribution)_privacy-pro_app_add-email_success_u"
-        case .privacyProWelcomeFAQClick: return "m_mac_\(appDistribution)_privacy-pro_welcome_faq_click_u"
-
         case .protectionToggledOffBreakageReport: return "m_mac_protection-toggled-off-breakage-report"
         case .toggleProtectionsDailyCount: return "m_mac_toggle-protections-daily-count"
         case .toggleReportDoNotSend: return "m_mac_toggle-report-do-not-send"
         case .toggleReportDismiss: return "m_mac_toggle-report-dismiss"
 
-        // Password Import Keychain Prompt
+            // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
         case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
 
-        // Installation Attribution
-        case .installationAttribution: return "m_mac_install"
-        }
-    }
-}
-
-// swiftlint:disable private_over_fileprivate
-#if APPSTORE
-fileprivate let appDistribution = "store"
-#else
-fileprivate let appDistribution = "direct"
-#endif
-// swiftlint:enable private_over_fileprivate
-
-extension Pixel.Event: Equatable {
-
-    static func == (lhs: Pixel.Event, rhs: Pixel.Event) -> Bool {
-        lhs.name == rhs.name && lhs.parameters == rhs.parameters
-    }
-
-}
-
-extension Pixel.Event.Debug {
-
-    var name: String {
-        switch self {
-        case .pixelKitEvent(let event):
-            return event.name
-
+            // DEBUG
         case .assertionFailure:
             return "assertion_failure"
 
@@ -861,8 +660,8 @@ extension Pixel.Event.Debug {
 
         case .bitwardenNotResponding:
             return "bitwarden_not_responding"
-        case .bitwardenRespondedCannotDecryptUnique:
-            return "bitwarden_responded_cannot_decrypt_unique"
+        case .bitwardenRespondedCannotDecrypt:
+            return "bitwarden_responded_cannot_decrypt_d"
         case .bitwardenHandshakeFailed:
             return "bitwarden_handshake_failed"
         case .bitwardenDecryptionOfSharedKeyFailed:
@@ -962,6 +761,176 @@ extension Pixel.Event.Debug {
         case .dataBrokerProtectionRemoteMessageStorageFailed: return "dbp_remote_message_storage_failed"
 
         case .loginItemUpdateError: return "login-item_update-error"
+
+            // Installation Attribution
+        case .installationAttribution: return "m_mac_install"
         }
+    }
+
+    var error: (any Error)? {
+        switch self {
+        case .dbMakeDatabaseError(let error?),
+                .dbContainerInitializationError(let error),
+                .dbInitializationError(let error),
+                .dbSaveExcludedHTTPSDomainsError(let error?),
+                .dbSaveBloomFilterError(let error?),
+                .configurationFetchError(let error),
+                .secureVaultInitError(let error),
+                .secureVaultError(let error),
+                .syncSignupError(let error),
+                .syncLoginError(let error),
+                .syncLogoutError(let error),
+                .syncUpdateDeviceError(let error),
+                .syncRemoveDeviceError(let error),
+                .syncDeleteAccountError(let error),
+                .syncLoginExistingAccountError(let error),
+                .bookmarksCouldNotLoadDatabase(let error?):
+            return error
+        default: return nil
+        }
+    }
+
+    var parameters: [String: String]? {
+        switch self {
+        case .loginItemUpdateError(let loginItemBundleID, let action, let buildType, let osVersion):
+            return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType, "macosVersion": osVersion]
+
+        case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
+            var params = error.pixelParameters
+
+            if let version {
+                params[PixelKit.Parameters.sourceBrowserVersion] = version
+            }
+            return params
+
+        case .launchInitial(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+
+        case .serpInitial(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+
+        case .serpDay21to27(let cohort):
+            return [PixelKit.Parameters.experimentCohort: cohort]
+
+        case .dailyOsVersionCounter:
+            return [PixelKit.Parameters.osMajorVersion: "\(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)"]
+
+        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
+        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
+        case .syncSuccessRateDaily:
+            return nil
+
+        case .vpnBreakageReport(let category, let description, let metadata):
+            return [
+                PixelKit.Parameters.vpnBreakageCategory: category,
+                PixelKit.Parameters.vpnBreakageDescription: description,
+                PixelKit.Parameters.vpnBreakageMetadata: metadata
+            ]
+        default: return nil
+        }
+    }
+
+    public enum CompileRulesListType: String, CustomStringConvertible {
+
+        public var description: String { rawValue }
+
+        case tds = "tracker_data"
+        case clickToLoad = "click_to_load"
+        case blockingAttribution = "blocking_attribution"
+        case attributed = "attributed"
+        case unknown = "unknown"
+
+    }
+
+    enum OnboardingShown: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        init(_ value: Bool) {
+            if value {
+                self = .onboardingShown
+            } else {
+                self = .regularNavigation
+            }
+        }
+        case onboardingShown = "onboarding-shown"
+        case regularNavigation = "regular-nav"
+    }
+
+    enum WaitResult: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case closed
+        case quit
+        case success
+    }
+
+    enum CompileRulesWaitTime: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case noWait = "0"
+        case lessThan1s = "1"
+        case lessThan5s = "5"
+        case lessThan10s = "10"
+        case lessThan20s = "20"
+        case lessThan40s = "40"
+        case more = "more"
+    }
+
+    enum FormAutofillKind: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case password
+        case card
+        case identity
+    }
+
+    enum FireButtonOption: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case tab
+        case window
+        case allSites = "all-sites"
+    }
+
+    enum AccessPoint: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case button = "source-button"
+        case mainMenu = "source-menu"
+        case tabMenu = "source-tab-menu"
+        case hotKey = "source-keyboard"
+        case moreMenu = "source-more-menu"
+        case newTab = "source-new-tab"
+
+        init(sender: Any, default: AccessPoint, mainMenuCheck: (NSMenu?) -> Bool = { $0 is MainMenu }) {
+            switch sender {
+            case let menuItem as NSMenuItem:
+                if mainMenuCheck(menuItem.topMenu) {
+                    if let event = NSApp.currentEvent,
+                       case .keyDown = event.type,
+                       event.characters == menuItem.keyEquivalent {
+
+                        self = .hotKey
+                    } else {
+                        self = .mainMenu
+                    }
+                } else {
+                    self = `default`
+                }
+
+            case is NSButton:
+                self = .button
+
+            default:
+                self = `default`
+            }
+        }
+
     }
 }

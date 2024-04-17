@@ -22,6 +22,7 @@ import Combine
 import BrowserServicesKit
 import SecureStorage
 import Autofill
+import PixelKit
 
 @MainActor
 public final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate {
@@ -191,7 +192,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
             parameters["keychain_operation"] = "save"
         }
 
-        Pixel.fire(.debug(event: .emailAutofillKeychainError, error: error), withAdditionalParameters: parameters)
+        PixelKit.fire(DebugEvent(GeneralPixel.emailAutofillKeychainError), withAdditionalParameters: parameters)
     }
 
     private enum Constants {
@@ -294,7 +295,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
-        Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+        PixelKit.fire(GeneralPixel.formAutofilled(kind: type.formAutofillKind))
 
         if type.formAutofillKind == .password &&
             passwordManagerCoordinator.isEnabled {
@@ -320,9 +321,9 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
             self.emailManager.updateLastUseDate()
 
-            Pixel.fire(.jsPixel(pixel), withAdditionalParameters: pixelParameters)
+            PixelKit.fire(GeneralPixel.jsPixel(pixel), withAdditionalParameters: pixelParameters)
         } else {
-            Pixel.fire(.jsPixel(pixel), withAdditionalParameters: pixel.pixelParameters)
+            PixelKit.fire(GeneralPixel.jsPixel(pixel), withAdditionalParameters: pixel.pixelParameters)
         }
     }
 

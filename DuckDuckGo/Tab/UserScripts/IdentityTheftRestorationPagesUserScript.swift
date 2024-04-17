@@ -72,7 +72,7 @@ extension IdentityTheftRestorationPagesUserScript: WKScriptMessageHandler {
 /// Use Subscription sub-feature
 ///
 final class IdentityTheftRestorationPagesFeature: Subfeature {
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
 
     var featureName = "useIdentityTheftRestoration"
 

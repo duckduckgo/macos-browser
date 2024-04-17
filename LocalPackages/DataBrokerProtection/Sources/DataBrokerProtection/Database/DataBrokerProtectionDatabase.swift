@@ -431,11 +431,19 @@ extension DataBrokerProtectionDatabase {
         // The queries we need to create are the one that exist on the new ones but not in the database
         let profileQueriesToCreate = Set(newProfileQueries).subtracting(Set(databaseProfileQueries))
 
-        // The queries that need update exist in both the new and the database
-        // We assume updated queries will be not deprecated
-        var profileQueriesToUpdate = Array(Set(databaseProfileQueries).intersection(Set(newProfileQueries))).map {
-            $0.with(deprecated: false)
-        }
+        // Updated profile queries. This is only for use for deprecated matches.
+        // We do not use it for updating a particular profile query. The reason is that
+        // updates do not exist because the UI returns a complete profile, and does not
+        // discriminate if a change was something new
+        //
+        // Examples:
+        // - If a user John Doe, Miami, FL. Changes its name to Jonathan, for us it will be a new profile query.
+        // and we should remove the John Doe one.
+        // - The same happens with addresses, if a user changes the address from Miami to Aventura. We want
+        // to delete all profile queries that have Miami, FL as an address, and add the new ones.
+        //
+        var profileQueriesToUpdate = [ProfileQuery]()
+
         // The ones that we need to remove are the ones that exist in the database but not in the new ones
         var profileQueriesToRemove = Set(databaseProfileQueries).subtracting(Set(newProfileQueries))
 

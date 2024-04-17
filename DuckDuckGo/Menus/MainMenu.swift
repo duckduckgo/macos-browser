@@ -577,7 +577,7 @@ import SubscriptionUI
                     NSMenuItem(title: "More Than 15 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan15DaysAgo(_:)))
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
-                NSMenuItem(title: "Reset Daily Pixels", action: #selector(MainViewController.resetDailyPixels))
+                NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))

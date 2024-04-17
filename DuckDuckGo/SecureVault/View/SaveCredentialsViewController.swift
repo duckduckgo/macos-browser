@@ -20,6 +20,7 @@ import AppKit
 import BrowserServicesKit
 import Combine
 import Common
+import PixelKit
 
 protocol SaveCredentialsDelegate: AnyObject {
 
@@ -227,10 +228,10 @@ final class SaveCredentialsViewController: NSViewController {
             }
         } catch {
             os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
 
-        Pixel.fire(.autofillItemSaved(kind: .password))
+        PixelKit.fire(GeneralPixel.autofillItemSaved(kind: .password))
 
         if passwordManagerCoordinator.isEnabled {
             passwordManagerCoordinator.reportPasswordSave()
@@ -313,7 +314,7 @@ final class SaveCredentialsViewController: NSViewController {
         } catch {
             os_log("%: failed to save never prompt for website %s", type: .error, #function, error.localizedDescription)
         }
-        Pixel.fire(.autofillLoginsSaveLoginModalExcludeSiteConfirmed)
+        PixelKit.fire(GeneralPixel.autofillLoginsSaveLoginModalExcludeSiteConfirmed)
 
         onNotNowClicked(sender: nil)
     }

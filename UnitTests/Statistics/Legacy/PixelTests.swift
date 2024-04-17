@@ -66,7 +66,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        Pixel.fire(.crash, withAdditionalParameters: params)
+        PixelKit.fire(GeneralPixel.crash, withAdditionalParameters: params)
 
         waitForExpectations(timeout: 1.0)
     }
@@ -82,7 +82,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        Pixel.fire(.debug(event: Pixel.Event.Debug.appOpenURLFailed, error: error))
+        PixelKit.fire(DebugEvent( GeneralPixel.appOpenURLFailed, error: error))
 
         waitForExpectations(timeout: 1.0)
     }
@@ -107,7 +107,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        Pixel.fire(.debug(event: Pixel.Event.Debug.appOpenURLFailed, error: error), withAdditionalParameters: params)
+        PixelKit.fire(DebugEvent( GeneralPixel.appOpenURLFailed, error: error), withAdditionalParameters: params)
 
         waitForExpectations(timeout: 1.0)
     }
