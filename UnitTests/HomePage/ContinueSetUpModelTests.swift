@@ -84,10 +84,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         duckPlayerPreferences = DuckPlayerPreferencesPersistorMock()
         privacyConfigManager = MockPrivacyConfigurationManager()
         let config = MockPrivacyConfiguration()
-        config.featureSettings = [
-            "surveyCardDay0": "enabled",
-            "surveyCardDay14": "enabled"
-        ] as! [String: String]
         privacyConfigManager.privacyConfig = config
         randomNumberGenerator = MockRandomNumberGenerator()
 
@@ -412,6 +408,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm.shouldShowAllFeatures = true
 
         XCTAssertTrue(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
+        XCTAssertEqual(randomNumberGenerator.capturedRange, 0..<100)
     }
 
     @MainActor func test_whenUserHasInteracted_andEnabled_andFirstInstallInTargetRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyInNotDisplayed() {
