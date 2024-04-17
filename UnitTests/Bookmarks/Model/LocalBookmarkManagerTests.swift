@@ -217,6 +217,51 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertNil(result)
     }
 
+    // MARK: - Save Multiple Bookmarks at once
+
+    func testWhenMakeBookmarksForWebsitesInfoIsCalledThenBookmarkStoreIsAskedToCreateMultipleBookmarks() {
+        // GIVEN
+        let (sut, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let newFolderName = #function
+        let websitesInfo = [
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 1"),
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 2"),
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 3"),
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 4"),
+        ].compactMap { $0 }
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedBookmarks)
+        XCTAssertNil(bookmarkStoreMock.capturedNewFolderName)
+        XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
+
+        // WHEN
+        sut.makeBookmarks(for: websitesInfo, inNewFolderNamed: newFolderName, withinParentFolder: .root)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedBookmarks?.count, 4)
+        XCTAssertEqual(bookmarkStoreMock.capturedNewFolderName, newFolderName)
+        XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
+        bookmarkStoreMock.capturedBookmarks?.enumerated().forEach { index, bookmark in
+            XCTAssertEqual(bookmark.title, websitesInfo[index].title)
+            XCTAssertEqual(bookmark.urlObject, websitesInfo[index].url)
+        }
+    }
+
+    func testWhenMakeBookmarksForWebsiteInfoIsCalledThenReloadAllBookmarks() {
+        // GIVEN
+        let (sut, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        bookmarkStoreMock.loadAllCalled = false // Reset after load all bookmarks the first time
+        XCTAssertFalse(bookmarkStoreMock.loadAllCalled)
+        let websitesInfo = [WebsiteInfo(url: URL.duckDuckGo, title: "Website 1")].compactMap { $0 }
+
+        // WHEN
+        sut.makeBookmarks(for: websitesInfo, inNewFolderNamed: "Test", withinParentFolder: .root)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.loadAllCalled)
+    }
+
 }
 
 fileprivate extension LocalBookmarkManager {
@@ -241,5 +286,16 @@ fileprivate extension Bookmark {
                                               url: URL.duckDuckGo.absoluteString,
                                               title: "Title",
                                               isFavorite: false)
+
+}
+
+private extension WebsiteInfo {
+
+    @MainActor
+    init?(url: URL, title: String) {
+        let tab = Tab(content: .url(url, credential: nil, source: .ui))
+        tab.title = title
+        self.init(tab)
+    }
 
 }
