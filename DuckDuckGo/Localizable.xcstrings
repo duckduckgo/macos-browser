@@ -31001,7 +31001,7 @@
     },
     "no.access.to.selected.folder" : {
       "comment" : "Alert presented to user if the app doesn't have rights to access selected folder",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -31061,7 +31061,7 @@
     },
     "no.access.to.selected.folder.header" : {
       "comment" : "Header of the alert dialog informing user about failed download",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -31355,6 +31355,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хорошо"
+          }
+        }
+      }
+    },
+    "onboarding.addtodock.button" : {
+      "comment" : "Button label to add application to the macOS system dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep in Dock"
+          }
+        }
+      }
+    },
+    "onboarding.addtodock.text" : {
+      "comment" : "Call to action to add the DuckDuckGo app icon to the macOS system dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "One last thing. Would you like to keep DuckDuckGo in your dock so the browser is always within reach?"
           }
         }
       }

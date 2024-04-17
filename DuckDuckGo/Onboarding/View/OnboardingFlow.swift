@@ -62,6 +62,13 @@ struct OnboardingFlow: View {
                         model.onSetDefaultSkipped()
                     }.visibility(model.state == .setDefault ? .visible : .gone)
 
+                    ActionSpeech(text: UserText.onboardingAddToDockText,
+                                 actionName: UserText.onboardingAddToDockButton) {
+                        model.onAddToDockPressed()
+                    } skip: {
+                        model.onAddToDockSkipped()
+                    }.visibility(model.state == .addToDock ? .visible : .gone)
+
                     DaxSpeech(text: UserText.onboardingStartBrowsingText, onTypingFinished: nil)
                         .visibility(model.state == .startBrowsing ? .visible : .gone)
 
