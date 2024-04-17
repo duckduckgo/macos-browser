@@ -245,7 +245,6 @@ struct MapperToUI {
                                                       lastStartedSchedulerOperationTimestamp: lastStartedOperation?.historyEvents.closestHistoryEvent?.date.timeIntervalSince1970.withoutDecimals,
                                                       lastStartedSchedulerOperationBrokerUrl: lastStartedOperationBrokerURL)
 
-
         #if DEBUG
         do {
             let encoder = JSONEncoder()
@@ -417,9 +416,10 @@ fileprivate extension Array where Element == HistoryEvent {
 extension HistoryEvent {
 
     var isError: Bool {
-        if case .error(_) = type {
+        switch type {
+        case .error:
             return true
-        } else {
+        default:
             return false
         }
     }
