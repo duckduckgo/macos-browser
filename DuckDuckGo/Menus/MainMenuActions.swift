@@ -655,6 +655,14 @@ extension MainViewController {
 
     // MARK: - Debug
 
+    @objc func addDebugTabs(_ sender: AnyObject) {
+        let numberOfTabs = sender.representedObject as? Int ?? 1
+        (1...numberOfTabs).forEach { _ in
+            let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .ui))
+            tabCollectionViewModel.append(tab: tab)
+        }
+    }
+
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
     }
