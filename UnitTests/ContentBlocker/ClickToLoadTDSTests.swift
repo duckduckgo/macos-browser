@@ -25,8 +25,20 @@ class ClickToLoadTDSTests: XCTestCase {
 
     func testEnsureClickToLoadTDSCompiles() throws {
 
-        let tds = ContentBlockerRulesLists.fbTrackerDataSet
-        let builder = ContentBlockerRulesBuilder(trackerData: tds)
+        let trackerManager = TrackerDataManager(etag: nil,
+                                         data: nil,
+                                         embeddedDataProvider: AppTrackerDataSetProvider())
+        let mockAdAttributing = MockAttributing()
+
+        let cbrLists = ContentBlockerRulesLists(trackerDataManager: trackerManager, adClickAttribution: mockAdAttributing)
+        let ruleSets = cbrLists.contentBlockerRulesLists
+        let tdsName = ContentBlockerRulesLists.Constants.clickToLoadRulesListName
+
+        let ctlRules = ruleSets.first(where: { $0.name == tdsName})
+        let ctlFallback = ctlRules?.fallbackTrackerData
+        let tds = ctlFallback?.tds
+        
+        let builder = ContentBlockerRulesBuilder(trackerData: tds!)
 
         let rules = builder.buildRules(withExceptions: [],
                                        andTemporaryUnprotectedDomains: [],
@@ -44,7 +56,7 @@ class ClickToLoadTDSTests: XCTestCase {
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             compiled.fulfill()
-                    }
+        }
 
         wait(for: [compiled], timeout: 30.0)
 
