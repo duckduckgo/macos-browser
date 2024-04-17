@@ -21,9 +21,8 @@ import Foundation
 @testable import DataBrokerProtection
 
 final class EmailServiceTests: XCTestCase {
-
     private let servicePixel = MockDataBrokerProtectionBackendServicePixels()
-    
+
     enum MockError: Error {
         case someError
     }
