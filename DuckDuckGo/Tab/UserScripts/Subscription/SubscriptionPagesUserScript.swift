@@ -472,7 +472,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             assertionFailure("Cannot continue without broker instance")
             return
         }
-        
+
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }
 }
