@@ -112,11 +112,6 @@ final class BWCommunicator: BWCommunication {
             return
         }
 
-        //TODO REMOVE
-        print("SENT!----------------------")
-        print(String(data: messageData, encoding: .utf8))
-        print("----------------------")
-
         // Prefix with the length of data
         var messageDataCount = UInt32(messageData.count)
         let messagePrefix = Data(bytes: &messageDataCount, count: MemoryLayout.size(ofValue: messageDataCount))
