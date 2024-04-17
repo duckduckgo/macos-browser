@@ -267,6 +267,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Initialization
 
+    @MainActor
     @objc public init() {
         let isSubscriptionEnabled = false
 
@@ -328,6 +329,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     /// Observe server changes to broadcast those changes through distributed notifications.
     ///
+    @MainActor
     private func observeServerChanges() {
         lastSelectedServerInfoPublisher.sink { [weak self] server in
             self?.lastStatusChangeDate = Date()
@@ -372,6 +374,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     /// Broadcasts the current server information.
     ///
+    @MainActor
     private func broadcastLastSelectedServerInfo() {
         broadcast(lastSelectedServerInfo)
     }
