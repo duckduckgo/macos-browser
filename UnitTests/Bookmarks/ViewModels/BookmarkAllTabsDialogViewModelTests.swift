@@ -301,7 +301,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
         let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         sut.selectedFolder = nil
-        XCTAssertFalse(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
         XCTAssertNil(bookmarkStoreMock.capturedBookmarks)
         XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
 
@@ -309,7 +309,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         sut.addOrSave(dismiss: {})
 
         // THEN
-        XCTAssertTrue(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
+        XCTAssertTrue(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
         XCTAssertEqual(bookmarkStoreMock.capturedBookmarks?.compactMap(\.urlObject), websitesInfo.map(\.url))
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
 
@@ -321,7 +321,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
         let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
         sut.selectedFolder = folder
-        XCTAssertFalse(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
         XCTAssertNil(bookmarkStoreMock.capturedBookmarks)
         XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
 
@@ -329,7 +329,7 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         sut.addOrSave(dismiss: {})
 
         // THEN
-        XCTAssertTrue(bookmarkStoreMock.bookmarkAllWebsitesInfoCalled)
+        XCTAssertTrue(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
         XCTAssertEqual(bookmarkStoreMock.capturedBookmarks?.compactMap(\.urlObject), websitesInfo.map(\.url))
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: "ABCDE"))
     }
