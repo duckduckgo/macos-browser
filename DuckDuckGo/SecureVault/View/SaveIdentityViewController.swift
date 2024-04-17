@@ -71,13 +71,8 @@ final class SaveIdentityViewController: NSViewController {
         identity.title = UserText.pmDefaultIdentityAutofillTitle
 
         do {
-<<<<<<< HEAD
             try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).storeIdentity(identity)
-            Pixel.fire(.autofillItemSaved(kind: .identity))
-=======
-            try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeIdentity(identity)
             PixelKit.fire(GeneralPixel.autofillItemSaved(kind: .identity))
->>>>>>> main
         } catch {
             os_log("%s:%s: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
             PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))

@@ -22,24 +22,17 @@ import BrowserServicesKit
 import PixelKit
 import SecureStorage
 
-extension SecureStorageKeyStoreEvent: PixelKitEvent {
-    public var name: String {
-        switch self {
-        case .l1KeyMigration: return "m_mac_secure_vault_keystore_event_l1-key-migration"
-        case .l2KeyMigration: return "m_mac_secure_vault_keystore_event_l2-key-migration"
-        case .l2KeyPasswordMigration: return "m_mac_secure_vault_keystore_event_l2-key-password-migration"
-        }
-    }
-
-    public var parameters: [String: String]? {
-        nil
-    }
-}
-
 final class SecureVaultKeyStoreEventMapper: EventMapping<SecureStorageKeyStoreEvent> {
     public init() {
         super.init { event, _, _, _ in
-            PixelKit.fire(DebugEvent(event))
+            switch event {
+            case .l1KeyMigration:
+                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultKeystoreEventL1KeyMigration))
+            case .l2KeyMigration:
+                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultKeystoreEventL2KeyMigration))
+            case .l2KeyPasswordMigration:
+                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultKeystoreEventL2KeyPasswordMigration))
+            }
         }
     }
 
@@ -60,9 +53,9 @@ final class SecureVaultReporter: SecureVaultReporting {
 
         switch error {
         case .initFailed, .failedToOpenDatabase:
-            Pixel.fire(.debug(event: .secureVaultInitError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultInitError(error: error)))
         default:
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }
 
