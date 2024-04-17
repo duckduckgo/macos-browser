@@ -20,14 +20,19 @@ import PixelKit
 import Common
 import BrowserServicesKit
 
-final class DataBrokerProtectionBackendServicePixels {
-    enum ServiceCallSite: String {
-        case extractEmailLink
-        case getEmail
-        case submitCaptchaInformationRequest
-        case submitCaptchaToBeResolvedRequest
-    }
+enum BackendServiceCallSite: String {
+    case extractEmailLink
+    case getEmail
+    case submitCaptchaInformationRequest
+    case submitCaptchaToBeResolvedRequest
+}
 
+protocol DataBrokerProtectionBackendServicePixels {
+    func fireGenerateEmailHTTPError(statusCode: Int)
+    func fireEmptyAccessToken(callSite: BackendServiceCallSite)
+}
+
+final class DefaultDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBackendServicePixels {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let settings: DataBrokerProtectionSettings
     private let authRepository: AuthenticationRepository
@@ -49,7 +54,7 @@ final class DataBrokerProtectionBackendServicePixels {
                                                        wasOnWaitlist: wasOnWaitlist))
     }
 
-    func fireEmptyAccessToken(callSite: ServiceCallSite) {
+    func fireEmptyAccessToken(callSite: BackendServiceCallSite) {
         let environment = settings.selectedEnvironment.rawValue
         let wasOnWaitlist = authRepository.getWaitlistTimestamp() != nil
 

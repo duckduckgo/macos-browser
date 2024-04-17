@@ -125,19 +125,22 @@ struct CaptchaService: CaptchaServiceProtocol {
     private let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let settings: DataBrokerProtectionSettings
-    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let servicePixel: DataBrokerProtectionBackendServicePixels
 
     init(urlSession: URLSession = URLSession.shared,
          redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
          settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
-         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
+         servicePixel: DataBrokerProtectionBackendServicePixels? = nil) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
         self.settings = settings
-        self.pixelHandler = pixelHandler
-        self.servicePixel = DataBrokerProtectionBackendServicePixels(pixelHandler: pixelHandler,
-                                                                     settings: settings)
+
+        if let servicePixel = servicePixel {
+            self.servicePixel = servicePixel
+        } else {
+            self.servicePixel = DefaultDataBrokerProtectionBackendServicePixels(pixelHandler: DataBrokerProtectionPixelsHandler(),
+                                                                                settings: settings)
+        }
     }
 
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
@@ -217,7 +220,14 @@ struct CaptchaService: CaptchaServiceProtocol {
                                    pollingInterval: TimeInterval = 50,
                                    attemptId: UUID,
                                    shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
-        guard let captchaResolveResult = try? await submitCaptchaToBeResolvedRequest(transactionID, attemptId: attemptId) else {
+
+        let captchaResolveResult: CaptchaResult
+
+        do {
+            captchaResolveResult = try await submitCaptchaToBeResolvedRequest(transactionID, attemptId: attemptId)
+        } catch let error as AuthenticationError where error == .noAuthToken {
+            throw AuthenticationError.noAuthToken
+        } catch {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
         }
 

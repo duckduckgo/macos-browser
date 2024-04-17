@@ -929,3 +929,24 @@ final class MockStageDurationCalculator: StageDurationCalculator {
         self.stage = nil
     }
 }
+
+final class MockDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBackendServicePixels {
+    var fireEmptyAccessTokenWasCalled = false
+    var fireGenerateEmailHTTPErrorWasCalled = false
+    var statusCode: Int?
+
+    func fireGenerateEmailHTTPError(statusCode: Int) {
+        fireGenerateEmailHTTPErrorWasCalled = true
+        self.statusCode = statusCode
+    }
+
+    func fireEmptyAccessToken(callSite: BackendServiceCallSite) {
+        fireEmptyAccessTokenWasCalled = true
+    }
+
+    func reset() {
+        fireEmptyAccessTokenWasCalled = false
+        fireGenerateEmailHTTPErrorWasCalled = false
+        statusCode = nil
+    }
+}

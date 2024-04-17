@@ -235,4 +235,42 @@ final class EmailServiceTests: XCTestCase {
             XCTFail("Unexpected. It should not throw")
         }
     }
+
+    func testWhenNoAuthTokenAvailable_noAuthTokenErrorIsThrown() async {
+        let redeemUseCase = MockRedeemUseCase()
+        let mockDataBrokerPixels = MockDataBrokerProtectionBackendServicePixels()
+        redeemUseCase.shouldSendNilAuthHeader = true
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: redeemUseCase,
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: mockDataBrokerPixels)
+
+        do {
+            _ = try await sut.getEmail(dataBrokerURL: "fakeBroker", attemptId: UUID())
+            XCTFail("Expected an error to be thrown")
+        } catch {
+            guard let authenticationError = error as? AuthenticationError, authenticationError == .noAuthToken else {
+                XCTFail("Error is not AuthenticationError.noAuthToken")
+                return
+            }
+            XCTAssertTrue(mockDataBrokerPixels.fireEmptyAccessTokenWasCalled)
+            XCTAssertFalse(mockDataBrokerPixels.fireGenerateEmailHTTPErrorWasCalled)
+        }
+    }
+
+    func testWhen401IsReceived_thenWeSubmit401ErrorPixel() async {
+        MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.noAuth, nil) })
+        let mockDataBrokerPixels = MockDataBrokerProtectionBackendServicePixels()
+
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard), servicePixel: mockDataBrokerPixels)
+
+        do {
+            _ = try await sut.getEmail(dataBrokerURL: "fakeBroker", attemptId: UUID())
+            XCTFail("Expected an error to be thrown")
+        } catch {
+            XCTAssertFalse(mockDataBrokerPixels.fireEmptyAccessTokenWasCalled)
+            XCTAssertTrue(mockDataBrokerPixels.fireGenerateEmailHTTPErrorWasCalled)
+            XCTAssertEqual(mockDataBrokerPixels.statusCode, 401)
+        }
+    }
 }

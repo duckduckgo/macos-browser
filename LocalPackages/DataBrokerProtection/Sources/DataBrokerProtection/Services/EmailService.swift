@@ -53,19 +53,22 @@ struct EmailService: EmailServiceProtocol {
     public let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let settings: DataBrokerProtectionSettings
-    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let servicePixel: DataBrokerProtectionBackendServicePixels
 
     init(urlSession: URLSession = URLSession.shared,
          redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
          settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
-         pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()) {
+         servicePixel: DataBrokerProtectionBackendServicePixels? = nil) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
         self.settings = settings
-        self.pixelHandler = pixelHandler
-        self.servicePixel = DataBrokerProtectionBackendServicePixels(pixelHandler: pixelHandler,
-                                                                     settings: settings)
+
+        if let servicePixel = servicePixel {
+            self.servicePixel = servicePixel
+        } else {
+            self.servicePixel = DefaultDataBrokerProtectionBackendServicePixels(pixelHandler: DataBrokerProtectionPixelsHandler(),
+                                                                                settings: settings)
+        }
     }
 
     func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData {

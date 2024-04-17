@@ -200,6 +200,29 @@ final class CaptchaServiceTests: XCTestCase {
             XCTFail("Unexpected error thrown: \(error).")
         }
     }
+
+    func testWhenNoAuthTokenAvailable_noAuthTokenErrorIsThrown() async {
+        let redeemUseCase = MockRedeemUseCase()
+        let mockDataBrokerPixels = MockDataBrokerProtectionBackendServicePixels()
+        redeemUseCase.shouldSendNilAuthHeader = true
+
+        let sut = CaptchaService(urlSession: mockURLSession,
+                                 redeemUseCase: redeemUseCase,
+                                 settings: DataBrokerProtectionSettings(defaults: .standard),
+                                 servicePixel: mockDataBrokerPixels)
+
+        do {
+            _ = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 1, attemptId: UUID(), shouldRunNextStep: { true })
+            XCTFail("Expected an error to be thrown")
+        } catch {
+            guard let authenticationError = error as? AuthenticationError, authenticationError == .noAuthToken else {
+                XCTFail("Error is not AuthenticationError.noAuthToken")
+                return
+            }
+            XCTAssertTrue(mockDataBrokerPixels.fireEmptyAccessTokenWasCalled)
+            XCTAssertFalse(mockDataBrokerPixels.fireGenerateEmailHTTPErrorWasCalled)
+        }
+    }
 }
 
 extension GetCaptchaInfoResponse {
