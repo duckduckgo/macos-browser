@@ -128,7 +128,11 @@ public extension XCTestCase {
             })
 
             if frequency == .dailyAndCount {
+                XCTAssertTrue(firedPixelName.hasPrefix(expectations.pixelName))
                 XCTAssertTrue(firedPixelName.hasSuffix("_c") || firedPixelName.hasSuffix("_d"))
+                XCTAssertEqual(firedPixelName.count, expectations.pixelName.count + 2)
+                let exp = self.expectedPixelNames(originalName: expectations.pixelName, frequency: frequency)
+                XCTAssertTrue(exp.contains(firedPixelName))
             } else {
                 XCTAssertEqual(expectations.pixelName, firedPixelName)
             }
