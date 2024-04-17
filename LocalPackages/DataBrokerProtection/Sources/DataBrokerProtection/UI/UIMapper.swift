@@ -216,12 +216,11 @@ struct MapperToUI {
         }
     }
 
-    func mapToMetadata(metadata: DBPBackgroundAgentMetadata?,
-                       brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIBackgroundAgentMetadata {
+    func mapToUI(metadata: DBPBackgroundAgentMetadata?, brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIDebugMetadata {   
         let currentAppVersion = Bundle.main.fullVersionNumber ?? "ERROR: Error fetching app version"
 
         guard let metadata = metadata else {
-            return DBPUIBackgroundAgentMetadata(lastRunAppVersion: currentAppVersion, isAgentRunning: false)
+            return DBPUIDebugMetadata(lastRunAppVersion: currentAppVersion, isAgentRunning: false)
         }
 
         let lastOperation = brokerProfileQueryData.lastOperation
@@ -231,21 +230,21 @@ struct MapperToUI {
         let lastOperationBrokerURL = brokerProfileQueryData.filter { $0.dataBroker.id == lastOperation?.brokerId }.first?.dataBroker.url
         let lastStartedOperationBrokerURL = brokerProfileQueryData.filter { $0.dataBroker.id == lastStartedOperation?.brokerId }.first?.dataBroker.url
 
-        let metadataUI = DBPUIBackgroundAgentMetadata(lastRunAppVersion: currentAppVersion,
-                                                      lastRunAgentVersion: metadata.backgroundAgentVersion,
-                                                      isAgentRunning: true,
-                                                      lastSchedulerOperationType: lastOperation?.toString,
-                                                      lastSchedulerOperationTimestamp: lastOperation?.lastRunDate?.timeIntervalSince1970.withoutDecimals,
-                                                      lastSchedulerOperationBrokerUrl: lastOperationBrokerURL,
-                                                      lastSchedulerErrorMessage: lastError?.error,
-                                                      lastSchedulerErrorTimestamp: lastError?.date.timeIntervalSince1970.withoutDecimals,
-                                                      lastSchedulerSessionStartTimestamp: metadata.lastSchedulerSessionStartTimestamp,
-                                                      agentSchedulerState: metadata.agentSchedulerState,
-                                                      lastStartedSchedulerOperationType: lastStartedOperation?.toString,
-                                                      lastStartedSchedulerOperationTimestamp: lastStartedOperation?.historyEvents.closestHistoryEvent?.date.timeIntervalSince1970.withoutDecimals,
-                                                      lastStartedSchedulerOperationBrokerUrl: lastStartedOperationBrokerURL)
+        let metadataUI = DBPUIDebugMetadata(lastRunAppVersion: currentAppVersion,
+                                            lastRunAgentVersion: metadata.backgroundAgentVersion,
+                                            isAgentRunning: true,
+                                            lastSchedulerOperationType: lastOperation?.toString,
+                                            lastSchedulerOperationTimestamp: lastOperation?.lastRunDate?.timeIntervalSince1970.withoutDecimals,
+                                            lastSchedulerOperationBrokerUrl: lastOperationBrokerURL,
+                                            lastSchedulerErrorMessage: lastError?.error,
+                                            lastSchedulerErrorTimestamp: lastError?.date.timeIntervalSince1970.withoutDecimals,
+                                            lastSchedulerSessionStartTimestamp: metadata.lastSchedulerSessionStartTimestamp,
+                                            agentSchedulerState: metadata.agentSchedulerState,
+                                            lastStartedSchedulerOperationType: lastStartedOperation?.toString,
+                                            lastStartedSchedulerOperationTimestamp: lastStartedOperation?.historyEvents.closestHistoryEvent?.date.timeIntervalSince1970.withoutDecimals,
+                                            lastStartedSchedulerOperationBrokerUrl: lastStartedOperationBrokerURL)
 
-        #if DEBUG
+#if DEBUG
         do {
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted
@@ -256,7 +255,7 @@ struct MapperToUI {
         } catch {
             os_log("Error encoding struct to JSON: %{public}@", log: OSLog.default, type: .error, error.localizedDescription)
         }
-        #endif
+#endif
 
         return metadataUI
     }
@@ -265,7 +264,7 @@ struct MapperToUI {
 extension Bundle {
     var fullVersionNumber: String? {
         guard let appVersion = self.releaseVersionNumber,
-                let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else {
+              let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else {
             return nil
         }
 

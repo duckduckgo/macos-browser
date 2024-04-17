@@ -324,9 +324,9 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
             }
     }
 
-    func getBackgroundAgentMetadata() async -> DBPUIBackgroundAgentMetadata {
+    func getBackgroundAgentMetadata() async -> DBPUIDebugMetadata {
         let metadata = await scanDelegate?.getBackgroundAgentMetadata()
 
-        return mapper.mapToMetadata(metadata: metadata, brokerProfileQueryData: brokerProfileQueryData)
+        return mapper.mapToUI(metadata: metadata, brokerProfileQueryData: brokerProfileQueryData)
     }
 }

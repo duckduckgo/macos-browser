@@ -37,7 +37,7 @@ protocol DBPUICommunicationDelegate: AnyObject {
     func getInitialScanState() async -> DBPUIInitialScanState
     func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState
     func getDataBrokers() async -> [DBPUIDataBroker]
-    func getBackgroundAgentMetadata() async -> DBPUIBackgroundAgentMetadata
+    func getBackgroundAgentMetadata() async -> DBPUIDebugMetadata
 }
 
 enum DBPUIReceivedMethodName: String {

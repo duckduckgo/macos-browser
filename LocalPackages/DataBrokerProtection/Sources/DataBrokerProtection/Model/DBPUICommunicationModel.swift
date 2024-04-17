@@ -185,7 +185,7 @@ struct DBPUIScanHistory: DBPUISendableMessage {
     let sitesScanned: Int
 }
 
-struct DBPUIBackgroundAgentMetadata: DBPUISendableMessage {
+struct DBPUIDebugMetadata: DBPUISendableMessage {
     let lastRunAppVersion: String
     let lastRunAgentVersion: String?
     let isAgentRunning: Bool
