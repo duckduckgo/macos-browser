@@ -356,6 +356,7 @@ final class MockAuthenticationRepository: AuthenticationRepository {
     var shouldSendNilAccessToken = false
     var wasInviteCodeSaveCalled = false
     var wasAccessTokenSaveCalled = false
+    var shouldSendNilWaitlistTimeStamp = false
 
     func getInviteCode() -> String? {
         if shouldSendNilInviteCode {
@@ -382,7 +383,10 @@ final class MockAuthenticationRepository: AuthenticationRepository {
     }
 
     func getWaitlistTimestamp() -> Int? {
-        123
+        if shouldSendNilWaitlistTimeStamp {
+            return nil
+        }
+        return 123
     }
 
     func reset() {
@@ -390,6 +394,7 @@ final class MockAuthenticationRepository: AuthenticationRepository {
         shouldSendNilAccessToken = false
         wasInviteCodeSaveCalled = false
         wasAccessTokenSaveCalled = false
+        shouldSendNilWaitlistTimeStamp = false
     }
 }
 

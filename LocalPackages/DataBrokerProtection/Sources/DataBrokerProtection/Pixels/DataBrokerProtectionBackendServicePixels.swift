@@ -20,7 +20,7 @@ import PixelKit
 import Common
 import BrowserServicesKit
 
-enum BackendServiceCallSite: String {
+public enum BackendServiceCallSite: String {
     case extractEmailLink
     case getEmail
     case submitCaptchaInformationRequest
