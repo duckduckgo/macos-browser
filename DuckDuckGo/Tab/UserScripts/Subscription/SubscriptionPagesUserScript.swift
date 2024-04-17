@@ -468,7 +468,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
-        let broker = UserScriptMessageBroker(context: SubscriptionPagesUserScript.context, requiresRunInPageContentWorld: true )
+        guard let broker else {
+            assertionFailure("Cannot continue without broker instance")
+            return
+        }
+        
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }
 }
