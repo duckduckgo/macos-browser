@@ -309,6 +309,14 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
 }
 
 final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
+    var shouldSendNilAuthHeader = false
+
+    func getAuthHeader() -> String? {
+        if shouldSendNilAuthHeader {
+            return nil
+        }
+        return "auth header"
+    }
 
     func shouldAskForInviteCode() -> Bool {
         false
@@ -316,10 +324,6 @@ final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
 
     func redeem(inviteCode: String) async throws {
 
-    }
-
-    func getAuthHeader() async throws -> String {
-        return "auth header"
     }
 }
 
@@ -344,7 +348,6 @@ final class MockAuthenticationService: DataBrokerProtectionAuthenticationService
 }
 
 final class MockAuthenticationRepository: AuthenticationRepository {
-
     var shouldSendNilInviteCode = false
     var shouldSendNilAccessToken = false
     var wasInviteCodeSaveCalled = false
@@ -372,6 +375,10 @@ final class MockAuthenticationRepository: AuthenticationRepository {
 
     func save(accessToken: String) {
         wasAccessTokenSaveCalled = true
+    }
+
+    func getWaitlistTimestamp() -> Int? {
+        123
     }
 
     func reset() {
