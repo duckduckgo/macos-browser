@@ -110,6 +110,7 @@ struct BookmarkAllTabsDialogView: ModalView {
     }
 }
 
+#if DEBUG
 #Preview("Bookmark All Tabs - Light") {
     let parentFolder = BookmarkFolder(id: "7", title: "DuckDuckGo")
     let bookmark = Bookmark(id: "1", url: "www.duckduckgo.com", title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "7")
@@ -137,3 +138,4 @@ struct BookmarkAllTabsDialogView: ModalView {
     return BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo, bookmarkManager: bookmarkManager)
         .preferredColorScheme(.dark)
 }
+#endif
