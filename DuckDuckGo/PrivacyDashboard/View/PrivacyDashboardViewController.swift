@@ -337,14 +337,14 @@ extension PrivacyDashboardViewController {
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.url?.host)
 
-        let webVitals = await calculateWebVitals(performanceMetrics: currentTab.performanceMetrics, privacyConfig: configuration)
+        let webVitals = await calculateWebVitals(performanceMetrics: currentTab.brokenSiteInfo?.performanceMetrics, privacyConfig: configuration)
 
         var errors: [Error]?
         var statusCodes: [Int]?
-        if let error = currentTab.lastWebError {
+        if let error = currentTab.brokenSiteInfo?.lastWebError {
             errors = [error]
         }
-        if let httpStatusCode = currentTab.lastHttpStatusCode {
+        if let httpStatusCode = currentTab.brokenSiteInfo?.lastHttpStatusCode {
             statusCodes = [httpStatusCode]
         }
 
@@ -364,10 +364,10 @@ extension PrivacyDashboardViewController {
                                                reportFlow: source,
                                                errors: errors,
                                                httpStatusCodes: statusCodes,
-                                               openerContext: currentTab.inferredOpenerContext,
-                                               vpnOn: currentTab.tunnelController.isConnected,
+                                               openerContext: currentTab.brokenSiteInfo?.inferredOpenerContext,
+                                               vpnOn: currentTab.networkProtection?.tunnelController.isConnected ?? false,
                                                jsPerformance: webVitals,
-                                               userRefreshCount: currentTab.refreshCountSinceLoad,
+                                               userRefreshCount: currentTab.brokenSiteInfo?.refreshCountSinceLoad ?? -1,
                                                didOpenReportInfo: didOpenReportInfo,
                                                toggleReportCounter: toggleReportCounter)
         return websiteBreakage

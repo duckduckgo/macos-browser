@@ -3202,6 +3202,18 @@
 		B6EECB322BC40A1400B3CB77 /* FileManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E61EE2263AC0C8004E11AB /* FileManagerExtension.swift */; };
 		B6EEDD7D2B8C69E900637EBC /* TabContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEDD7C2B8C69E900637EBC /* TabContentTests.swift */; };
 		B6EEDD7E2B8C69E900637EBC /* TabContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EEDD7C2B8C69E900637EBC /* TabContentTests.swift */; };
+		B6F1B0222BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B0212BCE5658005E863C /* BrokenSiteInfoTabExtension.swift */; };
+		B6F1B0232BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B0212BCE5658005E863C /* BrokenSiteInfoTabExtension.swift */; };
+		B6F1B0242BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B0212BCE5658005E863C /* BrokenSiteInfoTabExtension.swift */; };
+		B6F1B0262BCE5A50005E863C /* TabContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B0252BCE5A50005E863C /* TabContent.swift */; };
+		B6F1B0272BCE5A50005E863C /* TabContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B0252BCE5A50005E863C /* TabContent.swift */; };
+		B6F1B0282BCE5A50005E863C /* TabContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B0252BCE5A50005E863C /* TabContent.swift */; };
+		B6F1B02A2BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B0292BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift */; };
+		B6F1B02B2BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B0292BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift */; };
+		B6F1B02C2BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B0292BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift */; };
+		B6F1B02E2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B02D2BCE6B47005E863C /* TunnelControllerProvider.swift */; };
+		B6F1B02F2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B02D2BCE6B47005E863C /* TunnelControllerProvider.swift */; };
+		B6F1B0302BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B02D2BCE6B47005E863C /* TunnelControllerProvider.swift */; };
 		B6F1C80B2761C45400334924 /* LocalUnprotectedDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */; };
 		B6F41031264D2B23003DA42C /* ProgressExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F41030264D2B23003DA42C /* ProgressExtension.swift */; };
 		B6F56567299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */; };
@@ -4749,6 +4761,10 @@
 		B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = TestsServer.xcconfig; sourceTree = "<group>"; };
 		B6EC37FB29B83E99001ACE79 /* TestsURLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestsURLExtension.swift; sourceTree = "<group>"; };
 		B6EEDD7C2B8C69E900637EBC /* TabContentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabContentTests.swift; sourceTree = "<group>"; };
+		B6F1B0212BCE5658005E863C /* BrokenSiteInfoTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenSiteInfoTabExtension.swift; sourceTree = "<group>"; };
+		B6F1B0252BCE5A50005E863C /* TabContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabContent.swift; sourceTree = "<group>"; };
+		B6F1B0292BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionControllerTabExtension.swift; sourceTree = "<group>"; };
+		B6F1B02D2BCE6B47005E863C /* TunnelControllerProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelControllerProvider.swift; sourceTree = "<group>"; };
 		B6F41030264D2B23003DA42C /* ProgressExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtension.swift; sourceTree = "<group>"; };
 		B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewMockingExtension.swift; sourceTree = "<group>"; };
 		B6F7127D29F6779000594A45 /* QRSharingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRSharingService.swift; sourceTree = "<group>"; };
@@ -5879,24 +5895,25 @@
 		4B4D60632A0B29FA00BCD287 /* BothAppTargets */ = {
 			isa = PBXGroup;
 			children = (
-				EEA3EEAF2B24EB5100E8333A /* VPNLocation */,
+				4B4D60722A0B29FA00BCD287 /* EventMapping+NetworkProtectionError.swift */,
+				4B4D606B2A0B29FA00BCD287 /* Invite */,
+				7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */,
 				9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */,
-				7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */,
-				7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */,
-				7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */,
-				7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */,
-				7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */,
-				7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift */,
 				B602E81C2A1E25B0006D261F /* NEOnDemandRuleExtension.swift */,
+				4B4D60692A0B29FA00BCD287 /* NetworkProtection+ConvenienceInitializers.swift */,
+				7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */,
+				4B4D606A2A0B29FA00BCD287 /* NetworkProtectionControllerErrorStore.swift */,
+				7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */,
+				7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */,
 				4B4D60652A0B29FA00BCD287 /* NetworkProtectionNavBarButtonModel.swift */,
 				7B3618C12ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift */,
+				7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */,
+				7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */,
 				4B8F52402A18326600BE7131 /* NetworkProtectionTunnelController.swift */,
-				4B4D60692A0B29FA00BCD287 /* NetworkProtection+ConvenienceInitializers.swift */,
-				7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */,
-				4B4D606A2A0B29FA00BCD287 /* NetworkProtectionControllerErrorStore.swift */,
-				4B4D606B2A0B29FA00BCD287 /* Invite */,
-				4B4D60722A0B29FA00BCD287 /* EventMapping+NetworkProtectionError.swift */,
-				7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */,
+				7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift */,
+				EEA3EEAF2B24EB5100E8333A /* VPNLocation */,
+				7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */,
+				B6F1B02D2BCE6B47005E863C /* TunnelControllerProvider.swift */,
 			);
 			path = BothAppTargets;
 			sourceTree = "<group>";
@@ -7729,6 +7746,7 @@
 				B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */,
 				B634DBE4293C944700C3C99E /* NewWindowPolicy.swift */,
 				AA9FF95824A1ECF20039E328 /* Tab.swift */,
+				B6F1B0252BCE5A50005E863C /* TabContent.swift */,
 				B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */,
 				B61E2CD4294346C000773D8A /* Tab+Navigation.swift */,
 				B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */,
@@ -8405,24 +8423,26 @@
 		B647EFB32922539400BA628D /* TabExtensions */ = {
 			isa = PBXGroup;
 			children = (
-				B6BDDA002942389000F68088 /* TabExtensions.swift */,
-				1D9A4E592B43213B00F449E2 /* TabSnapshotExtension.swift */,
 				B647EFBA2922584B00BA628D /* AdClickAttributionTabExtension.swift */,
 				B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */,
+				B6F1B0212BCE5658005E863C /* BrokenSiteInfoTabExtension.swift */,
 				B6D574B12947224C008ED1B6 /* ContentBlockingTabExtension.swift */,
 				B6DA06E32913ECEE00225DE2 /* ContextMenuManager.swift */,
+				B6685E4129A61C460043D2EE /* DownloadsTabExtension.swift */,
 				B6C416A6294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift */,
 				B6D574B329472253008ED1B6 /* FBProtectionTabExtension.swift */,
-				B6685E4129A61C460043D2EE /* DownloadsTabExtension.swift */,
 				B6C00ECC292F89D9009C73A6 /* FindInPageTabExtension.swift */,
 				B66260DF29AC6EBD00E9E3EE /* HistoryTabExtension.swift */,
 				B6C00ED4292FB21E009C73A6 /* HoveredLinkTabExtension.swift */,
 				B6BF5D8829470BC4006742B1 /* HTTPSUpgradeTabExtension.swift */,
-				B6BF5D842946FFDA006742B1 /* PrivacyDashboardTabExtension.swift */,
 				B66260E529ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift */,
 				B66260DC29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift */,
-				B626A76C29928B1600053070 /* TestsClosureNavigationResponder.swift */,
+				B6F1B0292BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift */,
+				B6BF5D842946FFDA006742B1 /* PrivacyDashboardTabExtension.swift */,
 				56BA1E742BAAF70F001CF69F /* SSLErrorPageTabExtension.swift */,
+				B6BDDA002942389000F68088 /* TabExtensions.swift */,
+				1D9A4E592B43213B00F449E2 /* TabSnapshotExtension.swift */,
+				B626A76C29928B1600053070 /* TestsClosureNavigationResponder.swift */,
 			);
 			path = TabExtensions;
 			sourceTree = "<group>";
@@ -10445,6 +10465,7 @@
 				3706FAF3293F65D500E42796 /* LocalAuthenticationService.swift in Sources */,
 				1D36E659298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */,
 				B6BCC5242AFCDABB002C5499 /* DataImportSourceViewModel.swift in Sources */,
+				B6F1B02B2BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift in Sources */,
 				3706FEBC293F6EFF00E42796 /* BWResponse.swift in Sources */,
 				B65C7DFC2B886CF0001E2D5C /* WKPDFHUDViewWrapper.swift in Sources */,
 				3706FAF4293F65D500E42796 /* SafariBookmarksReader.swift in Sources */,
@@ -10560,6 +10581,7 @@
 				3706FB46293F65D500E42796 /* FirePopoverWrapperViewController.swift in Sources */,
 				3706FB47293F65D500E42796 /* NSPasteboardItemExtension.swift in Sources */,
 				3706FB48293F65D500E42796 /* AutofillPreferencesModel.swift in Sources */,
+				B6F1B0272BCE5A50005E863C /* TabContent.swift in Sources */,
 				3168506E2AF3AD1D009A2828 /* WaitlistViewControllerPresenter.swift in Sources */,
 				3706FB49293F65D500E42796 /* NSException+Catch.swift in Sources */,
 				B6B71C592B23379600487131 /* NSLayoutConstraintExtension.swift in Sources */,
@@ -10906,6 +10928,7 @@
 				B6685E4029A606190043D2EE /* WorkspaceProtocol.swift in Sources */,
 				3706FC2F293F65D500E42796 /* MouseOverButton.swift in Sources */,
 				3706FC30293F65D500E42796 /* FireInfoViewController.swift in Sources */,
+				B6F1B02F2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */,
 				56BA1E832BAC506F001CF69F /* SSLErrorPageUserScript.swift in Sources */,
 				3706FC31293F65D500E42796 /* PermissionButton.swift in Sources */,
 				3706FC32293F65D500E42796 /* MoreOptionsMenu.swift in Sources */,
@@ -11023,6 +11046,7 @@
 				3707C721294B5D2900682A9F /* WKMenuItemIdentifier.swift in Sources */,
 				3706FEBE293F6EFF00E42796 /* BWMessageIdGenerator.swift in Sources */,
 				C1E961F02B87AA29001760E1 /* AutofillActionBuilder.swift in Sources */,
+				B6F1B0232BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */,
 				3706FC85293F65D500E42796 /* ShadowView.swift in Sources */,
 				3706FC86293F65D500E42796 /* FeedbackSender.swift in Sources */,
 				3706FC88293F65D500E42796 /* TabBarViewItem.swift in Sources */,
@@ -11876,6 +11900,7 @@
 				4B957A622AC7AE700062CA31 /* AddressBarButton.swift in Sources */,
 				4B957A642AC7AE700062CA31 /* FaviconStore.swift in Sources */,
 				4B957A652AC7AE700062CA31 /* WaitlistTermsAndConditionsView.swift in Sources */,
+				B6F1B02C2BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift in Sources */,
 				B62B48592ADE730D000DECE5 /* FileImportView.swift in Sources */,
 				4B957A662AC7AE700062CA31 /* SuggestionListCharacteristics.swift in Sources */,
 				4B957A672AC7AE700062CA31 /* TimeIntervalExtension.swift in Sources */,
@@ -11958,6 +11983,7 @@
 				4B957AA52AC7AE700062CA31 /* FireproofDomainsContainer.swift in Sources */,
 				4B957AA62AC7AE700062CA31 /* ExternalAppSchemeHandler.swift in Sources */,
 				4B957AA72AC7AE700062CA31 /* GeolocationService.swift in Sources */,
+				B6F1B0302BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */,
 				4B957AA82AC7AE700062CA31 /* FireproofingURLExtensions.swift in Sources */,
 				4B957AA92AC7AE700062CA31 /* ContentOverlayPopover.swift in Sources */,
 				4B957AAA2AC7AE700062CA31 /* TabShadowView.swift in Sources */,
@@ -11981,6 +12007,7 @@
 				4B957AB62AC7AE700062CA31 /* FireproofDomains.xcdatamodeld in Sources */,
 				3158B14F2B0BF74F00AF130C /* DataBrokerProtectionManager.swift in Sources */,
 				4B957AB82AC7AE700062CA31 /* HomePageView.swift in Sources */,
+				B6F1B0282BCE5A50005E863C /* TabContent.swift in Sources */,
 				9FEE98672B846870002E44E8 /* AddEditBookmarkView.swift in Sources */,
 				4B957AB92AC7AE700062CA31 /* SerpHeadersNavigationResponder.swift in Sources */,
 				4B957ABA2AC7AE700062CA31 /* HomePageContinueSetUpModel.swift in Sources */,
@@ -12030,6 +12057,7 @@
 				4B957AE12AC7AE700062CA31 /* Instruments.swift in Sources */,
 				4B957AE22AC7AE700062CA31 /* ContentBlockerRulesLists.swift in Sources */,
 				4B957AE32AC7AE700062CA31 /* NSViewControllerExtension.swift in Sources */,
+				B6F1B0242BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */,
 				4B957AE42AC7AE700062CA31 /* NSAppearanceExtension.swift in Sources */,
 				4B957AE52AC7AE700062CA31 /* EmailManagerExtension.swift in Sources */,
 				4B957AE62AC7AE700062CA31 /* PermissionManager.swift in Sources */,
@@ -12782,6 +12810,7 @@
 				4BF0E5052AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */,
 				37CD54CD27F2FDD100F1F7B9 /* AboutModel.swift in Sources */,
+				B6F1B0262BCE5A50005E863C /* TabContent.swift in Sources */,
 				4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */,
 				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,
 				3706FEC8293F6F7500E42796 /* BWManagement.swift in Sources */,
@@ -12804,6 +12833,7 @@
 				B6DE57F62B05EA9000CD54B9 /* SheetHostingWindow.swift in Sources */,
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
+				B6F1B0222BCE5658005E863C /* BrokenSiteInfoTabExtension.swift in Sources */,
 				4B4D60C02A0C848D00BCD287 /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
 				7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */,
@@ -12921,6 +12951,7 @@
 				B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */,
 				9FBD84732BB3E15D00220859 /* InstallationAttributionPixelHandler.swift in Sources */,
 				AAE8B110258A456C00E81239 /* TabPreviewViewController.swift in Sources */,
+				B6F1B02A2BCE675C005E863C /* NetworkProtectionControllerTabExtension.swift in Sources */,
 				B6C8CAA72AD010DD0060E1CD /* YandexDataImporter.swift in Sources */,
 				EE66666F2B56EDE4001D898D /* VPNLocationsHostingViewController.swift in Sources */,
 				37CC53EC27E8A4D10028713D /* PreferencesDataClearingView.swift in Sources */,
@@ -13122,6 +13153,7 @@
 				37FD78112A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */,
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 				B634DBDF293C8F7F00C3C99E /* Tab+UIDelegate.swift in Sources */,
+				B6F1B02E2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */,
 				4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */,
 				37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */,
 				4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */,
