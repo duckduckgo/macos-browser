@@ -325,6 +325,10 @@ final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
     func redeem(inviteCode: String) async throws {
 
     }
+
+    func reset() {
+        shouldSendNilAuthHeader = false
+    }
 }
 
 final class MockAuthenticationService: DataBrokerProtectionAuthenticationService {
