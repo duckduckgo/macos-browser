@@ -85,7 +85,6 @@ public final class DataBrokerProtectionIPCClient: NSObject {
 extension DataBrokerProtectionIPCClient: IPCServerInterface {
 
     public func register() {
-        self.pixelHandler.fire(.ipcServerRegister)
         xpc.execute(call: { server in
             server.register()
         }, xpcReplyErrorHandler: { _ in

@@ -61,8 +61,6 @@ final class IPCServiceManager {
 extension IPCServiceManager: IPCServerInterface {
 
     func register() {
-        pixelHandler.fire(.ipcServerRegister)
-
         // When a new client registers, send the last known status
         ipcServer.schedulerStatusChanges(scheduler.status)
     }
