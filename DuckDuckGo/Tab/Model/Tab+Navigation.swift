@@ -42,6 +42,7 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(nullable: self.navigationHotkeyHandler),
+            .weak(nullable: self.brokenSiteInfo),
 
             // redirect to SERP for non-valid domains entered by user
             // should be before `self` to avoid Tab presenting an error screen
@@ -89,7 +90,9 @@ extension Tab: NavigationResponder {
             .weak(nullable: self.errorPage),
 
             // should be the last, for Unit Tests navigation events tracking
-            .struct(nullable: testsClosureNavigationResponder)
+            .struct(nullable: testsClosureNavigationResponder),
+
+            .weak(nullable: self.networkProtection)
         )
 
         newWindowPolicyDecisionMakers = [NewWindowPolicyDecisionMaker?](arrayLiteral:

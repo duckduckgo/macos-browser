@@ -1,5 +1,5 @@
 //
-//  CertificateTrustEvaluator.swift
+//  TunnelControllerProvider.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,16 +17,17 @@
 //
 
 import Foundation
+import NetworkProtectionIPC
 
-protocol CertificateTrustEvaluating {
-    func evaluateCertificateTrust(trust: SecTrust?) async -> Bool?
-}
+final class TunnelControllerProvider {
+    static let shared = TunnelControllerProvider()
 
-struct CertificateTrustEvaluator: CertificateTrustEvaluating {
-    func evaluateCertificateTrust(trust: SecTrust?) async -> Bool? {
-        var error: CFError?
-        guard let trust = trust else { return nil }
-        let result = SecTrustEvaluateWithError(trust, &error)
-        return result
+    let tunnelController: NetworkProtectionIPCTunnelController
+
+    private init() {
+        let ipcClient = TunnelControllerIPCClient()
+        ipcClient.register()
+        tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
     }
+
 }
