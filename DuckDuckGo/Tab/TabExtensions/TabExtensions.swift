@@ -169,7 +169,7 @@ extension TabExtensionsBuilder {
             HistoryTabExtension(isBurner: args.isTabBurner,
                                 historyCoordinating: dependencies.historyCoordinating,
                                 trackersPublisher: contentBlocking.trackersPublisher,
-                                urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.url : nil },
+                                urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.urlForWebView : nil },
                                 titlePublisher: args.titlePublisher)
         }
         add {

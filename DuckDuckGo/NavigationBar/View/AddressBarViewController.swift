@@ -244,9 +244,9 @@ final class AddressBarViewController: NSViewController {
 
         func shouldShowLoadingIndicator(for tabViewModel: TabViewModel, isLoading: Bool, error: Error?) -> Bool {
             if isLoading,
-               let url = tabViewModel.tab.content.url,
+               let url = tabViewModel.tab.content.urlForWebView,
                [.http, .https].contains(url.navigationalScheme),
-               url.isDuckDuckGoSearch == false,
+               !url.isDuckDuckGoSearch, !url.isDuckPlayer,
                error == nil {
                 return true
             } else {

@@ -215,7 +215,7 @@ class AddressBarTests: XCTestCase {
                 XCTAssertEqual(addressBarValue, "", "\(idx)")
             } else {
                 XCTAssertFalse(isAddressBarFirstResponder, "\(idx)")
-                XCTAssertEqual(addressBarValue, tab.content.isUrl ? tab.content.url!.absoluteString : "", "\(idx)")
+                XCTAssertEqual(addressBarValue, tab.content.isUrl ? tab.content.userEditableUrl!.absoluteString : "", "\(idx)")
             }
         }
     }

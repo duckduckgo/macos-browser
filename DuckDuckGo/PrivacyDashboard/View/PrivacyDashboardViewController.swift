@@ -327,7 +327,7 @@ extension PrivacyDashboardViewController {
 
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         guard let currentTab = tabViewModel?.tab,
-            let currentURL = currentTab.content.url?.trimmingQueryItemsAndFragment() else {
+            let currentURL = currentTab.content.urlForWebView?.trimmingQueryItemsAndFragment() else {
             throw BrokenSiteReportError.failedToFetchTheCurrentURL
         }
         let blockedTrackerDomains = currentTab.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
@@ -337,7 +337,7 @@ extension PrivacyDashboardViewController {
 
         // current domain's protection status
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.url?.host)
+        let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.urlForWebView?.host)
 
         let webVitals = await calculateWebVitals(performanceMetrics: currentTab.performanceMetrics, privacyConfig: configuration)
 

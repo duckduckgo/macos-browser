@@ -279,7 +279,7 @@ final class AddressBarButtonsViewController: NSViewController {
             guard let tabViewModel, tabViewModel.canBeBookmarked else { return false }
 
             var isUrlBookmarked = false
-            if let url = tabViewModel.tab.content.url,
+            if let url = tabViewModel.tab.content.userEditableUrl,
                bookmarkManager.isUrlBookmarked(url: url) {
                 isUrlBookmarked = true
             }
@@ -413,7 +413,7 @@ final class AddressBarButtonsViewController: NSViewController {
             permissions.microphone = tabViewModel.usedPermissions.microphone
         }
 
-        let url = tabViewModel.tab.content.url ?? .empty
+        let url = tabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: permissions.map { ($0, $1) }, domain: domain, delegate: self)
@@ -432,7 +432,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let url = tabViewModel.tab.content.url ?? .empty
+        let url = tabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: [(.microphone, state)], domain: domain, delegate: self)
@@ -451,7 +451,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return
         }
 
-        let url = tabViewModel.tab.content.url ?? .empty
+        let url = tabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: [(.geolocation, state)], domain: domain, delegate: self)
@@ -475,7 +475,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 $0.append( (.popups, .requested($1)) )
             }
         } else {
-            let url = tabViewModel.tab.content.url ?? .empty
+            let url = tabViewModel.tab.content.urlForWebView ?? .empty
             domain = url.isFileURL ? .localhost : (url.host ?? "")
             permissions = [(.popups, state)]
         }
@@ -499,7 +499,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         permissions = [(permissionType, state)]
-        let url = tabViewModel.tab.content.url ?? .empty
+        let url = tabViewModel.tab.content.urlForWebView ?? .empty
         let domain = url.isFileURL ? .localhost : (url.host ?? "")
 
         PermissionContextMenu(permissions: permissions, domain: domain, delegate: self)
@@ -733,7 +733,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
-        if let url = tabViewModel?.tab.content.url,
+        if let url = tabViewModel?.tab.content.userEditableUrl,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url)
         {
             bookmarkButton.image = .bookmarkFilled
@@ -770,11 +770,12 @@ final class AddressBarButtonsViewController: NSViewController {
     private func updatePrivacyEntryPointButton() {
         guard let tabViewModel else { return }
 
-        let urlScheme = tabViewModel.tab.content.url?.scheme
-        let isHypertextUrl = urlScheme == "http" || urlScheme == "https"
+        let isHypertextUrl = if case .url(let url, _, _) = tabViewModel.tab.content,
+            !(url.isDuckPlayer || url.isDuckURLScheme),
+            [.http, .https].contains(url.navigationalScheme) { true } else { false}
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
-        let isLocalUrl = tabViewModel.tab.content.url?.isLocalURL ?? false
+        let isLocalUrl = tabViewModel.tab.content.userEditableUrl?.isLocalURL ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isEditingMode

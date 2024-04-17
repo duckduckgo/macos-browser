@@ -52,7 +52,7 @@ extension URL {
     ]
 
     var canFireproof: Bool {
-        guard let host = self.host else { return false }
+        guard let host = self.host, [.http, .https].contains(self.navigationalScheme) else { return false }
         return (host != Self.cookieDomain)
     }
 
