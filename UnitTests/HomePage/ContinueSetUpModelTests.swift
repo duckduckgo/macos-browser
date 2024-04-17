@@ -535,7 +535,7 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.performAction(for: .permanentSurvey)
 
-        XCTAssertEqual(tabCollectionVM.tabs[1].url, URL(string: "\(urlString)?atb=\(atb)&v=\(someVariant)&ddg=\(AppVersion.shared.majorAndMinorVersion)&macos=\(ProcessInfo.processInfo.operatingSystemVersion)"))
+        XCTAssertEqual(tabCollectionVM.tabs[1].url, URL(string: "\(urlString)?atb=\(atb)&v=\(someVariant)&ddg=\(AppVersion.shared.versionNumber)&macos=\(AppVersion.shared.majorAndMinorOSVersion)"))
 
         let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
         vm2.shouldShowAllFeatures = true

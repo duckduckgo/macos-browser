@@ -376,8 +376,8 @@ extension HomePage.Models {
             if let variant = statisticsStore.variant {
                 newQueryItems.append(URLQueryItem(name: "v", value: variant))
             }
-            newQueryItems.append(URLQueryItem(name: "ddg", value: AppVersion.shared.majorAndMinorVersion))
-            newQueryItems.append(URLQueryItem(name: "macos", value: AppVersion.shared.osVersion))
+            newQueryItems.append(URLQueryItem(name: "ddg", value: AppVersion.shared.versionNumber))
+            newQueryItems.append(URLQueryItem(name: "macos", value: AppVersion.shared.majorAndMinorOSVersion))
             let oldQueryItems = components?.queryItems ?? []
             components?.queryItems = oldQueryItems + newQueryItems
 
@@ -616,8 +616,8 @@ struct RandomNumberGenerator: RandomNumberGenerating {
 }
 
 extension AppVersion {
-    public var majorAndMinorVersion: String {
-        let components = versionNumber.split(separator: ".")
+    public var majorAndMinorOSVersion: String {
+        let components = osVersion.split(separator: ".")
         guard components.count >= 2 else {
             return majorVersionNumber
         }
