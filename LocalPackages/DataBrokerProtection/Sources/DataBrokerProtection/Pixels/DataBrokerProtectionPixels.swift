@@ -63,6 +63,7 @@ public enum DataBrokerProtectionPixels {
         static let environmentKey = "environment"
         static let wasOnWaitlist = "was_on_waitlist"
         static let httpCode = "http_code"
+        static let backendServiceCallSite = "backend_service_callsite"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -143,7 +144,7 @@ public enum DataBrokerProtectionPixels {
 
     // Backend service errors
     case generateEmailHTTPErrorDaily(statusCode: Int, environment: String, wasOnWaitlist: Bool)
-    case emptyAccessTokenDaily(environment: String, wasOnWaitlist: Bool)
+    case emptyAccessTokenDaily(environment: String, wasOnWaitlist: Bool, callSite: BackendServiceCallSite)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -350,9 +351,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.environmentKey: environment,
                     Consts.httpCode: String(statusCode),
                     Consts.wasOnWaitlist: String(wasOnWaitlist)]
-        case .emptyAccessTokenDaily(let environment, let wasOnWaitlist):
+        case .emptyAccessTokenDaily(let environment, let wasOnWaitlist, let backendServiceCallSite):
             return [Consts.environmentKey: environment,
-                    Consts.wasOnWaitlist: String(wasOnWaitlist)]
+                    Consts.wasOnWaitlist: String(wasOnWaitlist),
+                    Consts.backendServiceCallSite: backendServiceCallSite.rawValue]
         }
     }
 }

@@ -59,6 +59,7 @@ final class DefaultDataBrokerProtectionBackendServicePixels: DataBrokerProtectio
         let wasOnWaitlist = authRepository.getWaitlistTimestamp() != nil
 
         pixelHandler.fire(.emptyAccessTokenDaily(environment: environment,
-                                                 wasOnWaitlist: wasOnWaitlist))
+                                                 wasOnWaitlist: wasOnWaitlist,
+                                                 callSite: callSite))
     }
 }
