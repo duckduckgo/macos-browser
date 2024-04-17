@@ -1,5 +1,5 @@
 //
-//  SecureVaultErrorReporter.swift
+//  SecureVaultReporter.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -20,8 +20,8 @@ import Foundation
 import BrowserServicesKit
 import SecureStorage
 
-final class SecureVaultErrorReporter: SecureVaultReporting {
-    static let shared = SecureVaultErrorReporter()
+final class SecureVaultReporter: SecureVaultReporting {
+    static let shared = SecureVaultReporter()
     private init() {}
 
     func secureVaultError(_ error: SecureStorageError) {

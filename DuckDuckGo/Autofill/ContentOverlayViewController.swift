@@ -309,7 +309,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultError(_ error: SecureStorageError) {
-        SecureVaultErrorReporter.shared.secureVaultError(error)
+        SecureVaultReporter.shared.secureVaultError(error)
     }
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {

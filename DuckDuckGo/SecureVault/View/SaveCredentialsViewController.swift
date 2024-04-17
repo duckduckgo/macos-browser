@@ -221,7 +221,7 @@ final class SaveCredentialsViewController: NSViewController {
                     }
                 }
             } else {
-                _ = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
+                _ = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared).storeWebsiteCredentials(credentials)
                 NSApp.delegateTyped.syncService?.scheduler.notifyDataChanged()
                 os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
             }

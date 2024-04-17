@@ -152,7 +152,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     var secureVault: (any AutofillSecureVault)? {
-        try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultErrorReporter.shared)
+        try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
     }
 
     private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
@@ -1073,7 +1073,7 @@ extension PasswordManagementViewController: NSMenuItemValidation {
     }
 
     private var haveDuckDuckGoPasswords: Bool {
-        guard let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultErrorReporter.shared) else { return false }
+        guard let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared) else { return false }
         let accounts = (try? vault.accounts()) ?? []
         return !accounts.isEmpty
     }

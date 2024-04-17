@@ -385,7 +385,7 @@ final class Fire {
     // MARK: - Favicons
 
     private func autofillDomains() -> Set<String> {
-        guard let vault = try? secureVaultFactory.makeVault(reporter: SecureVaultErrorReporter.shared),
+        guard let vault = try? secureVaultFactory.makeVault(reporter: SecureVaultReporter.shared),
               let accounts = try? vault.accounts() else {
             return []
         }
