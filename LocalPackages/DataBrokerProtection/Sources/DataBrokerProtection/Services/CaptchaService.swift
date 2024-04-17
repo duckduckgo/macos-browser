@@ -130,17 +130,11 @@ struct CaptchaService: CaptchaServiceProtocol {
     init(urlSession: URLSession = URLSession.shared,
          redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
          settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
-         servicePixel: DataBrokerProtectionBackendServicePixels? = nil) {
+         servicePixel: DataBrokerProtectionBackendServicePixels = DefaultDataBrokerProtectionBackendServicePixels()) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
         self.settings = settings
-
-        if let servicePixel = servicePixel {
-            self.servicePixel = servicePixel
-        } else {
-            self.servicePixel = DefaultDataBrokerProtectionBackendServicePixels(pixelHandler: DataBrokerProtectionPixelsHandler(),
-                                                                                settings: settings)
-        }
+        self.servicePixel = servicePixel
     }
 
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,

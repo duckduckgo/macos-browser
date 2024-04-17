@@ -22,6 +22,8 @@ import Foundation
 
 final class EmailServiceTests: XCTestCase {
 
+    private let servicePixel = MockDataBrokerProtectionBackendServicePixels()
+    
     enum MockError: Error {
         case someError
     }
@@ -34,11 +36,15 @@ final class EmailServiceTests: XCTestCase {
 
     override func tearDown() async throws {
         MockURLProtocol.requestHandlerQueue.removeAll()
+        servicePixel.reset()
     }
 
     func testWhenSessionThrows_thenTheCorrectErrorIsThrown() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             _ = try await sut.getEmail(dataBrokerURL: "fakeBroker", attemptId: UUID())
@@ -59,7 +65,10 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             _ = try await sut.getEmail(dataBrokerURL: "fakeBroker", attemptId: UUID())
@@ -78,7 +87,10 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             let emailData = try await sut.getEmail(dataBrokerURL: "fakeBroker", attemptId: UUID())
@@ -94,7 +106,10 @@ final class EmailServiceTests: XCTestCase {
         let unknownResponse: RequestHandler = { _ in (HTTPURLResponse.ok, responseData) }
         MockURLProtocol.requestHandlerQueue.append(unknownResponse)
 
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -121,7 +136,10 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
 
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -151,7 +169,10 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(successResponse)
 
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             let url = try await sut.getConfirmationLink(
@@ -172,7 +193,10 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -196,7 +220,10 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONEncoder().encode(invalidLink)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -220,7 +247,10 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONEncoder().encode(validURL)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard))
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             let url = try await sut.getConfirmationLink(
@@ -238,12 +268,11 @@ final class EmailServiceTests: XCTestCase {
 
     func testWhenNoAuthTokenAvailable_noAuthTokenErrorIsThrown() async {
         let redeemUseCase = MockRedeemUseCase()
-        let mockDataBrokerPixels = MockDataBrokerProtectionBackendServicePixels()
         redeemUseCase.shouldSendNilAuthHeader = true
         let sut = EmailService(urlSession: mockURLSession,
                                redeemUseCase: redeemUseCase,
                                settings: DataBrokerProtectionSettings(defaults: .standard),
-                               servicePixel: mockDataBrokerPixels)
+                               servicePixel: servicePixel)
 
         do {
             _ = try await sut.getEmail(dataBrokerURL: "fakeBroker", attemptId: UUID())
@@ -253,24 +282,26 @@ final class EmailServiceTests: XCTestCase {
                 XCTFail("Error is not AuthenticationError.noAuthToken")
                 return
             }
-            XCTAssertTrue(mockDataBrokerPixels.fireEmptyAccessTokenWasCalled)
-            XCTAssertFalse(mockDataBrokerPixels.fireGenerateEmailHTTPErrorWasCalled)
+            XCTAssertTrue(servicePixel.fireEmptyAccessTokenWasCalled)
+            XCTAssertFalse(servicePixel.fireGenerateEmailHTTPErrorWasCalled)
         }
     }
 
     func testWhen401IsReceived_thenWeSubmit401ErrorPixel() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.noAuth, nil) })
-        let mockDataBrokerPixels = MockDataBrokerProtectionBackendServicePixels()
 
-        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase(), settings: DataBrokerProtectionSettings(defaults: .standard), servicePixel: mockDataBrokerPixels)
+        let sut = EmailService(urlSession: mockURLSession,
+                               redeemUseCase: MockRedeemUseCase(),
+                               settings: DataBrokerProtectionSettings(defaults: .standard),
+                               servicePixel: servicePixel)
 
         do {
             _ = try await sut.getEmail(dataBrokerURL: "fakeBroker", attemptId: UUID())
             XCTFail("Expected an error to be thrown")
         } catch {
-            XCTAssertFalse(mockDataBrokerPixels.fireEmptyAccessTokenWasCalled)
-            XCTAssertTrue(mockDataBrokerPixels.fireGenerateEmailHTTPErrorWasCalled)
-            XCTAssertEqual(mockDataBrokerPixels.statusCode, 401)
+            XCTAssertFalse(servicePixel.fireEmptyAccessTokenWasCalled)
+            XCTAssertTrue(servicePixel.fireGenerateEmailHTTPErrorWasCalled)
+            XCTAssertEqual(servicePixel.statusCode, 401)
         }
     }
 }

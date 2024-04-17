@@ -37,8 +37,8 @@ final class DefaultDataBrokerProtectionBackendServicePixels: DataBrokerProtectio
     private let settings: DataBrokerProtectionSettings
     private let authRepository: AuthenticationRepository
 
-    init(pixelHandler: EventMapping<DataBrokerProtectionPixels>,
-         settings: DataBrokerProtectionSettings,
+    init(pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler(),
+         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
          authRepository: AuthenticationRepository = KeychainAuthenticationData()) {
         self.pixelHandler = pixelHandler
         self.settings = settings
