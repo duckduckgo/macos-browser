@@ -16,13 +16,44 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import BrowserServicesKit
+import PixelKit
 import SecureStorage
+
+extension SecureStorageKeyStoreEvent: PixelKitEvent {
+    public var name: String {
+        switch self {
+        case .l1KeyMigration: return "m_mac_secure_vault_keystore_event_l1-key-migration"
+        case .l2KeyMigration: return "m_mac_secure_vault_keystore_event_l2-key-migration"
+        case .l2KeyPasswordMigration: return "m_mac_secure_vault_keystore_event_l2-key-password-migration"
+        }
+    }
+
+    public var parameters: [String: String]? {
+        nil
+    }
+}
+
+final class SecureVaultKeyStoreEventMapper: EventMapping<SecureStorageKeyStoreEvent> {
+    public init() {
+        super.init { event, _, _, _ in
+            PixelKit.fire(DebugEvent(event))
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<SecureStorageKeyStoreEvent>.Mapping) {
+        fatalError("Use init()")
+    }
+}
 
 final class SecureVaultReporter: SecureVaultReporting {
     static let shared = SecureVaultReporter()
-    private init() {}
+    private var keyStoreMapper: SecureVaultKeyStoreEventMapper
+    private init(keyStoreMapper: SecureVaultKeyStoreEventMapper = SecureVaultKeyStoreEventMapper()) {
+        self.keyStoreMapper = keyStoreMapper
+    }
 
     func secureVaultError(_ error: SecureStorageError) {
         guard NSApp.runType.requiresEnvironment else { return }
@@ -35,4 +66,7 @@ final class SecureVaultReporter: SecureVaultReporting {
         }
     }
 
+    func secureVaultKeyStoreEvent(_ event: SecureStorageKeyStoreEvent) {
+        keyStoreMapper.fire(event)
+    }
 }
