@@ -260,17 +260,17 @@ final class TabViewModel {
         case .newtab, .onboarding, .none:
             .init() // empty
         case .settings(let pane):
-            .settingsTrustedIndicatorAttributedString
+            .settingsTrustedIndicator
         case .bookmarks:
-            .bookmarksTrustedIndicatorAttributedString
+            .bookmarksTrustedIndicator
         case .dataBrokerProtection:
-            .dbpTrustedIndicatorAttributedString
+            .dbpTrustedIndicator
         case .subscription:
-            .subscriptionTrustedIndicatorAttributedString
+            .subscriptionTrustedIndicator
         case .identityTheftRestoration:
-            .identityTheftRestorationTrustedIndicatorAttributedString
+            .identityTheftRestorationTrustedIndicator
         case .url(let url, _, _) where url.isDuckPlayer || url.isDuckURLScheme:
-            .duckPlayerTrustedIndicatorAttributedString
+            .duckPlayerTrustedIndicator
         case .url(let url, _, _):
             NSAttributedString(string: passiveAddressBarString(with: url, showFullURL: showFullURL))
         }
@@ -464,17 +464,17 @@ private extension NSAttributedString {
         }
     }
 
-    static let settingsTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .settingsMulticolor16,
-                                                                                           title: UserText.settings)
-    static let bookmarksTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .bookmarksFolder,
-                                                                                            title: UserText.bookmarks)
-    static let dbpTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
-                                                                                      title: UserText.tabDataBrokerProtectionTitle)
-    static let subscriptionTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .privacyPro,
-                                                                                               title: UserText.subscription)
-    static let identityTheftRestorationTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .subscriptionIcon,
-                                                                                                           title: UserText.subscription)
-    static let duckPlayerTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .duckPlayerSettings,
-                                                                                             title: UserText.duckPlayer)
+    static let settingsTrustedIndicator = trustedIndicatorAttributedString(with: .settingsMulticolor16,
+                                                                           title: UserText.settings)
+    static let bookmarksTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
+                                                                            title: UserText.bookmarks)
+    static let dbpTrustedIndicator = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
+                                                                      title: UserText.tabDataBrokerProtectionTitle)
+    static let subscriptionTrustedIndicator = trustedIndicatorAttributedString(with: .privacyPro,
+                                                                               title: UserText.subscription)
+    static let identityTheftRestorationTrustedIndicator = trustedIndicatorAttributedString(with: .identityTheftRestorationMulticolor16,
+                                                                                           title: UserText.identityTheftRestorationOptionsMenuItem)
+    static let duckPlayerTrustedIndicator = trustedIndicatorAttributedString(with: .duckPlayerSettings,
+                                                                             title: UserText.duckPlayer)
 
 }
