@@ -271,6 +271,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case bookmarksMigrationCouldNotRemoveOldStore
     case bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders
 
+    case bookmarkAllTabsLastUsedFolderBadModelMapping
+    case bookmarkAllTabsLastUsedFolderFetchFailed
+
     case syncSentUnauthenticatedRequest
     case syncMetadataCouldNotLoadDatabase
     case syncBookmarksProviderInitializationFailed
@@ -723,7 +726,10 @@ enum GeneralPixel: PixelKitEventV2 {
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
         case .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders:
             return "bookmarks_migration_could_not_prepare_multiple_favorite_folders"
-
+        case .bookmarkAllTabsLastUsedFolderBadModelMapping:
+            return "bookmark_all_tabs_last_used_folder_bad_model_mapping"
+        case .bookmarkAllTabsLastUsedFolderFetchFailed:
+            return "bookmark_all_tabs_last_used_folder_fetch_failed"
         case .syncSentUnauthenticatedRequest: return "sync_sent_unauthenticated_request"
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
         case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"

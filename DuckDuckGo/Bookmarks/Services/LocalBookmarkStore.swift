@@ -403,21 +403,22 @@ final class LocalBookmarkStore: BookmarkStore {
                 let folderFetchRequestResult = try context.fetch(folderFetchRequest)
                 guard let bookmarkFolderManagedObject = folderFetchRequestResult.first else { return }
 
-                bookmarkFolderToReturn = BaseBookmarkEntity.from(
+                guard let bookmarkFolder = BaseBookmarkEntity.from(
                     managedObject: bookmarkFolderManagedObject,
                     parentFolderUUID: bookmarkFolderManagedObject.parent?.uuid,
                     favoritesDisplayMode: favoritesDisplayMode
                 ) as? BookmarkFolder
-
-                guard let bookmarkFolderToReturn else {
+                else {
                     throw BookmarkStoreError.badModelMapping
                 }
+                bookmarkFolderToReturn = bookmarkFolder
+
             } catch BookmarkStoreError.badModelMapping {
-                Pixel.fire(.debug(event: .bookmarkAllTabsLastUsedFolderBadModelMapping))
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarkAllTabsLastUsedFolderBadModelMapping))
             } catch {
                 let error = error as NSError
                 let processedErrors = CoreDataErrorsParser.parse(error: error)
-                Pixel.fire(.debug(event: .bookmarkAllTabsLastUsedFolderFetchFailed, error: error), withAdditionalParameters: processedErrors.errorPixelParameters)
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarkAllTabsLastUsedFolderFetchFailed, error: error), withAdditionalParameters: processedErrors.errorPixelParameters)
             }
         }
 

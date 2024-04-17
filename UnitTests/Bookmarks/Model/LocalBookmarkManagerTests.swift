@@ -208,7 +208,6 @@ final class LocalBookmarkManagerTests: XCTestCase {
     func testWhenGetBookmarkFolderIsCalledAndFolderDoesNotExistInStoreThenBookmarkStoreReturnsNil() throws {
         // GIVEN
         let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
-        let folder = BookmarkFolder(id: "1", title: "Test")
         bookmarkStoreMock.bookmarkFolder = nil
 
         // WHEN
