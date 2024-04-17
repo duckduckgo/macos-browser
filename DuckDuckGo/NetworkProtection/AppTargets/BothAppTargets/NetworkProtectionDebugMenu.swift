@@ -340,7 +340,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func populateNetworkProtectionEnvironmentListMenuItems() {
         environmentMenu.items = [
             NSMenuItem(title: "Production", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
-            NSMenuItem(title: "Staging", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: "")
+            NSMenuItem(title: "Staging", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
         ]
     }
 

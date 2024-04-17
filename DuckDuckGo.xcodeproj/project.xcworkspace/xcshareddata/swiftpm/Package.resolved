@@ -10,15 +10,6 @@
       }
     },
     {
-      "identity" : "barebonesbrowser",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BareBonesBrowser.git",
-      "state" : {
-        "revision" : "31e5bfedc3c2ca005640c4bf2b6959d69b0e18b9",
-        "version" : "0.1.0"
-      }
-    },
-    {
       "identity" : "bloom_cpp",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/bloom_cpp.git",
@@ -64,33 +55,6 @@
       }
     },
     {
-      "identity" : "lottie-spm",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-spm.git",
-      "state" : {
-        "revision" : "3bd43e12d6fb54654366a61f7cfaca787318b8ce",
-        "version" : "4.4.1"
-      }
-    },
-    {
-      "identity" : "ohhttpstubs",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AliSoftware/OHHTTPStubs.git",
-      "state" : {
-        "revision" : "12f19662426d0434d6c330c6974d53e2eb10ecd9",
-        "version" : "9.1.0"
-      }
-    },
-    {
-      "identity" : "openssl-xcframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
-      "state" : {
-        "revision" : "b75ab2c0405860bb2616db71b9a456acb118c21a",
-        "version" : "3.1.4000"
-      }
-    },
-    {
       "identity" : "privacy-dashboard",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
@@ -109,15 +73,6 @@
       }
     },
     {
-      "identity" : "sparkle",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sparkle-project/Sparkle.git",
-      "state" : {
-        "revision" : "0a4caaf7a81eea2cece651ef4b17331fa0634dff",
-        "version" : "2.6.0"
-      }
-    },
-    {
       "identity" : "swift-argument-parser",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
@@ -127,30 +82,12 @@
       }
     },
     {
-      "identity" : "swift-snapshot-testing",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
-      "state" : {
-        "revision" : "625ccca8570773dd84a34ee51a81aa2bc5a4f97a",
-        "version" : "1.16.0"
-      }
-    },
-    {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
         "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
         "version" : "509.1.1"
-      }
-    },
-    {
-      "identity" : "swifter",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/httpswift/swifter.git",
-      "state" : {
-        "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
-        "version" : "1.5.0"
       }
     },
     {

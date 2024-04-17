@@ -44,7 +44,7 @@ final class MainView: NSView {
             navigationBarContainerView,
             webContainerView,
             findInPageContainerView,
-            fireContainerView
+            fireContainerView,
         ] {
             subview.translatesAutoresizingMaskIntoConstraints = false
             addSubview(subview)
@@ -98,7 +98,7 @@ final class MainView: NSView {
             fireContainerView.topAnchor.constraint(equalTo: topAnchor),
             fireContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             fireContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            fireContainerView.trailingAnchor.constraint(equalTo: trailingAnchor)
+            fireContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
         ])
     }
 
