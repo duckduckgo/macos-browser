@@ -49823,6 +49823,18 @@
         }
       }
     },
+    "tab.empty.title" : {
+      "comment" : "Title for an empty tab without a title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Untitled"
+          }
+        }
+      }
+    },
     "tab.error.title" : {
       "comment" : "Tab error title",
       "extractionState" : "extracted_with_value",
