@@ -173,7 +173,7 @@ final class LocalBookmarkManager: BookmarkManager {
     }
 
     func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType) {
-        bookmarkStore.save(bookmarks: websitesInfo.map(Bookmark.init), inNewFolderNamed: folderName, withinParentFolder: parent)
+        bookmarkStore.saveBookmarks(for: websitesInfo, inNewFolderNamed: folderName, withinParentFolder: parent)
         loadBookmarks()
         requestSync()
     }
@@ -388,14 +388,4 @@ final class LocalBookmarkManager: BookmarkManager {
 
         }
     }
-}
-
-// MARK: - WebsiteInfo + Bookmarks
-
-private extension Bookmark {
-
-    convenience init(websiteInfo: WebsiteInfo) {
-        self.init(id: UUID().uuidString, url: websiteInfo.url.absoluteString, title: websiteInfo.title ?? "", isFavorite: false)
-    }
-
 }

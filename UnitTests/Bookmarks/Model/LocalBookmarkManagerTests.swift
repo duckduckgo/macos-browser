@@ -230,7 +230,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
             WebsiteInfo(url: URL.duckDuckGo, title: "Website 4"),
         ].compactMap { $0 }
         XCTAssertFalse(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
-        XCTAssertNil(bookmarkStoreMock.capturedBookmarks)
+        XCTAssertNil(bookmarkStoreMock.capturedWebsitesInfo)
         XCTAssertNil(bookmarkStoreMock.capturedNewFolderName)
         XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
 
@@ -239,13 +239,10 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         // THEN
         XCTAssertTrue(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
-        XCTAssertEqual(bookmarkStoreMock.capturedBookmarks?.count, 4)
+        XCTAssertEqual(bookmarkStoreMock.capturedWebsitesInfo?.count, 4)
+        XCTAssertEqual(bookmarkStoreMock.capturedWebsitesInfo, websitesInfo)
         XCTAssertEqual(bookmarkStoreMock.capturedNewFolderName, newFolderName)
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
-        bookmarkStoreMock.capturedBookmarks?.enumerated().forEach { index, bookmark in
-            XCTAssertEqual(bookmark.title, websitesInfo[index].title)
-            XCTAssertEqual(bookmark.urlObject, websitesInfo[index].url)
-        }
     }
 
     func testWhenMakeBookmarksForWebsiteInfoIsCalledThenReloadAllBookmarks() {

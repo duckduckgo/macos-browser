@@ -261,19 +261,20 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
-    func testWhenMultipleBookmarksAreAddedToANewFolderInRootFolder_ThenTheNewFolderIsCreated_AndBoomarksAreAddedToTheFolder() async throws {
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfoToANewFolderInRootFolder_ThenTheNewFolderIsCreated_AndBoomarksAreAddedToTheFolder() async throws {
         // GIVEN
         let context = container.viewContext
         let sut = LocalBookmarkStore(context: context)
         let newFolderName = "Bookmark All Open Tabs"
-        let bookmarksToInsert = makeBookmarksMock(occurrences: 50)
+        let websites = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, occurrences: 50)
         var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
         var topLevelEntities = try await sut.loadAll(type: .topLevelEntities).get()
         XCTAssertEqual(bookmarksEntity.count, 0)
         XCTAssertEqual(topLevelEntities.count, 0)
 
         // WHEN
-        sut.save(bookmarks: bookmarksToInsert, inNewFolderNamed: newFolderName, withinParentFolder: .root)
+        sut.saveBookmarks(for: websites, inNewFolderNamed: newFolderName, withinParentFolder: .root)
 
         // THEN
         bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
@@ -291,12 +292,13 @@ final class LocalBookmarkStoreTests: XCTestCase {
         }
     }
 
-    func testWhenMultipleBookmarksAreAddedToANewFolderInSubfolder_ThenTheNewFolderIsCreated_AndBoomarksAreAddedToTheFolder() async throws {
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfoToANewFolderInSubfolder_ThenTheNewFolderIsCreated_AndBoomarksAreAddedToTheFolder() async throws {
         // GIVEN
         let context = container.viewContext
         let sut = LocalBookmarkStore(context: context)
         let newFolderName = "Bookmark All Open Tabs"
-        let bookmarksToInsert = makeBookmarksMock(occurrences: 50)
+        let websites = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, occurrences: 50)
         let parentFolderToInsert = BookmarkFolder(id: "ABCDE", title: "Subfolder")
         _ = await sut.save(folder: parentFolderToInsert, parent: nil)
         var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
@@ -307,7 +309,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual((topLevelEntities.first as? BookmarkFolder)?.parentFolderUUID, BookmarkEntity.Constants.rootFolderID)
 
         // WHEN
-        sut.save(bookmarks: bookmarksToInsert, inNewFolderNamed: newFolderName, withinParentFolder: .parent(uuid: parentFolderToInsert.id))
+        sut.saveBookmarks(for: websites, inNewFolderNamed: newFolderName, withinParentFolder: .parent(uuid: parentFolderToInsert.id))
 
         // THEN
         bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
@@ -325,6 +327,66 @@ final class LocalBookmarkStoreTests: XCTestCase {
         bookmarks.forEach { bookmark in
             XCTAssertEqual(bookmark.parentFolderUUID, subFolder.id)
         }
+    }
+
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfo_AndTitleIsNotNil_ThenTitleIsUsedAsBookmarkTitle() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let websiteName = "Test Website"
+        let websites = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, title: websiteName, occurrences: 1)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+
+        // WHEN
+        sut.saveBookmarks(for: websites, inNewFolderNamed: "Saved Tabs", withinParentFolder: .root)
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        let bookmark = try XCTUnwrap((bookmarksEntity as? [Bookmark])?.first)
+        XCTAssertEqual(bookmarksEntity.count, 1)
+        XCTAssertEqual(bookmark.title, websiteName)
+    }
+
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfo_AndTitleIsNil_ThenURLDomainIsUsedAsBookmarkTitle() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let url = URL.duckDuckGo
+        let websites = WebsiteInfo.makeWebsitesInfo(url: url, title: nil, occurrences: 1)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+
+        // WHEN
+        sut.saveBookmarks(for: websites, inNewFolderNamed: "Saved Tabs", withinParentFolder: .root)
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        let bookmark = try XCTUnwrap((bookmarksEntity as? [Bookmark])?.first)
+        XCTAssertEqual(bookmarksEntity.count, 1)
+        XCTAssertEqual(bookmark.title, url.host)
+    }
+
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfo_AndTitleIsNil_AndURLDoesNotConformToRFC3986_ThenURLAbsoluteStringIsUsedAsBookmarkTitle() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let url = try XCTUnwrap(URL(string: "duckduckgo.com"))
+        let websites = WebsiteInfo.makeWebsitesInfo(url: url, title: nil, occurrences: 1)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+
+        // WHEN
+        sut.saveBookmarks(for: websites, inNewFolderNamed: "Saved Tabs", withinParentFolder: .root)
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        let bookmark = try XCTUnwrap((bookmarksEntity as? [Bookmark])?.first)
+        XCTAssertEqual(bookmarksEntity.count, 1)
+        XCTAssertEqual(bookmark.title, url.absoluteString)
     }
 
     // MARK: Moving Bookmarks/Folders
@@ -1367,12 +1429,6 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks, syncedBookmarks: nil)
 
         return ImportedBookmarks(topLevelFolders: topLevelFolders)
-    }
-
-    func makeBookmarksMock(occurrences: Int = 1) -> [Bookmark] {
-        (1...occurrences).map { index in
-            Bookmark(id: UUID().uuidString, url: "https://example\(index).com", title: "Example \(index)", isFavorite: false)
-        }
     }
 
 }

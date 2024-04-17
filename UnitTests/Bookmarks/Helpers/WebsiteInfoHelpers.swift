@@ -1,5 +1,5 @@
 //
-//  WebsiteInfo.swift
+//  WebsiteInfoHelpers.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,26 +17,19 @@
 //
 
 import Foundation
-
-struct WebsiteInfo: Equatable {
-    let url: URL
-    let title: String?
-
-    init?(_ tab: Tab) {
-        guard case let .url(url, _, _) = tab.content else {
-            return nil
-        }
-        self.url = url
-        self.title = tab.title
-    }
-}
+@testable import DuckDuckGo_Privacy_Browser
 
 extension WebsiteInfo {
 
-    /// Returns the title of the website if available, otherwise returns the domain of the URL.
-    /// If both title and and domain are nil, it returns the absolute string representation of the URL.
-    var bookmarkTitle: String {
-        title ?? url.host ?? url.absoluteString
+    @MainActor
+    static func makeWebsitesInfo(url: URL, title: String? = nil, occurrences: Int = 1) -> [WebsiteInfo] {
+        (1...occurrences)
+            .map { _ in
+                let tab = Tab(content: .url(url, credential: nil, source: .ui))
+                tab.title = title
+                return tab
+            }
+            .compactMap(WebsiteInfo.init)
     }
 
 }

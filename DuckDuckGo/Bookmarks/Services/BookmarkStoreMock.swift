@@ -143,11 +143,11 @@ public final class BookmarkStoreMock: BookmarkStore {
     }
 
     var saveBookmarksInNewFolderNamedCalled = false
-    var capturedBookmarks: [Bookmark]?
+    var capturedWebsitesInfo: [WebsiteInfo]?
     var capturedNewFolderName: String?
-    func save(bookmarks: [Bookmark], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType) {
+    func saveBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType) {
         saveBookmarksInNewFolderNamedCalled = true
-        capturedBookmarks = bookmarks
+        capturedWebsitesInfo = websitesInfo
         capturedNewFolderName = folderName
         capturedParentFolderType = parent
     }
