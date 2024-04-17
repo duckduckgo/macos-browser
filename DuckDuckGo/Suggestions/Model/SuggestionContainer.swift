@@ -29,15 +29,17 @@ final class SuggestionContainer {
 
     private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
+    private let startupPreferences: StartupPreferences
     private let loading: SuggestionLoading
 
     private var latestQuery: Query?
 
     fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
-    init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager) {
+    init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared) {
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
+        self.startupPreferences = startupPreferences
         self.loading = suggestionLoading
         self.loading.dataSource = self
     }
@@ -90,8 +92,27 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
         return historyCoordinating.history ?? []
     }
 
-    func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
-        bookmarkManager.list?.bookmarks() ?? []
+    private func fakeBookmark(title: String, url: URL) -> Suggestions.Bookmark {
+        BookmarkList.IdentifiableBookmark(from: Bookmark(id: url.absoluteString, url: url.absoluteString, title: title, isFavorite: false))
+    }
+
+    @MainActor
+    private func extraSuggestions() -> [Suggestions.Bookmark] {
+        var extraSuggestions = [
+            fakeBookmark(title: UserText.bookmarks, url: .bookmarks),
+            fakeBookmark(title: UserText.settings, url: .settings),
+        ] + PreferencePaneIdentifier.allCases.map {
+            fakeBookmark(title: UserText.settings + " → " + $0.displayName, url: .settingsPane($0))
+        }
+        if startupPreferences.launchToCustomHomePage,
+           let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
+            extraSuggestions.append(fakeBookmark(title: UserText.homePage, url: customURL))
+        }
+        return extraSuggestions
+    }
+
+    @MainActor func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
+        (bookmarkManager.list?.bookmarks() ?? []) + extraSuggestions()
     }
 
     func suggestionLoading(_ suggestionLoading: SuggestionLoading,
