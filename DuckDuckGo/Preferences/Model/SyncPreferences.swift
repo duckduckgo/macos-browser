@@ -559,14 +559,18 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             return
         }
 
-        let data = RecoveryPDFGenerator()
-            .generate(recoveryCode)
-
         Task { @MainActor in
             let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
             guard authenticationResult.authenticated else {
+                if authenticationResult == .noAuthAvailable {
+                    presentDialog(for: .empty)
+                    managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToAuthenticateOnDevice, description: "")
+                }
                 return
             }
+
+            let data = RecoveryPDFGenerator()
+                .generate(recoveryCode)
 
             let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "Sync Data Recovery - DuckDuckGo.pdf")
             let response = await panel.begin()
@@ -607,7 +611,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     @MainActor
     func syncWithAnotherDevicePressed() async {
-        guard await userAuthenticator.authenticateUser(reason: .syncSettings).authenticated else {
+        let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
+        guard authenticationResult.authenticated else {
+            if authenticationResult == .noAuthAvailable {
+                presentDialog(for: .empty)
+                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToAuthenticateOnDevice, description: "")
+            }
             return
         }
         if isSyncEnabled {
@@ -619,7 +628,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     @MainActor
     func syncWithServerPressed() async {
-        guard await userAuthenticator.authenticateUser(reason: .syncSettings).authenticated else {
+        let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
+        guard authenticationResult.authenticated else {
+            if authenticationResult == .noAuthAvailable {
+                presentDialog(for: .empty)
+                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToAuthenticateOnDevice, description: "")
+            }
             return
         }
         presentDialog(for: .syncWithServer)
@@ -627,7 +641,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     @MainActor
     func recoverDataPressed() async {
-        guard await userAuthenticator.authenticateUser(reason: .syncSettings).authenticated else {
+        let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
+        guard authenticationResult.authenticated else {
+            if authenticationResult == .noAuthAvailable {
+                presentDialog(for: .empty)
+                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToAuthenticateOnDevice, description: "")
+            }
             return
         }
         presentDialog(for: .recoverSyncedData)
@@ -650,6 +669,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     @MainActor
     func recoveryCodeNextPressed() {
         showDevicesSynced()
+    }
+
+    @MainActor
+    func openSystemPasswordSettings() {
+        NSWorkspace.shared.open(URL.touchIDAndPassword)
     }
 
     @MainActor

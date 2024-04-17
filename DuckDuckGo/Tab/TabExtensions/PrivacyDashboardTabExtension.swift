@@ -74,15 +74,24 @@ final class PrivacyDashboardTabExtension {
         }
         .switchToLatest()
         .sink { [weak self] serverTrust in
-            guard let self else { return }
-            self.isCertificateValid = self.certificateTrustEvaluator.evaluateCertificateTrust(trust: serverTrust)
-            if self.isCertificateValid == true {
-                self.privacyInfo?.serverTrust = serverTrust
+            Task { [weak self] in
+                await self?.updatePrivacyInfo(with: serverTrust)
+            }
+        }
+        .store(in: &cancellables)
+
+    }
+
+    private func updatePrivacyInfo(with trust: SecTrust?) async {
+        let isValid = await self.certificateTrustEvaluator.evaluateCertificateTrust(trust: trust)
+        await MainActor.run {
+            self.isCertificateValid = isValid
+            if isValid ?? false {
+                self.privacyInfo?.serverTrust = trust
             } else {
                 self.privacyInfo?.serverTrust = nil
             }
         }
-        .store(in: &cancellables)
     }
 
 }

@@ -65,6 +65,18 @@ public final class DataBrokerProtectionIPCClient: NSObject {
         super.init()
 
         xpc.delegate = self
+        xpc.onDisconnect = { [weak self] in
+            guard let self else { return }
+            Task { @MainActor in
+                try await Task.sleep(interval: .seconds(1))
+                // By calling register we make sure that XPC will connect as soon as it
+                // becomes available again, as requests are queued.  This helps ensure
+                // that the client app will always be connected to XPC.
+                self.register()
+            }
+        }
+
+        self.register()
     }
 }
 
