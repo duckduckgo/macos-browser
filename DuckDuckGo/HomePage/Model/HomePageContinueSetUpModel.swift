@@ -376,8 +376,8 @@ extension HomePage.Models {
             if let variant = statisticsStore.variant {
                 newQueryItems.append(URLQueryItem(name: "v", value: variant))
             }
-            newQueryItems.append(URLQueryItem(name: "ddg", value: AppVersion.shared.versionNumber))
-            newQueryItems.append(URLQueryItem(name: "macos", value: "\(ProcessInfo.processInfo.operatingSystemVersion)"))
+            newQueryItems.append(URLQueryItem(name: "ddg", value: AppVersion.shared.majorAndMinorVersion))
+            newQueryItems.append(URLQueryItem(name: "macos", value: AppVersion.shared.osVersion))
             let oldQueryItems = components?.queryItems ?? []
             components?.queryItems = oldQueryItems + newQueryItems
 
@@ -612,5 +612,15 @@ public protocol RandomNumberGenerating {
 struct RandomNumberGenerator: RandomNumberGenerating {
     func random(in range: Range<Int>) -> Int {
         return Int.random(in: range)
+    }
+}
+
+extension AppVersion {
+    public var majorAndMinorVersion: String {
+        let components = versionNumber.split(separator: ".")
+        guard components.count >= 2 else {
+            return majorVersionNumber
+        }
+        return "\(components[0]).\(components[1])"
     }
 }
