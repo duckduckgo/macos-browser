@@ -36,31 +36,31 @@ struct MockFeatureVisibility: NetworkProtectionFeatureVisibility {
     func canStartVPN() async throws -> Bool {
         canStartVPNValue
     }
-    
+
     func isVPNVisible() -> Bool {
         isVPNVisibleValue
     }
-    
+
     func isNetworkProtectionBetaVisible() -> Bool {
         isNetworkProtectionBetaVisibleValue
     }
-    
+
     func shouldUninstallAutomatically() -> Bool {
         shouldUninstallAutomaticallyValue
     }
-    
+
     func disableForAllUsers() async {
         // Intentional no-op
     }
-    
+
     func disableForWaitlistUsers() {
         // Intentional no-op
     }
-    
+
     func disableIfUserHasNoAccess() async -> Bool {
         disableIfUserHasNoAccessValue
     }
-    
+
     let onboardStatusPublisher: AnyPublisher<NetworkProtectionUI.OnboardingStatus, Never>
 
     init(isEligibleForThankYouMessage: Bool = false,
@@ -98,7 +98,7 @@ struct MockServerInfoObserver: ConnectionServerInfoObserver {
 struct MockConnectionErrorObserver: ConnectionErrorObserver {
     var publisher: AnyPublisher<String?, Never> = Just(nil).eraseToAnyPublisher()
 
-    var recentValue: String? = nil
+    var recentValue: String?
 }
 
 struct MockIPCClient: NetworkProtectionIPCClient {
@@ -118,7 +118,7 @@ struct MockIPCClient: NetworkProtectionIPCClient {
 }
 
 struct MockLoginItemsManager: LoginItemsManaging {
-    
+
     enum MockResult {
         case success
         case failure(_ error: Error)
