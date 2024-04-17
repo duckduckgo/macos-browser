@@ -62,7 +62,8 @@ final class TabViewModel {
     var loadingStartTime: CFTimeInterval?
 
     @Published private(set) var addressBarString: String = ""
-    @Published private(set) var passiveAddressBarString: String = ""
+    @Published private(set) var passiveAddressBarAttributedString = NSAttributedString()
+
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
 
     @Published private(set) var title: String = UserText.tabHomeTitle
@@ -216,9 +217,8 @@ final class TabViewModel {
     }
 
     private func subscribeToPreferences() {
-        appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
-            guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
-            self.updatePassiveAddressBarString(showURL: newValue, url: url, hostURL: host)
+        appearancePreferences.$showFullURL.dropFirst().sink { [weak self] showFullURL in
+            self?.updatePassiveAddressBarString(showFullURL: showFullURL)
         }.store(in: &cancellables)
         accessibilityPreferences.$defaultPageZoom.sink { [weak self] newValue in
             guard let self = self else { return }
@@ -234,59 +234,63 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = !isShowingErrorPage && (tab.content.userEditableUrl ?? .blankPage) != .blankPage
-    }
-
-    private var tabURL: URL? {
-        return tab.content.userEditableUrl
-    }
-
-    private var tabHostURL: URL? {
-        return tabURL?.root
+        canBeBookmarked = !isShowingErrorPage && tab.content.isUrl && (tab.content.userEditableUrl ?? .blankPage) != .blankPage
     }
 
     private func updateAddressBarStrings() {
-        guard tab.content.isUrl, let url = tabURL else {
-            addressBarString = ""
-            passiveAddressBarString = ""
-            return
-        }
-
-        if url.isFileURL {
-            addressBarString = url.absoluteString
-            passiveAddressBarString = url.absoluteString
-            return
-        }
-
-        if url.isDataURL {
-            addressBarString = url.absoluteString
-            passiveAddressBarString = "data:"
-            return
-        }
-
-        if url.isBlobURL {
-            let strippedUrl = url.stripUnsupportedCredentials()
-            addressBarString = strippedUrl
-            passiveAddressBarString = strippedUrl
-            return
-        }
-
-        guard let hostURL = tabHostURL else {
-            // also lands here for about:blank and about:home
-            addressBarString = ""
-            passiveAddressBarString = ""
-            return
-        }
-
-        addressBarString = url.absoluteString
-        updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, hostURL: hostURL)
+        updateAddressBarString()
+        updatePassiveAddressBarString()
     }
 
-    private func updatePassiveAddressBarString(showURL: Bool, url: URL, hostURL: URL) {
-        if showURL {
-            passiveAddressBarString = url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
-        } else {
-            passiveAddressBarString = hostURL.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true).droppingWwwPrefix()
+    private func updateAddressBarString() {
+        addressBarString = {
+            guard ![.none, .onboarding, .newtab].contains(tab.content),
+                  let url = tab.content.userEditableUrl else { return "" }
+
+            if url.isBlobURL {
+                return url.strippingUnsupportedCredentials()
+            }
+            return url.absoluteString
+        }()
+    }
+
+    private func updatePassiveAddressBarString(showFullURL: Bool? = nil) {
+        let showFullURL = showFullURL ?? appearancePreferences.showFullURL
+        passiveAddressBarAttributedString = switch tab.content {
+        case .newtab, .onboarding, .none:
+            .init() // empty
+        case .settings(let pane):
+            .settingsTrustedIndicatorAttributedString
+        case .bookmarks:
+            .bookmarksTrustedIndicatorAttributedString
+        case .dataBrokerProtection:
+            .dbpTrustedIndicatorAttributedString
+        case .subscription:
+            .subscriptionTrustedIndicatorAttributedString
+        case .identityTheftRestoration:
+            .identityTheftRestorationTrustedIndicatorAttributedString
+        case .url(let url, _, _) where url.isDuckPlayer || url.isDuckURLScheme:
+            .duckPlayerTrustedIndicatorAttributedString
+        case .url(let url, _, _):
+            NSAttributedString(string: passiveAddressBarString(with: url, showFullURL: showFullURL))
+        }
+    }
+
+    private func passiveAddressBarString(with url: URL, showFullURL: Bool) -> String {
+        if url.isBlobURL {
+            url.strippingUnsupportedCredentials()
+
+        } else if url.isDataURL {
+            "data:"
+
+        } else if !showFullURL && url.isFileURL {
+            url.lastPathComponent
+
+        } else if !showFullURL && url.host?.isEmpty == false {
+            url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true).droppingWwwPrefix() ?? ""
+
+        } else /* display full url */ {
+            url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
         }
     }
 
@@ -422,5 +426,55 @@ extension TabViewModel: TabDataClearing {
     func prepareForDataClearing(caller: TabCleanupPreparer) {
         tab.prepareForDataClearing(caller: caller)
     }
+
+}
+
+private extension NSAttributedString {
+
+    private typealias Component = NSAttributedString
+
+    private static let spacer = NSImage() // empty spacer image attachment for Attributed Strings below
+
+    private static let duckDuckGoWithChevronAttributedString = NSAttributedString {
+        // logo
+        Component(image: .homeFavicon, rect: CGRect(x: 0, y: -3, width: 16, height: 16))
+        // spacing
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 4, height: 1))
+        // DuckDuckGo
+        Component(string: UserText.duckDuckGo)
+
+        // spacing (wide)
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 12, height: 1))
+        // chevron
+        Component(image: .chevronRight12, rect: CGRect(x: 0, y: -1, width: 12, height: 12))
+        // spacing (wide)
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 12, height: 1))
+    }
+
+    private static func trustedIndicatorAttributedString(with icon: NSImage, title: String) -> NSAttributedString {
+        NSAttributedString {
+            duckDuckGoWithChevronAttributedString
+
+            // favicon
+            Component(image: icon, rect: CGRect(x: 0, y: -3, width: 16, height: 16))
+            // spacing
+            Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 4, height: 1))
+            // title
+            Component(string: title)
+        }
+    }
+
+    static let settingsTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .settingsMulticolor16,
+                                                                                           title: UserText.settings)
+    static let bookmarksTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .bookmarksFolder,
+                                                                                            title: UserText.bookmarks)
+    static let dbpTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
+                                                                                      title: UserText.tabDataBrokerProtectionTitle)
+    static let subscriptionTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .privacyPro,
+                                                                                               title: UserText.subscription)
+    static let identityTheftRestorationTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .subscriptionIcon,
+                                                                                                           title: UserText.subscription)
+    static let duckPlayerTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .duckPlayerSettings,
+                                                                                             title: UserText.duckPlayer)
 
 }

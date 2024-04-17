@@ -230,9 +230,9 @@ final class AddressBarViewController: NSViewController {
             passiveTextField.stringValue = ""
             return
         }
-        tabViewModel.$passiveAddressBarString
+        tabViewModel.$passiveAddressBarAttributedString
             .receive(on: DispatchQueue.main)
-            .assign(to: \.stringValue, onWeaklyHeld: passiveTextField)
+            .assign(to: \.attributedStringValue, onWeaklyHeld: passiveTextField)
             .store(in: &tabViewModelCancellables)
     }
 

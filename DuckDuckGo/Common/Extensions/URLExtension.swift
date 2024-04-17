@@ -546,7 +546,7 @@ extension URL {
         return false
     }
 
-    func stripUnsupportedCredentials() -> String {
+    func strippingUnsupportedCredentials() -> String {
         if self.absoluteString.firstIndex(of: "@") != nil {
             let authPattern = "([^:]+):\\/\\/[^\\/]*@"
             let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
