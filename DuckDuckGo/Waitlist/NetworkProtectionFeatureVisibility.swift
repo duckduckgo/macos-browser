@@ -215,7 +215,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return false
         }
 
-        PixelKit.fire(VPNPrivacyProPixel.vpnBetaStoppedWhenPrivacyProEnabled, frequency: .dailyAndContinuous)
+        PixelKit.fire(VPNPrivacyProPixel.vpnBetaStoppedWhenPrivacyProEnabled, frequency: .dailyAndCount)
         defaults.vpnLegacyUserAccessDisabledOnce = true
         await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
         return true

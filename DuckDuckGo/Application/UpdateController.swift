@@ -21,6 +21,7 @@ import Combine
 import Sparkle
 import BrowserServicesKit
 import SwiftUIExtensions
+import PixelKit
 
 #if SPARKLE
 
@@ -107,7 +108,7 @@ extension UpdateController: SPUUpdaterDelegate {
             return
         }
 
-        Pixel.fire(.debug(event: .updaterAborted, error: error))
+        PixelKit.fire(DebugEvent(GeneralPixel.updaterAborted, error: error))
     }
 
     func updater(_ updater: SPUUpdater,
@@ -116,11 +117,11 @@ extension UpdateController: SPUUpdaterDelegate {
                  state: SPUUserUpdateState) {
         switch choice {
         case .skip:
-            Pixel.fire(.debug(event: .userSelectedToSkipUpdate))
+            PixelKit.fire(DebugEvent(GeneralPixel.userSelectedToSkipUpdate))
         case .install:
-            Pixel.fire(.debug(event: .userSelectedToInstallUpdate))
+            PixelKit.fire(DebugEvent(GeneralPixel.userSelectedToInstallUpdate))
         case .dismiss:
-            Pixel.fire(.debug(event: .userSelectedToDismissUpdate))
+            PixelKit.fire(DebugEvent(GeneralPixel.userSelectedToDismissUpdate))
         @unknown default:
             break
         }

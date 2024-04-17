@@ -20,6 +20,8 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
+import PixelKit
+
 import NetworkProtection
 
 #if SUBSCRIPTION
@@ -350,7 +352,7 @@ final class MoreOptionsMenu: NSMenu {
             items.append(dataBrokerProtectionItem)
 
 #if SUBSCRIPTION
-            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated  {
+            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -366,7 +368,7 @@ final class MoreOptionsMenu: NSMenu {
             }
 #endif
 
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
 
         } else {
             DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
@@ -382,7 +384,7 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(.itrIcon)
             items.append(identityTheftRestorationItem)
 
-            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated  {
+            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
                 Task {
                     let isMenuItemEnabled: Bool
 
@@ -536,7 +538,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
             let pixelParameters = self.emailManager.emailPixelParameters
             self.emailManager.updateLastUseDate()
 
-            Pixel.fire(.emailUserCreatedAlias, withAdditionalParameters: pixelParameters)
+            PixelKit.fire(GeneralPixel.emailUserCreatedAlias, withAdditionalParameters: pixelParameters)
 
             NSPasteboard.general.copy(address)
             NotificationCenter.default.post(name: NSNotification.Name.privateEmailCopiedToClipboard, object: nil)

@@ -20,6 +20,7 @@ import Combine
 import Common
 import Foundation
 import Navigation
+import PixelKit
 
 @MainActor
 private func getFirstAvailableWebView() -> WKWebView? {
@@ -482,7 +483,7 @@ final class DownloadListCoordinator {
                 }
             } catch {
                 assertionFailure("Resume data coding failed: \(error)")
-                Pixel.fire(.debug(event: .downloadResumeDataCodingFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.downloadResumeDataCodingFailed, error: error))
             }
 
             webView.resumeDownload(fromResumeData: resumeData,

@@ -1,7 +1,7 @@
 //
-//  SyncErrorHandler.swift
+//  PixelKit+Assertion.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,20 +16,10 @@
 //  limitations under the License.
 //
 
-import Common
-import DDGSync
 import Foundation
 import PixelKit
 
-public class SyncErrorHandler: EventMapping<SyncError> {
-
-    public init() {
-        super.init { event, _, _, _ in
-            PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))
-        }
-    }
-
-    override init(mapping: @escaping EventMapping<SyncError>.Mapping) {
-        fatalError("Use init()")
-    }
+public func pixelAssertionFailure(_ message: @autoclosure () -> String = String(), file: StaticString = #fileID, line: UInt = #line) {
+    PixelKit.fire(DebugEvent(GeneralPixel.assertionFailure(message: message(), file: file, line: line)))
+    Swift.assertionFailure(message(), file: file, line: line)
 }

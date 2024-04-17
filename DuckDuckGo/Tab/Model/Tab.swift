@@ -24,6 +24,7 @@ import Navigation
 import UserScript
 import WebKit
 import History
+import PixelKit
 
 // swiftlint:disable file_length
 
@@ -1179,7 +1180,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func webContentProcessDidTerminate(with reason: WKProcessTerminationReason?) {
         let error = WKError(.webContentProcessTerminated, userInfo: [
             WKProcessTerminationReason.userInfoKey: reason?.rawValue ?? -1,
-            NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage,
+            NSLocalizedDescriptionKey: UserText.webProcessCrashPageMessage
         ])
 
         if case.url(let url, _, _) = content {
@@ -1188,7 +1189,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             loadErrorHTML(error, header: UserText.webProcessCrashPageHeader, forUnreachableURL: url, alternate: true)
         }
 
-        Pixel.fire(.debug(event: .webKitDidTerminate, error: error))
+        PixelKit.fire(DebugEvent(GeneralPixel.webKitDidTerminate, error: error))
     }
 
     @MainActor

@@ -22,7 +22,7 @@ import Foundation
 ///
 /// This new implementation seeks to unify the handling of standard pixel parameters inside PixelKit.
 /// The starting example of how this can be useful is error parameter handling - this protocol allows
-/// the implementer to speciy an error without having to know about the parametrization of the error.
+/// the implementer to specify an error without having to know about its parameterisation.
 ///
 /// The reason this wasn't done directly in `PixelKitEvent` is to reduce the risk of breaking existing
 /// pixels, and to allow us to migrate towards this incrementally.
