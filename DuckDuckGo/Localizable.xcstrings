@@ -30201,42 +30201,6 @@
         }
       }
     },
-    "newTab.setup.permanent.survey.action" : {
-      "comment" : "Action title of the permanent survey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Share Your Thoughts"
-          }
-        }
-      }
-    },
-    "newTab.setup.permanent.survey.summary" : {
-      "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Take our short survey and help us build the best browser."
-          }
-        }
-      }
-    },
-    "newTab.setup.permanent.survey.title" : {
-      "comment" : "Title of the permanent survey in the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Help Us Improve"
-          }
-        }
-      }
-    },
     "newTab.setup.remove.item" : {
       "comment" : "Action title on the action menu of the set up cards card of the SetUp section in the home page to remove the item",
       "extractionState" : "extracted_with_value",
@@ -30779,7 +30743,7 @@
     },
     "newTab.setup.survey.day.14.summary" : {
       "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

@@ -469,7 +469,7 @@ extension HomePage.Models {
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionCardTitle
             case .permanentSurvey:
-                return UserText.newTabSetUpPermanentSurveyTitle
+                return "Help Us Improve"
             case .networkProtectionRemoteMessage(let message):
                 return message.cardTitle
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -494,7 +494,7 @@ extension HomePage.Models {
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionSummary
             case .permanentSurvey:
-                return UserText.newTabSetUpPermanentSurveySummary
+                return "Take our short survey and help us build the best browser."
             case .networkProtectionRemoteMessage(let message):
                 return message.cardDescription
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -519,7 +519,7 @@ extension HomePage.Models {
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionAction
             case .permanentSurvey:
-                return UserText.newTabSetUpPermanentSurveyAction
+                return "Share Your Thoughts"
             case .networkProtectionRemoteMessage(let message):
                 return message.action.actionTitle
             case .dataBrokerProtectionRemoteMessage(let message):
