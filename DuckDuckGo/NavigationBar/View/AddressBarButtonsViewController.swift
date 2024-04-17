@@ -923,7 +923,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
         guard let tabViewModel,
-              let url = tabViewModel.tab.content.url else {
+              let url = tabViewModel.tab.content.userEditableUrl else {
             assertionFailure("No URL for bookmarking")
             return (nil, false)
         }
