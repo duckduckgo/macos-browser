@@ -95,13 +95,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var updateController: UpdateController!
 #endif
 
-    static private var aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date())! // Temporary for init
-    @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: aMonthAgo)
+    @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Date.monthAgo)
     static var firstLaunchDate: Date
 
     static var isNewUser: Bool {
-        let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
-        return firstLaunchDate >= oneWeekAgo
+        return firstLaunchDate >= Date.weekAgo
     }
 
     // swiftlint:disable:next function_body_length
