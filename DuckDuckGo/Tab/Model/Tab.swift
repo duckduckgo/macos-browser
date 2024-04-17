@@ -1224,12 +1224,9 @@ protocol NewWindowPolicyDecisionMaker {
 
         webView.publisher(for: \.serverTrust)
             .sink { [weak self] serverTrust in
-                guard let self else { return }
-                self.isCertificateValid = self.certificateTrustEvaluator.evaluateCertificateTrust(trust: serverTrust)
-                if self.isCertificateValid == true {
-                    self.privacyInfo?.serverTrust = serverTrust
-                } else {
-                    self.privacyInfo?.serverTrust = nil
+                Task { [weak self] in
+                    guard let self = self else { return }
+                    await self.updatePrivacyInfo(with: serverTrust)
                 }
             }
             .store(in: &webViewCancellables)
@@ -1241,6 +1238,18 @@ protocol NewWindowPolicyDecisionMaker {
         // background tab loading should start immediately
         DispatchQueue.main.async {
             self.reloadIfNeeded(source: .loadInBackgroundIfNeeded(shouldLoadInBackground: shouldLoadInBackground))
+        }
+    }
+
+    private func updatePrivacyInfo(with trust: SecTrust?) async {
+        let isValid = await self.certificateTrustEvaluator.evaluateCertificateTrust(trust: trust)
+        await MainActor.run {
+            self.isCertificateValid = isValid
+            if isValid ?? false {
+                self.privacyInfo?.serverTrust = trust
+            } else {
+                self.privacyInfo?.serverTrust = nil
+            }
         }
     }
 
@@ -1489,15 +1498,17 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         invalidateInteractionStateData()
 
-        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled, error.errorCode != NSURLErrorServerCertificateUntrusted,
+        if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
                    // don‘t show an error page if the error was already handled
                    // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
             self.content.urlForWebView == url {
 
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
-            let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
-            loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
+            if error.errorCode != NSURLErrorServerCertificateUntrusted {
+                let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
+                loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
+            }
         }
     }
 
