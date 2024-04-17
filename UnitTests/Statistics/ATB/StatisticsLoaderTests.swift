@@ -27,13 +27,11 @@ class StatisticsLoaderTests: XCTestCase {
     private var mockAttributionsPixelHandler: MockAttributionsPixelHandler!
     private var mockStatisticsStore: StatisticsStore!
     private var testee: StatisticsLoader!
-    let pixelKit = PixelKit(dryRun: false,
-                                    appVersion: "1.0.0",
-                                    defaultHeaders: [:],
-                                    defaults: UserDefaults(),
-                                    fireRequest: { _, _, _, _, _, _ in
-
-            })
+    let pixelKit = PixelKit(dryRun: true,
+                            appVersion: "1.0.0",
+                            defaultHeaders: [:],
+                            defaults: UserDefaults(),
+                            fireRequest: { _, _, _, _, _, _ in })
 
     override func setUp() {
         PixelKit.setSharedForTesting(pixelKit: pixelKit)

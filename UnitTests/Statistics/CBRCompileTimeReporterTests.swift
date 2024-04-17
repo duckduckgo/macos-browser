@@ -28,13 +28,11 @@ class CBRCompileTimeReporterTests: XCTestCase {
     let host = "improving.duckduckgo.com"
     var tab: NSObject! = NSObject()
     var time = CACurrentMediaTime()
-    let pixelKit = PixelKit(dryRun: false,
+    let pixelKit = PixelKit(dryRun: true,
                             appVersion: "1.0.0",
                             defaultHeaders: [:],
                             defaults: UserDefaults(),
-                            fireRequest: { _, _, _, _, _, _ in
-
-    })
+                            fireRequest: { _, _, _, _, _, _ in })
 
     override func setUp() {
         PixelKit.setSharedForTesting(pixelKit: pixelKit)
