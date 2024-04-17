@@ -23,7 +23,7 @@ import SecureStorage
 final class SecureVaultLoginImporter: LoginImporter {
 
     func importLogins(_ logins: [ImportedLoginCredential], progressCallback: @escaping (Int) throws -> Void) throws -> DataImport.DataTypeSummary {
-        let vault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let vault = try AutofillSecureVaultFactory.makeVault(reporter: SecureVaultErrorReporter.shared)
 
         var successful: [String] = []
         var duplicates: [String] = []

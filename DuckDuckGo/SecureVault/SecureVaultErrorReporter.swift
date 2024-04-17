@@ -20,11 +20,11 @@ import Foundation
 import BrowserServicesKit
 import SecureStorage
 
-final class SecureVaultErrorReporter: SecureVaultErrorReporting {
+final class SecureVaultErrorReporter: SecureVaultReporting {
     static let shared = SecureVaultErrorReporter()
     private init() {}
 
-    func secureVaultInitFailed(_ error: SecureStorageError) {
+    func secureVaultError(_ error: SecureStorageError) {
         guard NSApp.runType.requiresEnvironment else { return }
 
         switch error {
