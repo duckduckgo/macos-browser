@@ -49,6 +49,7 @@ final class AddressBarButtonsViewController: NSViewController {
         return permissionAuthorizationPopover ?? {
             let popover = PermissionAuthorizationPopover()
             self.permissionAuthorizationPopover = popover
+            popover.setAccessibilityIdentifier("AddressBarButtonsViewController.permissionAuthorizationPopover")
             return popover
         }()
     }

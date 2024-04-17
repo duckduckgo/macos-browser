@@ -120,7 +120,7 @@ jobs:
       run: |
         codesign -d --entitlements :- DuckDuckGo.app > entitlements.plist
         echo "${{ env.ATB_VARIANT_NAME }}" > "DuckDuckGo.app/Contents/Resources/variant.txt"
-        echo "${{ env.ORIGIN_VARIANT_NAME }}" > "DuckDuckGo.app/Contents/Resources/origin.txt"
+        echo "${{ env.ORIGIN_VARIANT_NAME }}" > "DuckDuckGo.app/Contents/Resources/Origin.txt"
         sign_identity="$(security find-certificate -a -c "Developer ID Application" -Z | grep ^SHA-1 | cut -d " " -f3 | uniq)"
 
         /usr/bin/codesign \
