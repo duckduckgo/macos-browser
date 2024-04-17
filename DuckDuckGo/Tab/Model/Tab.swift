@@ -101,6 +101,7 @@ protocol NewWindowPolicyDecisionMaker {
                      favicon: NSImage? = nil,
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
+                     securityOrigin: SecurityOrigin? = nil,
                      shouldLoadInBackground: Bool = false,
                      burnerMode: BurnerMode = .regular,
                      canBeClosedWithBack: Bool = false,
@@ -142,6 +143,7 @@ protocol NewWindowPolicyDecisionMaker {
                   favicon: favicon,
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
+                  securityOrigin: securityOrigin,
                   shouldLoadInBackground: shouldLoadInBackground,
                   burnerMode: burnerMode,
                   canBeClosedWithBack: canBeClosedWithBack,
@@ -174,6 +176,7 @@ protocol NewWindowPolicyDecisionMaker {
          favicon: NSImage?,
          interactionStateData: Data?,
          parentTab: Tab?,
+         securityOrigin: SecurityOrigin? = nil,
          shouldLoadInBackground: Bool,
          burnerMode: BurnerMode,
          canBeClosedWithBack: Bool,
@@ -192,6 +195,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.title = title
         self.favicon = favicon
         self.parentTab = parentTab
+        self.securityOrigin = securityOrigin ?? .empty
         self.burnerMode = burnerMode
         self._canBeClosedWithBack = canBeClosedWithBack
         self.interactionState = interactionStateData.map(InteractionState.loadCachedFromTabContent) ?? .none
@@ -374,13 +378,18 @@ protocol NewWindowPolicyDecisionMaker {
 
     // MARK: - Event Publishers
 
-    let webViewDidStartNavigationPublisher = PassthroughSubject<Void, Never>()
-    let webViewDidReceiveUserInteractiveChallengePublisher = PassthroughSubject<Void, Never>()
-    let webViewDidReceiveRedirectPublisher = PassthroughSubject<Void, Never>()
-    var webViewDidCommitNavigationPublisher: some Publisher<Void, Never> {
-        $committedURL.dropFirst().asVoid()
+    /// Publishes currently active main frame Navigation state
+    var navigationStatePublisher: some Publisher<NavigationState?, Never> {
+        navigationDelegate.$currentNavigation.map { currentNavigation -> AnyPublisher<NavigationState?, Never> in
+            MainActor.assumeIsolated {
+                currentNavigation?.$state.map { $0 }.eraseToAnyPublisher() ?? Just(nil).eraseToAnyPublisher()
+            }
+        }.switchToLatest()
     }
-    let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
+
+    var webViewDidFinishNavigationPublisher: some Publisher<Void, Never> {
+        navigationStatePublisher.compactMap { $0 }.filter { $0.isFinished }.asVoid()
+    }
 
     // MARK: - Properties
 
@@ -401,16 +410,19 @@ protocol NewWindowPolicyDecisionMaker {
             if navigationDelegate.currentNavigation == nil {
                 updateCanGoBackForward(withCurrentNavigation: nil)
             }
-            error = nil
         }
     }
 
-    /// Use this property to obtain the accurate URL of the displayed content
+    /// Currently committed page security origin (protocol, host, port).
     ///
-    /// When a navigation request is made, the web view goes through a series of steps to load and display the requested content.
-    /// The committedURL property reflects the URL of the web page that has undergone this process and is currently being displayed in the web view.
-    /// Navigations that are still in progress or not yet committed won't have their URLs reflected in the committedURL property.
-    @PublishedAfter private(set) var committedURL: URL?
+    /// Set to the opener location security origin for popup Tabs.
+    /// Used to safely update the Address Bar displayed URL to protect from spoofing attacks
+    ///
+    /// see https://github.com/mozilla-mobile/firefox-ios/wiki/WKWebView-navigation-and-security-considerations
+    @Published private(set) var securityOrigin: SecurityOrigin = .empty
+
+    /// Set to true when the Tab‘s first navigation is committed
+    @Published var hasCommittedContent = false
 
     @discardableResult
     func setContent(_ newContent: TabContent) -> ExpectedNavigation? {
@@ -435,6 +447,8 @@ protocol NewWindowPolicyDecisionMaker {
         if let title = content.title {
             self.title = title
         }
+
+        if error != nil { error = nil }
 
         return reloadIfNeeded(source: .contentUpdated)
     }
@@ -1033,9 +1047,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic else { return nil }
 
-        // send this event only when we're interrupting loading and showing extra UI to the user
-        webViewDidReceiveUserInteractiveChallengePublisher.send()
-
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if case .url(let url, credential: .some(let credential), source: let source) = content,
            url.matches(challenge.protectionSpace),
@@ -1059,13 +1070,19 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
     }
 
-    func didReceiveRedirect(_ navigationAction: NavigationAction, for navigation: Navigation) {
-        webViewDidReceiveRedirectPublisher.send()
-    }
-
     @MainActor
     func didCommit(_ navigation: Navigation) {
-        committedURL = navigation.url
+        let securityOrigin = if !navigation.url.securityOrigin.isEmpty {
+            navigation.url.securityOrigin
+        } else {
+            navigation.navigationAction.sourceFrame.securityOrigin
+        }
+        if !securityOrigin.isEmpty || self.hasCommittedContent {
+            // don‘t reset the initially passed parent tab SecurityOrigin to an empty one for "about:blank" page
+            self.securityOrigin = securityOrigin
+        }
+
+        hasCommittedContent = true
     }
 
     @MainActor
@@ -1112,7 +1129,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func didStart(_ navigation: Navigation) {
-        webViewDidStartNavigationPublisher.send()
         delegate?.tabDidStartNavigation(self)
         permissions.tabDidStartNavigation()
         userInteractionDialog = nil
@@ -1129,7 +1145,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
         invalidateInteractionStateData()
-        webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
     }
 
@@ -1138,9 +1153,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         guard navigation.isCurrent else { return }
 
         invalidateInteractionStateData()
-        if navigation.url.host == committedURL?.host {
-            committedURL = navigation.url
-        }
     }
 
     @MainActor
@@ -1153,7 +1165,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         if !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
                    // don‘t show an error page if the error was already handled
                    // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
-            self.content.urlForWebView == url {
+            self.content.urlForWebView == url || self.content == .none /* when navigation fails instantly we may have no content set yet */ {
 
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
