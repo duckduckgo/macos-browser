@@ -119,18 +119,54 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         XCTAssertTrue(result.isEmpty)
     }
 
-    func testShouldSetNameAndURLToValueWhenInitModeIsAddTabInfoIsNotNilAndURLIsNotAlreadyBookmarked() {
+    func testWhenInitModeIsAddAndTabInfoIsNotNilAndURLIsNotAlreadyBookmarkedThenSetURLToValue() {
+        // GIVEN
+        let tab = Tab(content: .url(URL.duckDuckGo, source: .link), title: "Test")
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: WebsiteInfo(tab)), bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let url = sut.bookmarkURLPath
+
+        // THEN
+        XCTAssertEqual(url, URL.duckDuckGo.absoluteString)
+    }
+
+    func testWhenInitAndModeIsAddAndTabInfoTitleIsNotNilAndURLIsNotAlreadyBookmarkedThenSetBookmarkNameToTitle() {
         // GIVEN
         let tab = Tab(content: .url(URL.duckDuckGo, source: .link), title: "Test")
         let sut = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: WebsiteInfo(tab)), bookmarkManager: bookmarkManager)
 
         // WHEN
         let name = sut.bookmarkName
-        let url = sut.bookmarkURLPath
 
         // THEN
         XCTAssertEqual(name, "Test")
-        XCTAssertEqual(url, URL.duckDuckGo.absoluteString)
+    }
+
+    func testWhenInitAndModeIsAddAndTabInfoTitleIsNilAndURLIsNotAlreadyBookmarkedThenSetBookmarkNameToURLDomain() {
+        // GIVEN
+        let url = URL.duckDuckGo
+        let tab = Tab(content: .url(url, source: .link), title: nil)
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: WebsiteInfo(tab)), bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let name = sut.bookmarkName
+
+        // THEN
+        XCTAssertEqual(name, url.host)
+    }
+
+    func testWhenInitAndModeIsAddAndTabInfoTitleIsNilAndURLDoesNotConformToRFC3986AndURLIsNotAlreadyBookmarkedThenSetBookmarkNameToURLAbsoluteString() throws {
+        // GIVEN
+        let url = try XCTUnwrap(URL(string: "duckduckgo.com"))
+        let tab = Tab(content: .url(url, source: .link), title: nil)
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: WebsiteInfo(tab)), bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let name = sut.bookmarkName
+
+        // THEN
+        XCTAssertEqual(name, url.absoluteString)
     }
 
     func testShouldSetNameAndURLToEmptyWhenInitModeIsAddTabInfoIsNotNilAndURLIsAlreadyBookmarked() throws {

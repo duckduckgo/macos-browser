@@ -89,7 +89,7 @@ final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
             // Scenario we click on the "Add Bookmark" button from Bookmarks shortcut Panel. If Tab has a Bookmark loaded we present the dialog with prepopulated name and URL from the tab.
             // If we save and click again on the "Add Bookmark" button we don't want to try re-add the same bookmark. Hence we present a dialog that is not pre-populated.
             let isAlreadyBookmarked = websiteInfo.flatMap { bookmarkManager.isUrlBookmarked(url: $0.url) } ?? false
-            let websiteName = isAlreadyBookmarked ? "" : websiteInfo?.title ?? ""
+            let websiteName = isAlreadyBookmarked ? "" : websiteInfo?.bookmarkTitle ?? ""
             let websiteURLPath = isAlreadyBookmarked ? "" : websiteInfo?.url.absoluteString ?? ""
             bookmarkName = websiteName
             bookmarkURLPath = websiteURLPath
