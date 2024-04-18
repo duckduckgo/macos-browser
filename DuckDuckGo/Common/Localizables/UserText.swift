@@ -1120,7 +1120,7 @@ struct UserText {
                 static let folderName = NSLocalizedString("bookmarks.dialog.field.folderName", value: "Folder Name", comment: "Folder name field label for Bookmarks folder")
             }
             enum Value {
-                static let folderName = NSLocalizedString("bookmarks.dialog.field.folderName", value: "%@ - Tabs (%d)", comment: "The suggested name of the folder that will contain the bookmark tabs. Eg. 2024-02-12 - Tabs (42)")
+                static let folderName = NSLocalizedString("bookmarks.dialog.field.folderName.value", value: "%@ - Tabs (%d)", comment: "The suggested name of the folder that will contain the bookmark tabs. Eg. 2024-02-12 - Tabs (42)")
             }
             enum Action {
                 static let addBookmark = NSLocalizedString("bookmarks.dialog.action.addBookmark", value: "Add Bookmark", comment: "CTA title for adding a Bookmark")

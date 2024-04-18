@@ -8787,13 +8787,25 @@
       }
     },
     "bookmarks.dialog.field.folderName" : {
-      "comment" : "Folder name field label for Bookmarks folder\n   The suggested name of the folder that will contain the bookmark tabs. Eg. 2024-02-12 - Tabs (42)",
+      "comment" : "Folder name field label for Bookmarks folder",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Folder Name"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.folderName.value" : {
+      "comment" : "The suggested name of the folder that will contain the bookmark tabs. Eg. 2024-02-12 - Tabs (42)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - Tabs (%2$d)"
           }
         }
       }
