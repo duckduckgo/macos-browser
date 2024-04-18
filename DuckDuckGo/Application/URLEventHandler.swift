@@ -151,11 +151,9 @@ final class URLEventHandler {
         case AppLaunchCommand.showVPNLocations.launchURL:
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
             WindowControllersManager.shared.showLocationPickerSheet()
-#if SUBSCRIPTION
         case AppLaunchCommand.showPrivacyPro.launchURL:
             WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
-#endif
 #if !APPSTORE && !DEBUG
         case AppLaunchCommand.moveAppToApplications.launchURL:
             // this should be run after NSApplication.shared is set

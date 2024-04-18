@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if SUBSCRIPTION
-
 import BrowserServicesKit
 import Common
 import Combine
@@ -79,7 +77,7 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 /// Use Subscription sub-feature
 ///
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
     var featureName = "useSubscription"
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
         .exact(hostname: "duckduckgo.com"),
@@ -465,7 +463,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
-        let broker = UserScriptMessageBroker(context: SubscriptionPagesUserScript.context, requiresRunInPageContentWorld: true )
+        guard let broker else {
+            assertionFailure("Cannot continue without broker instance")
+            return
+        }
+
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }
 }
@@ -519,5 +521,3 @@ extension MainWindowController {
         })
     }
 }
-
-#endif

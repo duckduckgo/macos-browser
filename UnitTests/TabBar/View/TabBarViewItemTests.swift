@@ -17,10 +17,7 @@
 //
 
 import XCTest
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -163,7 +160,6 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(bookmarkItem?.isEnabled ?? false)
     }
 
-#if SUBSCRIPTION
     func testSubscriptionTabDisabledItems() {
         // Set up fake views for the TabBarViewItems
         let textField = NSTextField()
@@ -196,6 +192,5 @@ final class TabBarViewItemTests: XCTestCase {
         let bookmarkItem = menu.items.first { $0.title == UserText.bookmarkThisPage }
         XCTAssertFalse(bookmarkItem?.isEnabled ?? true)
     }
-#endif
 
 }

@@ -32,7 +32,6 @@ let package = Package(
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "134.1.0-1"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../XPCHelper"),
-        .package(url: "https://github.com/duckduckgo/apple-toolbox.git", exact: "2.0.0"),
     ],
     targets: [
         .target(
@@ -46,16 +45,14 @@ let package = Package(
             resources: [.process("Resources")],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
+            ]
         ),
         .testTarget(
             name: "DataBrokerProtectionTests",
             dependencies: [
                 "DataBrokerProtection",
                 "BrowserServicesKit",
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "apple-toolbox")]
+            ]
         )
     ]
 )

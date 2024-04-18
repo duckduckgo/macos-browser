@@ -32,9 +32,7 @@ import SystemExtensionManager
 import SystemExtensions
 #endif
 
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
@@ -74,11 +72,9 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
 
-#if SUBSCRIPTION
     // MARK: - Subscriptions
 
     private let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-#endif
 
     // MARK: - Debug Options Support
 
@@ -748,12 +744,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     }
 
     private func fetchAuthToken() throws -> NSString? {
-#if SUBSCRIPTION
         if let accessToken = accountManager.accessToken {
             os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         }
-#endif
         os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
         return try tokenStore.fetchToken() as NSString?
     }
