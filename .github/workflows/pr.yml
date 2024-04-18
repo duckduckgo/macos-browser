@@ -256,10 +256,6 @@ jobs:
     # workflow_call is used by bump_internal_release and is followed by a proper release job
     if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
 
-    strategy:
-      matrix:
-        scheme: [ "DuckDuckGo Privacy Browser", "DuckDuckGo Privacy Pro" ]
-
     runs-on: macos-13-xlarge
     timeout-minutes: 30
 
@@ -311,7 +307,7 @@ jobs:
       run: |
         export OS_ACTIVITY_MODE=debug
         set -o pipefail && xcodebuild \
-          -scheme "${{ matrix.scheme }}" \
+          -scheme "DuckDuckGo Privacy Browser" \
           -derivedDataPath "DerivedData" \
           -configuration "Release" \
           -skipPackagePluginValidation -skipMacroValidation \

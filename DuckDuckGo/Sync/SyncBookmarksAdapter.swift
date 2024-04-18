@@ -22,12 +22,13 @@ import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
+import PixelKit
 
 public class BookmarksFaviconsFetcherErrorHandler: EventMapping<BookmarksFaviconsFetcherError> {
 
     public init() {
         super.init { event, _, _, _ in
-            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherFailed, error: event.underlyingError))
+            PixelKit.fire(DebugEvent(GeneralPixel.bookmarksFaviconsFetcherFailed, error: event.underlyingError))
         }
     }
 
@@ -147,7 +148,7 @@ final class SyncBookmarksAdapter {
         do {
             stateStore = try BookmarksFaviconsFetcherStateStore(applicationSupportURL: URL.sandboxApplicationSupportURL)
         } catch {
-            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
             os_log(.error, log: OSLog.sync, "Failed to initialize BookmarksFaviconsFetcherStateStore: %{public}s", String(reflecting: error))
             return nil
         }
@@ -167,17 +168,17 @@ final class SyncBookmarksAdapter {
             .sink { [weak self] error in
                 switch error {
                 case let syncError as SyncError:
-                    Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: syncError))
                     switch syncError {
                     case .unexpectedStatusCode(409):
                         // If bookmarks count limit has been exceeded
                         self?.isSyncBookmarksPaused = true
-                        Pixel.fire(.syncBookmarksCountLimitExceededDaily, limitTo: .dailyFirst)
+                        PixelKit.fire(GeneralPixel.syncBookmarksCountLimitExceededDaily, frequency: .daily)
                         self?.showSyncPausedAlert()
                     case .unexpectedStatusCode(413):
                         // If bookmarks request size limit has been exceeded
                         self?.isSyncBookmarksPaused = true
-                        Pixel.fire(.syncBookmarksRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
+                        PixelKit.fire(GeneralPixel.syncBookmarksRequestSizeLimitExceededDaily, frequency: .daily)
                         self?.showSyncPausedAlert()
                     default:
                         break
@@ -187,7 +188,7 @@ final class SyncBookmarksAdapter {
                     if nsError.domain != NSURLErrorDomain {
                         let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
                         let params = processedErrors.errorPixelParameters
-                        Pixel.fire(.debug(event: .syncBookmarksFailed, error: error), withAdditionalParameters: params)
+                        PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: error), withAdditionalParameters: params)
                     }
                 }
                 os_log(.error, log: OSLog.sync, "Bookmarks Sync error: %{public}s", String(reflecting: error))
