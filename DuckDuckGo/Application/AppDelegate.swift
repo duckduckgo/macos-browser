@@ -284,7 +284,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 #if APPSTORE
         crashCollection.start { pixelParameters, payloads, completion in
-            pixelParameters.forEach { _ in Pixel.fire(.crash) }
+            pixelParameters.forEach { _ in PixelKit.fire(GeneralPixel.crash) }
             guard let lastPayload = payloads.last else {
                 return
             }
