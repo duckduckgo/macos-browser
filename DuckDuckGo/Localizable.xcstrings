@@ -6253,6 +6253,18 @@
         }
       }
     },
+    "bitwarden.incompatible" : {
+      "comment" : "Message that warns user that specific Bitwarden app vesions are not compatible with this app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please install a newer or older version."
+          }
+        }
+      }
+    },
     "bitwarden.install" : {
       "comment" : "Button to install Bitwarden app",
       "extractionState" : "extracted_with_value",

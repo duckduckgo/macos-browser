@@ -205,6 +205,11 @@ extension Preferences {
                                     title: UserText.bitwardenOldVersion,
                                     buttonValue: nil)
                 .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .incompatible:
+                BitwardenStatusView(iconType: .warning,
+                                    title: UserText.bitwardenIncompatible,
+                                    buttonValue: nil)
+                .offset(x: Preferences.Const.autoLockWarningOffset)
             case .notRunning:
                 BitwardenStatusView(iconType: .warning,
                                     title: UserText.bitwardenPreferencesRun,
