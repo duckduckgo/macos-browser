@@ -30,3 +30,29 @@ import Foundation
 public protocol PixelKitEventV2: PixelKitEvent {
     var error: Error? { get }
 }
+
+/// Protocol to support mocking pixel firing.
+///
+/// We're adding support for `PixelKitEventV2` events strategically because adding support for earlier pixels
+/// would be more complicated and time consuming.  The idea of V2 events is that fire calls should not include a lot
+/// of parameters.  Parameters should be provided by the `PixelKitEventV2` protocol (extending it if necessary)
+/// and the call to `fire` should process those properties to serialize in the requests.
+///
+public protocol PixelFiring {
+    func fire(_ event: PixelKitEventV2)
+
+    func fire(_ event: PixelKitEventV2,
+              frequency: PixelKit.Frequency)
+}
+
+extension PixelKit: PixelFiring {
+    public func fire(_ event: PixelKitEventV2) {
+        fire(event, frequency: .standard)
+    }
+
+    public func fire(_ event: PixelKitEventV2,
+                     frequency: PixelKit.Frequency) {
+
+        fire(event, frequency: frequency, onComplete: { _, _ in })
+    }
+}
