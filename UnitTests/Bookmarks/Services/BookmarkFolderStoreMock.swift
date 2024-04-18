@@ -1,5 +1,5 @@
 //
-//  WebsiteInfo.swift
+//  BookmarkFolderStoreMock.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,16 +17,9 @@
 //
 
 import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
-struct WebsiteInfo: Equatable {
-    let url: URL
-    let title: String?
+final class BookmarkFolderStoreMock: BookmarkFoldersStore {
+    var lastBookmarkAllTabsFolderIdUsed: String?
 
-    init?(_ tab: Tab) {
-        guard case let .url(url, _, _) = tab.content else {
-            return nil
-        }
-        self.url = url
-        self.title = tab.title
-    }
 }

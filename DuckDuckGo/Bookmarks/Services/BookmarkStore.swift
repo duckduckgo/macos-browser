@@ -59,6 +59,6 @@ protocol BookmarkStore {
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
-
+    func bookmarkAll(websitesInfo: [WebsiteInfo], withinParentFolder parent: ParentFolderType)
     func handleFavoritesAfterDisablingSync()
 }
