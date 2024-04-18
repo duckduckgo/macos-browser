@@ -88,7 +88,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
 
         func handleFailure(_ error: Error) {
             log(error)
-            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
+            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndContinuous)
         }
 
         do {
@@ -98,7 +98,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
                 if let error {
                     handleFailure(error)
                 } else {
-                    pixelKit?.fire(StartAttempt.success, frequency: .dailyAndCount)
+                    pixelKit?.fire(StartAttempt.success, frequency: .dailyAndContinuous)
                 }
             }
         } catch {
@@ -112,7 +112,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
 
         func handleFailure(_ error: Error) {
             log(error)
-            pixelKit?.fire(StopAttempt.failure(error), frequency: .dailyAndCount)
+            pixelKit?.fire(StopAttempt.failure(error), frequency: .dailyAndContinuous)
         }
 
         do {
@@ -122,7 +122,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
                 if let error {
                     handleFailure(error)
                 } else {
-                    pixelKit?.fire(StopAttempt.success, frequency: .dailyAndCount)
+                    pixelKit?.fire(StopAttempt.success, frequency: .dailyAndContinuous)
                 }
             }
         } catch {

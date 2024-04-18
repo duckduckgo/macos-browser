@@ -31,7 +31,7 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
     func testStartTunnelSuccess() async {
         let pixelKit = PixelKitMock(expecting: [
             .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.begin, frequency: .standard),
-            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.success, frequency: .dailyAndCount)
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.success, frequency: .dailyAndContinuous)
         ])
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
@@ -50,7 +50,7 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
 
         let pixelKit = PixelKitMock(expecting: [
             .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.begin, frequency: .standard),
-            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.failure(expectedError), frequency: .dailyAndCount)
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.failure(expectedError), frequency: .dailyAndContinuous)
         ])
 
         let controller = NetworkProtectionIPCTunnelController(
@@ -68,7 +68,7 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
         let error = NSError(domain: "test", code: 1)
         let pixelKit = PixelKitMock(expecting: [
             .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.begin, frequency: .standard),
-            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.failure(error), frequency: .dailyAndCount)
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.failure(error), frequency: .dailyAndContinuous)
         ])
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
@@ -86,7 +86,7 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
     func testStopTunnelSuccess() async {
         let pixelKit = PixelKitMock(expecting: [
             .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.begin, frequency: .standard),
-            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.success, frequency: .dailyAndCount)
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.success, frequency: .dailyAndContinuous)
         ])
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
@@ -105,7 +105,7 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
 
         let pixelKit = PixelKitMock(expecting: [
             .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.begin, frequency: .standard),
-            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.failure(expectedError), frequency: .dailyAndCount)
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.failure(expectedError), frequency: .dailyAndContinuous)
         ])
 
         let controller = NetworkProtectionIPCTunnelController(
@@ -123,7 +123,7 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
         let error = NSError(domain: "test", code: 1)
         let pixelKit = PixelKitMock(expecting: [
             .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.begin, frequency: .standard),
-            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.failure(error), frequency: .dailyAndCount)
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.failure(error), frequency: .dailyAndContinuous)
         ])
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
