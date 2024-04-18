@@ -65,6 +65,7 @@ final class PixelKitParametersTests: XCTestCase {
             ])
 
         fire(TestEvent.errorEvent(error: topLevelError),
+             frequency: .standard,
              and: .expect(pixelName: "m_mac_error_event",
                           error: topLevelError,
                           underlyingErrors: [underlyingError2, underlyingError3]),

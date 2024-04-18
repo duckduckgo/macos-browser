@@ -190,6 +190,9 @@ enum UserText {
     }
 
     static let syncErrorAlertTitle = NSLocalizedString("alert.sync-error", bundle: Bundle.module, value: "Sync & Backup Error", comment: "Title for sync error alert")
+    static let syncDeviceAuthenticationErrorAlertTitle = NSLocalizedString("alert.sync-device-auth-error", bundle: Bundle.module, value: "Sync & Backup Error", comment: "Title for an error alert")
+    static let syncDeviceAuthenticationErrorAlertButton = NSLocalizedString("alert.sync-device-auth-error-button", bundle: Bundle.module, value: "Go to Settings", comment: "Button Title of an error alert")
+    static let unableToAuthenticateDevice = NSLocalizedString("alert.unable-to-authenticate-device", bundle: Bundle.module, value: "A device password is required to use Sync & Backup.", comment: "Description for  unable to authenticate error")
     static let unableToSyncToServerDescription = NSLocalizedString("alert.unable-to-sync-to-server-description", bundle: Bundle.module, value: "Unable to connect to the server.", comment: "Description for unable to sync to server error")
     static let unableToSyncWithAnotherDeviceDescription = NSLocalizedString("alert.unable-to-sync-with-another-device-description", bundle: Bundle.module, value: "Unable to Sync with another device.", comment: "Description for unable to sync with another device error")
     static let unableToMergeTwoAccountsDescription = NSLocalizedString("alert.unable-to-merge-two-accounts-description", bundle: Bundle.module, value: "To pair these devices, turn off Sync & Backup on one device then tap \"Sync With Another Device\" on the other device.", comment: "Description for unable to merge two accounts error")

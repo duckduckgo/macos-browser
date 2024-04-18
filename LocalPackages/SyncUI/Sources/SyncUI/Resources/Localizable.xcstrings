@@ -119,6 +119,30 @@
         }
       }
     },
+    "alert.sync-device-auth-error" : {
+      "comment" : "Title for an error alert",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup Error"
+          }
+        }
+      }
+    },
+    "alert.sync-device-auth-error-button" : {
+      "comment" : "Button Title of an error alert",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Go to Settings"
+          }
+        }
+      }
+    },
     "alert.sync-error" : {
       "comment" : "Title for sync error alert",
       "extractionState" : "extracted_with_value",
@@ -175,6 +199,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка синхронизации и резервного копирования"
+          }
+        }
+      }
+    },
+    "alert.unable-to-authenticate-device" : {
+      "comment" : "Description for  unable to authenticate error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A device password is required to use Sync & Backup."
           }
         }
       }
@@ -4743,9 +4779,57 @@
       "comment" : "Alert message for multiple invalid bookmark being filtered out of synced data",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Some bookmarks (%d) can't sync because some of their fields exceed the character limit."
           }
         }
@@ -4755,9 +4839,57 @@
       "comment" : "Alert message for 1 invalid bookmark being filtered out of synced data",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Your bookmark for %@ can't sync because one of its fields exceeds the character limit."
           }
         }
@@ -4767,9 +4899,57 @@
       "comment" : "Alert title for invalid bookmarks being filtered out of synced data",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Some bookmarks are not syncing due to excessively long content in certain fields."
           }
         }
@@ -4779,9 +4959,57 @@
       "comment" : "Alert message for multiple invalid logins being filtered out of synced data",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Some passwords (n) can't sync because some of their fields exceed the character limit."
           }
         }
@@ -4791,9 +5019,57 @@
       "comment" : "Alert message for 1 invalid login being filtered out of synced data",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Your password for %@ can't sync because one of its fields exceeds the character limit."
           }
         }
@@ -4803,9 +5079,57 @@
       "comment" : "Alert title for invalid logins being filtered out of synced data",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some logins are not syncing due to excessively long content in certain fields."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Some logins are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some logins are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some logins are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some logins are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some logins are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some logins are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some logins are not syncing due to excessively long content in certain fields."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Some logins are not syncing due to excessively long content in certain fields."
           }
         }

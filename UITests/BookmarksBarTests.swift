@@ -35,6 +35,10 @@ class BookmarksBarTests: XCTestCase {
     private var addressBarTextField: XCUIElement!
     private let titleStringLength = 12
 
+    override class func setUp() {
+        UITests.firstRun()
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()

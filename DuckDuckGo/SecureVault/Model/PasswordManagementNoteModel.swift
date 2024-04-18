@@ -28,7 +28,7 @@ final class PasswordManagementNoteModel: ObservableObject, PasswordManagementIte
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .medium
         return dateFormatter
-    } ()
+    }()
 
     var onDirtyChanged: (Bool) -> Void
     var onSaveRequested: (SecureVaultModels.Note) -> Void

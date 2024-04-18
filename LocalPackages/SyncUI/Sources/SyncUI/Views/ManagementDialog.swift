@@ -30,6 +30,7 @@ public enum ManagementDialogKind: Equatable {
     case syncWithServer
     case enterRecoveryCode(code: String)
     case recoverSyncedData
+    case empty
 }
 
 public struct ManagementDialog: View {
@@ -49,6 +50,10 @@ public struct ManagementDialog: View {
         return typeDescription + "\n" + errorDescription
     }
 
+    var buttonTitle: String {
+        return model.syncErrorMessage?.type.buttonTitle ?? UserText.ok
+    }
+
     public init(model: ManagementDialogModel, recoveryCodeModel: RecoveryCodeViewModel = .init()) {
         self.model = model
         self.recoveryCodeModel = recoveryCodeModel
@@ -60,7 +65,7 @@ public struct ManagementDialog: View {
                 Alert(
                     title: Text(errorTitle),
                     message: Text(errorDescription),
-                    dismissButton: .default(Text(UserText.ok)) {
+                    dismissButton: .default(Text(buttonTitle)) {
                         model.endFlow()
                     }
                 )

@@ -136,4 +136,28 @@ final class URLExtensionTests: XCTestCase {
         }
     }
 
+    func testWhenGetHostAndPort_WithPort_ThenHostAndPortIsReturned() throws {
+        // Given
+        let expected = "duckduckgo.com:1234"
+        let sut = URL(string: "https://duckduckgo.com:1234")
+
+        // When
+        let result = sut?.hostAndPort()
+
+        // Then
+        XCTAssertEqual(expected, result)
+    }
+
+    func testWhenGetHostAndPort_WithoutPort_ThenHostReturned() throws {
+        // Given
+        let expected = "duckduckgo.com"
+        let sut = URL(string: "https://duckduckgo.com")
+
+        // When
+        let result = sut?.hostAndPort()
+
+        // Then
+        XCTAssertEqual(expected, result)
+    }
+
 }

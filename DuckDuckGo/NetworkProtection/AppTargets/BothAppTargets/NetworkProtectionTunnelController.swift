@@ -32,9 +32,7 @@ import SystemExtensionManager
 import SystemExtensions
 #endif
 
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
@@ -74,11 +72,9 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
 
-#if SUBSCRIPTION
     // MARK: - Subscriptions
 
     private let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-#endif
 
     // MARK: - Debug Options Support
 
@@ -418,16 +414,16 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case SystemExtensionRequestError.unknownRequestResult:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionUnknownActivationError
-            case SystemExtensionRequestError.willActivateAfterReboot:
+            case OSSystemExtensionError.extensionNotFound,
+                SystemExtensionRequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
             default:
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
             }
 
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure,
+                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure(error),
                 frequency: .standard,
-                withError: error,
                 includeAppVersionParameter: true
             )
 
@@ -485,7 +481,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     func start() async {
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
-                      frequency: .dailyAndContinuous)
+                      frequency: .dailyAndCount)
         controllerErrorStore.lastErrorMessage = nil
 
         do {
@@ -526,11 +522,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 // in the packet tunnel provider side that can be used to debug additional logic.
                 //
                 PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartSuccess,
-                              frequency: .dailyAndContinuous)
+                              frequency: .dailyAndCount)
             }
         } catch {
             PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndContinuous, includeAppVersionParameter: true
+                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndCount, includeAppVersionParameter: true
             )
 
             await stop()
@@ -582,7 +578,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
         PixelKit.fire(
             NetworkProtectionPixelEvent.networkProtectionNewUser,
-            frequency: .justOnce,
+            frequency: .unique,
             includeAppVersionParameter: true) { [weak self] fired, error in
                 guard let self, error == nil, fired else { return }
                 self.defaults.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)
@@ -748,12 +744,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     }
 
     private func fetchAuthToken() throws -> NSString? {
-#if SUBSCRIPTION
-        if let accessToken = accountManager.accessToken  {
+        if let accessToken = accountManager.accessToken {
             os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         }
-#endif
         os_log(.error, log: .networkProtection, "🔴 TunnelController found no token :(")
         return try tokenStore.fetchToken() as NSString?
     }
