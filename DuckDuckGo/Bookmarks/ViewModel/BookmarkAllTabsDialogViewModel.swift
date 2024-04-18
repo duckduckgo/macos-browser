@@ -85,7 +85,7 @@ final class BookmarkAllTabsDialogViewModel: BookmarkAllTabsDialogEditing {
 
         // Save all bookmarks
         let parentFolder: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
-        bookmarkManager.bookmarkAll(websitesInfo: websites, withinParentFolder: parentFolder)
+        bookmarkManager.makeBookmarks(for: websites, inNewFolderNamed: folderName, withinParentFolder: parentFolder)
 
         // Dismiss the view
         dismiss()

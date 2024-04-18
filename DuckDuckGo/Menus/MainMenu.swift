@@ -557,6 +557,14 @@ import SubscriptionUI
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()
+            NSMenuItem(title: "Tab") {
+                NSMenuItem(title: "Append Tabs") {
+                    NSMenuItem(title: "10 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 10)
+                    NSMenuItem(title: "50 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 50)
+                    NSMenuItem(title: "100 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 100)
+                    NSMenuItem(title: "150 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 150)
+                }
+            }
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))

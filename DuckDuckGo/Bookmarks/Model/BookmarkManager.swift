@@ -31,6 +31,7 @@ protocol BookmarkManager: AnyObject {
     func getBookmarkFolder(withId id: String) -> BookmarkFolder?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
+    func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
     func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
@@ -47,7 +48,6 @@ protocol BookmarkManager: AnyObject {
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
-    func bookmarkAll(websitesInfo: [WebsiteInfo], withinParentFolder parent: ParentFolderType)
     func handleFavoritesAfterDisablingSync()
 
     // Wrapper definition in a protocol is not supported yet
@@ -170,6 +170,12 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         return bookmark
+    }
+
+    func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType) {
+        bookmarkStore.saveBookmarks(for: websitesInfo, inNewFolderNamed: folderName, withinParentFolder: parent)
+        loadBookmarks()
+        requestSync()
     }
 
     func remove(bookmark: Bookmark) {
@@ -351,11 +357,6 @@ final class LocalBookmarkManager: BookmarkManager {
         requestSync()
 
         return results
-    }
-
-    func bookmarkAll(websitesInfo: [WebsiteInfo], withinParentFolder parent: ParentFolderType) {
-        // TODO: https://app.asana.com/0/0/1207032959154802/f
-        bookmarkStore.bookmarkAll(websitesInfo: websitesInfo, withinParentFolder: parent)
     }
 
     // MARK: - Sync
