@@ -263,6 +263,7 @@ public struct TunnelControllerView: View {
                                     .frame(width: 16, height: 16)
                             } else {
                                 Image(NetworkProtectionAsset.nearestAvailable)
+                                    .renderingMode(colorScheme == .light ? .original : .template)
                                     .frame(width: 16, height: 16)
                             }
                         }
@@ -365,10 +366,12 @@ public struct TunnelControllerView: View {
 
             Group {
                 Image(NetworkProtectionAsset.dataReceived)
+                    .renderingMode(colorScheme == .light ? .original : .template)
                     .frame(width: 12, height: 12)
                 Text(dataVolume.dataReceived)
                     .applyDataVolumeAttributes(colorScheme: colorScheme)
                 Image(NetworkProtectionAsset.dataSent)
+                    .renderingMode(colorScheme == .light ? .original : .template)
                     .frame(width: 12, height: 12)
                     .padding(.leading, 4)
                 Text(dataVolume.dataSent)
