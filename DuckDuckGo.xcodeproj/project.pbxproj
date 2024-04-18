@@ -1030,7 +1030,6 @@
 		37CEFCAA2A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */; };
 		37CF91592BB416A500BADCAE /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF91582BB416A500BADCAE /* Crashes */; };
 		37CF915B2BB416AC00BADCAE /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF915A2BB416AC00BADCAE /* Crashes */; };
-		37CF915D2BB416B300BADCAE /* Crashes in Frameworks */ = {isa = PBXBuildFile; productRef = 37CF915C2BB416B300BADCAE /* Crashes */; };
 		37D2377A287EB8CA00BCE03B /* TabIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D23779287EB8CA00BCE03B /* TabIndex.swift */; };
 		37D2377C287EBDA300BCE03B /* TabIndexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377B287EBDA300BCE03B /* TabIndexTests.swift */; };
 		37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */; };
@@ -12565,8 +12564,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "dominik/sentry-appstore";
-				kind = branch;
+				kind = exactVersion;
+				version = 137.0.0;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -12789,11 +12788,6 @@
 			productName = Crashes;
 		};
 		37CF915A2BB416AC00BADCAE /* Crashes */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = Crashes;
-		};
-		37CF915C2BB416B300BADCAE /* Crashes */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Crashes;
