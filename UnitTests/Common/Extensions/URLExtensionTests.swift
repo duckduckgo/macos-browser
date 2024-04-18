@@ -198,6 +198,12 @@ final class URLExtensionTests: XCTestCase {
 
     func testIsChildWhenChildHasParamThatShouldBeIgnored() throws {
         let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscriptions?environment=staging")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenChildHasPathAndParamThatShouldBeIgnored() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
         let testedURL = URL(string: "https://www.duckduckgo.com/subscriptions/test/t?environment=staging")!
         XCTAssertTrue(testedURL.isChild(of: parentURL))
     }
