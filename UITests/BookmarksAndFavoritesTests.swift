@@ -54,6 +54,10 @@ class BookmarksAndFavoritesTests: XCTestCase {
     private var showBookmarksBarPopup: XCUIElement!
     private var showFavoritesPreferenceToggle: XCUIElement!
 
+    override class func setUp() {
+        UITests.firstRun()
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
@@ -595,7 +599,8 @@ class BookmarksAndFavoritesTests: XCTestCase {
 //        This test uses coordinates (instead of accessibility IDs) to address the elements of the right click. As the writer of this test, I see this
 //        as a fragile test hook. However, I think it is preferable to making changes to the UI element it tests for this test alone. The reason is
 //        that the bookmark item on the bookmark bar isn't yet an accessibility-enabled UI element and doesn't appear to have a natural anchor point
-//        from which we can set its accessibility values without redesigning it. However, redesigning a road-tested UI element for a single test isn't a
+//        from which we can set its accessibility values without redesigning it. However, redesigning a road-tested UI element for a single test isn't
+//        a
 //        good idea, since the road-testing is also (valuable) testing and we don't want a single test to be the driver of a possible behavioral
 //        change in existing interface.
 //

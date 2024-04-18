@@ -18,6 +18,7 @@
 
 import Foundation
 import CryptoKit
+import PixelKit
 
 protocol FileStore {
     func persist(_ data: Data, url: URL) -> Bool
@@ -57,7 +58,7 @@ final class EncryptedFileStore: FileStore {
 
             return true
         } catch {
-            Pixel.fire(.debug(event: .fileStoreWriteFailed, error: error),
+            PixelKit.fire(DebugEvent(GeneralPixel.fileStoreWriteFailed, error: error),
                        withAdditionalParameters: ["config": url.lastPathComponent])
             return false
         }

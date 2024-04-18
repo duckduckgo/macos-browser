@@ -31,10 +31,8 @@ final class UserScripts: UserScriptsProvider {
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
-#if SUBSCRIPTION
     let subscriptionPagesUserScript = SubscriptionPagesUserScript()
     let identityTheftRestorationPagesUserScript = IdentityTheftRestorationPagesUserScript()
-#endif
     let clickToLoadScript: ClickToLoadUserScript
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
@@ -46,6 +44,7 @@ final class UserScripts: UserScriptsProvider {
     let autoconsentUserScript: UserScriptWithAutoconsent
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
+    let sslErrorPageUserScript: SSLErrorPageUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
@@ -64,14 +63,16 @@ final class UserScripts: UserScriptsProvider {
 
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
+        sslErrorPageUserScript = SSLErrorPageUserScript()
+
+        specialPages = SpecialPagesUserScript()
+
         if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
             youtubePlayerUserScript = YoutubePlayerUserScript()
-            specialPages = SpecialPagesUserScript()
         } else {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil
-            specialPages = nil
         }
 
         userScripts.append(autoconsentUserScript)
@@ -80,14 +81,16 @@ final class UserScripts: UserScriptsProvider {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
 
-        if let youtubePlayerUserScript {
-            if let specialPages = specialPages {
-                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
-                userScripts.append(specialPages)
+        if let specialPages = specialPages {
+            if let sslErrorPageUserScript {
+                specialPages.registerSubfeature(delegate: sslErrorPageUserScript)
             }
+            if let youtubePlayerUserScript {
+                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
+            }
+            userScripts.append(specialPages)
         }
 
-#if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
             userScripts.append(subscriptionPagesUserScript)
@@ -95,7 +98,6 @@ final class UserScripts: UserScriptsProvider {
             identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())
             userScripts.append(identityTheftRestorationPagesUserScript)
         }
-#endif
     }
 
     lazy var userScripts: [UserScript] = [

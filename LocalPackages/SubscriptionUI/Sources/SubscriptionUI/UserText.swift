@@ -75,7 +75,7 @@ enum UserText {
     static let haveSubscriptionButton = NSLocalizedString("subscription.preferences.i.have.a.subscription.button", value: "I Have a Subscription", comment: "Button enabling user to activate a subscription user bought earlier or on another device")
 
     // MARK: Preferences when subscription activation is pending
-    static let preferencesSubscriptionPendingHeader = NSLocalizedString("subscription.preferences.subscription.pending.header", value: "Your Subscription is Being Activated", comment: "Header for the subscription preferences pane when the subscription activation is pending")
+    static let preferencesSubscriptionPendingHeader = NSLocalizedString("subscription.preferences.subscription.pending.header", value: "Your subscription is being activated", comment: "Header for the subscription preferences pane when the subscription activation is pending")
     static let preferencesSubscriptionPendingCaption = NSLocalizedString("subscription.preferences.subscription.pending.caption", value: "This is taking longer than usual, please check back later.", comment: "Caption for the subscription preferences pane when the subscription activation is pending")
 
     // MARK: Preferences when subscription is expired

@@ -15,7 +15,7 @@ print_usage_and_exit() {
 
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") <review|release|dbp|subscription> [-a <asana_task_url>] [-d] [-s] [-r] [-v <version>]
+	  $ $(basename "$0") <review|release|dbp> [-a <asana_task_url>] [-d] [-s] [-r] [-v <version>]
 
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
@@ -55,11 +55,6 @@ read_command_line_arguments() {
 			app_name="DuckDuckGoDBP"
 			scheme="DuckDuckGo DBP"
 			configuration="Release"
-			;;
-		subscription)
-			app_name="DuckDuckGo Privacy Pro"
-			scheme="DuckDuckGo Privacy Pro"
-			configuration="Review"
 			;;
 		clear-keychain)
 			clear_keychain
