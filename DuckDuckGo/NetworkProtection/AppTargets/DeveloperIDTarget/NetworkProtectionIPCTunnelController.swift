@@ -26,6 +26,27 @@ import PixelKit
 ///
 final class NetworkProtectionIPCTunnelController {
 
+    enum RequestError: CustomNSError {
+        case notAuthorizedToEnableLoginItem
+        case internalLoginItemError(_ error: Error)
+
+        var errorCode: Int {
+            switch self {
+            case .notAuthorizedToEnableLoginItem: return 0
+            case .internalLoginItemError: return 1
+            }
+        }
+
+        var errorUserInfo: [String: Any] {
+            switch self {
+            case .notAuthorizedToEnableLoginItem:
+                return [:]
+            case .internalLoginItemError(let error):
+                return [NSUnderlyingErrorKey: error as NSError]
+            }
+        }
+    }
+
     private let featureVisibility: NetworkProtectionFeatureVisibility
     private let loginItemsManager: LoginItemsManaging
     private let ipcClient: NetworkProtectionIPCClient
@@ -44,14 +65,16 @@ final class NetworkProtectionIPCTunnelController {
 
     // MARK: - Login Items Manager
 
-    private func enableLoginItems() async throws -> Bool {
+    private func enableLoginItems() async throws {
         guard try await featureVisibility.canStartVPN() else {
-            // We shouldn't enable the menu app is the VPN feature is disabled.
-            return false
+            throw RequestError.notAuthorizedToEnableLoginItem
         }
 
-        try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
-        return true
+        do {
+            try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
+        } catch {
+            throw RequestError.internalLoginItemError(error)
+        }
     }
 }
 
@@ -63,17 +86,23 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
     func start() async {
         pixelKit?.fire(StartAttempt.begin)
 
-        do {
-            guard try await enableLoginItems() else {
-                os_log("🔴 IPC Controller refusing to start the VPN menu app.  Not authorized.", log: .networkProtection)
-                return
-            }
+        func handleFailure(_ error: Error) {
+            log(error)
+            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
+        }
 
-            ipcClient.start()
-            pixelKit?.fire(StartAttempt.success, frequency: .dailyAndContinuous)
+        do {
+            try await enableLoginItems()
+
+            ipcClient.start { [pixelKit] error in
+                if let error {
+                    handleFailure(error)
+                } else {
+                    pixelKit?.fire(StartAttempt.success, frequency: .dailyAndCount)
+                }
+            }
         } catch {
-            os_log("🔴 IPC Controller found en error when starting the VPN: \(error)", log: .networkProtection)
-            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndContinuous)
+            handleFailure(error)
         }
     }
 
@@ -81,17 +110,23 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
     func stop() async {
         pixelKit?.fire(StopAttempt.begin)
 
-        do {
-            guard try await enableLoginItems() else {
-                os_log("🔴 IPC Controller refusing to start the VPN.  Not authorized.", log: .networkProtection)
-                return
-            }
+        func handleFailure(_ error: Error) {
+            log(error)
+            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
+        }
 
-            ipcClient.stop()
-            pixelKit?.fire(StopAttempt.success, frequency: .dailyAndContinuous)
+        do {
+            try await enableLoginItems()
+
+            ipcClient.stop { [pixelKit] error in
+                if let error {
+                    handleFailure(error)
+                } else {
+                    pixelKit?.fire(StopAttempt.success, frequency: .dailyAndCount)
+                }
+            }
         } catch {
-            os_log("🔴 IPC Controller found en error when starting the VPN: \(error)", log: .networkProtection)
-            pixelKit?.fire(StopAttempt.failure(error), frequency: .dailyAndContinuous)
+            handleFailure(error)
         }
     }
 
@@ -106,6 +141,17 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
             }
 
             return false
+        }
+    }
+
+    private func log(_ error: Error) {
+        switch error {
+        case RequestError.notAuthorizedToEnableLoginItem:
+            os_log("🔴 IPC Controller not authorized to enable the login item", log: .networkProtection)
+        case RequestError.internalLoginItemError(let error):
+            os_log("🔴 IPC Controller found an error while enabling the login item: \(error)", log: .networkProtection)
+        default:
+            os_log("🔴 IPC Controller found an unknown error: \(error)", log: .networkProtection)
         }
     }
 }
