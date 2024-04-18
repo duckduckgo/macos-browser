@@ -18,6 +18,7 @@
 
 import Foundation
 import PixelKit
+import XCTest
 
 public final class PixelKitMock: PixelFiring {
 
@@ -42,8 +43,8 @@ public final class PixelKitMock: PixelFiring {
         actualFireCalls.append(fireCall)
     }
 
-    public var expectationsMet: Bool {
-        expectedFireCalls == actualFireCalls
+    public func verifyExpectations(file: StaticString, line: UInt) {
+        XCTAssertEqual(expectedFireCalls, actualFireCalls, file: file, line: line)
     }
 }
 

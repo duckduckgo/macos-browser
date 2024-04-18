@@ -41,15 +41,18 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
 
         await controller.start()
 
-        XCTAssertTrue(pixelKit.expectationsMet)
+        pixelKit.verifyExpectations(file: #file, line: #line)
     }
 
     func testStartTunnelLoginItemFailure() async {
         let error = NSError(domain: "test", code: 1)
+        let expectedError = NetworkProtectionIPCTunnelController.RequestError.internalLoginItemError(error)
+
         let pixelKit = PixelKitMock(expecting: [
             .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.begin, frequency: .standard),
-            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.failure(error), frequency: .dailyAndCount)
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.failure(expectedError), frequency: .dailyAndCount)
         ])
+
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
             loginItemsManager: MockLoginItemsManager(mockResult: .failure(error)),
@@ -58,7 +61,24 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
 
         await controller.start()
 
-        XCTAssertTrue(pixelKit.expectationsMet)
+        pixelKit.verifyExpectations(file: #file, line: #line)
+    }
+
+    func testStartTunnelIPCFailure() async {
+        let error = NSError(domain: "test", code: 1)
+        let pixelKit = PixelKitMock(expecting: [
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.begin, frequency: .standard),
+            .init(pixel: NetworkProtectionIPCTunnelController.StartAttempt.failure(error), frequency: .dailyAndCount)
+        ])
+        let controller = NetworkProtectionIPCTunnelController(
+            featureVisibility: MockFeatureVisibility(),
+            loginItemsManager: MockLoginItemsManager(mockResult: .success),
+            ipcClient: MockIPCClient(error: error),
+            pixelKit: pixelKit)
+
+        await controller.start()
+
+        pixelKit.verifyExpectations(file: #file, line: #line)
     }
 
     // MARK: - Tunnel Stop Tests
@@ -76,15 +96,18 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
 
         await controller.stop()
 
-        XCTAssertTrue(pixelKit.expectationsMet)
+        pixelKit.verifyExpectations(file: #file, line: #line)
     }
 
     func testStopTunnelLoginItemFailure() async {
         let error = NSError(domain: "test", code: 1)
+        let expectedError = NetworkProtectionIPCTunnelController.RequestError.internalLoginItemError(error)
+
         let pixelKit = PixelKitMock(expecting: [
             .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.begin, frequency: .standard),
-            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.failure(error), frequency: .dailyAndCount)
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.failure(expectedError), frequency: .dailyAndCount)
         ])
+
         let controller = NetworkProtectionIPCTunnelController(
             featureVisibility: MockFeatureVisibility(),
             loginItemsManager: MockLoginItemsManager(mockResult: .failure(error)),
@@ -93,6 +116,23 @@ final class NetworkProtectionIPCTunnelControllerTests: XCTestCase {
 
         await controller.stop()
 
-        XCTAssertTrue(pixelKit.expectationsMet)
+        pixelKit.verifyExpectations(file: #file, line: #line)
+    }
+
+    func testStopTunnelIPCFailure() async {
+        let error = NSError(domain: "test", code: 1)
+        let pixelKit = PixelKitMock(expecting: [
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.begin, frequency: .standard),
+            .init(pixel: NetworkProtectionIPCTunnelController.StopAttempt.failure(error), frequency: .dailyAndCount)
+        ])
+        let controller = NetworkProtectionIPCTunnelController(
+            featureVisibility: MockFeatureVisibility(),
+            loginItemsManager: MockLoginItemsManager(mockResult: .success),
+            ipcClient: MockIPCClient(error: error),
+            pixelKit: pixelKit)
+
+        await controller.stop()
+
+        pixelKit.verifyExpectations(file: #file, line: #line)
     }
 }

@@ -112,7 +112,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
 
         func handleFailure(_ error: Error) {
             log(error)
-            pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
+            pixelKit?.fire(StopAttempt.failure(error), frequency: .dailyAndCount)
         }
 
         do {

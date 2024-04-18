@@ -102,18 +102,23 @@ struct MockConnectionErrorObserver: ConnectionErrorObserver {
 }
 
 struct MockIPCClient: NetworkProtectionIPCClient {
+
+    private let error: Error?
+
     var ipcStatusObserver: NetworkProtection.ConnectionStatusObserver = MockConnectionStatusObserver()
-
     var ipcServerInfoObserver: NetworkProtection.ConnectionServerInfoObserver = MockServerInfoObserver()
-
     var ipcConnectionErrorObserver: NetworkProtection.ConnectionErrorObserver = MockConnectionErrorObserver()
 
-    func start() {
-        // Intentional no-op
+    init(error: Error? = nil) {
+        self.error = error
     }
 
-    func stop() {
-        // Intentional no-op
+    func start(completion: @escaping (Error?) -> Void) {
+        completion(error)
+    }
+
+    func stop(completion: @escaping (Error?) -> Void) {
+        completion(error)
     }
 }
 
