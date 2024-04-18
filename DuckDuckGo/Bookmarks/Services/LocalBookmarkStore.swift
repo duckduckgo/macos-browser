@@ -65,6 +65,7 @@ final class LocalBookmarkStore: BookmarkStore {
         case missingRoot
         case missingFavoritesRoot
         case saveLoopError(Error?)
+        case badModelMapping
     }
 
     private(set) var favoritesDisplayMode: FavoritesDisplayMode
@@ -388,6 +389,38 @@ final class LocalBookmarkStore: BookmarkStore {
             let error = error as NSError
             commonOnSaveErrorHandler(error)
         }
+    }
+
+    func bookmarkFolder(withId id: String) -> BookmarkFolder? {
+        let context = makeContext()
+
+        var bookmarkFolderToReturn: BookmarkFolder?
+        let favoritesDisplayMode = self.favoritesDisplayMode
+
+        context.performAndWait {
+            let folderFetchRequest = BaseBookmarkEntity.singleEntity(with: id)
+            do {
+                let folderFetchRequestResult = try context.fetch(folderFetchRequest)
+                guard let bookmarkFolderManagedObject = folderFetchRequestResult.first else { return }
+
+                guard let bookmarkFolder = BaseBookmarkEntity.from(
+                    managedObject: bookmarkFolderManagedObject,
+                    parentFolderUUID: bookmarkFolderManagedObject.parent?.uuid,
+                    favoritesDisplayMode: favoritesDisplayMode
+                ) as? BookmarkFolder
+                else {
+                    throw BookmarkStoreError.badModelMapping
+                }
+                bookmarkFolderToReturn = bookmarkFolder
+
+            } catch BookmarkStoreError.badModelMapping {
+                os_log("Failed to map BookmarkEntity to BookmarkFolder, with error: %s", log: .bookmarks, type: .error)
+            } catch {
+                os_log("Failed to fetch last saved folder for bookmarks all tabs, with error: %s", log: .bookmarks, type: .error, error.localizedDescription)
+            }
+        }
+
+        return bookmarkFolderToReturn
     }
 
     func update(folder: BookmarkFolder) {
@@ -1045,6 +1078,7 @@ extension LocalBookmarkStore.BookmarkStoreError: CustomNSError {
         case .missingRoot: return 7
         case .missingFavoritesRoot: return 8
         case .saveLoopError: return 9
+        case .badModelMapping: return 10
         }
     }
 

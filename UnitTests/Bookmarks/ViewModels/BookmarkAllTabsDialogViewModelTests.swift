@@ -146,12 +146,65 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
         XCTAssertEqual(result.first?.entity, folder)
     }
 
-    func testWhenFoldersStoreLastUsedFolderIsNilThenSelectedFolderIsNil() throws {
-        throw XCTSkip("Implemented in another PR https://app.asana.com/0/0/1207032959154802/f")
+    func testWhenInitAndFoldersStoreLastUsedFolderIsNilThenDoNotAskBookmarkStoreForBookmarkFolder() {
+        // GIVEN
+        foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = nil
+        XCTAssertFalse(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedFolderId)
+
+        // WHEN
+        let sut = BookmarkAllTabsDialogViewModel(websites: makeWebsitesInfo(url: .duckDuckGo), foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+
+        // THEN
+        XCTAssertFalse(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedFolderId)
+    }
+
+    func testWhenInitAndFoldersStoreLastUsedFolderIsNotNilThenAskBookmarkStoreForBookmarkFolder() {
+        foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = "1ABCDE"
+        XCTAssertFalse(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedFolderId)
+
+        // WHEN
+        let sut = BookmarkAllTabsDialogViewModel(websites: makeWebsitesInfo(url: .duckDuckGo), foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolderId, "1ABCDE")
+    }
+
+    func testWhenFoldersStoreLastUsedFolderIsNotNilAndBookmarkStoreDoesNotContainFolderThenSelectedFolderIsNil() throws {
+        // GIVEN
+        let folder = BookmarkFolder(id: "1", title: #function)
+        foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = "1"
+        bookmarkStoreMock.bookmarkFolder = nil
+        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkManager.loadBookmarks()
+        let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let result = sut.selectedFolder
+
+        // THEN
+        XCTAssertNil(result)
     }
 
     func testWhenFoldersStoreLastUsedFolderIsNotNilThenSelectedFolderIsNotNil() throws {
-        throw XCTSkip("Implemented in another PR https://app.asana.com/0/0/1207032959154802/f")
+        // GIVEN
+        let folder = BookmarkFolder(id: "1", title: #function)
+        foldersStoreMock.lastBookmarkAllTabsFolderIdUsed = "1"
+        bookmarkStoreMock.bookmarkFolder = folder
+        bookmarkStoreMock.bookmarks = [folder]
+        bookmarkManager.loadBookmarks()
+        let websitesInfo = makeWebsitesInfo(url: .duckDuckGo)
+        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let result = sut.selectedFolder
+
+        // THEN
+        XCTAssertEqual(result, folder)
     }
 
     func testWhenFolderIsAddedThenFoldersListIsRefreshed() {

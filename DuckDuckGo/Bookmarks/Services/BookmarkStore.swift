@@ -51,6 +51,7 @@ protocol BookmarkStore {
     func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
     func remove(objectsWithUUIDs: [String], completion: @escaping (Bool, Error?) -> Void)
     func update(bookmark: Bookmark)
+    func bookmarkFolder(withId id: String) -> BookmarkFolder?
     func update(folder: BookmarkFolder)
     func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType)
     func add(objectsWithUUIDs: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)

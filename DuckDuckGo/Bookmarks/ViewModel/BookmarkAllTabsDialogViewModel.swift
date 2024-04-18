@@ -71,8 +71,7 @@ final class BookmarkAllTabsDialogViewModel: BookmarkAllTabsDialogEditing {
         let dateString = Self.dateFormatter.string(from: dateProvider())
         folderName = String(format: UserText.Bookmarks.Dialog.Value.folderName, dateString, websites.count)
         folders = .init(bookmarkManager.list)
-        // TODO: Get Folder id from Folders Store and retrieve folder from Bookmark manager https://app.asana.com/0/0/1207032959154796/f
-
+        selectedFolder = foldersStore.lastBookmarkAllTabsFolderIdUsed.flatMap(bookmarkManager.getBookmarkFolder(withId:))
         bind()
     }
 

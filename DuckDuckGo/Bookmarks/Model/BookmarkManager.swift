@@ -28,6 +28,7 @@ protocol BookmarkManager: AnyObject {
     func allHosts() -> Set<String>
     func getBookmark(for url: URL) -> Bookmark?
     func getBookmark(forUrl url: String) -> Bookmark?
+    func getBookmarkFolder(withId id: String) -> BookmarkFolder?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
     func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
@@ -136,6 +137,10 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func getBookmark(forUrl url: String) -> Bookmark? {
         return list?[url]
+    }
+
+    func getBookmarkFolder(withId id: String) -> BookmarkFolder? {
+        bookmarkStore.bookmarkFolder(withId: id)
     }
 
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
