@@ -54,7 +54,7 @@ struct UserText {
     static let pasteAndSearch = NSLocalizedString("paste.and.search", value: "Paste & Search", comment: "Paste & Search button")
     static let clear = NSLocalizedString("clear", value: "Clear", comment: "Clear button")
     static let clearAndQuit = NSLocalizedString("clear.and.quit", value: "Clear and Quit", comment: "Button to clear data and quit the application")
-    static let quitWithoutClearing = NSLocalizedString("quit.without.clearing", value: "Quit without Clearing", comment: "Button to quit the application without clearing data")
+    static let quitWithoutClearing = NSLocalizedString("quit.without.clearing", value: "Quit without Clearing Data", comment: "Button to quit the application without clearing data")
     static let `continue` = NSLocalizedString("`continue`", value: "Continue", comment: "Continue button")
     static let bookmarkDialogAdd = NSLocalizedString("bookmark.dialog.add", value: "Add", comment: "Button to confim a bookmark creation")
     static let newFolderDialogAdd = NSLocalizedString("folder.dialog.add", value: "Add", comment: "Button to confim a bookmark folder creation")
@@ -1052,19 +1052,12 @@ struct UserText {
     static let warnBeforeQuit = NSLocalizedString("warn.before.quit", value: "Warn me that data will be cleared when quitting", comment: "Label after the checkbox in Settings which configures a warning before clearing data on the application termination.")
     static let warnBeforeQuitDialogHeader = NSLocalizedString("warn.before.quit.dialog.header", value: "Clear browsing data and quit\nDuckDuckGo?", comment: "A header of warning before clearing data on the application termination.")
     static let warnBeforeQuitDialogCheckboxMessage = NSLocalizedString("warn.before.quit.dialog.checkbox.message", value: "Warn me every time", comment: "A label after checkbox to configure the warning before clearing data on the application termination.")
-
-    static func disableAutoClearToEnableSessionRestore() -> String {
-        let localized = NSLocalizedString("disable.auto.clear.to.enable.session.restore",
-                                          value: "Disable the %@ setting to enable session restore on startup.",
-                                          comment: "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit")
-        return String(format: localized, autoClear)
-    }
-    static func showDataClearingSettings() -> String {
-        let localized = NSLocalizedString("show.data.clearing.settings",
-                                          value: "Show %@ Settings.",
-                                          comment: "Button in Settings. It navigates user to Data Clearing Settings.")
-        return String(format: localized, dataClearing)
-    }
+    static let disableAutoClearToEnableSessionRestore = NSLocalizedString("disable.auto.clear.to.enable.session.restore",
+                                                                          value: "Disable the Auto-Clear setting to enable session restore on startup.",
+                                                                          comment: "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit. Auto-Clear should match the string with 'auto.clear' key")
+    static let showDataClearingSettings = NSLocalizedString("show.data.clearing.settings",
+                                                            value: "Show Data Clearing Settings.",
+                                                            comment: "Button in Settings. It navigates user to Data Clearing Settings. The Data Clearing string should match the string with the preferences.data-clearing key")
 
     // MARK: Crash Report
     static let crashReportTitle = NSLocalizedString("crash-report.title", value: "DuckDuckGo Privacy Browser quit unexpectedly.", comment: "Title of the dialog where the user can send a crash report")

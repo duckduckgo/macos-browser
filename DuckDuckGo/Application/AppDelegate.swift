@@ -557,9 +557,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setUpAutoClearHandler() {
-        autoClearHandler = AutoClearHandler(preferences: .shared, fireViewModel: FireCoordinator.fireViewModel)
-        autoClearHandler.burnOnStartIfNeeded()
-        autoClearHandler.resetTheFlag()
+        autoClearHandler = AutoClearHandler(preferences: .shared,
+                                            fireViewModel: FireCoordinator.fireViewModel,
+                                            stateRestorationManager: stateRestorationManager)
+        autoClearHandler.handleAppLaunch()
         autoClearHandler.onAutoClearCompleted = {
             NSApplication.shared.reply(toApplicationShouldTerminate: true)
         }

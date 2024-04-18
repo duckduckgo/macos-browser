@@ -47,7 +47,7 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
     }
 
     @objc func toggleWarnBeforeClearing() {
-        isWarnBeforeClearingEnabled = !isWarnBeforeClearingEnabled
+        isWarnBeforeClearingEnabled.toggle()
     }
 
     @MainActor

@@ -50,8 +50,8 @@ extension Preferences {
                         .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
                         if dataClearingModel.isAutoClearEnabled {
                             VStack(alignment: .leading, spacing: 1) {
-                                TextMenuItemCaption(UserText.disableAutoClearToEnableSessionRestore())
-                                TextButton(UserText.showDataClearingSettings()) {
+                                TextMenuItemCaption(UserText.disableAutoClearToEnableSessionRestore)
+                                TextButton(UserText.showDataClearingSettings) {
                                     startupModel.show(url: .settingsPane(.dataClearing))
                                 }
                             }

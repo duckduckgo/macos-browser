@@ -12849,13 +12849,13 @@
       }
     },
     "disable.auto.clear.to.enable.session.restore" : {
-      "comment" : "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit",
+      "comment" : "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit. Auto-Clear should match the string with 'auto.clear' key",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Disable the %@ setting to enable session restore on startup."
+            "value" : "Disable the Auto-Clear setting to enable session restore on startup."
           }
         }
       }
@@ -45772,7 +45772,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Quit without Clearing"
+            "value" : "Quit without Clearing Data"
           }
         }
       }
@@ -48397,13 +48397,13 @@
       }
     },
     "show.data.clearing.settings" : {
-      "comment" : "Button in Settings. It navigates user to Data Clearing Settings.",
+      "comment" : "Button in Settings. It navigates user to Data Clearing Settings. The Data Clearing string should match the string with the preferences.data-clearing key",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Show %@ Settings."
+            "value" : "Show Data Clearing Settings."
           }
         }
       }

@@ -33,7 +33,13 @@ class AutoClearHandlerTests: XCTestCase {
         let persistor = MockFireButtonPreferencesPersistor()
         preferences = DataClearingPreferences(persistor: persistor)
         fireViewModel = FireViewModel(fire: Fire(tld: ContentBlocking.shared.tld))
-        handler = AutoClearHandler(preferences: preferences, fireViewModel: fireViewModel)
+        let fileName = "AutoClearHandlerTests"
+        let fileStore = FileStoreMock()
+        let service = StatePersistenceService(fileStore: fileStore, fileName: fileName)
+        let appStateRestorationManager = AppStateRestorationManager(fileStore: fileStore,
+                                                                    service: service,
+                                                                    shouldRestorePreviousSession: false)
+        handler = AutoClearHandler(preferences: preferences, fireViewModel: fireViewModel, stateRestorationManager: appStateRestorationManager)
     }
 
     override func tearDown() {
@@ -62,14 +68,14 @@ class AutoClearHandlerTests: XCTestCase {
 
         func testWhenBurningEnabledAndFlagFalseThenBurnOnStartTriggered() {
             preferences.isAutoClearEnabled = true
-            handler.resetTheFlag()
+            handler.resetTheCorrectTerminationFlag()
 
             XCTAssertTrue(handler.burnOnStartIfNeeded())
         }
 
         func testWhenBurningDisabledThenBurnOnStartNotTriggered() {
             preferences.isAutoClearEnabled = false
-            handler.resetTheFlag()
+            handler.resetTheCorrectTerminationFlag()
 
             XCTAssertFalse(handler.burnOnStartIfNeeded())
         }

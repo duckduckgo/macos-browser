@@ -23,10 +23,21 @@ final class AutoClearHandler {
 
     private let preferences: DataClearingPreferences
     private let fireViewModel: FireViewModel
+    private let stateRestorationManager: AppStateRestorationManager
 
-    init(preferences: DataClearingPreferences, fireViewModel: FireViewModel) {
+    init(preferences: DataClearingPreferences,
+         fireViewModel: FireViewModel,
+         stateRestorationManager: AppStateRestorationManager) {
         self.preferences = preferences
         self.fireViewModel = fireViewModel
+        self.stateRestorationManager = stateRestorationManager
+    }
+
+    @MainActor
+    func handleAppLaunch() {
+        burnOnStartIfNeeded()
+        restoreTabsIfNeeded()
+        resetTheCorrectTerminationFlag()
     }
 
     var onAutoClearCompleted: (() -> Void)?
@@ -38,12 +49,16 @@ final class AutoClearHandler {
         if preferences.isWarnBeforeClearingEnabled {
             switch confirmAutoClear() {
             case .alertFirstButtonReturn:
+                // Clear and Quit
                 performAutoClear()
                 return .terminateLater
             case .alertSecondButtonReturn:
+                // Quit without Clearing Data
                 appTerminationHandledCorrectly = true
+                restoreTabsOnStartup = true
                 return .terminateNow
             default:
+                // Cancel
                 return .terminateCancel
             }
         }
@@ -52,7 +67,7 @@ final class AutoClearHandler {
         return .terminateLater
     }
 
-    func resetTheFlag() {
+    func resetTheCorrectTerminationFlag() {
         appTerminationHandledCorrectly = false
     }
 
@@ -86,6 +101,25 @@ final class AutoClearHandler {
 
         fireViewModel.fire.burnAll()
         return true
+    }
+
+    // MARK: - Burn without Clearing Data
+
+    @UserDefaultsWrapper(key: .restoreTabsOnStartup, defaultValue: false)
+    private var restoreTabsOnStartup: Bool
+
+    @MainActor
+    @discardableResult
+    func restoreTabsIfNeeded() -> Bool {
+        let isAutoClearEnabled = preferences.isAutoClearEnabled
+        let restoreTabsOnStartup = restoreTabsOnStartup
+        self.restoreTabsOnStartup = false
+        if isAutoClearEnabled && restoreTabsOnStartup {
+            stateRestorationManager.restoreLastSessionState(interactive: false)
+            return true
+        }
+
+        return false
     }
 
 }

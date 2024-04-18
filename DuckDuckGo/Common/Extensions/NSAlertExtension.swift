@@ -228,15 +228,17 @@ extension NSAlert {
                                 target: DataClearingPreferences.shared,
                                 action: #selector(DataClearingPreferences.toggleWarnBeforeClearing))
         checkbox.state = DataClearingPreferences.shared.isWarnBeforeClearingEnabled ? .on : .off
+        checkbox.lineBreakMode = .byWordWrapping
         checkbox.translatesAutoresizingMaskIntoConstraints = false
 
         // Create a container view for the checkbox with custom padding
-        let containerView = NSView(frame: NSRect(x: 0, y: 0, width: 224, height: 25))
+        let containerView = NSView(frame: NSRect(x: 0, y: 0, width: 240, height: 25))
         containerView.addSubview(checkbox)
 
         NSLayoutConstraint.activate([
             checkbox.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            checkbox.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: -10) // Slightly up for better visual alignment
+            checkbox.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: -10), // Slightly up for better visual alignment
+            checkbox.widthAnchor.constraint(lessThanOrEqualTo: containerView.widthAnchor)
         ])
 
         alert.accessoryView = containerView
