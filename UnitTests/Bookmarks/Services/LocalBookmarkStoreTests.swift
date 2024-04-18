@@ -261,6 +261,134 @@ final class LocalBookmarkStoreTests: XCTestCase {
         waitForExpectations(timeout: 3, handler: nil)
     }
 
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfoToANewFolderInRootFolder_ThenTheNewFolderIsCreated_AndBoomarksAreAddedToTheFolder() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let newFolderName = "Bookmark All Open Tabs"
+        let websites = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, occurrences: 50)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        var topLevelEntities = try await sut.loadAll(type: .topLevelEntities).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+        XCTAssertEqual(topLevelEntities.count, 0)
+
+        // WHEN
+        sut.saveBookmarks(for: websites, inNewFolderNamed: newFolderName, withinParentFolder: .root)
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        topLevelEntities = try await sut.loadAll(type: .topLevelEntities).get()
+        let bookmarks = try XCTUnwrap(bookmarksEntity as? [Bookmark])
+        let folders = try XCTUnwrap(topLevelEntities as? [BookmarkFolder])
+        let folder = try XCTUnwrap(folders.first)
+        XCTAssertEqual(bookmarksEntity.count, 50)
+        XCTAssertEqual(folders.count, 1)
+        XCTAssertEqual(folder.parentFolderUUID, BookmarkEntity.Constants.rootFolderID)
+        XCTAssertEqual(folder.title, newFolderName)
+        XCTAssertEqual(Set(folder.children), Set(bookmarks))
+        bookmarks.forEach { bookmark in
+            XCTAssertEqual(bookmark.parentFolderUUID, folder.id)
+        }
+    }
+
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfoToANewFolderInSubfolder_ThenTheNewFolderIsCreated_AndBoomarksAreAddedToTheFolder() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let newFolderName = "Bookmark All Open Tabs"
+        let websites = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, occurrences: 50)
+        let parentFolderToInsert = BookmarkFolder(id: "ABCDE", title: "Subfolder")
+        _ = await sut.save(folder: parentFolderToInsert, parent: nil)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        var topLevelEntities = try await sut.loadAll(type: .topLevelEntities).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+        XCTAssertEqual(topLevelEntities.count, 1)
+        XCTAssertEqual(topLevelEntities.first, parentFolderToInsert)
+        XCTAssertEqual((topLevelEntities.first as? BookmarkFolder)?.parentFolderUUID, BookmarkEntity.Constants.rootFolderID)
+
+        // WHEN
+        sut.saveBookmarks(for: websites, inNewFolderNamed: newFolderName, withinParentFolder: .parent(uuid: parentFolderToInsert.id))
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        topLevelEntities = try await sut.loadAll(type: .topLevelEntities).get()
+        let bookmarks = try XCTUnwrap(bookmarksEntity as? [Bookmark])
+        let folders = try XCTUnwrap(topLevelEntities as? [BookmarkFolder])
+        let parentFolder = try XCTUnwrap(folders.first)
+        let subFolder = try XCTUnwrap(parentFolder.children.first as? BookmarkFolder)
+        XCTAssertEqual(bookmarksEntity.count, 50)
+        XCTAssertEqual(folders.count, 1)
+        XCTAssertEqual(parentFolder.title, parentFolderToInsert.title)
+        XCTAssertEqual(parentFolder.children.count, 1)
+        XCTAssertEqual(subFolder.title, newFolderName)
+        XCTAssertEqual(Set(subFolder.children), Set(bookmarks))
+        bookmarks.forEach { bookmark in
+            XCTAssertEqual(bookmark.parentFolderUUID, subFolder.id)
+        }
+    }
+
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfo_AndTitleIsNotNil_ThenTitleIsUsedAsBookmarkTitle() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let websiteName = "Test Website"
+        let websites = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, title: websiteName, occurrences: 1)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+
+        // WHEN
+        sut.saveBookmarks(for: websites, inNewFolderNamed: "Saved Tabs", withinParentFolder: .root)
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        let bookmark = try XCTUnwrap((bookmarksEntity as? [Bookmark])?.first)
+        XCTAssertEqual(bookmarksEntity.count, 1)
+        XCTAssertEqual(bookmark.title, websiteName)
+    }
+
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfo_AndTitleIsNil_ThenURLDomainIsUsedAsBookmarkTitle() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let url = URL.duckDuckGo
+        let websites = WebsiteInfo.makeWebsitesInfo(url: url, title: nil, occurrences: 1)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+
+        // WHEN
+        sut.saveBookmarks(for: websites, inNewFolderNamed: "Saved Tabs", withinParentFolder: .root)
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        let bookmark = try XCTUnwrap((bookmarksEntity as? [Bookmark])?.first)
+        XCTAssertEqual(bookmarksEntity.count, 1)
+        XCTAssertEqual(bookmark.title, url.host)
+    }
+
+    @MainActor
+    func testWhenSaveMultipleWebsiteInfo_AndTitleIsNil_AndURLDoesNotConformToRFC3986_ThenURLAbsoluteStringIsUsedAsBookmarkTitle() async throws {
+        // GIVEN
+        let context = container.viewContext
+        let sut = LocalBookmarkStore(context: context)
+        let url = try XCTUnwrap(URL(string: "duckduckgo.com"))
+        let websites = WebsiteInfo.makeWebsitesInfo(url: url, title: nil, occurrences: 1)
+        var bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        XCTAssertEqual(bookmarksEntity.count, 0)
+
+        // WHEN
+        sut.saveBookmarks(for: websites, inNewFolderNamed: "Saved Tabs", withinParentFolder: .root)
+
+        // THEN
+        bookmarksEntity = try await sut.loadAll(type: .bookmarks).get()
+        let bookmark = try XCTUnwrap((bookmarksEntity as? [Bookmark])?.first)
+        XCTAssertEqual(bookmarksEntity.count, 1)
+        XCTAssertEqual(bookmark.title, url.absoluteString)
+    }
+
     // MARK: Moving Bookmarks/Folders
 
     func testWhenMovingBookmarkWithinParentCollection_AndIndexIsValid_ThenBookmarkIsMoved() async {

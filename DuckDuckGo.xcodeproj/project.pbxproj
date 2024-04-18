@@ -1769,6 +1769,10 @@
 		9FA5A0B12BC9039300153786 /* BookmarkFolderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA5A0AC2BC9037A00153786 /* BookmarkFolderStoreMock.swift */; };
 		9FA75A3E2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */; };
 		9FA75A3F2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */; };
+		9FAD623A2BCFDB32007F3A65 /* WebsiteInfoHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAD62392BCFDB32007F3A65 /* WebsiteInfoHelpers.swift */; };
+		9FAD623B2BCFDB32007F3A65 /* WebsiteInfoHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAD62392BCFDB32007F3A65 /* WebsiteInfoHelpers.swift */; };
+		9FAD623D2BD09DE5007F3A65 /* WebsiteInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAD623C2BD09DE5007F3A65 /* WebsiteInfoTests.swift */; };
+		9FAD623E2BD09DE5007F3A65 /* WebsiteInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAD623C2BD09DE5007F3A65 /* WebsiteInfoTests.swift */; };
 		9FBD84522BB3AACB00220859 /* AttributionOriginFileProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBD84512BB3AACB00220859 /* AttributionOriginFileProvider.swift */; };
 		9FBD84532BB3AACB00220859 /* AttributionOriginFileProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBD84512BB3AACB00220859 /* AttributionOriginFileProvider.swift */; };
 		9FBD84562BB3ACFD00220859 /* AttributionOriginFileProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBD84552BB3ACFD00220859 /* AttributionOriginFileProviderTests.swift */; };
@@ -3478,6 +3482,8 @@
 		9FA5A0A82BC900FC00153786 /* BookmarkAllTabsDialogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogViewModelTests.swift; sourceTree = "<group>"; };
 		9FA5A0AC2BC9037A00153786 /* BookmarkFolderStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFolderStoreMock.swift; sourceTree = "<group>"; };
 		9FA75A3D2BA00E1400DA5FA6 /* BookmarksBarMenuFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuFactoryTests.swift; sourceTree = "<group>"; };
+		9FAD62392BCFDB32007F3A65 /* WebsiteInfoHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteInfoHelpers.swift; sourceTree = "<group>"; };
+		9FAD623C2BD09DE5007F3A65 /* WebsiteInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteInfoTests.swift; sourceTree = "<group>"; };
 		9FBD84512BB3AACB00220859 /* AttributionOriginFileProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributionOriginFileProvider.swift; sourceTree = "<group>"; };
 		9FBD84552BB3ACFD00220859 /* AttributionOriginFileProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributionOriginFileProviderTests.swift; sourceTree = "<group>"; };
 		9FBD845C2BB3B80300220859 /* Origin.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Origin.txt; sourceTree = "<group>"; };
@@ -6308,6 +6314,14 @@
 			path = Factory;
 			sourceTree = "<group>";
 		};
+		9FAD62382BCFDB1D007F3A65 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				9FAD62392BCFDB32007F3A65 /* WebsiteInfoHelpers.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		AA0877B626D515EE00B05660 /* UserAgent */ = {
 			isa = PBXGroup;
 			children = (
@@ -6657,6 +6671,7 @@
 		AA652CAB25DD820D009059CC /* Bookmarks */ = {
 			isa = PBXGroup;
 			children = (
+				9FAD62382BCFDB1D007F3A65 /* Helpers */,
 				9F872D9B2B9058B000138637 /* Extensions */,
 				9FA75A3C2BA00DF500DA5FA6 /* Factory */,
 				9F982F102B82264400231028 /* ViewModels */,
@@ -6683,6 +6698,7 @@
 				98A95D87299A2DF900B9B81A /* BookmarkMigrationTests.swift */,
 				9F872D9F2B90644800138637 /* ContextualMenuTests.swift */,
 				9F0A2CF72B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift */,
+				9FAD623C2BD09DE5007F3A65 /* WebsiteInfoTests.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -10237,6 +10253,7 @@
 				857E44642A9F70F200ED77A7 /* CampaignVariantTests.swift in Sources */,
 				3706FE1E293F661700E42796 /* GeolocationProviderTests.swift in Sources */,
 				9F39106A2B68D87B00CB5112 /* ProgressExtensionTests.swift in Sources */,
+				9FAD623B2BCFDB32007F3A65 /* WebsiteInfoHelpers.swift in Sources */,
 				3706FE1F293F661700E42796 /* AppStateChangePublisherTests.swift in Sources */,
 				9FA5A0B12BC9039300153786 /* BookmarkFolderStoreMock.swift in Sources */,
 				3706FE20293F661700E42796 /* CLLocationManagerMock.swift in Sources */,
@@ -10282,6 +10299,7 @@
 				3706FE37293F661700E42796 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */,
 				3706FE38293F661700E42796 /* SuggestionContainerTests.swift in Sources */,
 				3706FE39293F661700E42796 /* TabTests.swift in Sources */,
+				9FAD623E2BD09DE5007F3A65 /* WebsiteInfoTests.swift in Sources */,
 				3706FE3A293F661700E42796 /* MockVariantManager.swift in Sources */,
 				3706FE3C293F661700E42796 /* FireproofDomainsStoreMock.swift in Sources */,
 				3706FE3D293F661700E42796 /* DataEncryptionTests.swift in Sources */,
@@ -11498,6 +11516,7 @@
 				37D2377C287EBDA300BCE03B /* TabIndexTests.swift in Sources */,
 				37534CA52811987D002621E7 /* AdjacentItemEnumeratorTests.swift in Sources */,
 				56B234BF2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */,
+				9FAD623A2BCFDB32007F3A65 /* WebsiteInfoHelpers.swift in Sources */,
 				C13909F42B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */,
 				37534C9E28104D9B002621E7 /* TabLazyLoaderTests.swift in Sources */,
 				B6619EF62B10DFF700CD9186 /* InstructionsFormatParserTests.swift in Sources */,
@@ -11685,6 +11704,7 @@
 				4BF6962028BEEE8B00D402D4 /* LocalPinningManagerTests.swift in Sources */,
 				9F0FFFB82BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift in Sources */,
 				AAEC74B82642E43800C2EFBC /* HistoryStoreTests.swift in Sources */,
+				9FAD623D2BD09DE5007F3A65 /* WebsiteInfoTests.swift in Sources */,
 				9F180D0F2B69C553000D695F /* Tab+WKUIDelegateTests.swift in Sources */,
 				4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */,
 				B6106BB326A7F4AA0013B453 /* GeolocationServiceMock.swift in Sources */,

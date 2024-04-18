@@ -53,6 +53,8 @@ class MockBookmarkManager: BookmarkManager {
         return nil
     }
 
+    func makeBookmarks(for websitesInfo: [DuckDuckGo_Privacy_Browser.WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
+
     func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?, completion: (DuckDuckGo_Privacy_Browser.BookmarkFolder) -> Void) {}
 
     func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {}
@@ -90,8 +92,6 @@ class MockBookmarkManager: BookmarkManager {
     func importBookmarks(_ bookmarks: DuckDuckGo_Privacy_Browser.ImportedBookmarks, source: DuckDuckGo_Privacy_Browser.BookmarkImportSource) -> DuckDuckGo_Privacy_Browser.BookmarksImportSummary {
         BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
     }
-
-    func bookmarkAll(websitesInfo: [DuckDuckGo_Privacy_Browser.WebsiteInfo], withinParentFolder: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
 
     func handleFavoritesAfterDisablingSync() {}
 
