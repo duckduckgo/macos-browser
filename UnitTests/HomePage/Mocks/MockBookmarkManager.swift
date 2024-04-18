@@ -87,6 +87,8 @@ class MockBookmarkManager: BookmarkManager {
         BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
     }
 
+    func bookmarkAll(websitesInfo: [DuckDuckGo_Privacy_Browser.WebsiteInfo], withinParentFolder: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
+
     func handleFavoritesAfterDisablingSync() {}
 
     @Published var list: BookmarkList?

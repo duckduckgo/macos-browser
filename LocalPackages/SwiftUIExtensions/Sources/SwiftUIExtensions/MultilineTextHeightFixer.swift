@@ -39,7 +39,7 @@ private struct MultilineTextHeightFixer: ViewModifier {
     }
 }
 
-extension View {
+public extension View {
 
     /// Meant to be used for multiline-text.  This is currently only applying a modifier
     ///

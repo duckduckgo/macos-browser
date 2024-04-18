@@ -1,5 +1,5 @@
 //
-//  AddEditBookmarkDialogCoordinatorViewModelTests.swift
+//  BookmarkAllTabsDialogCoordinatorViewModelTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -21,9 +21,9 @@ import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
-final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
-    private var sut: AddEditBookmarkDialogCoordinatorViewModel<AddEditBookmarkDialogViewModelMock, AddEditBookmarkFolderDialogViewModelMock>!
-    private var bookmarkViewModelMock: AddEditBookmarkDialogViewModelMock!
+final class BookmarkAllTabsDialogCoordinatorViewModelTests: XCTestCase {
+    private var sut: BookmarkAllTabsDialogCoordinatorViewModel<BookmarkAllTabsDialogViewModelMock, AddEditBookmarkFolderDialogViewModelMock>!
+    private var bookmarkAllTabsViewModelMock: BookmarkAllTabsDialogViewModelMock!
     private var bookmarkFolderViewModelMock: AddEditBookmarkFolderDialogViewModelMock!
     private var cancellables: Set<AnyCancellable>!
 
@@ -31,50 +31,52 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
         try super.setUpWithError()
 
         cancellables = []
-        bookmarkViewModelMock = .init()
+        bookmarkAllTabsViewModelMock = .init()
         bookmarkFolderViewModelMock = .init()
-        sut = .init(bookmarkModel: bookmarkViewModelMock, folderModel: bookmarkFolderViewModelMock)
+        sut = .init(bookmarkModel: bookmarkAllTabsViewModelMock, folderModel: bookmarkFolderViewModelMock)
     }
 
     override func tearDownWithError() throws {
         cancellables = nil
-        bookmarkViewModelMock = nil
+        bookmarkAllTabsViewModelMock = nil
         bookmarkFolderViewModelMock = nil
         sut = nil
         try super.tearDownWithError()
     }
 
-    func testShouldReturnViewStateBookmarkWhenInit() {
-        XCTAssertEqual(sut.viewState, .bookmark)
+    func testWhenInitThenViewStateIsBookmarkAllTabs() {
+        XCTAssertEqual(sut.viewState, .bookmarkAllTabs)
     }
 
-    func testShouldReturnViewStateBookmarkWhenDismissActionIsCalled() {
+    func testWhenDismissActionIsCalledThenViewStateIsBookmarkAllTabs() {
         // GIVEN
         sut.addFolderAction()
-        XCTAssertEqual(sut.viewState, .folder)
+        XCTAssertEqual(sut.viewState, .addFolder)
 
         // WHEN
         sut.dismissAction()
 
         // THEN
-        XCTAssertEqual(sut.viewState, .bookmark)
+        XCTAssertEqual(sut.viewState, .bookmarkAllTabs)
 
     }
 
-    func testShouldSetSelectedFolderOnFolderViewModelAndReturnFolderViewStateWhenAddFolderActionIsCalled() {
+    func testWhenAddFolderActionIsCalledThenSetSelectedFolderOnFolderViewModelIsCalledAndReturnAddFolderViewState() {
         // GIVEN
         let folder = BookmarkFolder(id: "1", title: "Folder")
-        bookmarkViewModelMock.selectedFolder = folder
+        bookmarkAllTabsViewModelMock.selectedFolder = folder
         XCTAssertNil(bookmarkFolderViewModelMock.selectedFolder)
+        XCTAssertEqual(sut.viewState, .bookmarkAllTabs)
 
         // WHEN
         sut.addFolderAction()
 
         // THEN
         XCTAssertEqual(bookmarkFolderViewModelMock.selectedFolder, folder)
+        XCTAssertEqual(sut.viewState, .addFolder)
     }
 
-    func testShouldReceiveEventsWhenBookmarkModelChanges() {
+    func testWhenBookmarkModelChangesThenReceiveEvent() {
         // GIVEN
         let expectation = self.expectation(description: #function)
         var didCallChangeValue = false
@@ -92,7 +94,7 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
         XCTAssertTrue(didCallChangeValue)
     }
 
-    func testShouldReceiveEventsWhenBookmarkFolderModelChanges() {
+    func testWhenBookmarkFolderModelChangesThenReceiveEvent() {
         // GIVEN
         let expectation = self.expectation(description: #function)
         var didCallChangeValue = false
@@ -110,19 +112,19 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
         XCTAssertTrue(didCallChangeValue)
     }
 
-    func testShouldSetSelectedFolderOnBookmarkViewModelWhenAddFolderPublisherSendsEvent() {
+    func testWhenAddFolderPublisherSendsEventThenSelectedFolderOnBookmarkAllTabsViewModelIsSet() {
         // GIVEN
         let expectation = self.expectation(description: #function)
-        bookmarkViewModelMock.selectedFolderExpectation = expectation
+        bookmarkAllTabsViewModelMock.selectedFolderExpectation = expectation
         let folder = BookmarkFolder(id: "ABCDE", title: #function)
-        XCTAssertNil(bookmarkViewModelMock.selectedFolder)
+        XCTAssertNil(bookmarkAllTabsViewModelMock.selectedFolder)
 
         // WHEN
         sut.folderModel.subject.send(folder)
 
         // THEN
         waitForExpectations(timeout: 1.0)
-        XCTAssertEqual(bookmarkViewModelMock.selectedFolder, folder)
+        XCTAssertEqual(bookmarkAllTabsViewModelMock.selectedFolder, folder)
     }
 
     // MARK: - Integration Test
@@ -131,13 +133,13 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
         // GIVEN
         let expectation = self.expectation(description: #function)
         let folder = BookmarkFolder(id: "1", title: "Folder")
-        bookmarkViewModelMock.selectedFolder = folder
+        bookmarkAllTabsViewModelMock.selectedFolder = folder
         let bookmarkStoreMock = BookmarkStoreMock()
         bookmarkStoreMock.bookmarks = [folder]
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
         bookmarkManager.loadBookmarks()
         let folderModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
-        let sut = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModelMock, folderModel: folderModel)
+        let sut = BookmarkAllTabsDialogCoordinatorViewModel(bookmarkModel: bookmarkAllTabsViewModelMock, folderModel: folderModel)
         let c = folderModel.$folders
             .dropFirst(2) // Not interested in the first two events. 1.subscribing to $folders and 2. subscribing to $list.
             .sink { folders in
@@ -148,7 +150,7 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
 
         // Tap Add Folder
         sut.addFolderAction()
-        XCTAssertEqual(sut.viewState, .folder)
+        XCTAssertEqual(sut.viewState, .addFolder)
         XCTAssertTrue(folderModel.folderName.isEmpty)
         XCTAssertEqual(folderModel.selectedFolder, folder)
 
@@ -162,7 +164,8 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
         // THEN
         withExtendedLifetime(c) {}
         waitForExpectations(timeout: 1.0)
-        XCTAssertEqual(sut.viewState, .folder)
+        XCTAssertEqual(sut.viewState, .addFolder)
         XCTAssertTrue(folderModel.folderName.isEmpty)
     }
+
 }

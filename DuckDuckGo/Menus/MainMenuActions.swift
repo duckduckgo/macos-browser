@@ -508,8 +508,8 @@ extension MainViewController {
     }
 
     @objc func bookmarkAllOpenTabs(_ sender: Any) {
-        // TODO: https://app.asana.com/0/0/1207032400501907/f
-        print(#function)
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
     }
 
     @objc func favoriteThisPage(_ sender: Any) {

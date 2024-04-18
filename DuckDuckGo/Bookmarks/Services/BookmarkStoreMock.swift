@@ -133,6 +133,14 @@ public final class BookmarkStoreMock: BookmarkStore {
         return BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
     }
 
+    var bookmarkAllWebsitesInfoCalled = false
+    var capturedWebsitesInfo: [WebsiteInfo]?
+    func bookmarkAll(websitesInfo: [WebsiteInfo], withinParentFolder parent: ParentFolderType) {
+        bookmarkAllWebsitesInfoCalled = true
+        capturedWebsitesInfo = websitesInfo
+        capturedParentFolderType = parent
+    }
+
     var canMoveObjectWithUUIDCalled = false
     func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool {
         canMoveObjectWithUUIDCalled = true

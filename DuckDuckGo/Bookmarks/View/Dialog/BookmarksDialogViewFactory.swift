@@ -80,6 +80,18 @@ enum BookmarksDialogViewFactory {
         return makeAddEditBookmarkDialogView(viewModel: viewModel, bookmarkManager: bookmarkManager)
     }
 
+    /// Creates an instance of AddEditBookmarkDialogView for adding Bookmarks for all the open Tabs.
+    /// - Parameters:
+    ///   - websitesInfo: A list of websites to add as bookmarks.
+    ///   - bookmarkManager: An instance of `BookmarkManager`. This should be used for `#previews` only.
+    /// - Returns: An instance of BookmarkAllTabsDialogView
+    static func makeBookmarkAllOpenTabsView(websitesInfo: [WebsiteInfo], bookmarkManager: LocalBookmarkManager = .shared) -> BookmarkAllTabsDialogView {
+        let addFolderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
+        let bookmarkAllTabsViewModel = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: UserDefaultsBookmarkFoldersStore(), bookmarkManager: bookmarkManager)
+        let viewModel = BookmarkAllTabsDialogCoordinatorViewModel(bookmarkModel: bookmarkAllTabsViewModel, folderModel: addFolderViewModel)
+        return BookmarkAllTabsDialogView(viewModel: viewModel)
+    }
+
 }
 
 private extension BookmarksDialogViewFactory {

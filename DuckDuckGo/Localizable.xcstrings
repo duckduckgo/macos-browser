@@ -7570,55 +7570,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Diese Seite als Lesezeichen markieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Bookmark This Page"
+            "value" : "Bookmark This Page…"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Marcar esta página"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ajouter cette page aux signets"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Crea un segnalibro per questa pagina"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Bladwijzer toevoegen aan deze pagina"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dodaj tę stronę do zakładek"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Marcar esta página"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Сохранить в закладках"
           }
         }
@@ -8630,6 +8630,18 @@
         }
       }
     },
+    "bookmarks.dialog.action.addAllBookmarks" : {
+      "comment" : "CTA title for saving multiple Bookmarks at once",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Bookmarks"
+          }
+        }
+      }
+    },
     "bookmarks.dialog.action.addBookmark" : {
       "comment" : "CTA title for adding a Bookmark",
       "extractionState" : "extracted_with_value",
@@ -8746,6 +8758,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить папку"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.allTabs.message.add" : {
+      "comment" : "Bookmark creation for all open tabs dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "These bookmarks will be saved in a new folder:"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.allTabs.title.add" : {
+      "comment" : "Title of dialog to bookmark all open tabs. E.g. 'Bookmark 42 Open Tabs`",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark %1$d Open Tabs"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.folderName" : {
+      "comment" : "Folder name field label for Bookmarks folder\n   The suggested name of the folder that will contain the bookmark tabs. Eg. 2024-02-12 - 50 Tabs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Folder Name"
           }
         }
       }
@@ -50286,6 +50334,9 @@
           }
         }
       }
+    },
+    "These bookmarks will be saved in a new folder:" : {
+
     },
     "tooltip.addToFavorites" : {
       "comment" : "Tooltip for add to favorites button",

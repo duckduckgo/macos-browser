@@ -36,7 +36,6 @@ struct AddBookmarkFolderPopoverView: ModalView {
             isDefaultActionDisabled: model.isDefaultActionButtonDisabled,
             defaultAction: { _ in model.addFolder() }
         )
-        .padding(.vertical, 16.0)
         .font(.system(size: 13))
         .frame(width: 320)
     }

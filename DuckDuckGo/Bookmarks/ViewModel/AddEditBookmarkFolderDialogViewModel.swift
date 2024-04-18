@@ -42,8 +42,9 @@ final class AddEditBookmarkFolderDialogViewModel: BookmarkFolderDialogEditing {
 
     @Published var folderName: String
     @Published var selectedFolder: BookmarkFolder?
+    @Published private(set) var folders: [FolderViewModel]
 
-    let folders: [FolderViewModel]
+    private var folderCancellable: AnyCancellable?
 
     var title: String {
         mode.title
@@ -77,14 +78,20 @@ final class AddEditBookmarkFolderDialogViewModel: BookmarkFolderDialogEditing {
         folderName = mode.folderName
         folders = .init(bookmarkManager.list)
         selectedFolder = mode.parentFolder
+
+        bind()
     }
 
     func cancel(dismiss: () -> Void) {
+        reset()
         dismiss()
     }
 
     func addOrSave(dismiss: () -> Void) {
-        defer { dismiss() }
+        defer {
+            reset()
+            dismiss()
+        }
 
         guard !folderName.isEmpty else {
             assertionFailure("folderName is empty, button should be disabled")
@@ -110,6 +117,14 @@ final class AddEditBookmarkFolderDialogViewModel: BookmarkFolderDialogEditing {
 
 private extension AddEditBookmarkFolderDialogViewModel {
 
+    func bind() {
+        folderCancellable = bookmarkManager.listPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] bookmarkList in
+                self?.folders = .init(bookmarkList)
+            })
+    }
+
     func update(folder: BookmarkFolder, originalParent: BookmarkFolder?, newParent: BookmarkFolder?) {
         // If the original location of the folder changed move it to the new folder.
         if selectedFolder?.id != originalParent?.id {
@@ -127,6 +142,10 @@ private extension AddEditBookmarkFolderDialogViewModel {
         bookmarkManager.makeFolder(for: name, parent: parent) { [weak self] bookmarkFolder in
             self?.addFolderSubject.send(bookmarkFolder)
         }
+    }
+
+    func reset() {
+        self.folderName = ""
     }
 
 }
