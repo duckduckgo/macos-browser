@@ -93,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: duckduckgo-dmg
-          path: ${{ github.workspace }}/dmg
+          path: ${{ github.workspace }}/dmg/DuckDuckGo.app
           retention-days: 1
 
   
