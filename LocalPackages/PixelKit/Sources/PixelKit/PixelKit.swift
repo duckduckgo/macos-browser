@@ -324,12 +324,14 @@ public final class PixelKit {
 
         let newError: Error?
 
-        if let event = event as? PixelKitEventV2 {
+        if let event = event as? PixelKitEventV2,
+           let error = event.error {
+
             // For v2 events we only consider the error specified in the event
             // and purposedly ignore the parameter in this call.
             // This is to encourage moving the error over to the protocol error
             // instead of still relying on the parameter of this call.
-            newError = event.error
+            newError = error
         } else {
             newError = error
         }

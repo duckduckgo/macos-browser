@@ -30,8 +30,8 @@ protocol NetworkProtectionIPCClient {
     var ipcServerInfoObserver: ConnectionServerInfoObserver { get }
     var ipcConnectionErrorObserver: ConnectionErrorObserver { get }
 
-    func start()
-    func stop()
+    func start(completion: @escaping (Error?) -> Void)
+    func stop(completion: @escaping (Error?) -> Void)
 }
 
 extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
