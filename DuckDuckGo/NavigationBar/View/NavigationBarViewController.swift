@@ -25,11 +25,8 @@ import PixelKit
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-
-#if SUBSCRIPTION
 import Subscription
 import SubscriptionUI
-#endif
 
 // swiftlint:disable:next type_body_length
 final class NavigationBarViewController: NSViewController {
@@ -299,7 +296,6 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        #if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
@@ -309,7 +305,6 @@ final class NavigationBarViewController: NSViewController {
                 return
             }
         }
-        #endif
 
         // Note: the following code is quite contrived but we're aiming to hotfix issues without mixing subscription and
         // waitlist logic.  This should be cleaned up once waitlist can safely be removed.
@@ -1054,7 +1049,6 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
     }
 
-#if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
@@ -1063,8 +1057,6 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
     }
-#endif
-
 }
 
 // MARK: - NSPopoverDelegate

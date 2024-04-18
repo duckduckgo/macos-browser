@@ -17,10 +17,7 @@
 //
 
 import Foundation
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 extension DefaultSubscriptionFeatureAvailability {
     convenience init() {
