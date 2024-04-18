@@ -50,8 +50,16 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(menu.item(at: 5)?.isSeparatorItem ?? false)
         XCTAssertEqual(menu.item(at: 6)?.title, UserText.closeTab)
         XCTAssertEqual(menu.item(at: 7)?.title, UserText.closeOtherTabs)
-//        XCTAssertEqual(menu.item(at: 8)?.title, UserText.closeTabsToTheRight)
         XCTAssertEqual(menu.item(at: 8)?.title, UserText.moveTabToNewWindow)
+
+        // Check "Close Other Tabs" submenu
+        guard let submenu = menu.item(at: 7)?.submenu else {
+            XCTFail("\"Close Other Tabs\" menu item should have a submenu")
+            return
+        }
+        XCTAssertEqual(submenu.item(at: 0)?.title, UserText.closeTabsToTheLeft)
+        XCTAssertEqual(submenu.item(at: 1)?.title, UserText.closeTabsToTheRight)
+        XCTAssertEqual(submenu.item(at: 2)?.title, UserText.closeAllOtherTabs)
     }
 
     func testThatMuteIsShownWhenCurrentAudioStateIsUnmuted() {
