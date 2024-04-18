@@ -24,6 +24,7 @@ import Foundation
 extension URL.NavigationalScheme {
 
     static let duck = URL.NavigationalScheme(rawValue: "duck")
+    static let javascript = URL.NavigationalScheme(rawValue: "javascript")
 
     static var validSchemes: [URL.NavigationalScheme] {
         return [.http, .https, .file]
@@ -331,7 +332,7 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return !["https", "http", "about", "file", "blob", "data", "ftp"].contains(scheme)
+        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript].contains(navigationalScheme)
     }
 
     // MARK: - DuckDuckGo
@@ -531,6 +532,8 @@ extension URL {
     // MARK: - System Settings
 
     static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!
+
+    static var touchIDAndPassword = URL(string: "x-apple.systempreferences:com.apple.preferences.password")!
 
     // MARK: - Blob URLs
 

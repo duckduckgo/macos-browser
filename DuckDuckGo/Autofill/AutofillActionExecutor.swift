@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import DDGSync
 import AppKit
+import PixelKit
 
 /// Conforming types provide an `execute` method which performs some action on autofill types (e.g delete all passwords)
 protocol AutofillActionExecutor {
@@ -68,7 +69,7 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
                 syncService.scheduler.notifyDataChanged()
                 onSuccess?()
             } catch {
-                Pixel.fire(.debug(event: .secureVaultError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             }
 
             return

@@ -21,10 +21,7 @@ import Foundation
 import NetworkProtection
 import ServiceManagement
 import AppKit
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 /// Class that implements the necessary logic to ensure the VPN is enabled, or prevent the app from running otherwise.
 ///
@@ -34,13 +31,12 @@ final class NetworkProtectionBouncer {
     /// current app.
     ///
     func requireAuthTokenOrKillApp(controller: TunnelController) async {
-#if SUBSCRIPTION
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
         guard !accountManager.isUserAuthenticated else {
             return
         }
-#endif
+
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default,
                                                                 errorEvents: nil,
                                                                 isSubscriptionEnabled: false,

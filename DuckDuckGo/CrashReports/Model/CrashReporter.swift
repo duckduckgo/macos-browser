@@ -19,6 +19,7 @@
 import Common
 import Crashes
 import Foundation
+import PixelKit
 
 final class CrashReporter {
 
@@ -47,7 +48,7 @@ final class CrashReporter {
             return
         }
 
-        Pixel.fire(.crash)
+        PixelKit.fire(GeneralPixel.crash)
 
         promptPresenter.showPrompt(for: latest) {
             guard let contentData = latest.contentData else {

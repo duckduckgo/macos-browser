@@ -19,6 +19,7 @@
 import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+@testable import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class CBRCompileTimeReporterTests: XCTestCase {
@@ -27,15 +28,20 @@ class CBRCompileTimeReporterTests: XCTestCase {
     let host = "improving.duckduckgo.com"
     var tab: NSObject! = NSObject()
     var time = CACurrentMediaTime()
+    let pixelKit = PixelKit(dryRun: true,
+                            appVersion: "1.0.0",
+                            defaultHeaders: [:],
+                            defaults: UserDefaults(),
+                            fireRequest: { _, _, _, _, _, _ in })
 
     override func setUp() {
-        Pixel.setUp()
+        PixelKit.setSharedForTesting(pixelKit: pixelKit)
         UserDefaultsWrapper<Any>.clearAll()
     }
 
     override func tearDown() {
         HTTPStubs.removeAllStubs()
-        Pixel.tearDown()
+        PixelKit.tearDown()
         super.tearDown()
     }
 
@@ -51,8 +57,8 @@ class CBRCompileTimeReporterTests: XCTestCase {
     @discardableResult
     func performTest(withOnboardingFinished onboardingFinished: Bool,
                      waitTime: TimeInterval,
-                     expectedWaitTime: Pixel.Event.CompileRulesWaitTime,
-                     result: Pixel.Event.WaitResult,
+                     expectedWaitTime: GeneralPixel.CompileRulesWaitTime,
+                     result: GeneralPixel.WaitResult,
                      runBeforeFinishing: ((Reporter) throws -> Void)? = nil) rethrows -> Reporter {
 
         HTTPStubs.removeAllStubs()
@@ -60,7 +66,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
             HTTPStubs.removeAllStubs()
         }
         let reporter = initReporter(onboardingFinished: onboardingFinished)
-        let pixel = Pixel.Event.compileRulesWait(onboardingShown: onboardingFinished ? .regularNavigation : .onboardingShown,
+        let pixel = GeneralPixel.compileRulesWait(onboardingShown: onboardingFinished ? .regularNavigation : .onboardingShown,
                                                  waitTime: expectedWaitTime,
                                                  result: result)
 
@@ -98,7 +104,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
         return reporter
     }
 
-    typealias Pair = (TimeInterval, Pixel.Event.CompileRulesWaitTime)
+    typealias Pair = (TimeInterval, GeneralPixel.CompileRulesWaitTime)
     let waitExpectationSeq: [Pair] = [(0, .noWait),
                                       (0.5, .lessThan1s),
                                       (1, .lessThan1s),

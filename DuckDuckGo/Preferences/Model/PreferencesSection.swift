@@ -18,10 +18,7 @@
 
 import Foundation
 import SwiftUI
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
@@ -62,7 +59,6 @@ struct PreferencesSection: Hashable, Identifiable {
             .init(id: .about, panes: otherPanes)
         ]
 
-#if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
 
             var shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
@@ -76,7 +72,6 @@ struct PreferencesSection: Hashable, Identifiable {
                 sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
             }
         }
-#endif
 
         return sections
     }
@@ -115,9 +110,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case appearance
     case dataClearing
     case vpn
-#if SUBSCRIPTION
     case subscription
-#endif
     case autofill
     case accessibility
     case duckPlayer = "duckplayer"
@@ -171,10 +164,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.dataClearing
         case .vpn:
             return UserText.vpn
-#if SUBSCRIPTION
         case .subscription:
             return UserText.subscription
-#endif
         case .autofill:
             return UserText.autofill
         case .accessibility:
@@ -210,10 +201,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "FireSettings"
         case .vpn:
             return "VPN"
-#if SUBSCRIPTION
         case .subscription:
             return "PrivacyPro"
-#endif
         case .autofill:
             return "Autofill"
         case .accessibility:

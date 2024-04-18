@@ -68,9 +68,15 @@ public enum SyncErrorType {
     case unableToRemoveDevice
     case invalidCode
     case unableCreateRecoveryPDF
+    case unableToAuthenticateOnDevice
 
     var title: String {
-        return UserText.syncErrorAlertTitle
+        switch self {
+        case .unableToAuthenticateOnDevice:
+            return UserText.syncDeviceAuthenticationErrorAlertTitle
+        default:
+            return UserText.syncErrorAlertTitle
+        }
     }
 
     var description: String {
@@ -93,6 +99,26 @@ public enum SyncErrorType {
             return UserText.invalidCodeDescription
         case .unableCreateRecoveryPDF:
             return UserText.unableCreateRecoveryPdfDescription
+        case .unableToAuthenticateOnDevice:
+            return UserText.unableToAuthenticateDevice
+        }
+    }
+
+    var buttonTitle: String {
+        switch self {
+        case .unableToAuthenticateOnDevice:
+            return UserText.syncDeviceAuthenticationErrorAlertButton
+        default:
+            return UserText.ok
+        }
+    }
+
+    func onButtonPressed(delegate: ManagementDialogModelDelegate?) {
+        switch self {
+        case .unableToAuthenticateOnDevice:
+            delegate?.openSystemPasswordSettings()
+        default:
+            break
         }
     }
 }
