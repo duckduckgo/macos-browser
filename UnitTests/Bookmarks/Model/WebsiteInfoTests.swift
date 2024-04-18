@@ -22,13 +22,29 @@ import XCTest
 @MainActor
 final class WebsiteInfoTests: XCTestCase {
 
+    // MARK: - URL
+
+    func testWhenInitWithTabThenSetURLWithTabURLValue() throws {
+        // GIVEN
+        let url = URL.duckDuckGo
+        let websiteInfo = try XCTUnwrap(WebsiteInfo.makeWebsitesInfo(url: url).first)
+
+        // WHEN
+        let result = websiteInfo.url
+
+        // THEN
+        XCTAssertEqual(result, url)
+    }
+
+    // MARK: - Title
+
     func testWhenTitleIsNotNilThenDisplayTitleReturnsTitleValue() throws {
         // GIVEN
         let title = #function
         let websiteInfo = try XCTUnwrap(WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, title: title).first)
 
         // WHEN
-        let result = websiteInfo.bookmarkTitle
+        let result = websiteInfo.title
 
         // THEN
         XCTAssertEqual(result, title)
@@ -40,7 +56,7 @@ final class WebsiteInfoTests: XCTestCase {
         let websiteInfo = try XCTUnwrap(WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, title: nil).first)
 
         // WHEN
-        let result = websiteInfo.bookmarkTitle
+        let result = websiteInfo.title
 
         // THEN
         XCTAssertEqual(result, url.host)
@@ -52,7 +68,7 @@ final class WebsiteInfoTests: XCTestCase {
         let websiteInfo = try XCTUnwrap(WebsiteInfo.makeWebsitesInfo(url: invalidURL, title: nil).first)
 
         // WHEN
-        let result = websiteInfo.bookmarkTitle
+        let result = websiteInfo.title
 
         // THEN
         XCTAssertEqual(result, invalidURL.absoluteString)

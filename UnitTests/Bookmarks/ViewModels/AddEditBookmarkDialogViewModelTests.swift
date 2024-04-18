@@ -173,7 +173,7 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         // GIVEN
         let tab = Tab(content: .url(URL.duckDuckGo, source: .link), title: "Test")
         let websiteInfo = try XCTUnwrap(WebsiteInfo(tab))
-        let bookmark = Bookmark(id: "1", url: websiteInfo.url.absoluteString, title: websiteInfo.title ?? "", isFavorite: false)
+        let bookmark = Bookmark(id: "1", url: websiteInfo.url.absoluteString, title: websiteInfo.title, isFavorite: false)
         bookmarkStoreMock.bookmarks = [bookmark]
         bookmarkManager.loadBookmarks()
         let sut = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: WebsiteInfo(tab)), bookmarkManager: bookmarkManager)

@@ -349,7 +349,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 let newFolderMO = BookmarkEntity.makeFolder(title: folderName, parent: parentFolder, context: context)
                 // Save the bookmarks
                 websitesInfo.forEach { info in
-                    _ = BookmarkEntity.makeBookmark(title: info.bookmarkTitle, url: info.url.absoluteString, parent: newFolderMO, context: context)
+                    _ = BookmarkEntity.makeBookmark(title: info.title, url: info.url.absoluteString, parent: newFolderMO, context: context)
                 }
             }
         } catch {
