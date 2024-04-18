@@ -124,8 +124,6 @@ extension HomePage.Models {
 
         lazy var statisticsStore: StatisticsStore = LocalStatisticsStore()
 
-        lazy var waitlistBetaThankYouPresenter = WaitlistThankYouPromptPresenter()
-
         lazy var listOfFeatures = isFirstSession ? firstRunFeatures : randomisedFeatures
 
         private var featuresMatrix: [[FeatureType]] = [[]] {
@@ -191,18 +189,9 @@ extension HomePage.Models {
 #if DBP
                 DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
 #endif
-            case .vpnThankYou:
-                guard let window = NSApp.keyWindow,
-                      case .normal = NSApp.runType else { return }
-                waitlistBetaThankYouPresenter.presentVPNThankYouPrompt(in: window)
-            case .pirThankYou:
-                guard let window = NSApp.keyWindow,
-                      case .normal = NSApp.runType else { return }
-                waitlistBetaThankYouPresenter.presentPIRThankYouPrompt(in: window)
             }
         }
 
-        // swiftlint:disable:next cyclomatic_complexity
         func removeItem(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
@@ -227,10 +216,6 @@ extension HomePage.Models {
 #endif
             case .dataBrokerProtectionWaitlistInvited:
                 shouldShowDBPWaitlistInvitedCardUI = false
-            case .vpnThankYou:
-                waitlistBetaThankYouPresenter.didDismissVPNThankYouCard()
-            case .pirThankYou:
-                waitlistBetaThankYouPresenter.didDismissPIRThankYouCard()
             }
             refreshFeaturesMatrix()
         }
@@ -258,14 +243,6 @@ extension HomePage.Models {
                     pixel: .networkProtectionRemoteMessageDisplayed(messageID: message.id),
                     frequency: .dailyOnly
                 )
-            }
-
-            if waitlistBetaThankYouPresenter.canShowVPNCard {
-                features.append(.vpnThankYou)
-            }
-
-            if waitlistBetaThankYouPresenter.canShowPIRCard {
-                features.append(.pirThankYou)
             }
 
             for feature in listOfFeatures {
@@ -297,9 +274,7 @@ extension HomePage.Models {
                     }
                 case .networkProtectionRemoteMessage,
                         .dataBrokerProtectionRemoteMessage,
-                        .dataBrokerProtectionWaitlistInvited,
-                        .vpnThankYou,
-                        .pirThankYou:
+                        .dataBrokerProtectionWaitlistInvited:
                     break // Do nothing, these messages get appended first
                 }
             }
@@ -507,8 +482,6 @@ extension HomePage.Models {
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
         case dataBrokerProtectionRemoteMessage(DataBrokerProtectionRemoteMessage)
         case dataBrokerProtectionWaitlistInvited
-        case vpnThankYou
-        case pirThankYou
 
         var title: String {
             switch self {
@@ -530,10 +503,6 @@ extension HomePage.Models {
                 return message.cardTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Personal Information Removal"
-            case .vpnThankYou:
-                return "Thanks for testing DuckDuckGo VPN!"
-            case .pirThankYou:
-                return "Thanks for testing Personal Information Removal!"
             }
         }
 
@@ -557,10 +526,6 @@ extension HomePage.Models {
                 return message.cardDescription
             case .dataBrokerProtectionWaitlistInvited:
                 return "You're invited to try Personal Information Removal beta!"
-            case .vpnThankYou:
-                return "To keep using it, subscribe to DuckDuckGo Privacy Pro."
-            case .pirThankYou:
-                return "To keep using it, subscribe to DuckDuckGo Privacy Pro."
             }
         }
 
@@ -584,10 +549,6 @@ extension HomePage.Models {
                 return message.action.actionTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Get Started"
-            case .vpnThankYou:
-                return "See Special Offer For Testers"
-            case .pirThankYou:
-                return "See Special Offer For Testers"
             }
         }
 
@@ -612,10 +573,6 @@ extension HomePage.Models {
             case .dataBrokerProtectionRemoteMessage:
                 return .dbpInformationRemover.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
-                return .dbpInformationRemover.resized(to: iconSize)!
-            case .vpnThankYou:
-                return .vpnEnded.resized(to: iconSize)!
-            case .pirThankYou:
                 return .dbpInformationRemover.resized(to: iconSize)!
             }
         }
