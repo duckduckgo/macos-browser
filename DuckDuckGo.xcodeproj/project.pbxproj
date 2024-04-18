@@ -3373,6 +3373,8 @@
 		F1DF95DA2BD17AC90045E591 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1DF95D92BD17AC90045E591 /* PixelKit */; };
 		F1DF95DC2BD17AD20045E591 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1DF95DB2BD17AD20045E591 /* PixelKit */; };
 		F1DF95DE2BD17AD80045E591 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F1DF95DD2BD17AD80045E591 /* PixelKit */; };
+		F1DF95E02BD17BE50045E591 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F1DF95DF2BD17BE50045E591 /* PixelKitTestingUtilities */; };
+		F1DF95E22BD17BEA0045E591 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F1DF95E12BD17BEA0045E591 /* PixelKitTestingUtilities */; };
 		F41D174125CB131900472416 /* NSColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D174025CB131900472416 /* NSColorExtension.swift */; };
 		F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F44C130125C2DA0400426E3E /* NSAppearanceExtension.swift */; };
 		F4A6198C283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */; };
@@ -4875,6 +4877,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1DF95E22BD17BEA0045E591 /* PixelKitTestingUtilities in Frameworks */,
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
 				B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
@@ -5099,6 +5102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1DF95E02BD17BE50045E591 /* PixelKitTestingUtilities in Frameworks */,
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
 				B65CD8CB2B316DF100A595BB /* SnapshotTesting in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
@@ -8977,6 +8981,7 @@
 				3706FDD6293F661700E42796 /* OHHTTPStubs */,
 				3706FDD8293F661700E42796 /* OHHTTPStubsSwift */,
 				B65CD8CE2B316E0200A595BB /* SnapshotTesting */,
+				F1DF95E12BD17BEA0045E591 /* PixelKitTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -9435,6 +9440,7 @@
 				B6DA44162616C13800DD1EC2 /* OHHTTPStubs */,
 				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
 				B65CD8CA2B316DF100A595BB /* SnapshotTesting */,
+				F1DF95DF2BD17BE50045E591 /* PixelKitTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -15272,6 +15278,14 @@
 		F1DF95DD2BD17AD80045E591 /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PixelKit;
+		};
+		F1DF95DF2BD17BE50045E591 /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
+		};
+		F1DF95E12BD17BEA0045E591 /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
 		};
 /* End XCSwiftPackageProductDependency section */
 
