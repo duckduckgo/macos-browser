@@ -414,11 +414,9 @@ final class LocalBookmarkStore: BookmarkStore {
                 bookmarkFolderToReturn = bookmarkFolder
 
             } catch BookmarkStoreError.badModelMapping {
-                PixelKit.fire(DebugEvent(GeneralPixel.bookmarkAllTabsLastUsedFolderBadModelMapping))
+                os_log("Failed to map BookmarkEntity to BookmarkFolder, with error: %s", log: .bookmarks, type: .error)
             } catch {
-                let error = error as NSError
-                let processedErrors = CoreDataErrorsParser.parse(error: error)
-                PixelKit.fire(DebugEvent(GeneralPixel.bookmarkAllTabsLastUsedFolderFetchFailed, error: error), withAdditionalParameters: processedErrors.errorPixelParameters)
+                os_log("Failed to fetch last saved folder for bookmarks all tabs, with error: %s", log: .bookmarks, type: .error, error.localizedDescription)
             }
         }
 
