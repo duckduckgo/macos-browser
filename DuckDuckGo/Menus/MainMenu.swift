@@ -319,6 +319,7 @@ import SubscriptionUI
                 NSMenuItem(title: UserText.zoom, action: #selector(NSWindow.performZoom))
                 NSMenuItem.separator()
 
+                NSMenuItem(title: UserText.duplicateTab, action: #selector(MainViewController.duplicateTab))
                 NSMenuItem(title: UserText.pinTab, action: #selector(MainViewController.pinOrUnpinTab))
                 NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(MainViewController.moveTabToNewWindow))
                 NSMenuItem(title: UserText.mainMenuWindowMergeAllWindows, action: #selector(NSWindow.mergeAllWindows))

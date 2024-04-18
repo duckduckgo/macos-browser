@@ -601,6 +601,12 @@ extension MainViewController {
         WindowsManager.openNewWindow(with: tab)
     }
 
+    @objc func duplicateTab(_ sender: Any?) {
+        guard let (_, index) = getActiveTabAndIndex() else { return }
+
+        tabCollectionViewModel.duplicateTab(at: index)
+    }
+
     @objc func pinOrUnpinTab(_ sender: Any?) {
         guard let (_, selectedTabIndex) = getActiveTabAndIndex() else { return }
 
