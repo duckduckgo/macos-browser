@@ -10697,6 +10697,18 @@
         }
       }
     },
+    "close.all.other.tabs" : {
+      "comment" : "Menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close All Other Tabs"
+          }
+        }
+      }
+    },
     "close.other.tabs" : {
       "comment" : "Menu item",
       "extractionState" : "extracted_with_value",
@@ -10933,6 +10945,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закрыть и вернуться ко вкладке «%@»"
+          }
+        }
+      }
+    },
+    "close.tabs.to.the.left" : {
+      "comment" : "Menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close Tabs to the Left"
           }
         }
       }
