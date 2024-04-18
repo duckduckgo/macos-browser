@@ -45,6 +45,7 @@ let package = Package(
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "XPCHelper", package: "XPCHelper"),
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
@@ -58,6 +59,7 @@ let package = Package(
             name: "NetworkProtectionProxy",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
