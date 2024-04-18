@@ -8775,19 +8775,19 @@
       }
     },
     "bookmarks.dialog.allTabs.title.add" : {
-      "comment" : "Title of dialog to bookmark all open tabs. E.g. 'Bookmark 42 Open Tabs`",
+      "comment" : "Title of dialog to bookmark all open tabs. E.g. 'Bookmark Open Tabs (42)'",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Bookmark %1$d Open Tabs"
+            "value" : "Bookmark Open Tabs (%d)"
           }
         }
       }
     },
     "bookmarks.dialog.field.folderName" : {
-      "comment" : "Folder name field label for Bookmarks folder\n   The suggested name of the folder that will contain the bookmark tabs. Eg. 2024-02-12 - 50 Tabs",
+      "comment" : "Folder name field label for Bookmarks folder\n   The suggested name of the folder that will contain the bookmark tabs. Eg. 2024-02-12 - Tabs (42)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
