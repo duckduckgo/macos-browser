@@ -17,13 +17,17 @@
 //
 
 import Foundation
+import MetricKit
 
-protocol CrashReport {
+protocol CrashReportPresenting {
+    var content: String? { get }
+}
+
+protocol CrashReport: CrashReportPresenting {
 
     static var fileExtension: String { get }
 
     var url: URL { get }
-    var content: String? { get }
     var contentData: Data? { get }
 
 }
@@ -90,4 +94,11 @@ struct JSONCrashReport: CrashReport {
         content?.data(using: .utf8)
     }
 
+}
+
+@available(macOS 12.0, *)
+extension MXDiagnosticPayload: CrashReportPresenting {
+    var content: String? {
+        jsonRepresentation().utf8String()
+    }
 }
