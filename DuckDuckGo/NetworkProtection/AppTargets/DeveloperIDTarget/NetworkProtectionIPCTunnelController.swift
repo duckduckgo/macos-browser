@@ -50,12 +50,12 @@ final class NetworkProtectionIPCTunnelController {
     private let featureVisibility: NetworkProtectionFeatureVisibility
     private let loginItemsManager: LoginItemsManaging
     private let ipcClient: NetworkProtectionIPCClient
-    private let pixelKit: PixelKit?
+    private let pixelKit: PixelFiring?
 
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          ipcClient: NetworkProtectionIPCClient,
-         pixelKit: PixelKit? = PixelKit.shared) {
+         pixelKit: PixelFiring? = PixelKit.shared) {
 
         self.featureVisibility = featureVisibility
         self.loginItemsManager = loginItemsManager
