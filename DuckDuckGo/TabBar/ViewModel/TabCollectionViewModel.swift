@@ -489,18 +489,18 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func resetTabSelectionIfNeeded() {
-        if let currentSelection = selectionIndex, currentSelection.isUnpinnedTab, !tabCollection.tabs.indices.contains(currentSelection.item) {
-            selectionIndex = .unpinned(tabCollection.tabs.count - 1)
-        }
-    }
-
     func removeTabs(before index: Int) {
         guard changesEnabled else { return }
 
         tabCollection.removeTabs(before: index)
 
-        resetTabSelectionIfNeeded()
+        if let currentSelection = selectionIndex, currentSelection.isUnpinnedTab {
+            if currentSelection.item < index {
+                selectionIndex = .unpinned(0)
+            } else if !tabCollection.tabs.indices.contains(currentSelection.item) {
+                selectionIndex = .unpinned(tabCollection.tabs.count - 1)
+            }
+        }
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
@@ -510,7 +510,9 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(after: index)
 
-        resetTabSelectionIfNeeded()
+        if let currentSelection = selectionIndex, currentSelection.isUnpinnedTab, !tabCollection.tabs.indices.contains(currentSelection.item) {
+            selectionIndex = .unpinned(tabCollection.tabs.count - 1)
+        }
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }

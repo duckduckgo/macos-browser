@@ -318,6 +318,53 @@ final class TabCollectionViewModelTests: XCTestCase {
         XCTAssertEqual(firstTab, tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
+    func testWhenTabsToTheLeftAreRemovedAndSelectionIsRemoved_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+
+        tabCollectionViewModel.select(at: .unpinned(1))
+        tabCollectionViewModel.removeTabs(before: 2)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 0)
+    }
+
+    func testWhenTabsToTheLeftAreRemovedAndSelectionRemains_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(1))
+        tabCollectionViewModel.removeTabs(before: 1)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 0)
+    }
+
+    func testWhenTabsToTheRightAreRemovedAndSelectionIsRemoved_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+
+        tabCollectionViewModel.select(at: .unpinned(1))
+        tabCollectionViewModel.removeTabs(after: 0)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 0)
+    }
+
+    func testWhenTabsToTheRightAreRemovedAndSelectionRemains_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(1))
+        tabCollectionViewModel.removeTabs(after: 1)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 1)
+    }
+
     func testWhenLastTabIsRemoved_ThenSelectionIsNil() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
