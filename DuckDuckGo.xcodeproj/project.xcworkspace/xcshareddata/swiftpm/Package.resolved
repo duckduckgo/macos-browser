@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "graeme/vpn-server-failure-detection-recovery",
-        "revision" : "18d6a5998db707ea6426a44ed93737de6836cda0"
+        "branch" : "graeme/vpn-server-failure-recovery-retry-logic",
+        "revision" : "bea184c8d89ae072193712ea7958d503275a4653"
       }
     },
     {
