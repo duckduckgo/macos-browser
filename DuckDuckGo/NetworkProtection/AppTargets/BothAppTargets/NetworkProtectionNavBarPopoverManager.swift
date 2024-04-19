@@ -23,18 +23,15 @@ import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
     var ipcServerInfoObserver: ConnectionServerInfoObserver { get }
     var ipcConnectionErrorObserver: ConnectionErrorObserver { get }
 
-    func start()
-    func stop()
+    func start(completion: @escaping (Error?) -> Void)
+    func stop(completion: @escaping (Error?) -> Void)
 }
 
 extension TunnelControllerIPCClient: NetworkProtectionIPCClient {

@@ -21,9 +21,13 @@ import Foundation
 import LoginItems
 import PixelKit
 
+protocol LoginItemsManaging {
+    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws
+}
+
 /// Class to manage the login items for the VPN and DBP
 ///
-final class LoginItemsManager {
+final class LoginItemsManager: LoginItemsManaging {
     private enum Action: String {
         case enable
         case disable
@@ -39,6 +43,20 @@ final class LoginItemsManager {
                 os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
             } catch let error as NSError {
                 handleError(for: item, action: .enable, error: error)
+            }
+        }
+    }
+
+    /// Throwing version of enableLoginItems
+    ///
+    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws {
+        for item in items {
+            do {
+                try item.enable()
+                os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
+            } catch let error as NSError {
+                handleError(for: item, action: .enable, error: error)
+                throw error
             }
         }
     }

@@ -24,10 +24,7 @@ import NetworkProtection
 import NetworkProtectionUI
 import LoginItems
 import PixelKit
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 protocol NetworkProtectionFeatureVisibility {
     var isEligibleForThankYouMessage: Bool { get }
@@ -130,15 +127,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
-#if SUBSCRIPTION
         return subscriptionFeatureAvailability.isFeatureAvailable && !accountManager.isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
-#else
-        let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
-        let isNotEasterEggUser = !isEasterEggUser
-        let isOnboarded = defaults.networkProtectionOnboardingStatus != .default
-
-        return isNotEasterEggUser && waitlistAccessEnded && isOnboarded
-#endif
     }
 
     /// Whether the user is fully onboarded
