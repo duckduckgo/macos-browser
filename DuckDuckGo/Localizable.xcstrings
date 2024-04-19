@@ -20087,6 +20087,7 @@
     },
     "Hide" : {
       "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48036,6 +48037,7 @@
     },
     "Show left of the back button" : {
       "comment" : "Preferences > Home Button > left position item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48089,6 +48091,7 @@
     },
     "Show Left of the Back Button" : {
       "comment" : "Main Menu > View > Home Button > left position item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48354,6 +48357,7 @@
     },
     "Show right of the reload button" : {
       "comment" : "Preferences > Home Button > right position item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48407,6 +48411,7 @@
     },
     "Show Right of the Reload Button" : {
       "comment" : "Main Menu > View > Home Button > right position item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -50346,9 +50351,6 @@
           }
         }
       }
-    },
-    "These bookmarks will be saved in a new folder:" : {
-
     },
     "tooltip.addToFavorites" : {
       "comment" : "Tooltip for add to favorites button",
