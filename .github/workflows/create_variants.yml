@@ -99,7 +99,9 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix: [ab]
+      matrix:
+        include:
+          - variant: "ab"
     uses: ./.github/workflows/create_variant.yml
     with:
       atb-variant: ${{ matrix.variant }}
