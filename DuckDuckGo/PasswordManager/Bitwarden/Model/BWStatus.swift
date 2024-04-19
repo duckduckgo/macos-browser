@@ -28,6 +28,7 @@ enum BWStatus: Equatable {
 
     // Installed Bitwarden doesn't support the integration
     case oldVersion
+    case incompatible
 
     // Bitwarden application isn't running
     case notRunning

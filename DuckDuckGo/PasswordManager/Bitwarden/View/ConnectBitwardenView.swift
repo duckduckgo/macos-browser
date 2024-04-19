@@ -94,9 +94,10 @@ struct ConnectBitwardenView: View {
     @ViewBuilder private func bodyView(for state: ConnectBitwardenViewModel.ViewState) -> some View {
         switch viewModel.viewState {
         case .disclaimer: ConnectToBitwardenDisclaimerView()
-        case .lookingForBitwarden: BitwardenInstallationDetectionView(bitwardenDetected: false, bitwardenNeedsUpdate: false)
-        case .oldVersion: BitwardenInstallationDetectionView(bitwardenDetected: true, bitwardenNeedsUpdate: true)
-        case .bitwardenFound: BitwardenInstallationDetectionView(bitwardenDetected: true, bitwardenNeedsUpdate: false)
+        case .lookingForBitwarden: BitwardenInstallationDetectionView(bitwardenDetected: false, bitwardenNeedsUpdate: false, bitwardenIsIncompatible: false)
+        case .incompatible: BitwardenInstallationDetectionView(bitwardenDetected: true, bitwardenNeedsUpdate: false, bitwardenIsIncompatible: true)
+        case .oldVersion: BitwardenInstallationDetectionView(bitwardenDetected: true, bitwardenNeedsUpdate: true, bitwardenIsIncompatible: false)
+        case .bitwardenFound: BitwardenInstallationDetectionView(bitwardenDetected: true, bitwardenNeedsUpdate: false, bitwardenIsIncompatible: false)
         case .accessToContainersNotApproved: ConnectToBitwardenView(canConnect: false, canNotAccessSandboxContainers: true)
         case .waitingForConnectionPermission: ConnectToBitwardenView(canConnect: false, canNotAccessSandboxContainers: false)
         case .connectToBitwarden: ConnectToBitwardenView(canConnect: true, canNotAccessSandboxContainers: false)
@@ -155,36 +156,36 @@ private struct BitwardenInstallationDetectionView: View {
 
     let bitwardenDetected: Bool
     let bitwardenNeedsUpdate: Bool
+    let bitwardenIsIncompatible: Bool
 
     var body: some View {
 
         VStack(alignment: .leading, spacing: 10) {
-            Text(UserText.installBitwarden)
-                .font(.system(size: 13, weight: .bold))
 
-            HStack {
-                NumberedBadge(value: 1)
+            if !bitwardenIsIncompatible {
+                Text(UserText.installBitwarden)
+                    .font(.system(size: 13, weight: .bold))
 
-                Text(UserText.installBitwardenInfo)
+                HStack {
+                    NumberedBadge(value: 1)
+                    Text(UserText.installBitwardenInfo)
+                    Spacer()
+                }
 
-                Spacer()
+                HStack {
+                    NumberedBadge(value: 2)
+                    Text(UserText.afterBitwardenInstallationInfo)
+                    Spacer()
+                }
+
+                Button(action: {
+                    viewModel.process(action: .openBitwardenProductPage)
+                }, label: {
+                    Image(.macAppStoreButton)
+                })
+                .buttonStyle(PlainButtonStyle())
+                .frame(width: 156, height: 40)
             }
-
-            HStack {
-                NumberedBadge(value: 2)
-
-                Text(UserText.afterBitwardenInstallationInfo)
-
-                Spacer()
-            }
-
-            Button(action: {
-                viewModel.process(action: .openBitwardenProductPage)
-            }, label: {
-                Image(.macAppStoreButton)
-            })
-            .buttonStyle(PlainButtonStyle())
-            .frame(width: 156, height: 40)
 
             if bitwardenDetected {
                 if bitwardenNeedsUpdate {
@@ -192,6 +193,17 @@ private struct BitwardenInstallationDetectionView: View {
                         ActivityIndicator(isAnimating: .constant(true), style: .spinning)
 
                         Text(UserText.bitwardenOldVersion)
+                    }
+                } else if bitwardenIsIncompatible {
+                    HStack {
+                        ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+
+                        VStack(alignment: .leading) {
+                            Text(UserText.bitwardenIncompatible)
+                                .lineLimit(nil)
+                                .fixedSize(horizontal: false, vertical: true)
+                            BitwardenDowngradeInfoView()
+                        }
                     }
                 } else {
                     HStack {
