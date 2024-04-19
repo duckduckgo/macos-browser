@@ -434,20 +434,26 @@ private extension NSAttributedString {
 
     private static let spacer = NSImage() // empty spacer image attachment for Attributed Strings below
 
+    private static let iconBaselineOffset: CGFloat = -3
+    private static let iconSize: CGFloat = 16
+    private static let iconSpacing: CGFloat = 6
+    private static let chevronSize: CGFloat = 12
+    private static let chevronSpacing: CGFloat = 12
+
     private static let duckDuckGoWithChevronAttributedString = NSAttributedString {
         // logo
-        Component(image: .homeFavicon, rect: CGRect(x: 0, y: -3, width: 16, height: 16))
+        Component(image: .homeFavicon, rect: CGRect(x: 0, y: iconBaselineOffset, width: iconSize, height: iconSize))
         // spacing
-        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 4, height: 1))
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: iconSpacing, height: 1))
         // DuckDuckGo
         Component(string: UserText.duckDuckGo)
 
         // spacing (wide)
-        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 12, height: 1))
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: chevronSpacing, height: 1))
         // chevron
-        Component(image: .chevronRight12, rect: CGRect(x: 0, y: -1, width: 12, height: 12))
+        Component(image: .chevronRight12, rect: CGRect(x: 0, y: -1, width: chevronSize, height: chevronSize))
         // spacing (wide)
-        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 12, height: 1))
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: chevronSpacing, height: 1))
     }
 
     private static func trustedIndicatorAttributedString(with icon: NSImage, title: String) -> NSAttributedString {
@@ -455,9 +461,9 @@ private extension NSAttributedString {
             duckDuckGoWithChevronAttributedString
 
             // favicon
-            Component(image: icon, rect: CGRect(x: 0, y: -3, width: 16, height: 16))
+            Component(image: icon, rect: CGRect(x: 0, y: iconBaselineOffset, width: iconSize, height: iconSize))
             // spacing
-            Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 4, height: 1))
+            Component(image: spacer, rect: CGRect(x: 0, y: 0, width: iconSpacing, height: 1))
             // title
             Component(string: title)
         }
