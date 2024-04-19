@@ -303,13 +303,24 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToTitleChange(of selectedTabViewModel: TabViewModel?) {
-        guard let window = self.view.window else { return }
-        selectedTabViewModel?.$title
+        guard let selectedTabViewModel else { return }
+
+        let isAddedToWindowPublisher: AnyPublisher<Void, Never> = {
+            if let window = view.window {
+                return Just(()).eraseToAnyPublisher()
+            }
+            return view.publisher(for: \.window).filter({ $0 != nil }).prefix(1).asVoid().eraseToAnyPublisher()
+        }()
+
+        isAddedToWindowPublisher
+            .combineLatest(selectedTabViewModel.$title) { $1 }
             .map {
                 $0.truncated(length: MainMenu.Constants.maxTitleLength)
             }
             .receive(on: DispatchQueue.main)
-            .assign(to: \.title, onWeaklyHeld: window)
+            .sink { [weak self] title in
+                self?.view.window?.title = title
+            }
             .store(in: &tabViewModelCancellables)
     }
 
