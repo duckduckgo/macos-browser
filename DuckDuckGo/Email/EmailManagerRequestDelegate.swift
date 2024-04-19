@@ -17,6 +17,7 @@
 //
 
 import BrowserServicesKit
+import PixelKit
 
 extension EmailManagerRequestDelegate {
 
@@ -67,7 +68,7 @@ extension EmailManagerRequestDelegate {
             parameters["keychain_operation"] = "save"
         }
 
-        Pixel.fire(.debug(event: .emailAutofillKeychainError), withAdditionalParameters: parameters)
+        PixelKit.fire(DebugEvent(GeneralPixel.emailAutofillKeychainError), withAdditionalParameters: parameters)
     }
 
 }

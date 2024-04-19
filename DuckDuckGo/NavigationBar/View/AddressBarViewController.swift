@@ -168,12 +168,7 @@ final class AddressBarViewController: NSViewController {
             return true
         }
 
-        // If the webview doesn't have content it doesn't handle becoming the first responder properly
-        if tabViewModel?.tab.webView.url != nil {
-            tabViewModel?.tab.webView.makeMeFirstResponder()
-        } else {
-            view.superview?.becomeFirstResponder()
-        }
+        view.window?.makeFirstResponder(nil)
 
         return true
     }
@@ -245,7 +240,7 @@ final class AddressBarViewController: NSViewController {
         func shouldShowLoadingIndicator(for tabViewModel: TabViewModel, isLoading: Bool, error: Error?) -> Bool {
             if isLoading,
                let url = tabViewModel.tab.content.urlForWebView,
-               [.http, .https].contains(url.navigationalScheme),
+               url.navigationalScheme?.isHypertextScheme == true,
                !url.isDuckDuckGoSearch, !url.isDuckPlayer,
                error == nil {
                 return true
@@ -496,12 +491,16 @@ extension AddressBarViewController {
         return event
     }
 
+    private static let maxClickReleaseDistanceToResignFirstResponder: CGFloat = 4
+
     func mouseUp(with event: NSEvent) -> NSEvent? {
         // click (same position down+up) outside of the field: resign first responder
         guard event.window === self.view.window,
               self.view.window?.firstResponder === addressBarTextField.currentEditor(),
-              self.clickPoint == event.locationInWindow
-        else { return event }
+              let clickPoint,
+              clickPoint.distance(to: event.locationInWindow) <= Self.maxClickReleaseDistanceToResignFirstResponder else {
+            return event
+        }
 
         self.view.window?.makeFirstResponder(nil)
 

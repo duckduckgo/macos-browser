@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import Common
+import PixelKit
 
 @MainActor
 final class AppStateRestorationManager: NSObject {
@@ -71,10 +72,8 @@ final class AppStateRestorationManager: NSObject {
             // ignore
         } catch {
             os_log("App state could not be decoded: %s", "\(error)")
-            Pixel.fire(
-                .debug(event: .appStateRestorationFailed, error: error),
-                withAdditionalParameters: ["interactive": String(interactive)]
-            )
+            PixelKit.fire(DebugEvent(GeneralPixel.appStateRestorationFailed, error: error),
+                          withAdditionalParameters: ["interactive": String(interactive)])
         }
 
         return state
@@ -140,7 +139,7 @@ final class AppStateRestorationManager: NSObject {
             // ignore
         } catch {
             os_log("Pinned tabs state could not be decoded: %s", "\(error)")
-            Pixel.fire(.debug(event: .appStateRestorationFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.appStateRestorationFailed, error: error))
         }
     }
 

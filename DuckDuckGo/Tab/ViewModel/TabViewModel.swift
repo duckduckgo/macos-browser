@@ -108,26 +108,25 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        enum Event {
-            case instant
-            case didCommit
-        }
         tab.$content
-            .map { [tab] content -> AnyPublisher<Event, Never> in
+            .map { [tab] content -> AnyPublisher<Void, Never> in
                 switch content {
-                case .url(let url, _, source: .webViewUpdated),
-                     .url(let url, _, source: .link):
-
-                    // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
-                    return tab.$committedURL.filter { committedURL in
-                        committedURL == url
-                    }.map { _ in
-                        .didCommit
-                    }.eraseToAnyPublisher()
-
                 case .url(_, _, source: .userEntered(_, downloadRequested: true)):
                     // don‘t update the address bar for download navigations
                     return Empty().eraseToAnyPublisher()
+
+                case .url(let url, _, source: .webViewUpdated),
+                     .url(let url, _, source: .link):
+
+                    guard !url.isEmpty, url != .blankPage else { fallthrough }
+
+                    // Only display the Tab content URL update matching its Security Origin
+                    // see https://github.com/mozilla-mobile/firefox-ios/wiki/WKWebView-navigation-and-security-considerations
+                    return tab.$securityOrigin
+                        .filter { tabSecurityOrigin in
+                            url.securityOrigin == tabSecurityOrigin
+                        }
+                        .asVoid().eraseToAnyPublisher()
 
                 case .url(_, _, source: .pendingStateRestoration),
                      .url(_, _, source: .loadedByStateRestoration),
@@ -146,7 +145,7 @@ final class TabViewModel {
                      .subscription,
                      .identityTheftRestoration:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
-                    return Just( .instant ).eraseToAnyPublisher()
+                    return Just( () ).eraseToAnyPublisher()
                 }
             }
             .switchToLatest()
@@ -260,17 +259,17 @@ final class TabViewModel {
         case .newtab, .onboarding, .none:
             .init() // empty
         case .settings(let pane):
-            .settingsTrustedIndicatorAttributedString
+            .settingsTrustedIndicator
         case .bookmarks:
-            .bookmarksTrustedIndicatorAttributedString
+            .bookmarksTrustedIndicator
         case .dataBrokerProtection:
-            .dbpTrustedIndicatorAttributedString
+            .dbpTrustedIndicator
         case .subscription:
-            .subscriptionTrustedIndicatorAttributedString
+            .subscriptionTrustedIndicator
         case .identityTheftRestoration:
-            .identityTheftRestorationTrustedIndicatorAttributedString
+            .identityTheftRestorationTrustedIndicator
         case .url(let url, _, _) where url.isDuckPlayer || url.isDuckURLScheme:
-            .duckPlayerTrustedIndicatorAttributedString
+            .duckPlayerTrustedIndicator
         case .url(let url, _, _):
             NSAttributedString(string: passiveAddressBarString(with: url, showFullURL: showFullURL))
         }
@@ -435,20 +434,26 @@ private extension NSAttributedString {
 
     private static let spacer = NSImage() // empty spacer image attachment for Attributed Strings below
 
+    private static let iconBaselineOffset: CGFloat = -3
+    private static let iconSize: CGFloat = 16
+    private static let iconSpacing: CGFloat = 6
+    private static let chevronSize: CGFloat = 12
+    private static let chevronSpacing: CGFloat = 12
+
     private static let duckDuckGoWithChevronAttributedString = NSAttributedString {
         // logo
-        Component(image: .homeFavicon, rect: CGRect(x: 0, y: -3, width: 16, height: 16))
+        Component(image: .homeFavicon, rect: CGRect(x: 0, y: iconBaselineOffset, width: iconSize, height: iconSize))
         // spacing
-        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 4, height: 1))
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: iconSpacing, height: 1))
         // DuckDuckGo
         Component(string: UserText.duckDuckGo)
 
         // spacing (wide)
-        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 12, height: 1))
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: chevronSpacing, height: 1))
         // chevron
-        Component(image: .chevronRight12, rect: CGRect(x: 0, y: -1, width: 12, height: 12))
+        Component(image: .chevronRight12, rect: CGRect(x: 0, y: -1, width: chevronSize, height: chevronSize))
         // spacing (wide)
-        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 12, height: 1))
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: chevronSpacing, height: 1))
     }
 
     private static func trustedIndicatorAttributedString(with icon: NSImage, title: String) -> NSAttributedString {
@@ -456,25 +461,25 @@ private extension NSAttributedString {
             duckDuckGoWithChevronAttributedString
 
             // favicon
-            Component(image: icon, rect: CGRect(x: 0, y: -3, width: 16, height: 16))
+            Component(image: icon, rect: CGRect(x: 0, y: iconBaselineOffset, width: iconSize, height: iconSize))
             // spacing
-            Component(image: spacer, rect: CGRect(x: 0, y: 0, width: 4, height: 1))
+            Component(image: spacer, rect: CGRect(x: 0, y: 0, width: iconSpacing, height: 1))
             // title
             Component(string: title)
         }
     }
 
-    static let settingsTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .settingsMulticolor16,
-                                                                                           title: UserText.settings)
-    static let bookmarksTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .bookmarksFolder,
-                                                                                            title: UserText.bookmarks)
-    static let dbpTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
-                                                                                      title: UserText.tabDataBrokerProtectionTitle)
-    static let subscriptionTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .privacyPro,
-                                                                                               title: UserText.subscription)
-    static let identityTheftRestorationTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .subscriptionIcon,
-                                                                                                           title: UserText.subscription)
-    static let duckPlayerTrustedIndicatorAttributedString = trustedIndicatorAttributedString(with: .duckPlayerSettings,
-                                                                                             title: UserText.duckPlayer)
+    static let settingsTrustedIndicator = trustedIndicatorAttributedString(with: .settingsMulticolor16,
+                                                                           title: UserText.settings)
+    static let bookmarksTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
+                                                                            title: UserText.bookmarks)
+    static let dbpTrustedIndicator = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
+                                                                      title: UserText.tabDataBrokerProtectionTitle)
+    static let subscriptionTrustedIndicator = trustedIndicatorAttributedString(with: .privacyPro,
+                                                                               title: UserText.subscription)
+    static let identityTheftRestorationTrustedIndicator = trustedIndicatorAttributedString(with: .identityTheftRestorationMulticolor16,
+                                                                                           title: UserText.identityTheftRestorationOptionsMenuItem)
+    static let duckPlayerTrustedIndicator = trustedIndicatorAttributedString(with: .duckPlayerSettings,
+                                                                             title: UserText.duckPlayer)
 
 }

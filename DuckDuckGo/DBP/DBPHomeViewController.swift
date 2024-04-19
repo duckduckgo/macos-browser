@@ -151,17 +151,15 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
         super.init { event, _, _, _ in
             switch event {
             case .error(let error, _):
-                Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
+                PixelKit.fire(DebugEvent(event, error: error))
             case .generalError(let error, _),
                     .secureVaultInitError(let error),
                     .secureVaultError(let error):
-                // We can't use .debug directly because it modifies the pixel name and clobbers the params
-                Pixel.fire(.pixelKitEvent(DebugEvent(event, error: error)))
+                PixelKit.fire(DebugEvent(event, error: error))
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerScanAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
-                // We can't use .debug directly because it modifies the pixel name and clobbers the params
-                Pixel.fire(.pixelKitEvent(DebugEvent(event, error: error)))
+                PixelKit.fire(DebugEvent(event, error: error))
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -182,7 +180,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
                     .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
-                    .ipcServerRegister,
                     .ipcServerStartScheduler,
                     .ipcServerStopScheduler,
                     .ipcServerOptOutAllBrokers,
@@ -210,7 +207,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .webUILoadingFailed,
                     .webUILoadingStarted,
                     .webUILoadingSuccess:
-                Pixel.fire(.pixelKitEvent(event))
+                PixelKit.fire(event)
             }
         }
     }

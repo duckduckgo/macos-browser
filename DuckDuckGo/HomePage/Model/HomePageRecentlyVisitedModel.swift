@@ -28,7 +28,7 @@ final class RecentlyVisitedModel: ObservableObject {
         let f = RelativeDateTimeFormatter()
         f.unitsStyle = .abbreviated
         return f
-    } ()
+    }()
 
     private let fire: Fire
 

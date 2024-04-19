@@ -290,7 +290,7 @@ final class AddressBarButtonsViewController: NSViewController {
         bookmarkButton.isHidden = !showBookmarkButton
     }
 
-    func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
+    func openBookmarkPopover(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) {
         let result = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint)
         guard let bookmark = result.bookmark else {
             assertionFailure("Failed to get a bookmark for the popover")
@@ -770,12 +770,11 @@ final class AddressBarButtonsViewController: NSViewController {
     private func updatePrivacyEntryPointButton() {
         guard let tabViewModel else { return }
 
-        let isHypertextUrl = if case .url(let url, _, _) = tabViewModel.tab.content,
-            !(url.isDuckPlayer || url.isDuckURLScheme),
-            [.http, .https].contains(url.navigationalScheme) { true } else { false}
+        let url = tabViewModel.tab.content.userEditableUrl
+        let isHypertextUrl = url?.navigationalScheme?.isHypertextScheme == true && url?.isDuckPlayer == false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
-        let isLocalUrl = tabViewModel.tab.content.userEditableUrl?.isLocalURL ?? false
+        let isLocalUrl = url?.isLocalURL ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isEditingMode
@@ -923,7 +922,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
+    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
         guard let tabViewModel,
               let url = tabViewModel.tab.content.userEditableUrl else {
             assertionFailure("No URL for bookmarking")
