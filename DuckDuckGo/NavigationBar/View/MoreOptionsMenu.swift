@@ -416,12 +416,14 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(image)
         }
 
-        if tabViewModel.canReload {
+        if tabViewModel.canFindInPage {
             addItem(withTitle: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
                 .targetting(self)
                 .withImage(.findSearch)
                 .withAccessibilityIdentifier("MoreOptionsMenu.findInPage")
+        }
 
+        if tabViewModel.canReload {
             addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
                 .targetting(self)
                 .withImage(.share)
