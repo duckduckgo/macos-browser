@@ -497,8 +497,8 @@ final class TabCollectionViewModel: NSObject {
         if let currentSelection = selectionIndex, currentSelection.isUnpinnedTab {
             if currentSelection.item < index {
                 selectionIndex = .unpinned(0)
-            } else if !tabCollection.tabs.indices.contains(currentSelection.item) {
-                selectionIndex = .unpinned(tabCollection.tabs.count - 1)
+            } else {
+                selectionIndex = .unpinned(currentSelection.item - index)
             }
         }
 
