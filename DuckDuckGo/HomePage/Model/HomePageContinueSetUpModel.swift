@@ -50,7 +50,6 @@ extension HomePage.Models {
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
-        private let randomNumberGenerator: RandomNumberGenerating
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
@@ -80,12 +79,6 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
 
-        @UserDefaultsWrapper(key: .homePageUserInSurveyShare, defaultValue: nil)
-        private var isUserRegisteredInSurveyShare: Bool?
-
-        @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
-        private var firstLaunchDate: Date
-
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
         }
@@ -93,8 +86,6 @@ extension HomePage.Models {
         var hasContent: Bool {
             return !featuresMatrix.isEmpty
         }
-
-        lazy var statisticsStore: StatisticsStore = LocalStatisticsStore()
 
         lazy var waitlistBetaThankYouPresenter = WaitlistThankYouPromptPresenter()
 
@@ -115,8 +106,7 @@ extension HomePage.Models {
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              homePageRemoteMessaging: HomePageRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-             permanentSurveyManager: SurveyManager = PermanentSurveyManager(),
-             randomNumberGenerator: RandomNumberGenerating = RandomNumberGenerator()) {
+             permanentSurveyManager: SurveyManager = PermanentSurveyManager()) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -125,7 +115,6 @@ extension HomePage.Models {
             self.homePageRemoteMessaging = homePageRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager
             self.permanentSurveyManager = permanentSurveyManager
-            self.randomNumberGenerator = randomNumberGenerator
 
             refreshFeaturesMatrix()
 
@@ -342,46 +331,14 @@ extension HomePage.Models {
         }
 
         private var shouldPermanentSurveyBeVisible: Bool {
-            guard let survey = permanentSurveyManager.survey else { return false }
-            let firstDay = survey.firstDay
-            let lastDay = survey.lastDay
-
-            let firstSurveyDayDate = Calendar.current.date(byAdding: .weekday, value: -firstDay, to: Date())!
-            let lastSurveyDayDate = Calendar.current.date(byAdding: .weekday, value: -lastDay, to: Date())!
-            let rightLocale = survey.isLocalized ? true : Bundle.main.preferredLocalizations.first == "en"
-
             return shouldShowPermanentSurvey &&
-                firstLaunchDate >= lastSurveyDayDate &&
-                firstLaunchDate <= firstSurveyDayDate &&
-                rightLocale &&
-                isUserInSurveyShare(survey.sharePercentage)
-        }
-
-        private func isUserInSurveyShare(_ share: Int) -> Bool {
-            if isUserRegisteredInSurveyShare ?? false {
-                return true
-            }
-            let randomNumber0To99 = randomNumberGenerator.random(in: 0..<100)
-            isUserRegisteredInSurveyShare = randomNumber0To99 < share
-            return isUserRegisteredInSurveyShare!
+            permanentSurveyManager.isSurveyAvailable
         }
 
         @MainActor private func visitSurvey() {
-            guard let url = permanentSurveyManager.survey?.url else { return }
-            var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-            var newQueryItems: [URLQueryItem] = []
-            if let atb = statisticsStore.atb {
-                newQueryItems.append(URLQueryItem(name: "atb", value: atb))
-            }
-            if let variant = statisticsStore.variant {
-                newQueryItems.append(URLQueryItem(name: "v", value: variant))
-            }
-            newQueryItems.append(URLQueryItem(name: "ddg", value: AppVersion.shared.versionNumber))
-            newQueryItems.append(URLQueryItem(name: "macos", value: AppVersion.shared.majorAndMinorOSVersion))
-            let oldQueryItems = components?.queryItems ?? []
-            components?.queryItems = oldQueryItems + newQueryItems
+            guard let url = permanentSurveyManager.url else { return }
 
-            let tab = Tab(content: .url(components?.url ?? url, source: .ui), shouldLoadInBackground: true)
+            let tab = Tab(content: .url(url, source: .ui), shouldLoadInBackground: true)
             tabCollectionViewModel.append(tab: tab)
             shouldShowPermanentSurvey = false
         }
@@ -469,7 +426,7 @@ extension HomePage.Models {
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionCardTitle
             case .permanentSurvey:
-                return "Help Us Improve"
+                return PermanentSurveyManager.title
             case .networkProtectionRemoteMessage(let message):
                 return message.cardTitle
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -494,7 +451,7 @@ extension HomePage.Models {
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionSummary
             case .permanentSurvey:
-                return "Take our short survey and help us build the best browser."
+                return PermanentSurveyManager.body
             case .networkProtectionRemoteMessage(let message):
                 return message.cardDescription
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -519,7 +476,7 @@ extension HomePage.Models {
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionAction
             case .permanentSurvey:
-                return "Share Your Thoughts"
+                return PermanentSurveyManager.actionTitle
             case .networkProtectionRemoteMessage(let message):
                 return message.action.actionTitle
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -603,16 +560,6 @@ struct HomePageRemoteMessaging {
     let dataBrokerProtectionUserDefaults: UserDefaults
 #endif
 
-}
-
-public protocol RandomNumberGenerating {
-    func random(in range: Range<Int>) -> Int
-}
-
-struct RandomNumberGenerator: RandomNumberGenerating {
-    func random(in range: Range<Int>) -> Int {
-        return Int.random(in: range)
-    }
 }
 
 extension AppVersion {

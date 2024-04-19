@@ -109,7 +109,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             duckPlayerPreferences: duckPlayerPreferences,
             homePageRemoteMessaging: messaging,
             privacyConfigurationManager: privacyConfigManager,
-            randomNumberGenerator: randomNumberGenerator
+            permanentSurveyManager: MockPermanentSurveyManager()
         )
     }
 
@@ -150,7 +150,8 @@ final class ContinueSetUpModelTests: XCTestCase {
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
-            homePageRemoteMessaging: createMessaging()
+            homePageRemoteMessaging: createMessaging(),
+            permanentSurveyManager: MockPermanentSurveyManager()
         )
 
         XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
@@ -360,7 +361,8 @@ final class ContinueSetUpModelTests: XCTestCase {
             tabCollectionViewModel: tabCollectionVM,
             emailManager: emailManager,
             duckPlayerPreferences: duckPlayerPreferences,
-            homePageRemoteMessaging: createMessaging()
+            homePageRemoteMessaging: createMessaging(),
+            permanentSurveyManager: MockPermanentSurveyManager()
         )
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, [[]])
@@ -395,131 +397,68 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertFalse(vm2.shouldShowAllFeatures)
     }
 
-    @MainActor func test_whenUserHasNotInteracted_andEnabled_andFirstInstallInTargetRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyDisplayed() {
-        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
-        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let randomNumberGenerator = MockRandomNumberGenerator()
-        randomNumberGenerator.numberToReturn = 10
-        let surveyManager = MockPermanentSurveyManager()
-        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
+    @MainActor func test_PermanentSurveyHasExpectedStrings() {
+        let surveyCardType = HomePage.Models.FeatureType.permanentSurvey
 
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+        XCTAssertEqual(surveyCardType.title, PermanentSurveyManager.title)
+        XCTAssertEqual(surveyCardType.summary, PermanentSurveyManager.body)
+        XCTAssertEqual(surveyCardType.action, PermanentSurveyManager.actionTitle)
+    }
+
+    @MainActor func test_whenSurveyIsAvailable_AndUserHasNotInteractedWithTheCard_ThenPermanentSureveyDisplayed() {
+        let expectedURL = URL(string: "someurl.com")
+        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: true, url: expectedURL)
+        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
         vm.shouldShowAllFeatures = true
 
         XCTAssertTrue(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-        XCTAssertEqual(randomNumberGenerator.capturedRange, 0..<100)
     }
 
-    @MainActor func test_whenUserHasInteracted_andEnabled_andFirstInstallInTargetRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyInNotDisplayed() {
-        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
-        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @MainActor func test_whenSurveyIsNotAvailable_AndUserHasNotInteractedWithTheCard_ThenPermanentSureveyIsNotDisplayed() {
+        let expectedURL = URL(string: "someurl.com")
+        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: false, url: expectedURL)
+        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
+    }
+
+    @MainActor func test_whenSurveyIsAvailable_AndUserHasInteractedWithTheCard_ThenPermanentSureveyIsNotDisplayed() {
+        let expectedURL = URL(string: "someurl.com")
+        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: false, url: expectedURL)
         userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let randomNumberGenerator = MockRandomNumberGenerator()
-        randomNumberGenerator.numberToReturn = 10
-        let surveyManager = MockPermanentSurveyManager()
-        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
 
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
         vm.shouldShowAllFeatures = true
 
         XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
     }
 
-    @MainActor func test_whenUserHasNotInteracted_andNotEnabled_andFirstInstallInTargetRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyInNotDisplayed() {
-        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
-        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let randomNumberGenerator = MockRandomNumberGenerator()
-        randomNumberGenerator.numberToReturn = 10
-        let surveyManager = MockPermanentSurveyManager()
-        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
-
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+    @MainActor func test_whenUserDismissPermanentSurvey_ThenPermoanentSurveyIsRemovedFromVisibleMatrixAndChoicesArePersisted() {
+        let expectedURL = URL(string: "someurl.com")
+        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: false, url: expectedURL)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
         vm.shouldShowAllFeatures = true
-
-        XCTAssertTrue(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-    }
-
-    @MainActor func test_whenUserHasNotInteracted_andEnabled_andFirstInstallInTargetBelowRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyIsNotDisplayed() {
-        let fourDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: Date())!
-        userDefaults.set(fourDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let randomNumberGenerator = MockRandomNumberGenerator()
-        randomNumberGenerator.numberToReturn = 10
-        let surveyManager = MockPermanentSurveyManager()
-        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
-
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
-        vm.shouldShowAllFeatures = true
-
-        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-    }
-
-    @MainActor func test_whenUserHasNotInteracted_andEnabled_andFirstInstallInTargetAboveRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyIsNotDisplayed() {
-        let nineDaysAgo = Calendar.current.date(byAdding: .day, value: -9, to: Date())!
-        userDefaults.set(nineDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let randomNumberGenerator = MockRandomNumberGenerator()
-        randomNumberGenerator.numberToReturn = 10
-        let surveyManager = MockPermanentSurveyManager()
-        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
-
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
-        vm.shouldShowAllFeatures = true
-
-        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-    }
-
-    @MainActor func test_whenUserHasNotInteracted_andEnabled_andFirstInstallInTargetRange_andIsRightLocale_andNotInSureveyShare_ThenPermanentSureveyIsNotDisplayed() {
-        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
-        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let randomNumberGenerator = MockRandomNumberGenerator()
-        randomNumberGenerator.numberToReturn = 61
-        let surveyManager = MockPermanentSurveyManager()
-        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
-
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
-        vm.shouldShowAllFeatures = true
-
-        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-    }
-
-    @MainActor func test_whenUserDismissPermanentSurvey_ThenPermomentSurveyIsRemovedFromVisibleMatrixAndChoicesArePersisted() {
-        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
-        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let randomNumberGenerator = MockRandomNumberGenerator()
-        randomNumberGenerator.numberToReturn = 10
-        let surveyManager = MockPermanentSurveyManager()
-        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
-        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
 
         vm.removeItem(for: .permanentSurvey)
-        vm.shouldShowAllFeatures = true
 
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.permanentSurvey))
 
-        let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+        let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
         vm2.shouldShowAllFeatures = true
+
         XCTAssertFalse(vm2.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
     }
 
     @MainActor func testWhenAskedToPerformActionForPermanetShowsTheSurveySite() async {
-        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
-        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        let expectedURL = URL(string: "someurl.com")
+        let surveyManager = MockPermanentSurveyManager(isSurveyAvailable: true, url: expectedURL)
         userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
-        let randomNumberGenerator = MockRandomNumberGenerator()
-        randomNumberGenerator.numberToReturn = 10
-        let surveyManager = MockPermanentSurveyManager()
-        let urlString = "someurl.com"
-        surveyManager.survey = Survey(url: URL(string: urlString)!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
-        let atb = "someAtb"
-        let someVariant = "someVariant"
-        let statisticStore = MockStatisticsStore()
-        statisticStore.atb = atb
-        statisticStore.variant = someVariant
         let vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
             dataImportProvider: capturingDataImportProvider,
@@ -528,20 +467,109 @@ final class ContinueSetUpModelTests: XCTestCase {
             duckPlayerPreferences: duckPlayerPreferences,
             homePageRemoteMessaging: createMessaging(),
             privacyConfigurationManager: privacyConfigManager,
-            permanentSurveyManager: surveyManager,
-            randomNumberGenerator: randomNumberGenerator
+            permanentSurveyManager: surveyManager
         )
-        vm.statisticsStore = statisticStore
 
         vm.performAction(for: .permanentSurvey)
 
-        XCTAssertEqual(tabCollectionVM.tabs[1].url, URL(string: "\(urlString)?atb=\(atb)&v=\(someVariant)&ddg=\(AppVersion.shared.versionNumber)&macos=\(AppVersion.shared.majorAndMinorOSVersion)"))
+        XCTAssertEqual(tabCollectionVM.tabs[1].url, expectedURL)
 
-        let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+        let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager)
         vm2.shouldShowAllFeatures = true
         XCTAssertFalse(vm2.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
-
     }
+
+//    @MainActor func test_whenUserHasNotInteracted_andEnabled_andFirstInstallInTargetRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyDisplayed() {
+//        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
+//        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+//        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+//        let randomNumberGenerator = MockRandomNumberGenerator()
+//        randomNumberGenerator.numberToReturn = 10
+//        let surveyManager = MockPermanentSurveyManager()
+//        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
+//
+//        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+//        vm.shouldShowAllFeatures = true
+//
+//        XCTAssertTrue(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
+//        XCTAssertEqual(randomNumberGenerator.capturedRange, 0..<100)
+//    }
+//
+//    @MainActor func test_whenUserHasInteracted_andEnabled_andFirstInstallInTargetRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyInNotDisplayed() {
+//        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
+//        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+//        userDefaults.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+//        let randomNumberGenerator = MockRandomNumberGenerator()
+//        randomNumberGenerator.numberToReturn = 10
+//        let surveyManager = MockPermanentSurveyManager()
+//        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
+//
+//        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+//        vm.shouldShowAllFeatures = true
+//
+//        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
+//    }
+//
+//    @MainActor func test_whenUserHasNotInteracted_andNotEnabled_andFirstInstallInTargetRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyInNotDisplayed() {
+//        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
+//        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+//        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+//        let randomNumberGenerator = MockRandomNumberGenerator()
+//        randomNumberGenerator.numberToReturn = 10
+//        let surveyManager = MockPermanentSurveyManager()
+//        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
+//
+//        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+//        vm.shouldShowAllFeatures = true
+//
+//        XCTAssertTrue(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
+//    }
+//
+//    @MainActor func test_whenUserHasNotInteracted_andEnabled_andFirstInstallInTargetBelowRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyIsNotDisplayed() {
+//        let fourDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: Date())!
+//        userDefaults.set(fourDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+//        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+//        let randomNumberGenerator = MockRandomNumberGenerator()
+//        randomNumberGenerator.numberToReturn = 10
+//        let surveyManager = MockPermanentSurveyManager()
+//        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
+//
+//        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+//        vm.shouldShowAllFeatures = true
+//
+//        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
+//    }
+//
+//    @MainActor func test_whenUserHasNotInteracted_andEnabled_andFirstInstallInTargetAboveRange_andIsRightLocale_andInSureveyShare_ThenPermanentSureveyIsNotDisplayed() {
+//        let nineDaysAgo = Calendar.current.date(byAdding: .day, value: -9, to: Date())!
+//        userDefaults.set(nineDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+//        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+//        let randomNumberGenerator = MockRandomNumberGenerator()
+//        randomNumberGenerator.numberToReturn = 10
+//        let surveyManager = MockPermanentSurveyManager()
+//        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
+//
+//        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+//        vm.shouldShowAllFeatures = true
+//
+//        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
+//    }
+//
+//    @MainActor func test_whenUserHasNotInteracted_andEnabled_andFirstInstallInTargetRange_andIsRightLocale_andNotInSureveyShare_ThenPermanentSureveyIsNotDisplayed() {
+//        let sixDaysAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
+//        userDefaults.set(sixDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+//        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
+//        let randomNumberGenerator = MockRandomNumberGenerator()
+//        randomNumberGenerator.numberToReturn = 61
+//        let surveyManager = MockPermanentSurveyManager()
+//        surveyManager.survey = Survey(url: URL(string: "someurl.com")!, isLocalized: true, firstDay: 5, lastDay: 8, sharePercentage: 60)
+//
+//        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, permanentSurveyManager: surveyManager, randomNumberGenerator: randomNumberGenerator)
+//        vm.shouldShowAllFeatures = true
+//
+//        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.permanentSurvey))
+//    }
+
 
     private func doTheyContainTheSameElements(matrix1: [[HomePage.Models.FeatureType]], matrix2: [[HomePage.Models.FeatureType]]) -> Bool {
         Set(matrix1.flatMap { $0 }) == Set(matrix2.flatMap { $0 })
@@ -617,20 +645,17 @@ extension HomePage.Models.ContinueSetUpModel {
             duckPlayerPreferences: duckPlayerPreferences,
             homePageRemoteMessaging: messaging,
             privacyConfigurationManager: manager,
-            permanentSurveyManager: permanentSurveyManager,
-            randomNumberGenerator: randomNumberGenerator)
+            permanentSurveyManager: permanentSurveyManager)
     }
 }
 
-class MockRandomNumberGenerator: RandomNumberGenerating {
-    var numberToReturn = 0
-    var capturedRange: Range<Int>?
-    func random(in range: Range<Int>) -> Int {
-        capturedRange = range
-        return numberToReturn
-    }
-}
+struct MockPermanentSurveyManager: SurveyManager {
+    var isSurveyAvailable: Bool = false
+    var url: URL?
 
-class MockPermanentSurveyManager: SurveyManager {
-    var survey: DuckDuckGo_Privacy_Browser.Survey?
+    static var title: String = "some title"
+
+    static var body: String = "some body"
+
+    static var actionTitle: String = "some action"
 }

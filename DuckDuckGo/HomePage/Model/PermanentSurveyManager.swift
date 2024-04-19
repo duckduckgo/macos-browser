@@ -18,38 +18,83 @@
 
 import Foundation
 import BrowserServicesKit
+import Common
 import AppKit
 
-struct Survey: Equatable {
-    let url: URL
-    let isLocalized: Bool
-    let firstDay: Int
-    let lastDay: Int
-    let sharePercentage: Int
-}
-
 protocol SurveyManager {
-    var survey: Survey? { get }
+    var isSurveyAvailable: Bool { get }
+    var url: URL? { get }
+    static var title: String { get }
+    static var body: String { get }
+    static var actionTitle: String { get }
 }
 
 struct PermanentSurveyManager: SurveyManager {
+    static var title: String = "Help Us Improve"
+    static var body: String = "Take our short survey and help us build the best browser."
+    static var actionTitle: String = "Share Your Thoughts"
+
+    @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
+    private var firstLaunchDate: Date
+
+    @UserDefaultsWrapper(key: .homePageUserInSurveyShare, defaultValue: nil)
+    private var isUserRegisteredInSurveyShare: Bool?
+
     private let surveySettings: [String: Any]?
     private let userDecider: InternalUserDecider
-    var survey: Survey? {
-        guard isEnabled == true else { return nil }
-        guard let url else { return nil }
-        return Survey(
-            url: url,
-            isLocalized: isLocalised,
-            firstDay: firstDay,
-            lastDay: lastDay,
-            sharePercentage: sharePercentage)
-    }
+    private let randomNumberGenerator: RandomNumberGenerating
+    private let statisticsStore: StatisticsStore
 
-    init(privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
+    init(privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
+         randomNumberGenerator: RandomNumberGenerating = RandomNumberGenerator(),
+         statisticsStore: StatisticsStore = LocalStatisticsStore()) {
         let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
         self.surveySettings = newTabContinueSetUpSettings["permanentSurvey"] as? [String: Any]
         self.userDecider = NSApp.delegateTyped.internalUserDecider
+        self.randomNumberGenerator = randomNumberGenerator
+        self.statisticsStore = statisticsStore
+    }
+
+    public var isSurveyAvailable: Bool {
+        let firstSurveyDayDate = Calendar.current.date(byAdding: .weekday, value: -firstDay, to: Date())!
+        let lastSurveyDayDate = Calendar.current.date(byAdding: .weekday, value: -lastDay, to: Date())!
+        let rightLocale = isLocalized ? true : Bundle.main.preferredLocalizations.first == "en"
+
+        return
+            isEnabled &&
+            firstLaunchDate >= lastSurveyDayDate &&
+            firstLaunchDate <= firstSurveyDayDate &&
+            rightLocale &&
+            isUserInSurveyShare(sharePercentage)
+    }
+
+    public var url: URL? {
+        guard let urlString =  surveySettings?["url"] as? String else { return nil }
+        guard let url = URL(string: urlString) else { return nil }
+
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        var newQueryItems: [URLQueryItem] = []
+        if let atb = statisticsStore.atb {
+            newQueryItems.append(URLQueryItem(name: "atb", value: atb))
+        }
+        if let variant = statisticsStore.variant {
+            newQueryItems.append(URLQueryItem(name: "v", value: variant))
+        }
+        newQueryItems.append(URLQueryItem(name: "ddg", value: AppVersion.shared.versionNumber))
+        newQueryItems.append(URLQueryItem(name: "macos", value: AppVersion.shared.majorAndMinorOSVersion))
+        let oldQueryItems = components?.queryItems ?? []
+        components?.queryItems = oldQueryItems + newQueryItems
+
+        return components?.url ?? url
+    }
+
+    private func isUserInSurveyShare(_ share: Int) -> Bool {
+        if isUserRegisteredInSurveyShare ?? false {
+            return true
+        }
+        let randomNumber0To99 = randomNumberGenerator.random(in: 0..<100)
+        isUserRegisteredInSurveyShare = randomNumber0To99 < share
+        return isUserRegisteredInSurveyShare!
     }
 
     private var isEnabled: Bool {
@@ -64,20 +109,13 @@ struct PermanentSurveyManager: SurveyManager {
         return false
     }
 
-    private var isLocalised: Bool {
+    private var isLocalized: Bool {
         if let state =  surveySettings?["localization"] as? String {
             if state == "enabled" {
                 return true
             }
         }
         return false
-    }
-
-    private var url: URL? {
-        if let urlString =  surveySettings?["url"] as? String {
-            return URL(string: urlString)
-        }
-        return nil
     }
 
     private var firstDay: Int {
@@ -90,5 +128,15 @@ struct PermanentSurveyManager: SurveyManager {
 
     private var sharePercentage: Int {
         return surveySettings?["sharePercentage"] as? Int ?? 0
+    }
+}
+
+public protocol RandomNumberGenerating {
+    func random(in range: Range<Int>) -> Int
+}
+
+struct RandomNumberGenerator: RandomNumberGenerating {
+    func random(in range: Range<Int>) -> Int {
+        return Int.random(in: range)
     }
 }
