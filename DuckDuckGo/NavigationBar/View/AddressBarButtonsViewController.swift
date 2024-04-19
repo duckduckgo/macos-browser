@@ -290,7 +290,7 @@ final class AddressBarButtonsViewController: NSViewController {
         bookmarkButton.isHidden = !showBookmarkButton
     }
 
-    func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
+    func openBookmarkPopover(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) {
         let result = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint)
         guard let bookmark = result.bookmark else {
             assertionFailure("Failed to get a bookmark for the popover")
@@ -921,7 +921,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
+    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
         guard let tabViewModel,
               let url = tabViewModel.tab.content.userEditableUrl else {
             assertionFailure("No URL for bookmarking")

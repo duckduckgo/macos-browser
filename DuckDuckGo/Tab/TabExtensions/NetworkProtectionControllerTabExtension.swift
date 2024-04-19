@@ -19,6 +19,7 @@
 import Foundation
 import Navigation
 import NetworkProtection
+import PixelKit
 
 final class NetworkProtectionControllerTabExtension {
     let tunnelController: NetworkProtectionIPCTunnelController
@@ -31,7 +32,7 @@ final class NetworkProtectionControllerTabExtension {
 extension NetworkProtectionControllerTabExtension: NavigationResponder {
     func navigationDidFinish(_ navigation: Navigation) {
         if navigation.url.isDuckDuckGoSearch, tunnelController.isConnected == true {
-            DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount)
+            PixelKit.fire(GeneralPixel.networkProtectionEnabledOnSearch, frequency: .dailyAndCount)
         }
     }
 }

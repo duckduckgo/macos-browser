@@ -1,7 +1,7 @@
 //
-//  DuckDuckGoPrivacyPro.xcconfig
+//  PixelKit+Assertion.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 //  limitations under the License.
 //
 
-// Configuration settings file format documentation can be found at:
-// https://help.apple.com/xcode/#/dev745c5c974
+import Foundation
+import PixelKit
 
-#include "DuckDuckGo.xcconfig"
-
-FEATURE_FLAGS = FEEDBACK SPARKLE SUBSCRIPTION DBP SUBSCRIPTION_OVERRIDE_ENABLED STRIPE
-PRODUCT_NAME = $(PRODUCT_NAME_PREFIX) Privacy Pro
-PRODUCT_MODULE_NAME = $(PRIVACY_PRO_PRODUCT_MODULE_NAME_OVERRIDE:default=$(DEFAULT_PRODUCT_MODULE_NAME))
+public func pixelAssertionFailure(_ message: @autoclosure () -> String = String(), file: StaticString = #fileID, line: UInt = #line) {
+    PixelKit.fire(DebugEvent(GeneralPixel.assertionFailure(message: message(), file: file, line: line)))
+    Swift.assertionFailure(message(), file: file, line: line)
+}

@@ -18,10 +18,7 @@
 
 import Foundation
 import Navigation
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 extension Tab {
 
@@ -119,7 +116,6 @@ extension TabContent {
         default: break
         }
 
-#if SUBSCRIPTION
         if let url {
             if url.isChild(of: URL.subscriptionBaseURL) {
                 if SubscriptionPurchaseEnvironment.currentServiceEnvironment == .staging, url.getParameter(named: "environment") == nil {
@@ -130,7 +126,6 @@ extension TabContent {
                 return .identityTheftRestoration(url)
             }
         }
-#endif
 
         if let settingsPane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
             return .settings(pane: settingsPane)

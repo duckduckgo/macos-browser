@@ -43,7 +43,6 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
                        appVersion: AppVersion.shared.versionNumber,
                        source: "dbpBackgroundAgent",
                        defaultHeaders: [:],
-                       log: .dbpBackgroundAgentPixel,
                        defaults: .standard) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Bool, Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)

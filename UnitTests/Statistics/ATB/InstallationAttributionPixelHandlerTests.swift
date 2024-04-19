@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
 final class InstallationAttributionPixelHandlerTests: XCTestCase {
@@ -27,10 +28,12 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         capturedParams = CapturedParameters()
-        fireRequest = { event, repetition, parameters, reservedCharacters, includeAppVersion, onComplete in
+        fireRequest = { event, frequency, headers, parameters, error, reservedCharacters, includeAppVersion, onComplete in
             self.capturedParams.event = event
-            self.capturedParams.repetition = repetition
+            self.capturedParams.frequency = frequency
+            self.capturedParams.headers = headers
             self.capturedParams.parameters = parameters
+            self.capturedParams.error = error
             self.capturedParams.reservedCharacters = reservedCharacters
             self.capturedParams.includeAppVersion = includeAppVersion
             self.capturedParams.onComplete = onComplete
@@ -97,7 +100,7 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
         XCTAssertEqual(capturedParams?.parameters?[InstallationAttributionPixelHandler.Parameters.locale], "en-US")
     }
 
-    func testWhenPixelFiresThenAddAppVersionIsTrueAndRepetitionIsInitial() {
+    func testWhenPixelFiresThenAddAppVersionIsTrueAndFrequencyIsLegacyInitial() {
         // GIVEN
         sut = .init(fireRequest: fireRequest, originProvider: MockAttributionOriginProvider(), locale: .current)
 
@@ -106,19 +109,21 @@ final class InstallationAttributionPixelHandlerTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(capturedParams.includeAppVersion, true)
-        XCTAssertEqual(capturedParams.repetition, .initial)
+        XCTAssertEqual(capturedParams.frequency, .legacyInitial)
     }
 }
 
 extension InstallationAttributionPixelHandlerTests {
 
     struct CapturedParameters {
-        var event: Pixel.Event?
-        var repetition: Pixel.Event.Repetition = .repetitive
+        var event: PixelKit.Event?
+        var frequency: PixelKit.Frequency = .standard
+        var headers: [String: String] = [:]
         var parameters: [String: String]?
+        var error: Error?
         var reservedCharacters: CharacterSet?
         var includeAppVersion: Bool?
-        var onComplete: (Error?) -> Void = { _ in }
+        var onComplete: (Bool, Error?) -> Void = { _, _ in }
     }
 
 }

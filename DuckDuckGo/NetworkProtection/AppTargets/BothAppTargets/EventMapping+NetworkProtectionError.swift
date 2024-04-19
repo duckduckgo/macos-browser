@@ -62,10 +62,10 @@ extension EventMapping where Event == NetworkProtectionError {
             frequency = .standard
         case .failedToFetchLocationList(let error):
             domainEvent = .networkProtectionClientFailedToFetchLocations(error)
-            frequency = .dailyAndContinuous
+            frequency = .dailyAndCount
         case .failedToParseLocationListResponse(let error):
             domainEvent = .networkProtectionClientFailedToParseLocationsResponse(error)
-            frequency = .dailyAndContinuous
+            frequency = .dailyAndCount
         case .noServerRegistrationInfo,
                 .couldNotSelectClosestServer,
                 .couldNotGetPeerPublicKey,

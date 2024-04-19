@@ -81,9 +81,9 @@ struct DataBrokerProtectionAppEvents {
         if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
             switch source {
             case .cardUI:
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistCardUITapped, frequency: .dailyAndCount)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistCardUITapped, frequency: .dailyAndCount)
             case .localPush:
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
             }
 
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
@@ -96,12 +96,12 @@ struct DataBrokerProtectionAppEvents {
 
     private func sendActiveDataBrokerProtectionWaitlistUserPixel() {
         if DefaultDataBrokerProtectionFeatureVisibility().waitlistIsOngoing {
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistUserActive, frequency: .dailyOnly)
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistUserActive, frequency: .daily)
         }
     }
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
-        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerResetLoginItemDaily, frequency: .dailyOnly)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerResetLoginItemDaily, frequency: .daily)
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
 

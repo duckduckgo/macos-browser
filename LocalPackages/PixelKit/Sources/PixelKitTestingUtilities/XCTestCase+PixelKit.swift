@@ -25,9 +25,7 @@ public extension XCTestCase {
     // MARK: - Parameters
 
     /// List of standard pixel parameters.
-    ///
     /// This is useful to support filtering these parameters out if needed.
-    ///
     private static var standardPixelParameters = [
         PixelKit.Parameters.appVersion,
         PixelKit.Parameters.pixelSource,
@@ -35,21 +33,18 @@ public extension XCTestCase {
     ]
 
     /// List of errror pixel parameters
-    ///
     private static var errorPixelParameters = [
         PixelKit.Parameters.errorCode,
         PixelKit.Parameters.errorDomain
     ]
 
     /// List of underlying error pixel parameters
-    ///
     private static var underlyingErrorPixelParameters = [
         PixelKit.Parameters.underlyingErrorCode,
         PixelKit.Parameters.underlyingErrorDomain
     ]
 
     /// Filter out the standard parameters.
-    ///
     private static func filterStandardPixelParameters(from parameters: [String: String]) -> [String: String] {
         parameters.filter { element in
             !standardPixelParameters.contains(element.key)
@@ -59,10 +54,8 @@ public extension XCTestCase {
     static var pixelPlatformPrefix: String {
 #if os(macOS)
         return "m_mac_"
-#else
-        // Intentionally left blank for now because PixelKit currently doesn't support
-        // other platforms, but if we decide to implement another platform this'll fail
-        // and indicate that we need a value here.
+#elseif os(iOS)
+        return "m_"
 #endif
     }
 
@@ -71,7 +64,6 @@ public extension XCTestCase {
     /// They're not a complete list of parameters for the event, as the fire call may contain extra information
     /// that results in additional parameters.  Ideally we want most (if not all) that information to eventually
     /// make part of the pixel definition.
-    ///
     func knownExpectedParameters(for event: PixelKitEventV2) -> [String: String] {
         var expectedParameters = [String: String]()
 
@@ -97,19 +89,25 @@ public extension XCTestCase {
 
     // MARK: - Pixel Firing Expectations
 
-    func fire(_ event: PixelKitEventV2, and expectations: PixelFireExpectations, file: StaticString, line: UInt) {
-        verifyThat(event, meets: expectations, file: file, line: line)
+    func fire(_ event: PixelKitEventV2, frequency: PixelKit.Frequency, and expectations: PixelFireExpectations, file: StaticString, line: UInt) {
+        verifyThat(event, frequency: frequency, meets: expectations, file: file, line: line)
     }
 
     /// Provides some snapshot of a fired pixel so that external libraries can validate all the expected info is included.
     ///
     /// This method also checks that there is internal consistency in the expected fields.
-    ///
-    func verifyThat(_ event: PixelKitEventV2, meets expectations: PixelFireExpectations, file: StaticString, line: UInt) {
-
-        let expectedPixelName = event.name.hasPrefix(Self.pixelPlatformPrefix) ? event.name : Self.pixelPlatformPrefix + event.name
+    func verifyThat(_ event: PixelKitEventV2,
+                    frequency: PixelKit.Frequency,
+                    meets expectations: PixelFireExpectations,
+                    file: StaticString,
+                    line: UInt) {
+        let expectedPixelNames: [String] = expectedPixelNames(originalName: event.name, frequency: frequency)
         let knownExpectedParameters = knownExpectedParameters(for: event)
         let callbackExecutedExpectation = expectation(description: "The PixelKit callback has been executed")
+
+        if frequency == .dailyAndCount {
+            callbackExecutedExpectation.expectedFulfillmentCount = 2
+        }
 
         // Ensure PixelKit is torn down before setting it back up, avoiding unit test race conditions:
         PixelKit.tearDown()
@@ -118,28 +116,54 @@ public extension XCTestCase {
                        appVersion: "1.0.5",
                        source: "test-app",
                        defaultHeaders: [:],
-                       log: .disabled,
                        defaults: userDefaults) { firedPixelName, _, firedParameters, _, _, completion in
             callbackExecutedExpectation.fulfill()
 
             let firedParameters = Self.filterStandardPixelParameters(from: firedParameters)
 
             // Internal validations
-
-            XCTAssertEqual(firedPixelName, expectedPixelName, file: file, line: line)
-
+            XCTAssertTrue(expectedPixelNames.contains(firedPixelName), file: file, line: line)
             XCTAssertTrue(knownExpectedParameters.allSatisfy { (key, value) in
                 firedParameters[key] == value
             })
 
-            // Expectations
-            XCTAssertEqual(firedPixelName, expectations.pixelName)
+            if frequency == .dailyAndCount {
+                XCTAssertTrue(firedPixelName.hasPrefix(expectations.pixelName))
+                XCTAssertTrue(firedPixelName.hasSuffix("_c") || firedPixelName.hasSuffix("_d"))
+                XCTAssertEqual(firedPixelName.count, expectations.pixelName.count + 2)
+                let exp = self.expectedPixelNames(originalName: expectations.pixelName, frequency: frequency)
+                XCTAssertTrue(exp.contains(firedPixelName))
+            } else {
+                XCTAssertEqual(expectations.pixelName, firedPixelName)
+            }
             XCTAssertEqual(firedParameters, expectations.parameters)
 
             completion(true, nil)
         }
 
-        PixelKit.fire(event)
+        PixelKit.fire(event, frequency: frequency)
         waitForExpectations(timeout: 0.1)
+    }
+
+    func expectedPixelNames(originalName: String, frequency: PixelKit.Frequency) -> [String] {
+        let expectedPixelNameWithoutSuffix = originalName.hasPrefix(Self.pixelPlatformPrefix) ? originalName : Self.pixelPlatformPrefix + originalName
+        var expectedPixelNames: [String] = []
+
+        switch frequency {
+        case .standard:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix)
+        case .legacyInitial:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix)
+        case .unique:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix)
+        case .legacyDaily:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix)
+        case .daily:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix.appending("_d"))
+        case .dailyAndCount:
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix.appending("_d"))
+            expectedPixelNames.append(expectedPixelNameWithoutSuffix.appending("_c"))
+        }
+        return expectedPixelNames
     }
 }

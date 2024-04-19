@@ -23,6 +23,7 @@ import Common
 import SwiftUI
 import WebKit
 import Subscription
+import PixelKit
 
 // swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
@@ -154,7 +155,6 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseSubscriptionPage),
                                                name: .subscriptionPageCloseAndOpenPreferences,
@@ -163,7 +163,6 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onSubscriptionAccountDidSignOut),
                                                name: .accountDidSignOut,
                                                object: nil)
-#endif
     }
 
     @objc
@@ -225,7 +224,6 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
     @objc
     private func onCloseSubscriptionPage(_ notification: Notification) {
         guard let activeTab = tabViewModel?.tab else { return }
@@ -253,8 +251,6 @@ final class BrowserTabViewController: NSViewController {
             }
         }
     }
-
-#endif
 
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
@@ -1133,7 +1129,7 @@ extension BrowserTabViewController: OnboardingDelegate {
             return
         }
 
-        Pixel.fire(.defaultRequestedFromOnboarding)
+        PixelKit.fire(GeneralPixel.defaultRequestedFromOnboarding)
         defaultBrowserPreferences.becomeDefault { _ in
             _ = defaultBrowserPreferences
             withAnimation {

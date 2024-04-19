@@ -20,10 +20,7 @@ import Combine
 import NetworkProtection
 import NetworkProtectionUI
 import XCTest
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -124,7 +121,6 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagement)
         XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
-#if SUBSCRIPTION
         XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
 
         if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
@@ -134,10 +130,6 @@ final class MoreOptionsMenuTests: XCTestCase {
         } else {
             XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
         }
-#else
-        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
-#endif
     }
 
     // MARK: Zoom

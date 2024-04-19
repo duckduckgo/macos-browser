@@ -19,6 +19,7 @@
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
+import PixelKit
 
 fileprivate extension Preferences.Const {
     static let autoLockWarningOffset: CGFloat = {
@@ -133,7 +134,7 @@ extension Preferences {
                         Button(UserText.autofillExcludedSitesReset) {
                             showingResetNeverPromptSitesSheet.toggle()
                             if showingResetNeverPromptSitesSheet {
-                                Pixel.fire(.autofillLoginsSettingsResetExcludedDisplayed)
+                                PixelKit.fire(GeneralPixel.autofillLoginsSettingsResetExcludedDisplayed)
                             }
                         }
                     }.sheet(isPresented: $showingResetNeverPromptSitesSheet) {
@@ -348,7 +349,7 @@ struct ResetNeverPromptSitesSheet: View {
                 Spacer()
                 Button(UserText.cancel) {
                     isSheetPresented.toggle()
-                    Pixel.fire(.autofillLoginsSettingsResetExcludedDismissed)
+                    PixelKit.fire(GeneralPixel.autofillLoginsSettingsResetExcludedDismissed)
                 }
                 Button(action: {
                     saveChanges()
@@ -365,7 +366,7 @@ struct ResetNeverPromptSitesSheet: View {
     private func saveChanges() {
         autofillPreferencesModel.resetNeverPromptWebsites()
         isSheetPresented.toggle()
-        Pixel.fire(.autofillLoginsSettingsResetExcludedConfirmed)
+        PixelKit.fire(GeneralPixel.autofillLoginsSettingsResetExcludedConfirmed)
     }
 
 }

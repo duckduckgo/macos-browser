@@ -20,10 +20,7 @@ import BrowserServicesKit
 import Combine
 import DDGSync
 import SwiftUI
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 final class PreferencesSidebarModel: ObservableObject {
 
