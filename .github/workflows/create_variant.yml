@@ -92,11 +92,22 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: duckduckgo-dmg
-        path: ${{ github.workspace }}/dmg/DuckDuckGo.app
+        path: ${{ github.workspace }}
+
+    - name: Extract App from DMG
+      id: extract-app-from-dmg
+      if: ${{ steps.download-dmg-artifact.outcome == 'success' }}
+      continue-on-error: true
+      run: |
+        hdiutil attach duckduckgo.dmg -mountpoint vanilla
+        mkdir -p dmg
+        cp -R vanilla/DuckDuckGo.app dmg/DuckDuckGo.app
+        hdiutil detach vanilla
+        rm -f duckduckgo.dmg
 
     - name: Download release app
       # Download the release app only if download-dmg-artifact fails
-      if: ${{ steps.download-dmg-artifact.outcome == 'failure' }}
+      if: ${{ steps.extract-app-from-dmg.outcome == 'failure' }}
       run: |
         curl -fLSs "${{ vars.RELEASE_DMG_URL }}" --output duckduckgo.dmg
         hdiutil attach duckduckgo.dmg -mountpoint vanilla

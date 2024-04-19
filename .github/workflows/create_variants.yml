@@ -83,17 +83,12 @@ jobs:
       - name: Download release app
         run: |
           curl -fLSs "${{ vars.RELEASE_DMG_URL }}" --output duckduckgo.dmg
-          hdiutil attach duckduckgo.dmg -mountpoint vanilla
-          mkdir -p dmg
-          cp -R vanilla/DuckDuckGo.app dmg/DuckDuckGo.app
-          hdiutil detach vanilla
-          rm -f duckduckgo.dmg
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
           name: duckduckgo-dmg
-          path: ${{ github.workspace }}/dmg/DuckDuckGo.app
+          path: ${{ github.workspace }}
           retention-days: 1
 
   
