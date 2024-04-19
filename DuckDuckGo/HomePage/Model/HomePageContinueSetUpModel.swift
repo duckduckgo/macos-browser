@@ -225,31 +225,29 @@ extension HomePage.Models {
         }
 
         private func appendFeatureCards(_ features: inout [FeatureType]) {
-            for feature in listOfFeatures {
-                switch feature {
-                case .defaultBrowser:
-                    if shouldMakeDefaultCardBeVisible {
-                        features.append(feature)
-                    }
-                case .importBookmarksAndPasswords:
-                    if shouldImportCardBeVisible {
-                        features.append(feature)
-                    }
-                case .duckplayer:
-                    if shouldDuckPlayerCardBeVisible {
-                        features.append(feature)
-                    }
-                case .emailProtection:
-                    if shouldEmailProtectionCardBeVisible {
-                        features.append(feature)
-                    }
-                case .permanentSurvey:
-                    if shouldPermanentSurveyBeVisible {
-                        features.append(feature)
-                    }
-                default:
-                    break // Do nothing, the messages get appended first
-                }
+            for feature in listOfFeatures where shouldAppendFeature(feature: feature) {
+                features.append(feature)
+            }
+        }
+
+        private func shouldAppendFeature(feature: FeatureType) -> Bool {
+            switch feature {
+            case .defaultBrowser:
+                return shouldMakeDefaultCardBeVisible
+            case .importBookmarksAndPasswords:
+                return shouldImportCardBeVisible
+            case .duckplayer:
+                return shouldDuckPlayerCardBeVisible
+            case .emailProtection:
+                return shouldEmailProtectionCardBeVisible
+            case .permanentSurvey:
+                return shouldPermanentSurveyBeVisible
+            case .networkProtectionRemoteMessage,
+                 .dataBrokerProtectionRemoteMessage,
+                 .dataBrokerProtectionWaitlistInvited,
+                 .vpnThankYou,
+                 .pirThankYou:
+                return false // These are handled separately
             }
         }
 
