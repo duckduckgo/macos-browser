@@ -481,6 +481,12 @@
         }
       }
     },
+    "1." : {
+
+    },
+    "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder." : {
+
+    },
     "about.app_name" : {
       "comment" : "Application name to be displayed in the About dialog",
       "extractionState" : "extracted_with_value",
@@ -6249,6 +6255,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Приложение Bitwarden не подтвердило «рукопожатие»."
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible" : {
+      "comment" : "Message that warns user that specific Bitwarden app vesions are not compatible with this app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please revert to an older version by following these steps:"
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible.step.1" : {
+      "comment" : "First step to downgrade Bitwarden",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Download v2014.2.1"
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible.step.2" : {
+      "comment" : "Second step to downgrade Bitwarden",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder."
           }
         }
       }
@@ -13288,6 +13330,9 @@
           }
         }
       }
+    },
+    "Download v2014.2.1" : {
+
     },
     "download.finishing" : {
       "comment" : "Download being finished information text",
