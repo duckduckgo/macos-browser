@@ -772,7 +772,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let isHypertextUrl = if case .url(let url, _, _) = tabViewModel.tab.content,
             !(url.isDuckPlayer || url.isDuckURLScheme),
-            [.http, .https].contains(url.navigationalScheme) { true } else { false}
+            url.navigationalScheme?.isHypertextScheme == true { true } else { false}
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
         let isLocalUrl = tabViewModel.tab.content.userEditableUrl?.isLocalURL ?? false
