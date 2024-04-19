@@ -195,7 +195,6 @@ extension HomePage.Models {
             refreshFeaturesMatrix()
         }
 
-        // swiftlint:disable:next cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 #if DBP
@@ -221,6 +220,11 @@ extension HomePage.Models {
                 features.append(.pirThankYou)
             }
 
+            appendFeatureCards(&features)
+            featuresMatrix = features.chunked(into: itemsPerRow)
+        }
+
+        private func appendFeatureCards(_ features: inout [FeatureType]) {
             for feature in listOfFeatures {
                 switch feature {
                 case .defaultBrowser:
@@ -251,7 +255,6 @@ extension HomePage.Models {
                     break // Do nothing, these messages get appended first
                 }
             }
-            featuresMatrix = features.chunked(into: itemsPerRow)
         }
 
         // Helper Functions
