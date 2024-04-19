@@ -91,7 +91,6 @@ jobs:
           path: ${{ github.workspace }}/duckduckgo.dmg
           retention-days: 1
 
-  
   create-variants:
 
     name: Create Variant
