@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		021EA0802BD2A9D500772C9A /* TabsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021EA07F2BD2A9D500772C9A /* TabsPreferences.swift */; };
+		021EA0812BD2A9D500772C9A /* TabsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021EA07F2BD2A9D500772C9A /* TabsPreferences.swift */; };
 		0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0230C0A2272080090018F728 /* KeyedCodingExtension.swift */; };
 		026ADE1426C3010C002518EE /* macos-config.json in Resources */ = {isa = PBXBuildFile; fileRef = 026ADE1326C3010C002518EE /* macos-config.json */; };
 		028904202A7B25380028369C /* AppConfigurationURLProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0289041E2A7B23CE0028369C /* AppConfigurationURLProviderTests.swift */; };
@@ -2688,6 +2690,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		021EA07F2BD2A9D500772C9A /* TabsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabsPreferences.swift; sourceTree = "<group>"; };
 		0230C0A2272080090018F728 /* KeyedCodingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyedCodingExtension.swift; sourceTree = "<group>"; };
 		026ADE1326C3010C002518EE /* macos-config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "macos-config.json"; sourceTree = "<group>"; };
 		0289041E2A7B23CE0028369C /* AppConfigurationURLProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationURLProviderTests.swift; sourceTree = "<group>"; };
@@ -4681,6 +4684,7 @@
 				37F19A6628E1B43200740DC6 /* DuckPlayerPreferences.swift */,
 				37CD54C527F2FDD100F1F7B9 /* AboutModel.swift */,
 				1D220BFB2B87AACF00F8BBC6 /* PrivacyProtectionStatus.swift */,
+				021EA07F2BD2A9D500772C9A /* TabsPreferences.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -9790,6 +9794,7 @@
 				3706FC06293F65D500E42796 /* OnboardingViewModel.swift in Sources */,
 				3706FC07293F65D500E42796 /* ScriptSourceProviding.swift in Sources */,
 				31EF1E832B63FFCA00E6DB17 /* LoginItem+DataBrokerProtection.swift in Sources */,
+				021EA0812BD2A9D500772C9A /* TabsPreferences.swift in Sources */,
 				B6619EFC2B111CC600CD9186 /* InstructionsFormatParser.swift in Sources */,
 				3706FC08293F65D500E42796 /* CoreDataBookmarkImporter.swift in Sources */,
 				3706FC09293F65D500E42796 /* SuggestionViewModel.swift in Sources */,
@@ -11127,6 +11132,7 @@
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
 				B6DA06E62913F39400225DE2 /* MenuItemSelectors.swift in Sources */,
 				85589E9A27BFE3C30038AD11 /* FaviconView.swift in Sources */,
+				021EA0802BD2A9D500772C9A /* TabsPreferences.swift in Sources */,
 				85707F2C276A364E00DC0649 /* OnboardingFlow.swift in Sources */,
 				4BE65480271FCD4D008D1D63 /* PasswordManagementLoginModel.swift in Sources */,
 				AA9FF95B24A1EFC20039E328 /* TabViewModel.swift in Sources */,
