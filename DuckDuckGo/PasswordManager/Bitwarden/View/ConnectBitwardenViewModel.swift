@@ -36,6 +36,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
         // Bitwarden installation:
         case lookingForBitwarden
         case oldVersion
+        case incompatible
         case bitwardenFound
 
         // Bitwarden connection:
@@ -48,14 +49,14 @@ final class ConnectBitwardenViewModel: ObservableObject {
 
         var canContinue: Bool {
             switch self {
-            case .lookingForBitwarden, .oldVersion, .waitingForConnectionPermission: return false
+            case .lookingForBitwarden, .oldVersion, .incompatible, .waitingForConnectionPermission: return false
             default: return true
             }
         }
 
         var confirmButtonTitle: String {
             switch self {
-            case .disclaimer, .lookingForBitwarden, .oldVersion, .bitwardenFound: return "Next"
+            case .disclaimer, .lookingForBitwarden, .oldVersion, .incompatible, .bitwardenFound: return "Next"
             case .waitingForConnectionPermission, .connectToBitwarden: return "Connect"
             case .accessToContainersNotApproved: return "Open System Settings"
             case .connectedToBitwarden: return "OK"
@@ -106,6 +107,8 @@ final class ConnectBitwardenViewModel: ObservableObject {
             }
         case .oldVersion:
             self.viewState = .oldVersion
+        case .incompatible:
+            self.viewState = .incompatible
         case .notRunning:
             self.viewState = .waitingForConnectionPermission
         case .integrationNotApproved:
@@ -126,7 +129,6 @@ final class ConnectBitwardenViewModel: ObservableObject {
             self.viewState = .connectedToBitwarden
         case .error(error: let error):
             self.error = error
-
         }
     }
     // swiftlint:enable cyclomatic_complexity
