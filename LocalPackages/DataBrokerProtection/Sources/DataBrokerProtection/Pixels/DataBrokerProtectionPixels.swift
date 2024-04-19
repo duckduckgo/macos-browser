@@ -97,7 +97,6 @@ public enum DataBrokerProtectionPixels {
     case backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler
 
     // IPC server events
-    case ipcServerRegister
     case ipcServerStartScheduler
     case ipcServerStopScheduler
     case ipcServerOptOutAllBrokers
@@ -181,7 +180,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile: return "m_mac_dbp_background-agent-run-operations-and-start-scheduler-if-possible_no-saved-profile"
         case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler: return "m_mac_dbp_background-agent-run-operations-and-start-scheduler-if-possible_callback_start-scheduler"
 
-        case .ipcServerRegister: return "m_mac_dbp_ipc-server_register"
         case .ipcServerStartScheduler: return "m_mac_dbp_ipc-server_start-scheduler"
         case .ipcServerStopScheduler: return "m_mac_dbp_ipc-server_stop-scheduler"
         case .ipcServerOptOutAllBrokers: return "m_mac_dbp_ipc-server_opt-out-all-brokers"
@@ -319,8 +317,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultInitError,
                 .secureVaultError:
             return [:]
-        case .ipcServerRegister,
-                .ipcServerStartScheduler,
+        case .ipcServerStartScheduler,
                 .ipcServerStopScheduler,
                 .ipcServerOptOutAllBrokers,
                 .ipcServerOptOutAllBrokersCompletion,
@@ -377,7 +374,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
                     .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
-                    .ipcServerRegister,
                     .ipcServerStartScheduler,
                     .ipcServerStopScheduler,
                     .ipcServerOptOutAllBrokers,

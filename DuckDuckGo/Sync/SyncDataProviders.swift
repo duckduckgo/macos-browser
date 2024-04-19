@@ -22,6 +22,7 @@ import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
+import PixelKit
 
 final class SyncDataProviders: DataProvidersSource {
     public let bookmarksAdapter: SyncBookmarksAdapter
@@ -109,9 +110,9 @@ final class SyncDataProviders: DataProvidersSource {
         syncMetadataDatabase.db.loadStore { context, error in
             guard context != nil else {
                 if let error = error {
-                    Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncMetadataCouldNotLoadDatabase, error: error))
                 } else {
-                    Pixel.fire(.debug(event: .syncMetadataCouldNotLoadDatabase))
+                    PixelKit.fire(DebugEvent(GeneralPixel.syncMetadataCouldNotLoadDatabase))
                 }
 
                 Thread.sleep(forTimeInterval: 1)

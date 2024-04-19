@@ -21,6 +21,7 @@ import Combine
 import Foundation
 import WebKit
 import XCTest
+@testable import PixelKit
 
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -31,6 +32,11 @@ final class PermissionModelTests: XCTestCase {
     var geolocationProviderMock: GeolocationProviderMock!
     let webView = WebViewMock()
     var model: PermissionModel!
+    let pixelKit = PixelKit(dryRun: true,
+                            appVersion: "1.0.0",
+                            defaultHeaders: [:],
+                            defaults: UserDefaults(),
+                            fireRequest: { _, _, _, _, _, _ in })
 
     var securityOrigin: WKSecurityOrigin {
         WKSecurityOriginMock.new(url: .duckDuckGo)
@@ -42,6 +48,8 @@ final class PermissionModelTests: XCTestCase {
     }
 
     override func setUp() {
+        PixelKit.setSharedForTesting(pixelKit: pixelKit)
+
         webView.uiDelegate = self
 
         geolocationProviderMock = GeolocationProviderMock(geolocationService: geolocationServiceMock)

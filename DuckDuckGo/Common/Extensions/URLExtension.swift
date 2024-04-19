@@ -24,9 +24,15 @@ import Foundation
 extension URL.NavigationalScheme {
 
     static let duck = URL.NavigationalScheme(rawValue: "duck")
+    static let javascript = URL.NavigationalScheme(rawValue: "javascript")
 
     static var validSchemes: [URL.NavigationalScheme] {
         return [.http, .https, .file]
+    }
+
+    /// HTTP or HTTPS
+    var isHypertextScheme: Bool {
+        Self.hypertextSchemes.contains(self)
     }
 
 }
@@ -331,7 +337,7 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return !["https", "http", "about", "file", "blob", "data", "ftp"].contains(scheme)
+        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript].contains(navigationalScheme)
     }
 
     // MARK: - DuckDuckGo
@@ -556,10 +562,8 @@ extension URL {
         return self.absoluteString
     }
 
-    public func isChild(of url: URL) -> Bool {
-        var components = URLComponents(string: url.absoluteString)
-        components?.query = nil
-
-        return self.absoluteString.hasPrefix(components?.url?.absoluteString ?? url.absoluteString)
+    public func isChild(of parentURL: URL) -> Bool {
+        guard let parentURLHost = parentURL.host, self.isPart(ofDomain: parentURLHost) else { return false }
+        return pathComponents.starts(with: parentURL.pathComponents)
     }
 }

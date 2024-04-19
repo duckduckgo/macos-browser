@@ -20,18 +20,19 @@ import Foundation
 import Bookmarks
 import Common
 import Persistence
+import PixelKit
 
 public class BookmarksCleanupErrorHandling: EventMapping<BookmarksCleanupError> {
 
     public init() {
         super.init { event, _, _, _ in
             if event.cleanupError is BookmarksCleanupCancelledError {
-                Pixel.fire(.debug(event: .bookmarksCleanupAttemptedWhileSyncWasEnabled))
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksCleanupAttemptedWhileSyncWasEnabled))
             } else {
                 let processedErrors = CoreDataErrorsParser.parse(error: event.cleanupError as NSError)
                 let params = processedErrors.errorPixelParameters
 
-                Pixel.fire(.debug(event: .bookmarksCleanupFailed, error: event.cleanupError), withAdditionalParameters: params)
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksCleanupFailed, error: event.cleanupError), withAdditionalParameters: params)
             }
         }
     }

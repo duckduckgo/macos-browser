@@ -21,6 +21,7 @@ import WebKit
 import Combine
 import BrowserServicesKit
 import Common
+import PixelKit
 
 protocol ContentBlockingProtocol {
 
@@ -98,18 +99,18 @@ final class AppContentBlocking {
     }
 
     private let toggleProtectionsEvents = EventMapping<ToggleProtectionsCounterEvent> { event, _, parameters, _ in
-        let domainEvent: Pixel.Event
+        let domainEvent: GeneralPixel
         switch event {
         case .toggleProtectionsCounterDaily:
             domainEvent = .toggleProtectionsDailyCount
         }
-        Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
+        PixelKit.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
         guard NSApp.runType.requiresEnvironment else { return }
 
-        let domainEvent: Pixel.Event.Debug
+        let domainEvent: GeneralPixel
         switch event {
         case .trackerDataParseFailed:
             domainEvent = .trackerDataParseFailed
@@ -132,7 +133,7 @@ final class AppContentBlocking {
         case .contentBlockingCompilationFailed(let listName, let component):
             let defaultTDSListName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
 
-            let listType: Pixel.Event.CompileRulesListType
+            let listType: GeneralPixel.CompileRulesListType
             switch listName {
             case defaultTDSListName:
                 listType = .tds
@@ -154,13 +155,15 @@ final class AppContentBlocking {
             return
         }
 
-        Pixel.fire(.debug(event: domainEvent, error: error), withAdditionalParameters: parameters, onComplete: onComplete)
+        PixelKit.fire(DebugEvent(domainEvent, error: error), withAdditionalParameters: parameters) { _, error in
+            onComplete(error)
+        }
     }
 
     // MARK: - Ad Click Attribution
 
     let attributionEvents: EventMapping<AdClickAttributionEvents>? = .init { event, _, parameters, _ in
-        let domainEvent: Pixel.Event
+        let domainEvent: GeneralPixel
         switch event {
         case .adAttributionDetected:
             domainEvent = .adClickAttributionDetected
@@ -170,11 +173,11 @@ final class AppContentBlocking {
             domainEvent = .adClickAttributionPageLoads
         }
 
-        Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
+        PixelKit.fire(domainEvent, withAdditionalParameters: parameters ?? [:])
     }
 
     let attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>? = .init { event, _, _, _ in
-        let domainEvent: Pixel.Event.Debug
+        let domainEvent: GeneralPixel
         switch event {
         case .adAttributionCompilationFailedForAttributedRulesList:
             domainEvent = .adAttributionCompilationFailedForAttributedRulesList
@@ -198,8 +201,7 @@ final class AppContentBlocking {
             domainEvent = .adAttributionLogicWrongVendorOnFailedCompilation
         }
 
-        Pixel.fire(.debug(event: domainEvent, error: nil),
-                   includeAppVersionParameter: false)
+        PixelKit.fire(DebugEvent(domainEvent), includeAppVersionParameter: false)
     }
 }
 

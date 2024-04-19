@@ -22,7 +22,7 @@ extension Tab {
 
     @MainActor
     static func withContentOfBookmark(folder: BookmarkFolder, burnerMode: BurnerMode) -> [Tab] {
-        folder.children.compactMap { entity in
+        folder.children.compactMap { entity -> Tab? in
             guard let url = (entity as? Bookmark)?.urlObject else { return nil }
             return Tab(content: .url(url, source: .bookmark), shouldLoadInBackground: true, burnerMode: burnerMode)
         }

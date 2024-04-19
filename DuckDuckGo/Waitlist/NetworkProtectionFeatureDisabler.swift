@@ -128,7 +128,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     }
 
     func stop() {
-        ipcClient.stop()
+        ipcClient.stop { _ in
+            // Intentional no-op
+        }
     }
 
     private func enableLoginItems() {

@@ -40,9 +40,10 @@ extension Tab: LazyLoadable {
     var url: URL? { content.urlForWebView }
 
     var loadingFinishedPublisher: AnyPublisher<Tab, Never> {
-        webViewDidFinishNavigationPublisher
+        navigationStatePublisher.compactMap { $0 }
+            .filter { $0.isCompleted }
             .prefix(1)
-            .map { self }
+            .map { _ in self }
             .eraseToAnyPublisher()
     }
 

@@ -20,6 +20,7 @@ import Foundation
 import Subscription
 import SubscriptionUI
 import enum StoreKit.StoreKitError
+import PixelKit
 
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
@@ -66,13 +67,12 @@ struct SubscriptionAppStoreRestorer {
 
         switch result {
         case .success:
-            DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
-
+            PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
         case .failure(let error):
             switch error {
             case .missingAccountOrTransactions: break
             default:
-                DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreFailureOther, frequency: .dailyAndCount)
+                PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreFailureOther, frequency: .dailyAndCount)
             }
 
             switch error {

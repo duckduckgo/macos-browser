@@ -20,6 +20,7 @@ import Common
 import Foundation
 import BrowserServicesKit
 import Networking
+import PixelKit
 
 final class StatisticsLoader {
 
@@ -59,7 +60,7 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
-                Pixel.fire(.serp)
+                PixelKit.fire(GeneralPixel.serp)
                 self.fireDailyOsVersionCounterPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
@@ -224,9 +225,9 @@ final class StatisticsLoader {
         let randomDelay = Double.random(in: 0.5...5)
 
         DispatchQueue.global().asyncAfter(deadline: .now() + randomDelay) {
-            Pixel.fire(.dailyOsVersionCounter,
-                       limitTo: .dailyFirst,
-                       includeAppVersionParameter: false)
+            PixelKit.fire(GeneralPixel.dailyOsVersionCounter,
+                          frequency: .legacyDaily,
+                          includeAppVersionParameter: false)
         }
     }
 
