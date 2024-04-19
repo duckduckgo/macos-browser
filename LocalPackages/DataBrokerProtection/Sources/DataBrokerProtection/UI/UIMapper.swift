@@ -216,7 +216,7 @@ struct MapperToUI {
         }
     }
 
-    func mapToUI(metadata: DBPBackgroundAgentMetadata?, brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIDebugMetadata {
+    func mapToUIDebugMetadata(metadata: DBPBackgroundAgentMetadata?, brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIDebugMetadata {
         let currentAppVersion = Bundle.main.fullVersionNumber ?? "ERROR: Error fetching app version"
 
         guard let metadata = metadata else {
