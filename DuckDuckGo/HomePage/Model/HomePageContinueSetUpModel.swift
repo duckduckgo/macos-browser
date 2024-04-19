@@ -248,7 +248,7 @@ extension HomePage.Models {
                         features.append(feature)
                     }
                 default:
-                    break
+                    break // Do nothing, the messages get appended first
                 }
             }
         }
