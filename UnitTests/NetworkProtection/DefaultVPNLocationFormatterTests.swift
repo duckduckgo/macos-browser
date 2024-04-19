@@ -29,7 +29,7 @@ final class DefaultVPNLocationFormatterTests: XCTestCase {
     }
 
     func testUSLocation() {
-        let server = NetworkProtectionServerInfo.ServerAttributes(city: "Lafayette", country: "us", state: "la", timezoneOffset: 0)
+        let server = NetworkProtectionServerInfo.ServerAttributes(city: "Lafayette", country: "us", state: "la")
         let preferredLocation = VPNSettings.SelectedLocation.location(.init(country: "us"))
         let otherPreferredLocation = VPNSettings.SelectedLocation.location(.init(country: "gb"))
 
@@ -59,7 +59,7 @@ final class DefaultVPNLocationFormatterTests: XCTestCase {
     }
 
     func testCALocation() {
-        let server = NetworkProtectionServerInfo.ServerAttributes(city: "Toronto", country: "ca", state: "on", timezoneOffset: 0)
+        let server = NetworkProtectionServerInfo.ServerAttributes(city: "Toronto", country: "ca", state: "on")
         let preferredLocation = VPNSettings.SelectedLocation.location(.init(country: "ca"))
         let otherPreferredLocation = VPNSettings.SelectedLocation.location(.init(country: "gb"))
 
