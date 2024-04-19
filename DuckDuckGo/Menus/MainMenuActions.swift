@@ -601,6 +601,12 @@ extension MainViewController {
         WindowsManager.openNewWindow(with: tab)
     }
 
+    @objc func duplicateTab(_ sender: Any?) {
+        guard let (_, index) = getActiveTabAndIndex() else { return }
+
+        tabCollectionViewModel.duplicateTab(at: index)
+    }
+
     @objc func pinOrUnpinTab(_ sender: Any?) {
         guard let (_, selectedTabIndex) = getActiveTabAndIndex() else { return }
 
@@ -713,9 +719,7 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay14.rawValue)
-        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowPermanentSurvey.rawValue)
     }
 
     @objc func internalUserState(_ sender: Any?) {
@@ -749,38 +753,31 @@ extension MainViewController {
         PixelKit.shared?.clearFrequencyHistoryForAllPixels()
     }
 
-    @objc func in10PercentSurveyOn(_ sender: Any?) {
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay0in10Percent.rawValue)
+    @objc func inPermanentSurveyShareOn(_ sender: Any?) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
     }
 
-    @objc func in10PercentSurveyOff(_ sender: Any?) {
-        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay14in10Percent.rawValue)
-        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageShowSurveyDay0in10Percent.rawValue)
+    @objc func inPermanentSurveyShareOff(_ sender: Any?) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool?>.Key.homePageUserInSurveyShare.rawValue)
     }
 
     @objc func changeInstallDateToToday(_ sender: Any?) {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToLessThan1DayAgo(_ sender: Any?) {
-        let lessThanOneDaysAgo = Calendar.current.date(byAdding: .hour, value: -23, to: Date())
-        UserDefaults.standard.set(lessThanOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToLessThan5DayAgo(_ sender: Any?) {
+        let lessThanFiveDaysAgo = Calendar.current.date(byAdding: .day, value: -4, to: Date())
+        UserDefaults.standard.set(lessThanFiveDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToMoreThan1DayAgoButLessThan14(_ sender: Any?) {
-        let between1And4DaysAgo = Calendar.current.date(byAdding: .day, value: -13, to: Date())
-        UserDefaults.standard.set(between1And4DaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToMoreThan5DayAgoButLessThan9(_ sender: Any?) {
+        let between5And9DaysAgo = Calendar.current.date(byAdding: .day, value: -5, to: Date())
+        UserDefaults.standard.set(between5And9DaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @objc func changeInstallDateToMoreThan14DaysAgoButLessThan15(_ sender: Any?) {
-        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -14, to: Date())
-        UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
-    }
-
-    @objc func changeInstallDateToMoreThan15DaysAgo(_ sender: Any?) {
-        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -16, to: Date())
-        UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @objc func changeInstallDateToMoreThan9DaysAgo(_ sender: Any?) {
+        let nineDaysAgo = Calendar.current.date(byAdding: .day, value: -9, to: Date())
+        UserDefaults.standard.set(nineDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
     @objc func showSaveCredentialsPopover(_ sender: Any?) {

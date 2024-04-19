@@ -58,6 +58,7 @@ final class StatusBarMenuTests: XCTestCase {
             agentLoginItem: nil,
             isMenuBarStatusView: false,
             userDefaults: .standard,
+            locationFormatter: MockVPNLocationFormatter(),
             uninstallHandler: { })
 
         menu.show()
@@ -83,6 +84,7 @@ final class StatusBarMenuTests: XCTestCase {
             agentLoginItem: nil,
             isMenuBarStatusView: false,
             userDefaults: .standard,
+            locationFormatter: MockVPNLocationFormatter(),
             uninstallHandler: { })
 
         menu.hide()

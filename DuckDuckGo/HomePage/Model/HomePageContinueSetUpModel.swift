@@ -40,38 +40,18 @@ extension HomePage.Models {
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let privacyConfigurationManager: PrivacyConfigurationManaging
         let homePageRemoteMessaging: HomePageRemoteMessaging
+        let permanentSurveyManager: SurveyManager
 
-        var isDay0SurveyEnabled: Bool {
-            let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
-            if let day0SurveyString =  newTabContinueSetUpSettings["surveyCardDay0"] as? String {
-                if day0SurveyString == "enabled" {
-                    return true
-                }
-            }
-            return false
-        }
-        var isDay14SurveyEnabled: Bool {
-            let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
-            if let day14SurveyString =  newTabContinueSetUpSettings["surveyCardDay14"] as? String {
-                if day14SurveyString == "enabled" {
-                    return true
-                }
-            }
-            return false
-        }
         var duckPlayerURL: String {
             let duckPlayerSettings = privacyConfigurationManager.privacyConfig.settings(for: .duckPlayer)
             return duckPlayerSettings["tryDuckPlayerLink"] as? String ?? "https://www.youtube.com/watch?v=yKWIA-Pys4c"
         }
-        var day0SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/240300?list=1"
-        var day14SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/240300?list=2"
 
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
-        private let randomNumberGenerator: RandomNumberGenerating
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
@@ -92,29 +72,14 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
         private var shouldShowEmailProtectionSetting: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowSurveyDay0, defaultValue: true)
-        private var shouldShowSurveyDay0: Bool
-
-        @UserDefaultsWrapper(key: .homePageUserInteractedWithSurveyDay0, defaultValue: false)
-        private var userInteractedWithSurveyDay0: Bool
+        @UserDefaultsWrapper(key: .homePageShowPermanentSurvey, defaultValue: true)
+        private var shouldShowPermanentSurvey: Bool
 
         @UserDefaultsWrapper(key: .shouldShowDBPWaitlistInvitedCardUI, defaultValue: false)
         private var shouldShowDBPWaitlistInvitedCardUI: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowSurveyDay14, defaultValue: true)
-        private var shouldShowSurveyDay14: Bool
-
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
-
-        @UserDefaultsWrapper(key: .homePageShowSurveyDay0in10Percent, defaultValue: nil)
-        private var isPartOfSurveyDay0On10Percent: Bool?
-
-        @UserDefaultsWrapper(key: .homePageShowSurveyDay14in10Percent, defaultValue: nil)
-        private var isPartOfSurveyDay14On10Percent: Bool?
-
-        @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
-        private var firstLaunchDate: Date
 
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
@@ -123,10 +88,6 @@ extension HomePage.Models {
         var hasContent: Bool {
             return !featuresMatrix.isEmpty
         }
-
-        lazy var statisticsStore: StatisticsStore = LocalStatisticsStore()
-
-        lazy var waitlistBetaThankYouPresenter = WaitlistThankYouPromptPresenter()
 
         lazy var listOfFeatures = isFirstSession ? firstRunFeatures : randomisedFeatures
 
@@ -145,7 +106,7 @@ extension HomePage.Models {
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              homePageRemoteMessaging: HomePageRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-             randomNumberGenerator: RandomNumberGenerating = RandomNumberGenerator()) {
+             permanentSurveyManager: SurveyManager = PermanentSurveyManager()) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -153,7 +114,7 @@ extension HomePage.Models {
             self.duckPlayerPreferences = duckPlayerPreferences
             self.homePageRemoteMessaging = homePageRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager
-            self.randomNumberGenerator = randomNumberGenerator
+            self.permanentSurveyManager = permanentSurveyManager
 
             refreshFeaturesMatrix()
 
@@ -161,7 +122,6 @@ extension HomePage.Models {
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
         }
 
-        // swiftlint:disable:next cyclomatic_complexity
         @MainActor func performAction(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
@@ -181,10 +141,8 @@ extension HomePage.Models {
             case .emailProtection:
                 let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true)
                 tabCollectionViewModel.append(tab: tab)
-            case .surveyDay0:
-                visitSurvey(day: .day0)
-            case .surveyDay14:
-                visitSurvey(day: .day14)
+            case .permanentSurvey:
+                visitSurvey()
             case .networkProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
             case .dataBrokerProtectionRemoteMessage(let message):
@@ -193,18 +151,9 @@ extension HomePage.Models {
 #if DBP
                 DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
 #endif
-            case .vpnThankYou:
-                guard let window = NSApp.keyWindow,
-                      case .normal = NSApp.runType else { return }
-                waitlistBetaThankYouPresenter.presentVPNThankYouPrompt(in: window)
-            case .pirThankYou:
-                guard let window = NSApp.keyWindow,
-                      case .normal = NSApp.runType else { return }
-                waitlistBetaThankYouPresenter.presentPIRThankYouPrompt(in: window)
             }
         }
 
-        // swiftlint:disable:next cyclomatic_complexity
         func removeItem(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
@@ -215,10 +164,8 @@ extension HomePage.Models {
                 shouldShowDuckPlayerSetting = false
             case .emailProtection:
                 shouldShowEmailProtectionSetting = false
-            case .surveyDay0:
-                shouldShowSurveyDay0 = false
-            case .surveyDay14:
-                shouldShowSurveyDay14 = false
+            case .permanentSurvey:
+                shouldShowPermanentSurvey = false
             case .networkProtectionRemoteMessage(let message):
                 homePageRemoteMessaging.networkProtectionRemoteMessaging.dismiss(message: message)
                 PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDismissed(messageID: message.id))
@@ -229,15 +176,10 @@ extension HomePage.Models {
 #endif
             case .dataBrokerProtectionWaitlistInvited:
                 shouldShowDBPWaitlistInvitedCardUI = false
-            case .vpnThankYou:
-                waitlistBetaThankYouPresenter.didDismissVPNThankYouCard()
-            case .pirThankYou:
-                waitlistBetaThankYouPresenter.didDismissPIRThankYouCard()
             }
             refreshFeaturesMatrix()
         }
 
-        // swiftlint:disable:next cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 #if DBP
@@ -255,50 +197,34 @@ extension HomePage.Models {
                 PixelKit.fire(GeneralPixel.networkProtectionRemoteMessageDisplayed(messageID: message.id), frequency: .daily)
             }
 
-            if waitlistBetaThankYouPresenter.canShowVPNCard {
-                features.append(.vpnThankYou)
-            }
+            appendFeatureCards(&features)
 
-            if waitlistBetaThankYouPresenter.canShowPIRCard {
-                features.append(.pirThankYou)
-            }
-
-            for feature in listOfFeatures {
-                switch feature {
-                case .defaultBrowser:
-                    if shouldMakeDefaultCardBeVisible {
-                        features.append(feature)
-                    }
-                case .importBookmarksAndPasswords:
-                    if shouldImportCardBeVisible {
-                        features.append(feature)
-                    }
-                case .duckplayer:
-                    if shouldDuckPlayerCardBeVisible {
-                        features.append(feature)
-                    }
-                case .emailProtection:
-                    if shouldEmailProtectionCardBeVisible {
-                        features.append(feature)
-                    }
-                case .surveyDay0:
-                    if shouldSurveyDay0BeVisible {
-                        features.append(feature)
-                        userInteractedWithSurveyDay0 = true
-                    }
-                case .surveyDay14:
-                    if shouldSurveyDay14BeVisible {
-                        features.append(feature)
-                    }
-                case .networkProtectionRemoteMessage,
-                        .dataBrokerProtectionRemoteMessage,
-                        .dataBrokerProtectionWaitlistInvited,
-                        .vpnThankYou,
-                        .pirThankYou:
-                    break // Do nothing, these messages get appended first
-                }
-            }
             featuresMatrix = features.chunked(into: itemsPerRow)
+        }
+
+        private func appendFeatureCards(_ features: inout [FeatureType]) {
+            for feature in listOfFeatures where shouldAppendFeature(feature: feature) {
+                features.append(feature)
+            }
+        }
+
+        private func shouldAppendFeature(feature: FeatureType) -> Bool {
+            switch feature {
+            case .defaultBrowser:
+                return shouldMakeDefaultCardBeVisible
+            case .importBookmarksAndPasswords:
+                return shouldImportCardBeVisible
+            case .duckplayer:
+                return shouldDuckPlayerCardBeVisible
+            case .emailProtection:
+                return shouldEmailProtectionCardBeVisible
+            case .permanentSurvey:
+                return shouldPermanentSurveyBeVisible
+            case .networkProtectionRemoteMessage,
+                 .dataBrokerProtectionRemoteMessage,
+                 .dataBrokerProtectionWaitlistInvited:
+                return false // These are handled separately
+            }
         }
 
         // Helper Functions
@@ -372,64 +298,17 @@ extension HomePage.Models {
             !emailManager.isSignedIn
         }
 
-        private var shouldSurveyDay0BeVisible: Bool {
-            let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
-            return isDay0SurveyEnabled &&
-            shouldShowSurveyDay0 &&
-            firstLaunchDate >= oneDayAgo &&
-            Bundle.main.preferredLocalizations.first == "en" &&
-            isPartOfSurveyDay0On10Percent ?? calculateIfIn10percent(day: .day0)
+        private var shouldPermanentSurveyBeVisible: Bool {
+            return shouldShowPermanentSurvey &&
+            permanentSurveyManager.isSurveyAvailable
         }
 
-        private var shouldSurveyDay14BeVisible: Bool {
-            let fourteenDaysAgo = Calendar.current.date(byAdding: .weekday, value: -14, to: Date())!
-            let fifteenDaysAgo = Calendar.current.date(byAdding: .weekday, value: -15, to: Date())!
-            return isDay14SurveyEnabled &&
-            shouldShowSurveyDay0 &&
-            shouldShowSurveyDay14 &&
-            !userInteractedWithSurveyDay0 &&
-            firstLaunchDate >= fifteenDaysAgo &&
-            firstLaunchDate <= fourteenDaysAgo &&
-            Bundle.main.preferredLocalizations.first == "en" &&
-            isPartOfSurveyDay14On10Percent ?? calculateIfIn10percent(day: .day14)
-        }
+        @MainActor private func visitSurvey() {
+            guard let url = permanentSurveyManager.url else { return }
 
-        private func calculateIfIn10percent(day: SurveyDay) -> Bool {
-            let randomNumber0To99 = randomNumberGenerator.random(in: 0..<100)
-            let isInSurvey10Percent = randomNumber0To99 < 10
-            switch day {
-            case .day0:
-                isPartOfSurveyDay0On10Percent = isInSurvey10Percent
-            case .day14:
-                isPartOfSurveyDay14On10Percent = isInSurvey10Percent
-            }
-            return isInSurvey10Percent
-        }
-
-        private enum SurveyDay {
-            case day0
-            case day14
-        }
-
-        @MainActor private func visitSurvey(day: SurveyDay) {
-            var surveyURLString: String
-            switch day {
-            case .day0:
-                surveyURLString = day0SurveyURL
-            case .day14:
-                surveyURLString = day14SurveyURL
-            }
-
-            if let url = URL(string: surveyURLString) {
-                let tab = Tab(content: .url(url, source: .ui), shouldLoadInBackground: true)
-                tabCollectionViewModel.append(tab: tab)
-                switch day {
-                case .day0:
-                    shouldShowSurveyDay0 = false
-                case .day14:
-                    shouldShowSurveyDay14 = false
-                }
-            }
+            let tab = Tab(content: .url(url, source: .ui), shouldLoadInBackground: true)
+            tabCollectionViewModel.append(tab: tab)
+            shouldShowPermanentSurvey = false
         }
 
         @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
@@ -490,20 +369,17 @@ extension HomePage.Models {
         // We ignore the `networkProtectionRemoteMessage` case here to avoid it getting accidentally included - it has special handling and will get
         // included elsewhere.
         static var allCases: [HomePage.Models.FeatureType] {
-            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .surveyDay0, .surveyDay14]
+            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .permanentSurvey]
         }
 
         case duckplayer
         case emailProtection
         case defaultBrowser
         case importBookmarksAndPasswords
-        case surveyDay0
-        case surveyDay14
+        case permanentSurvey
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
         case dataBrokerProtectionRemoteMessage(DataBrokerProtectionRemoteMessage)
         case dataBrokerProtectionWaitlistInvited
-        case vpnThankYou
-        case pirThankYou
 
         var title: String {
             switch self {
@@ -515,20 +391,14 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerCardTitle
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionCardTitle
-            case .surveyDay0:
-                return UserText.newTabSetUpSurveyDay0CardTitle
-            case .surveyDay14:
-                return UserText.newTabSetUpSurveyDay14CardTitle
+            case .permanentSurvey:
+                return PermanentSurveyManager.title
             case .networkProtectionRemoteMessage(let message):
                 return message.cardTitle
             case .dataBrokerProtectionRemoteMessage(let message):
                 return message.cardTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Personal Information Removal"
-            case .vpnThankYou:
-                return "Thanks for testing DuckDuckGo VPN!"
-            case .pirThankYou:
-                return "Thanks for testing Personal Information Removal!"
             }
         }
 
@@ -542,20 +412,14 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerSummary
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionSummary
-            case .surveyDay0:
-                return UserText.newTabSetUpSurveyDay0Summary
-            case .surveyDay14:
-                return UserText.newTabSetUpSurveyDay14Summary
+            case .permanentSurvey:
+                return PermanentSurveyManager.body
             case .networkProtectionRemoteMessage(let message):
                 return message.cardDescription
             case .dataBrokerProtectionRemoteMessage(let message):
                 return message.cardDescription
             case .dataBrokerProtectionWaitlistInvited:
                 return "You're invited to try Personal Information Removal beta!"
-            case .vpnThankYou:
-                return "To keep using it, subscribe to DuckDuckGo Privacy Pro."
-            case .pirThankYou:
-                return "To keep using it, subscribe to DuckDuckGo Privacy Pro."
             }
         }
 
@@ -569,20 +433,14 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerAction
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionAction
-            case .surveyDay0:
-                return UserText.newTabSetUpSurveyDay0Action
-            case .surveyDay14:
-                return UserText.newTabSetUpSurveyDay14Action
+            case .permanentSurvey:
+                return PermanentSurveyManager.actionTitle
             case .networkProtectionRemoteMessage(let message):
                 return message.action.actionTitle
             case .dataBrokerProtectionRemoteMessage(let message):
                 return message.action.actionTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Get Started"
-            case .vpnThankYou:
-                return "See Special Offer For Testers"
-            case .pirThankYou:
-                return "See Special Offer For Testers"
             }
         }
 
@@ -598,19 +456,13 @@ extension HomePage.Models {
                 return .cleanTube128.resized(to: iconSize)!
             case .emailProtection:
                 return .inbox128.resized(to: iconSize)!
-            case .surveyDay0:
-                return .qandA128.resized(to: iconSize)!
-            case .surveyDay14:
-                return .qandA128.resized(to: iconSize)!
+            case .permanentSurvey:
+                return .survey128.resized(to: iconSize)!
             case .networkProtectionRemoteMessage:
                 return .vpnEnded.resized(to: iconSize)!
             case .dataBrokerProtectionRemoteMessage:
                 return .dbpInformationRemover.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
-                return .dbpInformationRemover.resized(to: iconSize)!
-            case .vpnThankYou:
-                return .vpnEnded.resized(to: iconSize)!
-            case .pirThankYou:
                 return .dbpInformationRemover.resized(to: iconSize)!
             }
         }
@@ -660,12 +512,12 @@ struct HomePageRemoteMessaging {
 
 }
 
-public protocol RandomNumberGenerating {
-    func random(in range: Range<Int>) -> Int
-}
-
-struct RandomNumberGenerator: RandomNumberGenerating {
-    func random(in range: Range<Int>) -> Int {
-        return Int.random(in: range)
+extension AppVersion {
+    public var majorAndMinorOSVersion: String {
+        let components = osVersion.split(separator: ".")
+        guard components.count >= 2 else {
+            return majorVersionNumber
+        }
+        return "\(components[0]).\(components[1])"
     }
 }
