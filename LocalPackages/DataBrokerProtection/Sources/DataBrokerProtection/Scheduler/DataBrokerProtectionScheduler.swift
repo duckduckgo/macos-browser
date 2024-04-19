@@ -30,6 +30,7 @@ public enum DataBrokerProtectionSchedulerStatus: Codable {
 public enum DataBrokerProtectionSchedulerError: Error {
     case loginItemDoesNotHaveNecessaryPermissions
     case appInWrongDirectory
+    case operationsInterrupted
 }
 
 @objc
@@ -262,8 +263,13 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
-                    os_log("Error during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                    self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.scanAllBrokers"))
+                    switch oneTimeError {
+                    case DataBrokerProtectionSchedulerError.operationsInterrupted:
+                        os_log("Interrupted during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    default:
+                        os_log("Error during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.scanAllBrokers"))
+                    }
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {

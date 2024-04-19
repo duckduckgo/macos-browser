@@ -89,7 +89,12 @@ extension IPCServiceManager: IPCServerInterface {
         pixelHandler.fire(.ipcServerScanAllBrokersReceivedByAgent)
         scheduler.scanAllBrokers(showWebView: showWebView) { errors in
             if let error = errors?.oneTimeError {
-                self.pixelHandler.fire(.ipcServerScanAllBrokersCompletedOnAgentWithError(error: error))
+                switch error {
+                case DataBrokerProtectionSchedulerError.operationsInterrupted:
+                    self.pixelHandler.fire(.ipcServerScanAllBrokersInterruptedOnAgent)
+                default:
+                    self.pixelHandler.fire(.ipcServerScanAllBrokersCompletedOnAgentWithError(error: error))
+                }
             } else {
                 self.pixelHandler.fire(.ipcServerScanAllBrokersCompletedOnAgentWithoutError)
             }

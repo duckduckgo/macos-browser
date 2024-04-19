@@ -157,7 +157,14 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         xpc.execute(call: { server in
             server.scanAllBrokers(showWebView: showWebView) { errors in
                 if let error = errors?.oneTimeError {
-                    self.pixelHandler.fire(.ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: error))
+                    let nsError = error as NSError
+                    let interruptedError = DataBrokerProtectionSchedulerError.operationsInterrupted as NSError
+                    if nsError.domain == interruptedError.domain,
+                       nsError.code == interruptedError.code {
+                        self.pixelHandler.fire(.ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption)
+                    } else {
+                        self.pixelHandler.fire(.ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: error))
+                    }
                 } else {
                     self.pixelHandler.fire(.ipcServerScanAllBrokersCompletionCalledOnAppWithoutError)
                 }

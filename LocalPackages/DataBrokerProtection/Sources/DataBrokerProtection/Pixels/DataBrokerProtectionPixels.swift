@@ -115,7 +115,8 @@ public enum DataBrokerProtectionPixels {
     case ipcServerScanAllBrokersCompletedOnAgentWithError(error: Error?)
     case ipcServerScanAllBrokersCompletionCalledOnAppWithoutError
     case ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: Error?)
-    case ipcServerScanAllBrokersScanAllBrokersInterrupted
+    case ipcServerScanAllBrokersInterruptedOnAgent
+    case ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption
 
     case ipcServerOptOutAllBrokers
     case ipcServerOptOutAllBrokersCompletion(error: Error?)
@@ -214,7 +215,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .ipcServerScanAllBrokersCompletedOnAgentWithError: return "m_mac_dbp_ipc-server_scan-all-brokers_completed-on-agent_with-error"
         case .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError: return "m_mac_dbp_ipc-server_scan-all-brokers_completion-called-on-app_without-error"
         case .ipcServerScanAllBrokersCompletionCalledOnAppWithError: return "m_mac_dbp_ipc-server_scan-all-brokers_completion-called-on-app_with-error"
-        case .ipcServerScanAllBrokersScanAllBrokersInterrupted: return "m_mac_dbp_ipc-server_scan-all-brokers_interrupted"
+        case .ipcServerScanAllBrokersInterruptedOnAgent: return "m_mac_dbp_ipc-server_scan-all-brokers_interrupted-on-agent"
+        case .ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption: return "m_mac_dbp_ipc-server_scan-all-brokers_completion-called-on-app_after-interruption"
 
         case .ipcServerOptOutAllBrokers: return "m_mac_dbp_ipc-server_opt-out-all-brokers"
         case .ipcServerOptOutAllBrokersCompletion: return "m_mac_dbp_ipc-server_opt-out-all-brokers_completion"
@@ -364,7 +366,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .ipcServerScanAllBrokersCompletedOnAgentWithError,
                 .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError,
                 .ipcServerScanAllBrokersCompletionCalledOnAppWithError,
-                .ipcServerScanAllBrokersScanAllBrokersInterrupted,
+                .ipcServerScanAllBrokersInterruptedOnAgent,
+                .ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption,
                 .ipcServerOptOutAllBrokers,
                 .ipcServerOptOutAllBrokersCompletion,
                 .ipcServerRunQueuedOperations,
@@ -432,7 +435,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerScanAllBrokersReceivedByAgent,
                     .ipcServerScanAllBrokersCompletedOnAgentWithoutError,
                     .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError,
-                    .ipcServerScanAllBrokersScanAllBrokersInterrupted,
+                    .ipcServerScanAllBrokersInterruptedOnAgent,
+                    .ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption,
                     .ipcServerOptOutAllBrokers,
                     .ipcServerRunQueuedOperations,
                     .ipcServerRunAllOperations,
