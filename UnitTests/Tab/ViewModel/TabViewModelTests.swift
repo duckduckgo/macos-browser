@@ -74,10 +74,32 @@ final class TabViewModelTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenURLIsFileURLThenAddressBarIsFilePath() {
+    func testWhenURLIsFileURLAndShowFullUrlIsDisabledThenAddressBarIsFileName() {
         let urlString = "file:///Users/Dax/file.txt"
         let url = URL.makeURL(from: urlString)!
-        let tabViewModel = TabViewModel.forTabWithURL(url)
+        let tab = Tab(content: .url(url, source: .link))
+        let appearancePreferences = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(showFullURL: false))
+        let tabViewModel = TabViewModel(tab: tab, appearancePreferences: appearancePreferences)
+
+        let addressBarStringExpectation = expectation(description: "Address bar string")
+
+        tabViewModel.simulateLoadingCompletion(url, in: tabViewModel.tab.webView)
+
+        tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
+            XCTAssertEqual(tabViewModel.addressBarString, urlString)
+            XCTAssertEqual(tabViewModel.passiveAddressBarAttributedString.string, url.lastPathComponent)
+            addressBarStringExpectation.fulfill()
+        } .store(in: &cancellables)
+        waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    @MainActor
+    func testWhenURLIsFileURLAndShowFullUrlIsEnabledThenAddressBarIsFilePath() {
+        let urlString = "file:///Users/Dax/file.txt"
+        let url = URL.makeURL(from: urlString)!
+        let tab = Tab(content: .url(url, source: .link))
+        let appearancePreferences = AppearancePreferences(persistor: AppearancePreferencesPersistorMock(showFullURL: true))
+        let tabViewModel = TabViewModel(tab: tab, appearancePreferences: appearancePreferences)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
