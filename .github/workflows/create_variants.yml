@@ -99,9 +99,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - variant: "ab"
+      matrix: ${{ fromJSON(needs.set-up-variants.outputs.build-variants) }}
     uses: ./.github/workflows/create_variant.yml
     with:
       atb-variant: ${{ matrix.variant }}
