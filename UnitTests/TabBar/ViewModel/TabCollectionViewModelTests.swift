@@ -335,10 +335,28 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
         tabCollectionViewModel.appendNewTab()
-        tabCollectionViewModel.select(at: .unpinned(1))
-        tabCollectionViewModel.removeTabs(before: 1)
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(3))
+        tabCollectionViewModel.removeTabs(before: 3)
 
         XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 0)
+    }
+
+    func testWhenTabsToTheLeftAreRemovedAndSelectionRemainsAndIsToTheRight_ThenSelectionIsCorrectlyUpdated() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(4))
+        tabCollectionViewModel.removeTabs(before: 2)
+
+        XCTAssertEqual(tabCollectionViewModel.selectionIndex?.item, 2)
     }
 
     func testWhenTabsToTheRightAreRemovedAndSelectionIsRemoved_ThenSelectionIsCorrectlyUpdated() {
