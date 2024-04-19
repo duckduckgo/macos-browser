@@ -258,7 +258,7 @@ final class TabViewModel {
         passiveAddressBarAttributedString = switch tab.content {
         case .newtab, .onboarding, .none:
             .init() // empty
-        case .settings(let pane):
+        case .settings:
             .settingsTrustedIndicator
         case .bookmarks:
             .bookmarksTrustedIndicator
