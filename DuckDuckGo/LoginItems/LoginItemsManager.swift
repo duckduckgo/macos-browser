@@ -19,10 +19,15 @@
 import Common
 import Foundation
 import LoginItems
+import PixelKit
+
+protocol LoginItemsManaging {
+    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws
+}
 
 /// Class to manage the login items for the VPN and DBP
 ///
-final class LoginItemsManager {
+final class LoginItemsManager: LoginItemsManaging {
     private enum Action: String {
         case enable
         case disable
@@ -38,6 +43,20 @@ final class LoginItemsManager {
                 os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
             } catch let error as NSError {
                 handleError(for: item, action: .enable, error: error)
+            }
+        }
+    }
+
+    /// Throwing version of enableLoginItems
+    ///
+    func throwingEnableLoginItems(_ items: Set<LoginItem>, log: OSLog) throws {
+        for item in items {
+            do {
+                try item.enable()
+                os_log("🟢 Enabled successfully %{public}@", log: log, String(describing: item))
+            } catch let error as NSError {
+                handleError(for: item, action: .enable, error: error)
+                throw error
             }
         }
     }
@@ -66,17 +85,12 @@ final class LoginItemsManager {
     }
 
     private func handleError(for item: LoginItem, action: Action, error: NSError) {
-        let event = Pixel.Event.Debug.loginItemUpdateError(
-            loginItemBundleID: item.agentBundleID,
-            action: "enable",
-            buildType: AppVersion.shared.buildType,
-            osVersion: AppVersion.shared.osVersion
-        )
-        DailyPixel.fire(pixel: .debug(event: event, error: error), frequency: .dailyAndCount)
-
-        os_log("🔴 Could not enable %{public}@: %{public}@",
-               item.debugDescription,
-               error.debugDescription)
+        let event = GeneralPixel.loginItemUpdateError(loginItemBundleID: item.agentBundleID,
+                                                      action: "enable",
+                                                      buildType: AppVersion.shared.buildType,
+                                                      osVersion: AppVersion.shared.osVersion)
+        PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount)
+        os_log("🔴 Could not enable %{public}@: %{public}@", item.debugDescription, error.debugDescription)
     }
 
     // MARK: - Debug Interactions

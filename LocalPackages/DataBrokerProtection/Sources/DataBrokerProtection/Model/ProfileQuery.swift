@@ -80,7 +80,7 @@ extension ProfileQuery: Equatable {
         return
             lhs.firstName.lowercased() == rhs.firstName.lowercased() &&
             lhs.lastName.lowercased() == rhs.lastName.lowercased() &&
-            lhs.middleName?.lowercased() == rhs.middleName?.lowercased() &&
+            lhs.middleName.normalized() == rhs.middleName.normalized() &&
             lhs.suffix?.lowercased() == rhs.suffix?.lowercased() &&
             lhs.city.lowercased() == rhs.city.lowercased() &&
             lhs.state.lowercased() == rhs.state.lowercased() &&
@@ -91,6 +91,20 @@ extension ProfileQuery: Equatable {
             lhs.fullName.lowercased() == rhs.fullName.lowercased() &&
             lhs.age == rhs.age &&
             lhs.addresses == rhs.addresses
+    }
+}
+
+extension Optional where Wrapped == String {
+
+    /// Returns a comparable string optional for profile query optional fields.
+    /// - Returns nil if the string is blank
+    /// - Returns nil when the value is nil, or the lowercased String if present
+    func normalized() -> String? {
+        guard let nonNilString = self else {
+            return nil
+        }
+
+        return nonNilString.isBlank ? nil : nonNilString.lowercased()
     }
 }
 

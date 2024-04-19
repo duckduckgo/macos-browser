@@ -72,6 +72,15 @@ final class UserAgentTests: XCTestCase {
         XCTAssertNotEqual(UserAgent.for("https://duckduckgo.com".url, privacyConfig: config), UserAgent.webViewDefault)
     }
 
+    func testWhenDefaultPolicyIsBrandThenBrandedUserAgentIsUsed() {
+        let config = MockPrivacyConfiguration()
+        config.featureSettings = [
+            "defaultPolicy": "brand"
+        ] as! [String: Any]
+
+        XCTAssertEqual(UserAgent.for("http://wikipedia.org".url, privacyConfig: config), UserAgent.brandedDefault)
+    }
+
     func testThatRemoteConfigurationTakesPrecedenceOverLocalConfiguration() {
         let config = MockPrivacyConfiguration()
 

@@ -150,4 +150,4 @@ private struct InfoItemView: View {
     }
     return PreviewView()
 
-} ()}
+}()}

@@ -601,6 +601,12 @@ extension MainViewController {
         WindowsManager.openNewWindow(with: tab)
     }
 
+    @objc func duplicateTab(_ sender: Any?) {
+        guard let (_, index) = getActiveTabAndIndex() else { return }
+
+        tabCollectionViewModel.duplicateTab(at: index)
+    }
+
     @objc func pinOrUnpinTab(_ sender: Any?) {
         guard let (_, selectedTabIndex) = getActiveTabAndIndex() else { return }
 
@@ -738,13 +744,13 @@ extension MainViewController {
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
 
         // Clear pixel data
-        DailyPixel.clearLastFireDate(pixel: .privacyProFeatureEnabled)
-        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouDBP)
-        Pixel.shared?.clearRepetitions(for: .privacyProBetaUserThankYouVPN)
+        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProFeatureEnabled)
+        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouDBP)
+        PixelKit.shared?.clearFrequencyHistoryFor(pixel: PrivacyProPixel.privacyProBetaUserThankYouVPN)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
-        UserDefaults.standard.removePersistentDomain(forName: DailyPixel.Constant.dailyPixelStorageIdentifier)
+        PixelKit.shared?.clearFrequencyHistoryForAllPixels()
     }
 
     @objc func inPermanentSurveyShareOn(_ sender: Any?) {

@@ -116,6 +116,9 @@
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
+                  Identifier = "PixelExperimentTests">
+               </Test>
+               <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
