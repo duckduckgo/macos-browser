@@ -770,12 +770,11 @@ final class AddressBarButtonsViewController: NSViewController {
     private func updatePrivacyEntryPointButton() {
         guard let tabViewModel else { return }
 
-        let isHypertextUrl = if case .url(let url, _, _) = tabViewModel.tab.content,
-            !(url.isDuckPlayer || url.isDuckURLScheme),
-            url.navigationalScheme?.isHypertextScheme == true { true } else { false}
+        let url = tabViewModel.tab.content.userEditableUrl
+        let isHypertextUrl = url?.navigationalScheme?.isHypertextScheme == true && url?.isDuckPlayer == false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
-        let isLocalUrl = tabViewModel.tab.content.userEditableUrl?.isLocalURL ?? false
+        let isLocalUrl = url?.isLocalURL ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isEditingMode
