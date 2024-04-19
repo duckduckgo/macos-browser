@@ -141,7 +141,7 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     private func mergeTrackerDataSets(rules: [ContentBlockerRulesManager.Rules]) -> (trackerData: TrackerData, encodedTrackerData: String) {
         let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
         let tdsIndex = contentBlockingManager.currentRules.firstIndex(where: { $0.name == tdsName})
-        
+
         var combinedTrackers: [String: KnownTracker] = [:]
         var combinedEntities: [String: Entity] = [:]
         var combinedDomains: [String: String] = [:]
