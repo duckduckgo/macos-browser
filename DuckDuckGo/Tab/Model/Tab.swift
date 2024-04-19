@@ -900,9 +900,10 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     func requestFireproofToggle() {
-        guard case .url(let url, _, _) = content, !(url.isDuckPlayer || url.isDuckURLScheme),
-              let host = url.host
-        else { return }
+        guard case .url(let url, _, _) = content,
+              url.navigationalScheme?.isHypertextScheme == true,
+              !url.isDuckPlayer,
+              let host = url.host else { return }
 
         _ = FireproofDomains.shared.toggle(domain: host)
     }
