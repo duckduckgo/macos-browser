@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import AppKit
+import PixelKit
 
 import NetworkProtectionUI
 
@@ -61,15 +62,15 @@ final class URLEventHandler {
     @objc func handleUrlEvent(event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {
         guard let stringValue = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue else {
             os_log("UrlEventListener: unable to determine path", type: .error)
-            Pixel.fire(.debug(event: .appOpenURLFailed,
-                              error: NSError(domain: "CouldNotGetPath", code: -1, userInfo: nil)))
+            let error = NSError(domain: "CouldNotGetPath", code: -1, userInfo: nil)
+            PixelKit.fire(DebugEvent(GeneralPixel.appOpenURLFailed, error: error))
             return
         }
 
         guard let url = URL.makeURL(from: stringValue) else {
             os_log("UrlEventListener: failed to construct URL from path %s", type: .error, stringValue)
-            Pixel.fire(.debug(event: .appOpenURLFailed,
-                              error: NSError(domain: "CouldNotConstructURL", code: -1, userInfo: nil)))
+            let error = NSError(domain: "CouldNotConstructURL", code: -1, userInfo: nil)
+            PixelKit.fire(DebugEvent(GeneralPixel.appOpenURLFailed, error: error))
             return
         }
 
@@ -150,11 +151,9 @@ final class URLEventHandler {
         case AppLaunchCommand.showVPNLocations.launchURL:
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
             WindowControllersManager.shared.showLocationPickerSheet()
-#if SUBSCRIPTION
         case AppLaunchCommand.showPrivacyPro.launchURL:
             WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
-            Pixel.fire(.privacyProOfferScreenImpression)
-#endif
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
 #if !APPSTORE && !DEBUG
         case AppLaunchCommand.moveAppToApplications.launchURL:
             // this should be run after NSApplication.shared is set

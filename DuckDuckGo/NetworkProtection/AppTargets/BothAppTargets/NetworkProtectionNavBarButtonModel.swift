@@ -116,14 +116,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         guard [.normal, .integrationTests].contains(NSApp.runType) else { return NSImage() }
 #endif
 
-        if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-            return .networkProtectionAvailableButton
-        }
-
-        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            return .image(for: icon)!
-        }
-
         return .image(for: icon)!
     }
 

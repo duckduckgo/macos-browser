@@ -300,9 +300,7 @@ public final class TunnelControllerViewModel: ObservableObject {
             } else if connectionStatus == .disconnecting {
                 toggleTransition = .switchingOff(locallyInitiated: false)
             }
-        case .switchingOn(let locallyInitiated), .switchingOff(let locallyInitiated):
-            guard !locallyInitiated else { break }
-
+        case .switchingOn, .switchingOff:
             if connectionStatus == .connecting {
                 toggleTransition = .switchingOn(locallyInitiated: false)
             } else if connectionStatus == .disconnecting {
@@ -505,8 +503,6 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         Task { @MainActor in
             await tunnelController.start()
-
-            toggleTransition = .idle
             refreshInternalIsRunning()
         }
     }
@@ -518,7 +514,6 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         Task { @MainActor in
             await tunnelController.stop()
-            toggleTransition = .idle
             refreshInternalIsRunning()
         }
     }

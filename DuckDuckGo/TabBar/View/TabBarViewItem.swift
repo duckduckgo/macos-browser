@@ -46,7 +46,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState?
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
@@ -446,7 +446,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         switch delegate?.tabBarViewItemAudioState(self) {
         case .muted:
             mutedTabIcon.isHidden = false
-        default:
+        case .unmuted, .none:
             mutedTabIcon.isHidden = true
         }
     }
@@ -540,15 +540,13 @@ extension TabBarViewItem: NSMenuDelegate {
     }
 
     private func addMuteUnmuteMenuItem(to menu: NSMenu) {
-        let audioState = delegate?.tabBarViewItemAudioState(self) ?? .notSupported
+        guard let audioState = delegate?.tabBarViewItemAudioState(self) else { return }
 
-        if audioState != .notSupported {
-            menu.addItem(NSMenuItem.separator())
-            let menuItemTitle = audioState == .muted ? UserText.unmuteTab : UserText.muteTab
-            let muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
-            muteUnmuteMenuItem.target = self
-            menu.addItem(muteUnmuteMenuItem)
-        }
+        menu.addItem(NSMenuItem.separator())
+        let menuItemTitle = audioState == .muted ? UserText.unmuteTab : UserText.muteTab
+        let muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
+        muteUnmuteMenuItem.target = self
+        menu.addItem(muteUnmuteMenuItem)
     }
 
     private func addCloseMenuItem(to menu: NSMenu) {

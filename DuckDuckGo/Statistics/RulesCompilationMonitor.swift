@@ -54,14 +54,14 @@ final class AbstractContentBlockingAssetsCompilationTimeReporter<Caller: Hashabl
         }
     }
 
-    private func report(waitTime: TimeInterval, result: Pixel.Event.WaitResult, completionHandler: @escaping ((Error?) -> Void) = { _ in }) {
+    private func report(waitTime: TimeInterval, result: GeneralPixel.WaitResult, completionHandler: @escaping ((Error?) -> Void) = { _ in }) {
         // report only once
         isFinished = true
         completionHandler(nil)
 
         // This is temporarily disabled:
         //
-        // Pixel.fire(.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result),
+        // PixelKit.fire(GeneralPixel.compileRulesWait(onboardingShown: self.onboardingShown, waitTime: waitTime, result: result),
         //            withAdditionalParameters: ["waitTime": String(waitTime)],
         //            onComplete: completionHandler)
 

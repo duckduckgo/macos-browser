@@ -160,22 +160,16 @@ extension TunnelControllerIPCClient: IPCServerInterface {
         })
     }
 
-    public func start() {
+    public func start(completion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
-            server.start()
-        }, xpcReplyErrorHandler: { _ in
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
+            server.start(completion: completion)
+        }, xpcReplyErrorHandler: completion)
     }
 
-    public func stop() {
+    public func stop(completion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
-            server.stop()
-        }, xpcReplyErrorHandler: { _ in
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
+            server.stop(completion: completion)
+        }, xpcReplyErrorHandler: completion)
     }
 
     public func debugCommand(_ command: DebugCommand) async throws {

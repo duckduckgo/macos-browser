@@ -481,6 +481,12 @@
         }
       }
     },
+    "1." : {
+
+    },
+    "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder." : {
+
+    },
     "about.app_name" : {
       "comment" : "Application name to be displayed in the About dialog",
       "extractionState" : "extracted_with_value",
@@ -769,6 +775,7 @@
     },
     "Add Folder" : {
       "comment" : "Add Folder popover: Create folder button",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1115,6 +1122,7 @@
     },
     "Address:" : {
       "comment" : "Add Bookmark dialog bookmark url field heading",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6251,6 +6259,42 @@
         }
       }
     },
+    "bitwarden.incompatible" : {
+      "comment" : "Message that warns user that specific Bitwarden app vesions are not compatible with this app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please revert to an older version by following these steps:"
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible.step.1" : {
+      "comment" : "First step to downgrade Bitwarden",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Download v2014.2.1"
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible.step.2" : {
+      "comment" : "Second step to downgrade Bitwarden",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder."
+          }
+        }
+      }
+    },
     "bitwarden.install" : {
       "comment" : "Button to install Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -7272,6 +7316,7 @@
     },
     "Bookmark Added" : {
       "comment" : "Bookmark Added popover title",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -9042,7 +9087,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lesezeichen hinzufügen"
+            "value" : "Add Bookmark"
           }
         },
         "en" : {
@@ -9054,43 +9099,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añadir marcador"
+            "value" : "Add Bookmark"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter un signet"
+            "value" : "Add Bookmark"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aggiungi ai segnalibri"
+            "value" : "Add Bookmark"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bladwijzer toevoegen"
+            "value" : "Add Bookmark"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dodaj zakładkę"
+            "value" : "Add Bookmark"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adicionar marcador"
+            "value" : "Add Bookmark"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавить закладку"
+            "value" : "Add Bookmark"
           }
         }
       }
@@ -9162,7 +9207,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lesezeichen bearbeiten"
+            "value" : "Edit Bookmark"
           }
         },
         "en" : {
@@ -9174,43 +9219,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar marcador"
+            "value" : "Edit Bookmark"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Modifier le signet"
+            "value" : "Edit Bookmark"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Modifica segnalibro"
+            "value" : "Edit Bookmark"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bladwijzer bewerken"
+            "value" : "Edit Bookmark"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edytuj zakładkę"
+            "value" : "Edit Bookmark"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar marcador"
+            "value" : "Edit Bookmark"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редактировать закладку"
+            "value" : "Edit Bookmark"
           }
         }
       }
@@ -11289,6 +11334,7 @@
     },
     "Copy" : {
       "comment" : "Command",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -12528,6 +12574,7 @@
     },
     "Delete" : {
       "comment" : "Command",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -13283,6 +13330,9 @@
           }
         }
       }
+    },
+    "Download v2014.2.1" : {
+
     },
     "download.finishing" : {
       "comment" : "Download being finished information text",
@@ -15724,6 +15774,7 @@
     },
     "Edit…" : {
       "comment" : "Command",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30333,44 +30384,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Comparte tus ideas"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Partagez votre avis"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Comunicaci la tua opinione"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Deel je gedachten"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Podziel się przemyśleniami"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Partilha as tuas opiniões"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Поделиться соображениями"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         }
       }
@@ -30393,44 +30444,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Responde a nuestra breve encuesta y ayúdanos a crear el mejor navegador."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Répondez à notre courte enquête et aidez-nous à créer le meilleur navigateur."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Rispondi al nostro breve sondaggio e aiutaci a creare il browser migliore."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Vul onze korte enquête in en help ons de beste browser te bouwen."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Weź udział w krótkiej ankiecie i pomóż nam opracować najlepszą przeglądarkę."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Responde ao nosso curto inquérito e ajuda-nos a criar o melhor navegador."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Пройдите короткий опрос и помогите DuckDuckGo стать лучшим из браузеров."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         }
       }
@@ -30453,44 +30504,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Cuéntanos qué te ha traído hasta aquí"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dites-nous ce qui vous amène ici"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Raccontaci cosa ti ha portato qui"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Vertel ons wat je hier heeft gebracht"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Powiedz nam, co Cię tu sprowadziło"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Diz-nos o que te trouxe aqui"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Что привело вас к нам"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         }
       }
@@ -30690,6 +30741,48 @@
             "state" : "new",
             "value" : "Sign Up To Participate"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
         }
       }
     },
@@ -30697,9 +30790,57 @@
       "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         }
@@ -30709,6 +30850,12 @@
       "comment" : "Title of the Day 14 durvey of the Set Up section in the home page",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -31001,7 +31148,7 @@
     },
     "no.access.to.selected.folder" : {
       "comment" : "Alert presented to user if the app doesn't have rights to access selected folder",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -31061,7 +31208,7 @@
     },
     "no.access.to.selected.folder.header" : {
       "comment" : "Header of the alert dialog informing user about failed download",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -45885,6 +46032,7 @@
     },
     "Remove" : {
       "comment" : "Remove bookmark button title",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48657,6 +48805,726 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Речь"
+          }
+        }
+      }
+    },
+    "ssl.error.certificate.expired.message" : {
+      "comment" : "Describes an SSL error where a website's security certificate is expired. '%1$@' is a placeholder for the website's domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Sicherheitszertifikat für %1$@ ist abgelaufen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The security certificate for %1$@ is expired."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El certificado de seguridad de %1$@ ha caducado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de sécurité de %1$@ a expiré."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di sicurezza per %1$@ è scaduto."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het beveiligingscertificaat voor %1$@ is verlopen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certyfikat zabezpieczeń dla %1$@ wygasł."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O certificado de segurança de %1$@ expirou."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Срок действия сертификата безопасности сайта %1$@ истек."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to see advanced options on click.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweitert …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Advanced…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avanzadas..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options avancées"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avanzate…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geavanceerd ..."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaawansowane..."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avançado…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дополнительно..."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.info.body.expired" : {
+      "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es posible que el sitio web esté mal configurado, que un atacante haya comprometido tu conexión o que el reloj del sistema no sea correcto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il est possible que le site soit mal configuré, qu'un pirate ait compromis votre connexion ou que l'horloge de votre système soit incorrecte."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l'orologio del tuo sistema non sia corretto."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możliwe, że witryna jest błędnie skonfigurowana, osoba atakująca naruszyła połączenie lub ustawienie zegara systemowego jest nieprawidłowe."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É possível que o site esteja mal configurado, que um invasor tenha comprometido a tua ligação ou que o teu relógio do sistema esteja incorreto."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.info.body.wrong.host" : {
+      "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möglicherweise ist die Website falsch konfiguriert oder ein Angreifer hat deine Verbindung kompromittiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "It’s possible that the website is misconfigured or that an attacker has compromised your connection."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es posible que el sitio web esté mal configurado o que un atacante haya comprometido tu conexión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il est possible que le site soit mal configuré ou qu'un pirate ait compromis votre connexion."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È possibile che il sito web non sia configurato correttamente o che un malintenzionato abbia compromesso la tua connessione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mogelijk is de website verkeerd geconfigureerd of heeft een aanvaller je verbinding gecompromitteerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możliwe, że witryna jest błędnie skonfigurowana lub osoba atakująca naruszyła połączenie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É possível que o site esteja mal configurado ou que um invasor tenha comprometido a tua ligação."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Возможно, неверно задана конфигурация сайта либо ваше соединение перехвачено злоумышленником."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.info.title" : {
+      "comment" : "Title of the Advanced info section shown in an error page that warns users of security risks on a website due to SSL issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo warnt dich, wenn eine Website ein ungültiges Zertifikat hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo warns you when a website has an invalid certificate."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo te avisa cuando un sitio web tiene un certificado no válido."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo vous avertit lorsque le certificat d'un site Web n'est pas valide."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo ti avverte quando un sito web ha un certificato non valido."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo waarschuwt je wanneer een website een ongeldig certificaat heeft."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo ostrzega gdy witryna internetowa ma nieprawidłowy certyfikat."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo avisa-te quando um site tem um certificado inválido."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo предупредит вас, если у сайта окажется недействительный сертификат."
+          }
+        }
+      }
+    },
+    "ssl.error.page.body" : {
+      "comment" : "Error description shown in an error page that warns users of security risks on a website due to SSL issues. %1$@ represent the site domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Zertifikat für diese Website ist ungültig. Möglicherweise stellst du eine Verbindung zu einem Server her, der vorgibt, %1$@ zu sein, wodurch deine vertraulichen Daten in Gefahr sein könnten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The certificate for this site is invalid. You might be connecting to a server that is pretending to be %1$@ which could put your confidential information at risk."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El certificado de este sitio no es válido. Puede que te estés conectando a un servidor que se hace pasar por %1$@, lo que podría poner en riesgo tu información confidencial."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de ce site n'est pas valide. Vous vous connectez peut-être à un serveur qui se fait passer pour %1$@, ce qui pourrait mettre vos informations confidentielles en danger."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di questo sito non è valido. Potresti collegarti a un server che finge di essere %1$@ e che potrebbe mettere a rischio le tue informazioni riservate."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het certificaat voor deze website is ongeldig. Mogelijk maak je verbinding met een server die zich voordoet als %1$@, waardoor je vertrouwelijke informatie in gevaar kan komen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certyfikat tej witryny jest nieprawidłowy. Być może łączysz się z serwerem podszywającym się pod %1$@, co może narazić poufne informacje na niebezpieczeństwo."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O certificado deste site é inválido. Podes estar a estabelecer ligação a um servidor que finge ser %1$@, o que pode colocar as tuas informações confidenciais em risco."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сертификат этого сайта недействителен. Возможно, вы пытаетесь подключиться к серверу, который выдает себя за %1$@, что ставит под угрозу вашу конфиденциальную информацию."
+          }
+        }
+      }
+    },
+    "ssl.error.page.header" : {
+      "comment" : "Title shown in an error page that warn users of security risks on a website due to SSL issues",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnung: Diese Website ist möglicherweise unsicher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: This site may be insecure"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertencia: este sitio puede ser inseguro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement : ce site n'est peut-être pas sécurisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attenzione: questo sito potrebbe non essere sicuro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waarschuwing: Deze website is mogelijk onveilig"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzeżenie: ta witryna może być niebezpieczna"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso: este site pode ser inseguro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Внимание! Возможно, сайт небезопасен"
+          }
+        }
+      }
+    },
+    "ssl.error.page.leave.site.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to leave the website and navigate to previous page.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Website verlassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Leave This Site"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir de este sitio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter ce site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esci da questo sito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze website verlaten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opuść tę stronę"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deixar este site"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покинуть сайт"
+          }
+        }
+      }
+    },
+    "ssl.error.page.tab.title" : {
+      "comment" : "Title shown in an error page tab that warn users of security risks on a website due to SSL issues",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnung: Website ist möglicherweise unsicher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: Site May Be Insecure"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertencia: el sitio puede ser inseguro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement : le site n'est peut-être pas sécurisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attenzione: il sito potrebbe non essere sicuro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waarschuwing: Website mogelijk onveilig"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzeżenie: witryna może być niebezpieczna"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso: o site pode ser inseguro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Внимание! Возможно, сайт небезопасен"
+          }
+        }
+      }
+    },
+    "ssl.error.page.visit.site.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to visit the website anyway despite the risks.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risiko akzeptieren und Website besuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accept Risk and Visit Site"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar el riesgo y visitar el sitio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accepter le risque et visiter le site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accetta il rischio e visita il sito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risico accepteren en site bezoeken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaakceptuj ryzyko i odwiedź witrynę"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceitar o risco e visitar o site"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Принять риск и перейти на сайт"
+          }
+        }
+      }
+    },
+    "ssl.error.self.signed.message" : {
+      "comment" : "Warns the user that the site's security certificate is self-signed and not trusted. '%1$@' is the site's domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Sicherheitszertifikat für %1$@ wird vom Betriebssystem deines Geräts als nicht vertrauenswürdig eingestuft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The security certificate for %1$@ is not trusted by your device's operating system."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sistema operativo del dispositivo no confía en el certificado de seguridad de %1$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de sécurité de %1$@ n'est pas approuvé par le système d'exploitation de votre appareil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di sicurezza di %1$@ non è considerato attendibile dal sistema operativo del tuo dispositivo."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het besturingssysteem van je apparaat vertrouwt het beveiligingscertificaat voor %1$@ niet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certyfikat bezpieczeństwa %1$@ nie jest zaufany przez system operacyjny urządzenia."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O sistema operativo do teu dispositivo não confia no certificado de segurança de %1$@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Операционная система вашего устройства не доверяет сертификату безопасности сайта %1$@."
+          }
+        }
+      }
+    },
+    "ssl.error.wrong.host.message" : {
+      "comment" : "Explains an SSL error when a site's certificate doesn't match its domain. '%1$@' is the site's domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Sicherheitszertifikat für %1$@ stimmt nicht mit *.%2$@ überein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The security certificate for %1$@ does not match *.%2$@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El certificado de seguridad de %1$@ no coincide con *.%2$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de sécurité de %1$@ ne correspond pas à *.%2$@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di protezione per %1$@ non corrisponde a *.%2$@."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het beveiligingscertificaat voor %1$@ komt niet overeen met *.%2$@. "
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certyfikat zabezpieczeń %1$@ nie jest zgodny z *.%2$@."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O certificado de segurança de %1$@ não corresponde a *.%2$@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сертификат безопасности сайта %1$@ не подходит для домена *.%2$@."
           }
         }
       }

@@ -603,7 +603,7 @@ extension BookmarkManagementDetailViewController: NSMenuDelegate {
         }
 
         // If only one item is selected try to get the item and its parent folder otherwise show the menu for multiple items.
-        if tableView.selectedRowIndexes.contains(row), tableView.selectedRowIndexes.count > 1  {
+        if tableView.selectedRowIndexes.contains(row), tableView.selectedRowIndexes.count > 1 {
             return ContextualMenu.menu(for: self.selectedItems())
         }
 

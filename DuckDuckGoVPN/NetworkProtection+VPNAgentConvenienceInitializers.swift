@@ -18,10 +18,7 @@
 
 import Foundation
 import NetworkProtection
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {

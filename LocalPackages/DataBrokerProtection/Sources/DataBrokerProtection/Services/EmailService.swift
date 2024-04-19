@@ -27,6 +27,8 @@ public enum EmailError: Error, Equatable, Codable {
     case cantDecodeEmailLink
     case unknownStatusReceived(email: String)
     case cancelled
+    case httpError(statusCode: Int)
+    case unknownHTTPError
 }
 
 struct EmailData: Decodable {
@@ -51,13 +53,16 @@ struct EmailService: EmailServiceProtocol {
     public let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let settings: DataBrokerProtectionSettings
+    private let servicePixel: DataBrokerProtectionBackendServicePixels
 
     init(urlSession: URLSession = URLSession.shared,
          redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
-         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
+         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
+         servicePixel: DataBrokerProtectionBackendServicePixels = DefaultDataBrokerProtectionBackendServicePixels()) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
         self.settings = settings
+        self.servicePixel = servicePixel
     }
 
     func getEmail(dataBrokerURL: String, attemptId: UUID) async throws -> EmailData {
@@ -73,15 +78,32 @@ struct EmailService: EmailServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        let authHeader = try await redeemUseCase.getAuthHeader()
+        guard let authHeader = redeemUseCase.getAuthHeader() else {
+            servicePixel.fireEmptyAccessToken(callSite: .getEmail)
+            throw AuthenticationError.noAuthToken
+        }
+
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
 
-        let (data, _) = try await urlSession.data(for: request)
+        let (data, response) = try await urlSession.data(for: request)
+        try validateHTTPResponse(response)
 
         do {
             return try JSONDecoder().decode(EmailData.self, from: data)
         } catch {
             throw EmailError.cantFindEmail
+        }
+    }
+
+    private func validateHTTPResponse(_ response: URLResponse) throws {
+        if let httpResponse = response as? HTTPURLResponse {
+            if !(200...299).contains(httpResponse.statusCode) {
+                servicePixel.fireGenerateEmailHTTPError(statusCode: httpResponse.statusCode)
+                throw EmailError.httpError(statusCode: httpResponse.statusCode)
+            }
+        } else {
+            servicePixel.fireGenerateEmailHTTPError(statusCode: 0)
+            throw EmailError.unknownHTTPError
         }
     }
 
@@ -139,7 +161,11 @@ struct EmailService: EmailServiceProtocol {
 
         var request = URLRequest(url: url)
 
-        let authHeader = try await redeemUseCase.getAuthHeader()
+        guard let authHeader = redeemUseCase.getAuthHeader() else {
+            servicePixel.fireEmptyAccessToken(callSite: .extractEmailLink)
+            throw AuthenticationError.noAuthToken
+        }
+
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
 
         let (data, _) = try await urlSession.data(for: request)

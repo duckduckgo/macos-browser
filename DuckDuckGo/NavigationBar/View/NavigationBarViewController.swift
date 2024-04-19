@@ -20,14 +20,13 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
+import PixelKit
+
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-
-#if SUBSCRIPTION
 import Subscription
 import SubscriptionUI
-#endif
 
 // swiftlint:disable:next type_body_length
 final class NavigationBarViewController: NSViewController {
@@ -297,7 +296,6 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        #if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
@@ -307,7 +305,6 @@ final class NavigationBarViewController: NSViewController {
                 return
             }
         }
-        #endif
 
         // Note: the following code is quite contrived but we're aiming to hotfix issues without mixing subscription and
         // waitlist logic.  This should be cleaned up once waitlist can safely be removed.
@@ -612,9 +609,9 @@ final class NavigationBarViewController: NSViewController {
             logoWidth.constant = sizeClass.logoWidth
         }
 
-        let heightChange: DispatchWorkItem
-        if animated {
-            heightChange = DispatchWorkItem {
+        let heightChange: () -> Void
+        if animated && view.window != nil {
+            heightChange = {
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.1
                     performResize()
@@ -631,12 +628,18 @@ final class NavigationBarViewController: NSViewController {
             self.daxFadeInAnimation = fadeIn
         } else {
             daxLogo.alphaValue = sizeClass.isLogoVisible ? 1 : 0
-            heightChange = DispatchWorkItem {
+            heightChange = {
                 performResize()
             }
         }
-        DispatchQueue.main.async(execute: heightChange)
-        self.heightChangeAnimation = heightChange
+        if view.window == nil {
+            // update synchronously for off-screen view
+            heightChange()
+        } else {
+            let dispatchItem = DispatchWorkItem(block: heightChange)
+            DispatchQueue.main.async(execute: dispatchItem)
+            self.heightChangeAnimation = dispatchItem
+        }
     }
 
     private func subscribeToDownloads() {
@@ -710,10 +713,11 @@ final class NavigationBarViewController: NSViewController {
         }
 
         popovers.passwordManagementDomain = nil
-        guard let url = url, let domain = url.host else {
+        guard let url = url, let hostAndPort = url.hostAndPort() else {
             return
         }
-        popovers.passwordManagementDomain = domain
+
+        popovers.passwordManagementDomain = hostAndPort
     }
 
     private func updateHomeButton() {
@@ -1051,17 +1055,14 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
     }
 
-#if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
-        Pixel.fire(.privacyProOfferScreenImpression)
+        PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
     }
-#endif
-
 }
 
 // MARK: - NSPopoverDelegate

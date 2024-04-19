@@ -394,8 +394,13 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func update(_ profileQuery: ProfileQueryDB) throws -> Int64 {
         try db.write { db in
-            try profileQuery.upsert(db)
-            return db.lastInsertedRowID
+            if let id = profileQuery.id {
+                try profileQuery.update(db)
+                return id
+            } else {
+                try profileQuery.insert(db)
+                return db.lastInsertedRowID
+            }
         }
     }
 

@@ -32,6 +32,7 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func recoveryCodePasted(_ code: String)
     func enterRecoveryCodePressed()
     func copyCode()
+    func openSystemPasswordSettings()
 }
 
 public final class ManagementDialogModel: ObservableObject {
@@ -54,6 +55,8 @@ public final class ManagementDialogModel: ObservableObject {
     }
 
     public func endFlow() {
+        syncErrorMessage?.type.onButtonPressed(delegate: delegate)
+        syncErrorMessage = nil
         currentDialog = nil
     }
 

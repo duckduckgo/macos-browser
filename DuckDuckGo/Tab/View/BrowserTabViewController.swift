@@ -23,6 +23,7 @@ import Common
 import SwiftUI
 import WebKit
 import Subscription
+import PixelKit
 
 // swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
@@ -154,7 +155,6 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseSubscriptionPage),
                                                name: .subscriptionPageCloseAndOpenPreferences,
@@ -163,7 +163,6 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onSubscriptionAccountDidSignOut),
                                                name: .accountDidSignOut,
                                                object: nil)
-#endif
     }
 
     @objc
@@ -225,7 +224,6 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
     @objc
     private func onCloseSubscriptionPage(_ notification: Notification) {
         guard let activeTab = tabViewModel?.tab else { return }
@@ -253,8 +251,6 @@ final class BrowserTabViewController: NSViewController {
             }
         }
     }
-
-#endif
 
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
@@ -391,20 +387,23 @@ final class BrowserTabViewController: NSViewController {
                 return old == new
             })
             .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
-                // For non-URL tabs, just emit an event
+                // For non-URL tabs, just emit an event displaying the tab content
                 guard let tabViewModel, tabContent.isUrl else {
                     return Just(()).eraseToAnyPublisher()
                 }
 
-                // For URL tabs, we only want to show tab content (webView) when webView starts
-                // navigation or when another navigation-related event happens.
-                // We take the first such event and move forward.
-                return Publishers.Merge4(
-                    tabViewModel.tab.webViewDidStartNavigationPublisher,
-                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
-                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
-                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
+                // For URL tabs, we only want to show tab content (webView) when
+                // it has content to display (first navigation had been committed)
+                // or starts navigation.
+                return Publishers.Merge(
+                    tabViewModel.tab.$hasCommittedContent
+                        .filter { $0 == true }
+                        .asVoid(),
+                    tabViewModel.tab.navigationStatePublisher.compactMap { $0 }
+                        .filter{ $0 >= .started }
+                        .asVoid()
                 )
+                // take the first such event and move forward.
                 .prefix(1)
                 .eraseToAnyPublisher()
             }
@@ -1130,7 +1129,7 @@ extension BrowserTabViewController: OnboardingDelegate {
             return
         }
 
-        Pixel.fire(.defaultRequestedFromOnboarding)
+        PixelKit.fire(GeneralPixel.defaultRequestedFromOnboarding)
         defaultBrowserPreferences.becomeDefault { _ in
             _ = defaultBrowserPreferences
             withAnimation {

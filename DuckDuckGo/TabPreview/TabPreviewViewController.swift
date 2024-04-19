@@ -23,6 +23,7 @@ protocol Previewable {
 
     var title: String { get }
     var tabContent: Tab.TabContent { get }
+    var addressBarString: String { get }
     var snapshot: NSImage? { get }
 }
 
@@ -131,11 +132,8 @@ final class TabPreviewViewController: NSViewController {
         titleTextField.lineBreakMode = isSelected ? .byWordWrapping : .byTruncatingTail
 
         switch tabViewModel.tabContent {
-        case .url(let url, credential: _, source: _):
-            urlTextField.stringValue = url.toString(decodePunycode: true,
-                                                    dropScheme: true,
-                                                    needsWWW: false,
-                                                    dropTrailingSlash: true)
+        case .url:
+            urlTextField.stringValue = tabViewModel.addressBarString
         case .bookmarks, .dataBrokerProtection, .newtab, .onboarding, .settings:
             urlTextField.stringValue = "DuckDuckGo Browser"
         default:
@@ -187,6 +185,7 @@ extension TabPreviewViewController {
             let title: String
             var tabContent: Tab.TabContent
             let shouldShowPreview: Bool
+            var addressBarString: String { tabContent.url?.absoluteString ?? "Default" }
 
             var snapshot: NSImage? {
                 let image = NSImage(size: size)

@@ -19,6 +19,7 @@
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
+import PixelKit
 
 fileprivate extension Preferences.Const {
     static let autoLockWarningOffset: CGFloat = {
@@ -133,7 +134,7 @@ extension Preferences {
                         Button(UserText.autofillExcludedSitesReset) {
                             showingResetNeverPromptSitesSheet.toggle()
                             if showingResetNeverPromptSitesSheet {
-                                Pixel.fire(.autofillLoginsSettingsResetExcludedDisplayed)
+                                PixelKit.fire(GeneralPixel.autofillLoginsSettingsResetExcludedDisplayed)
                             }
                         }
                     }.sheet(isPresented: $showingResetNeverPromptSitesSheet) {
@@ -197,14 +198,18 @@ extension Preferences {
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             case .notInstalled:
                 BitwardenStatusView(iconType: .warning,
-                                    title: UserText.bitwardenNotInstalled,
-                                    buttonValue: nil)
+                                    title: UserText.bitwardenNotInstalled)
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             case .oldVersion:
                 BitwardenStatusView(iconType: .warning,
-                                    title: UserText.bitwardenOldVersion,
-                                    buttonValue: nil)
+                                    title: UserText.bitwardenOldVersion)
                 .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .incompatible:
+                BitwardenStatusView(iconType: .warning,
+                                    title: UserText.bitwardenIncompatible,
+                                    content: AnyView(BitwardenDowngradeInfoView()))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+                    .offset(x: Preferences.Const.autoLockWarningOffset)
             case .notRunning:
                 BitwardenStatusView(iconType: .warning,
                                     title: UserText.bitwardenPreferencesRun,
@@ -273,6 +278,13 @@ extension Preferences {
 
 private struct BitwardenStatusView: View {
 
+    internal init(iconType: BitwardenStatusView.IconType, title: String, buttonValue: BitwardenStatusView.ButtonValue? = nil, content: AnyView? = nil) {
+        self.iconType = iconType
+        self.title = title
+        self.buttonValue = buttonValue
+        self.content = content
+    }
+
     struct ButtonValue {
         let title: String
         let action: () -> Void
@@ -295,6 +307,7 @@ private struct BitwardenStatusView: View {
     let iconType: IconType
     let title: String
     let buttonValue: ButtonValue?
+    let content: AnyView?
 
     var body: some View {
 
@@ -302,10 +315,15 @@ private struct BitwardenStatusView: View {
             HStack(alignment: .top) {
                 Image(iconType.imageName)
                     .padding(.top, 2)
-                Text(title)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding([.top, .bottom], 2)
+                VStack(alignment: .leading) {
+                    Text(title)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding([.top, .bottom], 2)
+                    if let content {
+                        content.padding([.top, .bottom], 2)
+                    }
+                }
             }
             .padding([.leading, .trailing], 6)
             .padding([.top, .bottom], 2)
@@ -323,6 +341,25 @@ private struct BitwardenStatusView: View {
 
     }
 
+}
+
+struct BitwardenDowngradeInfoView: View, PreferencesTabOpening {
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("1.")
+                    Button(UserText.bitwardenIncompatibleStep1, action: {
+                        openNewTab(with: URL(string: "https://github.com/bitwarden/clients/releases/download/desktop-v2024.2.1/Bitwarden-2024.2.1-universal.dmg")!)
+                    }).foregroundColor(.accentColor)
+                }
+                Text(UserText.bitwardenIncompatibleStep2)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
 }
 
 struct ResetNeverPromptSitesSheet: View {
@@ -348,7 +385,7 @@ struct ResetNeverPromptSitesSheet: View {
                 Spacer()
                 Button(UserText.cancel) {
                     isSheetPresented.toggle()
-                    Pixel.fire(.autofillLoginsSettingsResetExcludedDismissed)
+                    PixelKit.fire(GeneralPixel.autofillLoginsSettingsResetExcludedDismissed)
                 }
                 Button(action: {
                     saveChanges()
@@ -365,7 +402,7 @@ struct ResetNeverPromptSitesSheet: View {
     private func saveChanges() {
         autofillPreferencesModel.resetNeverPromptWebsites()
         isSheetPresented.toggle()
-        Pixel.fire(.autofillLoginsSettingsResetExcludedConfirmed)
+        PixelKit.fire(GeneralPixel.autofillLoginsSettingsResetExcludedConfirmed)
     }
 
 }

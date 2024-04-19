@@ -20,6 +20,7 @@ import Foundation
 import WebKit
 import Common
 import UserScript
+import PixelKit
 
 protocol YoutubeOverlayUserScriptDelegate: AnyObject {
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView)
@@ -113,16 +114,16 @@ extension YoutubeOverlayUserScript {
         if pixelName == "play.use" || pixelName == "play.do_not_use" {
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
             if pixelName == "play.use" {
-                Pixel.fire(.duckPlayerViewFromYoutubeViaMainOverlay)
+                PixelKit.fire(GeneralPixel.duckPlayerViewFromYoutubeViaMainOverlay)
             }
         }
 
         // Temporary pixel for first time user uses Duck Player
-        if !Pixel.isNewUser {
+        if !AppDelegate.isNewUser {
             return nil
         }
         if pixelName == "play.use" {
-            Pixel.fire(.watchInDuckPlayerInitial, limitTo: .initial)
+            PixelKit.fire(GeneralPixel.watchInDuckPlayerInitial, frequency: .legacyInitial)
         }
         return nil
     }

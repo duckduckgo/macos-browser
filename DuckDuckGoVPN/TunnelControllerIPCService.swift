@@ -105,16 +105,26 @@ extension TunnelControllerIPCService: IPCServerInterface {
         server.statusChanged(statusReporter.statusObserver.recentValue)
     }
 
-    func start() {
+    func start(completion: @escaping (Error?) -> Void) {
         Task {
             await tunnelController.start()
         }
+
+        // For IPC requests, completion means the IPC request was processed, and NOT
+        // that the requested operation was executed fully.  Failure to complete the
+        // operation will be handled entirely within the tunnel controller.
+        completion(nil)
     }
 
-    func stop() {
+    func stop(completion: @escaping (Error?) -> Void) {
         Task {
             await tunnelController.stop()
         }
+
+        // For IPC requests, completion means the IPC request was processed, and NOT
+        // that the requested operation was executed fully.  Failure to complete the
+        // operation will be handled entirely within the tunnel controller.
+        completion(nil)
     }
 
     func resetAll(uninstallSystemExtension: Bool) async {
