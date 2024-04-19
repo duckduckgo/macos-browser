@@ -168,17 +168,13 @@ private struct BitwardenInstallationDetectionView: View {
 
                 HStack {
                     NumberedBadge(value: 1)
-                    
                     Text(UserText.installBitwardenInfo)
-                    
                     Spacer()
                 }
 
                 HStack {
                     NumberedBadge(value: 2)
-                    
                     Text(UserText.afterBitwardenInstallationInfo)
-                    
                     Spacer()
                 }
 
