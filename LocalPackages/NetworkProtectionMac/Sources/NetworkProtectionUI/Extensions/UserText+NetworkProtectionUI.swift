@@ -19,7 +19,8 @@
 import Foundation
 
 final class UserText {
-    static let networkProtectionStatusViewFeatureDesc = NSLocalizedString("network.protection.status.view.feature.description", value: "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere.", comment: "Feature description shown in NetworkProtection's status view.")
+    static let networkProtectionStatusHeaderMessageOff = NSLocalizedString("network.protection.status.header.message.off", value: "Connect to secure all of your device’s\nInternet traffic.", comment: "Message label text for the status view when VPN is disconnected")
+    static let networkProtectionStatusHeaderMessageOn = NSLocalizedString("network.protection.status.header.message.on", value: "All device Internet traffic is being secured\nthrough the VPN.", comment: "Message label text for the status view when VPN is connected")
     static let networkProtectionStatusViewConnDetails = NSLocalizedString("network.protection.status.view.connection.details", value: "Connection Details", comment: "Connection details label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewConnLabel = NSLocalizedString("network.protection.status.view.connection.label", value: "VPN", comment: "Connection label shown in NetworkProtection's status view.")
     static let networkProtectionStatusViewLocation = NSLocalizedString("network.protection.status.view.location", value: "Location", comment: "Location label shown in NetworkProtection's status view.")
@@ -27,6 +28,11 @@ final class UserText {
     static let networkProtectionStatusViewFeatureOff = NSLocalizedString("network.protection.status.view.feature.on", value: "DuckDuckGo VPN is OFF", comment: "Text shown in NetworkProtection's status view when NetP is OFF.")
     static let networkProtectionStatusViewFeatureOn = NSLocalizedString("network.protection.status.view.feature.on", value: "DuckDuckGo VPN is ON", comment: "Text shown in NetworkProtection's status view when NetP is ON.")
     static let networkProtectionStatusViewTimerZero = "00:00:00"
+
+    static let netPVPNLocationNearest = NSLocalizedString("network.protection.vpn.location.nearest", value: "(Nearest)", comment: "Description of the location type in the VPN status view")
+    static let vpnLocationConnected = NSLocalizedString("network.protection.vpn.location.connected", value: "Connected Location", comment: "Description of the location type in the VPN status view")
+    static let vpnLocationSelected = NSLocalizedString("network.protection.vpn.location.selected", value: "Selected Location", comment: "Description of the location type in the VPN status view")
+    static let vpnDataVolume = NSLocalizedString("network.protection.vpn.data-volume", value: "Data Volume", comment: "Title for the data volume section in the VPN status view")
 
     // MARK: - Onboarding
 

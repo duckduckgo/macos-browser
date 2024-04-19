@@ -1,7 +1,7 @@
 //
-//  UserText.swift
+//  DataVolumeObserverThroughIPC.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,11 +16,25 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
+import NetworkProtection
 
-final class UserText {
-    // MARK: - Status Menu
+public final class DataVolumeObserverThroughIPC: DataVolumeObserver {
 
-    static let networkProtectionStatusMenuShareFeedback = NSLocalizedString("network.protection.status.menu.share.feedback", value: "Share VPN Feedback…", comment: "The status menu 'Share VPN Feedback' menu item")
-    static let networkProtectionStatusMenuOpenDuckDuckGo = NSLocalizedString("network.protection.status.menu.open.duckduckgo", value: "Open DuckDuckGo…", comment: "The status menu 'Open DuckDuckGo' menu item")
+    private let subject = CurrentValueSubject<DataVolume, Never>(.init())
+
+    // MARK: - DataVolumeObserver
+
+    public lazy var publisher = subject.eraseToAnyPublisher()
+
+    public var recentValue: DataVolume {
+        subject.value
+    }
+
+    // MARK: - Publishing Updates
+
+    func publish(_ dataVolume: DataVolume) {
+        subject.send(dataVolume)
+    }
 }
