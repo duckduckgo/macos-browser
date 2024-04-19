@@ -247,12 +247,8 @@ extension HomePage.Models {
                     if shouldPermanentSurveyBeVisible {
                         features.append(feature)
                     }
-                case .networkProtectionRemoteMessage,
-                        .dataBrokerProtectionRemoteMessage,
-                        .dataBrokerProtectionWaitlistInvited,
-                        .vpnThankYou,
-                        .pirThankYou:
-                    break // Do nothing, these messages get appended first
+                default:
+                    break
                 }
             }
         }
