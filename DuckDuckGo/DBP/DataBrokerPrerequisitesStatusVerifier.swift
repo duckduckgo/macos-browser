@@ -20,7 +20,7 @@ import Foundation
 import Combine
 
 enum DataBrokerPrerequisitesStatus {
-    case invalidDirectory
+    case invalidDirectory //TODO should not be set in DEV builds
     case invalidSystemPermission
     case unverified
     case valid
