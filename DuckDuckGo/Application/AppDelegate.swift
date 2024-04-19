@@ -23,8 +23,10 @@ import Combine
 import Common
 import Configuration
 import CoreData
+import Crashes
 import DDGSync
 import History
+import MetricKit
 import Networking
 import Persistence
 import PixelKit
@@ -34,10 +36,7 @@ import UserNotifications
 import Lottie
 
 import NetworkProtection
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -64,9 +63,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     let fileStore: FileStore
 
+#if APPSTORE
+    private let crashCollection = CrashCollection(platform: .macOSAppStore, log: .default)
+#else
+    private let crashReporter = CrashReporter()
+#endif
+
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
-    private let crashReporter = CrashReporter()
     let internalUserDecider: InternalUserDecider
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
@@ -80,12 +84,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-#if SUBSCRIPTION
     // Needs to be lazy as indirectly depends on AppDelegate
     private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
-#endif
 
-#if DBP && SUBSCRIPTION
+#if DBP
     private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
 #endif
 
@@ -94,6 +96,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #if SPARKLE
     var updateController: UpdateController!
 #endif
+
+    @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Date.monthAgo)
+    static var firstLaunchDate: Date
+
+    static var isNewUser: Bool {
+        return firstLaunchDate >= Date.weekAgo
+    }
 
     // swiftlint:disable:next function_body_length
     override init() {
@@ -109,22 +118,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
         if NSApplication.runType.requiresEnvironment {
-#if DEBUG
-            Pixel.setUp(dryRun: true)
-            Self.setUpPixelKit(dryRun: true)
-#else
-            Pixel.setUp()
-            Self.setUpPixelKit(dryRun: false)
-#endif
+            Self.configurePixelKit()
 
             Database.shared.loadStore { _, error in
                 guard let error = error else { return }
 
                 switch error {
                 case CoreDataDatabase.Error.containerLocationCouldNotBePrepared(let underlyingError):
-                    Pixel.fire(.debug(event: .dbContainerInitializationError, error: underlyingError))
+                    PixelKit.fire(DebugEvent(GeneralPixel.dbContainerInitializationError(error: underlyingError)))
                 default:
-                    Pixel.fire(.debug(event: .dbInitializationError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.dbInitializationError(error: error)))
                 }
 
                 // Give Pixel a chance to be sent, but not too long
@@ -133,12 +136,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
 
             let preMigrationErrorHandling = EventMapping<BookmarkFormFactorFavoritesMigration.MigrationErrors> { _, error, _, _ in
-                if let error = error {
-                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase, error: error))
-                } else {
-                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase))
-                }
-
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksCouldNotLoadDatabase(error: error)))
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
             }
@@ -152,12 +150,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             BookmarkDatabase.shared.db.loadStore { context, error in
                 guard let context = context else {
-                    if let error = error {
-                        Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase, error: error))
-                    } else {
-                        Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase))
-                    }
-
+                    PixelKit.fire(DebugEvent(GeneralPixel.bookmarksCouldNotLoadDatabase(error: error)))
                     Thread.sleep(forTimeInterval: 1)
                     fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
                 }
@@ -184,12 +177,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
         )
 
-#if SUBSCRIPTION
     #if APPSTORE || !STRIPE
         SubscriptionPurchaseEnvironment.current = .appStore
     #else
         SubscriptionPurchaseEnvironment.current = .stripe
     #endif
+    }
+
+    static func configurePixelKit() {
+#if DEBUG
+            Self.setUpPixelKit(dryRun: true)
+#else
+            Self.setUpPixelKit(dryRun: false)
 #endif
     }
 
@@ -236,11 +235,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = RecentlyClosedCoordinator.shared
 
         // Clean up previous experiment
-        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts {
-            PixelExperiment.cleanup()
-        }
+//        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts { // Re-implement https://app.asana.com/0/0/1207002879349166/f
+//            PixelExperiment.cleanup()
+//        }
+
         if LocalStatisticsStore().atb == nil {
-            Pixel.firstLaunchDate = Date()
+            AppDelegate.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
         }
         AtbAndVariantCleanup.cleanup()
@@ -253,7 +253,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         startupSync()
 
-#if SUBSCRIPTION
         let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
 
         let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
@@ -267,7 +266,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
             }
         }
-#endif
 
         if [.normal, .uiTests].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
@@ -284,7 +282,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         applyPreferredTheme()
 
+#if APPSTORE
+        crashCollection.start { pixelParameters, payloads, completion in
+            pixelParameters.forEach { _ in PixelKit.fire(GeneralPixel.crash) }
+            guard let lastPayload = payloads.last else {
+                return
+            }
+            DispatchQueue.main.async {
+                CrashReportPromptPresenter().showPrompt(for: lastPayload, userDidAllowToReport: completion)
+            }
+        }
+#else
         crashReporter.checkForNewReports()
+#endif
 
         urlEventHandler.applicationDidFinishLaunching()
 
@@ -293,23 +303,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-#if SUBSCRIPTION
         networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
-#endif
 
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 
-#if DBP && SUBSCRIPTION
+#if DBP
         dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 #endif
 
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
-#endif
-
-#if SUBSCRIPTION
-
 #endif
     }
 
@@ -384,7 +388,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                        appVersion: AppVersion.shared.versionNumber,
                        source: source,
                        defaultHeaders: [:],
-                       log: .networkProtectionPixel,
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
@@ -442,9 +445,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .filter { $0 }
             .asVoid()
             .sink { [weak syncService] in
-                Pixel.fire(.syncDaily, limitTo: .dailyFirst)
+                PixelKit.fire(GeneralPixel.syncDaily, frequency: .daily)
                 syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
-                    Pixel.fire(.syncSuccessRateDaily, withAdditionalParameters: params)
+                    PixelKit.fire(GeneralPixel.syncSuccessRateDaily, withAdditionalParameters: params)
                 })
             }
 
@@ -525,9 +528,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignInNotification(_ notification: Notification) {
-        Pixel.fire(.emailEnabled)
-        if Pixel.isNewUser {
-            Pixel.fire(.emailEnabledInitial, limitTo: .initial)
+        PixelKit.fire(GeneralPixel.emailEnabled)
+        if AppDelegate.isNewUser {
+            PixelKit.fire(GeneralPixel.emailEnabledInitial, frequency: .legacyInitial)
         }
 
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
@@ -536,22 +539,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignOutNotification(_ notification: Notification) {
-        Pixel.fire(.emailDisabled)
+        PixelKit.fire(GeneralPixel.emailDisabled)
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
             syncService?.scheduler.notifyDataChanged()
         }
     }
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
-        if Pixel.isNewUser {
-            Pixel.fire(.importDataInitial, limitTo: .initial)
+        if AppDelegate.isNewUser {
+            PixelKit.fire(GeneralPixel.importDataInitial, frequency: .legacyInitial)
         }
     }
-
 }
 
 func updateSubscriptionStatus() {
-#if SUBSCRIPTION
     Task {
         let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
@@ -559,13 +560,12 @@ func updateSubscriptionStatus() {
 
         if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             if subscription.isActive {
-                DailyPixel.fire(pixel: .privacyProSubscriptionActive, frequency: .dailyOnly)
+                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
             }
         }
 
         _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
     }
-#endif
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {

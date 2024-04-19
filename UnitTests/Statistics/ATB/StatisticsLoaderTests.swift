@@ -19,6 +19,7 @@
 import XCTest
 import OHHTTPStubs
 import OHHTTPStubsSwift
+@testable import PixelKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class StatisticsLoaderTests: XCTestCase {
@@ -26,14 +27,22 @@ class StatisticsLoaderTests: XCTestCase {
     private var mockAttributionsPixelHandler: MockAttributionsPixelHandler!
     private var mockStatisticsStore: StatisticsStore!
     private var testee: StatisticsLoader!
+    let pixelKit = PixelKit(dryRun: true,
+                            appVersion: "1.0.0",
+                            defaultHeaders: [:],
+                            defaults: UserDefaults(),
+                            fireRequest: { _, _, _, _, _, _ in })
 
     override func setUp() {
+        PixelKit.setSharedForTesting(pixelKit: pixelKit)
+
         mockAttributionsPixelHandler = MockAttributionsPixelHandler()
         mockStatisticsStore = MockStatisticsStore()
         testee = StatisticsLoader(statisticsStore: mockStatisticsStore, attributionPixelHandler: mockAttributionsPixelHandler)
     }
 
     override func tearDown() {
+        PixelKit.tearDown()
         HTTPStubs.removeAllStubs()
         mockStatisticsStore = nil
         mockAttributionsPixelHandler = nil

@@ -21,6 +21,7 @@ import Combine
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
+import PixelKit
 
 extension Preferences {
 
@@ -52,7 +53,7 @@ extension Preferences {
                                 }
                                 .padding(.trailing, 8)
                                 Button(action: {
-                                    Pixel.fire(.defaultRequestedFromSettings)
+                                    PixelKit.fire(GeneralPixel.defaultRequestedFromSettings)
                                     defaultBrowserModel.becomeDefault()
                                 }) {
                                     Text(UserText.makeDefaultBrowser)

@@ -23,6 +23,7 @@ import Foundation
 import Navigation
 import WebKit
 import UserScript
+import PixelKit
 
 enum DuckPlayerMode: Equatable, Codable {
     case enabled, alwaysAsk, disabled
@@ -152,11 +153,11 @@ final class DuckPlayer {
                 .handleEvents(receiveOutput: { mode in
                     switch mode {
                     case .enabled:
-                        Pixel.fire(.duckPlayerSettingAlways)
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlways)
                     case .alwaysAsk:
-                        Pixel.fire(.duckPlayerSettingBackToDefault)
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
                     case .disabled:
-                        Pixel.fire(.duckPlayerSettingNever)
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingNever)
                     }
                 })
                 .prepend(preferences.duckPlayerMode)

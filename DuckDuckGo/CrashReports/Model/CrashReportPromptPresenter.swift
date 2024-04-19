@@ -31,9 +31,9 @@ final class CrashReportPromptPresenter {
         // swiftlint:enable force_cast
     }
 
-    func showPrompt(_ delegate: CrashReportPromptViewControllerDelegate, for crashReport: CrashReport) {
-        viewController.delegate = delegate
+    func showPrompt(for crashReport: CrashReportPresenting, userDidAllowToReport: @escaping () -> Void) {
         viewController.crashReport = crashReport
+        viewController.userDidAllowToReport = userDidAllowToReport
 
         windowController.showWindow(self)
         windowController.window?.center()

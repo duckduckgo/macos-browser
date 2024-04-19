@@ -20,6 +20,7 @@ import Common
 import Foundation
 import Combine
 import History
+import PixelKit
 
 /**
  * The delegate callbacks are triggered for events related to unpinned tabs only.
@@ -657,7 +658,7 @@ final class TabCollectionViewModel: NSObject {
 
             // Make sure the tab is burner if it is supposed to be
             if newTabs.first(where: { $0.burnerMode != self.burnerMode }) != nil {
-                Pixel.fire(.debug(event: .burnerTabMisplaced))
+                PixelKit.fire(DebugEvent(GeneralPixel.burnerTabMisplaced))
                 fatalError("Error in burner tab management")
             }
         } .store(in: &cancellables)

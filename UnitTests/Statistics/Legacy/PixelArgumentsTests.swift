@@ -50,7 +50,7 @@ class PixelArgumentsTests: XCTestCase {
     // MARK: AccessPoint
 
     func testWhenInitWithButtonThenAccessPointIsButton() {
-        let ap = Pixel.Event.AccessPoint(sender: NSButton(), default: .tabMenu)
+        let ap = GeneralPixel.AccessPoint(sender: NSButton(), default: .tabMenu)
         XCTAssertEqual(ap, .button)
     }
 
@@ -68,7 +68,7 @@ class PixelArgumentsTests: XCTestCase {
 
     func testWhenInitWithMainMenuItemThenAccessPointIsMenu() {
         let mainMenu = makeMenu()
-        let ap = Pixel.Event.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
+        let ap = GeneralPixel.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
         XCTAssertEqual(ap, .mainMenu)
     }
 
@@ -79,7 +79,7 @@ class PixelArgumentsTests: XCTestCase {
                                      context: nil, characters: "x", charactersIgnoringModifiers: "",
                                      isARepeat: false, keyCode: UInt16(kVK_ANSI_X))!
         NSApp.setValue(event, forKey: "currentEvent")
-        let ap = Pixel.Event.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
+        let ap = GeneralPixel.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
         XCTAssertEqual(ap, .hotKey)
     }
 
@@ -90,7 +90,7 @@ class PixelArgumentsTests: XCTestCase {
                                      context: nil, characters: "\n", charactersIgnoringModifiers: "",
                                      isARepeat: false, keyCode: UInt16(kVK_Return))!
         NSApp.setValue(event, forKey: "currentEvent")
-        let ap = Pixel.Event.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
+        let ap = GeneralPixel.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
         XCTAssertEqual(ap, .mainMenu)
     }
 
@@ -101,30 +101,30 @@ class PixelArgumentsTests: XCTestCase {
                                      context: nil, characters: " ", charactersIgnoringModifiers: "",
                                      isARepeat: false, keyCode: UInt16(kVK_Space))!
         NSApp.setValue(event, forKey: "currentEvent")
-        let ap = Pixel.Event.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
+        let ap = GeneralPixel.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
         XCTAssertEqual(ap, .mainMenu)
     }
 
     func testWhenInitWithTabMenuItemThenAccessPointIsMenu() {
         let mainMenu = makeMenu()
         let tabMenu = makeMenu()
-        let ap = Pixel.Event.AccessPoint(sender: tabMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
+        let ap = GeneralPixel.AccessPoint(sender: tabMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
         XCTAssertEqual(ap, .tabMenu)
     }
 
     // MARK: Repetition
 
     func testWhenInitFirstTimeThenRepetitionIsInitial() {
-        let rep1 = Pixel.Event.Repetition(key: "test", store: pixelDataStore)
-        let rep2 = Pixel.Event.Repetition(key: "test2", store: pixelDataStore)
+        let rep1 = GeneralPixel.Repetition(key: "test", store: pixelDataStore)
+        let rep2 = GeneralPixel.Repetition(key: "test2", store: pixelDataStore)
         XCTAssertEqual(rep1, .initial)
         XCTAssertEqual(rep2, .initial)
     }
 
     func testWhenInitSecondTimeThenRepetitionIsRepetitive() {
-        _=Pixel.Event.Repetition(key: "test", store: pixelDataStore)
-        let rep1 = Pixel.Event.Repetition(key: "test", store: pixelDataStore)
-        let rep2 = Pixel.Event.Repetition(key: "test2", store: pixelDataStore)
+        _=GeneralPixel.Repetition(key: "test", store: pixelDataStore)
+        let rep1 = GeneralPixel.Repetition(key: "test", store: pixelDataStore)
+        let rep2 = GeneralPixel.Repetition(key: "test2", store: pixelDataStore)
         XCTAssertEqual(rep1, .repetitive)
         XCTAssertEqual(rep2, .initial)
     }
@@ -135,10 +135,10 @@ class PixelArgumentsTests: XCTestCase {
         let tomorrow2 = now.addingTimeInterval(3600 * 24 + 1)
         let afterTomorrow = tomorrow.addingTimeInterval(3600 * 24)
 
-        _=Pixel.Event.Repetition(key: "test", store: pixelDataStore, now: now)
-        let rep1 = Pixel.Event.Repetition(key: "test", store: pixelDataStore, now: tomorrow)
-        let rep2 = Pixel.Event.Repetition(key: "test", store: pixelDataStore, now: tomorrow2)
-        let rep3 = Pixel.Event.Repetition(key: "test", store: pixelDataStore, now: afterTomorrow)
+        _=GeneralPixel.Repetition(key: "test", store: pixelDataStore, now: now)
+        let rep1 = GeneralPixel.Repetition(key: "test", store: pixelDataStore, now: tomorrow)
+        let rep2 = GeneralPixel.Repetition(key: "test", store: pixelDataStore, now: tomorrow2)
+        let rep3 = GeneralPixel.Repetition(key: "test", store: pixelDataStore, now: afterTomorrow)
 
         XCTAssertEqual(rep1, .dailyFirst)
         XCTAssertEqual(rep2, .repetitive)

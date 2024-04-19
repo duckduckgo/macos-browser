@@ -19,11 +19,21 @@
 import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
+@testable import PixelKit
 
 final class PermissionStoreTests: XCTestCase {
 
     let container = CoreData.permissionContainer()
     lazy var store = LocalPermissionStore(context: container.viewContext)
+    let pixelKit = PixelKit(dryRun: true,
+                            appVersion: "1.0.0",
+                            defaultHeaders: [:],
+                            defaults: UserDefaults(),
+                            fireRequest: { _, _, _, _, _, _ in })
+
+    override func setUp() {
+        PixelKit.setSharedForTesting(pixelKit: pixelKit)
+    }
 
     func testWhenPermissionIsAddedThenItMustBeLoadedFromStore() throws {
         let stored1 = try store.add(domain: "duckduckgo.com", permissionType: .camera, decision: .allow)

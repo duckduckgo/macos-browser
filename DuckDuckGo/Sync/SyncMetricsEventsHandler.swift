@@ -19,6 +19,7 @@
 import Common
 import SyncDataProviders
 import Foundation
+import PixelKit
 
 public class SyncMetricsEventsHandler: EventMapping<MetricsEvent> {
 
@@ -26,9 +27,9 @@ public class SyncMetricsEventsHandler: EventMapping<MetricsEvent> {
         super.init { event, _, _, _ in
             switch event {
             case .overrideEmailProtectionSettings:
-                Pixel.fire(.syncDuckAddressOverride)
+                PixelKit.fire(GeneralPixel.syncDuckAddressOverride)
             case .localTimestampResolutionTriggered(let feature):
-                Pixel.fire(.syncLocalTimestampResolutionTriggered(feature))
+                PixelKit.fire(GeneralPixel.syncLocalTimestampResolutionTriggered(feature))
             }
         }
     }

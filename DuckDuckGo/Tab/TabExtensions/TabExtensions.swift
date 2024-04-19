@@ -70,6 +70,8 @@ protocol TabExtensionDependencies {
     var downloadManager: FileDownloadManagerProtocol { get }
     var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
     var duckPlayer: DuckPlayer { get }
+    var certificateTrustEvaluator: CertificateTrustEvaluating { get }
+    var tunnelController: NetworkProtectionIPCTunnelController? { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -122,9 +124,17 @@ extension TabExtensionsBuilder {
 
         add {
             PrivacyDashboardTabExtension(contentBlocking: dependencies.privacyFeatures.contentBlocking,
+                                         certificateTrustEvaluator: dependencies.certificateTrustEvaluator,
                                          autoconsentUserScriptPublisher: userScripts.map(\.?.autoconsentUserScript),
                                          didUpgradeToHttpsPublisher: httpsUpgrade.didUpgradeToHttpsPublisher,
-                                         trackersPublisher: contentBlocking.trackersPublisher)
+                                         trackersPublisher: contentBlocking.trackersPublisher,
+                                         webViewPublisher: args.webViewFuture)
+        }
+
+        add {
+            BrokenSiteInfoTabExtension(contentPublisher: args.contentPublisher,
+                                       webViewPublisher: args.webViewFuture,
+                                       contentScopeUserScriptPublisher: userScripts.compactMap(\.?.contentScopeUserScriptIsolated))
         }
 
         add {
@@ -189,6 +199,12 @@ extension TabExtensionsBuilder {
         add {
             SSLErrorPageTabExtension(webViewPublisher: args.webViewFuture,
                                   scriptsPublisher: userScripts.compactMap { $0 })
+        }
+
+        if let tunnelController = dependencies.tunnelController {
+            add {
+                NetworkProtectionControllerTabExtension(tunnelController: tunnelController)
+            }
         }
     }
 
