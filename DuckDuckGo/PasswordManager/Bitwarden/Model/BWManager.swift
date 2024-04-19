@@ -82,6 +82,10 @@ final class BWManager: BWManagement, ObservableObject {
             status = .oldVersion
             scheduleConnectionAttempt()
             return
+        case .incompatible:
+            status = .incompatible
+            scheduleConnectionAttempt()
+            return
         case .installed:
             break
         }
