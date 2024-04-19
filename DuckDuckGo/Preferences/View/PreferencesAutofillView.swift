@@ -356,9 +356,6 @@ struct BitwardenDowngradeInfoView: View, PreferencesTabOpening {
                 Text(UserText.bitwardenIncompatibleStep2)
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
-                Text(UserText.bitwardenIncompatibleStep2)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
