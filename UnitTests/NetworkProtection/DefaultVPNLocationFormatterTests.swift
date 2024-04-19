@@ -39,7 +39,7 @@ final class DefaultVPNLocationFormatterTests: XCTestCase {
         XCTAssertEqual(formatter.emoji(for: server.country, preferredLocation: preferredLocation), "🇺🇸")
         XCTAssertEqual(formatter.emoji(for: server.country, preferredLocation: otherPreferredLocation), "🇺🇸")
 
-        XCTAssertEqual(formatter.string(from: nil, preferredLocation: .nearest), "Nearest available")
+        XCTAssertEqual(formatter.string(from: nil, preferredLocation: .nearest), "Nearest Location")
         XCTAssertEqual(formatter.string(from: nil, preferredLocation: preferredLocation), "United States")
         XCTAssertEqual(formatter.string(from: nil, preferredLocation: otherPreferredLocation), "United Kingdom")
         XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: .nearest), "Lafayette, United States (Nearest)")
@@ -69,7 +69,7 @@ final class DefaultVPNLocationFormatterTests: XCTestCase {
         XCTAssertEqual(formatter.emoji(for: server.country, preferredLocation: preferredLocation), "🇨🇦")
         XCTAssertEqual(formatter.emoji(for: server.country, preferredLocation: otherPreferredLocation), "🇨🇦")
 
-        XCTAssertEqual(formatter.string(from: nil, preferredLocation: .nearest), "Nearest available")
+        XCTAssertEqual(formatter.string(from: nil, preferredLocation: .nearest), "Nearest Location")
         XCTAssertEqual(formatter.string(from: nil, preferredLocation: preferredLocation), "Canada")
         XCTAssertEqual(formatter.string(from: nil, preferredLocation: otherPreferredLocation), "United Kingdom")
         XCTAssertEqual(formatter.string(from: server.serverLocation, preferredLocation: .nearest), "Toronto, Canada (Nearest)")

@@ -14568,7 +14568,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "anh/netp/location-selection";
+				branch = "anh/netp/screen-improvements";
 				kind = branch;
 			};
 		};

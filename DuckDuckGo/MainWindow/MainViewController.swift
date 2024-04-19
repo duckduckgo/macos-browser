@@ -93,7 +93,8 @@ final class MainViewController: NSViewController {
                 serverInfoObserver: ipcClient.ipcServerInfoObserver,
                 connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: connectivityIssuesObserver,
-                controllerErrorMessageObserver: controllerErrorMessageObserver
+                controllerErrorMessageObserver: controllerErrorMessageObserver,
+                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
             )
         }()
 

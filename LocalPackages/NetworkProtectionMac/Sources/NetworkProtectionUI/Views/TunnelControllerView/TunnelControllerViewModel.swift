@@ -23,6 +23,10 @@ import SwiftUI
 
 @MainActor
 public final class TunnelControllerViewModel: ObservableObject {
+    public struct FormattedDataVolume: Equatable {
+        public let dataSent: String
+        public let dataReceived: String
+    }
 
     /// The NetP service.
     ///
@@ -56,6 +60,13 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     private let locationFormatter: VPNLocationFormatting
 
+    private static let byteCountFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.allowsNonnumericFormatting = false
+        formatter.allowedUnits = [.useKB, .useMB, .useGB]
+        return formatter
+    }()
+
     private let appLauncher: AppLaunching
 
     // MARK: - Misc
@@ -70,6 +81,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     private static let statusDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.statusDispatchQueue", qos: .userInteractive)
     private static let connectivityIssuesDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.connectivityIssuesDispatchQueue", qos: .userInteractive)
     private static let serverInfoDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.serverInfoDispatchQueue", qos: .userInteractive)
+    private static let dataVolumeDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.dataVolumeDispatchQueue", qos: .userInteractive)
 
     // MARK: - Initialization & Deinitialization
 
@@ -90,6 +102,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         self.appLauncher = appLauncher
 
         connectionStatus = statusReporter.statusObserver.recentValue
+        formattedDataVolume = statusReporter.dataVolumeObserver.recentValue.formatted(using: Self.byteCountFormatter)
         internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
         internalServerAttributes = statusReporter.serverInfoObserver.recentValue.serverLocation
         internalServerLocation = internalServerAttributes?.serverLocation
@@ -100,6 +113,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         subscribeToOnboardingStatusChanges()
         subscribeToStatusChanges()
         subscribeToServerInfoChanges()
+        subscribeToDataVolumeUpdates()
     }
 
     deinit {
@@ -153,6 +167,15 @@ public final class TunnelControllerViewModel: ObservableObject {
                 self.internalServerLocation = self.internalServerAttributes?.serverLocation
             }
         }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToDataVolumeUpdates() {
+        statusReporter.dataVolumeObserver.publisher
+            .subscribe(on: Self.dataVolumeDispatchQueue)
+            .map { $0.formatted(using: Self.byteCountFormatter) }
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.formattedDataVolume, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
@@ -444,6 +467,9 @@ public final class TunnelControllerViewModel: ObservableObject {
     @Published
     private var internalServerAttributes: NetworkProtectionServerInfo.ServerAttributes?
 
+    @Published
+    var formattedDataVolume: FormattedDataVolume
+
     var wantsNearestLocation: Bool {
         guard case .nearest = vpnSettings.selectedLocation else { return false }
         return true
@@ -460,11 +486,12 @@ public final class TunnelControllerViewModel: ObservableObject {
     }
 
     @available(macOS 12, *)
-    var formattedLocation: AttributedString {
-        locationFormatter.string(from: internalServerLocation,
-                                 preferredLocation: vpnSettings.selectedLocation,
-                                 locationTextColor: Color(.defaultText),
-                                 preferredLocationTextColor: Color(.defaultText).opacity(0.6))
+    func formattedLocation(colorScheme: ColorScheme) -> AttributedString {
+        let opacity = colorScheme == .light ? Double(0.6) : Double(0.5)
+        return locationFormatter.string(from: internalServerLocation,
+                                        preferredLocation: vpnSettings.selectedLocation,
+                                        locationTextColor: Color(.defaultText),
+                                        preferredLocationTextColor: Color(.defaultText).opacity(opacity))
     }
 
     // MARK: - Toggling VPN
@@ -506,5 +533,12 @@ public final class TunnelControllerViewModel: ObservableObject {
         Task { @MainActor in
             await appLauncher.launchApp(withCommand: .moveAppToApplications)
         }
+    }
+}
+
+extension DataVolume {
+    func formatted(using formatter: ByteCountFormatter) -> TunnelControllerViewModel.FormattedDataVolume {
+        .init(dataSent: formatter.string(fromByteCount: bytesSent),
+              dataReceived: formatter.string(fromByteCount: bytesReceived))
     }
 }

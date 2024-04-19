@@ -28,12 +28,12 @@ final class NetworkProtectionAssetTests: XCTestCase {
     ///
     func testAssetEnumValuesAreUnchanged() {
         let assetsAndExpectedRawValues: [NetworkProtectionAsset: String] = [
-            .ipAddressIcon: "IP-16",
-            .serverLocationIcon: "Server-Location-16",
             .vpnDisabledImage: "VPNDisabled",
             .vpnEnabledImage: "VPN",
             .vpnIcon: "VPN-16",
             .nearestAvailable: "VPNLocation",
+            .dataReceived: "VPNDownload",
+            .dataSent: "VPNUpload",
             .appleVaultIcon: "apple-vault-icon",
             .appleVPNIcon: "apple-vpn-icon",
             .appleSystemSettingsIcon: "apple-system-settings-icon",

@@ -32,6 +32,7 @@ protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
     var ipcServerInfoObserver: ConnectionServerInfoObserver { get }
     var ipcConnectionErrorObserver: ConnectionErrorObserver { get }
+    var ipcDataVolumeObserver: DataVolumeObserver { get }
 
     func start()
     func stop()
@@ -41,6 +42,7 @@ extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
     public var ipcStatusObserver: any NetworkProtection.ConnectionStatusObserver { connectionStatusObserver }
     public var ipcServerInfoObserver: any NetworkProtection.ConnectionServerInfoObserver { serverInfoObserver }
     public var ipcConnectionErrorObserver: any NetworkProtection.ConnectionErrorObserver { connectionErrorObserver }
+    public var ipcDataVolumeObserver: any NetworkProtection.DataVolumeObserver { dataVolumeObserver }
 }
 
 final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
@@ -69,7 +71,8 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 serverInfoObserver: ipcClient.ipcServerInfoObserver,
                 connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
+                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
             )
 
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher

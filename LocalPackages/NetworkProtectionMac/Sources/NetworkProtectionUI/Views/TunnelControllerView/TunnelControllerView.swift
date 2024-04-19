@@ -28,6 +28,10 @@ fileprivate extension Font {
             .system(size: 13, weight: .regular, design: .default)
         }
 
+        static var dataVolume: Font {
+            .system(size: 13, weight: .regular, design: .default)
+        }
+
         static var location: Font {
             .system(size: 13, weight: .regular, design: .default)
         }
@@ -64,13 +68,12 @@ private enum Opacity {
         colorScheme == .light ? Double(0.6) : Double(0.5)
     }
 
-    static func location(colorScheme: ColorScheme) -> Double {
+    static func dataVolume(colorScheme: ColorScheme) -> Double {
         colorScheme == .light ? Double(0.6) : Double(0.5)
     }
 
     static let content = Double(0.58)
     static let label = Double(0.9)
-    static let description = Double(0.9)
     static let link = Double(1)
 
     static func sectionHeader(colorScheme: ColorScheme) -> Double {
@@ -93,6 +96,12 @@ fileprivate extension View {
             .foregroundColor(Color(.defaultText))
     }
 
+    func applyDataVolumeAttributes(colorScheme: ColorScheme) -> some View {
+        opacity(Opacity.dataVolume(colorScheme: colorScheme))
+            .font(.NetworkProtection.dataVolume)
+            .foregroundColor(Color(.defaultText))
+    }
+
     func applyLocationAttributes() -> some View {
         font(.NetworkProtection.location)
     }
@@ -103,10 +112,9 @@ fileprivate extension View {
             .foregroundColor(Color(.defaultText))
     }
 
-    func applyDescriptionAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.description)
-            .font(.NetworkProtection.description)
-            .foregroundColor(Color(.defaultText))
+    func applyDescriptionAttributes() -> some View {
+        font(.NetworkProtection.description)
+            .foregroundColor(Color(.secondaryText))
     }
 
     func applyLabelAttributes(colorScheme: ColorScheme) -> some View {
@@ -190,7 +198,7 @@ public struct TunnelControllerView: View {
             Text(model.isToggleOn.wrappedValue ? UserText.networkProtectionStatusHeaderMessageOn : UserText.networkProtectionStatusHeaderMessageOff)
                 .multilineText()
                 .multilineTextAlignment(.center)
-                .applyDescriptionAttributes(colorScheme: colorScheme)
+                .applyDescriptionAttributes()
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
         }
@@ -208,10 +216,6 @@ public struct TunnelControllerView: View {
     @ViewBuilder
     private func headerAnimationView(_ animationName: String) -> some View {
         LottieView(animation: .named(animationName))
-            .configure { animationView in
-                animationView.contentMode = .scaleAspectFit
-                animationView.clipsToBounds = true
-            }
             .playing(withIntro: .init(
                     skipIntro: model.isVPNEnabled && !model.isToggleDisabled,
                     introStartFrame: 0,
@@ -248,8 +252,21 @@ public struct TunnelControllerView: View {
                             .background(Color(hex: "B2B2B2").opacity(0.3))
                             .clipShape(Circle())
                     } else if model.wantsNearestLocation {
-                        Image(NetworkProtectionAsset.nearestAvailable)
-                            .frame(width: 26, height: 26)
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "B2B2B2").opacity(0.3))
+                                .frame(width: 26, height: 26)
+                            if isHovered {
+                                Image(NetworkProtectionAsset.nearestAvailable)
+                                    .renderingMode(.template)
+                                    .foregroundColor(.white)
+                                    .frame(width: 16, height: 16)
+                            } else {
+                                Image(NetworkProtectionAsset.nearestAvailable)
+                                    .renderingMode(colorScheme == .light ? .original : .template)
+                                    .frame(width: 16, height: 16)
+                            }
+                        }
                     }
                     if #available(macOS 12, *) {
                         if isHovered {
@@ -257,7 +274,7 @@ public struct TunnelControllerView: View {
                                 .applyLocationAttributes()
                                 .foregroundColor(.white)
                         } else {
-                            Text(model.formattedLocation)
+                            Text(model.formattedLocation(colorScheme: colorScheme))
                                 .applyLocationAttributes()
                         }
                     } else {
@@ -280,9 +297,10 @@ public struct TunnelControllerView: View {
                 .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
 
-            connectionStatusRow(icon: .ipAddressIcon,
-                                title: UserText.networkProtectionStatusViewIPAddress,
+            connectionStatusRow(title: UserText.networkProtectionStatusViewIPAddress,
                                 details: model.serverAddress)
+
+            dataVolumeRow(title: UserText.vpnDataVolume, dataVolume: model.formattedDataVolume)
 
             dividerRow()
         }
@@ -322,11 +340,8 @@ public struct TunnelControllerView: View {
         .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
     }
 
-    private func connectionStatusRow(icon: NetworkProtectionAsset, title: String, details: String) -> some View {
+    private func connectionStatusRow(title: String, details: String) -> some View {
         HStack(spacing: 0) {
-            Image(icon)
-                .padding([.trailing], 8)
-
             Text(title)
                 .applyLabelAttributes(colorScheme: colorScheme)
                 .fixedSize()
@@ -337,6 +352,32 @@ public struct TunnelControllerView: View {
                 .makeSelectable()
                 .applyConnectionStatusDetailAttributes(colorScheme: colorScheme)
                 .fixedSize()
+        }
+        .padding(EdgeInsets(top: 6, leading: 10, bottom: 0, trailing: 9))
+    }
+
+    private func dataVolumeRow(title: String, dataVolume: TunnelControllerViewModel.FormattedDataVolume) -> some View {
+        HStack(spacing: 0) {
+            Text(title)
+                .applyLabelAttributes(colorScheme: colorScheme)
+                .fixedSize()
+
+            Spacer(minLength: 2)
+
+            Group {
+                Image(NetworkProtectionAsset.dataReceived)
+                    .renderingMode(colorScheme == .light ? .original : .template)
+                    .frame(width: 12, height: 12)
+                Text(dataVolume.dataReceived)
+                    .applyDataVolumeAttributes(colorScheme: colorScheme)
+                Image(NetworkProtectionAsset.dataSent)
+                    .renderingMode(colorScheme == .light ? .original : .template)
+                    .frame(width: 12, height: 12)
+                    .padding(.leading, 4)
+                Text(dataVolume.dataSent)
+                    .applyDataVolumeAttributes(colorScheme: colorScheme)
+            }
+            .fixedSize()
         }
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
     }

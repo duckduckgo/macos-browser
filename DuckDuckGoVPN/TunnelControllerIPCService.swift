@@ -50,6 +50,7 @@ final class TunnelControllerIPCService {
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
         subscribeToServerChanges()
+        subscribeToDataVolumeUpdates()
 
         server.serverDelegate = self
     }
@@ -81,6 +82,15 @@ final class TunnelControllerIPCService {
             .subscribe(on: DispatchQueue.main)
             .sink { [weak self] status in
                 self?.server.statusChanged(status)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToDataVolumeUpdates() {
+        statusReporter.dataVolumeObserver.publisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] dataVolume in
+                self?.server.dataVolumeUpdated(dataVolume)
             }
             .store(in: &cancellables)
     }
