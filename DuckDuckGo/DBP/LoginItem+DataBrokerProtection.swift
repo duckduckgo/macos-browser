@@ -18,6 +18,7 @@
 
 import Foundation
 import LoginItems
+import DataBrokerProtection
 
 #if DBP
 
@@ -25,6 +26,30 @@ extension LoginItem {
 
     static let dbpBackgroundAgent = LoginItem(bundleId: Bundle.main.dbpBackgroundAgentBundleId, defaults: .dbp, log: .dbp)
 
+}
+
+extension LoginItem: DBPLoginItemStatusChecker {
+
+    public func doesHaveNecessaryPermissions() -> Bool {
+        return status != .requiresApproval
+    }
+
+    public func isInCorrectDirectory() -> Bool {
+        guard let appPath = Bundle.main.resourceURL?.deletingLastPathComponent() else { return false }
+        let dirPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .localDomainMask, true)
+        for path in dirPaths {
+            let filePath: URL
+            if #available(macOS 13.0, *) {
+                filePath = URL(filePath: path)
+            } else {
+                filePath = URL(fileURLWithPath: path)
+            }
+            if appPath.absoluteString.hasPrefix(filePath.absoluteString) {
+                return true
+            }
+        }
+        return false
+    }
 }
 
 #endif

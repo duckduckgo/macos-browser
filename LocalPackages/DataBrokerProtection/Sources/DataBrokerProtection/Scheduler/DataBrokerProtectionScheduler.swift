@@ -27,6 +27,11 @@ public enum DataBrokerProtectionSchedulerStatus: Codable {
     case running
 }
 
+public enum DataBrokerProtectionSchedulerError: Error {
+    case loginItemDoesNotHaveNecessaryPermissions
+    case appInWrongDirectory
+}
+
 @objc
 public class DataBrokerProtectionSchedulerErrorCollection: NSObject, NSSecureCoding {
     /*

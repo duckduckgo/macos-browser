@@ -97,12 +97,28 @@ public enum DataBrokerProtectionPixels {
     case backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler
 
     // IPC server events
-    case ipcServerStartScheduler
-    case ipcServerStopScheduler
+    case ipcServerStartSchedulerCalledByApp
+    case ipcServerStartSchedulerReceivedByAgent
+    case ipcServerStartSchedulerXPCError(error: Error?)
+
+    case ipcServerStopSchedulerCalledByApp
+    case ipcServerStopSchedulerReceivedByAgent
+    case ipcServerStopSchedulerXPCError(error: Error?)
+
+    case ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions
+    case ipcServerScanAllBrokersAttemptedToCallInWrongDirectory
+    case ipcServerScanAllBrokersCalledByApp
+    case ipcServerScanAllBrokersReceivedByAgent
+    case ipcServerScanAllBrokersXPCError(error: Error?)
+
+    case ipcServerScanAllBrokersCompletedOnAgentWithoutError
+    case ipcServerScanAllBrokersCompletedOnAgentWithError(error: Error?)
+    case ipcServerScanAllBrokersCompletionCalledOnAppWithoutError
+    case ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: Error?)
+    case ipcServerScanAllBrokersScanAllBrokersInterrupted
+
     case ipcServerOptOutAllBrokers
     case ipcServerOptOutAllBrokersCompletion(error: Error?)
-    case ipcServerScanAllBrokers
-    case ipcServerScanAllBrokersCompletion(error: Error?)
     case ipcServerRunQueuedOperations
     case ipcServerRunQueuedOperationsCompletion(error: Error?)
     case ipcServerRunAllOperations
@@ -180,12 +196,28 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile: return "m_mac_dbp_background-agent-run-operations-and-start-scheduler-if-possible_no-saved-profile"
         case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler: return "m_mac_dbp_background-agent-run-operations-and-start-scheduler-if-possible_callback_start-scheduler"
 
-        case .ipcServerStartScheduler: return "m_mac_dbp_ipc-server_start-scheduler"
-        case .ipcServerStopScheduler: return "m_mac_dbp_ipc-server_stop-scheduler"
+
+        case .ipcServerStartSchedulerCalledByApp: return "m_mac_dbp_ipc-server_start-scheduler_called-by-app"
+        case .ipcServerStartSchedulerReceivedByAgent: return "m_mac_dbp_ipc-server_start-scheduler_received-by-agent"
+        case .ipcServerStartSchedulerXPCError: return "m_mac_dbp_ipc-server_start-scheduler_xpc-error"
+
+        case .ipcServerStopSchedulerCalledByApp: return "m_mac_dbp_ipc-server_stop-scheduler_called-by-app"
+        case .ipcServerStopSchedulerReceivedByAgent: return "m_mac_dbp_ipc-server_stop-scheduler_received-by-agent"
+        case .ipcServerStopSchedulerXPCError: return "m_mac_dbp_ipc-server_stop-scheduler_xpc-error"
+
+        case .ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions: return "m_mac_dbp_ipc-server_scan-all-brokers_attempted-to-call-without-login-item-permissions"
+        case .ipcServerScanAllBrokersAttemptedToCallInWrongDirectory: return "m_mac_dbp_ipc-server_scan-all-brokers_attempted-to-call-in-wrong-directory"
+        case .ipcServerScanAllBrokersCalledByApp: return "m_mac_dbp_ipc-server_scan-all-brokers_called-by-app"
+        case .ipcServerScanAllBrokersReceivedByAgent: return "m_mac_dbp_ipc-server_scan-all-brokers_received-by-agent"
+        case .ipcServerScanAllBrokersXPCError: return "m_mac_dbp_ipc-server_scan-all-brokers_xpc-error"
+        case .ipcServerScanAllBrokersCompletedOnAgentWithoutError: return "m_mac_dbp_ipc-server_scan-all-brokers_completed-on-agent_without-error"
+        case .ipcServerScanAllBrokersCompletedOnAgentWithError: return "m_mac_dbp_ipc-server_scan-all-brokers_completed-on-agent_with-error"
+        case .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError: return "m_mac_dbp_ipc-server_scan-all-brokers_completion-called-on-app_without-error"
+        case .ipcServerScanAllBrokersCompletionCalledOnAppWithError: return "m_mac_dbp_ipc-server_scan-all-brokers_completion-called-on-app_with-error"
+        case .ipcServerScanAllBrokersScanAllBrokersInterrupted: return "m_mac_dbp_ipc-server_scan-all-brokers_interrupted"
+
         case .ipcServerOptOutAllBrokers: return "m_mac_dbp_ipc-server_opt-out-all-brokers"
         case .ipcServerOptOutAllBrokersCompletion: return "m_mac_dbp_ipc-server_opt-out-all-brokers_completion"
-        case .ipcServerScanAllBrokers: return "m_mac_dbp_ipc-server_scan-all-brokers"
-        case .ipcServerScanAllBrokersCompletion: return "m_mac_dbp_ipc-server_scan-all-brokers_completion"
         case .ipcServerRunQueuedOperations: return "m_mac_dbp_ipc-server_run-queued-operations"
         case .ipcServerRunQueuedOperationsCompletion: return "m_mac_dbp_ipc-server_run-queued-operations_completion"
         case .ipcServerRunAllOperations: return "m_mac_dbp_ipc-server_run-all-operations"
@@ -317,12 +349,24 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .secureVaultInitError,
                 .secureVaultError:
             return [:]
-        case .ipcServerStartScheduler,
-                .ipcServerStopScheduler,
+        case .ipcServerStartSchedulerCalledByApp,
+                .ipcServerStartSchedulerReceivedByAgent,
+                .ipcServerStartSchedulerXPCError,
+                .ipcServerStopSchedulerCalledByApp,
+                .ipcServerStopSchedulerReceivedByAgent,
+                .ipcServerStopSchedulerXPCError,
+                .ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions,
+                .ipcServerScanAllBrokersAttemptedToCallInWrongDirectory,
+                .ipcServerScanAllBrokersCalledByApp,
+                .ipcServerScanAllBrokersReceivedByAgent,
+                .ipcServerScanAllBrokersXPCError,
+                .ipcServerScanAllBrokersCompletedOnAgentWithoutError,
+                .ipcServerScanAllBrokersCompletedOnAgentWithError,
+                .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError,
+                .ipcServerScanAllBrokersCompletionCalledOnAppWithError,
+                .ipcServerScanAllBrokersScanAllBrokersInterrupted,
                 .ipcServerOptOutAllBrokers,
                 .ipcServerOptOutAllBrokersCompletion,
-                .ipcServerScanAllBrokers,
-                .ipcServerScanAllBrokersCompletion,
                 .ipcServerRunQueuedOperations,
                 .ipcServerRunQueuedOperationsCompletion,
                 .ipcServerRunAllOperations:
@@ -350,8 +394,12 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .secureVaultInitError(let error),
                     .secureVaultError(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
-            case .ipcServerOptOutAllBrokersCompletion(error: let error),
-                    .ipcServerScanAllBrokersCompletion(error: let error),
+            case .ipcServerStartSchedulerXPCError(error: let error),
+                    .ipcServerStopSchedulerXPCError(error: let error),
+                    .ipcServerScanAllBrokersXPCError(error: let error),
+                    .ipcServerScanAllBrokersCompletedOnAgentWithError(error: let error),
+                    .ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: let error),
+                    .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
                 PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
             case .parentChildMatches,
@@ -374,10 +422,18 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
                     .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
-                    .ipcServerStartScheduler,
-                    .ipcServerStopScheduler,
+                    .ipcServerStartSchedulerCalledByApp,
+                    .ipcServerStartSchedulerReceivedByAgent,
+                    .ipcServerStopSchedulerCalledByApp,
+                    .ipcServerStopSchedulerReceivedByAgent,
+                    .ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions,
+                    .ipcServerScanAllBrokersAttemptedToCallInWrongDirectory,
+                    .ipcServerScanAllBrokersCalledByApp,
+                    .ipcServerScanAllBrokersReceivedByAgent,
+                    .ipcServerScanAllBrokersCompletedOnAgentWithoutError,
+                    .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError,
+                    .ipcServerScanAllBrokersScanAllBrokersInterrupted,
                     .ipcServerOptOutAllBrokers,
-                    .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
                     .ipcServerRunAllOperations,
                     .scanSuccess,
