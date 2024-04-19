@@ -202,7 +202,12 @@ private struct BitwardenInstallationDetectionView: View {
                     HStack {
                         ActivityIndicator(isAnimating: .constant(true), style: .spinning)
 
-                        Text(UserText.bitwardenIncompatible)
+                        VStack(alignment: .leading) {
+                            Text(UserText.bitwardenIncompatible)
+                                .lineLimit(nil)
+                                .fixedSize(horizontal: false, vertical: true)
+                            BitwardenDowngradeInfoView()
+                        }
                     }
                 } else {
                     HStack {
