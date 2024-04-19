@@ -59,7 +59,8 @@ final class PermanentSurveyManagerTests: XCTestCase {
         let newTabContinueSetUpSettings = createNewTabContinueSetUpSettings(state: "enabled", url: urlString, firstDay: 0, lastDay: 0, sharePercentage: 0)
         privacyConfig.featureSettings = newTabContinueSetUpSettings
         privacyConfigManager.privacyConfig = privacyConfig
-        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, statisticsStore: statisticsStore)
+        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager)
+        manager.statisticsStore = statisticsStore
 
         let actualURL = manager.url
 
@@ -71,7 +72,7 @@ final class PermanentSurveyManagerTests: XCTestCase {
         let newTabContinueSetUpSettings = createNewTabContinueSetUpSettings(state: "enabled", url: urlString, firstDay: 0, lastDay: 0, sharePercentage: 0)
         privacyConfig.featureSettings = newTabContinueSetUpSettings
         privacyConfigManager.privacyConfig = privacyConfig
-        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, statisticsStore: statisticsStore)
+        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager)
 
         let actualURL = manager.url
 
@@ -88,16 +89,16 @@ final class PermanentSurveyManagerTests: XCTestCase {
         let newTabContinueSetUpSettings = createNewTabContinueSetUpSettings(state: "enabled", url: urlString, firstDay: 5, lastDay: 8, sharePercentage: 60)
         privacyConfig.featureSettings = newTabContinueSetUpSettings
         privacyConfigManager.privacyConfig = privacyConfig
-        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator, statisticsStore: statisticsStore)
-
+        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator)
         let isSurveyAvailable = manager.isSurveyAvailable
 
         XCTAssertTrue(isSurveyAvailable)
         XCTAssertEqual(randomGenerator.capturedRange, 0..<100)
 
-        let manager2 = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator, statisticsStore: statisticsStore)
+        let manager2 = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator)
+        manager2.statisticsStore = statisticsStore
 
-        let isSurveyAvailable2 = manager.isSurveyAvailable
+        let isSurveyAvailable2 = manager2.isSurveyAvailable
 
         XCTAssertTrue(isSurveyAvailable2)
     }
@@ -112,7 +113,7 @@ final class PermanentSurveyManagerTests: XCTestCase {
         let newTabContinueSetUpSettings = createNewTabContinueSetUpSettings(state: "disabled", url: urlString, firstDay: 5, lastDay: 8, sharePercentage: 60)
         privacyConfig.featureSettings = newTabContinueSetUpSettings
         privacyConfigManager.privacyConfig = privacyConfig
-        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator, statisticsStore: statisticsStore)
+        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator)
 
         let isSurveyAvailable = manager.isSurveyAvailable
 
@@ -129,7 +130,7 @@ final class PermanentSurveyManagerTests: XCTestCase {
         let newTabContinueSetUpSettings = createNewTabContinueSetUpSettings(state: "enabled", url: urlString, firstDay: 5, lastDay: 8, sharePercentage: 60)
         privacyConfig.featureSettings = newTabContinueSetUpSettings
         privacyConfigManager.privacyConfig = privacyConfig
-        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator, statisticsStore: statisticsStore)
+        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator)
 
         let isSurveyAvailable = manager.isSurveyAvailable
 
@@ -146,7 +147,7 @@ final class PermanentSurveyManagerTests: XCTestCase {
         let newTabContinueSetUpSettings = createNewTabContinueSetUpSettings(state: "enabled", url: urlString, firstDay: 5, lastDay: 8, sharePercentage: 60)
         privacyConfig.featureSettings = newTabContinueSetUpSettings
         privacyConfigManager.privacyConfig = privacyConfig
-        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator, statisticsStore: statisticsStore)
+        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator)
 
         let isSurveyAvailable = manager.isSurveyAvailable
 
@@ -163,7 +164,7 @@ final class PermanentSurveyManagerTests: XCTestCase {
         let newTabContinueSetUpSettings = createNewTabContinueSetUpSettings(state: "enabled", url: urlString, firstDay: 5, lastDay: 8, sharePercentage: 60)
         privacyConfig.featureSettings = newTabContinueSetUpSettings
         privacyConfigManager.privacyConfig = privacyConfig
-        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator, statisticsStore: statisticsStore)
+        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator)
 
         let isSurveyAvailable = manager.isSurveyAvailable
 
@@ -180,7 +181,7 @@ final class PermanentSurveyManagerTests: XCTestCase {
         let newTabContinueSetUpSettings = createNewTabContinueSetUpSettings(state: "enabled", url: urlString, firstDay: 5, lastDay: 8, sharePercentage: 60)
         privacyConfig.featureSettings = newTabContinueSetUpSettings
         privacyConfigManager.privacyConfig = privacyConfig
-        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator, statisticsStore: statisticsStore)
+        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator)
 
         let isSurveyAvailable = manager.isSurveyAvailable
 
@@ -197,7 +198,7 @@ final class PermanentSurveyManagerTests: XCTestCase {
         let newTabContinueSetUpSettings = createNewTabContinueSetUpSettings(state: "enabled", url: urlString, localization: "disabled", firstDay: 5, lastDay: 8, sharePercentage: 60)
         privacyConfig.featureSettings = newTabContinueSetUpSettings
         privacyConfigManager.privacyConfig = privacyConfig
-        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator, statisticsStore: statisticsStore)
+        let manager = PermanentSurveyManager(privacyConfigurationManager: privacyConfigManager, randomNumberGenerator: randomGenerator)
 
         let isSurveyAvailable = manager.isSurveyAvailable
 

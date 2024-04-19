@@ -29,7 +29,7 @@ protocol SurveyManager {
     static var actionTitle: String { get }
 }
 
-struct PermanentSurveyManager: SurveyManager {
+final class PermanentSurveyManager: SurveyManager {
     static var title: String = "Help Us Improve"
     static var body: String = "Take our short survey and help us build the best browser."
     static var actionTitle: String = "Share Your Thoughts"
@@ -43,16 +43,15 @@ struct PermanentSurveyManager: SurveyManager {
     private let surveySettings: [String: Any]?
     private let userDecider: InternalUserDecider
     private let randomNumberGenerator: RandomNumberGenerating
-    private let statisticsStore: StatisticsStore
+
+    lazy var statisticsStore: StatisticsStore = LocalStatisticsStore()
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-         randomNumberGenerator: RandomNumberGenerating = RandomNumberGenerator(),
-         statisticsStore: StatisticsStore = LocalStatisticsStore()) {
+         randomNumberGenerator: RandomNumberGenerating = RandomNumberGenerator()) {
         let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
         self.surveySettings = newTabContinueSetUpSettings["permanentSurvey"] as? [String: Any]
         self.userDecider = NSApp.delegateTyped.internalUserDecider
         self.randomNumberGenerator = randomNumberGenerator
-        self.statisticsStore = statisticsStore
     }
 
     public var isSurveyAvailable: Bool {
@@ -74,7 +73,7 @@ struct PermanentSurveyManager: SurveyManager {
 
         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
         var newQueryItems: [URLQueryItem] = []
-        if let atb = statisticsStore.atb {
+        if let atb = self.statisticsStore.atb {
             newQueryItems.append(URLQueryItem(name: "atb", value: atb))
         }
         if let variant = statisticsStore.variant {
