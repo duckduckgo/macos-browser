@@ -934,8 +934,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(findInPage),
              #selector(findInPageNext),
              #selector(findInPagePrevious):
-            return activeTabViewModel?.canReload == true // must have content loaded
-                && view.window?.isKeyWindow == true // disable in full screen
+            return activeTabViewModel?.canFindInPage == true // must have content loaded
+                && view.window?.isKeyWindow == true // disable in video full screen
 
         case #selector(findInPageDone):
             return getActiveTabAndIndex()?.tab.findInPage?.isActive == true

@@ -81,6 +81,19 @@ final class TabViewModel {
         !isShowingErrorPage && canReload && !tab.webView.isInFullScreenMode
     }
 
+    var canFindInPage: Bool {
+        guard !isShowingErrorPage else { return false }
+        switch tab.content {
+        case .url(let url, _, _):
+            return !(url.isDuckPlayer || url.isDuckURLScheme)
+        case .subscription, .identityTheftRestoration:
+            return true
+
+        case .newtab, .settings, .bookmarks, .onboarding, .dataBrokerProtection, .none:
+            return false
+        }
+    }
+
     init(tab: Tab,
          appearancePreferences: AppearancePreferences = .shared,
          accessibilityPreferences: AccessibilityPreferences = .shared) {
@@ -258,7 +271,7 @@ final class TabViewModel {
         passiveAddressBarAttributedString = switch tab.content {
         case .newtab, .onboarding, .none:
             .init() // empty
-        case .settings(let pane):
+        case .settings:
             .settingsTrustedIndicator
         case .bookmarks:
             .bookmarksTrustedIndicator
