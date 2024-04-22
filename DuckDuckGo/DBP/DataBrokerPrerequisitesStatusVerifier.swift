@@ -29,28 +29,18 @@ enum DataBrokerPrerequisitesStatus {
 }
 
 protocol DataBrokerPrerequisitesStatusVerifier: AnyObject {
-    var status: DataBrokerPrerequisitesStatus { get set }
-    var statusPublisher: Published<DataBrokerPrerequisitesStatus>.Publisher { get }
-    func checkStatus()
+    func checkStatus() -> DataBrokerPrerequisitesStatus
 }
 
 final class DefaultDataBrokerPrerequisitesStatusVerifier: DataBrokerPrerequisitesStatusVerifier {
-    @Published var status: DataBrokerPrerequisitesStatus
-    var statusPublisher: Published<DataBrokerPrerequisitesStatus>.Publisher { $status }
 
-    init() {
-        self.status = .unverified
-        checkStatus()
-    }
-
-    func checkStatus() {
+    func checkStatus() -> DataBrokerPrerequisitesStatus {
         if !LoginItem.dbpBackgroundAgent.doesHaveNecessaryPermissions() {
-            self.status = .invalidSystemPermission
+            return .invalidSystemPermission
         } else if !LoginItem.dbpBackgroundAgent.isInCorrectDirectory() {
-            self.status = .invalidDirectory
+            return .invalidDirectory
         } else {
-            self.status = .valid
+            return .valid
         }
-        self.status = .invalidSystemPermission
     }
 }

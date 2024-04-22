@@ -133,7 +133,7 @@ final class DBPHomeViewController: NSViewController {
     }
 
     private func setupUIWithCurrentStatus() {
-        setupUIWithStatus(prerequisiteVerifier.status)
+        setupUIWithStatus(prerequisiteVerifier.checkStatus())
     }
 
     private func setupUIWithStatus(_ status: DataBrokerPrerequisitesStatus) {
@@ -153,7 +153,7 @@ final class DBPHomeViewController: NSViewController {
     }
 
     private func shouldAskForInviteCode() -> Bool {
-        prerequisiteVerifier.status == .valid && dataBrokerProtectionManager.shouldAskForInviteCode()
+        prerequisiteVerifier.checkStatus() == .valid && dataBrokerProtectionManager.shouldAskForInviteCode()
     }
 
     private func displayDBPUI() {
