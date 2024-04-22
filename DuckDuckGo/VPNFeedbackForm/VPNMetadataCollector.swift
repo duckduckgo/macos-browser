@@ -24,6 +24,7 @@ import NetworkProtection
 import NetworkExtension
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import Subscription
 
 struct VPNMetadata: Encodable {
 
@@ -72,12 +73,19 @@ struct VPNMetadata: Encodable {
         let notificationsAgentIsRunning: Bool
     }
 
+    struct PrivacyProInfo: Encodable {
+        let betaParticipant: Bool
+        let hasAuthToken: Bool
+        let subscriptionActive: Bool
+    }
+
     let appInfo: AppInfo
     let deviceInfo: DeviceInfo
     let networkInfo: NetworkInfo
     let vpnState: VPNState
     let vpnSettingsState: VPNSettingsState
     let loginItemState: LoginItemState
+    let privacyProInfo: PrivacyProInfo
 
     func toPrettyPrintedJSON() -> String? {
         let encoder = JSONEncoder()
@@ -138,6 +146,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         let vpnState = await collectVPNState()
         let vpnSettingsState = collectVPNSettingsState()
         let loginItemState = collectLoginItemState()
+        let privacyProInfo = collectPrivacyProInfo()
 
         return VPNMetadata(
             appInfo: appInfoMetadata,
@@ -145,7 +154,8 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             networkInfo: networkInfoMetadata,
             vpnState: vpnState,
             vpnSettingsState: vpnSettingsState,
-            loginItemState: loginItemState
+            loginItemState: loginItemState,
+            privacyProInfo: privacyProInfo
         )
     }
 
@@ -280,6 +290,27 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             showInMenuBarEnabled: settings.showInMenuBar,
             selectedServer: settings.selectedServer.stringValue ?? "automatic",
             selectedEnvironment: settings.selectedEnvironment.rawValue
+        )
+    }
+
+    func collectPrivacyProInfo() -> VPNMetadata.PrivacyProInfo {
+        let tokenStore = NetworkProtectionKeychainTokenStore()
+        let waitlistStore = WaitlistKeychainStore(
+            waitlistIdentifier: NetworkProtectionWaitlist.identifier,
+            keychainAppGroup: NetworkProtectionWaitlist.keychainAppGroup
+        )
+
+        var hasAuthToken: Bool {
+            guard let token = try? tokenStore.fetchToken(), !token.hasPrefix(NetworkProtectionKeychainTokenStore.authTokenPrefix) else {
+                return false
+            }
+            return true
+        }
+
+        return .init(
+            betaParticipant: waitlistStore.isInvited,
+            hasAuthToken: hasAuthToken,
+            subscriptionActive: AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated
         )
     }
 
