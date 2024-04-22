@@ -137,7 +137,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     }
 
     public func startManualScan(showWebView: Bool,
-                               completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
+                                completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         self.pixelHandler.fire(.ipcServerScanAllBrokersCalledByApp)
 
         guard loginItemStatusChecker.doesHaveNecessaryPermissions() else {
