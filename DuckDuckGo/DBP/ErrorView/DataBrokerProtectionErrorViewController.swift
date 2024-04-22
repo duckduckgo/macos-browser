@@ -36,30 +36,50 @@ final class DataBrokerProtectionErrorViewController: NSViewController {
             }
         }
     }
-
 }
 
 struct DataBrokerProtectionErrorView: View {
     var viewModel: DataBrokerProtectionErrorViewModel
 
     var body: some View {
-        VStack(alignment: .center, spacing: 9) {
+        VStack(alignment: .center, spacing: 16) {
+
+            HStack {
+                Image("DaxLockScreenLogo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 32, height: 32)
+
+                Text("Privacy Pro")
+                    .font(.title)
+                    .fontWeight(.light)
+            }
+            .padding(.bottom, 25)
+
+            Image("Alert-Color-16")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 24, height: 24)
 
             Text(viewModel.title)
-                .font(.title2)
+                .font(.title)
+                .fontWeight(.light)
 
             Text(viewModel.message)
                 .font(.body)
+                .fontWeight(.light)
                 .multilineTextAlignment(.center)
+                .padding(.bottom, 10)
 
             Button(action: {
                 viewModel.ctaAction()
             }) {
                 Text(viewModel.ctaText)
             }
+
             Spacer()
         }.padding()
-            .frame(maxWidth: 600)
+            .frame(maxWidth: 500)
     }
 }
 
@@ -68,4 +88,13 @@ struct DataBrokerProtectionErrorViewModel {
     let message: String
     let ctaText: String
     let ctaAction: () -> Void
+}
+
+#Preview {
+    let errorViewModel = DataBrokerProtectionErrorViewModel(title: "Move DuckDuckGo App to Applications",
+                                                            message: "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. Click the button bellow to move the app and restart the browser.",
+                                                            ctaText: "Move App for Me and Restart...",
+                                                            ctaAction: {     })
+
+   return DataBrokerProtectionErrorView(viewModel: errorViewModel)
 }

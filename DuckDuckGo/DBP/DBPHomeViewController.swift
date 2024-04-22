@@ -197,7 +197,7 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
 
 extension DBPHomeViewController {
     private func displayWrongDirectoryErrorUI() {
-        let errorViewModel = DataBrokerProtectionErrorViewModel(title: "Move DuckDuckGo App",
+        let errorViewModel = DataBrokerProtectionErrorViewModel(title: "Move DuckDuckGo App to Applications",
                                                                 message: "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. Click the button bellow to move the app and restart the browser.",
                                                                 ctaText: "Move App for Me and Restart...",
                                                                 ctaAction: { [weak self] in
