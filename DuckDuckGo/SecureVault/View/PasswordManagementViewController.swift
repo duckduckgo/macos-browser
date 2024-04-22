@@ -203,7 +203,7 @@ final class PasswordManagementViewController: NSViewController {
         deleteAllPasswordsMenuItem.title = UserText.deleteAllPasswords
         settingsMenuItem.title = UserText.settingsSuspended
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
-        autofillTitleLabel.stringValue = UserText.autofill
+        autofillTitleLabel.stringValue = UserText.passwordManagementTitle
         emptyStateTitle.stringValue = UserText.pmEmptyStateDefaultTitle
         emptyStateMessage.stringValue = UserText.pmEmptyStateDefaultDescription
         emptyStateButton.title = UserText.importData

@@ -33361,7 +33361,7 @@
     },
     "passsword.management" : {
       "comment" : "Used as title for password management user interface",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -35074,6 +35074,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не удалось импортировать пароли."
+          }
+        }
+      }
+    },
+    "password.management.title" : {
+      "comment" : "Used as the title for menu item and related Settings page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords & Autofill"
           }
         }
       }

@@ -82,7 +82,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionMenu.items[7].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[8].title, UserText.bookmarks)
         XCTAssertEqual(moreOptionMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagement)
+        XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagementTitle)
         XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
 
@@ -118,7 +118,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionMenu.items[7].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[8].title, UserText.bookmarks)
         XCTAssertEqual(moreOptionMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagement)
+        XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagementTitle)
         XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
         XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
