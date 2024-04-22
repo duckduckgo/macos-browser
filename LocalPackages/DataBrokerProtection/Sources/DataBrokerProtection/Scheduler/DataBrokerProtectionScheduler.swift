@@ -256,7 +256,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         userNotificationService.requestNotificationPermission()
 
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] errors in
+        dataBrokerProcessor.startManualScans(showWebView: showWebView) { [weak self] errors in
             guard let self = self else { return }
 
             self.startScheduler(showWebView: showWebView)
