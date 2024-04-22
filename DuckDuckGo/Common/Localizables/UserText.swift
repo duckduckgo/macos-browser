@@ -202,6 +202,8 @@ struct UserText {
     static let muteTab = NSLocalizedString("mute.tab", value: "Mute Tab", comment: "Menu item. Mute tab")
     static let unmuteTab = NSLocalizedString("unmute.tab", value: "Unmute Tab", comment: "Menu item. Unmute tab")
     static let closeOtherTabs = NSLocalizedString("close.other.tabs", value: "Close Other Tabs", comment: "Menu item")
+    static let closeAllOtherTabs = NSLocalizedString("close.all.other.tabs", value: "Close All Other Tabs", comment: "Menu item")
+    static let closeTabsToTheLeft = NSLocalizedString("close.tabs.to.the.left", value: "Close Tabs to the Left", comment: "Menu item")
     static let closeTabsToTheRight = NSLocalizedString("close.tabs.to.the.right", value: "Close Tabs to the Right", comment: "Menu item")
     static let openInNewTab = NSLocalizedString("open.in.new.tab", value: "Open in New Tab", comment: "Menu item that opens the link in a new tab")
     static let openInNewWindow = NSLocalizedString("open.in.new.window", value: "Open in New Window", comment: "Menu item that opens the link in a new window")
