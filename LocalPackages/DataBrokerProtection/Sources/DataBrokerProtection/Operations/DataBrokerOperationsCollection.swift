@@ -32,6 +32,7 @@ final class DataBrokerOperationsCollection: Operation {
 
     enum OperationType {
         case scan
+        case manualScan
         case optOut
         case all
     }
@@ -119,7 +120,7 @@ final class DataBrokerOperationsCollection: Operation {
         switch operationType {
         case .optOut:
             operationsData = brokerProfileQueriesData.flatMap { $0.optOutOperationsData }
-        case .scan:
+        case .scan, .manualScan:
             operationsData = brokerProfileQueriesData.compactMap { $0.scanOperationData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
@@ -181,6 +182,7 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 runner: runner,
                                                                                 pixelHandler: pixelHandler,
                                                                                 showWebView: showWebView,
+                                                                                isManualScans: operationType == .manualScan,
                                                                                 userNotificationService: userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
