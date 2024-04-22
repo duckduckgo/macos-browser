@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "fcappelli/PixelKit2",
-        "revision" : "8d14d5020080045cebaecaef0dea60db26682ed4"
+        "revision" : "4ec92e6b94076c53b9b2d34fdcbc2b52cecf9c8e",
+        "version" : "138.1.0"
       }
     },
     {
