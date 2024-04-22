@@ -1747,13 +1747,10 @@
 		9F9C49F72BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F52BC786790099738D /* MoreOptionsMenu+BookmarksTests.swift */; };
 		9F9C49F92BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */; };
 		9F9C49FA2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */; };
-		9F9C49FB2BC7BC970099738D /* BookmarkAllTabsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49F82BC7BC970099738D /* BookmarkAllTabsDialogView.swift */; };
 		9F9C49FD2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsDialogViewModel.swift */; };
 		9F9C49FE2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsDialogViewModel.swift */; };
-		9F9C49FF2BC7E9830099738D /* BookmarkAllTabsDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C49FC2BC7E9820099738D /* BookmarkAllTabsDialogViewModel.swift */; };
 		9F9C4A012BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */; };
 		9F9C4A022BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */; };
-		9F9C4A032BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F9C4A002BC7F36D0099738D /* BookmarkAllTabsDialogCoordinatorViewModel.swift */; };
 		9FA173DA2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
 		9FA173DB2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
 		9FA173DF2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */; };
