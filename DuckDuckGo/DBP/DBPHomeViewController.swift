@@ -188,9 +188,9 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
 
 extension DBPHomeViewController {
     private func displayWrongDirectoryErrorUI() {
-        let errorViewModel = DataBrokerProtectionErrorViewModel(title: "Move DuckDuckGo App to Applications",
-                                                                message: "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. Click the button bellow to move the app and restart the browser.",
-                                                                ctaText: "Move App for Me and Restart...",
+        let errorViewModel = DataBrokerProtectionErrorViewModel(title: UserText.dbpErrorPageBadPathTitle,
+                                                                message: UserText.dbpErrorPageBadPathMessage,
+                                                                ctaText: UserText.dbpErrorPageBadPathCTA,
                                                                 ctaAction: { [weak self] in
             self?.moveToApplicationFolder()
         })
@@ -200,9 +200,9 @@ extension DBPHomeViewController {
     }
 
     private func displayWrongPermissionsErrorUI() {
-        let errorViewModel = DataBrokerProtectionErrorViewModel(title: "Change System Setting",
-                                                                message: "Open System Settings and allow DuckDuckGo Personal Information Removal to run in the background",
-                                                                ctaText: "Open System Settings...",
+        let errorViewModel = DataBrokerProtectionErrorViewModel(title: UserText.dbpErrorPageNoPermissionTitle,
+                                                                message: UserText.dbpErrorPageNoPermissionMessage,
+                                                                ctaText: UserText.dbpErrorPageNoPermissionCTA,
                                                                 ctaAction: { [weak self] in
             self?.openLoginItemSettings()
         })
