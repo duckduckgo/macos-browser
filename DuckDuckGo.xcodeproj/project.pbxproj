@@ -2506,9 +2506,7 @@
 		EEDE50122BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */; };
 		EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
-		F116A7C12BD1924B00F3FCF7 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C02BD1924B00F3FCF7 /* PixelKit */; };
 		F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */; };
-		F116A7C52BD1925500F3FCF7 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C42BD1925500F3FCF7 /* PixelKit */; };
 		F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */; };
 		F116A7C92BD1929000F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C82BD1929000F3FCF7 /* PixelKitTestingUtilities */; };
 		F188267C2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */; };
@@ -4034,7 +4032,6 @@
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
 				F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */,
-				F116A7C52BD1925500F3FCF7 /* PixelKit in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4227,7 +4224,6 @@
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
 				F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */,
 				B65CD8CB2B316DF100A595BB /* SnapshotTesting in Frameworks */,
-				F116A7C12BD1924B00F3FCF7 /* PixelKit in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8118,7 +8114,6 @@
 				3706FDD6293F661700E42796 /* OHHTTPStubs */,
 				3706FDD8293F661700E42796 /* OHHTTPStubsSwift */,
 				B65CD8CE2B316E0200A595BB /* SnapshotTesting */,
-				F116A7C42BD1925500F3FCF7 /* PixelKit */,
 				F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
@@ -8512,7 +8507,6 @@
 				B6DA44162616C13800DD1EC2 /* OHHTTPStubs */,
 				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
 				B65CD8CA2B316DF100A595BB /* SnapshotTesting */,
-				F116A7C02BD1924B00F3FCF7 /* PixelKit */,
 				F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
@@ -11821,6 +11815,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Debug;
 		};
@@ -11828,6 +11823,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = CI;
 		};
@@ -11835,6 +11831,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Release;
 		};
@@ -11842,6 +11839,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Review;
 		};
@@ -13209,20 +13207,10 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = NetworkProtection;
 		};
-		F116A7C02BD1924B00F3FCF7 /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = PixelKit;
-		};
 		F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = PixelKitTestingUtilities;
-		};
-		F116A7C42BD1925500F3FCF7 /* PixelKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = PixelKit;
 		};
 		F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */ = {
 			isa = XCSwiftPackageProductDependency;
