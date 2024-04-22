@@ -18,9 +18,11 @@
 
 import Foundation
 import Combine
+import DataBrokerProtection
+import LoginItems
 
 enum DataBrokerPrerequisitesStatus {
-    case invalidDirectory //TODO should not be set in DEV builds
+    case invalidDirectory
     case invalidSystemPermission
     case unverified
     case valid
@@ -42,6 +44,12 @@ final class DefaultDataBrokerPrerequisitesStatusVerifier: DataBrokerPrerequisite
     }
 
     func checkStatus() {
-        self.status = .invalidSystemPermission
+        if !LoginItem.dbpBackgroundAgent.doesHaveNecessaryPermissions() {
+            self.status = .invalidSystemPermission
+        } else if !LoginItem.dbpBackgroundAgent.isInCorrectDirectory() {
+            self.status = .invalidDirectory
+        } else {
+            self.status = .valid
+        }
     }
 }
