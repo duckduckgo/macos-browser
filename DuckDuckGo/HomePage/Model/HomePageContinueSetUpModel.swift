@@ -67,6 +67,7 @@ extension HomePage.Models {
         var day14SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/240300?list=2"
 
         private let defaultBrowserProvider: DefaultBrowserProvider
+        private let dockCustomizer: DockCustomization
         private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
@@ -82,6 +83,9 @@ extension HomePage.Models {
 
         @UserDefaultsWrapper(key: .homePageShowMakeDefault, defaultValue: true)
         private var shouldShowMakeDefaultSetting: Bool
+
+        @UserDefaultsWrapper(key: .homePageShowAddToDock, defaultValue: true)
+        private var shouldShowAddToDockSetting: Bool
 
         @UserDefaultsWrapper(key: .homePageShowImport, defaultValue: true)
         private var shouldShowImportSetting: Bool
@@ -137,6 +141,7 @@ extension HomePage.Models {
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
         init(defaultBrowserProvider: DefaultBrowserProvider,
+             dockCustomizer: DockCustomization,
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
@@ -145,6 +150,7 @@ extension HomePage.Models {
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
              randomNumberGenerator: RandomNumberGenerating = RandomNumberGenerator()) {
             self.defaultBrowserProvider = defaultBrowserProvider
+            self.dockCustomizer = dockCustomizer
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
@@ -169,6 +175,9 @@ extension HomePage.Models {
                 } catch {
                     defaultBrowserProvider.openSystemPreferences()
                 }
+            case .dock:
+                dockCustomizer.addToDock()
+                removeItem(for: .dock)
             case .importBookmarksAndPasswords:
                 dataImportProvider.showImportWindow(completion: {self.refreshFeaturesMatrix()})
             case .duckplayer:
@@ -198,6 +207,8 @@ extension HomePage.Models {
             switch featureType {
             case .defaultBrowser:
                 shouldShowMakeDefaultSetting = false
+            case .dock:
+                shouldShowAddToDockSetting = false
             case .importBookmarksAndPasswords:
                 shouldShowImportSetting = false
             case .duckplayer:
@@ -244,6 +255,10 @@ extension HomePage.Models {
                 switch feature {
                 case .defaultBrowser:
                     if shouldMakeDefaultCardBeVisible {
+                        features.append(feature)
+                    }
+                case .dock:
+                    if shouldDockCardBeVisible {
                         features.append(feature)
                     }
                 case .importBookmarksAndPasswords:
@@ -321,6 +336,11 @@ extension HomePage.Models {
         private var shouldMakeDefaultCardBeVisible: Bool {
             shouldShowMakeDefaultSetting &&
             !defaultBrowserProvider.isDefault
+        }
+
+        private var shouldDockCardBeVisible: Bool {
+            shouldShowAddToDockSetting &&
+            !dockCustomizer.isAddedToDock
         }
 
         private var shouldImportCardBeVisible: Bool {
@@ -465,12 +485,13 @@ extension HomePage.Models {
         // We ignore the `networkProtectionRemoteMessage` case here to avoid it getting accidentally included - it has special handling and will get
         // included elsewhere.
         static var allCases: [HomePage.Models.FeatureType] {
-            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .surveyDay0, .surveyDay14]
+            [.duckplayer, .emailProtection, .defaultBrowser, .dock, .importBookmarksAndPasswords, .surveyDay0, .surveyDay14]
         }
 
         case duckplayer
         case emailProtection
         case defaultBrowser
+        case dock
         case importBookmarksAndPasswords
         case surveyDay0
         case surveyDay14
@@ -482,6 +503,8 @@ extension HomePage.Models {
             switch self {
             case .defaultBrowser:
                 return UserText.newTabSetUpDefaultBrowserCardTitle
+            case .dock:
+                return UserText.newTabSetUpDockCardTitle
             case .importBookmarksAndPasswords:
                 return UserText.newTabSetUpImportCardTitle
             case .duckplayer:
@@ -505,6 +528,8 @@ extension HomePage.Models {
             switch self {
             case .defaultBrowser:
                 return UserText.newTabSetUpDefaultBrowserSummary
+            case .dock:
+                return UserText.newTabSetUpDockSummary
             case .importBookmarksAndPasswords:
                 return UserText.newTabSetUpImportSummary
             case .duckplayer:
@@ -528,6 +553,8 @@ extension HomePage.Models {
             switch self {
             case .defaultBrowser:
                 return UserText.newTabSetUpDefaultBrowserAction
+            case .dock:
+                return UserText.newTabSetUpDockAction
             case .importBookmarksAndPasswords:
                 return UserText.newTabSetUpImportAction
             case .duckplayer:
@@ -553,6 +580,8 @@ extension HomePage.Models {
             switch self {
             case .defaultBrowser:
                 return .defaultApp128.resized(to: iconSize)!
+            case .dock:
+                return .dock128.resized(to: iconSize)!
             case .importBookmarksAndPasswords:
                 return .import128.resized(to: iconSize)!
             case .duckplayer:

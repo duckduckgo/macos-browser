@@ -29706,6 +29706,42 @@
         }
       }
     },
+    "newTab.setup.dock.action" : {
+      "comment" : "Action title on the action menu of the 'Add App to the Dock' card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add to Dock"
+          }
+        }
+      }
+    },
+    "newTab.setup.dock.summary" : {
+      "comment" : "Summary of the 'Add App to the Dock' card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Access DuckDuckGo faster by adding it to your Dock"
+          }
+        }
+      }
+    },
+    "newTab.setup.dock.title" : {
+      "comment" : "Title of the new tab page card for adding application to the Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add App to the Dock"
+          }
+        }
+      }
+    },
     "newTab.setup.duck.player.action" : {
       "comment" : "Action title on the action menu of the Duck Player card of the Set Up section in the home page",
       "extractionState" : "extracted_with_value",

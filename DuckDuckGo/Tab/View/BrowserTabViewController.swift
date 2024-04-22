@@ -1140,7 +1140,7 @@ extension BrowserTabViewController: OnboardingDelegate {
     }
 
     func onboardingDidRequestAddToDock(completion: @escaping () -> Void) {
-        dockCustomizer.addCurrentApplicationToDock()
+        dockCustomizer.addToDock()
         completion()
     }
 

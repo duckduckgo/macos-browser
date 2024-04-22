@@ -17,37 +17,67 @@
 //
 
 import Foundation
+import Common
 
-final class DockCustomizer {
+protocol DockCustomization {
+    var isAddedToDock: Bool { get }
 
-    /// Adds the current application to the Dock if it's not already there.
-    func addCurrentApplicationToDock() {
-        let appPath = Bundle.main.bundleURL.path
+    @discardableResult
+    func addToDock() -> Bool
+}
+
+final class DockCustomizer: DockCustomization {
+
+    var isAddedToDock: Bool {
+        // Checks if the current application is already in the Dock
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
-            return
+            return false
         }
 
-        let dockPlistPath = NSString(string: "~/Library/Preferences/com.apple.dock.plist").expandingTildeInPath
-        let dockPlistURL = URL(fileURLWithPath: dockPlistPath)
+        guard let dockPlistDict = dockPlistDict else {
+            return false
+        }
 
-        guard var dockPlistDict = NSDictionary(contentsOf: dockPlistURL) as? [String: AnyObject] else {
-            return
+        if let persistentApps = dockPlistDict["persistent-apps"] as? [[String: AnyObject]] {
+            return persistentApps.contains { appDict in
+                if let tileData = appDict["tile-data"] as? [String: AnyObject],
+                   let appBundleIdentifier = tileData["bundle-identifier"] as? String {
+                    return appBundleIdentifier == bundleIdentifier
+                }
+                return false
+            }
+        }
+
+        return false
+    }
+
+    private var dockPlistURL: URL {
+        let dockPlistPath = NSString(string: "~/Library/Preferences/com.apple.dock.plist").expandingTildeInPath
+        return URL(fileURLWithPath: dockPlistPath)
+    }
+
+    private var dockPlistDict: [String: AnyObject]? {
+        return NSDictionary(contentsOf: dockPlistURL) as? [String: AnyObject]
+    }
+
+    @discardableResult
+    func addToDock() -> Bool {
+        let appPath = Bundle.main.bundleURL.path
+
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+            return false
+        }
+
+        guard var dockPlistDict = dockPlistDict else {
+            return false
         }
 
         var persistentApps = dockPlistDict["persistent-apps"] as? [[String: AnyObject]] ?? []
         let recentApps = dockPlistDict["recent-apps"] as? [[String: AnyObject]] ?? []
 
-        // Check if the application is already in the persistent apps
-        let isAppAlreadyInPersistentApps = persistentApps.contains { appDict in
-            if let tileData = appDict["tile-data"] as? [String: AnyObject],
-               let appBundleIdentifier = tileData["bundle-identifier"] as? String {
-                return appBundleIdentifier == bundleIdentifier
-            }
+        // Check if the application is already in the Dock
+        if isAddedToDock {
             return false
-        }
-
-        if isAppAlreadyInPersistentApps {
-            return
         }
 
         // Find the app in recent apps
@@ -71,24 +101,27 @@ final class DockCustomizer {
         dockPlistDict["persistent-apps"] = persistentApps as AnyObject?
         dockPlistDict["recent-apps"] = recentApps as AnyObject?
 
-        // Mofidy the mod-count
+        // Update mod-count
         if let modCount = dockPlistDict["mod-count"] as? Int {
-            dockPlistDict["mod-count"] = (modCount + 1) as AnyObject?
+            dockPlistDict["mod-count"] = modCount + 1 as AnyObject?
         } else {
             assertionFailure("mod-count modification failed")
         }
 
-        // Write
+        // Write changes to the plist
         do {
             try (dockPlistDict as NSDictionary).write(to: dockPlistURL)
         } catch {
-            return
+            os_log(.error, "Error writing to Dock plist: %{public}@", error.localizedDescription)
+            return false
         }
 
         // Restart the Dock to apply changes
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.restartDock()
         }
+
+        return true
     }
 
     private func restartDock() {

@@ -108,6 +108,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowAllFavorites = "home.page.show.all.favorites"
         case homePageShowAllFeatures = "home.page.show.all.features"
         case homePageShowMakeDefault = "home.page.show.make.default"
+        case homePageShowAddToDock = "home.page.show.add.to.dock"
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
