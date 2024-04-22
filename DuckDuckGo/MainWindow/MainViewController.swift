@@ -93,7 +93,8 @@ final class MainViewController: NSViewController {
                 serverInfoObserver: ipcClient.ipcServerInfoObserver,
                 connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: connectivityIssuesObserver,
-                controllerErrorMessageObserver: controllerErrorMessageObserver
+                controllerErrorMessageObserver: controllerErrorMessageObserver,
+                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
             )
         }()
 
@@ -188,7 +189,6 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-        presentWaitlistThankYouPromptIfNecessary()
 
         refreshNetworkProtectionMessages()
 
@@ -428,16 +428,6 @@ final class MainViewController: NSViewController {
             return
         }
         NSApp.mainMenuTyped.stopMenuItem.isEnabled = selectedTabViewModel.isLoading
-    }
-
-    func presentWaitlistThankYouPromptIfNecessary() {
-        guard let window = self.view.window else {
-            assertionFailure("Couldn't get main view controller's window")
-            return
-        }
-
-        let presenter = WaitlistThankYouPromptPresenter()
-        presenter.presentThankYouPromptIfNecessary(in: window)
     }
 
     // MARK: - First responder

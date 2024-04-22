@@ -309,6 +309,14 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
 }
 
 final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
+    var shouldSendNilAuthHeader = false
+
+    func getAuthHeader() -> String? {
+        if shouldSendNilAuthHeader {
+            return nil
+        }
+        return "auth header"
+    }
 
     func shouldAskForInviteCode() -> Bool {
         false
@@ -318,8 +326,8 @@ final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
 
     }
 
-    func getAuthHeader() async throws -> String {
-        return "auth header"
+    func reset() {
+        shouldSendNilAuthHeader = false
     }
 }
 
@@ -344,11 +352,11 @@ final class MockAuthenticationService: DataBrokerProtectionAuthenticationService
 }
 
 final class MockAuthenticationRepository: AuthenticationRepository {
-
     var shouldSendNilInviteCode = false
     var shouldSendNilAccessToken = false
     var wasInviteCodeSaveCalled = false
     var wasAccessTokenSaveCalled = false
+    var shouldSendNilWaitlistTimeStamp = false
 
     func getInviteCode() -> String? {
         if shouldSendNilInviteCode {
@@ -374,11 +382,19 @@ final class MockAuthenticationRepository: AuthenticationRepository {
         wasAccessTokenSaveCalled = true
     }
 
+    func getWaitlistTimestamp() -> Int? {
+        if shouldSendNilWaitlistTimeStamp {
+            return nil
+        }
+        return 123
+    }
+
     func reset() {
         shouldSendNilInviteCode = false
         shouldSendNilAccessToken = false
         wasInviteCodeSaveCalled = false
         wasAccessTokenSaveCalled = false
+        shouldSendNilWaitlistTimeStamp = false
     }
 }
 
@@ -920,5 +936,26 @@ final class MockStageDurationCalculator: StageDurationCalculator {
 
     func clear() {
         self.stage = nil
+    }
+}
+
+final class MockDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBackendServicePixels {
+    var fireEmptyAccessTokenWasCalled = false
+    var fireGenerateEmailHTTPErrorWasCalled = false
+    var statusCode: Int?
+
+    func fireGenerateEmailHTTPError(statusCode: Int) {
+        fireGenerateEmailHTTPErrorWasCalled = true
+        self.statusCode = statusCode
+    }
+
+    func fireEmptyAccessToken(callSite: BackendServiceCallSite) {
+        fireEmptyAccessTokenWasCalled = true
+    }
+
+    func reset() {
+        fireEmptyAccessTokenWasCalled = false
+        fireGenerateEmailHTTPErrorWasCalled = false
+        statusCode = nil
     }
 }

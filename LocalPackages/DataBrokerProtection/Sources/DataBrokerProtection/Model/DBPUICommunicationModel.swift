@@ -185,6 +185,50 @@ struct DBPUIScanHistory: DBPUISendableMessage {
     let sitesScanned: Int
 }
 
+struct DBPUIDebugMetadata: DBPUISendableMessage {
+    let lastRunAppVersion: String
+    let lastRunAgentVersion: String?
+    let isAgentRunning: Bool
+    let lastSchedulerOperationType: String? // scan or optOut
+    let lastSchedulerOperationTimestamp: Double?
+    let lastSchedulerOperationBrokerUrl: String?
+    let lastSchedulerErrorMessage: String?
+    let lastSchedulerErrorTimestamp: Double?
+    let lastSchedulerSessionStartTimestamp: Double?
+    let agentSchedulerState: String? // stopped, running or idle
+    let lastStartedSchedulerOperationType: String?
+    let lastStartedSchedulerOperationTimestamp: Double?
+    let lastStartedSchedulerOperationBrokerUrl: String?
+
+    init(lastRunAppVersion: String,
+         lastRunAgentVersion: String? = nil,
+         isAgentRunning: Bool = false,
+         lastSchedulerOperationType: String? = nil,
+         lastSchedulerOperationTimestamp: Double? = nil,
+         lastSchedulerOperationBrokerUrl: String? = nil,
+         lastSchedulerErrorMessage: String? = nil,
+         lastSchedulerErrorTimestamp: Double? = nil,
+         lastSchedulerSessionStartTimestamp: Double? = nil,
+         agentSchedulerState: String? = nil,
+         lastStartedSchedulerOperationType: String? = nil,
+         lastStartedSchedulerOperationTimestamp: Double? = nil,
+         lastStartedSchedulerOperationBrokerUrl: String? = nil) {
+        self.lastRunAppVersion = lastRunAppVersion
+        self.lastRunAgentVersion = lastRunAgentVersion
+        self.isAgentRunning = isAgentRunning
+        self.lastSchedulerOperationType = lastSchedulerOperationType
+        self.lastSchedulerOperationTimestamp = lastSchedulerOperationTimestamp
+        self.lastSchedulerOperationBrokerUrl = lastSchedulerOperationBrokerUrl
+        self.lastSchedulerErrorMessage = lastSchedulerErrorMessage
+        self.lastSchedulerErrorTimestamp = lastSchedulerErrorTimestamp
+        self.lastSchedulerSessionStartTimestamp = lastSchedulerSessionStartTimestamp
+        self.agentSchedulerState = agentSchedulerState
+        self.lastStartedSchedulerOperationType = lastStartedSchedulerOperationType
+        self.lastStartedSchedulerOperationTimestamp = lastStartedSchedulerOperationTimestamp
+        self.lastStartedSchedulerOperationBrokerUrl = lastStartedSchedulerOperationBrokerUrl
+    }
+}
+
 extension DBPUIInitialScanState {
     static var empty: DBPUIInitialScanState {
         .init(resultsFound: [DBPUIDataBrokerProfileMatch](),

@@ -184,12 +184,18 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             platformNotificationCenter: NSWorkspace.shared.notificationCenter,
             platformDidWakeNotification: NSWorkspace.didWakeNotification)
 
+        let dataVolumeObserver = DataVolumeObserverThroughSession(
+            tunnelSessionProvider: tunnelController,
+            platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+            platformDidWakeNotification: NSWorkspace.didWakeNotification)
+
         return DefaultNetworkProtectionStatusReporter(
             statusObserver: statusObserver,
             serverInfoObserver: serverInfoObserver,
             connectionErrorObserver: errorObserver,
             connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
+            dataVolumeObserver: dataVolumeObserver
         )
     }()
 
@@ -242,17 +248,18 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuFAQ, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .showFAQ)
                     }),
+                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
+                        await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                    }),
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .justOpen)
                     }),
-                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                        await self?.appLauncher.launchApp(withCommand: .shareFeedback)
-                    })
                 ]
             },
             agentLoginItem: nil,
             isMenuBarStatusView: true,
             userDefaults: .netP,
+            locationFormatter: DefaultVPNLocationFormatter(),
             uninstallHandler: { [weak self] in
                 guard let self else { return }
                 await self.vpnUninstaller.uninstall(includingSystemExtension: true)

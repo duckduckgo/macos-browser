@@ -112,4 +112,8 @@ extension IPCServiceManager: IPCServerInterface {
             browserWindowManager.show(domain: domain)
         }
     }
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        scheduler.getDebugMetadata(completion: completion)
+    }
 }
