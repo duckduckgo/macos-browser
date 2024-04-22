@@ -182,7 +182,7 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 runner: runner,
                                                                                 pixelHandler: pixelHandler,
                                                                                 showWebView: showWebView,
-                                                                                isManualScans: operationType == .manualScan,
+                                                                                isManualScan: operationType == .manualScan,
                                                                                 userNotificationService: userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
