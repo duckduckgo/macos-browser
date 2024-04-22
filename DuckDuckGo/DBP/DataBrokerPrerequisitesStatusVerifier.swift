@@ -51,5 +51,6 @@ final class DefaultDataBrokerPrerequisitesStatusVerifier: DataBrokerPrerequisite
         } else {
             self.status = .valid
         }
+        self.status = .invalidSystemPermission
     }
 }

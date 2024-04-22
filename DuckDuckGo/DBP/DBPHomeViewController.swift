@@ -25,7 +25,6 @@ import Common
 import SwiftUI
 import BrowserServicesKit
 import PixelKit
-import Combine
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
@@ -35,7 +34,6 @@ final class DBPHomeViewController: NSViewController {
     private var presentedWindowController: NSWindowController?
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
-    private var cancellables = Set<AnyCancellable>()
     private var currentChildViewController: NSViewController?
 
     private let prerequisiteVerifier: DataBrokerPrerequisitesStatusVerifier
@@ -89,8 +87,6 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupCancellables()
-
         if !shouldAskForInviteCode() {
             setupUIWithCurrentStatus()
         }
@@ -136,14 +132,6 @@ final class DBPHomeViewController: NSViewController {
         parentWindowController.window?.beginSheet(newWindow)
     }
 
-    private func setupCancellables() {
-        prerequisiteVerifier.statusPublisher
-            .sink { [weak self] status in
-                self?.setupUIWithStatus(status)
-            }
-            .store(in: &cancellables)
-    }
-
     private func setupUIWithCurrentStatus() {
         setupUIWithStatus(prerequisiteVerifier.status)
     }
@@ -152,10 +140,13 @@ final class DBPHomeViewController: NSViewController {
         switch status {
         case .invalidDirectory:
             displayWrongDirectoryErrorUI()
+            pixelHandler.fire(.homeViewShowBadPathError)
         case .invalidSystemPermission:
             displayWrongPermissionsErrorUI()
+            pixelHandler.fire(.homeViewShowNoPermissionError)
         case .valid:
             displayDBPUI()
+            pixelHandler.fire(.homeViewShowWebUI)
         case .unverified:
             break
         }
@@ -227,6 +218,7 @@ import ServiceManagement
 
 extension DBPHomeViewController {
     func openLoginItemSettings() {
+        pixelHandler.fire(.homeViewCTAGrantPermissionClicked)
         if #available(macOS 13.0, *) {
             SMAppService.openSystemSettingsLoginItems()
         } else {
@@ -236,6 +228,7 @@ extension DBPHomeViewController {
     }
 
     func moveToApplicationFolder() {
+        pixelHandler.fire(.homeViewCTAMoveApplicationClicked)
         Task { @MainActor in
             await AppLauncher(appBundleURL: Bundle.main.bundleURL).launchApp(withCommand: .moveAppToApplications)
         }

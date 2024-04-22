@@ -101,6 +101,13 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .emptyAccessTokenDaily,
                     .generateEmailHTTPErrorDaily:
                 PixelKit.fire(event)
+
+            case .homeViewShowNoPermissionError,
+                    .homeViewShowWebUI,
+                    .homeViewShowBadPathError,
+                    .homeViewCTAMoveApplicationClicked,
+                    .homeViewCTAGrantPermissionClicked:
+                PixelKit.fire(event, frequency: .dailyAndCount)
             }
         }
     }

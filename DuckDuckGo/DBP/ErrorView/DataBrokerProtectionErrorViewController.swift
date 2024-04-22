@@ -89,12 +89,3 @@ struct DataBrokerProtectionErrorViewModel {
     let ctaText: String
     let ctaAction: () -> Void
 }
-
-#Preview {
-    let errorViewModel = DataBrokerProtectionErrorViewModel(title: "Move DuckDuckGo App to Applications",
-                                                            message: "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. Click the button bellow to move the app and restart the browser.",
-                                                            ctaText: "Move App for Me and Restart...",
-                                                            ctaAction: {     })
-
-   return DataBrokerProtectionErrorView(viewModel: errorViewModel)
-}
