@@ -32,6 +32,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "138.1.0"),
+        .package(url: "https://github.com/airbnb/lottie-spm", exact: "4.4.1"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../LoginItems"),
@@ -73,6 +74,7 @@ let package = Package(
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "LoginItems", package: "LoginItems"),
+                .product(name: "Lottie", package: "lottie-spm")
             ],
             resources: [
                 .copy("Resources/Assets.xcassets")
