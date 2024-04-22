@@ -62,16 +62,15 @@ final class BookmarkAllTabsDialogViewModel: BookmarkAllTabsDialogEditing {
         websites: [WebsiteInfo],
         foldersStore: BookmarkFoldersStore,
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-        dateProvider: () -> Date = Date.init
+        dateFormatterConfigurationProvider: () -> DateFormatterConfiguration = DateFormatterConfiguration.defaultConfiguration
     ) {
         self.websites = websites
         self.foldersStore = foldersStore
         self.bookmarkManager = bookmarkManager
 
-        let dateString = Self.dateFormatter.string(from: dateProvider())
-        folderName = String(format: UserText.Bookmarks.Dialog.Value.folderName, dateString, websites.count)
         folders = .init(bookmarkManager.list)
         selectedFolder = foldersStore.lastBookmarkAllTabsFolderIdUsed.flatMap(bookmarkManager.getBookmarkFolder(withId:))
+        folderName = Self.folderName(configuration: dateFormatterConfigurationProvider(), websitesNumber: websites.count)
         bind()
     }
 
@@ -96,12 +95,33 @@ final class BookmarkAllTabsDialogViewModel: BookmarkAllTabsDialogEditing {
 
 private extension BookmarkAllTabsDialogViewModel {
 
+    static func folderName(configuration: DateFormatterConfiguration, websitesNumber: Int) -> String {
+        Self.dateFormatter.timeZone = configuration.timeZone
+        let dateString = Self.dateFormatter.string(from: configuration.date)
+        return String(format: UserText.Bookmarks.Dialog.Value.folderName, dateString, websitesNumber)
+    }
+
     func bind() {
         folderCancellable = bookmarkManager.listPublisher
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] bookmarkList in
                 self?.folders = .init(bookmarkList)
             })
+    }
+
+}
+
+// MARK: - DateConfiguration
+
+extension BookmarkAllTabsDialogViewModel {
+
+    struct DateFormatterConfiguration {
+        let date: Date
+        let timeZone: TimeZone
+
+        static func defaultConfiguration() -> DateFormatterConfiguration {
+            .init(date: Date(), timeZone: .current)
+        }
     }
 
 }
