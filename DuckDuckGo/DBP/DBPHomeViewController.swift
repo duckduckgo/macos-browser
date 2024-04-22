@@ -25,6 +25,7 @@ import Common
 import SwiftUI
 import BrowserServicesKit
 import PixelKit
+import Combine
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
@@ -34,8 +35,15 @@ final class DBPHomeViewController: NSViewController {
     private var presentedWindowController: NSWindowController?
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+    private var cancellables = Set<AnyCancellable>()
+    private var currentChildViewController: NSViewController?
 
-    lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
+    private let prerequisiteVerifier: DataBrokerPrerequisitesStatusVerifier
+    private lazy var errorViewController: DataBrokerProtectionErrorViewController = {
+        DataBrokerProtectionErrorViewController()
+    }()
+
+    private lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
         let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
         let features = ContentScopeFeatureToggles(emailProtection: false,
                                                   emailProtectionIncontextSignup: false,
@@ -64,8 +72,9 @@ final class DBPHomeViewController: NSViewController {
             })
     }()
 
-    init(dataBrokerProtectionManager: DataBrokerProtectionManager) {
+    init(dataBrokerProtectionManager: DataBrokerProtectionManager, prerequisiteVerifier: DataBrokerPrerequisitesStatusVerifier = DefaultDataBrokerPrerequisitesStatusVerifier()) {
         self.dataBrokerProtectionManager = dataBrokerProtectionManager
+        self.prerequisiteVerifier = prerequisiteVerifier
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -80,8 +89,10 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if !dataBrokerProtectionManager.shouldAskForInviteCode() {
-            attachDataBrokerContainerView()
+        setupCancellables()
+
+        if !shouldAskForInviteCode() {
+            setupUIWithCurrentStatus()
         }
 
         do {
@@ -95,15 +106,10 @@ final class DBPHomeViewController: NSViewController {
         }
     }
 
-    private func attachDataBrokerContainerView() {
-        addChild(dataBrokerProtectionViewController)
-        view.addSubview(dataBrokerProtectionViewController.view)
-    }
-
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        if dataBrokerProtectionManager.shouldAskForInviteCode() {
+        if shouldAskForInviteCode() {
             presentInviteCodeFlow()
         }
     }
@@ -111,6 +117,7 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLayout() {
         super.viewDidLayout()
         dataBrokerProtectionViewController.view.frame = view.bounds
+        errorViewController.view.frame = view.bounds
     }
 
     private func presentInviteCodeFlow() {
@@ -128,19 +135,110 @@ final class DBPHomeViewController: NSViewController {
         }
         parentWindowController.window?.beginSheet(newWindow)
     }
+
+    private func setupCancellables() {
+        prerequisiteVerifier.statusPublisher
+            .sink { [weak self] status in
+                self?.setupUIWithStatus(status)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func setupUIWithCurrentStatus() {
+        setupUIWithStatus(prerequisiteVerifier.status)
+    }
+
+    private func setupUIWithStatus(_ status: DataBrokerPrerequisitesStatus) {
+        switch status {
+        case .invalidDirectory:
+            displayWrongDirectoryErrorUI()
+        case .invalidSystemPermission:
+            displayWrongPermissionsErrorUI()
+        case .valid:
+            displayDBPUI()
+        case .unverified:
+            break
+        }
+    }
+
+    private func shouldAskForInviteCode() -> Bool {
+        prerequisiteVerifier.status == .valid && dataBrokerProtectionManager.shouldAskForInviteCode()
+    }
+
+    private func displayDBPUI() {
+        replaceChildController(dataBrokerProtectionViewController)
+    }
+
+    private func replaceChildController(_ childViewController: NSViewController) {
+        if let child = currentChildViewController {
+            child.removeCompletely()
+        }
+
+        addAndLayoutChild(childViewController)
+        self.currentChildViewController = childViewController
+    }
 }
 
 extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDelegate {
     func dataBrokerProtectionInviteDialogsViewModelDidReedemSuccessfully(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
         presentedWindowController?.window?.close()
         presentedWindowController = nil
-        attachDataBrokerContainerView()
+        setupUIWithCurrentStatus()
     }
 
     func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
         presentedWindowController?.window?.close()
         presentedWindowController = nil
         NotificationCenter.default.post(name: .dbpDidClose, object: nil)
+    }
+}
+
+// MARK: - Error UI
+
+extension DBPHomeViewController {
+    private func displayWrongDirectoryErrorUI() {
+        let errorViewModel = DataBrokerProtectionErrorViewModel(title: "Move DuckDuckGo App",
+                                                                message: "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. Click the button bellow to move the app and restart the browser.",
+                                                                ctaText: "Move App for Me and Restart...",
+                                                                ctaAction: { [weak self] in
+            self?.moveToApplicationFolder()
+        })
+
+        errorViewController.errorViewModel = errorViewModel
+        replaceChildController(errorViewController)
+    }
+
+    private func displayWrongPermissionsErrorUI() {
+        let errorViewModel = DataBrokerProtectionErrorViewModel(title: "Change System Setting",
+                                                                message: "Open System Settings and allow DuckDuckGo Personal Information Removal to run in the background",
+                                                                ctaText: "Open System Settings...",
+                                                                ctaAction: { [weak self] in
+            self?.openLoginItemSettings()
+        })
+
+        errorViewController.errorViewModel = errorViewModel
+        replaceChildController(errorViewController)
+    }
+}
+
+// MARK: - System configuration
+
+import ServiceManagement
+
+extension DBPHomeViewController {
+    func openLoginItemSettings() {
+        if #available(macOS 13.0, *) {
+            SMAppService.openSystemSettingsLoginItems()
+        } else {
+            let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension")!
+            NSWorkspace.shared.open(loginItemsURL)
+        }
+    }
+
+    func moveToApplicationFolder() {
+        Task { @MainActor in
+            await AppLauncher(appBundleURL: Bundle.main.bundleURL).launchApp(withCommand: .moveAppToApplications)
+        }
     }
 }
 

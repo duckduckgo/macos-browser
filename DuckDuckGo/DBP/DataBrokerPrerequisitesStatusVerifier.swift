@@ -42,8 +42,6 @@ final class DefaultDataBrokerPrerequisitesStatusVerifier: DataBrokerPrerequisite
     }
 
     func checkStatus() {
-        self.status = .valid
+        self.status = .invalidSystemPermission
     }
 }
-
-
