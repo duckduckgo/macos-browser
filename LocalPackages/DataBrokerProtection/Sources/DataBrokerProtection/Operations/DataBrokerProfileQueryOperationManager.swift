@@ -35,7 +35,7 @@ protocol OperationsManager {
                       runner: WebOperationRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       showWebView: Bool,
-                      isManualScans: Bool,
+                      isManualScan: Bool,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
                       shouldRunNextStep: @escaping () -> Bool) async throws
 }
@@ -57,7 +57,7 @@ extension OperationsManager {
                                runner: runner,
                                pixelHandler: pixelHandler,
                                showWebView: false,
-                               isManualScans: false,
+                               isManualScan: false,
                                userNotificationService: userNotificationService,
                                shouldRunNextStep: shouldRunNextStep)
     }
@@ -72,7 +72,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                runner: WebOperationRunner,
                                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                showWebView: Bool = false,
-                               isManualScans: Bool = false,
+                               isManualScan: Bool = false,
                                userNotificationService: DataBrokerProtectionUserNotificationService,
                                shouldRunNextStep: @escaping () -> Bool) async throws {
 
@@ -83,7 +83,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                        notificationCenter: notificationCenter,
                                        pixelHandler: pixelHandler,
                                        showWebView: showWebView,
-                                       isManual: isManualScans,
+                                       isManual: isManualScan,
                                        userNotificationService: userNotificationService,
                                        shouldRunNextStep: shouldRunNextStep)
         } else if let optOutOperationData = operationData as? OptOutOperationData {
