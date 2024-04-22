@@ -24,6 +24,16 @@ protocol OperationRunnerProvider {
     func getOperationRunner() -> WebOperationRunner
 }
 
+<<<<<<< HEAD
+=======
+private enum DataBrokerProtectionProcessorFunction {
+    case startManualScans(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    case runAllOptOutOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    case runQueuedOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    case runAllOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+}
+
+>>>>>>> e918ff6f7 (Refactor scan all brokers on processor)
 final class DataBrokerProtectionProcessor {
     private let database: DataBrokerProtectionRepository
     private let config: SchedulerConfig
