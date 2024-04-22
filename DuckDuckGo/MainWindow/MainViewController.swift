@@ -305,14 +305,10 @@ final class MainViewController: NSViewController {
     private func subscribeToTitleChange(of selectedTabViewModel: TabViewModel?) {
         guard let selectedTabViewModel else { return }
 
-        let isAddedToWindowPublisher: AnyPublisher<Void, Never> = {
-            if view.window != nil {
-                return Just(()).eraseToAnyPublisher()
-            }
-            return view.publisher(for: \.window).filter({ $0 != nil }).prefix(1).asVoid().eraseToAnyPublisher()
-        }()
+        // Only subscribe once the view is added to the window.
+        let windowPublisher = view.publisher(for: \.window).filter({ $0 != nil }).prefix(1)
 
-        isAddedToWindowPublisher
+        windowPublisher
             .combineLatest(selectedTabViewModel.$title) { $1 }
             .map {
                 $0.truncated(length: MainMenu.Constants.maxTitleLength)
