@@ -143,6 +143,20 @@ extension TunnelControllerIPCServer: IPCClientInterface {
             client.statusChanged(payload: payload)
         }
     }
+
+    public func dataVolumeUpdated(_ dataVolume: DataVolume) {
+        let payload: Data
+
+        do {
+            payload = try JSONEncoder().encode(dataVolume)
+        } catch {
+            return
+        }
+
+        xpc.forEachClient { client in
+            client.dataVolumeUpdated(payload: payload)
+        }
+    }
 }
 
 // MARK: - Incoming communication from a client

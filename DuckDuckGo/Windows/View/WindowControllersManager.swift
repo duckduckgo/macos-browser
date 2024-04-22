@@ -237,7 +237,7 @@ extension WindowControllersManager {
         }
     }
 
-    func showNewWindow() {
+    func showMainWindow() {
         guard WindowControllersManager.shared.lastKeyMainWindowController == nil else { return }
         let tabCollection = TabCollection(tabs: [])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
