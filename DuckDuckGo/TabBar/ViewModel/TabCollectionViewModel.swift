@@ -489,6 +489,22 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
+    func removeTabs(before index: Int) {
+        guard changesEnabled else { return }
+
+        tabCollection.removeTabs(before: index)
+
+        if let currentSelection = selectionIndex, currentSelection.isUnpinnedTab {
+            if currentSelection.item < index {
+                selectionIndex = .unpinned(0)
+            } else {
+                selectionIndex = .unpinned(currentSelection.item - index)
+            }
+        }
+
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
     func removeTabs(after index: Int) {
         guard changesEnabled else { return }
 
