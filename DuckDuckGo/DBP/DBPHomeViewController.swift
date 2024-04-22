@@ -35,6 +35,7 @@ final class DBPHomeViewController: NSViewController {
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
     private var currentChildViewController: NSViewController?
+    private var observer: NSObjectProtocol?
 
     private let prerequisiteVerifier: DataBrokerPrerequisitesStatusVerifier
     private lazy var errorViewController: DataBrokerProtectionErrorViewController = {
@@ -87,9 +88,8 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if !shouldAskForInviteCode() {
-            setupUIWithCurrentStatus()
-        }
+        setupUI()
+        setupObserver()
 
         do {
             if try dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
@@ -114,6 +114,18 @@ final class DBPHomeViewController: NSViewController {
         super.viewDidLayout()
         dataBrokerProtectionViewController.view.frame = view.bounds
         errorViewController.view.frame = view.bounds
+    }
+
+    private func setupUI() {
+        if !shouldAskForInviteCode() {
+            setupUIWithCurrentStatus()
+        }
+    }
+
+    private func setupObserver() {
+        observer = NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: nil) { [weak self] _ in
+            self?.setupUI()
+        }
     }
 
     private func presentInviteCodeFlow() {
@@ -165,6 +177,12 @@ final class DBPHomeViewController: NSViewController {
 
         addAndLayoutChild(childViewController)
         self.currentChildViewController = childViewController
+    }
+
+    deinit {
+        if let observer = observer {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 }
 
