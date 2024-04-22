@@ -65,6 +65,10 @@ public enum DataBrokerProtectionPixels {
         static let httpCode = "http_code"
         static let backendServiceCallSite = "backend_service_callsite"
         static let isManualScan = "is_manual_scan"
+        static let durationInMs = "duration_in_ms"
+        static let profileQueries = "profile_queries"
+        static let hasError = "has_error"
+        static let brokerURL = "broker_url"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -169,6 +173,12 @@ public enum DataBrokerProtectionPixels {
     case homeViewShowBadPathError
     case homeViewCTAMoveApplicationClicked
     case homeViewCTAGrantPermissionClicked
+
+    // Initial scans pixels
+    // https://app.asana.com/0/1204006570077678/1206981742767458/f
+    case initialScanTotalDuration(duration: Double, profileQueries: Int)
+    case initialScanSiteLoadDuration(duration: Double, hasError: Bool, brokerURL: String)
+    case initialScanPostLoadingDuration(duration: Double, hasError: Bool, brokerURL: String)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -280,6 +290,11 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .homeViewShowBadPathError: return "m_mac_dbp_home_view_show-bad-path-error"
         case .homeViewCTAMoveApplicationClicked: return "m_mac_dbp_home_view-cta-move-application-clicked"
         case .homeViewCTAGrantPermissionClicked: return "m_mac_dbp_home_view-cta-grant-permission-clicked"
+
+            // Initial scans pixels
+        case .initialScanTotalDuration: return "m_mac_dbp_initial_scan_duration"
+        case .initialScanSiteLoadDuration: return "m_mac_dbp_scan_broker_site_loaded"
+        case .initialScanPostLoadingDuration: return "m_mac_dbp_initial_scan_broker_post_loading"
         }
     }
 
@@ -418,6 +433,12 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.environmentKey: environment,
                     Consts.wasOnWaitlist: String(wasOnWaitlist),
                     Consts.backendServiceCallSite: backendServiceCallSite.rawValue]
+        case .initialScanTotalDuration(let duration, let profileQueries):
+            return [Consts.durationInMs: String(duration), Consts.profileQueries: String(profileQueries)]
+        case .initialScanSiteLoadDuration(let duration, let hasError, let brokerURL):
+            return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL]
+        case .initialScanPostLoadingDuration(let duration, let hasError, let brokerURL):
+            return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL]
         }
     }
 }
@@ -503,7 +524,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .scanningEventReAppearance,
                     .webUILoadingFailed,
                     .webUILoadingStarted,
-                    .webUILoadingSuccess:
+                    .webUILoadingSuccess,
+                    .initialScanTotalDuration,
+                    .initialScanSiteLoadDuration,
+                    .initialScanPostLoadingDuration:
 
                 PixelKit.fire(event)
 

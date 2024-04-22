@@ -203,6 +203,7 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
 
 // MARK: - Error UI
 
+<<<<<<< HEAD
 extension DBPHomeViewController {
     private func displayWrongDirectoryErrorUI() {
         let errorViewModel = DataBrokerProtectionErrorViewModel(title: UserText.dbpErrorPageBadPathTitle,
