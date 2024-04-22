@@ -306,7 +306,7 @@ final class MainViewController: NSViewController {
         guard let selectedTabViewModel else { return }
 
         // Only subscribe once the view is added to the window.
-        let windowPublisher = view.publisher(for: \.window).filter({ $0 != nil }).prefix(1)
+        let windowPublisher = view.publisher(for: \.window).filter({ $0 != nil }).prefix(1).asVoid()
 
         windowPublisher
             .combineLatest(selectedTabViewModel.$title) { $1 }
