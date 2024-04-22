@@ -1,7 +1,7 @@
 {
   "name": "AdvancedBackgroundChecks",
   "url": "advancedbackgroundchecks.com",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678060800000,
   "steps": [
@@ -11,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "7967f064-e3c5-442d-8380-99cf752fb8df",
+          "id": "070b6417-8ccd-4111-b5ae-7ae470b0399a",
           "url": "https://www.advancedbackgroundchecks.com/names/${firstName}-${lastName}_${city}-${state}_age_${age}"
         },
         {
           "actionType": "extract",
-          "id": "6f6bb616-a4cb-4231-9abb-522722208f95",
+          "id": "d760163d-4a1f-476a-bc3e-4f3ccedc29f1",
           "selector": ".card-block",
           "profile": {
             "name": {
@@ -24,7 +24,7 @@
               "beforeText": "Age"
             },
             "alternativeNamesList": {
-              "selector": "(.//p[@class='card-text max-lines-1'])[1]",
+              "selector": ".//p[contains(@class, 'card-text') and strong[contains(text(), 'AKA')]]",
               "afterText": "AKA:",
               "separator": ","
             },
@@ -40,7 +40,7 @@
               "selector": "(.//p[@class='card-text'])[1]"
             },
             "relativesList": {
-              "selector": "(.//p[@class='card-text max-lines-1'])[2]",
+              "selector": ".//p[contains(@class, 'card-text') and strong[contains(text(), 'Related to')]]",
               "afterText": "Related to:",
               "separator": ","
             },
