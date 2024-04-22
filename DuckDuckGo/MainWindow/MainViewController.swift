@@ -306,7 +306,7 @@ final class MainViewController: NSViewController {
         guard let selectedTabViewModel else { return }
 
         let isAddedToWindowPublisher: AnyPublisher<Void, Never> = {
-            if let window = view.window {
+            if view.window != nil {
                 return Just(()).eraseToAnyPublisher()
             }
             return view.publisher(for: \.window).filter({ $0 != nil }).prefix(1).asVoid().eraseToAnyPublisher()
