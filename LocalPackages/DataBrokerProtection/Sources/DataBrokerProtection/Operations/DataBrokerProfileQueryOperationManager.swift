@@ -35,6 +35,7 @@ protocol OperationsManager {
                       runner: WebOperationRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       showWebView: Bool,
+                      isManualScans: Bool,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
                       shouldRunNextStep: @escaping () -> Bool) async throws
 }
@@ -56,6 +57,7 @@ extension OperationsManager {
                                runner: runner,
                                pixelHandler: pixelHandler,
                                showWebView: false,
+                               isManualScans: false,
                                userNotificationService: userNotificationService,
                                shouldRunNextStep: shouldRunNextStep)
     }
@@ -70,6 +72,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                runner: WebOperationRunner,
                                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                showWebView: Bool = false,
+                               isManualScans: Bool = false,
                                userNotificationService: DataBrokerProtectionUserNotificationService,
                                shouldRunNextStep: @escaping () -> Bool) async throws {
 
@@ -80,6 +83,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                        notificationCenter: notificationCenter,
                                        pixelHandler: pixelHandler,
                                        showWebView: showWebView,
+                                       isManual: isManualScans,
                                        userNotificationService: userNotificationService,
                                        shouldRunNextStep: shouldRunNextStep)
         } else if let optOutOperationData = operationData as? OptOutOperationData {
@@ -102,6 +106,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                    notificationCenter: NotificationCenter,
                                    pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                    showWebView: Bool = false,
+                                   isManual: Bool = false,
                                    userNotificationService: DataBrokerProtectionUserNotificationService,
                                    shouldRunNextStep: @escaping () -> Bool) async throws {
         os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
