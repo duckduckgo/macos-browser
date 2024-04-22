@@ -12860,7 +12860,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Disable the Auto-Clear setting to enable session restore on startup."
+            "value" : "Disable auto-clear on quit to turn on session restore."
           }
         }
       }
@@ -45874,7 +45874,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Quit without Clearing Data"
+            "value" : "Quit Without Clearing Data"
           }
         }
       }
@@ -48506,7 +48506,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Show Data Clearing Settings."
+            "value" : "Open Data Clearing Settings"
           }
         }
       }
