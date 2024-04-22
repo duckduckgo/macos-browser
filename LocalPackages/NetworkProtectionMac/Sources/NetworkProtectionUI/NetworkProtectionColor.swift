@@ -31,6 +31,7 @@ extension Color {
 ///
 enum NetworkProtectionColor: String {
     case defaultText = "TextColor"
+    case secondaryText = "SecondaryColor"
     case linkColor = "LinkBlueColor"
     case onboardingButtonBackgroundColor = "OnboardingButtonBackgroundColor"
 #if swift(<5.9)

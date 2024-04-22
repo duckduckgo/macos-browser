@@ -19,6 +19,60 @@
 import Foundation
 import XPCHelper
 
+@objc(DBPBackgroundAgentMetadata)
+public final class DBPBackgroundAgentMetadata: NSObject, NSSecureCoding {
+    enum Consts {
+        static let backgroundAgentVersionKey = "backgroundAgentVersion"
+        static let isAgentRunningKey = "isAgentRunning"
+        static let agentSchedulerStateKey = "agentSchedulerState"
+        static let lastSchedulerSessionStartTimestampKey = "lastSchedulerSessionStartTimestamp"
+    }
+
+    public static var supportsSecureCoding: Bool = true
+
+    let backgroundAgentVersion: String
+    let isAgentRunning: Bool
+    let agentSchedulerState: String
+    let lastSchedulerSessionStartTimestamp: Double?
+
+    init(backgroundAgentVersion: String,
+         isAgentRunning: Bool,
+         agentSchedulerState: String,
+         lastSchedulerSessionStartTimestamp: Double?) {
+        self.backgroundAgentVersion = backgroundAgentVersion
+        self.isAgentRunning = isAgentRunning
+        self.agentSchedulerState = agentSchedulerState
+        self.lastSchedulerSessionStartTimestamp = lastSchedulerSessionStartTimestamp
+    }
+
+    public init?(coder: NSCoder) {
+        guard let backgroundAgentVersion = coder.decodeObject(of: NSString.self,
+                                                              forKey: Consts.backgroundAgentVersionKey) as? String,
+              let agentSchedulerState = coder.decodeObject(of: NSString.self,
+                                                           forKey: Consts.agentSchedulerStateKey) as? String else {
+            return nil
+        }
+
+        self.backgroundAgentVersion = backgroundAgentVersion
+        self.isAgentRunning = coder.decodeBool(forKey: Consts.isAgentRunningKey)
+        self.agentSchedulerState = agentSchedulerState
+        self.lastSchedulerSessionStartTimestamp = coder.decodeObject(
+            of: NSNumber.self,
+            forKey: Consts.lastSchedulerSessionStartTimestampKey
+        )?.doubleValue
+    }
+
+    public func encode(with coder: NSCoder) {
+        coder.encode(self.backgroundAgentVersion as NSString, forKey: Consts.backgroundAgentVersionKey)
+        coder.encode(self.isAgentRunning, forKey: Consts.isAgentRunningKey)
+        coder.encode(self.agentSchedulerState as NSString, forKey: Consts.agentSchedulerStateKey)
+
+        if let lastSchedulerSessionStartTimestamp = self.lastSchedulerSessionStartTimestamp {
+            coder.encode(lastSchedulerSessionStartTimestamp as NSNumber, forKey: Consts.lastSchedulerSessionStartTimestampKey)
+        }
+    }
+}
+
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
 public protocol IPCServerInterface: AnyObject {
@@ -51,6 +105,9 @@ public protocol IPCServerInterface: AnyObject {
     /// Opens a browser window with the specified domain
     ///
     func openBrowser(domain: String)
+
+    /// Returns background agent metadata for debugging purposes
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -89,6 +146,8 @@ protocol XPCServerInterface {
     /// Opens a browser window with the specified domain
     ///
     func openBrowser(domain: String)
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 
 public final class DataBrokerProtectionIPCServer {
@@ -170,5 +229,9 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
 
     func openBrowser(domain: String) {
         serverDelegate?.openBrowser(domain: domain)
+    }
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        serverDelegate?.getDebugMetadata(completion: completion)
     }
 }

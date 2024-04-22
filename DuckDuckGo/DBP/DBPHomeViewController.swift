@@ -206,7 +206,9 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .scanningEventReAppearance,
                     .webUILoadingFailed,
                     .webUILoadingStarted,
-                    .webUILoadingSuccess:
+                    .webUILoadingSuccess,
+                    .emptyAccessTokenDaily,
+                    .generateEmailHTTPErrorDaily:
                 PixelKit.fire(event)
             }
         }
