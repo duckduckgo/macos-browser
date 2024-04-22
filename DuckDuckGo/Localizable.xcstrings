@@ -42864,6 +42864,30 @@
         }
       }
     },
+    "preferences-tabs.switch.tab.when.opened" : {
+      "comment" : "Option to switch to a new tab when it is opened",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Always switch to a new tab when opened"
+          }
+        }
+      }
+    },
+    "preferences-tabs.title" : {
+      "comment" : "Title for tabs section in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tabs"
+          }
+        }
+      }
+    },
     "preferences.about" : {
       "comment" : "Title of the option to show the About screen",
       "extractionState" : "extracted_with_value",

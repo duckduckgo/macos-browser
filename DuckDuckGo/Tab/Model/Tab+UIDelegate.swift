@@ -99,7 +99,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             break
         }
 
-        let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
+        let shouldSelectNewTab = !NSApp.isCommandPressed || tabsPreferences.switchToNewTabWhenOpened // this is actually not correct, to be fixed later
         // try to guess popup kind from provided windowFeatures
         let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: burnerMode.isBurner)
 

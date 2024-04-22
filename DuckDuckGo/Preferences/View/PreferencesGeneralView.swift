@@ -28,6 +28,7 @@ extension Preferences {
         @ObservedObject var startupModel: StartupPreferences
         @ObservedObject var downloadsModel: DownloadsPreferences
         @ObservedObject var searchModel: SearchPreferences
+        @ObservedObject var tabsModel: TabsPreferences
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
@@ -49,7 +50,14 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 2: Home Page
+                // SECTION 2: Tabs
+                PreferencePaneSection(UserText.tabs) {
+                    PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.switchToNewTabWhenOpened, isOn: $tabsModel.switchToNewTabWhenOpened)
+                    }
+                }
+
+                // SECTION 3: Home Page
                 PreferencePaneSection(UserText.homePage) {
 
                     PreferencePaneSubSection {
@@ -93,12 +101,12 @@ extension Preferences {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
-                // SECTION 3: Search Settings
+                // SECTION 4: Search Settings
                 PreferencePaneSection(UserText.privateSearch) {
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions).accessibilityIdentifier("PreferencesGeneralView.showAutocompleteSuggestions")
                 }
 
-                // SECTION 4: Downloads
+                // SECTION 5: Downloads
                 PreferencePaneSection(UserText.downloads) {
                     PreferencePaneSubSection {
                         ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,
