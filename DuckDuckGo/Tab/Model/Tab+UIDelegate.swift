@@ -88,6 +88,15 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         switch newWindowPolicy(for: navigationAction) {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
+            switch targetKind {
+            case .tab(let selected, let burner):
+                if !selected && tabsPreferences.switchToNewTabWhenOpened {
+                    completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: .tab(selected: true, burner: burner)))
+                    return
+                }
+            default:
+                break
+            }
             // proceed to web view creation
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
