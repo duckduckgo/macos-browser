@@ -64,6 +64,7 @@ public enum DataBrokerProtectionPixels {
         static let wasOnWaitlist = "was_on_waitlist"
         static let httpCode = "http_code"
         static let backendServiceCallSite = "backend_service_callsite"
+        static let isManualScan = "is_manual_scan"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -138,9 +139,9 @@ public enum DataBrokerProtectionPixels {
     case dataBrokerProtectionNotificationOpenedAllRecordsRemoved
 
     // Scan/Search pixels
-    case scanSuccess(dataBroker: String, matchesFound: Int, duration: Double, tries: Int)
-    case scanFailed(dataBroker: String, duration: Double, tries: Int)
-    case scanError(dataBroker: String, duration: Double, category: String, details: String)
+    case scanSuccess(dataBroker: String, matchesFound: Int, duration: Double, tries: Int, isManualScan: Bool)
+    case scanFailed(dataBroker: String, duration: Double, tries: Int, isManualScan: Bool)
+    case scanError(dataBroker: String, duration: Double, category: String, details: String, isManualScan: Bool)
 
     // KPIs - engagement
     case dailyActiveUser
@@ -403,12 +404,12 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .ipcServerRunQueuedOperationsCompletion,
                 .ipcServerRunAllOperations:
             return [Consts.bundleIDParamKey: Bundle.main.bundleIdentifier ?? "nil"]
-        case .scanSuccess(let dataBroker, let matchesFound, let duration, let tries):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.matchesFoundKey: String(matchesFound), Consts.durationParamKey: String(duration), Consts.triesKey: String(tries)]
-        case .scanFailed(let dataBroker, let duration, let tries):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries)]
-        case .scanError(let dataBroker, let duration, let category, let details):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.errorCategoryKey: category, Consts.errorDetailsKey: details]
+        case .scanSuccess(let dataBroker, let matchesFound, let duration, let tries, let isManualScan):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.matchesFoundKey: String(matchesFound), Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isManualScan: isManualScan.description]
+        case .scanFailed(let dataBroker, let duration, let tries, let isManualScan):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isManualScan: isManualScan.description]
+        case .scanError(let dataBroker, let duration, let category, let details, let isManualScan):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.errorCategoryKey: category, Consts.errorDetailsKey: details, Consts.isManualScan: isManualScan.description]
         case .generateEmailHTTPErrorDaily(let statusCode, let environment, let wasOnWaitlist):
             return [Consts.environmentKey: environment,
                     Consts.httpCode: String(statusCode),
