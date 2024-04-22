@@ -94,7 +94,7 @@ public protocol IPCServerInterface: AnyObject {
 
     func optOutAllBrokers(showWebView: Bool,
                           completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func scanAllBrokers(showWebView: Bool,
+    func startManualScan(showWebView: Bool,
                         completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
     func runQueuedOperations(showWebView: Bool,
                              completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
@@ -135,7 +135,7 @@ protocol XPCServerInterface {
 
     func optOutAllBrokers(showWebView: Bool,
                           completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func scanAllBrokers(showWebView: Bool,
+    func startManualScan(showWebView: Bool,
                         completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
     func runQueuedOperations(showWebView: Bool,
                              completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
@@ -213,9 +213,9 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
         serverDelegate?.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func scanAllBrokers(showWebView: Bool,
+    func startManualScan(showWebView: Bool,
                         completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
-        serverDelegate?.scanAllBrokers(showWebView: showWebView, completion: completion)
+        serverDelegate?.startManualScan(showWebView: showWebView, completion: completion)
     }
 
     func runQueuedOperations(showWebView: Bool,
