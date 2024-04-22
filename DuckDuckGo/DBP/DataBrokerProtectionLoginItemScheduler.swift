@@ -83,6 +83,10 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         ipcScheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        ipcScheduler.getDebugMetadata(completion: completion)
+    }
 }
 
 #endif
