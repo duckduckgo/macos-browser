@@ -123,7 +123,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
-        let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+        let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, 
+                                                                          handler: pixelHandler,
+                                                                          isManualScan: isManual)
 
         do {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
