@@ -18,28 +18,11 @@
 
 import Foundation
 
-public protocol PixelKitEventErrorDetails: Error {
-    var underlyingError: Error? { get }
-}
-
-extension PixelKitEventErrorDetails {
-    var underlyingErrorParameters: [String: String] {
-        guard let nsError = underlyingError as? NSError else {
-            return [:]
-        }
-
-        return [
-            PixelKit.Parameters.underlyingErrorCode: "\(nsError.code)",
-            PixelKit.Parameters.underlyingErrorDomain: nsError.domain
-        ]
-    }
-}
-
 /// New version of this protocol that allows us to maintain backwards-compatibility with PixelKitEvent
 ///
 /// This new implementation seeks to unify the handling of standard pixel parameters inside PixelKit.
 /// The starting example of how this can be useful is error parameter handling - this protocol allows
-/// the implementer to speciy an error without having to know about the parametrization of the error.
+/// the implementer to specify an error without having to know about its parameterisation.
 ///
 /// The reason this wasn't done directly in `PixelKitEvent` is to reduce the risk of breaking existing
 /// pixels, and to allow us to migrate towards this incrementally.
@@ -48,22 +31,28 @@ public protocol PixelKitEventV2: PixelKitEvent {
     var error: Error? { get }
 }
 
-extension PixelKitEventV2 {
-    var pixelParameters: [String: String] {
-        guard let error else {
-            return [:]
-        }
+/// Protocol to support mocking pixel firing.
+///
+/// We're adding support for `PixelKitEventV2` events strategically because adding support for earlier pixels
+/// would be more complicated and time consuming.  The idea of V2 events is that fire calls should not include a lot
+/// of parameters.  Parameters should be provided by the `PixelKitEventV2` protocol (extending it if necessary)
+/// and the call to `fire` should process those properties to serialize in the requests.
+///
+public protocol PixelFiring {
+    func fire(_ event: PixelKitEventV2)
 
-        let nsError = error as NSError
-        var parameters = [
-            PixelKit.Parameters.errorCode: "\(nsError.code)",
-            PixelKit.Parameters.errorDomain: nsError.domain,
-        ]
+    func fire(_ event: PixelKitEventV2,
+              frequency: PixelKit.Frequency)
+}
 
-        if let error = error as? PixelKitEventErrorDetails {
-            parameters.merge(error.underlyingErrorParameters, uniquingKeysWith: { $1 })
-        }
+extension PixelKit: PixelFiring {
+    public func fire(_ event: PixelKitEventV2) {
+        fire(event, frequency: .standard)
+    }
 
-        return parameters
+    public func fire(_ event: PixelKitEventV2,
+                     frequency: PixelKit.Frequency) {
+
+        fire(event, frequency: frequency, onComplete: { _, _ in })
     }
 }

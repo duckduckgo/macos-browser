@@ -19,6 +19,15 @@
 import Foundation
 import Common
 
+protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didError error: Error,
+                                        whileRunningBrokerOperationData: BrokerOperationData,
+                                        withDataBrokerName dataBrokerName: String?)
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didErrorBeforeStartingBrokerOperations error: Error)
+}
+
 final class DataBrokerOperationsCollection: Operation {
 
     enum OperationType {
@@ -26,6 +35,9 @@ final class DataBrokerOperationsCollection: Operation {
         case optOut
         case all
     }
+
+    public var error: Error?
+    public weak var errorDelegate: DataBrokerOperationsCollectionErrorDelegate?
 
     private let dataBrokerID: Int64
     private let database: DataBrokerProtectionRepository
@@ -126,8 +138,18 @@ final class DataBrokerOperationsCollection: Operation {
         return filteredAndSortedOperationsData
     }
 
+    // swiftlint:disable:next function_body_length
     private func runOperation() async {
-        let allBrokerProfileQueryData = database.fetchAllBrokerProfileQueryData()
+        let allBrokerProfileQueryData: [BrokerProfileQueryData]
+
+        do {
+            allBrokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
+        } catch {
+            os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
+            errorDelegate?.dataBrokerOperationsCollection(self, didErrorBeforeStartingBrokerOperations: error)
+            return
+        }
+
         let brokerProfileQueriesData = allBrokerProfileQueryData.filter { $0.dataBroker.id == dataBrokerID }
 
         let filteredAndSortedOperationsData = filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,
@@ -174,12 +196,11 @@ final class DataBrokerOperationsCollection: Operation {
 
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-                if let error = error as? DataBrokerProtectionError,
-                   let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
-                    pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
-                } else {
-                    os_log("Cant handle error", log: .dataBrokerProtection)
-                }
+                self.error = error
+                errorDelegate?.dataBrokerOperationsCollection(self,
+                                                              didError: error,
+                                                              whileRunningBrokerOperationData: operationData,
+                                                              withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }
     }

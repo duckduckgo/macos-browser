@@ -21,6 +21,7 @@ import BrowserServicesKit
 import CoreData
 import Foundation
 import Persistence
+import PixelKit
 
 final class Database {
 
@@ -100,7 +101,7 @@ final class Database {
         // Fire the pixel once a day at max
         if lastPixelSentAt < Date.daysAgo(1) {
             lastDatabaseFactoryFailurePixelDate = Date()
-            Pixel.fire(.debug(event: .dbMakeDatabaseError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.dbMakeDatabaseError(error: error)))
         }
     }
 }
@@ -185,14 +186,14 @@ extension NSManagedObjectModel {
 
 extension NSManagedObjectContext {
 
-    func save(onErrorFire event: Pixel.Event.Debug) throws {
+    func save(onErrorFire event: PixelKitEventV2) throws {
         do {
             try save()
         } catch {
             let nsError = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: nsError)
 
-            Pixel.fire(.debug(event: event, error: error),
+            PixelKit.fire(DebugEvent(event, error: error),
                        withAdditionalParameters: processedErrors.errorPixelParameters)
 
             throw error

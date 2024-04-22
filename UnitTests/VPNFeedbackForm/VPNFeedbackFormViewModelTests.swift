@@ -19,8 +19,6 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-#if NETWORK_PROTECTION
-
 final class VPNFeedbackFormViewModelTests: XCTestCase {
 
     func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
@@ -171,5 +169,3 @@ private class MockVPNFeedbackFormViewModelDelegate: VPNFeedbackFormViewModelDele
     }
 
 }
-
-#endif

@@ -205,7 +205,7 @@ extension HistoryTabExtension: NavigationResponder {
     }
 
     func navigation(_ navigation: Navigation, didSameDocumentNavigationOf navigationType: WKSameDocumentNavigationType) {
-        if navigation.isCurrent, navigationType != .sessionStatePop {
+        if navigation.isCurrent, [.sessionStatePush, .anchorNavigation].contains(navigationType) {
             self.url = navigation.navigationAction.url
             addVisit()
         }

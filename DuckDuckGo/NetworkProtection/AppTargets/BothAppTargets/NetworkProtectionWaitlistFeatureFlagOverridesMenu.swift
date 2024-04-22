@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Foundation
 import NetworkProtection
@@ -165,6 +163,4 @@ final class NetworkProtectionWaitlistFeatureFlagOverridesMenu: NSMenu {
 #Preview {
     return MenuPreview(menu: NetworkProtectionWaitlistFeatureFlagOverridesMenu())
 }
-#endif
-
 #endif

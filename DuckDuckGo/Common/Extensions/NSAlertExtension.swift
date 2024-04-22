@@ -137,15 +137,6 @@ extension NSAlert {
         return alert
     }
 
-    static func noAccessToSelectedFolder() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.noAccessToSelectedFolderHeader
-        alert.informativeText = UserText.noAccessToSelectedFolder
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.cancel)
-        return alert
-    }
-
     static func disableEmailProtection() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.disableEmailProtectionTitle

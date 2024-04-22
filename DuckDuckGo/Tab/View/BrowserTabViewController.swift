@@ -23,6 +23,7 @@ import Common
 import SwiftUI
 import WebKit
 import Subscription
+import PixelKit
 
 // swiftlint:disable file_length
 // swiftlint:disable:next type_body_length
@@ -154,7 +155,6 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseSubscriptionPage),
                                                name: .subscriptionPageCloseAndOpenPreferences,
@@ -163,7 +163,6 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onSubscriptionAccountDidSignOut),
                                                name: .accountDidSignOut,
                                                object: nil)
-#endif
     }
 
     @objc
@@ -225,7 +224,6 @@ final class BrowserTabViewController: NSViewController {
 
 #endif
 
-#if SUBSCRIPTION
     @objc
     private func onCloseSubscriptionPage(_ notification: Notification) {
         guard let activeTab = tabViewModel?.tab else { return }
@@ -253,8 +251,6 @@ final class BrowserTabViewController: NSViewController {
             }
         }
     }
-
-#endif
 
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel
@@ -391,20 +387,23 @@ final class BrowserTabViewController: NSViewController {
                 return old == new
             })
             .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
-                // For non-URL tabs, just emit an event
+                // For non-URL tabs, just emit an event displaying the tab content
                 guard let tabViewModel, tabContent.isUrl else {
                     return Just(()).eraseToAnyPublisher()
                 }
 
-                // For URL tabs, we only want to show tab content (webView) when webView starts
-                // navigation or when another navigation-related event happens.
-                // We take the first such event and move forward.
-                return Publishers.Merge4(
-                    tabViewModel.tab.webViewDidStartNavigationPublisher,
-                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
-                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
-                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
+                // For URL tabs, we only want to show tab content (webView) when
+                // it has content to display (first navigation had been committed)
+                // or starts navigation.
+                return Publishers.Merge(
+                    tabViewModel.tab.$hasCommittedContent
+                        .filter { $0 == true }
+                        .asVoid(),
+                    tabViewModel.tab.navigationStatePublisher.compactMap { $0 }
+                        .filter{ $0 >= .started }
+                        .asVoid()
                 )
+                // take the first such event and move forward.
                 .prefix(1)
                 .eraseToAnyPublisher()
             }
@@ -425,6 +424,7 @@ final class BrowserTabViewController: NSViewController {
             tabViewModel.tab.downloads?.savePanelDialogPublisher ?? Just(nil).eraseToAnyPublisher()
         )
         .map { $1 ?? $0 }
+        .removeDuplicates()
         .sink { [weak self] dialog in
             self?.show(dialog)
         }
@@ -916,6 +916,15 @@ extension BrowserTabViewController: TabDelegate {
     // MARK: - Dialogs
 
     fileprivate func show(_ dialog: Tab.UserDialog?) {
+        guard activeUserDialogCancellable == nil || dialog == nil else {
+            // first hide a displayed dialog before showing another one
+            activeUserDialogCancellable = nil
+            DispatchQueue.main.async { [weak self] in
+                self?.show(dialog)
+            }
+            return
+        }
+
         switch dialog?.dialog {
         case .basicAuthenticationChallenge(let query):
             activeUserDialogCancellable = showBasicAuthenticationChallenge(with: query)
@@ -964,13 +973,28 @@ extension BrowserTabViewController: TabDelegate {
                                                                  suggestedFilename: request.parameters.suggestedFilename,
                                                                  directoryURL: directoryURL)
 
-        savePanel.beginSheetModal(for: window) { [weak request] response in
+        savePanel.beginSheetModal(for: window) { [weak request, weak self] response in
             switch response {
             case .abort:
                 // panel not closed by user but by a tab switching
                 return
             case .OK:
-                guard let url = savePanel.url else { fallthrough }
+                guard let self,
+                      let window = view.window,
+                      let url = savePanel.url else { fallthrough }
+
+                do {
+                    // validate selected URL is writable
+                    try FileManager.default.checkWritability(url)
+                } catch {
+                    // hide the save panel
+                    self.activeUserDialogCancellable = nil
+                    NSAlert(error: error).beginSheetModal(for: window) { [weak self] _ in
+                        guard let self, let request else { return }
+                        self.activeUserDialogCancellable = showSavePanel(with: request)
+                    }
+                    return
+                }
                 request?.submit( (url, savePanel.selectedFileType) )
             default:
                 request?.submit(nil)
@@ -1105,7 +1129,7 @@ extension BrowserTabViewController: OnboardingDelegate {
             return
         }
 
-        Pixel.fire(.defaultRequestedFromOnboarding)
+        PixelKit.fire(GeneralPixel.defaultRequestedFromOnboarding)
         defaultBrowserPreferences.becomeDefault { _ in
             _ = defaultBrowserPreferences
             withAnimation {

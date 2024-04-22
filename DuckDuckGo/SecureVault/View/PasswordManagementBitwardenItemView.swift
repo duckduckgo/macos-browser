@@ -28,7 +28,7 @@ struct PasswordManagementBitwardenItemView: View {
 
             VStack(spacing: 2) {
                 Text(UserText.passwordManagerPopoverTitle(managerName: manager.displayName))
-                HStack (spacing: 3) {
+                HStack(spacing: 3) {
                     Text(UserText.passwordManagerPopoverChangeInSettingsLabel)
                     Button {
                         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)

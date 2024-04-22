@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
 import Common
 import Foundation
 import LoginItems
@@ -82,10 +81,6 @@ final class NetworkProtectionAppEvents {
     func applicationDidBecomeActive() {
         Task { @MainActor in
             await featureVisibility.disableIfUserHasNoAccess()
-
-#if SUBSCRIPTION
-            await AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).refreshSubscriptionAndEntitlements()
-#endif
         }
     }
 
@@ -118,5 +113,3 @@ final class NetworkProtectionAppEvents {
         }
     }
 }
-
-#endif

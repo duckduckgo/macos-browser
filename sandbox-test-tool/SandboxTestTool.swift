@@ -55,7 +55,11 @@ extension FileLogger: FilePresenterLogger {
 final class FileLogger {
     static let shared = FileLogger()
 
-    private init() {}
+    private init() {
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            FileManager.default.createFile(atPath: fileURL.path, contents: nil)
+        }
+    }
 
     private let pid = ProcessInfo().processIdentifier
 
@@ -176,7 +180,7 @@ final class SandboxTestToolAppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         do {
-            let filePresenter = try SandboxFilePresenter(fileBookmarkData: bookmark, logger: logger)
+            let filePresenter = try BookmarkFilePresenter(fileBookmarkData: bookmark, logger: logger)
             guard let url = filePresenter.url else { throw NSError(domain: "SandboxTestTool", code: -1, userInfo: [NSLocalizedDescriptionKey: "FilePresenter URL is nil"]) }
 
             filePresenter.urlPublisher.dropFirst().sink { [unowned self] url in
@@ -188,7 +192,7 @@ final class SandboxTestToolAppDelegate: NSObject, NSApplicationDelegate {
             self.filePresenters[url] = filePresenter
             logger.log("📗 openBookmarkWithFilePresenter done: \"\(filePresenter.url?.path ?? "<nil>")\"")
         } catch {
-            post(.error, with: error.encoded("could not open SandboxFilePresenter"))
+            post(.error, with: error.encoded("could not open BookmarkFilePresenter"))
         }
     }
 
@@ -198,7 +202,6 @@ final class SandboxTestToolAppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         logger.log("🌂 closeFilePresenter for \(path)")
-
         let url = URL(fileURLWithPath: path)
         filePresenterCancellables[url] = nil
         filePresenters[url] = nil
@@ -229,4 +232,32 @@ private extension Error {
         let json = try? JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
         return String(data: json!, encoding: .utf8)!
     }
+}
+
+extension NSURL {
+
+    private static var stopAccessingSecurityScopedResourceCallback: ((URL) -> Void)?
+
+    private static let originalStopAccessingSecurityScopedResource = {
+        class_getInstanceMethod(NSURL.self, #selector(NSURL.stopAccessingSecurityScopedResource))!
+    }()
+    private static let swizzledStopAccessingSecurityScopedResource = {
+        class_getInstanceMethod(NSURL.self, #selector(NSURL.test_tool_stopAccessingSecurityScopedResource))!
+    }()
+    private static let swizzleStopAccessingSecurityScopedResourceOnce: Void = {
+        method_exchangeImplementations(originalStopAccessingSecurityScopedResource, swizzledStopAccessingSecurityScopedResource)
+    }()
+
+    static func swizzleStopAccessingSecurityScopedResource(with stopAccessingSecurityScopedResourceCallback: ((URL) -> Void)?) {
+        _=swizzleStopAccessingSecurityScopedResourceOnce
+        self.stopAccessingSecurityScopedResourceCallback = stopAccessingSecurityScopedResourceCallback
+    }
+
+    @objc private dynamic func test_tool_stopAccessingSecurityScopedResource() {
+        if let stopAccessingSecurityScopedResourceCallback = Self.stopAccessingSecurityScopedResourceCallback {
+            stopAccessingSecurityScopedResourceCallback(self as URL)
+        }
+        self.test_tool_stopAccessingSecurityScopedResource() // call original
+    }
+
 }

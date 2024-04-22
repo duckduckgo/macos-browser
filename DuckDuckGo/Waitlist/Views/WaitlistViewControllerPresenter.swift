@@ -20,8 +20,6 @@ import Foundation
 import UserNotifications
 import Subscription
 
-#if NETWORK_PROTECTION || DBP
-
 protocol WaitlistViewControllerPresenter {
     static func show(completion: (() -> Void)?)
 }
@@ -31,10 +29,6 @@ extension WaitlistViewControllerPresenter {
         Self.show(completion: nil)
     }
 }
-
-#endif
-
-#if NETWORK_PROTECTION
 
 struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
 
@@ -75,18 +69,15 @@ struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerP
     }
 }
 
-#endif
-
 #if DBP
 
 struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
 
     static func shouldPresentWaitlist() -> Bool {
-#if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             return false
         }
-#endif
+
         let waitlist = DataBrokerProtectionWaitlist()
 
         let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
@@ -99,7 +90,7 @@ struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControll
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
             return
         }
-        DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
+        DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
 
         // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
         // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,

@@ -200,7 +200,6 @@ extension WindowControllersManager {
 
     // MARK: - VPN
 
-#if NETWORK_PROTECTION
     @MainActor
     func showNetworkProtectionStatus(retry: Bool = false) async {
         guard let windowController = mainWindowControllers.first else {
@@ -223,13 +222,26 @@ extension WindowControllersManager {
         let feedbackFormViewController = VPNFeedbackFormViewController()
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
-        guard let feedbackFormWindow = feedbackFormWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
-            assertionFailure("Failed to present native VPN feedback form")
+        guard let feedbackFormWindow = feedbackFormWindowController.window else {
+            assertionFailure("Couldn't get window for feedback form")
             return
         }
 
-        parentWindowController.window?.beginSheet(feedbackFormWindow)
+        if let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController {
+            parentWindowController.window?.beginSheet(feedbackFormWindow)
+        } else {
+            let tabCollection = TabCollection(tabs: [])
+            let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+            let window = WindowsManager.openNewWindow(with: tabCollectionViewModel)
+            window?.beginSheet(feedbackFormWindow)
+        }
+    }
+
+    func showMainWindow() {
+        guard WindowControllersManager.shared.lastKeyMainWindowController == nil else { return }
+        let tabCollection = TabCollection(tabs: [])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+        _ = WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
     func showLocationPickerSheet() {
@@ -244,7 +256,6 @@ extension WindowControllersManager {
 
         parentWindowController.window?.beginSheet(locationsFormWindow)
     }
-#endif
 
 }
 

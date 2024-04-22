@@ -199,10 +199,10 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 var params = processedErrors.errorPixelParameters
                 params[PixelKit.Parameters.errorSource] = source
-                Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksSaveFailed, error: error),
                            withAdditionalParameters: params)
             } else {
-                Pixel.fire(.debug(event: .bookmarksSaveFailed, error: localError),
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksSaveFailed, error: localError),
                            withAdditionalParameters: [PixelKit.Parameters.errorSource: source])
             }
         } else {
@@ -211,7 +211,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
             var params = processedErrors.errorPixelParameters
             params[PixelKit.Parameters.errorSource] = source
-            Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
+            PixelKit.fire(DebugEvent(GeneralPixel.bookmarksSaveFailed, error: error),
                        withAdditionalParameters: params)
         }
     }
@@ -228,7 +228,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 )
 
                 if context.hasChanges {
-                    try context.save(onErrorFire: .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders)
+                    try context.save(onErrorFire: GeneralPixel.bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders)
                 }
             } catch {
                 Thread.sleep(forTimeInterval: 1)
@@ -310,7 +310,7 @@ final class LocalBookmarkStore: BookmarkStore {
             } else if let root = bookmarksRoot(in: context) {
                 parentEntity = root
             } else {
-                Pixel.fire(.debug(event: .missingParent))
+                PixelKit.fire(DebugEvent(GeneralPixel.missingParent))
                 throw BookmarkStoreError.missingParent
             }
 
@@ -506,7 +506,7 @@ final class LocalBookmarkStore: BookmarkStore {
             } else if let root = self.bookmarksRoot(in: context) {
                 parentEntity = root
             } else {
-                Pixel.fire(.debug(event: .missingParent))
+                PixelKit.fire(DebugEvent(GeneralPixel.missingParent))
                 throw BookmarkStoreError.missingParent
             }
 
@@ -720,7 +720,7 @@ final class LocalBookmarkStore: BookmarkStore {
             let processedErrors = CoreDataErrorsParser.parse(error: error)
 
             if NSApp.runType.requiresEnvironment {
-                Pixel.fire(.debug(event: .bookmarksSaveFailedOnImport, error: error),
+                PixelKit.fire(DebugEvent(GeneralPixel.bookmarksSaveFailedOnImport, error: error),
                            withAdditionalParameters: processedErrors.errorPixelParameters)
                 assertionFailure("LocalBookmarkStore: Saving of context failed, error: \(error.localizedDescription)")
             }
@@ -856,7 +856,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             if deletedEntityCount > 0 {
-                Pixel.fire(.debug(event: .removedInvalidBookmarkManagedObjects))
+                PixelKit.fire(DebugEvent(GeneralPixel.removedInvalidBookmarkManagedObjects))
             }
         } onError: { [weak self] error in
             self?.commonOnSaveErrorHandler(error)
@@ -904,7 +904,7 @@ final class LocalBookmarkStore: BookmarkStore {
             let nsError = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: nsError)
             let params = processedErrors.errorPixelParameters
-            Pixel.fire(.debug(event: .favoritesCleanupFailed, error: error), withAdditionalParameters: params)
+            PixelKit.fire(DebugEvent(GeneralPixel.favoritesCleanupFailed, error: error), withAdditionalParameters: params)
         } onDidSave: {}
     }
 

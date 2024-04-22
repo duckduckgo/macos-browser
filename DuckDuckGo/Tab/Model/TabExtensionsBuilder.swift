@@ -117,7 +117,7 @@ final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
         else {
             fatalError("\(type(of: components[idx].buildingBlock)) has been already initialized at the moment of the `override` call")
         }
-        loader.state = TabExtensionLazyLoader<Extension.PublicProtocol>.State.none { makeTabExtension().getPublicProtocol () }
+        loader.state = TabExtensionLazyLoader<Extension.PublicProtocol>.State.none { makeTabExtension().getPublicProtocol() }
 
         return builderBlock
     }

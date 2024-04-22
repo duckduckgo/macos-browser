@@ -24,6 +24,7 @@ import DDGSync
 import Foundation
 import SecureStorage
 import SwiftUI
+import PixelKit
 
 protocol PasswordManagementDelegate: AnyObject {
 
@@ -548,7 +549,7 @@ final class PasswordManagementViewController: NSViewController {
             if case SecureStorageError.duplicateRecord = error {
                 showDuplicateAlert()
             } else {
-                Pixel.fire(.debug(event: .secureVaultError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             }
         }
     }
@@ -571,7 +572,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }
 
@@ -615,7 +616,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
         }
     }
 
@@ -634,7 +635,7 @@ final class PasswordManagementViewController: NSViewController {
                     self.requestSync()
                     self.refreshData()
                 } catch {
-                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
 
             default:
@@ -657,7 +658,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteIdentityFor(identityId: id)
                     self.refreshData()
                 } catch {
-                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
 
             default:
@@ -699,7 +700,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteCreditCardFor(cardId: id)
                     self.refreshData()
                 } catch {
-                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
 
             default:
@@ -753,7 +754,7 @@ final class PasswordManagementViewController: NSViewController {
                         self?.syncModelsOnNote(note)
                     }
                 } catch {
-                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
                 }
             }
 
@@ -818,10 +819,10 @@ final class PasswordManagementViewController: NSViewController {
     // swiftlint:enable function_body_length
 
     private func createNewSecureVaultItemMenu() -> NSMenu {
-        NSMenu {
-            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin)).withImage(.loginGlyph)
-            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity)).withImage(.identityGlyph)
-            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard)).withImage(.creditCardGlyph)
+        return NSMenu {
+            NSMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), target: self).withImage(.loginGlyph)
+            NSMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), target: self).withImage(.identityGlyph)
+            NSMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), target: self).withImage(.creditCardGlyph)
         }
     }
 
@@ -857,7 +858,7 @@ final class PasswordManagementViewController: NSViewController {
                     items = cards.map(SecureVaultItem.card)
                 }
             } catch {
-                Pixel.fire(.debug(event: .secureVaultError, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             }
 
             DispatchQueue.main.async {

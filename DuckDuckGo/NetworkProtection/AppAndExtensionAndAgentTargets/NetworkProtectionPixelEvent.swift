@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import PixelKit
 import NetworkProtection
@@ -87,7 +85,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionRekeyCompleted
     case networkProtectionRekeyFailure(_ error: Error)
 
-    case networkProtectionSystemExtensionActivationFailure
+    case networkProtectionSystemExtensionActivationFailure(_ error: Error)
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
@@ -256,108 +254,102 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         switch self {
         case .networkProtectionKeychainErrorFailedToCastKeychainValueToData(let field):
             return [PixelKit.Parameters.keychainFieldName: field]
-
         case .networkProtectionKeychainReadError(let field, let status):
             return [
                 PixelKit.Parameters.keychainFieldName: field,
                 PixelKit.Parameters.errorCode: String(status)
             ]
-
         case .networkProtectionKeychainWriteError(let field, let status):
             return [
                 PixelKit.Parameters.keychainFieldName: field,
                 PixelKit.Parameters.errorCode: String(status)
             ]
-
         case .networkProtectionKeychainUpdateError(let field, let status):
             return [
                 PixelKit.Parameters.keychainFieldName: field,
                 PixelKit.Parameters.errorCode: String(status)
             ]
-
         case .networkProtectionKeychainDeleteError(let status):
-            return [
-                PixelKit.Parameters.errorCode: String(status)
-            ]
-
+            return [PixelKit.Parameters.errorCode: String(status)]
         case .networkProtectionClientFailedToFetchServerList(let error):
             return error?.pixelParameters
-
         case .networkProtectionClientFailedToFetchRegisteredServers(let error):
             return error?.pixelParameters
-
         case .networkProtectionClientFailedToRedeemInviteCode(let error):
             return error?.pixelParameters
-
         case .networkProtectionClientFailedToFetchLocations(let error):
             return error?.pixelParameters
-
         case .networkProtectionClientFailedToParseLocationsResponse(let error):
             return error?.pixelParameters
-
         case .networkProtectionUnhandledError(let function, let line, let error):
             var parameters = error.pixelParameters
             parameters[PixelKit.Parameters.function] = function
             parameters[PixelKit.Parameters.line] = String(line)
             return parameters
-
         case .networkProtectionWireguardErrorCannotSetNetworkSettings(let error):
             return error.pixelParameters
-
         case .networkProtectionWireguardErrorCannotStartWireguardBackend(code: let code):
-            return [
-                PixelKit.Parameters.errorCode: String(code)
-            ]
-
+            return [PixelKit.Parameters.errorCode: String(code)]
         case .networkProtectionWireguardErrorInvalidState(reason: let reason):
-            return [
-                PixelKit.Parameters.reason: reason
-            ]
-
-        case .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
-             .networkProtectionTunnelConfigurationCouldNotSelectClosestServer,
-             .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey,
-             .networkProtectionTunnelConfigurationCouldNotGetPeerHostName,
-             .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange,
-             .networkProtectionClientFailedToParseServerListResponse,
-             .networkProtectionClientFailedToEncodeRegisterKeyRequest,
-             .networkProtectionClientFailedToParseRegisteredServersResponse,
-             .networkProtectionClientFailedToParseRedeemResponse,
-             .networkProtectionClientInvalidInviteCode,
-             .networkProtectionClientFailedToEncodeRedeemRequest,
-             .networkProtectionClientInvalidAuthToken,
-             .networkProtectionNoAuthTokenFoundError,
-             .networkProtectionRekeyAttempt,
-             .networkProtectionRekeyCompleted,
-             .networkProtectionRekeyFailure,
-             .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
-             .networkProtectionWireguardErrorFailedDNSResolution,
-             .networkProtectionSystemExtensionActivationFailure,
-             .networkProtectionActiveUser,
-             .networkProtectionNewUser,
-             .networkProtectionEnableAttemptConnecting,
-             .networkProtectionEnableAttemptSuccess,
-             .networkProtectionEnableAttemptFailure,
-             .networkProtectionTunnelFailureDetected,
-             .networkProtectionTunnelFailureRecovered,
-             .networkProtectionLatency,
-             .networkProtectionLatencyError,
-             .networkProtectionControllerStartAttempt,
-             .networkProtectionControllerStartSuccess,
-             .networkProtectionControllerStartFailure,
-             .networkProtectionTunnelStartAttempt,
-             .networkProtectionTunnelStartSuccess,
-             .networkProtectionTunnelStartFailure,
-             .networkProtectionTunnelUpdateAttempt,
-             .networkProtectionTunnelUpdateSuccess,
-             .networkProtectionTunnelUpdateFailure:
-
+            return [PixelKit.Parameters.reason: reason]
+        case .networkProtectionActiveUser,
+                .networkProtectionNewUser,
+                .networkProtectionControllerStartAttempt,
+                .networkProtectionControllerStartSuccess,
+                .networkProtectionControllerStartFailure,
+                .networkProtectionTunnelStartAttempt,
+                .networkProtectionTunnelStartSuccess,
+                .networkProtectionTunnelStartFailure,
+                .networkProtectionTunnelUpdateAttempt,
+                .networkProtectionTunnelUpdateSuccess,
+                .networkProtectionTunnelUpdateFailure,
+                .networkProtectionEnableAttemptConnecting,
+                .networkProtectionEnableAttemptSuccess,
+                .networkProtectionEnableAttemptFailure,
+                .networkProtectionTunnelFailureDetected,
+                .networkProtectionTunnelFailureRecovered,
+                .networkProtectionLatency,
+                .networkProtectionLatencyError,
+                .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
+                .networkProtectionTunnelConfigurationCouldNotSelectClosestServer,
+                .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey,
+                .networkProtectionTunnelConfigurationCouldNotGetPeerHostName,
+                .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange,
+                .networkProtectionClientFailedToParseServerListResponse,
+                .networkProtectionClientFailedToEncodeRegisterKeyRequest,
+                .networkProtectionClientFailedToParseRegisteredServersResponse,
+                .networkProtectionClientFailedToEncodeRedeemRequest,
+                .networkProtectionClientInvalidInviteCode,
+                .networkProtectionClientFailedToParseRedeemResponse,
+                .networkProtectionClientInvalidAuthToken,
+                .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
+                .networkProtectionWireguardErrorFailedDNSResolution,
+                .networkProtectionNoAuthTokenFoundError,
+                .networkProtectionRekeyAttempt,
+                .networkProtectionRekeyCompleted,
+                .networkProtectionRekeyFailure,
+                .networkProtectionSystemExtensionActivationFailure:
             return nil
         }
     }
 
     var error: (any Error)? {
         switch self {
+        case .networkProtectionClientFailedToRedeemInviteCode(let error),
+                .networkProtectionClientFailedToFetchLocations(let error),
+                .networkProtectionClientFailedToParseLocationsResponse(let error),
+                .networkProtectionClientFailedToFetchServerList(let error),
+                .networkProtectionClientFailedToFetchRegisteredServers(let error):
+            return error
+        case .networkProtectionControllerStartFailure(let error),
+                .networkProtectionTunnelStartFailure(let error),
+                .networkProtectionTunnelUpdateFailure(let error),
+                .networkProtectionClientFailedToParseRedeemResponse(let error),
+                .networkProtectionWireguardErrorCannotSetNetworkSettings(let error),
+                .networkProtectionRekeyFailure(let error),
+                .networkProtectionUnhandledError(_, _, let error),
+                .networkProtectionSystemExtensionActivationFailure(let error):
+            return error
         case .networkProtectionActiveUser,
                 .networkProtectionNewUser,
                 .networkProtectionControllerStartAttempt,
@@ -371,16 +363,16 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionEnableAttemptFailure,
                 .networkProtectionTunnelFailureDetected,
                 .networkProtectionTunnelFailureRecovered,
-                .networkProtectionLatencyError,
                 .networkProtectionLatency,
+                .networkProtectionLatencyError,
                 .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
+                .networkProtectionTunnelConfigurationCouldNotSelectClosestServer,
                 .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey,
                 .networkProtectionTunnelConfigurationCouldNotGetPeerHostName,
                 .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange,
                 .networkProtectionClientFailedToParseServerListResponse,
                 .networkProtectionClientFailedToEncodeRegisterKeyRequest,
                 .networkProtectionClientFailedToParseRegisteredServersResponse,
-                .networkProtectionTunnelConfigurationCouldNotSelectClosestServer,
                 .networkProtectionClientFailedToEncodeRedeemRequest,
                 .networkProtectionClientInvalidInviteCode,
                 .networkProtectionClientInvalidAuthToken,
@@ -395,25 +387,8 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionWireguardErrorCannotStartWireguardBackend,
                 .networkProtectionNoAuthTokenFoundError,
                 .networkProtectionRekeyAttempt,
-                .networkProtectionRekeyCompleted,
-                .networkProtectionSystemExtensionActivationFailure:
+                .networkProtectionRekeyCompleted:
             return nil
-        case .networkProtectionClientFailedToRedeemInviteCode(let error),
-                .networkProtectionClientFailedToFetchLocations(let error),
-                .networkProtectionClientFailedToParseLocationsResponse(let error),
-                .networkProtectionClientFailedToFetchServerList(let error),
-                .networkProtectionClientFailedToFetchRegisteredServers(let error):
-            return error
-        case .networkProtectionControllerStartFailure(let error),
-                .networkProtectionTunnelStartFailure(let error),
-                .networkProtectionTunnelUpdateFailure(let error),
-                .networkProtectionClientFailedToParseRedeemResponse(let error),
-                .networkProtectionWireguardErrorCannotSetNetworkSettings(let error),
-                .networkProtectionRekeyFailure(let error),
-                .networkProtectionUnhandledError(_, _, let error):
-            return error
         }
     }
 }
-
-#endif

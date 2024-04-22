@@ -174,7 +174,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         self.contentScopeProperties = contentScopeProperties
 
         let fileResources = FileResources()
-        self.brokers = fileResources.fetchBrokerFromResourceFiles() ?? [DataBroker]()
+        self.brokers = (try? fileResources.fetchBrokerFromResourceFiles()) ?? [DataBroker]()
     }
 
     func runAllBrokers() {
@@ -184,18 +184,14 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
         Task.detached {
             var scanResults = [DebugScanReturnValue]()
-            let semaphore = DispatchSemaphore(value: 10)
+
             try await withThrowingTaskGroup(of: DebugScanReturnValue.self) { group in
                 for queryData in brokerProfileQueryData {
-                    semaphore.wait()
                     let debugScanOperation = DebugScanOperation(privacyConfig: self.privacyConfigManager, prefs: self.contentScopeProperties, query: queryData) {
                         true
                     }
 
                     group.addTask {
-                        defer {
-                            semaphore.signal()
-                        }
                         do {
                             return try await debugScanOperation.run(inputValue: (), showWebView: false)
                         } catch {

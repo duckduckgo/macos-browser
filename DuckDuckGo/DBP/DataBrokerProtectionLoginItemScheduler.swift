@@ -36,12 +36,12 @@ final class DataBrokerProtectionLoginItemScheduler {
     // MARK: - Login Item Management
 
     func disableLoginItem() {
-        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerDisableLoginItemDaily, frequency: .dailyOnly)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableLoginItemDaily, frequency: .daily)
         loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 
     func enableLoginItem() {
-        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerEnableLoginItemDaily, frequency: .dailyOnly)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerEnableLoginItemDaily, frequency: .daily)
         loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
     }
 }
@@ -55,7 +55,8 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
         ipcScheduler.statusPublisher
     }
 
-    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    func scanAllBrokers(showWebView: Bool,
+                        completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         enableLoginItem()
         ipcScheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
@@ -69,7 +70,8 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
         ipcScheduler.stopScheduler()
     }
 
-    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    func optOutAllBrokers(showWebView: Bool,
+                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         ipcScheduler.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
@@ -77,8 +79,13 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
         ipcScheduler.runAllOperations(showWebView: showWebView)
     }
 
-    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    func runQueuedOperations(showWebView: Bool,
+                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         ipcScheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
+    }
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        ipcScheduler.getDebugMetadata(completion: completion)
     }
 }
 

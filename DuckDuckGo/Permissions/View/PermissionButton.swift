@@ -40,18 +40,23 @@ final class PermissionButton: AddressBarButton {
             case .active:
                 self.image = activeImage ?? defaultImage
                 self.normalTintColor = activeTintColor
+                self.setAccessibilityValue("active")
             case .paused:
                 self.image = mutedImage ?? defaultImage
                 self.normalTintColor = mutedTintColor
+                self.setAccessibilityValue("paused")
             case .disabled, .denied, .revoking:
                 self.image = disabledImage ?? defaultImage
                 self.normalTintColor = disabledTintColor
+                self.setAccessibilityValue("disabled-denied-revoking")
             case .requested:
                 self.image = defaultImage
                 self.normalTintColor = defaultTint
+                self.setAccessibilityValue("requested")
             case .inactive:
                 self.image = inactiveImage ?? defaultImage
                 self.normalTintColor = inactiveTintColor ?? defaultTint
+                self.setAccessibilityValue("inactive")
             }
             self.isHidden = isHidden
         }

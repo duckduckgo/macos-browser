@@ -23,26 +23,23 @@ import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-
-#if SUBSCRIPTION
 import Subscription
-#endif
-
-#if NETWORK_PROTECTION
 
 protocol NetworkProtectionIPCClient {
     var ipcStatusObserver: ConnectionStatusObserver { get }
     var ipcServerInfoObserver: ConnectionServerInfoObserver { get }
     var ipcConnectionErrorObserver: ConnectionErrorObserver { get }
+    var ipcDataVolumeObserver: DataVolumeObserver { get }
 
-    func start()
-    func stop()
+    func start(completion: @escaping (Error?) -> Void)
+    func stop(completion: @escaping (Error?) -> Void)
 }
 
 extension TunnelControllerIPCClient: NetworkProtectionIPCClient {
     public var ipcStatusObserver: any NetworkProtection.ConnectionStatusObserver { connectionStatusObserver }
     public var ipcServerInfoObserver: any NetworkProtection.ConnectionServerInfoObserver { serverInfoObserver }
     public var ipcConnectionErrorObserver: any NetworkProtection.ConnectionErrorObserver { connectionErrorObserver }
+    public var ipcDataVolumeObserver: any NetworkProtection.DataVolumeObserver { dataVolumeObserver }
 }
 
 final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
@@ -57,16 +54,12 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     }
 
     var isShown: Bool {
-#if NETWORK_PROTECTION
         networkProtectionPopover?.isShown ?? false
-#else
-        return false
-#endif
     }
 
     // swiftlint:disable:next function_body_length
     func show(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = networkProtectionPopover ?? {
+        let popover = {
 
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
@@ -75,7 +68,8 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 serverInfoObserver: ipcClient.ipcServerInfoObserver,
                 connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
+                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
             )
 
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
@@ -120,6 +114,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                                    agentLoginItem: LoginItem.vpnMenu,
                                                    isMenuBarStatusView: false,
                                                    userDefaults: .netP,
+                                                   locationFormatter: DefaultVPNLocationFormatter(),
                                                    uninstallHandler: { [weak self] in
                 _ = await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
             })
@@ -141,6 +136,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
     func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate) {
         if let networkProtectionPopover, networkProtectionPopover.isShown {
             networkProtectionPopover.close()
+            self.networkProtectionPopover = nil
         } else {
             let featureVisibility = DefaultNetworkProtectionVisibility()
 
@@ -154,6 +150,6 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
 
     func close() {
         networkProtectionPopover?.close()
+        networkProtectionPopover = nil
     }
 }
-#endif

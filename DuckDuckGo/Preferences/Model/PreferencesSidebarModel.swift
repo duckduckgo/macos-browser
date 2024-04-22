@@ -20,10 +20,7 @@ import BrowserServicesKit
 import Combine
 import DDGSync
 import SwiftUI
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 final class PreferencesSidebarModel: ObservableObject {
 
@@ -32,6 +29,7 @@ final class PreferencesSidebarModel: ObservableObject {
     @Published private(set) var sections: [PreferencesSection] = []
     @Published var selectedTabIndex: Int = 0
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .defaultBrowser
+    private let vpnVisibility: NetworkProtectionFeatureVisibility
 
     var selectedTabContent: AnyPublisher<Tab.TabContent, Never> {
         $selectedTabIndex.map { [tabSwitcherTabs] in tabSwitcherTabs[$0] }.eraseToAnyPublisher()
@@ -43,10 +41,12 @@ final class PreferencesSidebarModel: ObservableObject {
         loadSections: @escaping () -> [PreferencesSection],
         tabSwitcherTabs: [Tab.TabContent],
         privacyConfigurationManager: PrivacyConfigurationManaging,
-        syncService: DDGSyncing
+        syncService: DDGSyncing,
+        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
+        self.vpnVisibility = vpnVisibility
 
         resetTabSelectionIfNeeded()
         refreshSections()
@@ -69,9 +69,7 @@ final class PreferencesSidebarModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-#if NETWORK_PROTECTION
         setupVPNPaneVisibility()
-#endif
     }
 
     @MainActor
@@ -79,15 +77,12 @@ final class PreferencesSidebarModel: ObservableObject {
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
         syncService: DDGSyncing,
+        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
         includeDuckPlayer: Bool,
         userDefaults: UserDefaults = .netP
     ) {
         let loadSections = {
-#if NETWORK_PROTECTION
-            let includingVPN = DefaultNetworkProtectionVisibility().isInstalled
-#else
-            let includingVPN = false
-#endif
+            let includingVPN = vpnVisibility.isInstalled
 
             return PreferencesSection.defaultSections(
                 includingDuckPlayer: includeDuckPlayer,
@@ -99,14 +94,14 @@ final class PreferencesSidebarModel: ObservableObject {
         self.init(loadSections: loadSections,
                   tabSwitcherTabs: tabSwitcherTabs,
                   privacyConfigurationManager: privacyConfigurationManager,
-                  syncService: syncService)
+                  syncService: syncService,
+                  vpnVisibility: vpnVisibility)
     }
 
     // MARK: - Setup
 
-#if NETWORK_PROTECTION
     private func setupVPNPaneVisibility() {
-        DefaultNetworkProtectionVisibility().onboardStatusPublisher
+        vpnVisibility.onboardStatusPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self else { return }
@@ -115,7 +110,6 @@ final class PreferencesSidebarModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
-#endif
 
     // MARK: - Refreshing logic
 

@@ -18,10 +18,7 @@
 
 import Foundation
 import SwiftUI
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
@@ -31,11 +28,9 @@ struct PreferencesSection: Hashable, Identifiable {
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
         var privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
 
-#if NETWORK_PROTECTION
         if includingVPN {
             privacyPanes.append(.vpn)
         }
-#endif
 
         let regularPanes: [PreferencePaneIdentifier] = {
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .accessibility, .dataClearing]
@@ -51,7 +46,12 @@ struct PreferencesSection: Hashable, Identifiable {
             return panes
         }()
 
+#if APPSTORE
+        // App Store guidelines don't allow references to other platforms, so the Mac App Store build omits the otherPlatforms section.
+        let otherPanes: [PreferencePaneIdentifier] = [.about]
+#else
         let otherPanes: [PreferencePaneIdentifier] = [.about, .otherPlatforms]
+#endif
 
         var sections: [PreferencesSection] = [
             .init(id: .privacyProtections, panes: privacyPanes),
@@ -59,7 +59,6 @@ struct PreferencesSection: Hashable, Identifiable {
             .init(id: .about, panes: otherPanes)
         ]
 
-#if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
 
             var shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
@@ -73,7 +72,6 @@ struct PreferencesSection: Hashable, Identifiable {
                 sections.insert(.init(id: .privacyPro, panes: subscriptionPanes), at: 1)
             }
         }
-#endif
 
         return sections
     }
@@ -111,12 +109,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case sync
     case appearance
     case dataClearing
-#if NETWORK_PROTECTION
     case vpn
-#endif
-#if SUBSCRIPTION
     case subscription
-#endif
     case autofill
     case accessibility
     case duckPlayer = "duckplayer"
@@ -168,14 +162,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.appearance
         case .dataClearing:
             return UserText.dataClearing
-#if NETWORK_PROTECTION
         case .vpn:
             return UserText.vpn
-#endif
-#if SUBSCRIPTION
         case .subscription:
             return UserText.subscription
-#endif
         case .autofill:
             return UserText.autofill
         case .accessibility:
@@ -209,14 +199,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Appearance"
         case .dataClearing:
             return "FireSettings"
-#if NETWORK_PROTECTION
         case .vpn:
             return "VPN"
-#endif
-#if SUBSCRIPTION
         case .subscription:
             return "PrivacyPro"
-#endif
         case .autofill:
             return "Autofill"
         case .accessibility:

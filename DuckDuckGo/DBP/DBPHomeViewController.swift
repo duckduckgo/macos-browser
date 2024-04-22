@@ -33,6 +33,7 @@ public extension Notification.Name {
 final class DBPHomeViewController: NSViewController {
     private var presentedWindowController: NSWindowController?
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
         let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
@@ -83,9 +84,14 @@ final class DBPHomeViewController: NSViewController {
             attachDataBrokerContainerView()
         }
 
-        if dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
-            let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
-            dbpDateStore.updateLastActiveDate()
+        do {
+            if try dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
+                let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+                dbpDateStore.updateLastActiveDate()
+            }
+        } catch {
+            os_log("DBPHomeViewController error: viewDidLoad, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPHomeViewController.viewDidLoad"))
         }
     }
 
@@ -145,12 +151,32 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
         super.init { event, _, _, _ in
             switch event {
             case .error(let error, _):
-                Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
-            case .ipcServerOptOutAllBrokersCompletion(error: let error),
-                    .ipcServerScanAllBrokersCompletion(error: let error),
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .generalError(let error, _),
+                    .secureVaultInitError(let error),
+                    .secureVaultError(let error):
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .ipcServerStartSchedulerXPCError(error: let error),
+                    .ipcServerStopSchedulerXPCError(error: let error),
+                    .ipcServerScanAllBrokersXPCError(error: let error),
+                    .ipcServerScanAllBrokersCompletedOnAgentWithError(error: let error),
+                    .ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: let error),
+                    .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
-                // We can't use .debug directly because it modifies the pixel name and clobbers the params
-                Pixel.fire(.pixelKitEvent(DebugEvent(event, error: error)))
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
+            case .ipcServerStartSchedulerCalledByApp,
+                    .ipcServerStartSchedulerReceivedByAgent,
+                    .ipcServerStopSchedulerCalledByApp,
+                    .ipcServerStopSchedulerReceivedByAgent,
+                    .ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions,
+                    .ipcServerScanAllBrokersAttemptedToCallInWrongDirectory,
+                    .ipcServerScanAllBrokersCalledByApp,
+                    .ipcServerScanAllBrokersReceivedByAgent,
+                    .ipcServerScanAllBrokersCompletedOnAgentWithoutError,
+                    .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError,
+                    .ipcServerScanAllBrokersInterruptedOnAgent,
+                    .ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption:
+                PixelKit.fire(event, frequency: .dailyAndCount, includeAppVersionParameter: true)
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -171,11 +197,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
                     .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
-                    .ipcServerRegister,
-                    .ipcServerStartScheduler,
-                    .ipcServerStopScheduler,
                     .ipcServerOptOutAllBrokers,
-                    .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
                     .ipcServerRunAllOperations,
                     .scanSuccess,
@@ -198,8 +220,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .scanningEventReAppearance,
                     .webUILoadingFailed,
                     .webUILoadingStarted,
-                    .webUILoadingSuccess:
-                Pixel.fire(.pixelKitEvent(event))
+                    .webUILoadingSuccess,
+                    .emptyAccessTokenDaily,
+                    .generateEmailHTTPErrorDaily:
+                PixelKit.fire(event)
             }
         }
     }

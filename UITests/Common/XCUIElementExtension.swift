@@ -62,4 +62,34 @@ extension XCUIElement {
             self.typeText("\r")
         }
     }
+
+    /// Check for the existence of the address bar and type a URL into it if it passes. Although it doesn't really make sense to restrict its usage to
+    /// the address bar, it is only foreseen and recommended for use with the address bar.
+    /// - Parameters:
+    ///   - url: The URL to be typed into the address bar (or other element, for which use with this function should be seen as experimental)
+    ///   - pressingEnter: If the `enter` key should not be pressed after typing this URL in, set this optional parameter to `false`, otherwise it
+    /// will be pressed.
+    func typeURLAfterExistenceTestSucceeds(_ url: URL, pressingEnter: Bool = true) {
+        XCTAssertTrue(
+            self.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "The element \(self.debugDescription) didn't load with the expected title in a reasonable timeframe."
+        )
+        self.typeURL(url, pressingEnter: pressingEnter)
+    }
+
+    func clickAfterExistenceTestSucceeds() {
+        XCTAssertTrue(
+            self.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "\(self.debugDescription) didn't load with the expected title in a reasonable timeframe."
+        )
+        self.click()
+    }
+
+    func hoverAfterExistenceTestSucceeds() {
+        XCTAssertTrue(
+            self.waitForExistence(timeout: UITests.Timeouts.elementExistence),
+            "\(self.debugDescription) didn't load with the expected title in a reasonable timeframe."
+        )
+        self.hover()
+    }
 }

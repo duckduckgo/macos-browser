@@ -36,12 +36,17 @@ public final class DataBrokerProtectionManager {
     private let dataBrokerProtectionWaitlistDataSource: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
-        let dataManager = DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
+        let dataManager = DataBrokerProtectionDataManager(pixelHandler: pixelHandler, fakeBrokerFlag: fakeBrokerFlag)
         dataManager.delegate = self
         return dataManager
     }()
 
-    private lazy var ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, pixelHandler: pixelHandler)
+    private lazy var ipcClient: DataBrokerProtectionIPCClient = {
+        let loginItemStatusChecker = LoginItem.dbpBackgroundAgent
+        return DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId,
+                                             pixelHandler: pixelHandler,
+                                             loginItemStatusChecker: loginItemStatusChecker)
+    }()
 
     lazy var scheduler: DataBrokerProtectionLoginItemScheduler = {
 

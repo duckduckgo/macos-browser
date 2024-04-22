@@ -39,11 +39,13 @@ extension Preferences {
                     PreferencePaneSubSection {
                         Picker(selection: $startupModel.restorePreviousSession, content: {
                             Text(UserText.showHomePage).tag(false)
-                                .padding(.bottom, 4)
+                                .padding(.bottom, 4).accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.openANewWindow")
                             Text(UserText.reopenAllWindowsFromLastSession).tag(true)
+                                .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.reopenAllWindowsFromLastSession")
                         }, label: {})
-                        .pickerStyle(.radioGroup)
-                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                            .pickerStyle(.radioGroup)
+                            .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                            .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
                     }
                 }
 
@@ -93,7 +95,7 @@ extension Preferences {
 
                 // SECTION 3: Search Settings
                 PreferencePaneSection(UserText.privateSearch) {
-                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions)
+                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions).accessibilityIdentifier("PreferencesGeneralView.showAutocompleteSuggestions")
                 }
 
                 // SECTION 4: Downloads
@@ -106,15 +108,15 @@ extension Preferences {
                     // MARK: Location
                     PreferencePaneSubSection {
                         Text(UserText.downloadsLocation).bold()
+
                         HStack {
                             NSPathControlView(url: downloadsModel.selectedDownloadLocation)
-#if !APPSTORE
                             Button(UserText.downloadsChangeDirectory) {
                                 downloadsModel.presentDownloadDirectoryPanel()
                             }
-#endif
                         }
                         .disabled(downloadsModel.alwaysRequestDownloadLocation)
+
                         ToggleMenuItem(UserText.downloadsAlwaysAsk,
                                        isOn: $downloadsModel.alwaysRequestDownloadLocation)
                     }

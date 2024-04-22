@@ -22,11 +22,9 @@ import SwiftUI
 import SwiftUIExtensions
 import SyncUI
 import BrowserServicesKit
-
-#if SUBSCRIPTION
+import PixelKit
 import Subscription
 import SubscriptionUI
-#endif
 
 enum Preferences {
 
@@ -48,16 +46,11 @@ enum Preferences {
 
         @ObservedObject var model: PreferencesSidebarModel
 
-#if SUBSCRIPTION
         var subscriptionModel: PreferencesSubscriptionModel?
-#endif
 
         init(model: PreferencesSidebarModel) {
             self.model = model
-
-#if SUBSCRIPTION
             self.subscriptionModel = makeSubscriptionViewModel()
-#endif
         }
 
         var body: some View {
@@ -101,16 +94,10 @@ enum Preferences {
                     AppearanceView(model: .shared)
                 case .dataClearing:
                     DataClearingView(model: DataClearingPreferences.shared)
-
-#if NETWORK_PROTECTION
                 case .vpn:
                     VPNView(model: VPNPreferencesModel())
-#endif
-
-#if SUBSCRIPTION
                 case .subscription:
                     SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
-#endif
                 case .autofill:
                     AutofillView(model: AutofillPreferencesModel())
                 case .accessibility:
@@ -121,12 +108,8 @@ enum Preferences {
                     // Opens a new tab
                     Spacer()
                 case .about:
-#if NETWORK_PROTECTION
                     let netPInvitePresenter = NetworkProtectionInvitePresenter()
                     AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
-#else
-                    AboutView(model: AboutModel())
-#endif
                 }
             }
             .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
@@ -134,7 +117,6 @@ enum Preferences {
             .padding(.horizontal, Const.panePaddingHorizontal)
         }
 
-#if SUBSCRIPTION
         // swiftlint:disable:next cyclomatic_complexity function_body_length
         private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
@@ -147,32 +129,32 @@ enum Preferences {
                 DispatchQueue.main.async {
                     switch event {
                     case .openVPN:
-                        Pixel.fire(.privacyProVPNSettings)
+                        PixelKit.fire(PrivacyProPixel.privacyProVPNSettings)
                         NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
                     case .openDB:
-                        Pixel.fire(.privacyProPersonalInformationRemovalSettings)
+                        PixelKit.fire(PrivacyProPixel.privacyProPersonalInformationRemovalSettings)
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
                     case .openITR:
-                        Pixel.fire(.privacyProIdentityRestorationSettings)
+                        PixelKit.fire(PrivacyProPixel.privacyProIdentityRestorationSettings)
                         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
                     case .iHaveASubscriptionClick:
-                        Pixel.fire(.privacyProRestorePurchaseClick)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
                     case .activateAddEmailClick:
-                        DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
                     case .postSubscriptionAddEmailClick:
-                        Pixel.fire(.privacyProWelcomeAddDevice, limitTo: .initial)
+                        PixelKit.fire(PrivacyProPixel.privacyProWelcomeAddDevice, frequency: .unique)
                     case .restorePurchaseStoreClick:
-                        DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreStart, frequency: .dailyAndCount)
                     case .addToAnotherDeviceClick:
-                        Pixel.fire(.privacyProSettingsAddDevice)
+                        PixelKit.fire(PrivacyProPixel.privacyProSettingsAddDevice)
                     case .addDeviceEnterEmail:
-                        Pixel.fire(.privacyProAddDeviceEnterEmail)
+                        PixelKit.fire(PrivacyProPixel.privacyProAddDeviceEnterEmail)
                     case .activeSubscriptionSettingsClick:
-                        Pixel.fire(.privacyProSubscriptionSettings)
+                        PixelKit.fire(PrivacyProPixel.privacyProSubscriptionSettings)
                     case .changePlanOrBillingClick:
-                        Pixel.fire(.privacyProSubscriptionManagementPlanBilling)
+                        PixelKit.fire(PrivacyProPixel.privacyProSubscriptionManagementPlanBilling)
                     case .removeSubscriptionClick:
-                        Pixel.fire(.privacyProSubscriptionManagementRemoval)
+                        PixelKit.fire(PrivacyProPixel.privacyProSubscriptionManagementRemoval)
                     }
                 }
             }
@@ -197,6 +179,5 @@ enum Preferences {
                                                 sheetActionHandler: sheetActionHandler,
                                                 subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         }
-#endif
     }
 }

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1712071688011,
+    "version": 1713542334045,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -75,12 +75,6 @@
                     "domain": "thehustle.co"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -111,7 +105,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "51b76aa7b92d78ad52106b04ac809843"
+            "hash": "16c6e3fb43797e3ca13a9259569a9e4e"
         },
         "androidBrowserConfig": {
             "exceptions": [],
@@ -286,10 +280,13 @@
                     "domain": "condell-ltd.com"
                 },
                 {
-                    "domain": "earth.google.com"
+                    "domain": "leefgemeenschapzilt.nl"
                 },
                 {
-                    "domain": "iscorp.com"
+                    "domain": "healthline.com"
+                },
+                {
+                    "domain": "sporthoj.com"
                 },
                 {
                     "domain": "marvel.com"
@@ -302,11 +299,12 @@
                 "disabledCMPs": [
                     "generic-cosmetic",
                     "termsfeed3",
-                    "strato.de"
+                    "healthline-media",
+                    "tarteaucitron.js"
                 ]
             },
             "state": "enabled",
-            "hash": "98e57a3eb872c9dfb4a019b90dc6c0ec"
+            "hash": "f35e24cf85485b441cb9a76146e77e17"
         },
         "autofill": {
             "exceptions": [
@@ -923,12 +921,6 @@
                     "domain": "pocketbook.digital"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -950,16 +942,10 @@
                 }
             },
             "state": "disabled",
-            "hash": "36e8971fa9bb204b78a5929a14a108dd"
+            "hash": "770f7ae0f752e976764771bccec352b2"
         },
         "clickToPlay": {
             "exceptions": [
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -977,7 +963,7 @@
                 }
             },
             "state": "enabled",
-            "hash": "f1b7de266435cd2e414f50deb2c9234a"
+            "hash": "2cff3d9b2df1ed9375f362848c8ed5f3"
         },
         "clientBrandHint": {
             "exceptions": [],
@@ -1009,19 +995,13 @@
                     "domain": "soranews24.com"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "e37447d42ee8194f185e35e40f577f41"
+            "hash": "593797946074a1f304add65e7543b9be"
         },
         "cookie": {
             "settings": {
@@ -1064,12 +1044,6 @@
                     "domain": "news.ti.com"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -1077,7 +1051,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "37a27966915571085613911b47e6e2eb"
+            "hash": "7ade754b885238cd191f1a61b4eeb0b6"
         },
         "customUserAgent": {
             "settings": {
@@ -1096,7 +1070,7 @@
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
                     },
                     {
-                        "domain": "www.canva.com",
+                        "domain": "canva.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1818"
                     },
                     {
@@ -1136,12 +1110,16 @@
                     {
                         "domain": "sas.dk",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
+                    },
+                    {
+                        "domain": "nationalmssociety.org",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1963"
                     }
                 ]
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "7edfa8344fd2577b31426130696d8b23"
+            "hash": "76976e1ac417949aae8cb1c7c7ca0a60"
         },
         "dbp": {
             "state": "enabled",
@@ -1184,7 +1162,9 @@
                             "videoElement": "#player video",
                             "videoElementContainer": "#player .html5-video-player",
                             "hoverExcluded": [],
-                            "clickExcluded": [],
+                            "clickExcluded": [
+                                "ytd-thumbnail-overlay-toggle-button-renderer"
+                            ],
                             "allowedEventTargets": [
                                 ".ytp-inline-preview-scrim",
                                 ".ytd-video-preview",
@@ -1231,18 +1211,12 @@
                 ]
             },
             "state": "enabled",
-            "hash": "ab2c73639ad75b2d6efb18f324230397"
+            "hash": "b685397a8317384bec3b8d7e8b7571bb"
         },
         "elementHiding": {
             "exceptions": [
                 {
                     "domain": "duckduckgo.com"
-                },
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
                 },
                 {
                     "domain": "marvel.com"
@@ -1915,6 +1889,14 @@
                             {
                                 "selector": ".proper-dynamic-insertion",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".Page-header-leaderboardAd",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".SovrnAd",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -2286,6 +2268,15 @@
                         ]
                     },
                     {
+                        "domain": "doodle.com",
+                        "rules": [
+                            {
+                                "selector": "[data-testid*='ads-layout-placement']",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "dpreview.com",
                         "rules": [
                             {
@@ -2361,6 +2352,23 @@
                         "rules": [
                             {
                                 "selector": ".es-ad-space-container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "eurogamer.net",
+                        "rules": [
+                            {
+                                "selector": "#sticky_leaderboard",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".primis_wrapper",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".autoad",
                                 "type": "hide-empty"
                             }
                         ]
@@ -2839,6 +2847,27 @@
                         "rules": [
                             {
                                 "selector": ".google-Only-Modal",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "independent.co.uk",
+                        "rules": [
+                            {
+                                "selector": "#partners",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#top-banner-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[data-mpu1=true]",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#stickyFooterRoot",
                                 "type": "hide"
                             }
                         ]
@@ -4019,6 +4048,15 @@
                         ]
                     },
                     {
+                        "domain": "woot.com",
+                        "rules": [
+                            {
+                                "selector": "[data-test-ui*='advertisementLeaderboard']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "wsj.com",
                         "rules": [
                             {
@@ -4222,16 +4260,10 @@
                 ]
             },
             "state": "enabled",
-            "hash": "10545dae34a5b5f2cc26c91976be5809"
+            "hash": "765e789c939c6e3307f576bc698fbb9e"
         },
         "exceptionHandler": {
             "exceptions": [
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -4240,7 +4272,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "5e792dd491428702bc0104240fbce0ce"
+            "hash": "dc1b4fa301193a03ddcd4bdf7ee3e610"
         },
         "fingerprintingAudio": {
             "state": "disabled",
@@ -4249,30 +4281,18 @@
                     "domain": "litebluesso.usps.gov"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "f25a8f2709e865c2bd743828c7ee2f77"
+            "hash": "2037fcd805ece181cfffc482f262941f"
         },
         "fingerprintingBattery": {
             "exceptions": [
                 {
                     "domain": "litebluesso.usps.gov"
-                },
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
                 },
                 {
                     "domain": "marvel.com"
@@ -4282,7 +4302,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "4085f1593faff2feac2093533b819a41"
+            "hash": "07ee708dc740aab3b1f048d9bb571dac"
         },
         "fingerprintingCanvas": {
             "settings": {
@@ -4374,12 +4394,6 @@
                     "domain": "godaddy.com"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4387,7 +4401,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "ea4c565bae27996f0d651300d757594c"
+            "hash": "d48bfb1151476f49970ffd3b1f778bf9"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -4440,12 +4454,6 @@
                     "domain": "proton.me"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4486,7 +4494,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "37e16df501e3e68416a13f991b4e4147"
+            "hash": "aefca8e7a9a3d9b65370608dd639cd3f"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4527,12 +4535,6 @@
                     "domain": "secureserver.net"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4540,7 +4542,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "466b85680f138657de9bfd222c440887"
+            "hash": "eef4614273c28d50dd298a68ffbac309"
         },
         "fingerprintingTemporaryStorage": {
             "exceptions": [
@@ -4554,12 +4556,6 @@
                     "domain": "tattoogenius.art"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4567,17 +4563,11 @@
                 }
             ],
             "state": "disabled",
-            "hash": "f858697949c90842c450daee64a1dc30"
+            "hash": "2746e6cb6c773e80a36fda03618ef930"
         },
         "googleRejected": {
             "exceptions": [
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4585,7 +4575,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "5e792dd491428702bc0104240fbce0ce"
+            "hash": "dc1b4fa301193a03ddcd4bdf7ee3e610"
         },
         "gpc": {
             "state": "enabled",
@@ -4601,6 +4591,9 @@
                 },
                 {
                     "domain": "crunchyroll.com"
+                },
+                {
+                    "domain": "espn.com"
                 },
                 {
                     "domain": "eventbrite.com"
@@ -4621,12 +4614,6 @@
                     "domain": "tirerack.com"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4642,7 +4629,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "1a1373bcf16647d63220659fce650a83"
+            "hash": "05bddff3ae61a9536e38a6ef7d383eb3"
         },
         "harmfulApis": {
             "settings": {
@@ -4745,12 +4732,6 @@
             },
             "exceptions": [
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4758,7 +4739,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "44d3e707cba3ee0a3578f52dc2ce2aa4"
+            "hash": "f29eae11500edcda80aa8b32b12869eb"
         },
         "history": {
             "state": "disabled",
@@ -4778,19 +4759,13 @@
                     "domain": "jp.square-enix.com"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "f772808ed34cc9ea8cbcbb7cdaf74429"
+            "hash": "ea2c4fc84f27eb3694acd9ccf1023e95"
         },
         "incontextSignup": {
             "exceptions": [],
@@ -4828,12 +4803,6 @@
         "navigatorInterface": {
             "exceptions": [
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -4848,7 +4817,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "698de7b963d7d7942c5c5d1e986bb1b1"
+            "hash": "bb2ed420e76ecaf31a1f99decd370e55"
         },
         "networkProtection": {
             "state": "enabled",
@@ -4893,23 +4862,25 @@
             "exceptions": [],
             "state": "enabled",
             "settings": {
-                "surveyCardDay0": "enabled",
+                "surveyCardDay0": "disabled",
                 "surveyCardDay7": "disabled",
-                "surveyCardDay14": "enabled"
+                "surveyCardDay14": "disabled",
+                "permanentSurvey": {
+                    "state": "internal",
+                    "localization": "disabled",
+                    "url": "https://selfserve.decipherinc.com/survey/selfserve/32ab/240404?list=2",
+                    "firstDay": 5,
+                    "lastDay": 8,
+                    "sharePercentage": 60
+                }
             },
-            "hash": "eb826d9079211f30d624211f44aed184"
+            "hash": "7f7445d021268ef854b20022d0fb48e6"
         },
         "nonTracking3pCookies": {
             "settings": {
                 "excludedCookieDomains": []
             },
             "exceptions": [
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -4918,17 +4889,11 @@
                 }
             ],
             "state": "disabled",
-            "hash": "841fa92b9728c9754f050662678f82c7"
+            "hash": "522e3e42e2612ac2811342d3f6754c5a"
         },
         "performanceMetrics": {
             "state": "enabled",
             "exceptions": [
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -4936,7 +4901,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "38558d5e7b231d4b27e7dd76814387a7"
+            "hash": "936f00970c108fd646f73d00b3f3f5b5"
         },
         "privacyDashboard": {
             "exceptions": [],
@@ -4948,25 +4913,38 @@
                     }
                 },
                 "toggleReports": {
-                    "state": "enabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 5
-                            }
-                        ]
-                    }
+                    "state": "enabled"
                 }
             },
             "state": "enabled",
-            "hash": "f7cce63c16c142db4ff5764b542a6c52"
+            "hash": "66968d9b69520975185476473cc11824"
         },
         "privacyPro": {
             "state": "enabled",
             "exceptions": [],
             "features": {
                 "isLaunched": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 30
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.82.1"
                 },
                 "isLaunchedOverride": {
                     "state": "disabled"
@@ -4975,13 +4953,33 @@
                     "state": "enabled"
                 },
                 "isLaunchedStripe": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            },
+                            {
+                                "percent": 10
+                            },
+                            {
+                                "percent": 30
+                            },
+                            {
+                                "percent": 50
+                            },
+                            {
+                                "percent": 100
+                            }
+                        ]
+                    },
+                    "minSupportedVersion": "1.82.1"
                 },
                 "allowPurchaseStripe": {
                     "state": "enabled"
                 }
             },
-            "hash": "c9153c5cc3b6b7eba024c6c597e15edb"
+            "hash": "1a10a68ea8885db0d1d9bab371c0f738"
         },
         "privacyProtectionsPopup": {
             "state": "disabled",
@@ -5009,12 +5007,6 @@
                     "domain": "xcelenergy.com"
                 },
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -5022,17 +5014,11 @@
                 }
             ],
             "state": "disabled",
-            "hash": "0d3df0f7c24ebde89d2dced4e2d34322"
+            "hash": "1cfe449de8a4fcb542757383d846c031"
         },
         "requestFilterer": {
             "state": "disabled",
             "exceptions": [
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -5043,17 +5029,11 @@
             "settings": {
                 "windowInMs": 0
             },
-            "hash": "0fff8017d8ea4b5609b8f5c110be1401"
+            "hash": "3218faa098a2e9da61447fb63e3a5ed9"
         },
         "runtimeChecks": {
             "state": "disabled",
             "exceptions": [
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -5062,16 +5042,10 @@
                 }
             ],
             "settings": {},
-            "hash": "800a19533c728bbec7e31e466f898268"
+            "hash": "ddb64344aa42e9593964f14b6de3d6df"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -5080,7 +5054,17 @@
                 }
             ],
             "state": "disabled",
-            "hash": "5e792dd491428702bc0104240fbce0ce"
+            "hash": "dc1b4fa301193a03ddcd4bdf7ee3e610"
+        },
+        "sslCertificates": {
+            "state": "enabled",
+            "exceptions": [],
+            "features": {
+                "allowBypass": {
+                    "state": "enabled"
+                }
+            },
+            "hash": "abe9584048f7f8157f71a14e7914cb1c"
         },
         "sync": {
             "state": "enabled",
@@ -5256,7 +5240,8 @@
                             {
                                 "rule": "static.adsafeprotected.com/iasPET.1.js",
                                 "domains": [
-                                    "corriere.it"
+                                    "corriere.it",
+                                    "independent.co.uk"
                                 ]
                             },
                             {
@@ -5366,6 +5351,7 @@
                                     "fattoincasadabenedetta.it",
                                     "inquirer.com",
                                     "thesurfersview.com",
+                                    "twitchy.com",
                                     "wildrivers.lostcoastoutpost.com"
                                 ]
                             },
@@ -5526,6 +5512,12 @@
                     },
                     "boldapps.net": {
                         "rules": [
+                            {
+                                "rule": "mc.boldapps.net/install_assets/bold.multicurrency.js",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
                             {
                                 "rule": "option.boldapps.net/js/options.js",
                                 "domains": [
@@ -5990,6 +5982,12 @@
                                 ]
                             },
                             {
+                                "rule": "www3.doubleclick.net",
+                                "domains": [
+                                    "scrolller.com"
+                                ]
+                            },
+                            {
                                 "rule": "doubleclick.net",
                                 "domains": [
                                     "rocketnews24.com"
@@ -6012,11 +6010,7 @@
                             {
                                 "rule": "cdn.dynamicyield.com/api/",
                                 "domains": [
-                                    "asics.com",
-                                    "brooklinen.com",
-                                    "carters.com",
-                                    "otterbox.com",
-                                    "seatosummit.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6421,6 +6415,12 @@
                                 "domains": [
                                     "<all>"
                                 ]
+                            },
+                            {
+                                "rule": "marketingplatform.google.com/about/enterprise",
+                                "domains": [
+                                    "scrolller.com"
+                                ]
                             }
                         ]
                     },
@@ -6429,19 +6429,7 @@
                             {
                                 "rule": "imasdk.googleapis.com/js/sdkloader/ima3.js",
                                 "domains": [
-                                    "arkadium.com",
-                                    "bloomberg.com",
-                                    "cbssports.com",
-                                    "crunchyroll.com",
-                                    "gamak.tv",
-                                    "games.washingtonpost.com",
-                                    "metro.co.uk",
-                                    "nfl.com",
-                                    "pandora.com",
-                                    "paper-io.com",
-                                    "rawstory.com",
-                                    "usatoday.com",
-                                    "washingtonpost.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6466,6 +6454,7 @@
                                     "daotranslate.com",
                                     "drakescans.com",
                                     "duden.de",
+                                    "edealinfo.com",
                                     "freetubetv.net",
                                     "hscprojects.com",
                                     "kits4beats.com",
@@ -6928,7 +6917,8 @@
                                 "domains": [
                                     "andieswim.com",
                                     "footweartruth.com",
-                                    "kmail-lists.com"
+                                    "kmail-lists.com",
+                                    "usafacts.org"
                                 ]
                             }
                         ]
@@ -6953,6 +6943,16 @@
                         "rules": [
                             {
                                 "rule": "cdn.listrakbi.com/scripts/script.js",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "litix.io": {
+                        "rules": [
+                            {
+                                "rule": "src.litix.io/videojs/",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -7131,7 +7131,8 @@
                             {
                                 "rule": "npttech.com/advertising.js",
                                 "domains": [
-                                    "blick.ch"
+                                    "blick.ch",
+                                    "independent.co.uk"
                                 ]
                             }
                         ]
@@ -7777,6 +7778,16 @@
                             }
                         ]
                     },
+                    "sundaysky.com": {
+                        "rules": [
+                            {
+                                "rule": "sundaysky.com",
+                                "domains": [
+                                    "bankofamerica.com"
+                                ]
+                            }
+                        ]
+                    },
                     "taboola.com": {
                         "rules": [
                             {
@@ -7929,6 +7940,12 @@
                                 "rule": "platform.twitter.com/widgets/tweet_button",
                                 "domains": [
                                     "winnipegfreepress.com"
+                                ]
+                            },
+                            {
+                                "rule": "platform.twitter.com/_next/static",
+                                "domains": [
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -8197,19 +8214,13 @@
             },
             "exceptions": [
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "adf596be88e8975a3cdcaaef3d24990d"
+            "hash": "2d5ce26ddae089bcb61e4f4a0b1ae487"
         },
         "trackingCookies1p": {
             "settings": {
@@ -8220,12 +8231,6 @@
             },
             "exceptions": [
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -8233,7 +8238,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "4dddf681372a2aea9788090b13db6e6f"
+            "hash": "dab51f5ad2454727f8bc474cdd3da65b"
         },
         "trackingCookies3p": {
             "settings": {
@@ -8241,12 +8246,6 @@
             },
             "exceptions": [
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -8254,18 +8253,12 @@
                 }
             ],
             "state": "disabled",
-            "hash": "841fa92b9728c9754f050662678f82c7"
+            "hash": "522e3e42e2612ac2811342d3f6754c5a"
         },
         "trackingParameters": {
             "exceptions": [
                 {
                     "domain": "axs.com"
-                },
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
                 },
                 {
                     "domain": "marvel.com"
@@ -8305,19 +8298,13 @@
             },
             "state": "enabled",
             "minSupportedVersion": "0.22.3",
-            "hash": "9a0282376084874f0245c421d6943841"
+            "hash": "44005192b6dba245e95de042fc224228"
         },
         "userAgentRotation": {
             "settings": {
                 "agentExcludePatterns": []
             },
             "exceptions": [
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -8326,7 +8313,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "f65d10dfdf6739feab99a08d42734747"
+            "hash": "e30277704ddbf20c14136baab08519c5"
         },
         "voiceSearch": {
             "exceptions": [],
@@ -8335,12 +8322,6 @@
         },
         "webCompat": {
             "exceptions": [
-                {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
                 {
                     "domain": "marvel.com"
                 },
@@ -8609,7 +8590,7 @@
                     }
                 ]
             },
-            "hash": "151d7ee40451c4aac4badfcc829ea0b5"
+            "hash": "90687b1a5ac7aec8bf26f24a75cd883f"
         },
         "windowsPermissionUsage": {
             "exceptions": [],
@@ -8619,12 +8600,6 @@
         "windowsStartupBoost": {
             "exceptions": [
                 {
-                    "domain": "earth.google.com"
-                },
-                {
-                    "domain": "iscorp.com"
-                },
-                {
                     "domain": "marvel.com"
                 },
                 {
@@ -8632,7 +8607,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "5e792dd491428702bc0104240fbce0ce"
+            "hash": "dc1b4fa301193a03ddcd4bdf7ee3e610"
         },
         "windowsWaitlist": {
             "exceptions": [],

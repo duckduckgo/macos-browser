@@ -66,6 +66,8 @@ public extension PixelKit {
         public static let vpnBreakageMetadata = "breakageMetadata"
 
         public static let reason = "reason"
+
+        public static let vpnCohort = "cohort"
     }
 
     enum Values {
@@ -94,9 +96,9 @@ public extension Error {
         params[PixelKit.Parameters.errorCode] = "\(nsError.code)"
         params[PixelKit.Parameters.errorDomain] = nsError.domain
 
-        if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
-            params[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            params[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
+        let underlyingErrorParameters = self.underlyingErrorParameters(for: nsError)
+        params.merge(underlyingErrorParameters) { first, _ in
+            return first
         }
 
         if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
@@ -110,4 +112,26 @@ public extension Error {
         return params
     }
 
+    /// Recursive call to add underlying error information
+    ///
+    func underlyingErrorParameters(for nsError: NSError, level: Int = 0) -> [String: String] {
+        if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
+            let errorCodeParameterName = PixelKit.Parameters.underlyingErrorCode + (level == 0 ? "" : String(level + 1))
+            let errorDomainParameterName = PixelKit.Parameters.underlyingErrorDomain + (level == 0 ? "" : String(level + 1))
+
+            let currentUnderlyingErrorParameters = [
+                errorCodeParameterName: "\(underlyingError.code)",
+                errorDomainParameterName: underlyingError.domain
+            ]
+
+            // Check if the underlying error has an underlying error of its own
+            let additionalParameters = underlyingErrorParameters(for: underlyingError, level: level + 1)
+
+            return currentUnderlyingErrorParameters.merging(additionalParameters) { first, _ in
+                return first // Doesn't really matter as there should be no conflict of parameters
+            }
+        }
+
+        return [:]
+    }
 }

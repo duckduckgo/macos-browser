@@ -23,7 +23,6 @@ import Common
 /// A scheduler that works through IPC to request the scheduling to a different process
 ///
 public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionScheduler {
-
     private let ipcClient: DataBrokerProtectionIPCClient
 
     public init(ipcClient: DataBrokerProtectionIPCClient) {
@@ -46,22 +45,29 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
         ipcClient.stopScheduler()
     }
 
-    public func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    public func optOutAllBrokers(showWebView: Bool,
+                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         let completion = completion ?? { _ in }
         ipcClient.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    public func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    public func scanAllBrokers(showWebView: Bool,
+                               completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         let completion = completion ?? { _ in }
         ipcClient.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    public func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    public func runQueuedOperations(showWebView: Bool,
+                                    completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         let completion = completion ?? { _ in }
         ipcClient.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 
     public func runAllOperations(showWebView: Bool) {
         ipcClient.runAllOperations(showWebView: showWebView)
+    }
+
+    public func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        ipcClient.getDebugMetadata(completion: completion)
     }
 }

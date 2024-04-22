@@ -49,8 +49,8 @@ struct DataBrokerProtectionAppEvents {
 
             // If we don't have profileQueries it means there's no user profile saved in our DB
             // In this case, let's disable the agent and delete any left-over data because there's nothing for it to do
-            let profileQueries = await DataBrokerProtectionManager.shared.dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
-            if profileQueries.count > 0 {
+            if let profileQueries = try? DataBrokerProtectionManager.shared.dataManager.fetchBrokerProfileQueryData(ignoresCache: true),
+               profileQueries.count > 0 {
                 restartBackgroundAgent(loginItemsManager: loginItemsManager)
             } else {
                 featureVisibility.disableAndDeleteForWaitlistUsers()
@@ -81,9 +81,9 @@ struct DataBrokerProtectionAppEvents {
         if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
             switch source {
             case .cardUI:
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistCardUITapped, frequency: .dailyAndCount)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistCardUITapped, frequency: .dailyAndCount)
             case .localPush:
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
             }
 
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
@@ -96,12 +96,12 @@ struct DataBrokerProtectionAppEvents {
 
     private func sendActiveDataBrokerProtectionWaitlistUserPixel() {
         if DefaultDataBrokerProtectionFeatureVisibility().waitlistIsOngoing {
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistUserActive, frequency: .dailyOnly)
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistUserActive, frequency: .daily)
         }
     }
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
-        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerResetLoginItemDaily, frequency: .dailyOnly)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerResetLoginItemDaily, frequency: .daily)
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
 

@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import AppKit
 import Common
@@ -123,7 +121,8 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             serverInfoObserver: ipcClient.serverInfoObserver,
             connectionErrorObserver: ipcClient.connectionErrorObserver,
             connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
+            dataVolumeObserver: ipcClient.dataVolumeObserver
         )
 
         // Force refresh just in case. A refresh is requested when the IPC client is created, but distributed notifications don't guarantee delivery
@@ -285,5 +284,3 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
 }
-
-#endif
