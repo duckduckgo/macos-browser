@@ -83,6 +83,7 @@ final class PermissionAuthorizationViewController: NSViewController {
         } else {
             denyButton.title = UserText.permissionPopoverDenyButton
         }
+        denyButton.setAccessibilityIdentifier("PermissionAuthorizationViewController.denyButton")
     }
 
     private func updateText() {
@@ -116,6 +117,7 @@ final class PermissionAuthorizationViewController: NSViewController {
         buttonsBottomConstraint.isActive = !learnMoreBottomConstraint.isActive
         linkButton.title = UserText.permissionPopupLearnMoreLink
         allowButton.title = UserText.permissionPopupAllowButton
+        allowButton.setAccessibilityIdentifier("PermissionAuthorizationViewController.allowButton")
     }
 
     @IBAction func alwaysAllowLabelClick(_ sender: Any) {

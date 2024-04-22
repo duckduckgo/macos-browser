@@ -28,11 +28,16 @@ public enum DataBrokerProtectionSchedulerStatus: Codable {
 }
 
 @objc
-public class DataBrokerProtectionSchedulerErrorCollection: NSObject {
+public class DataBrokerProtectionSchedulerErrorCollection: NSObject, NSSecureCoding {
     /*
      This needs to be an NSObject (rather than a struct) so it can be represented in Objective C
-     for the IPC layer
+     and confrom to NSSecureCoding for the IPC layer.
      */
+
+    private enum NSSecureCodingKeys {
+        static let oneTimeError = "oneTimeError"
+        static let operationErrors = "operationErrors"
+    }
 
     public let oneTimeError: Error?
     public let operationErrors: [Error]?
@@ -41,6 +46,22 @@ public class DataBrokerProtectionSchedulerErrorCollection: NSObject {
         self.oneTimeError = oneTimeError
         self.operationErrors = operationErrors
         super.init()
+    }
+
+    // MARK: - NSSecureCoding
+
+    public static var supportsSecureCoding: Bool {
+        return true
+    }
+
+    public func encode(with coder: NSCoder) {
+        coder.encode(oneTimeError, forKey: NSSecureCodingKeys.oneTimeError)
+        coder.encode(operationErrors, forKey: NSSecureCodingKeys.operationErrors)
+    }
+
+    public required init?(coder: NSCoder) {
+        oneTimeError = coder.decodeObject(of: NSError.self, forKey: NSSecureCodingKeys.oneTimeError)
+        operationErrors = coder.decodeArrayOfObjects(ofClass: NSError.self, forKey: NSSecureCodingKeys.operationErrors)
     }
 }
 

@@ -1144,12 +1144,9 @@ extension TabBarViewController: TabBarViewItemDelegate {
         removeFireproofing(from: tab)
     }
 
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState {
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
-        else {
-            return .notSupported
-        }
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return nil }
 
         return tab.audioState
     }

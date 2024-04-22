@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import PixelKit
 
 enum ChromiumKeychainPromptResult {
     case password(String)
@@ -45,7 +46,7 @@ final class ChromiumKeychainPrompt: ChromiumKeychainPrompting {
         var dataFromKeychain: AnyObject?
 
         // Fire Pixel to help measure rate of password prompt denied actions
-        Pixel.fire(.passwordImportKeychainPrompt)
+        PixelKit.fire(GeneralPixel.passwordImportKeychainPrompt)
 
         let status: OSStatus = SecItemCopyMatching(query as CFDictionary, &dataFromKeychain)
 

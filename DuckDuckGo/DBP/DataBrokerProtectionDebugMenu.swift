@@ -211,7 +211,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
-                    os_log("Queued operations finished, operation errors count: %{public}@", log: .dataBrokerProtection, operationErrors.count)
+                    os_log("Queued operations finished, operation errors count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             } else {
                 os_log("Queued operations finished", log: .dataBrokerProtection)
@@ -226,11 +226,11 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         DataBrokerProtectionManager.shared.scheduler.scanAllBrokers(showWebView: showWebView) { errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
-                    os_log("scan operations finished,  error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    os_log("scan operations finished, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
-                    os_log("scan operations finished, operation errors count: %{public}@", log: .dataBrokerProtection, operationErrors.count)
+                    os_log("scan operations finished, operation errors count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             } else {
                 os_log("Scan operations finished", log: .dataBrokerProtection)
@@ -249,7 +249,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
-                    os_log("Optout operations finished, operation errors count: %{public}@", log: .dataBrokerProtection, operationErrors.count)
+                    os_log("Optout operations finished, operation errors count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             } else {
                 os_log("Optout operations finished", log: .dataBrokerProtection)

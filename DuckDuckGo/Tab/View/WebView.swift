@@ -36,6 +36,30 @@ final class WebView: WKWebView {
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
     weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
 
+    private var isLoadingObserver: Any?
+
+    override func addTrackingArea(_ trackingArea: NSTrackingArea) {
+        /// disable mouseEntered/mouseMoved/mouseExited events passing to Web View while it‘s loading
+        /// see https://app.asana.com/0/1177771139624306/1206990108527681/f
+        if trackingArea.owner?.className == "WKMouseTrackingObserver" {
+            // suppress Tracking Area events while loading
+            isLoadingObserver = self.observe(\.isLoading, options: [.new]) { [weak self, trackingArea] _, c in
+                if c.newValue /* isLoading */ ?? false {
+                    guard let self, self.trackingAreas.contains(trackingArea) else { return }
+                    removeTrackingArea(trackingArea)
+                } else {
+                    guard let self, !self.trackingAreas.contains(trackingArea) else { return }
+                    superAddTrackingArea(trackingArea)
+                }
+            }
+        }
+        super.addTrackingArea(trackingArea)
+    }
+
+    private func superAddTrackingArea(_ trackingArea: NSTrackingArea) {
+        super.addTrackingArea(trackingArea)
+    }
+
     override var isInFullScreenMode: Bool {
         if #available(macOS 13.0, *) {
             return self.fullscreenState != .notInFullscreen

@@ -16,18 +16,19 @@
 //  limitations under the License.
 //
 
+import Common
+import Crashes
 import Foundation
+import PixelKit
 
 final class CrashReporter {
 
     private let reader = CrashReportReader()
-    private lazy var sender = CrashReportSender()
+    private lazy var sender = CrashReportSender(platform: .macOS, log: .default)
     private lazy var promptPresenter = CrashReportPromptPresenter()
 
     @UserDefaultsWrapper(key: .lastCrashReportCheckDate, defaultValue: nil)
     private var lastCheckDate: Date?
-
-    private var latestCrashReport: CrashReport?
 
     func checkForNewReports() {
 
@@ -47,31 +48,19 @@ final class CrashReporter {
             return
         }
 
-        Pixel.fire(.crash)
+        PixelKit.fire(GeneralPixel.crash)
 
-        latestCrashReport = latest
-        promptPresenter.showPrompt(self, for: latest)
+        promptPresenter.showPrompt(for: latest) {
+            guard let contentData = latest.contentData else {
+                assertionFailure("CrashReporter: Can't get the content of the crash report")
+                return
+            }
+            Task {
+                await self.sender.send(contentData)
+            }
+        }
 
 #endif
 
     }
-
-}
-
-extension CrashReporter: CrashReportPromptViewControllerDelegate {
-
-    func crashReportPromptViewController(_ crashReportPromptViewController: CrashReportPromptViewController,
-                                         userDidAllowToReport: Bool) {
-        guard userDidAllowToReport else {
-            return
-        }
-
-        guard let latestCrashReport = latestCrashReport else {
-            assertionFailure("CrashReporter: The latest crash report is nil")
-            return
-        }
-
-        sender.send(latestCrashReport)
-    }
-
 }

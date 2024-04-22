@@ -49,6 +49,7 @@ final class AddressBarButtonsViewController: NSViewController {
         return permissionAuthorizationPopover ?? {
             let popover = PermissionAuthorizationPopover()
             self.permissionAuthorizationPopover = popover
+            popover.setAccessibilityIdentifier("AddressBarButtonsViewController.permissionAuthorizationPopover")
             return popover
         }()
     }
@@ -289,7 +290,7 @@ final class AddressBarButtonsViewController: NSViewController {
         bookmarkButton.isHidden = !showBookmarkButton
     }
 
-    func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
+    func openBookmarkPopover(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) {
         let result = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint)
         guard let bookmark = result.bookmark else {
             assertionFailure("Failed to get a bookmark for the popover")
@@ -799,11 +800,12 @@ final class AddressBarButtonsViewController: NSViewController {
             guard let host = url.host else { break }
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
+            let isCertificateValid = tabViewModel.tab.isCertificateValid ?? true
 
             let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
             let isUnprotected = configuration.isUserUnprotected(domain: host)
 
-            let isShieldDotVisible = isNotSecure || isUnprotected
+            let isShieldDotVisible = isNotSecure || isUnprotected || !isCertificateValid
 
             privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
 
@@ -918,7 +920,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
+    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
         guard let tabViewModel,
               let url = tabViewModel.tab.content.url else {
             assertionFailure("No URL for bookmarking")
