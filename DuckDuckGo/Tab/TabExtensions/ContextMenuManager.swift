@@ -189,6 +189,9 @@ extension ContextMenuManager {
 
     private func handleReloadItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
         menu.insertItem(self.bookmarkPageMenuItem(), at: index + 1)
+        if let autoplayPolicyMenuItem = autoplayPolicyMenuItem() {
+            menu.insertItem(autoplayPolicyMenuItem, at: index + 2)
+        }
     }
 }
 
@@ -244,6 +247,60 @@ private extension ContextMenuManager {
     func openFrameInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
         makeMenuItem(withTitle: item.title, action: #selector(openFrameInNewWindow), from: item, with: .openFrameInNewWindow)
     }
+
+    func autoplayPolicyMenuItem() -> NSMenuItem? {
+        guard let domain = webView?.url?.host else {
+            return nil
+        }
+
+        print(domain)
+        let permissionManager = PermissionManager.shared
+
+        let isAllowAll = permissionManager.permission(forDomain: domain, permissionType: .autoplayWithSound) == .allow
+        let isAllowNoSound = permissionManager.permission(forDomain: domain, permissionType: .autoplayWithoutSound) == .allow
+
+        let menuItem = NSMenuItem(title: "Auto-Play".localizedCapitalized)
+        let allow = NSMenuItem(title: "Allow all Auto-Play".localizedCapitalized, action: #selector(enableAutoPlay), target: self)
+        let allowNoSound = NSMenuItem(title: "Stop Media with Sound".localizedCapitalized, action: #selector(enableAutoPlayNoSound), target: self)
+        let deny = NSMenuItem(title: "Never Auto-Play".localizedCapitalized, action: #selector(disableAutoPlay), target: self)
+
+        if isAllowAll {
+            allow.state = .on
+        } else if isAllowNoSound {
+            allowNoSound.state = .on
+        } else {
+            deny.state = .on
+        }
+
+        menuItem.submenu = NSMenu(title: menuItem.title, items: [allow, allowNoSound, deny])
+
+        return menuItem
+    }
+
+    @objc func enableAutoPlay() {
+        guard let domain = webView?.url?.host else {
+            return
+        }
+        PermissionManager.shared.setPermission(.allow, forDomain: domain, permissionType: .autoplayWithSound)
+        PermissionManager.shared.setPermission(.allow, forDomain: domain, permissionType: .autoplayWithSound)
+    }
+
+    @objc func enableAutoPlayNoSound() {
+        guard let domain = webView?.url?.host else {
+            return
+        }
+        PermissionManager.shared.setPermission(.deny, forDomain: domain, permissionType: .autoplayWithSound)
+        PermissionManager.shared.setPermission(.allow, forDomain: domain, permissionType: .autoplayWithoutSound)
+    }
+
+    @objc func disableAutoPlay() {
+        guard let domain = webView?.url?.host else {
+            return
+        }
+        PermissionManager.shared.setPermission(.deny, forDomain: domain, permissionType: .autoplayWithSound)
+        PermissionManager.shared.setPermission(.deny, forDomain: domain, permissionType: .autoplayWithoutSound)
+    }
+
 
     private func downloadMenuItemTitle(for item: NSMenuItem) -> String {
         switch item.identifier.flatMap(WKMenuItemIdentifier.init) {

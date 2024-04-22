@@ -1084,8 +1084,27 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         hasCommittedContent = true
     }
 
+//    typedef NS_ENUM(NSInteger, _WKWebsiteAutoplayPolicy) {
+//        _WKWebsiteAutoplayPolicyDefault,
+//        _WKWebsiteAutoplayPolicyAllow,
+//        _WKWebsiteAutoplayPolicyAllowWithoutSound,
+//        _WKWebsiteAutoplayPolicyDeny
+//    } WK_API_AVAILABLE(macos(10.13), ios(11.0));
+
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        if NavigationPreferences.autoplayPolicySupported, let host = navigationAction.url.host {
+            let permissionManager = PermissionManager.shared
+            let allowedWithSound = permissionManager.permission(forDomain: host, permissionType: .autoplayWithSound) == .allow
+            let allowedWithoutSound = permissionManager.permission(forDomain: host, permissionType: .autoplayWithoutSound) == .allow
+            if !allowedWithSound && !allowedWithoutSound {
+                preferences.autoplayPolicy = 3
+            } else if !allowedWithSound {
+                preferences.autoplayPolicy = 2
+            } else {
+                preferences.autoplayPolicy = 1
+            }
+        }
         // allow local file navigations
         if navigationAction.url.isFileURL { return .allow }
 

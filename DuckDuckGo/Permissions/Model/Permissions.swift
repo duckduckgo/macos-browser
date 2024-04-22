@@ -58,6 +58,24 @@ extension Dictionary where Key == PermissionType, Value == PermissionState {
         }
     }
 
+    var autoplayWithSound: PermissionState? {
+        get {
+            self[.autoplayWithSound]
+        }
+        set {
+            self[.autoplayWithSound] = newValue
+        }
+    }
+
+    var autoplayWithoutSound: PermissionState? {
+        get {
+            self[.autoplayWithoutSound]
+        }
+        set {
+            self[.autoplayWithoutSound] = newValue
+        }
+    }
+
     var externalScheme: PermissionState? {
         return self.first(where: { $0.key.isExternalScheme })?.value
     }

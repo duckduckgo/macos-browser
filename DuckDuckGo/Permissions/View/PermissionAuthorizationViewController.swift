@@ -29,6 +29,8 @@ extension PermissionType {
             return UserText.permissionGeolocation
         case .popups:
             return UserText.permissionPopups
+        case .autoplayWithSound, .autoplayWithoutSound:
+            return "Auto-Play"
         case .externalScheme(scheme: let scheme):
             guard let url = URL(string: scheme + URL.NavigationalScheme.separator),
                   let app = NSWorkspace.shared.application(toOpen: url)
@@ -108,6 +110,8 @@ final class PermissionAuthorizationViewController: NSViewController {
             descriptionLabel.stringValue = String(format: UserText.externalSchemePermissionAuthorizationFormat,
                                                   query.domain,
                                                   query.permissions.localizedDescription)
+        case .autoplayWithSound, .autoplayWithoutSound:
+            break
         }
         alwaysAllowCheckbox.title = UserText.permissionAlwaysAllowOnDomainCheckbox
         domainNameLabel.stringValue = query.domain.isEmpty ? "" : "“" + query.domain + "”"

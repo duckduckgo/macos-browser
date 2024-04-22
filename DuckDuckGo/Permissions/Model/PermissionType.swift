@@ -19,6 +19,12 @@
 import Foundation
 import WebKit
 
+// S NS
+// 0 0
+// 0 1
+// 1 x
+// 1 x
+
 enum PermissionType: Hashable {
     private enum Constants: String {
         case camera
@@ -26,6 +32,8 @@ enum PermissionType: Hashable {
         case geolocation
         case popups
         case external = "external_"
+        case autoplayWithoutSound
+        case autoplayWithSound
     }
 
     case camera
@@ -33,6 +41,8 @@ enum PermissionType: Hashable {
     case geolocation
     case popups
     case externalScheme(scheme: String)
+    case autoplayWithoutSound
+    case autoplayWithSound
 
     var rawValue: String {
         switch self {
@@ -41,6 +51,8 @@ enum PermissionType: Hashable {
         case .geolocation: return Constants.geolocation.rawValue
         case .popups: return Constants.popups.rawValue
         case .externalScheme(scheme: let scheme): return Constants.external.rawValue + scheme
+        case .autoplayWithoutSound: return Constants.autoplayWithoutSound.rawValue
+        case .autoplayWithSound: return Constants.autoplayWithSound.rawValue
         }
     }
 
@@ -50,6 +62,8 @@ enum PermissionType: Hashable {
         case Constants.microphone.rawValue: self = .microphone
         case Constants.geolocation.rawValue: self = .geolocation
         case Constants.popups.rawValue: self = .popups
+        case Constants.autoplayWithoutSound.rawValue: self = .autoplayWithoutSound
+        case Constants.autoplayWithSound.rawValue: self = .autoplayWithSound
         default:
             if rawValue.hasPrefix(Constants.external.rawValue) {
                 let scheme = rawValue.dropping(prefix: Constants.external.rawValue)
@@ -70,7 +84,7 @@ extension PermissionType {
 
     var canPersistGrantedDecision: Bool {
         switch self {
-        case .camera, .microphone, .externalScheme:
+        case .camera, .microphone, .externalScheme, .autoplayWithSound, .autoplayWithoutSound:
             return true
         case .geolocation:
             return false
@@ -80,7 +94,7 @@ extension PermissionType {
     }
     var canPersistDeniedDecision: Bool {
         switch self {
-        case .camera, .microphone, .geolocation:
+        case .camera, .microphone, .geolocation, .autoplayWithSound, .autoplayWithoutSound:
             return true
         case .popups, .externalScheme:
             return false
@@ -132,6 +146,7 @@ extension Array where Element == PermissionType {
     static var microphone: Self { [.microphone] }
     static var geolocation: Self { [.geolocation] }
     static var popups: Self { [.popups] }
+    static var autoplay: Self { [.autoplayWithSound, .autoplayWithoutSound] }
     static func externalScheme(_ scheme: String) -> Self { return [.externalScheme(scheme: scheme)] }
 
 }
