@@ -11815,7 +11815,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Debug;
 		};
@@ -11823,7 +11822,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = CI;
 		};
@@ -11831,7 +11829,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Release;
 		};
@@ -11839,7 +11836,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 			};
 			name = Review;
 		};
@@ -12029,7 +12025,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
-				DEVELOPMENT_TEAM = HKE973VLUW;
 			};
 			name = Debug;
 		};
