@@ -24,7 +24,6 @@ import LoginItems
 enum DataBrokerPrerequisitesStatus {
     case invalidDirectory
     case invalidSystemPermission
-    case unverified
     case valid
 }
 
@@ -33,11 +32,16 @@ protocol DataBrokerPrerequisitesStatusVerifier: AnyObject {
 }
 
 final class DefaultDataBrokerPrerequisitesStatusVerifier: DataBrokerPrerequisitesStatusVerifier {
+    private let statusChecker: DBPLoginItemStatusChecker
+
+    init(statusChecker: DBPLoginItemStatusChecker = LoginItem.dbpBackgroundAgent) {
+        self.statusChecker = statusChecker
+    }
 
     func checkStatus() -> DataBrokerPrerequisitesStatus {
-        if !LoginItem.dbpBackgroundAgent.doesHaveNecessaryPermissions() {
+        if !statusChecker.doesHaveNecessaryPermissions() {
             return .invalidSystemPermission
-        } else if !LoginItem.dbpBackgroundAgent.isInCorrectDirectory() {
+        } else if !statusChecker.isInCorrectDirectory() {
             return .invalidDirectory
         } else {
             return .valid

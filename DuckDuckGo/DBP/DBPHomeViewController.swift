@@ -147,8 +147,6 @@ final class DBPHomeViewController: NSViewController {
         case .valid:
             displayDBPUI()
             pixelHandler.fire(.homeViewShowWebUI)
-        case .unverified:
-            break
         }
     }
 
