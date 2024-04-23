@@ -72,6 +72,7 @@ final class DataBrokerProtectionProcessor {
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
             os_log("Scans done", log: .dataBrokerProtection)
+            self.currentlyRunningOperationsForFunction = nil
             completion?(errors)
             self.calculateMisMatches()
         }
@@ -90,6 +91,7 @@ final class DataBrokerProtectionProcessor {
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
             os_log("Optouts done", log: .dataBrokerProtection)
+            self.currentlyRunningOperationsForFunction = nil
             completion?(errors)
         }
     }
@@ -102,6 +104,7 @@ final class DataBrokerProtectionProcessor {
                       priorityDate: Date(),
                       showWebView: showWebView) { errors in
             os_log("Queued operations done", log: .dataBrokerProtection)
+            self.currentlyRunningOperationsForFunction = nil
             completion?(errors)
         }
     }
@@ -114,6 +117,7 @@ final class DataBrokerProtectionProcessor {
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
             os_log("Queued operations done", log: .dataBrokerProtection)
+            self.currentlyRunningOperationsForFunction = nil
             completion?(errors)
         }
     }
