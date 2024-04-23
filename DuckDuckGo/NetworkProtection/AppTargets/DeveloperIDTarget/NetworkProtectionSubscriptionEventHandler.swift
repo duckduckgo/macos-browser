@@ -21,6 +21,7 @@ import Foundation
 import Subscription
 import NetworkProtection
 import NetworkProtectionUI
+import Common
 
 final class NetworkProtectionSubscriptionEventHandler {
 
