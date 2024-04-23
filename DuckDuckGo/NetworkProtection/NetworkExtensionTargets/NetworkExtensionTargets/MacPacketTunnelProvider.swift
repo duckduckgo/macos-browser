@@ -457,30 +457,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         try? loadDefaultPixelHeaders(from: options)
     }
 
-    // MARK: - Start/Stop Tunnel
-
-    override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
-        super.stopTunnel(with: reason) {
-            Task {
-                completionHandler()
-
-                // From what I'm seeing in my tests the next call to start the tunnel is MUCH
-                // less likely to fail if we force this extension to exit when the tunnel is killed.
-                //
-                // Ref: https://app.asana.com/0/72649045549333/1204668639086684/f
-                //
-                exit(EXIT_SUCCESS)
-            }
-        }
-    }
-
-    override func cancelTunnelWithError(_ error: Error?) {
-        Task {
-            super.cancelTunnelWithError(error)
-            exit(EXIT_SUCCESS)
-        }
-    }
-
     // MARK: - Pixels
 
     private func setupPixels(defaultHeaders: [String: String] = [:]) {
