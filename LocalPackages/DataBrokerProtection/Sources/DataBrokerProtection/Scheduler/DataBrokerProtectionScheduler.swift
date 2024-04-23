@@ -261,7 +261,9 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             self.startScheduler(showWebView: showWebView)
 
-            self.userNotificationService.sendFirstScanCompletedNotification()
+            if errors?.oneTimeError == nil {
+                self.userNotificationService.sendFirstScanCompletedNotification()
+            }
 
             if let hasMatches = try? self.dataManager.hasMatches(),
                 hasMatches {
