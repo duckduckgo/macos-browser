@@ -117,17 +117,47 @@ final class BookmarkAllTabsDialogViewModelTests: XCTestCase {
 
     // MARK: - State
 
-    func testWhenInitThenFolderNameIsSetToCurrentDateAndNumberOfWebsites() {
+    func testWhenInitThenFolderNameIsSetToCurrentDateAndNumberOfWebsites() throws {
         // GIVEN
         let date = Date(timeIntervalSince1970: 1712902304) // 12th of April 2024
+        let gmtTimeZone = try XCTUnwrap(TimeZone(identifier: "GMT"))
         let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, occurrences: 5)
-        let sut = BookmarkAllTabsDialogViewModel(websites: websitesInfo, foldersStore: foldersStoreMock, bookmarkManager: bookmarkManager, dateProvider: { date })
+        let sut = BookmarkAllTabsDialogViewModel(
+            websites: websitesInfo,
+            foldersStore: foldersStoreMock,
+            bookmarkManager: bookmarkManager,
+            dateFormatterConfigurationProvider: {
+                BookmarkAllTabsDialogViewModel.DateFormatterConfiguration(date: date, timeZone: gmtTimeZone)
+            }
+        )
 
         // WHEN
         let result = sut.folderName
 
         // THEN
         XCTAssertEqual(result, String(format: UserText.Bookmarks.Dialog.Value.folderName, "2024-04-12", websitesInfo.count))
+    }
+
+    func testWhenInitAndTimeZoneIsPDTThenFolderNameIsSetToCurrentDateAndNumberOfWebsites() throws {
+        // GIVEN
+        let date = Date(timeIntervalSince1970: 1712902304) // 12th of April 2024 (GMT)
+        let pdtTimeZone = try XCTUnwrap(TimeZone(identifier: "America/Los_Angeles"))
+        let expectedDate = "2024-04-11" // Expected date in PDT TimeZone
+        let websitesInfo = WebsiteInfo.makeWebsitesInfo(url: .duckDuckGo, occurrences: 5)
+        let sut = BookmarkAllTabsDialogViewModel(
+            websites: websitesInfo,
+            foldersStore: foldersStoreMock,
+            bookmarkManager: bookmarkManager,
+            dateFormatterConfigurationProvider: {
+                BookmarkAllTabsDialogViewModel.DateFormatterConfiguration(date: date, timeZone: pdtTimeZone)
+            }
+        )
+
+        // WHEN
+        let result = sut.folderName
+
+        // THEN
+        XCTAssertEqual(result, String(format: UserText.Bookmarks.Dialog.Value.folderName, expectedDate, websitesInfo.count))
     }
 
     func testWhenInitThenFoldersAreSetFromBookmarkList() {
