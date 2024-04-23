@@ -70,11 +70,11 @@ final class DataBrokerProtectionProcessor {
         currentlyRunningOperationsForFunction = .startManualScans(pendingCompletion: completion)
         runOperations(operationType: .scan,
                       priorityDate: nil,
-                      showWebView: showWebView) { errors in
+                      showWebView: showWebView) { [weak self] errors in
             os_log("Scans done", log: .dataBrokerProtection)
-            self.currentlyRunningOperationsForFunction = nil
+            self?.currentlyRunningOperationsForFunction = nil
             completion?(errors)
-            self.calculateMisMatches()
+            self?.calculateMisMatches()
         }
     }
 
@@ -89,9 +89,9 @@ final class DataBrokerProtectionProcessor {
         currentlyRunningOperationsForFunction = .runAllOptOutOperations(pendingCompletion: completion)
         runOperations(operationType: .optOut,
                       priorityDate: nil,
-                      showWebView: showWebView) { errors in
+                      showWebView: showWebView) { [weak self] errors in
             os_log("Optouts done", log: .dataBrokerProtection)
-            self.currentlyRunningOperationsForFunction = nil
+            self?.currentlyRunningOperationsForFunction = nil
             completion?(errors)
         }
     }
@@ -102,9 +102,9 @@ final class DataBrokerProtectionProcessor {
         currentlyRunningOperationsForFunction = .runQueuedOperations(pendingCompletion: completion)
         runOperations(operationType: .all,
                       priorityDate: Date(),
-                      showWebView: showWebView) { errors in
+                      showWebView: showWebView) { [weak self] errors in
             os_log("Queued operations done", log: .dataBrokerProtection)
-            self.currentlyRunningOperationsForFunction = nil
+            self?.currentlyRunningOperationsForFunction = nil
             completion?(errors)
         }
     }
@@ -115,9 +115,9 @@ final class DataBrokerProtectionProcessor {
         currentlyRunningOperationsForFunction = .runAllOperations(pendingCompletion: completion)
         runOperations(operationType: .all,
                       priorityDate: nil,
-                      showWebView: showWebView) { errors in
+                      showWebView: showWebView) { [weak self] errors in
             os_log("Queued operations done", log: .dataBrokerProtection)
-            self.currentlyRunningOperationsForFunction = nil
+            self?.currentlyRunningOperationsForFunction = nil
             completion?(errors)
         }
     }
