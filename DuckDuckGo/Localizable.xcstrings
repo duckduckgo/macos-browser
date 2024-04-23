@@ -5620,7 +5620,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Automatically clear browsing data when DuckDuckGo quits"
+            "value" : "Automatically clear tabs and browsing data when DuckDuckGo quits"
           }
         }
       }
@@ -45874,7 +45874,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Quit Without Clearing Data"
+            "value" : "Quit Without Clearing"
           }
         }
       }
@@ -52548,7 +52548,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Warn me that data will be cleared when quitting"
+            "value" : "Warn me that tabs and data will be cleared when quitting"
           }
         }
       }
@@ -52572,7 +52572,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Clear browsing data and quit\nDuckDuckGo?"
+            "value" : "Clear tabs and browsing data and quit DuckDuckGo?"
           }
         }
       }
