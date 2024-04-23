@@ -25,7 +25,7 @@ protocol OperationRunnerProvider {
 }
 
 private enum DataBrokerProtectionProcessorFunction {
-    case runAllScanOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    case startManualScans(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     case runAllOptOutOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     case runQueuedOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     case runAllOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
@@ -64,10 +64,10 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runAllScanOperations(showWebView: Bool = false,
-                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+    func startManualScans(showWebView: Bool = false,
+                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         interruptCurrentlyRunningFunction()
-        currentlyRunningOperationsForFunction = .runAllScanOperations(pendingCompletion: completion)
+        currentlyRunningOperationsForFunction = .startManualScans(pendingCompletion: completion)
         runOperations(operationType: .scan,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
@@ -202,7 +202,7 @@ final class DataBrokerProtectionProcessor {
         operationQueue.cancelAllOperations()
 
         switch currentlyRunningOperationsForFunction {
-        case .runAllScanOperations(let pendingCompletion),
+        case .startManualScans(let pendingCompletion),
                 .runAllOptOutOperations(let pendingCompletion),
                 .runQueuedOperations(let pendingCompletion),
                 .runAllOperations(let pendingCompletion):
