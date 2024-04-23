@@ -20,9 +20,13 @@ import Foundation
 
 protocol TabsPreferencesPersistor {
     var switchToNewTabWhenOpened: Bool { get set }
+    var preferNewTabsToWindows: Bool { get set }
 }
 
 struct TabsPreferencesUserDefaultsPersistor: TabsPreferencesPersistor {
+    @UserDefaultsWrapper(key: .preferNewTabsToWindows, defaultValue: true)
+    var preferNewTabsToWindows: Bool
+
     @UserDefaultsWrapper(key: .switchToNewTabWhenOpened, defaultValue: false)
     var switchToNewTabWhenOpened: Bool
 }
@@ -30,6 +34,12 @@ struct TabsPreferencesUserDefaultsPersistor: TabsPreferencesPersistor {
 final class TabsPreferences: ObservableObject, PreferencesTabOpening {
 
     static let shared = TabsPreferences()
+
+    @Published var preferNewTabsToWindows: Bool {
+        didSet {
+            persistor.preferNewTabsToWindows = preferNewTabsToWindows
+        }
+    }
 
     @Published var switchToNewTabWhenOpened: Bool {
         didSet {
@@ -39,6 +49,7 @@ final class TabsPreferences: ObservableObject, PreferencesTabOpening {
 
     init(persistor: TabsPreferencesPersistor = TabsPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
+        preferNewTabsToWindows = persistor.preferNewTabsToWindows
         switchToNewTabWhenOpened = persistor.switchToNewTabWhenOpened
     }
 

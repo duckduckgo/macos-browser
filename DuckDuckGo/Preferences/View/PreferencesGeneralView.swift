@@ -53,6 +53,7 @@ extension Preferences {
                 // SECTION 2: Tabs
                 PreferencePaneSection(UserText.tabs) {
                     PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.preferNewTabsToWindows, isOn: $tabsModel.preferNewTabsToWindows)
                         ToggleMenuItem(UserText.switchToNewTabWhenOpened, isOn: $tabsModel.switchToNewTabWhenOpened)
                     }
                 }

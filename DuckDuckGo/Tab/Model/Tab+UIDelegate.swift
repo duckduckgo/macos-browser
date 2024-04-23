@@ -136,6 +136,10 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     private func newWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
+        if !tabsPreferences.preferNewTabsToWindows {
+            return .allow(.window(active: true, burner: burnerMode.isBurner))
+        }
+
         if let newWindowPolicy = self.decideNewWindowPolicy(for: navigationAction) {
             return newWindowPolicy
         }
