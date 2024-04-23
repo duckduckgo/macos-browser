@@ -136,24 +136,35 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     private func newWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
-        if !tabsPreferences.preferNewTabsToWindows {
-            return .allow(.window(active: true, burner: burnerMode.isBurner))
+        func handleWithPreferences(newPolicy: NavigationDecision?) -> NavigationDecision? {
+            guard let newPolicy else { return nil }
+
+            switch newPolicy {
+            case .allow(let targetKind):
+                if !tabsPreferences.preferNewTabsToWindows {
+                    return .allow(.window(active: targetKind.isSelectedTab, burner: burnerMode.isBurner))
+                }
+            case .cancel:
+                break
+            }
+
+            return newPolicy
         }
 
         if let newWindowPolicy = self.decideNewWindowPolicy(for: navigationAction) {
-            return newWindowPolicy
+            return handleWithPreferences(newPolicy: newWindowPolicy)
         }
 
         // Are we handling custom Context Menu navigation action or link click with a hotkey?
         for handler in self.newWindowPolicyDecisionMakers ?? [] {
             guard let newWindowPolicy = handler.decideNewWindowPolicy(for: navigationAction) else { continue }
-            return newWindowPolicy
+            return handleWithPreferences(newPolicy: newWindowPolicy)
         }
 
         // allow popups opened from an empty window console
         let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
-            return .allow(.tab(selected: true, burner: burnerMode.isBurner))
+            return handleWithPreferences(newPolicy: .allow(.tab(selected: true, burner: burnerMode.isBurner)))
         }
 
         return nil
