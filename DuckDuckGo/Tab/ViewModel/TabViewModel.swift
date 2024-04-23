@@ -26,12 +26,13 @@ final class TabViewModel {
 
     enum Favicon {
         static let home = NSImage.homeFavicon
+        static let duckPlayer = NSImage.duckPlayerSettings
         static let burnerHome = NSImage.burnerTabFavicon
         static let preferences = NSImage.preferences
-        static let bookmarks = NSImage.bookmarks
-        static let dataBrokerProtection = NSImage.dbpIcon
-        static let subscription = NSImage.subscriptionIcon
-        static let identityTheftRestoration = NSImage.itrIcon
+        static let bookmarks = NSImage.bookmarksFolder
+        static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
+        static let subscription = NSImage.privacyPro
+        static let identityTheftRestoration = NSImage.identityTheftRestorationMulticolor16
     }
 
     private(set) var tab: Tab
@@ -281,7 +282,7 @@ final class TabViewModel {
             .subscriptionTrustedIndicator
         case .identityTheftRestoration:
             .identityTheftRestorationTrustedIndicator
-        case .url(let url, _, _) where url.isDuckPlayer || url.isDuckURLScheme:
+        case .url(let url, _, _) where url.isDuckPlayer:
             .duckPlayerTrustedIndicator
         case .url(let url, _, _):
             NSAttributedString(string: passiveAddressBarString(with: url, showFullURL: showFullURL))
@@ -346,6 +347,7 @@ final class TabViewModel {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
             favicon = errorFaviconToShow(error: tab.error)
@@ -373,6 +375,9 @@ final class TabViewModel {
             return
         case .identityTheftRestoration:
             favicon = Favicon.identityTheftRestoration
+            return
+        case .url(let url, _, _) where url.isDuckPlayer:
+            favicon = Favicon.duckPlayer
             return
         case .url, .onboarding, .none: break
         }
