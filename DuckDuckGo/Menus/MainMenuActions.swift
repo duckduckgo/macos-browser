@@ -215,7 +215,7 @@ extension AppDelegate {
             savePanel.beginSheetModal(for: window) { response in
                 guard response == .OK, let selectedURL = savePanel.url else { return }
 
-                let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+                let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
                 let exporter = CSVLoginExporter(secureVault: vault!)
                 do {
                     try exporter.exportVaultLogins(to: selectedURL)
@@ -670,7 +670,7 @@ extension MainViewController {
     }
 
     @objc func resetSecureVaultData(_ sender: Any?) {
-        let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
 
         let accounts = (try? vault?.accounts()) ?? []
         for accountID in accounts.compactMap(\.id) {
@@ -1042,7 +1042,7 @@ extension AppDelegate: NSMenuItemValidation {
     }
 
     private var areTherePasswords: Bool {
-        let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
         guard let vault else {
             return false
         }

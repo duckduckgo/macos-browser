@@ -22,7 +22,7 @@ import SecureStorage
 import PixelKit
 import Common
 
-final class DataBrokerProtectionSecureVaultErrorReporter: SecureVaultErrorReporting {
+final class DataBrokerProtectionSecureVaultErrorReporter: SecureVaultReporting {
     static let shared = DataBrokerProtectionSecureVaultErrorReporter(pixelHandler: DataBrokerProtectionPixelsHandler())
 
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
@@ -30,7 +30,7 @@ final class DataBrokerProtectionSecureVaultErrorReporter: SecureVaultErrorReport
         self.pixelHandler = pixelHandler
     }
 
-    func secureVaultInitFailed(_ error: SecureStorageError) {
+    func secureVaultError(_ error: SecureStorageError) {
         switch error {
         case .initFailed, .failedToOpenDatabase:
             pixelHandler.fire(.secureVaultInitError(error: error))

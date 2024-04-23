@@ -771,10 +771,21 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel else { return }
 
         let url = tabViewModel.tab.content.userEditableUrl
-        let isHypertextUrl = url?.navigationalScheme?.isHypertextScheme == true && url?.isDuckPlayer == false
-        let isEditingMode = controllerMode?.isEditing ?? false
-        let isTextFieldValueText = textFieldValue?.isText ?? false
-        let isLocalUrl = url?.isLocalURL ?? false
+        var isNewTabOrOnboarding: Bool {
+            [.newtab, .onboarding].contains(tabViewModel.tab.content)
+        }
+        lazy var isHypertextUrl: Bool = {
+            url?.navigationalScheme?.isHypertextScheme == true && url?.isDuckPlayer == false
+        }()
+        var isEditingMode: Bool {
+            controllerMode?.isEditing ?? false
+        }
+        var isTextFieldValueText: Bool {
+            textFieldValue?.isText ?? false
+        }
+        var isLocalUrl: Bool {
+            url?.isLocalURL ?? false
+        }
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isEditingMode
@@ -785,7 +796,7 @@ final class AddressBarButtonsViewController: NSViewController {
         || isLocalUrl
 
         imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
-        || (!isHypertextUrl && !isTextFieldEditorFirstResponder)
+        || !(isHypertextUrl || isTextFieldEditorFirstResponder || isNewTabOrOnboarding)
         || !privacyEntryPointButton.isHidden
         || isAnyTrackerAnimationPlaying
     }

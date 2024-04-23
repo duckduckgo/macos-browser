@@ -142,7 +142,7 @@ extension URL {
     // base url for Error Page Alternate HTML loaded into Web View
     static let error = URL(string: "duck://error")!
 
-    static let dataBrokerProtection = URL(string: "duck://dbp")!
+    static let dataBrokerProtection = URL(string: "duck://personal-information-removal")!
 
 #if !SANDBOX_TEST_TOOL
     static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {

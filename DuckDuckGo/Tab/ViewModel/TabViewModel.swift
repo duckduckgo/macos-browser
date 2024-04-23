@@ -26,12 +26,13 @@ final class TabViewModel {
 
     enum Favicon {
         static let home = NSImage.homeFavicon
+        static let duckPlayer = NSImage.duckPlayerSettings
         static let burnerHome = NSImage.burnerTabFavicon
         static let preferences = NSImage.preferences
-        static let bookmarks = NSImage.bookmarks
-        static let dataBrokerProtection = NSImage.dbpIcon
-        static let subscription = NSImage.subscriptionIcon
-        static let identityTheftRestoration = NSImage.itrIcon
+        static let bookmarks = NSImage.bookmarksFolder
+        static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
+        static let subscription = NSImage.privacyPro
+        static let identityTheftRestoration = NSImage.identityTheftRestorationMulticolor16
     }
 
     private(set) var tab: Tab
@@ -246,7 +247,7 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = !isShowingErrorPage && tab.content.isUrl && (tab.content.userEditableUrl ?? .blankPage) != .blankPage
+        canBeBookmarked = !isShowingErrorPage && tab.content.canBeBookmarked
     }
 
     private func updateAddressBarStrings() {
@@ -281,7 +282,7 @@ final class TabViewModel {
             .subscriptionTrustedIndicator
         case .identityTheftRestoration:
             .identityTheftRestorationTrustedIndicator
-        case .url(let url, _, _) where url.isDuckPlayer || url.isDuckURLScheme:
+        case .url(let url, _, _) where url.isDuckPlayer:
             .duckPlayerTrustedIndicator
         case .url(let url, _, _):
             NSAttributedString(string: passiveAddressBarString(with: url, showFullURL: showFullURL))
@@ -307,7 +308,7 @@ final class TabViewModel {
     }
 
     private func updateTitle() { // swiftlint:disable:this cyclomatic_complexity
-        let title: String
+        var title: String
         switch tab.content {
         // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
         case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
@@ -341,11 +342,15 @@ final class TabViewModel {
                 title = addressBarString
             }
         }
+        if title.isEmpty {
+            title = UserText.tabUntitledTitle
+        }
         if self.title != title {
             self.title = title
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
             favicon = errorFaviconToShow(error: tab.error)
@@ -373,6 +378,9 @@ final class TabViewModel {
             return
         case .identityTheftRestoration:
             favicon = Favicon.identityTheftRestoration
+            return
+        case .url(let url, _, _) where url.isDuckPlayer:
+            favicon = Favicon.duckPlayer
             return
         case .url, .onboarding, .none: break
         }
@@ -474,7 +482,7 @@ private extension NSAttributedString {
             duckDuckGoWithChevronAttributedString
 
             // favicon
-            Component(image: icon, rect: CGRect(x: 0, y: iconBaselineOffset, width: iconSize, height: iconSize))
+            Component(image: icon, rect: CGRect(x: 0, y: iconBaselineOffset, width: icon.size.width, height: icon.size.height))
             // spacing
             Component(image: spacer, rect: CGRect(x: 0, y: 0, width: iconSpacing, height: 1))
             // title

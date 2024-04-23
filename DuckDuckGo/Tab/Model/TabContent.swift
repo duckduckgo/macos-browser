@@ -129,6 +129,8 @@ extension TabContent {
 
         if let settingsPane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
             return .settings(pane: settingsPane)
+        } else if url?.isDuckPlayer == true, let (videoId, timestamp) = url?.youtubeVideoParams {
+            return .url(.duckPlayer(videoId, timestamp: timestamp), credential: nil, source: source)
         } else if let url, let credential = url.basicAuthCredential {
             // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
             return .url(url.removingBasicAuthCredential(), credential: credential, source: source)
@@ -291,10 +293,10 @@ extension TabContent {
 
     var canBeBookmarked: Bool {
         switch self {
-        case .subscription, .identityTheftRestoration, .dataBrokerProtection:
+        case .newtab, .onboarding, .none:
             return false
-        default:
-            return isUrl
+        case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection:
+            return true
         }
     }
 
