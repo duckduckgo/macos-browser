@@ -86,14 +86,28 @@ jobs:
           .github
           scripts
 
+    - name: Download DMG artifact
+      id: download-dmg-artifact
+      continue-on-error: true
+      uses: actions/download-artifact@v4
+      with:
+        name: duckduckgo-dmg
+        path: ${{ github.workspace }}
+
     - name: Download release app
+      # Download the release app only if download-dmg-artifact fails
+      if: ${{ steps.download-dmg-artifact.outcome == 'failure' }}
       run: |
         curl -fLSs "${{ vars.RELEASE_DMG_URL }}" --output duckduckgo.dmg
-        hdiutil attach duckduckgo.dmg -mountpoint vanilla
-        mkdir -p dmg
-        cp -R vanilla/DuckDuckGo.app dmg/DuckDuckGo.app
-        hdiutil detach vanilla
-        rm -f duckduckgo.dmg
+
+    - name: Extract App from DMG
+      id: extract-app-from-dmg
+      run: |
+          hdiutil attach duckduckgo.dmg -mountpoint vanilla
+          mkdir -p dmg
+          cp -R vanilla/DuckDuckGo.app dmg/DuckDuckGo.app
+          hdiutil detach vanilla
+          rm -f duckduckgo.dmg
 
     - name: Install create-dmg
       run: brew install create-dmg

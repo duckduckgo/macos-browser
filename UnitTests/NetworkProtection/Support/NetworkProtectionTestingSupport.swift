@@ -101,13 +101,19 @@ struct MockConnectionErrorObserver: ConnectionErrorObserver {
     var recentValue: String?
 }
 
-struct MockIPCClient: NetworkProtectionIPCClient {
+struct MockDataVolumeObserver: DataVolumeObserver {
+    var publisher: AnyPublisher<DataVolume, Never> = Just(.init()).eraseToAnyPublisher()
 
+    var recentValue: DataVolume = .init()
+}
+
+struct MockIPCClient: NetworkProtectionIPCClient {
     private let error: Error?
 
     var ipcStatusObserver: NetworkProtection.ConnectionStatusObserver = MockConnectionStatusObserver()
     var ipcServerInfoObserver: NetworkProtection.ConnectionServerInfoObserver = MockServerInfoObserver()
     var ipcConnectionErrorObserver: NetworkProtection.ConnectionErrorObserver = MockConnectionErrorObserver()
+    var ipcDataVolumeObserver: any NetworkProtection.DataVolumeObserver = MockDataVolumeObserver()
 
     init(error: Error? = nil) {
         self.error = error

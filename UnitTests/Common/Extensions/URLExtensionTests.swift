@@ -160,4 +160,75 @@ final class URLExtensionTests: XCTestCase {
         XCTAssertEqual(expected, result)
     }
 
+    func testIsChildWhenURLsSame() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenTestedURLHasSubpath() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://dax.duckduckgo.com/subscriptions/test")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenTestedURLHasSubdomain() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://dax.duckduckgo.com/subscriptions")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenTestedURLHasSubdomainAndSubpath() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://dax.duckduckgo.com/subscriptions/test")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenTestedURLHasWWW() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://www.duckduckgo.com/subscriptions/test/t")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenParentHasParamThatShouldBeIgnored() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions?environment=staging")!
+        let testedURL = URL(string: "https://www.duckduckgo.com/subscriptions/test/t")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenChildHasParamThatShouldBeIgnored() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscriptions?environment=staging")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenChildHasPathAndParamThatShouldBeIgnored() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://www.duckduckgo.com/subscriptions/test/t?environment=staging")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildWhenBothHaveParamThatShouldBeIgnored() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions?environment=production")!
+        let testedURL = URL(string: "https://www.duckduckgo.com/subscriptions/test/t?environment=staging")!
+        XCTAssertTrue(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildFailsWhenPathIsShorterSubstring() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscription")!
+        XCTAssertFalse(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildFailsWhenPathIsLonger() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscriptionszzz")!
+        XCTAssertFalse(testedURL.isChild(of: parentURL))
+    }
+
+    func testIsChildFailsWhenPathIsNotComplete() throws {
+        let parentURL = URL(string: "https://duckduckgo.com/subscriptions/welcome")!
+        let testedURL = URL(string: "https://duckduckgo.com/subscriptions")!
+        XCTAssertFalse(testedURL.isChild(of: parentURL))
+    }
 }
