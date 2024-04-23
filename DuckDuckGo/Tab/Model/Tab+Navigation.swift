@@ -89,6 +89,9 @@ extension Tab: NavigationResponder {
             // Error Page
             .weak(nullable: self.errorPage),
 
+            // Phishing Error Page
+            .weak(nullable: self.phishingErrorPage),
+
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder),
 

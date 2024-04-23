@@ -45,6 +45,7 @@ final class UserScripts: UserScriptsProvider {
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
     let sslErrorPageUserScript: SSLErrorPageUserScript?
+    let phishingErrorPageUserScript: PhishingErrorPageUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
@@ -64,6 +65,8 @@ final class UserScripts: UserScriptsProvider {
         autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
         sslErrorPageUserScript = SSLErrorPageUserScript()
+        
+        phishingErrorPageUserScript = PhishingErrorPageUserScript()
 
         specialPages = SpecialPagesUserScript()
 
@@ -84,6 +87,9 @@ final class UserScripts: UserScriptsProvider {
         if let specialPages = specialPages {
             if let sslErrorPageUserScript {
                 specialPages.registerSubfeature(delegate: sslErrorPageUserScript)
+            }
+            if let phishingErrorPageUserScript {
+                specialPages.registerSubfeature(delegate: phishingErrorPageUserScript)
             }
             if let youtubePlayerUserScript {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)

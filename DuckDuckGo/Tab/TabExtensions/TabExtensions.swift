@@ -201,6 +201,11 @@ extension TabExtensionsBuilder {
                                   scriptsPublisher: userScripts.compactMap { $0 })
         }
 
+        add {
+            PhishingErrorPageTabExtension(webViewPublisher: args.webViewFuture,
+                                  scriptsPublisher: userScripts.compactMap { $0 })
+        }
+
         if let tunnelController = dependencies.tunnelController {
             add {
                 NetworkProtectionControllerTabExtension(tunnelController: tunnelController)
