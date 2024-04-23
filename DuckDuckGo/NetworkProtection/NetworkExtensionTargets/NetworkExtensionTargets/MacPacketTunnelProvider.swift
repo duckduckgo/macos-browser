@@ -233,6 +233,24 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true)
             }
+        case .tunnelStopAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStopAttempt,
+                    frequency: .standard,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStopFailure(error),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStopSuccess,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
         case .tunnelUpdateAttempt(let step):
             switch step {
             case .begin:
@@ -248,6 +266,24 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .success:
                 PixelKit.fire(
                     NetworkProtectionPixelEvent.networkProtectionTunnelUpdateSuccess,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
+        case .tunnelWakeAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelWakeAttempt,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelWakeFailure(error),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelWakeSuccess,
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true)
             }
