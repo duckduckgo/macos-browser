@@ -20,14 +20,13 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
+import PixelKit
+
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-
-#if SUBSCRIPTION
 import Subscription
 import SubscriptionUI
-#endif
 
 // swiftlint:disable:next type_body_length
 final class NavigationBarViewController: NSViewController {
@@ -297,7 +296,6 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        #if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
@@ -307,18 +305,26 @@ final class NavigationBarViewController: NSViewController {
                 return
             }
         }
-        #endif
 
-        // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
-        // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
-        // 3. If the user has no state of any kind, show the waitlist screen.
+        // Note: the following code is quite contrived but we're aiming to hotfix issues without mixing subscription and
+        // waitlist logic.  This should be cleaned up once waitlist can safely be removed.
 
-        if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
-            NetworkProtectionWaitlistViewControllerPresenter.show()
-        } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            if NetworkProtectionKeychainTokenStore().isFeatureActivated {
+                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+            }
         } else {
-            NetworkProtectionWaitlistViewControllerPresenter.show()
+            // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
+            // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
+            // 3. If the user has no state of any kind, show the waitlist screen.
+
+            if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
+                NetworkProtectionWaitlistViewControllerPresenter.show()
+            } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
+                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+            } else {
+                NetworkProtectionWaitlistViewControllerPresenter.show()
+            }
         }
     }
 
@@ -603,9 +609,9 @@ final class NavigationBarViewController: NSViewController {
             logoWidth.constant = sizeClass.logoWidth
         }
 
-        let heightChange: DispatchWorkItem
-        if animated {
-            heightChange = DispatchWorkItem {
+        let heightChange: () -> Void
+        if animated && view.window != nil {
+            heightChange = {
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.1
                     performResize()
@@ -622,12 +628,18 @@ final class NavigationBarViewController: NSViewController {
             self.daxFadeInAnimation = fadeIn
         } else {
             daxLogo.alphaValue = sizeClass.isLogoVisible ? 1 : 0
-            heightChange = DispatchWorkItem {
+            heightChange = {
                 performResize()
             }
         }
-        DispatchQueue.main.async(execute: heightChange)
-        self.heightChangeAnimation = heightChange
+        if view.window == nil {
+            // update synchronously for off-screen view
+            heightChange()
+        } else {
+            let dispatchItem = DispatchWorkItem(block: heightChange)
+            DispatchQueue.main.async(execute: dispatchItem)
+            self.heightChangeAnimation = dispatchItem
+        }
     }
 
     private func subscribeToDownloads() {
@@ -636,22 +648,20 @@ final class NavigationBarViewController: NSViewController {
             .sink { [weak self] update in
                 guard let self else { return }
 
-                let shouldShowPopover = update.kind == .updated
-                && DownloadsPreferences.shared.shouldOpenPopupOnCompletion
-                && update.item.destinationURL != nil
-                && update.item.tempURL == nil
-                && !update.item.isBurner
-                && WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window
+                if case .updated(let oldValue) = update.kind,
+                    DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
+                    update.item.destinationURL != nil,
+                    update.item.tempURL == nil,
+                    oldValue.tempURL != nil, // download finished
+                    !update.item.isBurner,
+                    WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window {
 
-                if shouldShowPopover {
                     self.popovers.showDownloadsPopoverAndAutoHide(usingView: downloadsButton,
                                                                   popoverDelegate: self,
                                                                   downloadsDelegate: self)
-                } else {
-                    if update.item.isBurner {
-                        invalidateDownloadButtonHidingTimer()
-                        updateDownloadsButton(updatingFromPinnedViewsNotification: false)
-                    }
+                } else if update.item.isBurner {
+                    invalidateDownloadButtonHidingTimer()
+                    updateDownloadsButton(updatingFromPinnedViewsNotification: false)
                 }
                 updateDownloadsButton()
             }
@@ -703,10 +713,11 @@ final class NavigationBarViewController: NSViewController {
         }
 
         popovers.passwordManagementDomain = nil
-        guard let url = url, let domain = url.host else {
+        guard let url = url, let hostAndPort = url.hostAndPort() else {
             return
         }
-        popovers.passwordManagementDomain = domain
+
+        popovers.passwordManagementDomain = hostAndPort
     }
 
     private func updateHomeButton() {
@@ -964,6 +975,7 @@ extension NavigationBarViewController: NSMenuDelegate {
             .store(in: &cancellables)
 
         networkProtectionButtonModel.$showButton
+            .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] show in
                 let isPopUpWindow = self?.view.window?.isPopUpWindow ?? false
@@ -1028,7 +1040,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {
-        toggleDownloadsPopover(keepButtonVisible: false)
+        toggleDownloadsPopover(keepButtonVisible: true)
     }
 
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu) {
@@ -1043,17 +1055,14 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
     }
 
-#if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
-        Pixel.fire(.privacyProOfferScreenImpression)
+        PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
     }
-#endif
-
 }
 
 // MARK: - NSPopoverDelegate

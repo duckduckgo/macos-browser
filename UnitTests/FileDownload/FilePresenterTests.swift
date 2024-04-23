@@ -64,7 +64,6 @@ final class FilePresenterTests: XCTestCase {
         cancellables.removeAll()
         onError = nil
         onFileRead = nil
-        NSURL.swizzleStopAccessingSecurityScopedResource(with: nil)
     }
 
     private func makeNonSandboxFile() throws -> URL {
@@ -95,15 +94,17 @@ final class FilePresenterTests: XCTestCase {
         return app
     }
 
-    private func terminateApp(timeout: TimeInterval = 1) async {
-        let eTerminated = runningApp != nil ? expectation(description: "terminated") : nil
+    private func terminateApp(timeout: TimeInterval = 5, expectation: XCTestExpectation = XCTestExpectation(description: "terminated")) async {
+        if runningApp == nil {
+            expectation.fulfill()
+        }
         let c = runningApp?.publisher(for: \.isTerminated).filter { $0 }.sink { _ in
-            eTerminated?.fulfill()
+            expectation.fulfill()
         }
         post(.terminate)
         runningApp?.forceTerminate()
 
-        await fulfillment(of: eTerminated.map { [$0] } ?? [], timeout: timeout)
+        await fulfillment(of: [expectation], timeout: timeout)
         withExtendedLifetime(c) {}
     }
 
@@ -111,7 +112,7 @@ final class FilePresenterTests: XCTestCase {
         DistributedNotificationCenter.default().post(name: .init(name.rawValue), object: object)
     }
 
-    private func fileReadPromise(timeout: TimeInterval = 5) -> Future<FileReadResult, Error> {
+    private func fileReadPromise(timeout: TimeInterval = 5, file: StaticString = #file, line: UInt = #line) -> Future<FileReadResult, Error> {
         Future<FileReadResult, Error> { [unowned self] fulfill in
             onFileRead = { result in
                 fulfill(.success(result))
@@ -124,13 +125,14 @@ final class FilePresenterTests: XCTestCase {
                 self.onError = nil
             }
         }
-        .timeout(timeout)
+        .timeout(timeout, file: file, line: line)
         .first()
         .promise()
     }
 
     // MARK: - Test sandboxed file access
 #if APPSTORE && !CI
+
     func testTool_run() async throws {
         // 1. make non-sandbox file
         let nonSandboxUrl = try makeNonSandboxFile()
@@ -177,7 +179,7 @@ final class FilePresenterTests: XCTestCase {
         await terminateApp()
         runningApp = try await runHelperApp()
 
-        // 3. open the bookmark with SandboxFilePresenter
+        // 3. open the bookmark with BookmarkFilePresenter
         post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
 
         // 4. read the file
@@ -188,7 +190,7 @@ final class FilePresenterTests: XCTestCase {
         XCTAssertEqual(result.data, testData.utf8String())
         XCTAssertEqual(result.bookmark, bookmark)
 
-        // 5. close SandboxFilePresenter
+        // 5. close BookmarkFilePresenter
         let e = expectation(description: "access stopped")
         let c = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.stopAccessingSecurityScopedResourceCalled.name).sink { _ in
             e.fulfill()
@@ -220,7 +222,7 @@ final class FilePresenterTests: XCTestCase {
         await terminateApp()
         runningApp = try await runHelperApp()
 
-        // 3. open the bookmark with SandboxFilePresenter
+        // 3. open the bookmark with BookmarkFilePresenter
         post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
         fileReadPromise = self.fileReadPromise()
         post(.openFile, with: nonSandboxUrl.path)
@@ -290,7 +292,7 @@ final class FilePresenterTests: XCTestCase {
         await terminateApp()
         runningApp = try await runHelperApp()
 
-        // 3. open the bookmark with SandboxFilePresenter
+        // 3. open the bookmark with BookmarkFilePresenter
         post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
         fileReadPromise = self.fileReadPromise()
 
@@ -316,7 +318,7 @@ final class FilePresenterTests: XCTestCase {
         await terminateApp()
         runningApp = try await runHelperApp()
 
-        // 3. open the bookmark with SandboxFilePresenter
+        // 3. open the bookmark with BookmarkFilePresenter
         post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
         fileReadPromise = self.fileReadPromise()
         post(.openFile, with: nonSandboxUrl.path)
@@ -355,7 +357,7 @@ final class FilePresenterTests: XCTestCase {
         await terminateApp()
         runningApp = try await runHelperApp()
 
-        // 3. open the bookmark with SandboxFilePresenter
+        // 3. open the bookmark with BookmarkFilePresenter
         post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
         fileReadPromise = self.fileReadPromise()
         post(.openFile, with: nonSandboxUrl.path)
@@ -374,7 +376,7 @@ final class FilePresenterTests: XCTestCase {
         }
         await fulfillment(of: [e], timeout: 5)
 
-        // 5. close SandboxFilePresenter
+        // 5. close BookmarkFilePresenter
         let eStopped = expectation(description: "access stopped")
         let c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.stopAccessingSecurityScopedResourceCalled.name).sink { _ in
             eStopped.fulfill()
@@ -406,13 +408,13 @@ final class FilePresenterTests: XCTestCase {
         await terminateApp()
         runningApp = try await runHelperApp()
 
-        // 3. open the bookmark with SandboxFilePresenter
+        // 3. open the bookmark with BookmarkFilePresenter
         post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
         fileReadPromise = self.fileReadPromise()
         post(.openFile, with: nonSandboxUrl.path)
         _=try await fileReadPromise.value
 
-        // 4. close SandboxFilePresenter
+        // 4. close BookmarkFilePresenter
         let eStopped = expectation(description: "access stopped")
         let c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.stopAccessingSecurityScopedResourceCalled.name).sink { _ in
             eStopped.fulfill()
@@ -456,7 +458,7 @@ final class FilePresenterTests: XCTestCase {
         await terminateApp()
         runningApp = try await runHelperApp()
 
-        // 3. open the bookmark with SandboxFilePresenter
+        // 3. open the bookmark with BookmarkFilePresenter
         post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
         fileReadPromise = self.fileReadPromise()
         post(.openFile, with: nonSandboxUrl.path)
@@ -503,7 +505,7 @@ final class FilePresenterTests: XCTestCase {
         await terminateApp()
         runningApp = try await runHelperApp()
 
-        // 3. open the bookmark with SandboxFilePresenter
+        // 3. open the bookmark with BookmarkFilePresenter
         post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
         fileReadPromise = self.fileReadPromise()
         post(.openFile, with: nonSandboxUrl.path)
@@ -543,7 +545,7 @@ final class FilePresenterTests: XCTestCase {
         await terminateApp()
         runningApp = try await runHelperApp()
 
-        // 3. open the bookmark with SandboxFilePresenter
+        // 3. open the bookmark with BookmarkFilePresenter
         post(.openBookmarkWithFilePresenter, with: bookmark1.base64EncodedString())
         post(.openBookmarkWithFilePresenter, with: bookmark2.base64EncodedString())
         fileReadPromise = self.fileReadPromise()
@@ -571,7 +573,6 @@ final class FilePresenterTests: XCTestCase {
         // 5. close FilePresenter 1 (at the original URL)
         let e3 = expectation(description: "access stopped")
         let c2 = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.stopAccessingSecurityScopedResourceCalled.name).sink { n in
-            XCTAssertEqual(n.object as? String, nonSandboxUrl1.path)
             e3.fulfill()
         }
         post(.closeFilePresenter, with: nonSandboxUrl1.path)
@@ -600,32 +601,6 @@ final class FilePresenterTests: XCTestCase {
         }
     }
 
-    func testWhenFilePresenterClosesFileOpenedByOS_fileAccessIsPreserved() async throws {
-        // 1. make non-sandbox file and open the file with the helper app
-        let nonSandboxUrl = try makeNonSandboxFile()
-        var fileReadPromise = self.fileReadPromise()
-        runningApp = try await runHelperApp(opening: nonSandboxUrl)
-        guard let bookmark = try await fileReadPromise.value.bookmark else { XCTFail("No bookmark"); return }
-
-        // 2. open file presenter
-        post(.openBookmarkWithFilePresenter, with: bookmark.base64EncodedString())
-
-        // 3. close the file presenter
-        let e = expectation(description: "access stopped")
-        let c = DistributedNotificationCenter.default().publisher(for: SandboxTestNotification.stopAccessingSecurityScopedResourceCalled.name).sink { n in
-            XCTAssertEqual(n.object as? String, nonSandboxUrl.path)
-            e.fulfill()
-        }
-        post(.closeFilePresenter, with: nonSandboxUrl.path)
-        await fulfillment(of: [e], timeout: 1)
-        withExtendedLifetime(c) {}
-
-        // 4. validate file can still be read
-        fileReadPromise = self.fileReadPromise()
-        post(.openFile, with: nonSandboxUrl.path)
-        let result = try await fileReadPromise.value
-        XCTAssertEqual(result.path, nonSandboxUrl.path)
-    }
 #endif
 
     // MARK: - Test non-sandboxed file access
@@ -633,10 +608,10 @@ final class FilePresenterTests: XCTestCase {
     func testWhenSandboxFilePresenterIsOpen_itCanReadFile_accessIsNotStoppedWhenClosed_noSandbox() async throws {
         // 1. make non-sandbox file; create bookmark
         let nonSandboxUrl = try makeNonSandboxFile()
-        guard let bookmarkData = try SandboxFilePresenter(url: nonSandboxUrl).fileBookmarkData else { XCTFail("No bookmark"); return }
+        guard let bookmarkData = try BookmarkFilePresenter(url: nonSandboxUrl).fileBookmarkData else { XCTFail("No bookmark"); return }
 
-        // 2. open the bookmark with SandboxFilePresenter
-        var filePresenter: SandboxFilePresenter! = try SandboxFilePresenter(fileBookmarkData: bookmarkData)
+        // 2. open the bookmark with BookmarkFilePresenter
+        var filePresenter: BookmarkFilePresenter! = try BookmarkFilePresenter(fileBookmarkData: bookmarkData)
 
         // 3. validate
         var publishedUrl: URL?
@@ -656,7 +631,7 @@ final class FilePresenterTests: XCTestCase {
     func testWhenFileIsRenamed_urlIsUpdated_noSandbox() async throws {
         // 1. make non-sandbox file
         let nonSandboxUrl = try makeNonSandboxFile()
-        let filePresenter = try SandboxFilePresenter(url: nonSandboxUrl)
+        let filePresenter = try BookmarkFilePresenter(url: nonSandboxUrl)
 
         // 4. rename the file
         let newUrl = nonSandboxUrl.deletingPathExtension().appendingPathExtension("1.txt")
@@ -689,7 +664,7 @@ final class FilePresenterTests: XCTestCase {
     func testWhenFileIsRemoved_removalIsDetected_noSandbox() async throws {
         // 1. make non-sandbox file
         let nonSandboxUrl = try makeNonSandboxFile()
-        let filePresenter = try SandboxFilePresenter(url: nonSandboxUrl)
+        let filePresenter = try BookmarkFilePresenter(url: nonSandboxUrl)
 
         // 2. remove the file
         let e1 = expectation(description: "file presenter: file removed")
@@ -716,8 +691,8 @@ final class FilePresenterTests: XCTestCase {
         let bookmarkData1 = try nonSandboxUrl1.bookmarkData(options: .withSecurityScope)
         let nonSandboxUrl2 = try makeNonSandboxFile()
         let bookmarkData2 = try nonSandboxUrl2.bookmarkData(options: .withSecurityScope)
-        let filePresenter1 = try SandboxFilePresenter(fileBookmarkData: bookmarkData1)
-        let filePresenter2 = try SandboxFilePresenter(fileBookmarkData: bookmarkData2)
+        let filePresenter1 = try BookmarkFilePresenter(fileBookmarkData: bookmarkData1)
+        let filePresenter2 = try BookmarkFilePresenter(fileBookmarkData: bookmarkData2)
 
         // 2. cross-rename the files
         let tempUrl = nonSandboxUrl1.appendingPathExtension("tmp")

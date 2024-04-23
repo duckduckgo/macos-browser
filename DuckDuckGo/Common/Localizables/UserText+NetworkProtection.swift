@@ -42,8 +42,8 @@ extension UserText {
     static let networkProtectionInviteSuccessMessage = "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere."
 
     // MARK: - Navigation Bar Status View
-    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Send VPN Feedback' in the VPN status view that's shown in the navigation bar
-    static let networkProtectionNavBarStatusViewShareFeedback = "Send VPN Feedback…"
+    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Share VPN Feedback' in the VPN status view that's shown in the navigation bar
+    static let networkProtectionNavBarStatusViewShareFeedback = "Share VPN Feedback…"
     // "network.protection.status.menu.vpn.settings" - The status menu 'VPN Settings' menu item
     static let networkProtectionNavBarStatusMenuVPNSettings = "VPN Settings…"
     // "network.protection.status.menu.faq" - The status menu 'FAQ' menu item
@@ -67,7 +67,7 @@ extension UserText {
     // "network.protection.system.extension.unknown.activation.error" - Message shown to users when they try to enable NetP and there is an unexpected activation error.
     static let networkProtectionUnknownActivationError = "There as an unexpected error. Please try again."
     // "network.protection.system.extension.please.reboot" - Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation
-    static let networkProtectionPleaseReboot = "Please reboot to activate the VPN"
+    static let networkProtectionPleaseReboot = "VPN update available. Restart your Mac to reconnect."
 }
 
 // MARK: - VPN Waitlist
@@ -299,7 +299,7 @@ extension UserText {
     // "vpn.location.description.nearest" - Nearest city setting description
     static let vpnLocationNearest = "Nearest"
     // "vpn.location.description.nearest.available" - Nearest available location setting description
-    static let vpnLocationNearestAvailable = "Nearest available"
+    static let vpnLocationNearestAvailable = "Nearest Location"
     // "vpn.location.nearest.available.title" - Subtitle underneath the nearest available vpn location preference text.
     static let vpnLocationNearestAvailableSubtitle = "Automatically connect to the nearest server we can find."
 
@@ -330,6 +330,15 @@ extension UserText {
     static let uninstallVPNAlertTitle = "Are you sure you want to uninstall the VPN?"
     // "vpn.uninstall.alert.informative.text" - Informative text for the alert that comes up when the user decides to uninstall our VPN
     static let uninstallVPNInformativeText = "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device."
+
+    // MARK: - VPN Screen
+    // "network.protection.vpn.location.nearest" - Description of the location type in the VPN status view
+    static let netPVPNLocationNearest = "(Nearest)"
+
+    // "network.protection.vpn.location.subtitle.formatted.city.and.country" - Subtitle for the preferred location item that formats a city and country. E.g Chicago, United States
+    static func netPVPNSettingsLocationSubtitleFormattedCityAndCountry(city: String, country: String) -> String {
+        return "\(city), \(country)"
+    }
 }
 
 #if DBP

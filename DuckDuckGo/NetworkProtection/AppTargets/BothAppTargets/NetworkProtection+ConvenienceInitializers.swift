@@ -20,10 +20,7 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 import Common
-
-#if SUBSCRIPTION
 import Subscription
-#endif
 
 extension NetworkProtectionDeviceManager {
 
@@ -56,11 +53,7 @@ extension NetworkProtectionKeychainTokenStore {
     }
 
     convenience init(isSubscriptionEnabled: Bool) {
-#if SUBSCRIPTION
         let accessTokenProvider: () -> String? = { AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).accessToken }
-#else
-        let accessTokenProvider: () -> String? = { return nil }
-#endif
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
                   isSubscriptionEnabled: isSubscriptionEnabled,

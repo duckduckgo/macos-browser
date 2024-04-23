@@ -32,6 +32,7 @@ final class MainViewController: NSViewController {
     let findInPageViewController: FindInPageViewController
     let fireViewController: FireViewController
     let bookmarksBarViewController: BookmarksBarViewController
+    private let bookmarksBarVisibilityManager: BookmarksBarVisibilityManager
 
     let tabCollectionViewModel: TabCollectionViewModel
     let isBurner: Bool
@@ -60,6 +61,7 @@ final class MainViewController: NSViewController {
         self.isBurner = tabCollectionViewModel.isBurner
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+        bookmarksBarVisibilityManager = BookmarksBarVisibilityManager(selectedTabPublisher: tabCollectionViewModel.$selectedTabViewModel.eraseToAnyPublisher())
 
         let networkProtectionPopoverManager: NetPPopoverManager = {
 #if DEBUG
@@ -91,7 +93,8 @@ final class MainViewController: NSViewController {
                 serverInfoObserver: ipcClient.ipcServerInfoObserver,
                 connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: connectivityIssuesObserver,
-                controllerErrorMessageObserver: controllerErrorMessageObserver
+                controllerErrorMessageObserver: controllerErrorMessageObserver,
+                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
             )
         }()
 
@@ -124,7 +127,7 @@ final class MainViewController: NSViewController {
         listenToKeyDownEvents()
         subscribeToMouseTrackingArea()
         subscribeToSelectedTabViewModel()
-        subscribeToAppSettingsNotifications()
+        subscribeToBookmarkBarVisibility()
         subscribeToFirstResponder()
         mainView.findInPageContainerView.applyDropShadow()
 
@@ -171,9 +174,6 @@ final class MainViewController: NSViewController {
 
             resizeNavigationBar(isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
                                 animated: false)
-
-            let bookmarksBarVisible = AppearancePreferences.shared.showBookmarksBar
-            updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
         }
 
         updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
@@ -189,11 +189,8 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-        presentWaitlistThankYouPromptIfNecessary()
 
-#if NETWORK_PROTECTION
         refreshNetworkProtectionMessages()
-#endif
 
 #if DBP
         DataBrokerProtectionAppEvents().windowDidBecomeMain()
@@ -306,21 +303,30 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToTitleChange(of selectedTabViewModel: TabViewModel?) {
-        guard let window = self.view.window else { return }
-        selectedTabViewModel?.$title
+        guard let selectedTabViewModel else { return }
+
+        // Only subscribe once the view is added to the window.
+        let windowPublisher = view.publisher(for: \.window).filter({ $0 != nil }).prefix(1).asVoid()
+
+        windowPublisher
+            .combineLatest(selectedTabViewModel.$title) { $1 }
             .map {
                 $0.truncated(length: MainMenu.Constants.maxTitleLength)
             }
             .receive(on: DispatchQueue.main)
-            .assign(to: \.title, onWeaklyHeld: window)
+            .sink { [weak self] title in
+                self?.view.window?.title = title
+            }
             .store(in: &tabViewModelCancellables)
     }
 
-    private func subscribeToAppSettingsNotifications() {
-        bookmarksBarVisibilityChangedCancellable = NotificationCenter.default
-            .publisher(for: AppearancePreferences.Notifications.showBookmarksBarSettingChanged)
-            .sink { [weak self] _ in
-                self?.updateBookmarksBarViewVisibility(visible: AppearancePreferences.shared.showBookmarksBar)
+    private func subscribeToBookmarkBarVisibility() {
+        bookmarksBarVisibilityChangedCancellable = bookmarksBarVisibilityManager
+            .$isBookmarksBarVisible
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isBookmarksBarVisible in
+                self?.updateBookmarksBarViewVisibility(visible: isBookmarksBarVisible)
             }
     }
 
@@ -337,7 +343,6 @@ final class MainViewController: NSViewController {
                 defer { lastTabContent = content }
 
                 resizeNavigationBar(isHomePage: content == .newtab, animated: content == .newtab && lastTabContent != .newtab)
-                updateBookmarksBar(content)
                 adjustFirstResponder(selectedTabViewModel: selectedTabViewModel, tabContent: content)
             }
             .store(in: &self.tabViewModelCancellables)
@@ -354,14 +359,6 @@ final class MainViewController: NSViewController {
         // when window first responder is reset (to the window): activate Tab Content View
         if view.window?.firstResponder === view.window {
             browserTabViewController.adjustFirstResponder()
-        }
-    }
-
-    private func updateBookmarksBar(_ content: Tab.TabContent, _ prefs: AppearancePreferences = AppearancePreferences.shared) {
-        if content.isUrl && prefs.bookmarksBarAppearance == .newTabOnly {
-            updateBookmarksBarViewVisibility(visible: false)
-        } else if prefs.showBookmarksBar {
-            updateBookmarksBarViewVisibility(visible: true)
         }
     }
 
@@ -438,16 +435,6 @@ final class MainViewController: NSViewController {
             return
         }
         NSApp.mainMenuTyped.stopMenuItem.isEnabled = selectedTabViewModel.isLoading
-    }
-
-    func presentWaitlistThankYouPromptIfNecessary() {
-        guard let window = self.view.window else {
-            assertionFailure("Couldn't get main view controller's window")
-            return
-        }
-
-        let presenter = WaitlistThankYouPromptPresenter()
-        presenter.presentThankYouPromptIfNecessary(in: window)
     }
 
     // MARK: - First responder

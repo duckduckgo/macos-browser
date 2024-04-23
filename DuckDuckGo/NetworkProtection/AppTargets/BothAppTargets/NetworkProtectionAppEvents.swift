@@ -81,10 +81,6 @@ final class NetworkProtectionAppEvents {
     func applicationDidBecomeActive() {
         Task { @MainActor in
             await featureVisibility.disableIfUserHasNoAccess()
-
-#if SUBSCRIPTION
-            await AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).refreshSubscriptionAndEntitlements()
-#endif
         }
     }
 

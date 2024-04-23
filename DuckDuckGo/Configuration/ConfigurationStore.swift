@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import Configuration
+import PixelKit
 
 final class ConfigurationStore: ConfigurationStoring {
 
@@ -99,7 +100,7 @@ final class ConfigurationStore: ConfigurationStoring {
             let nserror = error as NSError
 
             if nserror.domain != NSCocoaErrorDomain || nserror.code != NSFileReadNoSuchFileError {
-                Pixel.fire(.debug(event: .trackerDataCouldNotBeLoaded, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.trackerDataCouldNotBeLoaded, error: error))
             }
 
             return nil

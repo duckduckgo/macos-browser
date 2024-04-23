@@ -69,6 +69,7 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
+      language = "en"
       codeCoverageEnabled = "YES">
       <PreActions>
          <ExecutionAction
@@ -113,6 +114,9 @@
                </Test>
                <Test
                   Identifier = "CBRCompileTimeReporterTests">
+               </Test>
+               <Test
+                  Identifier = "PixelExperimentTests">
                </Test>
                <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
@@ -188,30 +192,10 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PixelKitTests"
-               BuildableName = "PixelKitTests"
-               BlueprintName = "PixelKitTests"
-               ReferencedContainer = "container:LocalPackages/PixelKit">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "DataBrokerProtectionTests"
                BuildableName = "DataBrokerProtectionTests"
                BlueprintName = "DataBrokerProtectionTests"
                ReferencedContainer = "container:LocalPackages/DataBrokerProtection">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "NetworkProtectionTests"
-               BuildableName = "NetworkProtectionTests"
-               BlueprintName = "NetworkProtectionTests"
-               ReferencedContainer = "container:../BrowserServicesKit">
             </BuildableReference>
          </TestableReference>
       </Testables>

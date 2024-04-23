@@ -35,6 +35,10 @@ class BookmarksBarTests: XCTestCase {
     private var addressBarTextField: XCUIElement!
     private let titleStringLength = 12
 
+    override class func setUp() {
+        UITests.firstRun()
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
@@ -55,7 +59,6 @@ class BookmarksBarTests: XCTestCase {
         resetBookmarksAndAddOneBookmark()
         app.typeKey("w", modifierFlags: [.command, .option, .shift]) // Close windows
         openSettingsAndSetShowBookmarksBarToUnchecked()
-        settingsWindow = app.windows.containing(.checkBox, identifier: "Preferences.AppearanceView.showBookmarksBarPreferenceToggle").firstMatch
         openSecondWindowAndVisitSite()
         siteWindow = app.windows.containing(.webView, identifier: pageTitle).firstMatch
     }

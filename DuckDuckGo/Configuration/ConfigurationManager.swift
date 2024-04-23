@@ -22,6 +22,7 @@ import BrowserServicesKit
 import Configuration
 import Common
 import Networking
+import PixelKit
 
 @MainActor
 final class ConfigurationManager {
@@ -72,13 +73,13 @@ final class ConfigurationManager {
                                                     eventMapping: Self.configurationDebugEvents)
 
     private static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
-        let domainEvent: Pixel.Event.Debug
+        let domainEvent: GeneralPixel
         switch event {
         case .invalidPayload(let configuration):
             domainEvent = .invalidPayload(configuration)
         }
 
-        Pixel.fire(.debug(event: domainEvent, error: error))
+        PixelKit.fire(DebugEvent(domainEvent, error: error))
     }
 
     func start() {
@@ -170,7 +171,7 @@ final class ConfigurationManager {
         }
 
         os_log("Failed to complete configuration update %@", log: .config, type: .error, error.localizedDescription)
-        Pixel.fire(.debug(event: .configurationFetchError, error: error))
+        PixelKit.fire(DebugEvent(GeneralPixel.configurationFetchError(error: error)))
         tryAgainSoon()
     }
 

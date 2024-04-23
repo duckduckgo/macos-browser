@@ -25,11 +25,8 @@ import SwiftUI
 import WebKit
 import Configuration
 import NetworkProtection
-
-#if SUBSCRIPTION
 import Subscription
 import SubscriptionUI
-#endif
 
 // swiftlint:disable:next type_body_length
 @MainActor final class MainMenu: NSMenu {
@@ -69,7 +66,7 @@ import SubscriptionUI
     var forwardMenuItem: NSMenuItem { historyMenu.forwardMenuItem }
 
     // MARK: Bookmarks
-    let manageBookmarksMenuItem = NSMenuItem(title: UserText.mainMenuHistoryManageBookmarks, action: #selector(MainViewController.showManageBookmarks))
+    let manageBookmarksMenuItem = NSMenuItem(title: UserText.mainMenuHistoryManageBookmarks, action: #selector(MainViewController.showManageBookmarks)).withAccessibilityIdentifier("MainMenu.manageBookmarksMenuItem")
     var bookmarksMenuToggleBookmarksBarMenuItem = NSMenuItem(title: "BookmarksBarMenuPlaceholder", action: #selector(MainViewController.toggleBookmarksBarFromMenu), keyEquivalent: "B")
     let importBookmarksMenuItem = NSMenuItem(title: UserText.importBookmarks, action: #selector(AppDelegate.openImportBrowserDataWindow))
     let bookmarksMenu = NSMenu(title: UserText.bookmarks)
@@ -306,6 +303,7 @@ import SubscriptionUI
                 .submenu(favoritesMenu.buildItems {
                     NSMenuItem(title: UserText.mainMenuHistoryFavoriteThisPage, action: #selector(MainViewController.favoriteThisPage))
                         .withImage(.favorite)
+                        .withAccessibilityIdentifier("MainMenu.favoriteThisPage")
                     NSMenuItem.separator()
                 })
                 .withImage(.favorite)
@@ -321,6 +319,7 @@ import SubscriptionUI
                 NSMenuItem(title: UserText.zoom, action: #selector(NSWindow.performZoom))
                 NSMenuItem.separator()
 
+                NSMenuItem(title: UserText.duplicateTab, action: #selector(MainViewController.duplicateTab))
                 NSMenuItem(title: UserText.pinTab, action: #selector(MainViewController.pinOrUnpinTab))
                 NSMenuItem(title: UserText.moveTabToNewWindow, action: #selector(MainViewController.moveTabToNewWindow))
                 NSMenuItem(title: UserText.mainMenuWindowMergeAllWindows, action: #selector(NSWindow.mergeAllWindows))
@@ -556,7 +555,7 @@ import SubscriptionUI
     // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
-            NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser))
+            NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
@@ -566,17 +565,16 @@ import SubscriptionUI
                 NSMenuItem(title: "Reset Pinned Tabs", action: #selector(MainViewController.resetPinnedTabs))
                 NSMenuItem(title: "Reset YouTube Overlay Interactions", action: #selector(MainViewController.resetDuckPlayerOverlayInteractions))
                 NSMenuItem(title: "Reset MakeDuckDuckYours user settings", action: #selector(MainViewController.resetMakeDuckDuckGoYoursUserSettings))
-                NSMenuItem(title: "Survey 10% on", action: #selector(MainViewController.in10PercentSurveyOn))
-                NSMenuItem(title: "Survey 10% off", action: #selector(MainViewController.in10PercentSurveyOff))
+                NSMenuItem(title: "Permanent Survey share on", action: #selector(MainViewController.inPermanentSurveyShareOn(_:)))
+                NSMenuItem(title: "Permanent Survey share off", action: #selector(MainViewController.inPermanentSurveyShareOff(_:)))
                 NSMenuItem(title: "Change Activation Date") {
                     NSMenuItem(title: "Today", action: #selector(MainViewController.changeInstallDateToToday), keyEquivalent: "N")
-                    NSMenuItem(title: "Less Than a 1 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan1DayAgo(_:)))
-                    NSMenuItem(title: "More Than 1 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan1DayAgoButLessThan14(_:)))
-                    NSMenuItem(title: "More Than 14 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan14DaysAgoButLessThan15(_:)))
-                    NSMenuItem(title: "More Than 15 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan15DaysAgo(_:)))
+                    NSMenuItem(title: "Less Than a 5 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan5DayAgo(_:)))
+                    NSMenuItem(title: "More Than 5 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan5DayAgoButLessThan9(_:)))
+                    NSMenuItem(title: "More Than 9 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan9DaysAgo(_:)))
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
-                NSMenuItem(title: "Reset Daily Pixels", action: #selector(MainViewController.resetDailyPixels))
+                NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))
             }.withAccessibilityIdentifier("MainMenu.resetData")
             NSMenuItem(title: "UI Triggers") {
                 NSMenuItem(title: "Show Save Credentials Popover", action: #selector(MainViewController.showSaveCredentialsPopover))
@@ -612,7 +610,6 @@ import SubscriptionUI
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
-#if SUBSCRIPTION
             let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
 
@@ -631,7 +628,6 @@ import SubscriptionUI
             },
                 subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)
             )
-#endif
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }

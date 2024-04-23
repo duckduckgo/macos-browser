@@ -23,6 +23,7 @@ enum BWInstallationState {
 
     case notInstalled
     case oldVersion
+    case incompatible
     case installed
 
 }
@@ -41,6 +42,7 @@ final class LocalBitwardenInstallationService: BWInstallationService {
     static var bundlePath = "/Applications/Bitwarden.app"
     private lazy var bundleUrl = URL(fileURLWithPath: Self.bundlePath)
     static var minimumVersion = "2022.10.1"
+    static var incompatibleVersions = ["2024.3.0", "2024.3.2", "2024.4.0", "2024.4.1"]
 
     private lazy var manifestPath: String = {
 #if DEBUG
@@ -73,6 +75,10 @@ final class LocalBitwardenInstallationService: BWInstallationService {
 
         guard Self.minimumVersion.compare(version, options: .numeric) != .orderedDescending else {
             return .oldVersion
+        }
+
+        guard !Self.incompatibleVersions.contains(version) else {
+            return .incompatible
         }
 
         return .installed
@@ -124,7 +130,7 @@ final class LocalBitwardenInstallationService: BWInstallationService {
     private func isIntegrationEnabled(in dataFileURL: URL) -> Bool {
         do {
             let dataFile = try String(contentsOf: dataFileURL)
-            return dataFile.range(of: "\"enableDuckDuckGoBrowserIntegration\": true") != nil
+            return dataFile.range(of: "enableDuckDuckGoBrowserIntegration\": true") != nil
         } catch {
             return false
         }

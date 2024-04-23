@@ -51,7 +51,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
         APIRequest.Headers.setUserAgent("")
         var params = parameters
         params["test"] = "1"
-        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
+        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: GeneralPixel.brokenSiteReport.name),
                                                      queryParameters: params,
                                                      allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         return configuration.request

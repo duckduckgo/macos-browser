@@ -20,6 +20,7 @@ import Foundation
 import Suggestions
 import Common
 import History
+import PixelKit
 
 final class SuggestionContainer {
 
@@ -63,7 +64,7 @@ final class SuggestionContainer {
                 os_log("Suggestions: Failed to get suggestions - %s",
                        type: .error,
                        "\(String(describing: error))")
-                Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.suggestionsFetchFailed, error: error))
                 return
             }
 

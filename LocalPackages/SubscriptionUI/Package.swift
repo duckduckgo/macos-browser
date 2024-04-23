@@ -12,7 +12,7 @@ let package = Package(
             targets: ["SubscriptionUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "132.0.2"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "138.1.0"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
@@ -24,7 +24,11 @@ let package = Package(
             ],
             resources: [
                 .process("Resources")
-            ]),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ]
+        ),
         .testTarget(
             name: "SubscriptionUITests",
             dependencies: ["SubscriptionUI"]),

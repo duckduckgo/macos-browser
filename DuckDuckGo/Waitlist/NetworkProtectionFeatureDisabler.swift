@@ -74,6 +74,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     @MainActor
     @discardableResult
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool {
+        // We can do this optimistically as it has little if any impact.
+        unpinNetworkProtection()
+
         // To disable NetP we need the login item to be running
         // This should be fine though as we'll disable them further down below
         guard canUninstall(includingSystemExtension: uninstallSystemExtension) else {
@@ -83,7 +86,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         isDisabling = true
 
         defer {
-            unpinNetworkProtection()
             resetUserDefaults(uninstallSystemExtension: uninstallSystemExtension)
         }
 
@@ -100,7 +102,18 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
             }
         }
 
-        try? await removeVPNConfiguration()
+        var attemptNumber = 1
+        while attemptNumber <= 3 {
+            do {
+                try await removeVPNConfiguration()
+                break // Removal succeeded, break out of the while loop and continue with the rest of uninstallation
+            } catch {
+                print("Failed to remove VPN configuration, with error: \(error.localizedDescription)")
+            }
+
+            attemptNumber += 1
+        }
+
         // We want to give some time for the login item to reset state before disabling it
         try? await Task.sleep(interval: 0.5)
         disableLoginItems()
@@ -115,7 +128,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     }
 
     func stop() {
-        ipcClient.stop()
+        ipcClient.stop { _ in
+            // Intentional no-op
+        }
     }
 
     private func enableLoginItems() {

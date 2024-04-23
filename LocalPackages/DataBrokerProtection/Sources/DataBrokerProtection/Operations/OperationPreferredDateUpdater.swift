@@ -33,7 +33,7 @@ protocol OperationPreferredDateUpdater {
                                   extractedProfileId: Int64?,
                                   schedulingConfig: DataBrokerScheduleConfig) throws
 
-    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64)
+    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64) throws
 }
 
 struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
@@ -47,8 +47,8 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                                   extractedProfileId: Int64?,
                                   schedulingConfig: DataBrokerScheduleConfig) throws {
 
-        guard let brokerProfileQuery = database.brokerProfileQueryData(for: brokerId,
-                                                                       and: profileQueryId) else { return }
+        guard let brokerProfileQuery = try database.brokerProfileQueryData(for: brokerId,
+                                                                           and: profileQueryId) else { return }
 
         try updateScanOperationDataDates(origin: origin,
                                          brokerId: brokerId,
@@ -70,16 +70,21 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
 
     /// 1, This method fetches scan operations with the profileQueryId and with child sites of parentBrokerId
     /// 2. Then for each one it updates the preferredRunDate of the scan to its confirm scan
-    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64) {
-        let childBrokers = database.fetchChildBrokers(for: parentBroker.name)
+    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64) throws {
+        do {
+            let childBrokers =  try database.fetchChildBrokers(for: parentBroker.name)
 
-        childBrokers.forEach { childBroker in
-            if let childBrokerId = childBroker.id {
-                let confirmOptOutScanDate = Date().addingTimeInterval(childBroker.schedulingConfig.confirmOptOutScan.hoursToSeconds)
-                database.updatePreferredRunDate(confirmOptOutScanDate,
-                                                brokerId: childBrokerId,
-                                                profileQueryId: profileQueryId)
+            try childBrokers.forEach { childBroker in
+                if let childBrokerId = childBroker.id {
+                    let confirmOptOutScanDate = Date().addingTimeInterval(childBroker.schedulingConfig.confirmOptOutScan.hoursToSeconds)
+                    try database.updatePreferredRunDate(confirmOptOutScanDate,
+                                                    brokerId: childBrokerId,
+                                                    profileQueryId: profileQueryId)
+                }
             }
+        } catch {
+            os_log("OperationPreferredDateUpdaterUseCase error: updateChildrenBrokerForParentBroker, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
     }
 
@@ -102,10 +107,10 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
         }
 
         if newScanPreferredRunDate != currentScanPreferredRunDate {
-            updatePreferredRunDate(newScanPreferredRunDate,
-                                   brokerId: brokerId,
-                                   profileQueryId: profileQueryId,
-                                   extractedProfileId: nil)
+            try updatePreferredRunDate(newScanPreferredRunDate,
+                                       brokerId: brokerId,
+                                       profileQueryId: profileQueryId,
+                                       extractedProfileId: nil)
         }
     }
 
@@ -129,10 +134,10 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
         }
 
         if newOptOutPreferredDate != currentOptOutPreferredRunDate {
-            updatePreferredRunDate(newOptOutPreferredDate,
-                                   brokerId: brokerId,
-                                   profileQueryId: profileQueryId,
-                                   extractedProfileId: extractedProfileId)
+            try updatePreferredRunDate(newOptOutPreferredDate,
+                                       brokerId: brokerId,
+                                       profileQueryId: profileQueryId,
+                                       extractedProfileId: extractedProfileId)
         }
     }
 
@@ -146,11 +151,16 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
     private func updatePreferredRunDate( _ date: Date?,
                                          brokerId: Int64,
                                          profileQueryId: Int64,
-                                         extractedProfileId: Int64?) {
-        if let extractedProfileId = extractedProfileId {
-            database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
-        } else {
-            database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
+                                         extractedProfileId: Int64?) throws {
+        do {
+            if let extractedProfileId = extractedProfileId {
+                try database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+            } else {
+                try database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
+            }
+        } catch {
+            os_log("OperationPreferredDateUpdaterUseCase error: updatePreferredRunDate, error: %{public}@", log: .error, error.localizedDescription)
+            throw error
         }
 
         os_log("Updating preferredRunDate on operation with brokerId %{public}@ and profileQueryId %{public}@", log: .dataBrokerProtection, brokerId.description, profileQueryId.description)

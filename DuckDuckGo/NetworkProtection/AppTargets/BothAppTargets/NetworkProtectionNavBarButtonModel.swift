@@ -36,8 +36,9 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
-    // MARK: - NetP Icon publisher
+    // MARK: - VPN
 
+    private let vpnVisibility: NetworkProtectionFeatureVisibility
     private let iconPublisher: NetworkProtectionIconPublisher
     private var iconPublisherCancellable: AnyCancellable?
 
@@ -70,10 +71,12 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     init(popoverManager: NetPPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
+         vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
          statusReporter: NetworkProtectionStatusReporter,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         self.popoverManager = popoverManager
+        self.vpnVisibility = vpnVisibility
         self.networkProtectionStatusReporter = statusReporter
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.pinningManager = pinningManager
@@ -112,14 +115,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 #if DEBUG
         guard [.normal, .integrationTests].contains(NSApp.runType) else { return NSImage() }
 #endif
-
-        if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-            return .networkProtectionAvailableButton
-        }
-
-        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            return .image(for: icon)!
-        }
 
         return .image(for: icon)!
     }
@@ -175,8 +170,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     @MainActor
     func updateVisibility() {
         // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
-        let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
-        if networkProtectionVisibility.isNetworkProtectionBetaVisible() {
+        if vpnVisibility.isNetworkProtectionBetaVisible() {
             if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
                 showButton = true
                 return
