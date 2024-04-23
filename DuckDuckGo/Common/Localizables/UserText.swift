@@ -1142,7 +1142,7 @@ struct UserText {
     // MARK: - DBP Error pages
 
     static let dbpErrorPageBadPathTitle = "Move DuckDuckGo App to Applications"
-    static let dbpErrorPageBadPathMessage = "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. You move the app yourself and restart the browser, or we can do it for you."
+    static let dbpErrorPageBadPathMessage = "To use Personal Information Removal, the DuckDuckGo app needs to be in the Applications folder on your Mac. You can move the app yourself and restart the browser, or we can do it for you."
     static let dbpErrorPageBadPathCTA = "Move App for Me..."
 
     static let dbpErrorPageNoPermissionTitle = "Change System Setting"
