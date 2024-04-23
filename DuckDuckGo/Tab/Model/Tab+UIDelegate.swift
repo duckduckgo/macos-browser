@@ -85,16 +85,12 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                                             windowFeatures: WKWindowFeatures,
                                             completionHandler: @escaping (WKWebView?) -> Void) {
 
-        switch newWindowPolicy(for: navigationAction) {
+        switch newWindowPolicy(for: navigationAction)?.preferringTabsToWindows(tabsPreferences.preferNewTabsToWindows) {
         // popup kind is known, action doesn‘t require Popup Permission
-        case .allow(.tab(selected: false, let burner)):
-            // update selected flag based on tab preferences
-            let targetKind = NewWindowPolicy.tab(selected: tabsPreferences.switchToNewTabWhenOpened, burner: burner)
-            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
-            return
         case .allow(let targetKind):
             // proceed to web view creation
-            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
+            completionHandler(self.createWebView(from: webView, with: configuration,
+                                                 for: navigationAction, of: targetKind.preferringSelectedTabs(tabsPreferences.switchToNewTabWhenOpened)))
             return
         case .cancel:
             // navigation action was handled before and cancelled
@@ -107,6 +103,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         let shouldSelectNewTab = !NSApp.isCommandPressed || tabsPreferences.switchToNewTabWhenOpened // this is actually not correct, to be fixed later
         // try to guess popup kind from provided windowFeatures
         let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: burnerMode.isBurner)
+            .preferringTabsToWindows(tabsPreferences.preferNewTabsToWindows)
 
         // action doesn‘t require Popup Permission as it‘s user-initiated
         // TO BE FIXED: this also opens a new window when a popup ad is shown on click simultaneously with the main frame navigation:
@@ -136,35 +133,20 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     private func newWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
-        func handleWithPreferences(newPolicy: NavigationDecision?) -> NavigationDecision? {
-            guard let newPolicy else { return nil }
-
-            switch newPolicy {
-            case .allow(let targetKind):
-                if !tabsPreferences.preferNewTabsToWindows {
-                    return .allow(.window(active: targetKind.isSelectedTab, burner: burnerMode.isBurner))
-                }
-            case .cancel:
-                break
-            }
-
-            return newPolicy
-        }
-
         if let newWindowPolicy = self.decideNewWindowPolicy(for: navigationAction) {
-            return handleWithPreferences(newPolicy: newWindowPolicy)
+            return newWindowPolicy
         }
 
         // Are we handling custom Context Menu navigation action or link click with a hotkey?
         for handler in self.newWindowPolicyDecisionMakers ?? [] {
             guard let newWindowPolicy = handler.decideNewWindowPolicy(for: navigationAction) else { continue }
-            return handleWithPreferences(newPolicy: newWindowPolicy)
+            return newWindowPolicy
         }
 
         // allow popups opened from an empty window console
         let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
-            return handleWithPreferences(newPolicy: .allow(.tab(selected: true, burner: burnerMode.isBurner)))
+            return .allow(.tab(selected: true, burner: burnerMode.isBurner))
         }
 
         return nil
