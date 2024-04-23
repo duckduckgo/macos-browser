@@ -474,7 +474,7 @@ private extension NSAttributedString {
             duckDuckGoWithChevronAttributedString
 
             // favicon
-            Component(image: icon, rect: CGRect(x: 0, y: iconBaselineOffset, width: iconSize, height: iconSize))
+            Component(image: icon, rect: CGRect(x: 0, y: iconBaselineOffset, width: icon.size.width, height: icon.size.height))
             // spacing
             Component(image: spacer, rect: CGRect(x: 0, y: 0, width: iconSpacing, height: 1))
             // title
