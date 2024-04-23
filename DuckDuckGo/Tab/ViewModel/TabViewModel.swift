@@ -233,7 +233,7 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = !isShowingErrorPage && (tab.content.userEditableUrl ?? .blankPage) != .blankPage
+        canBeBookmarked = !isShowingErrorPage && tab.content.canBeBookmarked
     }
 
     private var tabURL: URL? {

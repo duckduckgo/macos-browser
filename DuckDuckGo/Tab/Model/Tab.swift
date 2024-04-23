@@ -725,7 +725,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         if startupPreferences.launchToCustomHomePage,
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
-            setContent(.url(customURL, credential: nil, source: .ui))
+            setContent(.contentFromURL(customURL, source: .ui))
         } else {
             setContent(.newtab)
         }
