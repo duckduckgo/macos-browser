@@ -56,14 +56,15 @@ struct DataBrokerProtectionErrorView: View {
             }
             .padding(.bottom, 25)
 
-            Image("Alert-Color-16")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 24, height: 24)
+            HStack {
+                Image("dbp-error-info")
+                    .resizable()
+                    .frame(width: 24, height: 24)
 
-            Text(viewModel.title)
-                .font(.title)
-                .fontWeight(.light)
+                Text(viewModel.title)
+                    .font(.title)
+                    .fontWeight(.light)
+            }
 
             Text(viewModel.message)
                 .font(.body)
