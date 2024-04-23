@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1713140318814,
+    "version": 1713542334045,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -280,6 +280,15 @@
                     "domain": "condell-ltd.com"
                 },
                 {
+                    "domain": "leefgemeenschapzilt.nl"
+                },
+                {
+                    "domain": "healthline.com"
+                },
+                {
+                    "domain": "sporthoj.com"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -290,13 +299,12 @@
                 "disabledCMPs": [
                     "generic-cosmetic",
                     "termsfeed3",
-                    "strato.de",
                     "healthline-media",
                     "tarteaucitron.js"
                 ]
             },
             "state": "enabled",
-            "hash": "0eaff8b64b6d3e8a59879f3b4ab6c0ba"
+            "hash": "f35e24cf85485b441cb9a76146e77e17"
         },
         "autofill": {
             "exceptions": [
@@ -2844,6 +2852,27 @@
                         ]
                     },
                     {
+                        "domain": "independent.co.uk",
+                        "rules": [
+                            {
+                                "selector": "#partners",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#top-banner-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[data-mpu1=true]",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#stickyFooterRoot",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "indiatimes.com",
                         "rules": [
                             {
@@ -4231,7 +4260,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "c0fa0dfbc6231be31492023b623ac99b"
+            "hash": "765e789c939c6e3307f576bc698fbb9e"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4884,18 +4913,11 @@
                     }
                 },
                 "toggleReports": {
-                    "state": "enabled",
-                    "rollout": {
-                        "steps": [
-                            {
-                                "percent": 10
-                            }
-                        ]
-                    }
+                    "state": "enabled"
                 }
             },
             "state": "enabled",
-            "hash": "b337f9c7cf15e7e4807ef232befaa999"
+            "hash": "66968d9b69520975185476473cc11824"
         },
         "privacyPro": {
             "state": "enabled",
@@ -5218,7 +5240,8 @@
                             {
                                 "rule": "static.adsafeprotected.com/iasPET.1.js",
                                 "domains": [
-                                    "corriere.it"
+                                    "corriere.it",
+                                    "independent.co.uk"
                                 ]
                             },
                             {
@@ -6894,7 +6917,8 @@
                                 "domains": [
                                     "andieswim.com",
                                     "footweartruth.com",
-                                    "kmail-lists.com"
+                                    "kmail-lists.com",
+                                    "usafacts.org"
                                 ]
                             }
                         ]
@@ -7107,7 +7131,8 @@
                             {
                                 "rule": "npttech.com/advertising.js",
                                 "domains": [
-                                    "blick.ch"
+                                    "blick.ch",
+                                    "independent.co.uk"
                                 ]
                             }
                         ]
@@ -8195,7 +8220,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "2d627140b59bca8b8edbc236e79cd46e"
+            "hash": "2d5ce26ddae089bcb61e4f4a0b1ae487"
         },
         "trackingCookies1p": {
             "settings": {

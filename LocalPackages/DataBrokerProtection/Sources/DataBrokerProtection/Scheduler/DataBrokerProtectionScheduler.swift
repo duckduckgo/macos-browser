@@ -27,6 +27,12 @@ public enum DataBrokerProtectionSchedulerStatus: Codable {
     case running
 }
 
+public enum DataBrokerProtectionSchedulerError: Error {
+    case loginItemDoesNotHaveNecessaryPermissions
+    case appInWrongDirectory
+    case operationsInterrupted
+}
+
 @objc
 public class DataBrokerProtectionSchedulerErrorCollection: NSObject, NSSecureCoding {
     /*
@@ -74,7 +80,7 @@ public protocol DataBrokerProtectionScheduler {
     func stopScheduler()
 
     func optOutAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    func scanAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func startManualScan(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runQueuedOperations(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runAllOperations(showWebView: Bool)
 
@@ -92,8 +98,8 @@ extension DataBrokerProtectionScheduler {
         runAllOperations(showWebView: false)
     }
 
-    public func scanAllBrokers() {
-        scanAllBrokers(showWebView: false, completion: nil)
+    public func startManualScan() {
+        startManualScan(showWebView: false, completion: nil)
     }
 }
 
@@ -243,19 +249,21 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     }
 
-    public func scanAllBrokers(showWebView: Bool = false,
-                               completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+    public func startManualScan(showWebView: Bool = false,
+                                completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         stopScheduler()
 
         userNotificationService.requestNotificationPermission()
 
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] errors in
+        dataBrokerProcessor.startManualScans(showWebView: showWebView) { [weak self] errors in
             guard let self = self else { return }
 
             self.startScheduler(showWebView: showWebView)
 
-            self.userNotificationService.sendFirstScanCompletedNotification()
+            if errors?.oneTimeError == nil {
+                self.userNotificationService.sendFirstScanCompletedNotification()
+            }
 
             if let hasMatches = try? self.dataManager.hasMatches(),
                 hasMatches {
@@ -264,12 +272,17 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
-                    os_log("Error during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                    self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.scanAllBrokers"))
+                    switch oneTimeError {
+                    case DataBrokerProtectionSchedulerError.operationsInterrupted:
+                        os_log("Interrupted during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    default:
+                        os_log("Error during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.startManualScan"))
+                    }
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
-                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
+                    os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
 

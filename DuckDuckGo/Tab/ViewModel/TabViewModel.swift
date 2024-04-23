@@ -247,7 +247,7 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = !isShowingErrorPage && tab.content.isUrl && (tab.content.userEditableUrl ?? .blankPage) != .blankPage
+        canBeBookmarked = !isShowingErrorPage && tab.content.canBeBookmarked
     }
 
     private func updateAddressBarStrings() {
@@ -308,7 +308,7 @@ final class TabViewModel {
     }
 
     private func updateTitle() { // swiftlint:disable:this cyclomatic_complexity
-        let title: String
+        var title: String
         switch tab.content {
         // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
         case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
@@ -341,6 +341,9 @@ final class TabViewModel {
             } else {
                 title = addressBarString
             }
+        }
+        if title.isEmpty {
+            title = UserText.tabUntitledTitle
         }
         if self.title != title {
             self.title = title

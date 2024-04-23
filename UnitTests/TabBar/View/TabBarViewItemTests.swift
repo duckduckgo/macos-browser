@@ -188,9 +188,6 @@ final class TabBarViewItemTests: XCTestCase {
 
         let pinItem = menu.items.first { $0.title == UserText.pinTab }
         XCTAssertFalse(pinItem?.isEnabled ?? true)
-
-        let bookmarkItem = menu.items.first { $0.title == UserText.bookmarkThisPage }
-        XCTAssertFalse(bookmarkItem?.isEnabled ?? true)
     }
 
 }

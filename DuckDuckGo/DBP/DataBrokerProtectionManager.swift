@@ -41,7 +41,12 @@ public final class DataBrokerProtectionManager {
         return dataManager
     }()
 
-    private lazy var ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, pixelHandler: pixelHandler)
+    private lazy var ipcClient: DataBrokerProtectionIPCClient = {
+        let loginItemStatusChecker = LoginItem.dbpBackgroundAgent
+        return DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId,
+                                             pixelHandler: pixelHandler,
+                                             loginItemStatusChecker: loginItemStatusChecker)
+    }()
 
     lazy var scheduler: DataBrokerProtectionLoginItemScheduler = {
 

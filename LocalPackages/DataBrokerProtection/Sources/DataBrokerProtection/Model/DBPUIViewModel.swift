@@ -75,7 +75,7 @@ final class DBPUIViewModel {
 
 extension DBPUIViewModel: DBPUIScanOps {
     func startScan() -> Bool {
-        scheduler.scanAllBrokers()
+        scheduler.startManualScan()
         return true
     }
 

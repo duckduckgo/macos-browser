@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 
 public final class DataBrokerProtectionSettings {
     private let defaults: UserDefaults
@@ -45,6 +46,8 @@ public final class DataBrokerProtectionSettings {
         self.init(defaults: .dbp)
     }
 
+    // MARK: - Environment
+
     public var selectedEnvironment: SelectedEnvironment {
         get {
             defaults.dataBrokerProtectionSelectedEnvironment
@@ -54,12 +57,35 @@ public final class DataBrokerProtectionSettings {
             defaults.dataBrokerProtectionSelectedEnvironment = newValue
         }
     }
+
+    // MARK: - Show in Menu Bar
+
+    public var showInMenuBarPublisher: AnyPublisher<Bool, Never> {
+        defaults.networkProtectionSettingShowInMenuBarPublisher
+    }
+
+    public var showInMenuBar: Bool {
+        get {
+            defaults.dataBrokerProtectionShowMenuBarIcon
+        }
+
+        set {
+            defaults.dataBrokerProtectionShowMenuBarIcon = newValue
+        }
+    }
 }
 
 extension UserDefaults {
     private var selectedEnvironmentKey: String {
         "dataBrokerProtectionSelectedEnvironmentRawValue"
     }
+
+    static let showMenuBarIconDefaultValue = false
+    private var showMenuBarIconKey: String {
+        "dataBrokerProtectionShowMenuBarIcon"
+    }
+
+    // MARK: - Environment
 
     @objc
     dynamic var dataBrokerProtectionSelectedEnvironmentRawValue: String {
@@ -80,5 +106,26 @@ extension UserDefaults {
         set {
             dataBrokerProtectionSelectedEnvironmentRawValue = newValue.rawValue
         }
+    }
+
+    // MARK: - Show in Menu Bar
+
+    @objc
+    dynamic var dataBrokerProtectionShowMenuBarIcon: Bool {
+        get {
+            value(forKey: showMenuBarIconKey) as? Bool ?? Self.showMenuBarIconDefaultValue
+        }
+
+        set {
+            guard newValue != dataBrokerProtectionShowMenuBarIcon else {
+                return
+            }
+
+            set(newValue, forKey: showMenuBarIconKey)
+        }
+    }
+
+    var networkProtectionSettingShowInMenuBarPublisher: AnyPublisher<Bool, Never> {
+        publisher(for: \.dataBrokerProtectionShowMenuBarIcon).eraseToAnyPublisher()
     }
 }

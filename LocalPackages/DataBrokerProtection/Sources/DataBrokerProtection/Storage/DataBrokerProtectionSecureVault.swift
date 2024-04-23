@@ -26,7 +26,7 @@ typealias DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBroke
 let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBrokerProtectionSecureVault>(
     makeCryptoProvider: {
         return DataBrokerProtectionCryptoProvider()
-    }, makeKeyStoreProvider: {
+    }, makeKeyStoreProvider: { _ in
         return DataBrokerProtectionKeyStoreProvider()
     }, makeDatabaseProvider: { key in
         return try DefaultDataBrokerProtectionDatabaseProvider(key: key)
