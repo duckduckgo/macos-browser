@@ -254,6 +254,33 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndContinuous,
                     includeAppVersionParameter: true)
             }
+        case .failureRecoveryAttempt(let step):
+            switch step {
+            case .started:
+                PixelKit.fire(
+                    VPNFailureRecoveryPixel.vpnFailureRecoveryStarted,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true
+                )
+            case .completed(.healthy):
+                PixelKit.fire(
+                    VPNFailureRecoveryPixel.vpnFailureRecoveryCompletedHealthy,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true
+                )
+            case .completed(.unhealthy):
+                PixelKit.fire(
+                    VPNFailureRecoveryPixel.vpnFailureRecoveryCompletedUnhealthy,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true
+                )
+            case .failed(let error):
+                PixelKit.fire(
+                    VPNFailureRecoveryPixel.vpnFailureRecoveryFailed(error),
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true
+                )
+            }
         }
     }
 
