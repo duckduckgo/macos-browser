@@ -557,10 +557,8 @@ extension URL {
         return self.absoluteString
     }
 
-    public func isChild(of url: URL) -> Bool {
-        var components = URLComponents(string: url.absoluteString)
-        components?.query = nil
-
-        return self.absoluteString.hasPrefix(components?.url?.absoluteString ?? url.absoluteString)
+    public func isChild(of parentURL: URL) -> Bool {
+        guard let parentURLHost = parentURL.host, self.isPart(ofDomain: parentURLHost) else { return false }
+        return pathComponents.starts(with: parentURL.pathComponents)
     }
 }

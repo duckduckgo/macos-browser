@@ -78,7 +78,6 @@ protocol NewWindowPolicyDecisionMaker {
         self.extensions[keyPath: keyPath]
     }
 
-    @Published
     private(set) var userContentController: UserContentController?
 
     @MainActor

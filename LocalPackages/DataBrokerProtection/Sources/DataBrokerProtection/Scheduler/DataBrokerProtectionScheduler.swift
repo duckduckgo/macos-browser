@@ -27,6 +27,12 @@ public enum DataBrokerProtectionSchedulerStatus: Codable {
     case running
 }
 
+public enum DataBrokerProtectionSchedulerError: Error {
+    case loginItemDoesNotHaveNecessaryPermissions
+    case appInWrongDirectory
+    case operationsInterrupted
+}
+
 @objc
 public class DataBrokerProtectionSchedulerErrorCollection: NSObject, NSSecureCoding {
     /*
@@ -77,6 +83,10 @@ public protocol DataBrokerProtectionScheduler {
     func scanAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runQueuedOperations(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runAllOperations(showWebView: Bool)
+
+    /// Debug operations
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 
 extension DataBrokerProtectionScheduler {
@@ -120,6 +130,8 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
 
     public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status }
+
+    private var lastSchedulerSessionStartTimestamp: Date?
 
     private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
@@ -174,6 +186,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 completion(.finished)
                 return
             }
+            self.lastSchedulerSessionStartTimestamp = Date()
             self.status = .running
             os_log("Scheduler running...", log: .dataBrokerProtection)
             self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] errors in
@@ -257,8 +270,13 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
-                    os_log("Error during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
-                    self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.scanAllBrokers"))
+                    switch oneTimeError {
+                    case DataBrokerProtectionSchedulerError.operationsInterrupted:
+                        os_log("Interrupted during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                    default:
+                        os_log("Error during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
+                        self.pixelHandler.fire(.generalError(error: oneTimeError, functionOccurredIn: "DefaultDataBrokerProtectionScheduler.scanAllBrokers"))
+                    }
                 }
                 if let operationErrors = errors.operationErrors,
                           operationErrors.count != 0 {
@@ -288,5 +306,32 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             completion?(errors)
         })
+    }
+
+    public func getDebugMetadata(completion: (DBPBackgroundAgentMetadata?) -> Void) {
+        if let backgroundAgentVersion = Bundle.main.releaseVersionNumber, let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
+            completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: backgroundAgentVersion + " (build: \(buildNumber))",
+                                                  isAgentRunning: status == .running,
+                                                  agentSchedulerState: status.toString,
+                                                  lastSchedulerSessionStartTimestamp: lastSchedulerSessionStartTimestamp?.timeIntervalSince1970))
+        } else {
+            completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: "ERROR: Error fetching background agent version",
+                                                  isAgentRunning: status == .running,
+                                                  agentSchedulerState: status.toString,
+                                                  lastSchedulerSessionStartTimestamp: lastSchedulerSessionStartTimestamp?.timeIntervalSince1970))
+        }
+    }
+}
+
+extension DataBrokerProtectionSchedulerStatus {
+    var toString: String {
+        switch self {
+        case .idle:
+            return "idle"
+        case .running:
+            return "running"
+        case .stopped:
+            return "stopped"
+        }
     }
 }

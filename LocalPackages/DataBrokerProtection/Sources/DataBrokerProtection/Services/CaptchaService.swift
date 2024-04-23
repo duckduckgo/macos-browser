@@ -125,13 +125,16 @@ struct CaptchaService: CaptchaServiceProtocol {
     private let urlSession: URLSession
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let settings: DataBrokerProtectionSettings
+    private let servicePixel: DataBrokerProtectionBackendServicePixels
 
     init(urlSession: URLSession = URLSession.shared,
          redeemUseCase: DataBrokerProtectionRedeemUseCase = RedeemUseCase(),
-         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings()) {
+         settings: DataBrokerProtectionSettings = DataBrokerProtectionSettings(),
+         servicePixel: DataBrokerProtectionBackendServicePixels = DefaultDataBrokerProtectionBackendServicePixels()) {
         self.urlSession = urlSession
         self.redeemUseCase = redeemUseCase
         self.settings = settings
+        self.servicePixel = servicePixel
     }
 
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
@@ -182,7 +185,12 @@ struct CaptchaService: CaptchaServiceProtocol {
 
         os_log("Submitting captcha request ...", log: .service)
         var request = URLRequest(url: url)
-        let authHeader = try await redeemUseCase.getAuthHeader()
+
+        guard let authHeader = redeemUseCase.getAuthHeader() else {
+            servicePixel.fireEmptyAccessToken(callSite: .submitCaptchaInformationRequest)
+            throw AuthenticationError.noAuthToken
+        }
+
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
@@ -206,7 +214,14 @@ struct CaptchaService: CaptchaServiceProtocol {
                                    pollingInterval: TimeInterval = 50,
                                    attemptId: UUID,
                                    shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
-        guard let captchaResolveResult = try? await submitCaptchaToBeResolvedRequest(transactionID, attemptId: attemptId) else {
+
+        let captchaResolveResult: CaptchaResult
+
+        do {
+            captchaResolveResult = try await submitCaptchaToBeResolvedRequest(transactionID, attemptId: attemptId)
+        } catch let error as AuthenticationError where error == .noAuthToken {
+            throw AuthenticationError.noAuthToken
+        } catch {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
         }
 
@@ -257,7 +272,11 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        let authHeader = try await redeemUseCase.getAuthHeader()
+        guard let authHeader = redeemUseCase.getAuthHeader() else {
+            servicePixel.fireEmptyAccessToken(callSite: .submitCaptchaToBeResolvedRequest)
+            throw AuthenticationError.noAuthToken
+        }
+
         request.setValue(authHeader, forHTTPHeaderField: "Authorization")
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "GET"

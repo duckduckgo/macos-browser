@@ -119,6 +119,7 @@ extension NetworkProtectionStatusView {
                     isMenuBarStatusView: Bool,
                     runLoopMode: RunLoop.Mode? = nil,
                     userDefaults: UserDefaults,
+                    locationFormatter: VPNLocationFormatting,
                     uninstallHandler: @escaping () async -> Void) {
 
             self.tunnelController = controller
@@ -135,6 +136,8 @@ extension NetworkProtectionStatusView {
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
                                                                   statusReporter: statusReporter,
+                                                                  vpnSettings: .init(defaults: userDefaults),
+                                                                  locationFormatter: locationFormatter,
                                                                   appLauncher: appLauncher)
 
             connectionStatus = statusReporter.statusObserver.recentValue

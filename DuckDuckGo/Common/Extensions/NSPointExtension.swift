@@ -20,6 +20,12 @@ import Foundation
 
 extension NSPoint {
 
+    func distance(to point: NSPoint) -> CGFloat {
+        let deltaX = self.x - point.x
+        let deltaY = self.y - point.y
+        return sqrt(deltaX * deltaX + deltaY * deltaY)
+    }
+
     func isNearRect(_ rect: NSRect, allowedDistance: CGFloat) -> Bool {
         let expandedRect = rect.insetBy(dx: -allowedDistance, dy: -allowedDistance)
         return expandedRect.contains(self)
