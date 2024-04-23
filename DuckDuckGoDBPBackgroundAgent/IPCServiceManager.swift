@@ -66,12 +66,12 @@ extension IPCServiceManager: IPCServerInterface {
     }
 
     func startScheduler(showWebView: Bool) {
-        pixelHandler.fire(.ipcServerStartScheduler)
+        pixelHandler.fire(.ipcServerStartSchedulerReceivedByAgent)
         scheduler.startScheduler(showWebView: showWebView)
     }
 
     func stopScheduler() {
-        pixelHandler.fire(.ipcServerStopScheduler)
+        pixelHandler.fire(.ipcServerStopSchedulerReceivedByAgent)
         scheduler.stopScheduler()
     }
 
@@ -84,11 +84,20 @@ extension IPCServiceManager: IPCServerInterface {
         }
     }
 
-    func scanAllBrokers(showWebView: Bool,
-                        completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
-        pixelHandler.fire(.ipcServerScanAllBrokers)
-        scheduler.scanAllBrokers(showWebView: showWebView) { errors in
-            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: errors?.oneTimeError))
+    func startManualScan(showWebView: Bool,
+                         completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
+        pixelHandler.fire(.ipcServerScanAllBrokersReceivedByAgent)
+        scheduler.startManualScan(showWebView: showWebView) { errors in
+            if let error = errors?.oneTimeError {
+                switch error {
+                case DataBrokerProtectionSchedulerError.operationsInterrupted:
+                    self.pixelHandler.fire(.ipcServerScanAllBrokersInterruptedOnAgent)
+                default:
+                    self.pixelHandler.fire(.ipcServerScanAllBrokersCompletedOnAgentWithError(error: error))
+                }
+            } else {
+                self.pixelHandler.fire(.ipcServerScanAllBrokersCompletedOnAgentWithoutError)
+            }
             completion(errors)
         }
     }

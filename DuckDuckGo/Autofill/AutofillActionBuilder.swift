@@ -35,7 +35,7 @@ extension AutofillActionBuilder {
 struct AutofillDeleteAllPasswordsBuilder: AutofillActionBuilder {
     @MainActor
     func buildExecutor() -> AutofillActionExecutor? {
-        guard let secureVault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared),
+        guard let secureVault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared),
         let syncService = NSApp.delegateTyped.syncService else { return nil }
 
         return AutofillDeleteAllPasswordsExecutor(userAuthenticator: DeviceAuthenticator.shared,
