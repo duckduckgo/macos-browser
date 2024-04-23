@@ -20015,6 +20015,7 @@
     },
     "Hide" : {
       "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -47964,6 +47965,7 @@
     },
     "Show left of the back button" : {
       "comment" : "Preferences > Home Button > left position item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48017,6 +48019,7 @@
     },
     "Show Left of the Back Button" : {
       "comment" : "Main Menu > View > Home Button > left position item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48282,6 +48285,7 @@
     },
     "Show right of the reload button" : {
       "comment" : "Preferences > Home Button > right position item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48335,6 +48339,7 @@
     },
     "Show Right of the Reload Button" : {
       "comment" : "Main Menu > View > Home Button > right position item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -49827,10 +49832,58 @@
       "comment" : "Title for an empty tab without a title",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Titel"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Untitled"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin título"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans titre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Titel"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naamloos"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez tytułu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem título"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без названия"
           }
         }
       }
