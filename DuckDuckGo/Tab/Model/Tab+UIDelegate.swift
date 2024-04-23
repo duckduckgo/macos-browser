@@ -87,6 +87,11 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
         switch newWindowPolicy(for: navigationAction) {
         // popup kind is known, action doesn‘t require Popup Permission
+        case .allow(.tab(selected: false, let burner)):
+            // update selected flag based on tab preferences
+            let targetKind = NewWindowPolicy.tab(selected: tabsPreferences.switchToNewTabWhenOpened, burner: burner)
+            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
+            return
         case .allow(let targetKind):
             // proceed to web view creation
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
@@ -99,7 +104,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             break
         }
 
-        let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
+        let shouldSelectNewTab = !NSApp.isCommandPressed || tabsPreferences.switchToNewTabWhenOpened // this is actually not correct, to be fixed later
         // try to guess popup kind from provided windowFeatures
         let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: burnerMode.isBurner)
 

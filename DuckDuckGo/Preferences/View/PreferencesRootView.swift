@@ -87,7 +87,8 @@ enum Preferences {
                 case .general:
                     GeneralView(startupModel: StartupPreferences.shared,
                                 downloadsModel: DownloadsPreferences.shared,
-                                searchModel: SearchPreferences.shared)
+                                searchModel: SearchPreferences.shared,
+                                tabsModel: TabsPreferences.shared)
                 case .sync:
                     SyncView()
                 case .appearance:

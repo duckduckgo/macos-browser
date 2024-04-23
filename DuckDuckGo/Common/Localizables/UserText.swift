@@ -604,6 +604,9 @@ struct UserText {
     static let setHomePage = NSLocalizedString("preferences-homepage-set-homePage", value: "Set Homepage", comment: "Set Homepage dialog title")
     static let addressLabel = NSLocalizedString("preferences-homepage-address", value: "Address:", comment: "Homepage address field label")
 
+    static let tabs = NSLocalizedString("preferences-tabs.title", value: "Tabs", comment: "Title for tabs section in settings")
+    static let switchToNewTabWhenOpened = NSLocalizedString("preferences-tabs.switch.tab.when.opened", value: "Always switch to a new tab when opened", comment: "Option to switch to a new tab when it is opened")
+
     static func homeButtonMode(for position: HomeButtonPosition) -> String {
         switch position {
         case .hidden:
