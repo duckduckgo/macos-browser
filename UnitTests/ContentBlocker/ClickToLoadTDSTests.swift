@@ -37,7 +37,7 @@ class ClickToLoadTDSTests: XCTestCase {
         let ctlRules = ruleSets.first(where: { $0.name == tdsName})
         let ctlFallback = ctlRules?.fallbackTrackerData
         let tds = ctlFallback?.tds
-        
+
         let builder = ContentBlockerRulesBuilder(trackerData: tds!)
 
         let rules = builder.buildRules(withExceptions: [],
