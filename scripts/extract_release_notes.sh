@@ -41,7 +41,7 @@ html_escape() {
 
 make_links() {
     local input="$1"
-    sed -E 's|(https://[^ ]*)|<a href=\1>\1</a>|' <<< "$input"
+    sed -E 's|(https://[^ ]*)|<a href="\1">\1</a>|' <<< "$input"
 }
 
 while read -r line
@@ -84,7 +84,7 @@ do
         has_content=1
         if [[ "$output" == "asana" ]]; then
             escaped_line=$(html_escape "$line")
-            printf '%s' "<li>${escaped_line}</li>"
+            printf '%s' "<li>$(make_links "$escaped_line")</li>"
         elif [[ "$output" == "html" ]]; then
             # Add each line as a list item and convert URLs to clickable links
             escaped_line=$(html_escape "$line")
