@@ -70,11 +70,11 @@ extension Preferences {
                     Button(UserText.autofillViewContentButtonPasswords) {
                         model.showAutofillPopover(.logins)
                     }
-                    Button(UserText.autofillViewContentButtonPaymentMethods) {
-                        model.showAutofillPopover(.cards)
-                    }
                     Button(UserText.autofillViewContentButtonIdentities) {
                         model.showAutofillPopover(.identities)
+                    }
+                    Button(UserText.autofillViewContentButtonPaymentMethods) {
+                        model.showAutofillPopover(.cards)
                     }
 #if APPSTORE
                     Button(UserText.importPasswords) {

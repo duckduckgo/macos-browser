@@ -394,7 +394,7 @@ struct UserText {
     static let autofillViewContentButtonPasswords = NSLocalizedString("autofill.view-autofill-content.passwords", value: "View Passwords…", comment: "View Password Content Button title in the autofill Settings")
     static let autofillViewContentButtonPaymentMethods = NSLocalizedString("autofill.view-autofill-content.payment-methods", value: "View Payment Methods…", comment: "View Payment Methods Content Button title in the autofill Settings")
     static let autofillViewContentButtonIdentities = NSLocalizedString("autofill.view-autofill-content.identities", value: "View Identities…", comment: "View Identities Content Button title in the autofill Settings")
-    static let autofillAskToSave = NSLocalizedString("autofill.ask-to-save", value: "Ask to save and Autofill", comment: "Autofill settings section title")
+    static let autofillAskToSave = NSLocalizedString("autofill.ask-to-save", value: "Ask to Save and Autofill", comment: "Autofill settings section title")
     static let autofillAskToSaveExplanation = NSLocalizedString("autofill.ask-to-save.explanation", value: "Receive prompts to save new information and autofill online forms.", comment: "Description of Autofill autosaving feature - used in settings")
     static let autofillPasswords = NSLocalizedString("autofill.passwords", value: "Passwords", comment: "Autofill autosaved data type")
     static let autofillAddresses = NSLocalizedString("autofill.addresses", value: "Addresses", comment: "Autofill autosaved data type")
