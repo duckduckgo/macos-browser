@@ -123,7 +123,25 @@ jobs:
     needs: [assert-project-membership]
 
     steps:
-    - 
+    - name: Check out the code
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        sparse-checkout: |
+          .github
+           scripts
+
+    - name: Get PR URL
+      uses: kceb/pull-request-url-action@v1
+      id: pr-url
+
+    - name: Create or Update PR Subtask
+      uses: ./.github/actions/asana-create-pr-subtask
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        asana-task-id: ${{ needs.assert-project-membership.outputs.task_id }}
+        github-reviewer-user: ${{ github.event.requested_reviewer.login }}
+        github-pr-url: ${{ steps.pr-url.outputs.url }}
 
   # When a PR is merged, move the task to the Waiting for Release section of the App Board.
   mark-waiting-for-release:
