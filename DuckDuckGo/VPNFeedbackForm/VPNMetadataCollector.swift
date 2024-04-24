@@ -75,7 +75,6 @@ struct VPNMetadata: Encodable {
 
     struct PrivacyProInfo: Encodable {
         let betaParticipant: Bool
-        let hasAuthToken: Bool
         let subscriptionActive: Bool
     }
 
@@ -294,22 +293,13 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     func collectPrivacyProInfo() -> VPNMetadata.PrivacyProInfo {
-        let tokenStore = NetworkProtectionKeychainTokenStore()
         let waitlistStore = WaitlistKeychainStore(
             waitlistIdentifier: NetworkProtectionWaitlist.identifier,
             keychainAppGroup: NetworkProtectionWaitlist.keychainAppGroup
         )
 
-        var hasAuthToken: Bool {
-            guard let token = try? tokenStore.fetchToken(), !token.hasPrefix(NetworkProtectionKeychainTokenStore.authTokenPrefix) else {
-                return false
-            }
-            return true
-        }
-
         return .init(
             betaParticipant: waitlistStore.isInvited,
-            hasAuthToken: hasAuthToken,
             subscriptionActive: AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated
         )
     }
