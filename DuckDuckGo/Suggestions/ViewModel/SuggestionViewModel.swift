@@ -172,7 +172,7 @@ struct SuggestionViewModel: Equatable {
             return .web
         case .historyEntry:
             return .historySuggestion
-        case .bookmark(title: _, url: let url, isFavorite: false, allowedInTopHits: _):
+        case .bookmark(title: _, url: _, isFavorite: false, allowedInTopHits: _):
             return .bookmarkSuggestion
         case .bookmark(title: _, url: _, isFavorite: true, allowedInTopHits: _):
             return .favoritedBookmarkSuggestion
