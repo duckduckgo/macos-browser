@@ -290,7 +290,7 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable && !accountManager.isUserAuthenticated {
-            items.append(contentsOf: makeInactiveSubscriptionItems())
+            items.append(contentsOf: makeActiveSubscriptionItems())
         } else {
             items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
         }
@@ -334,7 +334,7 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
         let dbpVisibility = DefaultDataBrokerProtectionFeatureVisibility()
-        if dbpVisibility.isFeatureVisible() || dbpVisibility.isPrivacyProEnabled() {
+        if true {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")

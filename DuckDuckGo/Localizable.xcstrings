@@ -46105,6 +46105,9 @@
         }
       }
     },
+    "Privacy Pro" : {
+
+    },
     "private.search.explenation" : {
       "comment" : "feature explanation in settings",
       "extractionState" : "extracted_with_value",

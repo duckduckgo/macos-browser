@@ -24,13 +24,6 @@ protocol OperationRunnerProvider {
     func getOperationRunner() -> WebOperationRunner
 }
 
-private enum DataBrokerProtectionProcessorFunction {
-    case startManualScans(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    case runAllOptOutOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    case runQueuedOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    case runAllOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-}
-
 final class DataBrokerProtectionProcessor {
     private let database: DataBrokerProtectionRepository
     private let config: SchedulerConfig
@@ -41,8 +34,6 @@ final class DataBrokerProtectionProcessor {
     private let userNotificationService: DataBrokerProtectionUserNotificationService
     private let engagementPixels: DataBrokerProtectionEngagementPixels
     private let eventPixels: DataBrokerProtectionEventPixels
-
-    private var currentlyRunningOperationsForFunction: DataBrokerProtectionProcessorFunction?
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
@@ -65,16 +56,14 @@ final class DataBrokerProtectionProcessor {
 
     // MARK: - Public functions
     func startManualScans(showWebView: Bool = false,
-                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
-        interruptCurrentlyRunningFunction()
-        currentlyRunningOperationsForFunction = .startManualScans(pendingCompletion: completion)
+                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+        operationQueue.cancelAllOperations()
         runOperations(operationType: .scan,
                       priorityDate: nil,
-                      showWebView: showWebView) { [weak self] errors in
+                      showWebView: showWebView) { errors in
             os_log("Scans done", log: .dataBrokerProtection)
-            self?.currentlyRunningOperationsForFunction = nil
             completion?(errors)
-            self?.calculateMisMatches()
+            self.calculateMisMatches()
         }
     }
 
@@ -85,45 +74,37 @@ final class DataBrokerProtectionProcessor {
 
     func runAllOptOutOperations(showWebView: Bool = false,
                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
-        interruptCurrentlyRunningFunction()
-        currentlyRunningOperationsForFunction = .runAllOptOutOperations(pendingCompletion: completion)
+        operationQueue.cancelAllOperations()
         runOperations(operationType: .optOut,
                       priorityDate: nil,
-                      showWebView: showWebView) { [weak self] errors in
+                      showWebView: showWebView) { errors in
             os_log("Optouts done", log: .dataBrokerProtection)
-            self?.currentlyRunningOperationsForFunction = nil
             completion?(errors)
         }
     }
 
     func runQueuedOperations(showWebView: Bool = false,
                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
-        interruptCurrentlyRunningFunction()
-        currentlyRunningOperationsForFunction = .runQueuedOperations(pendingCompletion: completion)
         runOperations(operationType: .all,
                       priorityDate: Date(),
-                      showWebView: showWebView) { [weak self] errors in
+                      showWebView: showWebView) { errors in
             os_log("Queued operations done", log: .dataBrokerProtection)
-            self?.currentlyRunningOperationsForFunction = nil
             completion?(errors)
         }
     }
 
     func runAllOperations(showWebView: Bool = false,
                           completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
-        interruptCurrentlyRunningFunction()
-        currentlyRunningOperationsForFunction = .runAllOperations(pendingCompletion: completion)
         runOperations(operationType: .all,
                       priorityDate: nil,
-                      showWebView: showWebView) { [weak self] errors in
+                      showWebView: showWebView) { errors in
             os_log("Queued operations done", log: .dataBrokerProtection)
-            self?.currentlyRunningOperationsForFunction = nil
             completion?(errors)
         }
     }
 
     func stopAllOperations() {
-        interruptCurrentlyRunningFunction()
+        operationQueue.cancelAllOperations()
     }
 
     // MARK: - Private functions
@@ -200,25 +181,6 @@ final class DataBrokerProtectionProcessor {
         }
 
         return collections
-    }
-
-    private func interruptCurrentlyRunningFunction() {
-        operationQueue.cancelAllOperations()
-
-        switch currentlyRunningOperationsForFunction {
-        case .startManualScans(let pendingCompletion),
-                .runAllOptOutOperations(let pendingCompletion),
-                .runQueuedOperations(let pendingCompletion),
-                .runAllOperations(let pendingCompletion):
-
-            if let pendingCompletion = pendingCompletion {
-                // There's a current limitation that if interrupted, we won't propagate the scan errors
-                pendingCompletion(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: DataBrokerProtectionSchedulerError.operationsInterrupted))
-            }
-        case nil:
-            break
-        }
-        currentlyRunningOperationsForFunction = nil
     }
 
     deinit {
