@@ -1,0 +1,38 @@
+name: Create Asana PR subtask
+description: |
+  Creates a PR subtask and assign it to the team member in charge of the GitHub review.
+  If the PR subtask already exist, it ensure the reviewer is assigned and the task is not mark 'completed'.
+inputs:
+  access-token:
+    description: "Asana access token"
+    required: true
+    type: string
+  asana-task-id:
+    description: "Asana Task Id for the PR"
+    required: string
+    type: string
+  github-reviewer-user:
+    description: "GitHub username for the requested reviewer"
+    required: true
+    type: string
+  github-pr-url:
+    description: "GitHub URL for the opened PR"
+    required: true
+    type: string
+runs:
+  using: "composite"
+  steps:
+      - name: "Map GitHub to Asana Assignee"
+        id: map-github-to-asana-user
+        run: |
+          echo assignee_id=$(jq -r .${{ github.event.action.pull_request.requested_reviewer.login }} < ${{ github.action_path }}/user_ids.json) >> "$GITHUB_OUTPUT"
+
+      - name: "Create PR Subtask"
+        shell: bash
+        env:
+          ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+          ASANA_TASK_ID: ${{ inputs.asana-task-id }}
+          ASANA_PR_REVIEWER_ID: ${{ steps.map-github-to-asana-user.outputs.assignee_id }}
+          GITHUB_PR_URL: ${{ inputs.github-pr-url }}
+        run: |
+          ${{ github.action_path }}/asana-create-pr-subtask.sh
