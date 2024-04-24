@@ -132,7 +132,7 @@ jobs:
            scripts
 
     - name: Get PR URL
-      uses: kceb/pull-request-url-action@v1
+      uses: kceb/pull-request-url-action@v2
       id: pr-url
 
     - name: Create or Update PR Subtask
