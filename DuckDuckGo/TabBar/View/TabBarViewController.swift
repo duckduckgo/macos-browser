@@ -50,7 +50,6 @@ final class TabBarViewController: NSViewController {
     let tabCollectionViewModel: TabCollectionViewModel
 
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
-    private let tabsPreferences: TabsPreferences
     private let pinnedTabsViewModel: PinnedTabsViewModel?
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
@@ -80,8 +79,7 @@ final class TabBarViewController: NSViewController {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, tabsPreferences: TabsPreferences = TabsPreferences.shared) {
-        self.tabsPreferences = tabsPreferences
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
         if !tabCollectionViewModel.isBurner, let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
             let pinnedTabsViewModel = PinnedTabsViewModel(collection: pinnedTabCollection)
