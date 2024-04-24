@@ -32,7 +32,7 @@ runs:
         env:
           ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
           ASANA_TASK_ID: ${{ inputs.asana-task-id }}
-          ASANA_PR_REVIEWER_ID: ${{ steps.map-github-to-asana-user.outputs.assignee_id }}
+          ASANA_ASSIGNEE_ID: ${{ steps.map-github-to-asana-user.outputs.assignee_id }}
           GITHUB_PR_URL: ${{ inputs.github-pr-url }}
         run: |
           ${{ github.action_path }}/asana-create-pr-subtask.sh

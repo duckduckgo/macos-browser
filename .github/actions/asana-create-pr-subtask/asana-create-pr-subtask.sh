@@ -11,7 +11,7 @@ pr_prefix="PR:"
 ASANA_TASK_ID="1206501971760048"
 ASANA_ACCESS_TOKEN=""
 
-ASANA_PR_REVIEWER_ID="1206329551987270"
+ASANA_ASSIGNEE_ID="1206329551987270"
 GITHUB_PR_URL="https://www.example.com"
 
 # Fetch the subtasks of a task with the given ASANA_TASK_ID.
@@ -66,7 +66,7 @@ _create_pr_subtask() {
     local payload=$(cat <<EOF
     {
         "data": {
-            "assignee": "${ASANA_PR_REVIEWER_ID}",
+            "assignee": "${ASANA_ASSIGNEE_ID}",
             "notes": "${pr_prefix} ${GITHUB_PR_URL}",
             "name": "${pr_prefix} ${parent_task_name}"
         }
@@ -94,7 +94,7 @@ _assign_reviewer_to_existing_pr_subtask_and_update_status() {
         payload=$(cat <<EOF
         {
             "data": {
-                "assignee": "${ASANA_PR_REVIEWER_ID}",
+                "assignee": "${ASANA_ASSIGNEE_ID}",
                 "completed": false
             }
         }
@@ -105,7 +105,7 @@ EOF
         payload=$(cat <<EOF
         {
             "data": {
-                "assignee": "${ASANA_PR_REVIEWER_ID}"
+                "assignee": "${ASANA_ASSIGNEE_ID}"
             }
         }
 EOF
