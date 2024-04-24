@@ -23,9 +23,12 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     var mockedCurrentTab: Tab?
 
+    var canBookmarkAllOpenTabs = false
     var hasItemsToTheLeft = false
     var hasItemsToTheRight = false
     var audioState: WKWebView.AudioState?
+
+    private(set) var tabBarViewItemBookmarkAllOpenTabsActionCalled = false
 
     func tabBarViewItem(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem, isMouseOver: Bool) {
 
@@ -73,6 +76,14 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
+    }
+
+    func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
+        canBookmarkAllOpenTabs
+    }
+
+    func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+        tabBarViewItemBookmarkAllOpenTabsActionCalled = true
     }
 
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {

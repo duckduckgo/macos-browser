@@ -1011,6 +1011,11 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
 
+    func optionsButtonMenuRequestedBookmarkAllOpenTabs(_ sender: NSMenuItem) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
+    }
+
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
         popovers.showBookmarkListPopover(usingView: bookmarkListButton,
                                          withDelegate: self,
