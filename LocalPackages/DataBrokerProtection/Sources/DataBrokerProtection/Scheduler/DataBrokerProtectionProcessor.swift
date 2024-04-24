@@ -56,7 +56,7 @@ final class DataBrokerProtectionProcessor {
 
     // MARK: - Public functions
     func startManualScans(showWebView: Bool = false,
-                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         operationQueue.cancelAllOperations()
         runOperations(operationType: .scan,
                       priorityDate: nil,
