@@ -26,7 +26,6 @@ protocol ClickToLoadUserScriptDelegate: AnyObject {
 }
 
 final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
-
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView?
 
@@ -73,6 +72,7 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
         }
     }
 
+    @MainActor
     private func handleGetClickToLoadState(params: Any, message: UserScriptMessage) -> Encodable? {
         webView = message.messageWebView
         return [
@@ -81,6 +81,7 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
         ]
     }
 
+    @MainActor
     private func handleUnblockClickToLoadContent(params: Any, message: UserScriptMessage) -> Encodable? {
         struct UnblockMessage: Decodable {
             let action: String
@@ -95,13 +96,14 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
         return delegate.clickToLoadUserScriptAllowFB()
     }
 
+    @MainActor
     private func handleDebugFlagsMock(params: Any, message: UserScriptMessage) -> Encodable? {
         // breakage flags not supported on Mac yet
         return nil
     }
 
+    @MainActor
     public func displayClickToLoadPlaceholders() {
-        print("displayClickToLoadPlaceholders for url \(String(describing: webView?.url)) for broker \(broker)")
         if let webView = webView {
             broker?.push(method: "displayClickToLoadPlaceholders", params: ["ruleAction": ["block"]], for: self, into: webView)
         }

@@ -46,8 +46,8 @@ final class FBProtectionTabExtension {
         }.store(in: &cancellables)
     }
 
+    @MainActor
     public func trackerDetected() {
-        print("FB tracker blocked")
         self.clickToLoadUserScript?.displayClickToLoadPlaceholders()
     }
 }
