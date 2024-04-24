@@ -30,6 +30,7 @@ final class TabViewModel {
         static let burnerHome = NSImage.burnerTabFavicon
         static let preferences = NSImage.preferences
         static let bookmarks = NSImage.bookmarksFolder
+        static let emailProtection = NSImage.emailProtectionIcon
         static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
         static let subscription = NSImage.privacyPro
         static let identityTheftRestoration = NSImage.identityTheftRestorationMulticolor16
@@ -284,6 +285,8 @@ final class TabViewModel {
             .identityTheftRestorationTrustedIndicator
         case .url(let url, _, _) where url.isDuckPlayer:
             .duckPlayerTrustedIndicator
+        case .url(let url, _, _) where url.isEmailProtection:
+            .emailProtectionTrustedIndicator
         case .url(let url, _, _):
             NSAttributedString(string: passiveAddressBarString(with: url, showFullURL: showFullURL))
         }
@@ -356,39 +359,27 @@ final class TabViewModel {
             favicon = errorFaviconToShow(error: tab.error)
             return
         }
-        switch tab.content {
+        favicon = switch tab.content {
         case .dataBrokerProtection:
-            favicon = Favicon.dataBrokerProtection
-            return
+            Favicon.dataBrokerProtection
+        case .newtab where tab.burnerMode.isBurner:
+            Favicon.burnerHome
         case .newtab:
-            if tab.burnerMode.isBurner {
-                favicon = Favicon.burnerHome
-            } else {
-                favicon = Favicon.home
-            }
-            return
+            Favicon.home
         case .settings:
-            favicon = Favicon.preferences
-            return
+            Favicon.preferences
         case .bookmarks:
-            favicon = Favicon.bookmarks
-            return
+            Favicon.bookmarks
         case .subscription:
-            favicon = Favicon.subscription
-            return
+            Favicon.subscription
         case .identityTheftRestoration:
-            favicon = Favicon.identityTheftRestoration
-            return
+            Favicon.identityTheftRestoration
         case .url(let url, _, _) where url.isDuckPlayer:
-            favicon = Favicon.duckPlayer
-            return
-        case .url, .onboarding, .none: break
-        }
-
-        if let favicon: NSImage? = tabFavicon {
-            self.favicon = favicon
-        } else {
-            self.favicon = tab.favicon
+            Favicon.duckPlayer
+        case .url(let url, _, _) where url.isEmailProtection:
+            Favicon.emailProtection
+        case .url, .onboarding, .none:
+            tabFavicon ?? tab.favicon
         }
     }
 
@@ -502,5 +493,7 @@ private extension NSAttributedString {
                                                                                            title: UserText.identityTheftRestorationOptionsMenuItem)
     static let duckPlayerTrustedIndicator = trustedIndicatorAttributedString(with: .duckPlayerSettings,
                                                                              title: UserText.duckPlayer)
+    static let emailProtectionTrustedIndicator = trustedIndicatorAttributedString(with: .emailProtectionIcon,
+                                                                                  title: UserText.emailProtectionPreferences)
 
 }

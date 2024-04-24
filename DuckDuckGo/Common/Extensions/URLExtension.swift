@@ -409,6 +409,10 @@ extension URL {
         return false
     }
 
+    var isEmailProtection: Bool {
+        self.isChild(of: .duckDuckGoEmailLogin) || self == .duckDuckGoEmail
+    }
+
     enum DuckDuckGoParameters: String {
         case search = "q"
         case ia
@@ -563,7 +567,14 @@ extension URL {
     }
 
     public func isChild(of parentURL: URL) -> Bool {
-        guard let parentURLHost = parentURL.host, self.isPart(ofDomain: parentURLHost) else { return false }
-        return pathComponents.starts(with: parentURL.pathComponents)
+        if scheme == parentURL.scheme,
+           port == parentURL.port,
+           let parentURLHost = parentURL.host,
+           self.isPart(ofDomain: parentURLHost),
+           pathComponents.starts(with: parentURL.pathComponents) {
+            return true
+        } else {
+            return false
+        }
     }
 }
