@@ -32,6 +32,12 @@ _set_parent_task_name() {
 
     # extracts the parent name from the first object  
     parent_task_name=$(echo "$subtasks" | jq -r '.[0].parent_name')
+
+    # if parent_task_name is nil it means that there are no subtask in the current task so we fetch the parent name
+    if [ -z "$parent_task_name" ] || [ "$parent_task_name" = "null" ]; then
+        local url="${asana_api_url}/tasks/${ASANA_TASK_ID}"
+        parent_task_name="$(curl -fLSs "$url" -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" | jq -r '.data.name')"
+    fi
 }
 
 # Checks if a subtask for the PR already exists.
