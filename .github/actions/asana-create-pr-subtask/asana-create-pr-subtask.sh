@@ -8,12 +8,6 @@ set -e -o pipefail
 asana_api_url="https://app.asana.com/api/1.0"
 pr_prefix="PR:"
 
-ASANA_TASK_ID="1206501971760048"
-ASANA_ACCESS_TOKEN=""
-
-ASANA_ASSIGNEE_ID="1206329551987270"
-GITHUB_PR_URL="https://www.example.com"
-
 # Fetch the subtasks of a task with the given ASANA_TASK_ID.
 _fetch_subtasks() {
     local url="${asana_api_url}/tasks/${ASANA_TASK_ID}/subtasks?opt_fields=name,completed,parent.name"
