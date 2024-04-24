@@ -113,6 +113,11 @@ extension FBProtectionTabExtension: ClickToLoadUserScriptDelegate {
 extension FBProtectionTabExtension: NavigationResponder {
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        if navigationAction.navigationType == NavigationType.backForward(distance: -1)
+            || navigationAction.navigationType == NavigationType.backForward(distance: 1) {
+            return .next
+        }
+
         if navigationAction.navigationType == NavigationType.other && navigationAction.isUserInitiated == false {
             return .next
         }
