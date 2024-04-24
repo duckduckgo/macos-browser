@@ -835,7 +835,7 @@ extension BrowserTabViewController: TabDelegate {
         case .window(active: let active, let isBurner):
             assert(isBurner == childTab.burnerMode.isBurner)
             WindowsManager.openNewWindow(with: childTab, showWindow: active)
-        case .tab(selected: let selected, _):
+        case .tab(selected: let selected, _, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
         }
     }
