@@ -78,6 +78,10 @@ struct DataImportView: ModalView {
     private func viewHeader() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(UserText.importDataTitle)
+                .font(.title2.weight(.semibold))
+                .padding(.bottom, 24)
+
+            Text(UserText.importDataSourceTitle)
                 .bold()
                 .padding(.bottom, 16)
 

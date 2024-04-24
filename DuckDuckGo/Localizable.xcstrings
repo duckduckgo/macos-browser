@@ -22030,55 +22030,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Browserdaten importieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Import Browser Data"
+            "value" : "Import to DuckDuckGo"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importar datos del navegador"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importer les données du navigateur"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importa dati browser"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Browsergegevens importeren"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importuj dane przeglądarki"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importar dados do navegador"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Импорт данных браузера"
           }
         }
@@ -22200,6 +22200,18 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Импортировать пароли..."
+          }
+        }
+      }
+    },
+    "import.browser.data.source.title" : {
+      "comment" : "Import Browser Data title for option to choose source browser to import from",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import from"
           }
         }
       }
@@ -45804,6 +45816,9 @@
           }
         }
       }
+    },
+    "Privacy Pro" : {
+
     },
     "private.search.explenation" : {
       "comment" : "feature explanation in settings",

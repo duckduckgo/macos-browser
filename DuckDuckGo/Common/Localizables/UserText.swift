@@ -455,7 +455,8 @@ struct UserText {
     static let importBookmarks = NSLocalizedString("import.browser.data.bookmarks", value: "Import Bookmarks…", comment: "Opens Import Browser Data dialog")
     static let importPasswords = NSLocalizedString("import.browser.data.passwords", value: "Import passwords…", comment: "Opens Import Browser Data dialog")
 
-    static let importDataTitle = NSLocalizedString("import.browser.data", value: "Import Browser Data", comment: "Import Browser Data dialog title")
+    static let importDataTitle = NSLocalizedString("import.browser.data", value: "Import to DuckDuckGo", comment: "Import Browser Data dialog title")
+    static let importDataSourceTitle = NSLocalizedString("import.browser.data.source.title", value: "Import from", comment: "Import Browser Data title for option to choose source browser to import from")
 
     static let exportLogins = NSLocalizedString("export.logins.data", value: "Export passwords…", comment: "Opens Export Logins Data dialog")
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
