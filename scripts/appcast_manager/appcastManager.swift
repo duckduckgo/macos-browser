@@ -80,6 +80,9 @@ SYNOPSIS
     appcastManager --release-to-internal-channel --dmg <path_to_dmg_file> --release-notes <path_to_release_notes> [--key <path_to_private_key>]
     appcastManager --release-to-public-channel --version <version_identifier> [--release-notes <path_to_release_notes>] [--key <path_to_private_key>]
     appcastManager --release-hotfix-to-public-channel --dmg <path_to_dmg_file> --release-notes <path_to_release_notes> [--key <path_to_private_key>]
+    appcastManager --release-to-internal-channel --dmg <path_to_dmg_file> --release-notes-html <path_to_release_notes_html> [--key <path_to_private_key>]
+    appcastManager --release-to-public-channel --version <version_identifier> [--release-notes-html <path_to_release_notes_html>] [--key <path_to_private_key>]
+    appcastManager --release-hotfix-to-public-channel --dmg <path_to_dmg_file> --release-notes-html <path_to_release_notes_html> [--key <path_to_private_key>]
     appcastManager --help
 
 DESCRIPTION
@@ -170,6 +173,10 @@ case .releaseToPublicChannel:
         print("Release Notes Path: \(releaseNotesPath)")
         let dmgURLForPublic = specificDir.appendingPathComponent(dmgFileName)
         handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: specificDir, dmgURL: dmgURLForPublic)
+    } else if let releaseNotesHTMLPath = arguments.parameters["--release-notes-html"] {
+        print("Release Notes Path: \(releaseNotesHTMLPath)")
+        let dmgURLForPublic = specificDir.appendingPathComponent(dmgFileName)
+        handleReleaseNotesHTML(path: releaseNotesHTMLPath, updatesDirectoryURL: specificDir, dmgURL: dmgURLForPublic)
     } else {
         print("👀 No new release notes provided. Keeping existing release notes.")
     }
@@ -604,6 +611,27 @@ final class AppcastDownloader {
 }
 
 // MARK: - Handling of Release Notes
+
+func handleReleaseNotesHTML(path: String, updatesDirectoryURL: URL, dmgURL: URL) {
+    // Copy release notes file and rename it to match the dmg filename
+    let releaseNotesURL = URL(fileURLWithPath: path)
+    let destinationReleaseNotesURL = updatesDirectoryURL.appendingPathComponent(dmgURL.deletingPathExtension().lastPathComponent + ".html")
+
+    do {
+        if FileManager.default.fileExists(atPath: destinationReleaseNotesURL.path) {
+            try FileManager.default.removeItem(at: destinationReleaseNotesURL)
+            print("Old release notes file removed.")
+        }
+
+        // Save the converted release notes to the destination file
+        try FileManager.default.copyItem(at: releaseNotesURL, to: destinationReleaseNotesURL)
+        print("✅ New release notes HTML file copied to the updates directory.")
+
+    } catch {
+        print("❌ Failed to copy and convert release notes HTML file: \(error).")
+        exit(1)
+    }
+}
 
 func handleReleaseNotesFile(path: String, updatesDirectoryURL: URL, dmgURL: URL) {
     // Copy release notes file and rename it to match the dmg filename
