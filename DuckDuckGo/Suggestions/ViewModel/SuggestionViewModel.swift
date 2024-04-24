@@ -94,7 +94,8 @@ struct SuggestionViewModel: Equatable {
             } else {
                 return title ?? url.toString(forUserInput: userStringValue)
             }
-        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _):
+        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _),
+             .internalPage(title: let title, url: _):
             return title
         case .unknown(value: let value):
             return value
@@ -113,7 +114,8 @@ struct SuggestionViewModel: Equatable {
             } else {
                 return title
             }
-        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _):
+        case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _),
+             .internalPage(title: let title, url: _):
             return title
         }
     }
@@ -155,6 +157,8 @@ struct SuggestionViewModel: Equatable {
                                               dropScheme: true,
                                               dropTrailingSlash: true)
             }
+        case .internalPage:
+            return " – " + UserText.duckDuckGo
         }
     }
 
@@ -169,20 +173,18 @@ struct SuggestionViewModel: Equatable {
         case .historyEntry:
             return .historySuggestion
         case .bookmark(title: _, url: let url, isFavorite: false, allowedInTopHits: _):
-            if url == .bookmarks {
-                return .bookmarksFolder
-            } else if url.absoluteString.hasPrefix(URL.settings.absoluteString),
-                      url == .settings || PreferencePaneIdentifier(url: url) != nil {
-                return .settingsMulticolor16
-            } else if let customURL = URL(string: StartupPreferences.shared.formattedCustomHomePageURL),
-                      url == customURL {
-                return .home16
-            }
             return .bookmarkSuggestion
         case .bookmark(title: _, url: _, isFavorite: true, allowedInTopHits: _):
             return .favoritedBookmarkSuggestion
         case .unknown:
             return .web
+        case .internalPage(title: _, url: let url) where url == .bookmarks:
+            return .bookmarksFolder
+        case .internalPage(title: _, url: let url) where url.isSettingsURL:
+            return .settingsMulticolor16
+        case .internalPage(title: _, url: let url):
+            guard url == URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else { return nil }
+            return .home16
         }
     }
 

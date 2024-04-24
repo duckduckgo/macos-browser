@@ -93,27 +93,24 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
         return historyCoordinating.history ?? []
     }
 
-    private func fakeBookmark(title: String, url: URL) -> Suggestions.Bookmark {
-        BookmarkList.IdentifiableBookmark(from: Bookmark(id: url.absoluteString, url: url.absoluteString, title: title, isFavorite: false))
-    }
-
-    @MainActor
-    private func extraSuggestions() -> [Suggestions.Bookmark] {
-        var extraSuggestions = [
-            fakeBookmark(title: UserText.bookmarks, url: .bookmarks),
-            fakeBookmark(title: UserText.settings, url: .settings),
+    @MainActor func internalPages(for suggestionLoading: Suggestions.SuggestionLoading) -> [Suggestions.InternalPage] {
+        [
+            // suggestions for Bookmarks&Settings
+            .init(title: UserText.bookmarks, url: .bookmarks),
+            .init(title: UserText.settings, url: .settings),
         ] + PreferencePaneIdentifier.allCases.map {
-            fakeBookmark(title: UserText.settings + " → " + $0.displayName, url: .settingsPane($0))
-        }
-        if startupPreferences.launchToCustomHomePage,
-           let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
-            extraSuggestions.append(fakeBookmark(title: UserText.homePage, url: customURL))
-        }
-        return extraSuggestions
+            // preference panes URLs
+            .init(title: UserText.settings + " → " + $0.displayName, url: .settingsPane($0))
+        } + {
+            guard startupPreferences.launchToCustomHomePage,
+                  let homePage = URL(string: startupPreferences.formattedCustomHomePageURL) else { return [] }
+            // home page suggestion
+            return [.init(title: UserText.homePage, url: homePage)]
+        }()
     }
 
     @MainActor func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
-        (bookmarkManager.list?.bookmarks() ?? []) + extraSuggestions()
+        bookmarkManager.list?.bookmarks() ?? []
     }
 
     func suggestionLoading(_ suggestionLoading: SuggestionLoading,
