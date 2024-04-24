@@ -150,8 +150,7 @@ extension URL {
     }
 
     var isSettingsURL: Bool {
-        absoluteString.hasPrefix(URL.settings.absoluteString) &&
-            (self == .settings || PreferencePaneIdentifier(url: self) != nil)
+        isChild(of: .settings) && (pathComponents.isEmpty || PreferencePaneIdentifier(url: self) != nil)
     }
 #endif
 
