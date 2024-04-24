@@ -23,6 +23,7 @@ import Lottie
 import SwiftUI
 import WebKit
 
+// swiftlint:disable file_length
 final class TabBarViewController: NSViewController {
 
     enum HorizontalSpace: CGFloat {
@@ -50,6 +51,7 @@ final class TabBarViewController: NSViewController {
     let tabCollectionViewModel: TabCollectionViewModel
 
     private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    private let tabsPreferences: TabsPreferences
     private let pinnedTabsViewModel: PinnedTabsViewModel?
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
@@ -79,7 +81,8 @@ final class TabBarViewController: NSViewController {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, tabsPreferences: TabsPreferences = TabsPreferences.shared) {
+        self.tabsPreferences = tabsPreferences
         self.tabCollectionViewModel = tabCollectionViewModel
         if !tabCollectionViewModel.isBurner, let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
             let pinnedTabsViewModel = PinnedTabsViewModel(collection: pinnedTabCollection)
@@ -141,7 +144,12 @@ final class TabBarViewController: NSViewController {
     }
 
     @objc func addButtonAction(_ sender: NSButton) {
-        tabCollectionViewModel.appendNewTab(with: .newtab)
+        if tabsPreferences.newTabPosition == .nextToCurrent,
+           let selectedTab = tabCollectionViewModel.selectedTabViewModel {
+            tabCollectionViewModel.insertNewTab(after: selectedTab.tab)
+        } else {
+            tabCollectionViewModel.appendNewTab(with: .newtab)
+        }
     }
 
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {

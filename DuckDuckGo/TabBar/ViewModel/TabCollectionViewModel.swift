@@ -321,6 +321,10 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
+    func insertNewTab(after parentTab: Tab, with content: Tab.TabContent = .newtab, selected: Bool = true) {
+        insert(Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), after: parentTab, selected: selected)
+    }
+
     func insert(_ tab: Tab, at index: TabIndex, selected: Bool = true) {
         guard changesEnabled else { return }
         guard let tabCollection = tabCollection(for: index) else {

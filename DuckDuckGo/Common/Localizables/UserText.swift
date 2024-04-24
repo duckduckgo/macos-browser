@@ -608,6 +608,16 @@ struct UserText {
 
     static let tabs = NSLocalizedString("preferences-tabs.title", value: "Tabs", comment: "Title for tabs section in settings")
     static let switchToNewTabWhenOpened = NSLocalizedString("preferences-tabs.switch.tab.when.opened", value: "Always switch to a new tab when opened", comment: "Option to switch to a new tab when it is opened")
+    static let newTabPositionTitle = NSLocalizedString("preferences-tabs.new.tab.position.title", value: "Open new tabs", comment: "Title for new tab positioning")
+
+    static func newTabPositionMode(for position: NewTabPosition) -> String {
+        switch position {
+        case .atEnd:
+            return NSLocalizedString("context.menu.new.tab.mode.at.end", value: "At the end of tabs list", comment: "Preferences > Tabs > At end of list")
+        case .nextToCurrent:
+            return NSLocalizedString("context.menu.new.tab.mode.next.to.current", value: "Next to the current tab", comment: "Preferences > Tabs > Next to current tab")
+        }
+    }
 
     static func homeButtonMode(for position: HomeButtonPosition) -> String {
         switch position {
