@@ -61,7 +61,7 @@ enum NewWindowPolicy {
         guard case .tab(let isSelected, let isBurner, contextMenuInitiated: false) = self, !prefersTabsToWindows else {
             return self
         }
-        return .window(active: isSelected, burner: isBurner)
+        return .window(active: true, burner: isBurner)
     }
 
     /**
