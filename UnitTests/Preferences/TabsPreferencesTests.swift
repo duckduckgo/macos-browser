@@ -20,6 +20,7 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockTabsPreferencesPersistor: TabsPreferencesPersistor {
+    var preferNewTabsToWindows: Bool = false
     var switchToNewTabWhenOpened: Bool = false
 }
 
@@ -27,17 +28,21 @@ final class TabsPreferencesTests: XCTestCase {
 
     func testWhenInitializedThenItLoadsPersistedValues() {
         let mockPersistor = MockTabsPreferencesPersistor()
+        mockPersistor.preferNewTabsToWindows = true
         mockPersistor.switchToNewTabWhenOpened = true
         let tabsPreferences = TabsPreferences(persistor: mockPersistor)
 
+        XCTAssertTrue(tabsPreferences.preferNewTabsToWindows)
         XCTAssertTrue(tabsPreferences.switchToNewTabWhenOpened)
     }
 
-    func testWhenSwitchToNewTabUpdatedThenPersistorUpdates() {
+    func testWhenPreferencesUpdatedThenPersistorUpdates() {
         let mockPersistor = MockTabsPreferencesPersistor()
         let tabsPreferences = TabsPreferences(persistor: mockPersistor)
+        tabsPreferences.preferNewTabsToWindows = true
         tabsPreferences.switchToNewTabWhenOpened = true
 
+        XCTAssertTrue(mockPersistor.preferNewTabsToWindows)
         XCTAssertTrue(mockPersistor.switchToNewTabWhenOpened)
     }
 }

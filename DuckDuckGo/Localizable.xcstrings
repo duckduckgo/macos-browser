@@ -43249,6 +43249,18 @@
         }
       }
     },
+    "preferences-tabs.prefer.new.tabs.to.windows" : {
+      "comment" : "Option to prefer opening new tabs instead of windows when opening links",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Prefer new tabs instead of new windows when opening links"
+          }
+        }
+      }
+    },
     "preferences-tabs.switch.tab.when.opened" : {
       "comment" : "Option to switch to a new tab when it is opened",
       "extractionState" : "extracted_with_value",
