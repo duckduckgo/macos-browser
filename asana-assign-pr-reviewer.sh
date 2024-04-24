@@ -6,9 +6,10 @@
 set -e -o pipefail
 
 asana_api_url="https://app.asana.com/api/1.0"
+pr_prefix="PR:"
 
 ASANA_TASK_ID="1206501971760048"
-ASANA_ACCESS_TOKEN="2/1206329551987270/1206904223324738:1c68ff7d9f9afcdb84089276681dbc47"
+ASANA_ACCESS_TOKEN=""
 
 ASANA_PR_REVIEWER_ID="1206329551987270"
 GITHUB_PR_URL="https://www.example.com"
@@ -42,19 +43,16 @@ _set_parent_task_name() {
 # Checks if a subtask for the PR already exists.
 _check_pr_subtask_exist() {
     local response="$1"
-    local pr_prefix="PR:"
 
     # read each line of the array
-    # extract the task name
-    # remove the `PR:` prefix from the string and trim leading and trailing white spaces
+    # extract the task name and trim leading and trailing white spaces
     # extract the parent name and trim leading and trailing white spaces
-    # checks if the task name is contained in the parent name
+    # checks if the task name has 'PR:' prefix and if contains the parent name
     echo "$response" | jq -c '.[]' | while read item; do
-        task_name=$(jq -r '.task_name' <<< "$item")
-        sanitised_task_name=$(echo "${task_name//$pr_prefix/}" | awk '{$1=$1};1')
+        task_name=$(jq -r '.task_name' <<< "$item" | awk '{$1=$1};1')
         parent_name=$(jq -r '.parent_name' <<< "$item" | awk '{$1=$1};1')
 
-        if [[ "$parent_name" == *"$sanitised_task_name"* ]]; then
+        if [[ "$task_name" == "${pr_prefix}"* && "$task_name" == *"$parent_name"* ]]; then
             echo "$item"
         fi
     done
@@ -69,8 +67,8 @@ _create_pr_subtask() {
     {
         "data": {
             "assignee": "${ASANA_PR_REVIEWER_ID}",
-            "notes": "PR: ${GITHUB_PR_URL}",
-            "name": "PR: ${parent_task_name}"
+            "notes": "${pr_prefix} ${GITHUB_PR_URL}",
+            "name": "${pr_prefix} ${parent_task_name}"
         }
     }
 EOF
