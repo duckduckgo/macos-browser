@@ -41,6 +41,10 @@ class MockBookmarkManager: BookmarkManager {
         return nil
     }
 
+    func getBookmarkFolder(withId id: String) -> DuckDuckGo_Privacy_Browser.BookmarkFolder? {
+        return nil
+    }
+
     func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> DuckDuckGo_Privacy_Browser.Bookmark? {
         return nil
     }
@@ -48,6 +52,8 @@ class MockBookmarkManager: BookmarkManager {
     func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?) -> DuckDuckGo_Privacy_Browser.Bookmark? {
         return nil
     }
+
+    func makeBookmarks(for websitesInfo: [DuckDuckGo_Privacy_Browser.WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: DuckDuckGo_Privacy_Browser.ParentFolderType) {}
 
     func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?, completion: (DuckDuckGo_Privacy_Browser.BookmarkFolder) -> Void) {}
 

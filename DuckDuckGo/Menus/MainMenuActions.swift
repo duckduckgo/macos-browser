@@ -215,7 +215,7 @@ extension AppDelegate {
             savePanel.beginSheetModal(for: window) { response in
                 guard response == .OK, let selectedURL = savePanel.url else { return }
 
-                let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+                let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
                 let exporter = CSVLoginExporter(secureVault: vault!)
                 do {
                     try exporter.exportVaultLogins(to: selectedURL)
@@ -507,6 +507,11 @@ extension MainViewController {
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
 
+    @objc func bookmarkAllOpenTabs(_ sender: Any) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
+    }
+
     @objc func favoriteThisPage(_ sender: Any) {
         guard let tabIndex = getActiveTabAndIndex()?.index else { return }
         if tabCollectionViewModel.selectedTabIndex != tabIndex {
@@ -656,6 +661,14 @@ extension MainViewController {
 
     // MARK: - Debug
 
+    @objc func addDebugTabs(_ sender: AnyObject) {
+        let numberOfTabs = sender.representedObject as? Int ?? 1
+        (1...numberOfTabs).forEach { _ in
+            let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .ui))
+            tabCollectionViewModel.append(tab: tab)
+        }
+    }
+
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
     }
@@ -670,7 +683,7 @@ extension MainViewController {
     }
 
     @objc func resetSecureVaultData(_ sender: Any?) {
-        let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
 
         let accounts = (try? vault?.accounts()) ?? []
         for accountID in accounts.compactMap(\.id) {
@@ -944,6 +957,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return activeTabViewModel?.canBeBookmarked == true
+        case #selector(MainViewController.bookmarkAllOpenTabs(_:)):
+            return tabCollectionViewModel.canBookmarkAllOpenTabs()
         case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
             return true
@@ -1042,7 +1057,7 @@ extension AppDelegate: NSMenuItemValidation {
     }
 
     private var areTherePasswords: Bool {
-        let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let vault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)
         guard let vault else {
             return false
         }

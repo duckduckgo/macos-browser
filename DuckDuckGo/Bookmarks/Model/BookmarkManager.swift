@@ -28,8 +28,10 @@ protocol BookmarkManager: AnyObject {
     func allHosts() -> Set<String>
     func getBookmark(for url: URL) -> Bookmark?
     func getBookmark(forUrl url: String) -> Bookmark?
+    func getBookmarkFolder(withId id: String) -> BookmarkFolder?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
+    func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
     func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
@@ -46,7 +48,6 @@ protocol BookmarkManager: AnyObject {
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
-
     func handleFavoritesAfterDisablingSync()
 
     // Wrapper definition in a protocol is not supported yet
@@ -138,6 +139,10 @@ final class LocalBookmarkManager: BookmarkManager {
         return list?[url]
     }
 
+    func getBookmarkFolder(withId id: String) -> BookmarkFolder? {
+        bookmarkStore.bookmarkFolder(withId: id)
+    }
+
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark? {
         makeBookmark(for: url, title: title, isFavorite: isFavorite, index: nil, parent: nil)
     }
@@ -165,6 +170,12 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         return bookmark
+    }
+
+    func makeBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType) {
+        bookmarkStore.saveBookmarks(for: websitesInfo, inNewFolderNamed: folderName, withinParentFolder: parent)
+        loadBookmarks()
+        requestSync()
     }
 
     func remove(bookmark: Bookmark) {

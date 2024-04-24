@@ -42,9 +42,13 @@ struct BookmarkDialogContainerView<Content: View, Buttons: View>: View {
                 Text(title)
                     .foregroundColor(.primary)
                     .fontWeight(.semibold)
+                    .padding(.top, 20)
             },
             center: middleSection,
-            bottom: bottomSection
+            bottom: {
+                bottomSection()
+                    .padding(.bottom, 16.0)
+            }
         )
     }
 }

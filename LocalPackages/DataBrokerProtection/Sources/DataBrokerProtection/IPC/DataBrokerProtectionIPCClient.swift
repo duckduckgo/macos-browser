@@ -136,8 +136,8 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-    public func scanAllBrokers(showWebView: Bool,
-                               completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
+    public func startManualScan(showWebView: Bool,
+                                completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         self.pixelHandler.fire(.ipcServerScanAllBrokersCalledByApp)
 
         guard loginItemStatusChecker.doesHaveNecessaryPermissions() else {
@@ -155,7 +155,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         }
 
         xpc.execute(call: { server in
-            server.scanAllBrokers(showWebView: showWebView) { errors in
+            server.startManualScan(showWebView: showWebView) { errors in
                 if let error = errors?.oneTimeError {
                     let nsError = error as NSError
                     let interruptedError = DataBrokerProtectionSchedulerError.operationsInterrupted as NSError

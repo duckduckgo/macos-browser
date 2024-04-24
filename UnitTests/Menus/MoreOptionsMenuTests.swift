@@ -155,6 +155,23 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
     }
 
+    // MARK: - Bookmarks
+
+    @MainActor
+    func testWhenClickingOnBookmarkAllTabsMenuItemThenTheActionDelegateIsAlerted() throws {
+        // GIVEN
+        let bookmarksMenu = try XCTUnwrap(moreOptionMenu.item(at: 8)?.submenu)
+        let bookmarkAllTabsIndex = try XCTUnwrap(bookmarksMenu.indexOfItem(withTitle: UserText.bookmarkAllTabs))
+        let bookmarkAllTabsMenuItem = try XCTUnwrap(bookmarksMenu.items[bookmarkAllTabsIndex])
+        bookmarkAllTabsMenuItem.isEnabled = true
+
+        // WHEN
+        bookmarksMenu.performActionForItem(at: bookmarkAllTabsIndex)
+
+        // THEN
+        XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedBookmarkAllOpenTabsCalled)
+    }
+
 }
 
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {

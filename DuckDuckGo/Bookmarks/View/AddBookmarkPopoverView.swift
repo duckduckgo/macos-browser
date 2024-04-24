@@ -55,7 +55,6 @@ struct AddBookmarkPopoverView: View {
             isDefaultActionDisabled: model.isDefaultActionButtonDisabled,
             defaultAction: model.doneButtonAction
         )
-        .padding(.vertical, 16.0)
         .font(.system(size: 13))
         .frame(width: 320)
     }
