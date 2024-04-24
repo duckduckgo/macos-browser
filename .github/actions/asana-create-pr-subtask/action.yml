@@ -24,6 +24,7 @@ runs:
   steps:
       - name: "Map GitHub to Asana Assignee"
         id: map-github-to-asana-user
+        shell: bash
         run: |
           echo assignee_id=$(jq -r .${{ github.event.action.pull_request.requested_reviewer.login }} < ${{ github.action_path }}/user_ids.json) >> "$GITHUB_OUTPUT"
 
