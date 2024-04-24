@@ -126,7 +126,7 @@ jobs:
     - name: Check out the code
       uses: actions/checkout@v4
       with:
-        ref: main
+        ref: alessandro/create-subtask-on-pr-requested
         sparse-checkout: |
           .github
            scripts
