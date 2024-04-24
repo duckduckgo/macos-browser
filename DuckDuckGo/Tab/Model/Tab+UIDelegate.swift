@@ -50,7 +50,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         Task {
             var result: URL?
             do {
-                result = try await saveDownloadedData(data, suggestedFilename: suggestedFilename, mimeType: mimeType, originatingURL: originatingURL)
+                result = try await saveDownloadedData(data, suggestedFilename: suggestedFilename, mimeType: mimeType, originatingURL: originatingURL, originatingWebView: webView)
             } catch {
                 assertionFailure("Save web content failed with \(error)")
             }

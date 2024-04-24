@@ -491,6 +491,12 @@ extension URL {
         return isDirectory.boolValue
     }
 
+    var fileSize: Int? {
+        get throws {
+            try self.resourceValues(forKeys: [.fileSizeKey]).fileSize
+        }
+    }
+
     mutating func setFileHidden(_ hidden: Bool) throws {
         var resourceValues = URLResourceValues()
         resourceValues.isHidden = true

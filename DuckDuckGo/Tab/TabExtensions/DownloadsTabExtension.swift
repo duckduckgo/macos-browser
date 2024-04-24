@@ -96,7 +96,7 @@ final class DownloadsTabExtension: NSObject {
             if url.isFileURL {
                 self.nextSaveDataRequestDownloadLocation = location
                 do {
-                    _=try await self.saveDownloadedData(nil, suggestedFilename: url.lastPathComponent, mimeType: mimeType ?? "text/html", originatingURL: url)
+                    _=try await self.saveDownloadedData(nil, suggestedFilename: url.lastPathComponent, mimeType: mimeType ?? "text/html", originatingURL: url, originatingWebView: webView)
                 } catch {
                     assertionFailure("Save web content failed with \(error)")
                 }
@@ -123,30 +123,6 @@ final class DownloadsTabExtension: NSObject {
             let dirURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
             try? fm.createDirectory(at: dirURL, withIntermediateDirectories: true)
             return .preset(dirURL.appendingPathComponent(suggestedFilename))
-        }
-    }
-
-    private func saveDownloadedData(_ data: Data?, to toURL: URL, originatingURL: URL) throws {
-        let fm = FileManager.default
-
-        // if no data provided - copy file from local url to the destination url
-        guard let data else {
-            guard originatingURL.isFileURL else {
-                assertionFailure("No data provided for non-file URL")
-                return
-            }
-            try Progress.withPublishedProgress(url: toURL) {
-                try fm.copyItem(at: originatingURL, to: toURL, incrementingIndexIfExists: true)
-            }
-            return
-        }
-
-        let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
-        // First save file in a temporary directory
-        try data.write(to: tempURL)
-        // Then move the file to the download location and show a bounce if the file is in a location on the user's dock.
-        try Progress.withPublishedProgress(url: toURL) {
-            try fm.moveItem(at: tempURL, to: toURL, incrementingIndexIfExists: true)
         }
     }
 
@@ -295,7 +271,7 @@ protocol DownloadsTabExtensionProtocol: AnyObject, NavigationResponder, Download
 
     func saveWebViewContent(from webView: WKWebView, pdfHUD: WKPDFHUDViewWrapper?, location: DownloadsTabExtension.DownloadLocation)
 
-    func saveDownloadedData(_ data: Data?, suggestedFilename: String, mimeType: String, originatingURL: URL) async throws -> URL?
+    func saveDownloadedData(_ data: Data?, suggestedFilename: String, mimeType: String, originatingURL: URL, originatingWebView: WKWebView?) async throws -> URL?
 }
 
 extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
@@ -308,38 +284,25 @@ extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
     }
 
     @MainActor
-    func saveDownloadedData(_ data: Data?, suggestedFilename: String, mimeType: String, originatingURL: URL) async throws -> URL? {
-        defer {
-            self.nextSaveDataRequestDownloadLocation = .auto
-        }
-        switch downloadDestination(for: nextSaveDataRequestDownloadLocation, suggestedFilename: suggestedFilename) {
-        case .auto:
-            guard !downloadsPreferences.alwaysRequestDownloadLocation,
-                  let location = downloadsPreferences.effectiveDownloadLocation else { fallthrough /* prompt */ }
+    func saveDownloadedData(_ data: Data?, suggestedFilename: String, mimeType: String, originatingURL: URL, originatingWebView: WKWebView?) async throws -> URL? {
+        let destination = self.downloadDestination(for: nextSaveDataRequestDownloadLocation, suggestedFilename: suggestedFilename)
+        self.nextSaveDataRequestDownloadLocation = .auto
+        let download = LocalFileDownload(originatingURL: originatingURL, data: data, mimeType: mimeType, webView: originatingWebView)
+        let task = downloadManager.add(download, fromBurnerWindow: self.isBurner, delegate: self, destination: destination)
 
-            let url = location.appendingPathComponent(suggestedFilename)
-            try saveDownloadedData(data, to: url, originatingURL: originatingURL)
-            return url
-
-        case .prompt:
-            let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
-            let url: URL? = await withCheckedContinuation { continuation in
-                chooseDestination(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { url, _ in
-                    continuation.resume(returning: url)
+        return try await withCheckedThrowingContinuation { continuation in
+            var cancellable: AnyCancellable?
+            cancellable = task.$state.sink { state in
+                switch state {
+                case .initial, .downloading:
+                    return
+                case .downloaded(let destination):
+                    continuation.resume(returning: destination.url)
+                case .failed(destination: _, tempFile: _, resumeData: _, error: let error):
+                    continuation.resume(throwing: error)
                 }
+                withExtendedLifetime(cancellable) { cancellable?.cancel() }
             }
-
-            guard let url else { return nil }
-
-            try saveDownloadedData(data, to: url, originatingURL: originatingURL)
-            return url
-
-        case .preset(let destinationURL):
-            try saveDownloadedData(data, to: destinationURL, originatingURL: originatingURL)
-            return destinationURL
-
-        case .resume:
-            fatalError("Unexpected resume download location")
         }
     }
 }
@@ -356,8 +319,117 @@ extension Tab {
         self.downloads?.saveWebViewContent(from: webView, pdfHUD: pdfHUD, location: location)
     }
 
-    func saveDownloadedData(_ data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) async throws -> URL? {
-        try await self.downloads?.saveDownloadedData(data, suggestedFilename: suggestedFilename, mimeType: mimeType, originatingURL: originatingURL)
+    func saveDownloadedData(_ data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL, originatingWebView: WKWebView?) async throws -> URL? {
+        try await self.downloads?.saveDownloadedData(data, suggestedFilename: suggestedFilename, mimeType: mimeType, originatingURL: originatingURL, originatingWebView: originatingWebView)
+    }
+
+}
+
+final class LocalFileDownload: NSObject, WebKitDownload, ProgressReporting {
+
+    private let originatingURL: URL
+    private let data: Data?
+    private let mimeType: String?
+    private weak var _webView: WKWebView?
+
+    private(set) var progress = Progress()
+
+    private weak var _delegate: WKDownloadDelegate? {
+        didSet {
+            assert(oldValue == nil)
+            guard let delegate else {
+                assertionFailure("setDelegate must be called with non-nil delegate")
+                return
+            }
+            DispatchQueue.main.async { [weak self] in
+                self?.start(with: delegate)
+            }
+        }
+    }
+
+    var originalRequest: URLRequest? { URLRequest(url: originatingURL) }
+    var webView: WKWebView? { _webView }
+
+    var delegate: WKDownloadDelegate? {
+        get { _delegate }
+        set { _delegate = newValue }
+    }
+
+    private lazy var contentLength: Int = {
+        if let data {
+            return data.count
+        }
+
+        guard originatingURL.isFileURL, let fileSize = try? originatingURL.fileSize else {
+            assertionFailure("Expected local file URL")
+            return 0
+        }
+        return fileSize
+    }()
+
+    init(originatingURL: URL, data: Data?, mimeType: String? = nil, webView: WKWebView? = nil) {
+        self.data = data
+        self.mimeType = mimeType
+        self.originatingURL = originatingURL
+        _webView = webView
+    }
+
+    private func start(with delegate: WKDownloadDelegate) {
+        let response = URLResponse(url: originatingURL, mimeType: mimeType, expectedContentLength: contentLength, textEncodingName: nil)
+        delegate.download(self.asWKDownload(), decideDestinationUsing: response, suggestedFilename: "") { [weak self] url in
+            guard let url else { return }
+            self?.destinationChosen(url)
+        }
+    }
+
+    private func destinationChosen(_ destinationURL: URL) {
+        let progress = Progress(totalUnitCount: Int64(contentLength))
+        self.progress.addChild(progress, withPendingUnitCount: Int64(contentLength))
+
+        DispatchQueue.global().async {
+            let result = Result {
+                try self.write(to: destinationURL, with: progress)
+            }
+            DispatchQueue.main.async { [weak self] in
+                guard let self, let delegate else { return }
+                switch result {
+                case .success(let success):
+                    delegate.downloadDidFinish?(self.asWKDownload())
+                case .failure(let error):
+                    delegate.download?(self.asWKDownload(), didFailWithError: error, resumeData: nil)
+                }
+            }
+        }
+    }
+
+    private func write(to destinationURL: URL, with progress: Progress) throws {
+        let fm = FileManager()
+        progress.becomeCurrent(withPendingUnitCount: Int64(contentLength))
+        defer {
+            progress.resignCurrent()
+        }
+
+        do {
+            if let data {
+                let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
+                // First save file in a temporary directory
+                try data.write(to: tempURL)
+                // Then move the file to the download location and show a bounce if the file is in a location on the user's dock.
+                try fm.moveItem(at: tempURL, to: destinationURL, incrementingIndexIfExists: true)
+
+            } else {
+                // if no data provided - copy file from local url to the destination url
+                guard originatingURL.isFileURL else {
+                    assertionFailure("No data provided for non-file URL")
+                    return
+                }
+                try fm.copyItem(at: originatingURL, to: destinationURL, incrementingIndexIfExists: true)
+            }
+        }
+    }
+
+    private func asWKDownload() -> WKDownload {
+        withUnsafePointer(to: self) { $0.withMemoryRebound(to: WKDownload.self, capacity: 1) { $0 } }.pointee
     }
 
 }
