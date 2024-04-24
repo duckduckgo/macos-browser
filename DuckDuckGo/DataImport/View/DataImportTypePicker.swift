@@ -56,6 +56,12 @@ struct DataImportTypePicker: View {
                     }
                 }
             }
+
+            Spacer()
+
+            Text(UserText.importDataSubtitle)
+                .font(.subheadline)
+                .padding(.top, 16)
         }
     }
 
