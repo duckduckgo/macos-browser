@@ -256,25 +256,25 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .started:
                 PixelKit.fire(
                     VPNFailureRecoveryPixel.vpnFailureRecoveryStarted,
-                    frequency: .dailyAndContinuous,
+                    frequency: .dailyAndCount,
                     includeAppVersionParameter: true
                 )
             case .completed(.healthy):
                 PixelKit.fire(
                     VPNFailureRecoveryPixel.vpnFailureRecoveryCompletedHealthy,
-                    frequency: .dailyAndContinuous,
+                    frequency: .dailyAndCount,
                     includeAppVersionParameter: true
                 )
             case .completed(.unhealthy):
                 PixelKit.fire(
                     VPNFailureRecoveryPixel.vpnFailureRecoveryCompletedUnhealthy,
-                    frequency: .dailyAndContinuous,
+                    frequency: .dailyAndCount,
                     includeAppVersionParameter: true
                 )
             case .failed(let error):
                 PixelKit.fire(
                     VPNFailureRecoveryPixel.vpnFailureRecoveryFailed(error),
-                    frequency: .dailyAndContinuous,
+                    frequency: .dailyAndCount,
                     includeAppVersionParameter: true
                 )
             }
