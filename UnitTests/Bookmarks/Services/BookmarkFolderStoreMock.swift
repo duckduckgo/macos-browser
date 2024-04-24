@@ -1,5 +1,5 @@
 //
-//  WebsiteInfo.swift
+//  BookmarkFolderStoreMock.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -17,18 +17,9 @@
 //
 
 import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
-struct WebsiteInfo: Equatable {
-    let url: URL
-    /// Returns the title of the website if available, otherwise returns the domain of the URL.
-    /// If both title and and domain are nil, it returns the absolute string representation of the URL.
-    let title: String
+final class BookmarkFolderStoreMock: BookmarkFoldersStore {
+    var lastBookmarkAllTabsFolderIdUsed: String?
 
-    init?(_ tab: Tab) {
-        guard case let .url(url, _, _) = tab.content else {
-            return nil
-        }
-        self.url = url
-        self.title = tab.title ?? url.host ?? url.absoluteString
-    }
 }

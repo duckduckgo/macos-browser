@@ -178,6 +178,87 @@ final class LocalBookmarkManagerTests: XCTestCase {
         XCTAssertNotNil(bookmarkList)
     }
 
+    func testWhenGetBookmarkFolderIsCalledThenAskBookmarkStoreToRetrieveFolder() throws {
+        // GIVEN
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        XCTAssertFalse(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedFolderId)
+
+        // WHEN
+        _ = bookmarkManager.getBookmarkFolder(withId: #function)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.bookmarkFolderWithIdCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolderId, #function)
+    }
+
+    func testWhenGetBookmarkFolderIsCalledAndFolderExistsInStoreThenBookmarkStoreReturnsFolder() throws {
+        // GIVEN
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let folder = BookmarkFolder(id: "1", title: "Test")
+        bookmarkStoreMock.bookmarkFolder = folder
+
+        // WHEN
+        let result = bookmarkManager.getBookmarkFolder(withId: #function)
+
+        // THEN
+        XCTAssertEqual(result, folder)
+    }
+
+    func testWhenGetBookmarkFolderIsCalledAndFolderDoesNotExistInStoreThenBookmarkStoreReturnsNil() throws {
+        // GIVEN
+        let (bookmarkManager, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        bookmarkStoreMock.bookmarkFolder = nil
+
+        // WHEN
+        let result = bookmarkManager.getBookmarkFolder(withId: #function)
+
+        // THEN
+        XCTAssertNil(result)
+    }
+
+    // MARK: - Save Multiple Bookmarks at once
+
+    func testWhenMakeBookmarksForWebsitesInfoIsCalledThenBookmarkStoreIsAskedToCreateMultipleBookmarks() {
+        // GIVEN
+        let (sut, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        let newFolderName = #function
+        let websitesInfo = [
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 1"),
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 2"),
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 3"),
+            WebsiteInfo(url: URL.duckDuckGo, title: "Website 4"),
+        ].compactMap { $0 }
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedWebsitesInfo)
+        XCTAssertNil(bookmarkStoreMock.capturedNewFolderName)
+        XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
+
+        // WHEN
+        sut.makeBookmarks(for: websitesInfo, inNewFolderNamed: newFolderName, withinParentFolder: .root)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.saveBookmarksInNewFolderNamedCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedWebsitesInfo?.count, 4)
+        XCTAssertEqual(bookmarkStoreMock.capturedWebsitesInfo, websitesInfo)
+        XCTAssertEqual(bookmarkStoreMock.capturedNewFolderName, newFolderName)
+        XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
+    }
+
+    func testWhenMakeBookmarksForWebsiteInfoIsCalledThenReloadAllBookmarks() {
+        // GIVEN
+        let (sut, bookmarkStoreMock) = LocalBookmarkManager.aManager
+        bookmarkStoreMock.loadAllCalled = false // Reset after load all bookmarks the first time
+        XCTAssertFalse(bookmarkStoreMock.loadAllCalled)
+        let websitesInfo = [WebsiteInfo(url: URL.duckDuckGo, title: "Website 1")].compactMap { $0 }
+
+        // WHEN
+        sut.makeBookmarks(for: websitesInfo, inNewFolderNamed: "Test", withinParentFolder: .root)
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.loadAllCalled)
+    }
+
 }
 
 fileprivate extension LocalBookmarkManager {
@@ -202,5 +283,16 @@ fileprivate extension Bookmark {
                                               url: URL.duckDuckGo.absoluteString,
                                               title: "Title",
                                               isFavorite: false)
+
+}
+
+private extension WebsiteInfo {
+
+    @MainActor
+    init?(url: URL, title: String) {
+        let tab = Tab(content: .url(url, credential: nil, source: .ui))
+        tab.title = title
+        self.init(tab)
+    }
 
 }
