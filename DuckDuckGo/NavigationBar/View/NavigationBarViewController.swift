@@ -644,15 +644,20 @@ final class NavigationBarViewController: NSViewController {
 
     private func subscribeToDownloads() {
         downloadListCoordinator.updates
+            .filter { update in
+                // filter download completion events only
+                if case .updated(let oldValue) = update.kind,
+                   oldValue.progress != nil && update.item.progress == nil {
+                    return true
+                } else {
+                    return false
+                }
+            }
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
                 guard let self else { return }
 
-                if case .updated(let oldValue) = update.kind,
-                    DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
-                    update.item.destinationURL != nil,
-                    update.item.tempURL == nil,
-                    oldValue.tempURL != nil, // download finished
+                if DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
                     !update.item.isBurner,
                     WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window {
 
@@ -661,11 +666,11 @@ final class NavigationBarViewController: NSViewController {
                                                                   downloadsDelegate: self)
                 } else if update.item.isBurner {
                     invalidateDownloadButtonHidingTimer()
-                    updateDownloadsButton(updatingFromPinnedViewsNotification: false)
                 }
                 updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
+
         downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
             .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
