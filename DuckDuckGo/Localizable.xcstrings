@@ -3033,55 +3033,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Speichern und autovervollständigen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Save and Autofill"
+            "value" : "Ask to Save and Autofill"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Guardar y autocompletar"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Enregistrement et saisie automatique"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Salva e compila automaticamente"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Opslaan en automatisch invullen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Zapisywanie i autouzupełnianie"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Guardar e preencher automaticamente"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Сохранение и автозаполнение"
           }
         }
@@ -4887,6 +4887,18 @@
         }
       }
     },
+    "autofill.passwords" : {
+      "comment" : "Autofill autosaved data type",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords"
+          }
+        }
+      }
+    },
     "autofill.payment-methods" : {
       "comment" : "Autofill autosaved data type",
       "extractionState" : "extracted_with_value",
@@ -5489,7 +5501,7 @@
     },
     "autofill.usernames-and-passwords" : {
       "comment" : "Autofill autosaved data type",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5549,7 +5561,7 @@
     },
     "autofill.view-autofill-content" : {
       "comment" : "View Autofill Content Button name in the autofill settings",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5603,6 +5615,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Просмотреть данные автозаполнения..."
+          }
+        }
+      }
+    },
+    "autofill.view-autofill-content.identities" : {
+      "comment" : "View Identities Content Button title in the autofill Settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "View Identities…"
+          }
+        }
+      }
+    },
+    "autofill.view-autofill-content.passwords" : {
+      "comment" : "View Password Content Button title in the autofill Settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "View Passwords…"
+          }
+        }
+      }
+    },
+    "autofill.view-autofill-content.payment-methods" : {
+      "comment" : "View Payment Methods Content Button title in the autofill Settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "View Payment Methods…"
           }
         }
       }
@@ -16718,55 +16766,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Passwörter exportieren …"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Export Passwords…"
+            "value" : "Export passwords…"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Exportar contraseñas…"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Exporter les mots de passe…"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Esporta password…"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wachtwoorden exporteren ..."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Eksportuj hasła…"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Exportar palavras-passe…"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Экспортировать пароли…"
           }
         }
@@ -22102,55 +22150,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Passwörter importieren …"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Import Passwords…"
+            "value" : "Import passwords…"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importar contraseñas"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importer les mots de passe…"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importa password…"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "%1$d Open en ontgrendel **%2$s**\n%3$d Selecteer **Bestand → Kluis exporteren** in de menubalk\n%4$d Selecteer de bestandsindeling: **.csv**\n%5$d Voer je Bitwarden-masterwachtwoord in\n%6$d Klik op %7$@ en bewaar het bestand op een plek waar je het kunt vinden (bijv. het bureaublad)\n%8$d %9$@t"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importuj hasła..."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Importar palavras-passe…"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Импортировать пароли..."
           }
         }

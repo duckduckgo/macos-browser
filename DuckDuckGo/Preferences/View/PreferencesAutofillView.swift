@@ -67,8 +67,14 @@ extension Preferences {
 
                 // Autofill Content  Button
                 PreferencePaneSection {
-                    Button(UserText.autofillViewContentButton) {
-                        model.showAutofillPopover()
+                    Button(UserText.autofillViewContentButtonPasswords) {
+                        model.showAutofillPopover(.logins)
+                    }
+                    Button(UserText.autofillViewContentButtonIdentities) {
+                        model.showAutofillPopover(.identities)
+                    }
+                    Button(UserText.autofillViewContentButtonPaymentMethods) {
+                        model.showAutofillPopover(.cards)
                     }
 #if APPSTORE
                     Button(UserText.importPasswords) {
@@ -117,7 +123,7 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(UserText.autofillAskToSave)
                     VStack(alignment: .leading, spacing: 6) {
-                        ToggleMenuItem(UserText.autofillUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
+                        ToggleMenuItem(UserText.autofillPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
                         ToggleMenuItem(UserText.autofillAddresses, isOn: $model.askToSaveAddresses)
                         ToggleMenuItem(UserText.autofillPaymentMethods, isOn: $model.askToSavePaymentMethods)
                     }
