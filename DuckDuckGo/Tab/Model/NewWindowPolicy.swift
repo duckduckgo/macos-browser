@@ -58,7 +58,7 @@ enum NewWindowPolicy {
      * Replaces `.tab` with `.window` when user prefers windows over tabs.
      */
     func preferringTabsToWindows(_ prefersTabsToWindows: Bool) -> NewWindowPolicy {
-        guard case .tab(let isSelected, let isBurner, contextMenuInitiated: false) = self, !prefersTabsToWindows else {
+        guard case .tab(_, let isBurner, contextMenuInitiated: false) = self, !prefersTabsToWindows else {
             return self
         }
         return .window(active: true, burner: isBurner)
