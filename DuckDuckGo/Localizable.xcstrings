@@ -36871,6 +36871,102 @@
         }
       }
     },
+    "phishing.error.page.advanced.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to see advanced options on click.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Advanced…"
+          }
+        }
+      }
+    },
+    "phishing.error.page.advanced.info.body.credential.phishing" : {
+      "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to Phishing issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warnings are shown for websites that have been reported as deceptive."
+          }
+        }
+      }
+    },
+    "phishing.error.page.advanced.info.title" : {
+      "comment" : "Title of the Advanced info section shown in an error page that warns users of security risks on a website due to Phishing issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo warns you when a website has been flagged as malicious."
+          }
+        }
+      }
+    },
+    "phishing.error.page.body" : {
+      "comment" : "Error description shown in an error page that warns users of security risks on a website due to Phishing issues. %1$@ represent the site domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This website may try to trick you into doing something dangerous, like installing software or disclosing personal or financial information, like passwords, phone numbers or credit cards."
+          }
+        }
+      }
+    },
+    "phishing.error.page.header" : {
+      "comment" : "Title shown in an error page that warn users of security risks on a website due to Phishing issues",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: This site may be malicious"
+          }
+        }
+      }
+    },
+    "phishing.error.page.leave.site.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to leave the website and navigate to previous page.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Leave This Site"
+          }
+        }
+      }
+    },
+    "phishing.error.page.tab.title" : {
+      "comment" : "Title shown in an error page tab that warn users of security risks on a website due to Phishing issues",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: Site May Be Malicious"
+          }
+        }
+      }
+    },
+    "phishing.error.page.visit.site.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to Phishing issues. The buttons allows the user to visit the website anyway despite the risks.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accept Risk and Visit Site"
+          }
+        }
+      }
+    },
     "pin.tab" : {
       "comment" : "Menu item. Pin as a verb",
       "extractionState" : "extracted_with_value",
