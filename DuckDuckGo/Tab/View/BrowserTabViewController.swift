@@ -41,7 +41,6 @@ final class BrowserTabViewController: NSViewController {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let bookmarkManager: BookmarkManager
-    private let tabsPreferences: TabsPreferences
 
     private var tabViewModelCancellables = Set<AnyCancellable>()
     private var activeUserDialogCancellable: Cancellable?
@@ -60,11 +59,9 @@ final class BrowserTabViewController: NSViewController {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         tabsPreferences: TabsPreferences = TabsPreferences.shared) {
+    init(tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
-        self.tabsPreferences = tabsPreferences
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -551,12 +548,7 @@ final class BrowserTabViewController: NSViewController {
                       burnerMode: tabCollectionViewModel.burnerMode,
                       webViewSize: view.frame.size)
 
-        if tabsPreferences.newTabPosition == .nextToCurrent,
-           let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel {
-            tabCollectionViewModel.insert(tab, after: selectedTabViewModel.tab, selected: true)
-        } else {
-            tabCollectionViewModel.append(tab: tab, selected: true)
-        }
+        tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
     }
 
     // MARK: - Browser Tabs

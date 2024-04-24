@@ -144,12 +144,7 @@ final class TabBarViewController: NSViewController {
     }
 
     @objc func addButtonAction(_ sender: NSButton) {
-        if tabsPreferences.newTabPosition == .nextToCurrent,
-           let selectedTab = tabCollectionViewModel.selectedTabViewModel {
-            tabCollectionViewModel.insertNewTab(after: selectedTab.tab)
-        } else {
-            tabCollectionViewModel.appendNewTab(with: .newtab)
-        }
+        tabCollectionViewModel.insertOrAppendNewTab()
     }
 
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
