@@ -131,9 +131,10 @@ jobs:
           .github
            scripts
 
-    - name: Get PR URL
-      uses: kceb/pull-request-url-action@v2
+    - name: Generate PR URL
       id: pr-url
+      run: |
+        echo "url=https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/pull/${{ github.event.number }}" >> "$GITHUB_OUTPUT"
 
     - name: Create or Update PR Subtask
       uses: ./.github/actions/asana-create-pr-subtask
