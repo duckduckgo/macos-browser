@@ -22204,6 +22204,18 @@
         }
       }
     },
+    "import.browser.data.source.subtitle" : {
+      "comment" : "Subtitle explaining where users can find imported passwords.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords will be stored securely on your device. Find them in DuckDuckGo Settings > Passwords & Autofill."
+          }
+        }
+      }
+    },
     "import.browser.data.source.title" : {
       "comment" : "Import Browser Data title for option to choose source browser to import from",
       "extractionState" : "extracted_with_value",

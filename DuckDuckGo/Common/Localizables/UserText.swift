@@ -457,6 +457,7 @@ struct UserText {
 
     static let importDataTitle = NSLocalizedString("import.browser.data", value: "Import to DuckDuckGo", comment: "Import Browser Data dialog title")
     static let importDataSourceTitle = NSLocalizedString("import.browser.data.source.title", value: "Import from", comment: "Import Browser Data title for option to choose source browser to import from")
+    static let importDataSubtitle = NSLocalizedString("import.browser.data.source.subtitle", value: "Passwords will be stored securely on your device. Find them in DuckDuckGo Settings > Passwords & Autofill.", comment: "Subtitle explaining where users can find imported passwords.")
 
     static let exportLogins = NSLocalizedString("export.logins.data", value: "Export passwords…", comment: "Opens Export Logins Data dialog")
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")

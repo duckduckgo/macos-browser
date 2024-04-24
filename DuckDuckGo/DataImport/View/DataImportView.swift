@@ -91,7 +91,7 @@ struct DataImportView: ModalView {
                     model.update(with: importSource)
                 }
                 .disabled(model.isImportSourcePickerDisabled)
-                .padding(.bottom, 24)
+                .padding(.bottom, 16)
             }
         }
     }
