@@ -63,7 +63,7 @@ extension Preferences {
         }
 
         var body: some View {
-            PreferencePane(UserText.autofill) {
+            PreferencePane(UserText.passwordManagementTitle) {
 
                 // Autofill Content  Button
                 PreferencePaneSection {
