@@ -779,3 +779,14 @@ extension TabCollectionViewModel {
     }
 
 }
+
+// MARK: - Bookmark All Open Tabs
+
+extension TabCollectionViewModel {
+
+    func canBookmarkAllOpenTabs() -> Bool {
+        // At least two non pinned, non empty (URL only), and not showing an error tabs.
+        tabViewModels.values.filter(\.canBeBookmarked).count >= 2
+    }
+
+}

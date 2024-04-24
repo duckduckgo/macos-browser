@@ -490,6 +490,79 @@ final class TabCollectionViewModelTests: XCTestCase {
         XCTAssertEqual(events.count, 1)
         XCTAssertIdentical(events[0], tabCollectionViewModel.selectedTabViewModel)
     }
+
+    // MARK: - Bookmark All Open Tabs
+
+    func testWhenOneEmptyTabOpenThenCanBookmarkAllOpenTabsIsFalse() throws {
+        // GIVEN
+        let sut = TabCollectionViewModel.aTabCollectionViewModel()
+        let firstTabViewModel = try XCTUnwrap(sut.tabViewModel(at: 0))
+        XCTAssertEqual(sut.tabViewModels.count, 1)
+        XCTAssertEqual(firstTabViewModel.tabContent, .newtab)
+
+        // WHEN
+        let result = sut.canBookmarkAllOpenTabs()
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenOneURLTabOpenThenCanBookmarkAllOpenTabsIsFalse() throws {
+        // GIVEN
+        let sut = TabCollectionViewModel.aTabCollectionViewModel()
+        sut.replaceTab(at: .unpinned(0), with: .init(content: .url(.duckDuckGo, credential: nil, source: .ui)))
+        let firstTabViewModel = try XCTUnwrap(sut.tabViewModel(at: 0))
+        XCTAssertEqual(sut.tabViewModels.count, 1)
+        XCTAssertEqual(firstTabViewModel.tabContent, .url(.duckDuckGo, credential: nil, source: .ui))
+
+        // WHEN
+        let result = sut.canBookmarkAllOpenTabs()
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenOneURLTabAndOnePinnedTabOpenThenCanBookmarkAllOpenTabsIsFalse() {
+        // GIVEN
+        let sut = TabCollectionViewModel.aTabCollectionViewModel()
+        sut.replaceTab(at: .unpinned(0), with: .init(content: .url(.duckDuckGo, credential: nil, source: .ui)))
+        sut.append(tab: .init(content: .url(.duckDuckGoEmail, credential: nil, source: .ui)))
+        sut.pinTab(at: 0)
+        XCTAssertEqual(sut.pinnedTabs.count, 1)
+        XCTAssertEqual(sut.tabViewModels.count, 1)
+
+        // WHEN
+        let result = sut.canBookmarkAllOpenTabs()
+
+        // THEN
+        XCTAssertFalse(result)
+    }
+
+    func testWhenAtLeastTwoURLTabsOpenThenCanBookmarkAllOpenTabsIsTrue() {
+        // GIVEN
+        let sut = TabCollectionViewModel.aTabCollectionViewModel()
+        let pinnedTab = Tab(content: .url(.aboutDuckDuckGo, credential: nil, source: .ui))
+        sut.append(tabs: [
+            pinnedTab,
+            .init(content: .url(.duckDuckGo, credential: nil, source: .ui)),
+            .init(content: .newtab),
+            .init(content: .bookmarks),
+            .init(content: .anySettingsPane),
+            .init(content: .url(.duckDuckGoEmail, credential: nil, source: .ui)),
+        ])
+        sut.pinTab(at: 1)
+        XCTAssertEqual(sut.pinnedTabs.count, 1)
+        XCTAssertEqual(sut.tabViewModels.count, 6)
+        XCTAssertEqual(sut.pinnedTabs.first, pinnedTab)
+        XCTAssertNil(sut.tabViewModels[pinnedTab])
+
+        // WHEN
+        let result = sut.canBookmarkAllOpenTabs()
+
+        // THEN
+        XCTAssertTrue(result)
+    }
+
 }
 
 fileprivate extension TabCollectionViewModel {

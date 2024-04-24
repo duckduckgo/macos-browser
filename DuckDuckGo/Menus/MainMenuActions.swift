@@ -507,6 +507,11 @@ extension MainViewController {
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
 
+    @objc func bookmarkAllOpenTabs(_ sender: Any) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
+    }
+
     @objc func favoriteThisPage(_ sender: Any) {
         guard let tabIndex = getActiveTabAndIndex()?.index else { return }
         if tabCollectionViewModel.selectedTabIndex != tabIndex {
@@ -655,6 +660,14 @@ extension MainViewController {
     }
 
     // MARK: - Debug
+
+    @objc func addDebugTabs(_ sender: AnyObject) {
+        let numberOfTabs = sender.representedObject as? Int ?? 1
+        (1...numberOfTabs).forEach { _ in
+            let tab = Tab(content: .url(.duckDuckGo, credential: nil, source: .ui))
+            tabCollectionViewModel.append(tab: tab)
+        }
+    }
 
     @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
@@ -944,6 +957,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
             return activeTabViewModel?.canBeBookmarked == true
+        case #selector(MainViewController.bookmarkAllOpenTabs(_:)):
+            return tabCollectionViewModel.canBookmarkAllOpenTabs()
         case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
             return true

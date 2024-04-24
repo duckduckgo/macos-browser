@@ -125,46 +125,44 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
         XCTAssertEqual(bookmarkViewModelMock.selectedFolder, folder)
     }
 
-}
+    // MARK: - Integration Test
 
-final class AddEditBookmarkDialogViewModelMock: BookmarkDialogEditing {
-    var bookmarkName: String = ""
-    var bookmarkURLPath: String = ""
-    var isBookmarkFavorite: Bool = false
-    var isURLFieldHidden: Bool = false
-    var title: String = ""
-    var folders: [DuckDuckGo_Privacy_Browser.FolderViewModel] = []
-    var selectedFolder: DuckDuckGo_Privacy_Browser.BookmarkFolder? {
-        didSet {
-            selectedFolderExpectation?.fulfill()
+    func testWhenAddFolderMultipleTimesThenFolderListIsUpdatedAndSelectedFolderIsNil() {
+        // GIVEN
+        let expectation = self.expectation(description: #function)
+        let folder = BookmarkFolder(id: "1", title: "Folder")
+        bookmarkViewModelMock.selectedFolder = folder
+        let bookmarkStoreMock = BookmarkStoreMock()
+        bookmarkStoreMock.bookmarks = [folder]
+        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: FaviconManagerMock())
+        bookmarkManager.loadBookmarks()
+        let folderModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
+        let sut = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModelMock, folderModel: folderModel)
+        let c = folderModel.$folders
+            .dropFirst(2) // Not interested in the first two events. 1.subscribing to $folders and 2. subscribing to $list.
+            .sink { folders in
+                expectation.fulfill()
         }
+
+        XCTAssertNil(folderModel.selectedFolder)
+
+        // Tap Add Folder
+        sut.addFolderAction()
+        XCTAssertEqual(sut.viewState, .folder)
+        XCTAssertTrue(folderModel.folderName.isEmpty)
+        XCTAssertEqual(folderModel.selectedFolder, folder)
+
+        // Create a new folder
+        folderModel.folderName = #function
+        folderModel.addOrSave {}
+
+        // Add folder again
+        sut.addFolderAction()
+
+        // THEN
+        withExtendedLifetime(c) {}
+        waitForExpectations(timeout: 1.0)
+        XCTAssertEqual(sut.viewState, .folder)
+        XCTAssertTrue(folderModel.folderName.isEmpty)
     }
-    var cancelActionTitle: String = ""
-    var isOtherActionDisabled: Bool = false
-    var defaultActionTitle: String = ""
-    var isDefaultActionDisabled: Bool = false
-
-    func cancel(dismiss: () -> Void) {}
-    func addOrSave(dismiss: () -> Void) {}
-
-    var selectedFolderExpectation: XCTestExpectation?
-}
-
-final class AddEditBookmarkFolderDialogViewModelMock: BookmarkFolderDialogEditing {
-    let subject = PassthroughSubject<BookmarkFolder, Never>()
-
-    var addFolderPublisher: AnyPublisher<DuckDuckGo_Privacy_Browser.BookmarkFolder, Never> {
-        subject.eraseToAnyPublisher()
-    }
-    var folderName: String = ""
-    var title: String = ""
-    var folders: [DuckDuckGo_Privacy_Browser.FolderViewModel] = []
-    var selectedFolder: DuckDuckGo_Privacy_Browser.BookmarkFolder?
-    var cancelActionTitle: String = ""
-    var isOtherActionDisabled: Bool = false
-    var defaultActionTitle: String = ""
-    var isDefaultActionDisabled: Bool = false
-
-    func cancel(dismiss: () -> Void) {}
-    func addOrSave(dismiss: () -> Void) {}
 }

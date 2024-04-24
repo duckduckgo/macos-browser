@@ -18,6 +18,7 @@
 
 import XCTest
 import Combine
+import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class MainMenuTests: XCTestCase {
@@ -86,5 +87,27 @@ class MainMenuTests: XCTestCase {
         XCTAssertEqual(manager.lastSessionMenuItem?.keyEquivalentModifierMask, .command)
         XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalent, ReopenMenuItemKeyEquivalentManager.Const.keyEquivalent)
         XCTAssertEqual(manager.reopenLastClosedMenuItem?.keyEquivalentModifierMask, ReopenMenuItemKeyEquivalentManager.Const.modifierMask)
+    }
+
+    // MARK: - Bookmarks
+
+    @MainActor
+    func testWhenBookmarksMenuIsInitialized_ThenSecondItemIsBookmarkAllTabs() throws {
+        // GIVEN
+        let sut = MainMenu(featureFlagger: DummyFeatureFlagger(), bookmarkManager: MockBookmarkManager(), faviconManager: FaviconManagerMock(), copyHandler: CopyHandler())
+        let bookmarksMenu = try XCTUnwrap(sut.item(withTitle: UserText.bookmarks))
+
+        // WHEN
+        let result = try XCTUnwrap(bookmarksMenu.submenu?.item(withTitle: UserText.bookmarkAllTabs))
+
+        // THEN
+        XCTAssertEqual(result.keyEquivalent, "d")
+        XCTAssertEqual(result.keyEquivalentModifierMask, [.command, .shift])
+    }
+}
+
+private class DummyFeatureFlagger: FeatureFlagger {
+    func isFeatureOn<F: BrowserServicesKit.FeatureFlagSourceProviding>(forProvider: F) -> Bool {
+        false
     }
 }
