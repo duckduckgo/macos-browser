@@ -131,7 +131,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
             try database.add(event)
 
-            let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
+            let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, pixelHandler: pixelHandler, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
@@ -329,6 +329,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             try await runner.optOut(profileQuery: brokerProfileQueryData,
                                     extractedProfile: extractedProfile,
                                     stageCalculator: stageDurationCalculator,
+                                    pixelHandler: pixelHandler,
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
 

@@ -145,6 +145,9 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
     private let runnerProvider: OperationRunnerProvider
     private let privacyConfigManager: PrivacyConfigurationManaging
+    private let fakePixelHandler: EventMapping<DataBrokerProtectionPixels> = EventMapping { event, _, _, _ in
+        print(event)
+    }
     private let contentScopeProperties: ContentScopeProperties
     private let csvColumns = ["name_input", "age_input", "city_input", "state_input", "name_scraped", "age_scraped", "address_scraped", "relatives_scraped", "url", "broker name", "screenshot_id", "error", "matched_fields", "result_match", "expected_match"]
 
@@ -347,7 +350,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
                     Task {
                         do {
-                            let extractedProfiles = try await runner.scan(query, stageCalculator: FakeStageDurationCalculator(), showWebView: true) { true }
+                            let extractedProfiles = try await runner.scan(query, stageCalculator: FakeStageDurationCalculator(), pixelHandler: fakePixelHandler, showWebView: true) { true }
 
                             DispatchQueue.main.async {
                                 for extractedProfile in extractedProfiles {
@@ -383,7 +386,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         )
         Task {
             do {
-                try await runner.optOut(profileQuery: brokerProfileQueryData, extractedProfile: scanResult.extractedProfile, stageCalculator: FakeStageDurationCalculator(), showWebView: true) {
+                try await runner.optOut(profileQuery: brokerProfileQueryData, extractedProfile: scanResult.extractedProfile, stageCalculator: FakeStageDurationCalculator(), pixelHandler: fakePixelHandler, showWebView: true) {
                     true
                 }
 

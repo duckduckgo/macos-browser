@@ -21,23 +21,46 @@ import Common
 import BrowserServicesKit
 import PixelKit
 
+enum InitialScanState {
+    case webSiteLoading
+    case other
+}
+
 final class DataBrokerProtectionInitialScanPixels {
 
     private let handler: EventMapping<DataBrokerProtectionPixels>
+    private let brokerURL: String
 
-    init(handler: EventMapping<DataBrokerProtectionPixels>) {
+    var startSiteLoadingTime: Date?
+    var finishedSiteLoadingTime: Date?
+    var startPostLoadingTime: Date?
+    var finishedPostLoadingTime: Date?
+
+    init(handler: EventMapping<DataBrokerProtectionPixels>, 
+         brokerURL: String,
+         startSiteLoadingTime: Date? = nil,
+         finishedSiteLoadingTime: Date? = nil, 
+         startPostLoadingTime: Date? = nil,
+         finishedPostLoadingTime: Date? = nil) {
         self.handler = handler
+        self.brokerURL = brokerURL
+        self.startSiteLoadingTime = startSiteLoadingTime
+        self.finishedSiteLoadingTime = finishedSiteLoadingTime
+        self.startPostLoadingTime = startPostLoadingTime
+        self.finishedPostLoadingTime = finishedPostLoadingTime
     }
 
-    func fireInitialScanCompleted() {
-
+    func fireInitialScanSiteLoadDurationPixel(hasError: Bool) {
+        if let startSiteLoadingTime = self.startSiteLoadingTime {
+            let durationinMs = (Date().timeIntervalSince(startSiteLoadingTime) * 1000).rounded(.towardZero)
+            handler.fire(.initialScanSiteLoadDuration(duration: durationinMs, hasError: hasError, brokerURL: brokerURL))
+        }
     }
 
-    func fireInitialScanSiteLoadDurationPixel() {
-
-    }
-
-    func fireInitialScanPostLoadingDurationPixel() {
-
+    func fireInitialScanPostLoadingDurationPixel(hasError:Bool) {
+        if let startPostLoadingTime = self.startPostLoadingTime {
+            let durationinMs = (Date().timeIntervalSince(startPostLoadingTime) * 1000).rounded(.towardZero)
+            handler.fire(.initialScanSiteLoadDuration(duration: durationinMs, hasError: hasError, brokerURL: brokerURL))
+        }
     }
 }
