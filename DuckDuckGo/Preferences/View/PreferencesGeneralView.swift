@@ -55,6 +55,7 @@ extension Preferences {
                                     startupModel.show(url: .settingsPane(.dataClearing))
                                 }
                             }
+                            .padding(.leading, 19)
                         }
                     }
                 }
