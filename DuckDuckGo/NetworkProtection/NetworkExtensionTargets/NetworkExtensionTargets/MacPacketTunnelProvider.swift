@@ -426,15 +426,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Start/Stop Tunnel
 
-    override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
-        super.startTunnel(options: options, completionHandler: completionHandler)
-
-        Task {
-            try await Task.sleep(interval: .seconds(5))
-            cancelTunnelWithError(NSError(domain: "test", code: 5))
-        }
-    }
-
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         super.stopTunnel(with: reason) {
             Task {
