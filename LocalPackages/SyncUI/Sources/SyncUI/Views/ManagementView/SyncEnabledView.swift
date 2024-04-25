@@ -26,6 +26,9 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         // Errors
         VStack(alignment: .leading, spacing: 16) {
             syncUnavailableView()
+            if model.isSyncPaused {
+                syncPaused()
+            }
             if model.isSyncBookmarksPaused {
                 syncPaused(for: .bookmarks)
             }
@@ -86,30 +89,53 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     }
 
     @ViewBuilder
+    func syncPaused() -> some View {
+        if let title = model.syncPausedTitle,
+           let message = model.syncPausedMessage,
+           let buttonTitle = model.syncPausedButtonTitle  {
+            if let action = model.syncPausedButtonAction {
+                SyncWarningMessage(title: title, message: message, buttonTitle: buttonTitle) {
+                    action()
+                }
+            } else {
+                SyncWarningMessage(title: title, message: message, buttonTitle: buttonTitle)
+            }
+        }
+
+    }
+
+    @ViewBuilder
     func syncPaused(for itemType: LimitedItemType) -> some View {
+        var title: String {
+            switch itemType {
+            case .bookmarks:
+                return model.syncBookmarksPausedTitle
+            case .credentials:
+                return model.syncCredentialsPausedTitle
+            }
+        }
         var description: String {
             switch itemType {
             case .bookmarks:
-                return UserText.bookmarksLimitExceededDescription
+                return model.syncBookmarksPausedMessage
             case .credentials:
-                return UserText.credentialsLimitExceededDescription
+                return model.syncCredentialsPausedMessage
             }
         }
         var actionTitle: String {
             switch itemType {
             case .bookmarks:
-                return UserText.bookmarksLimitExceededAction
+                return model.syncBookmarksPausedButtonTitle
             case .credentials:
-                return UserText.credentialsLimitExceededAction
+                return model.syncCredentialsPausedButtonTitle
             }
         }
-        SyncWarningMessage(title: UserText.syncLimitExceededTitle, message: description, buttonTitle: actionTitle) {
-            switch itemType {
-            case .bookmarks:
-                model.manageBookmarks()
-            case .credentials:
-                model.manageLogins()
+        if let action = model.syncPausedButtonAction {
+            SyncWarningMessage(title: title, message: description, buttonTitle: actionTitle) {
+                action()
             }
+        } else {
+            SyncWarningMessage(title: title, message: description, buttonTitle: actionTitle)
         }
     }
 

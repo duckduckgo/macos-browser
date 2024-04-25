@@ -20,8 +20,53 @@ import Common
 import DDGSync
 import Foundation
 import PixelKit
+import Persistence
+import Combine
 
-public class SyncErrorHandler: EventMapping<SyncError> {
+public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
+
+    @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
+    private (set) var isSyncBookmarksPaused: Bool {
+        didSet {
+            isSyncPausedChangedPublisher.send()
+        }
+    }
+
+    @UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false)
+    private (set) var isSyncCredentialsPaused: Bool {
+        didSet {
+            isSyncPausedChangedPublisher.send()
+        }
+    }
+
+    @UserDefaultsWrapper(key: .synclsPaused, defaultValue: false)
+    private (set) var isSyncPaused: Bool {
+        didSet {
+            isSyncPausedChangedPublisher.send()
+        }
+    }
+
+    @UserDefaultsWrapper(key: .syncBookmarksPausedErrorDisplayed, defaultValue: false)
+    private var didShowBookmarksSyncPausedError: Bool
+
+    @UserDefaultsWrapper(key: .syncCredentialsPausedErrorDisplayed, defaultValue: false)
+    private var didShowCredentialsSyncPausedError: Bool
+
+    @UserDefaultsWrapper(key: .syncInvalidLoginPausedErrorDisplayed, defaultValue: false)
+    private var didShowInvalidLoginSyncPausedError: Bool
+
+    @UserDefaultsWrapper(key: .syncLastErrorNotificationTime, defaultValue: nil)
+    private var lastErrorNotificationTime: Date?
+
+    @UserDefaultsWrapper(key: .syncLastSuccesfullTime, defaultValue: nil)
+    private var lastSyncSuccessTime: Date?
+
+    @UserDefaultsWrapper(key: .syncLastNonActionableErrorCount, defaultValue: 0)
+    private var nonActionableErrorCount: Int
+
+    var isSyncPausedChangedPublisher = PassthroughSubject<Void, Never>()
+
+    private var currentError: AsyncErrorType?
 
     public init() {
         super.init { event, _, _, _ in
@@ -32,4 +77,260 @@ public class SyncErrorHandler: EventMapping<SyncError> {
     override init(mapping: @escaping EventMapping<SyncError>.Mapping) {
         fatalError("Use init()")
     }
+
+    var addErrorPublisher: AnyPublisher<Bool, Never> {
+        addErrorSubject.eraseToAnyPublisher()
+    }
+
+    private let addErrorSubject: PassthroughSubject<Bool, Never> = .init()
+    public let objectWillChange = ObservableObjectPublisher()
+
+    private func resetErrors() {
+        isSyncBookmarksPaused = false
+        isSyncCredentialsPaused = false
+        isSyncPaused = false
+        didShowBookmarksSyncPausedError = false
+        currentError = nil
+    }
+
+    private func shouldShowAlertForNonActionableError() -> Bool {
+        nonActionableErrorCount += 1
+        let oneDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        var lastErrorNotificationWasMoreThan24hAgo: Bool
+        if let lastErrorNotificationTime {
+            lastErrorNotificationWasMoreThan24hAgo = lastErrorNotificationTime < oneDayAgo
+        } else {
+            lastErrorNotificationWasMoreThan24hAgo = true
+        }
+        let areThere10ConsecutiveError = nonActionableErrorCount >= 10
+        if nonActionableErrorCount >= 10 {
+            nonActionableErrorCount = 0
+        }
+        let twelveHoursAgo = Calendar.current.date(byAdding: .hour, value: -12, to: Date())!
+        let noSuccessfulSyncInLast12h = nonActionableErrorCount > 0 && lastSyncSuccessTime ?? Date() <= twelveHoursAgo
+
+        return lastErrorNotificationWasMoreThan24hAgo &&
+        (areThere10ConsecutiveError || noSuccessfulSyncInLast12h)
+    }
+
+    private var syncPausedMessage: String? {
+        guard let error = currentError else { return nil }
+        switch error {
+        case .invalidLoginCredentials:
+            return "Invalid Login"
+        case .tooManyRequests:
+            return "Too many requests"
+        case .unknown:
+            return "Unknown"
+        default:
+            assertionFailure("Sync Paused error should be one of those listes")
+            return nil
+        }
+    }
+
+    private var syncPausedButtonTitle: String? {
+        guard let error = currentError else { return nil }
+        switch error {
+        case .invalidLoginCredentials:
+            return "Invalid Login"
+        case .tooManyRequests:
+            return "Too many requests"
+        case .unknown:
+            return "Unknown"
+        default:
+            assertionFailure("Sync Paused error should be one of those listes")
+            return nil
+        }
+    }
+
+}
+
+extension SyncErrorHandler: SyncAdapterErrorHandler {
+
+    func syncBookmarksSucceded() {
+        lastSyncSuccessTime = Date()
+        resetErrors()
+    }
+
+    func handleBookmarkError(_ error: Error) {
+        handleError(error, modelType: .bookmarks)
+    }
+
+    func handleCredentialError(_ error: Error) {
+        handleError(error, modelType: .credentials)
+    }
+
+    private func handleError(_ error: Error, modelType: ModelType) {
+        switch error {
+        case let syncError as SyncError:
+            PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: syncError))
+            switch syncError {
+            case .unexpectedStatusCode(409):
+                switch modelType {
+                case .bookmarks:
+                    syncIsPaused(errorType: .bookmarksCountLimitExceeded)
+                case .credentials:
+                    syncIsPaused(errorType: .credentialsCountLimitExceeded)
+                }
+            case .unexpectedStatusCode(413):
+                switch modelType {
+                case .bookmarks:
+                    syncIsPaused(errorType: .bookmarksRequestSizeLimitExceeded)
+                case .credentials:
+                    syncIsPaused(errorType: .credentialsRequestSizeLimitExceeded)
+                }
+            case .unexpectedStatusCode(401):
+                syncIsPaused(errorType: .invalidLoginCredentials)
+            case .unexpectedStatusCode(400):
+                syncIsPaused(errorType: .unknown)
+            case .unexpectedStatusCode(418), .unexpectedStatusCode(429):
+                syncIsPaused(errorType: .tooManyRequests)
+            default:
+                break
+            }
+        default:
+            let nsError = error as NSError
+            if nsError.domain != NSURLErrorDomain {
+                let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
+                let params = processedErrors.errorPixelParameters
+                PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: error), withAdditionalParameters: params)
+            }
+        }
+    }
+
+    private func syncIsPaused(errorType: AsyncErrorType) {
+        currentError = errorType
+        showSyncPausedAlertIfNeeded(for: errorType)
+        switch errorType {
+        case .bookmarksCountLimitExceeded:
+            self.isSyncBookmarksPaused = true
+            PixelKit.fire(GeneralPixel.syncBookmarksCountLimitExceededDaily, frequency: .daily)
+        case .credentialsCountLimitExceeded:
+            self.isSyncCredentialsPaused = true
+            PixelKit.fire(GeneralPixel.syncCredentialsCountLimitExceededDaily, frequency: .daily)
+        case .bookmarksRequestSizeLimitExceeded:
+            self.isSyncBookmarksPaused = true
+            PixelKit.fire(GeneralPixel.syncBookmarksRequestSizeLimitExceededDaily, frequency: .daily)
+        case .credentialsRequestSizeLimitExceeded:
+            self.isSyncCredentialsPaused = true
+            PixelKit.fire(GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .daily)
+        case .invalidLoginCredentials:
+            self.isSyncPaused = true
+        case .tooManyRequests, .unknown:
+            self.isSyncPaused = true
+        }
+    }
+
+    private func showSyncPausedAlertIfNeeded(for errorType: AsyncErrorType) {
+        Task {
+            await MainActor.run {
+                var alert: NSAlert
+                switch errorType {
+                case .bookmarksCountLimitExceeded:
+                    guard !didShowBookmarksSyncPausedError else { return }
+                    alert = NSAlert.syncPaused(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncBookmarkPausedAlertDescription)
+                    didShowBookmarksSyncPausedError = true
+                case .credentialsCountLimitExceeded:
+                    guard !didShowCredentialsSyncPausedError else { return }
+                    alert = NSAlert.syncPaused(title: UserText.syncCredentialsPausedAlertTitle, informative: UserText.syncCredentialsPausedAlertDescription)
+                    didShowCredentialsSyncPausedError = true
+                case .bookmarksRequestSizeLimitExceeded:
+                    guard !didShowBookmarksSyncPausedError else { return }
+                    alert = NSAlert.syncPaused(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncBookmarkPausedAlertDescription)
+                    didShowBookmarksSyncPausedError = true
+                case .credentialsRequestSizeLimitExceeded:
+                    guard !didShowCredentialsSyncPausedError else { return }
+                    alert = NSAlert.syncPaused(title: UserText.syncCredentialsPausedAlertTitle, informative: UserText.syncCredentialsPausedAlertDescription)
+                    didShowCredentialsSyncPausedError = true
+                case .invalidLoginCredentials:
+                    guard !didShowInvalidLoginSyncPausedError else { return }
+                    alert = NSAlert.syncPaused(title: "Invalid Credentials", informative: "Invalid Credentials")
+                    didShowInvalidLoginSyncPausedError = true
+                case .tooManyRequests, .unknown:
+                    guard shouldShowAlertForNonActionableError() == true else { return }
+                    alert = NSAlert.syncPaused(title: "Non Actionable Error", informative: "Non Actionable Error")
+                    lastErrorNotificationTime = Date()
+                }
+
+                let response = alert.runModal()
+
+                switch response {
+                case .alertSecondButtonReturn:
+                    alert.window.sheetParent?.endSheet(alert.window)
+                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                default:
+                    break
+                }
+            }
+        }
+    }
+
+    private enum AsyncErrorType {
+        case bookmarksCountLimitExceeded
+        case credentialsCountLimitExceeded
+        case bookmarksRequestSizeLimitExceeded
+        case credentialsRequestSizeLimitExceeded
+        case invalidLoginCredentials
+        case tooManyRequests
+        case unknown
+    }
+
+    private enum ModelType {
+        case bookmarks
+        case credentials
+    }
+
+    @MainActor
+    private func manageBookmarks() {
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
+        mainVC.showManageBookmarks(self)
+    }
+
+    @MainActor
+    private func manageLogins() {
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
+        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
+    }
+
+}
+
+extension SyncErrorHandler: SyncPreferencesErrorHandler {
+    var syncPausedMetadata: SyncPausedErrorMetadata? {
+        guard let syncPausedMessage else { return nil }
+        return SyncPausedErrorMetadata(syncPausedTitle: UserText.syncLimitExceededTitle,
+                                       syncPausedMessage: syncPausedMessage,
+                                       syncPausedButtonTitle: syncPausedButtonTitle ?? "",
+                                       syncPausedAction: nil)
+    }
+
+    @MainActor
+    var syncBookmarksPausedMetadata: SyncPausedErrorMetadata {
+        return SyncPausedErrorMetadata(syncPausedTitle: UserText.syncLimitExceededTitle,
+                                       syncPausedMessage: UserText.bookmarksLimitExceededDescription,
+                                       syncPausedButtonTitle: UserText.bookmarksLimitExceededAction,
+                                       syncPausedAction: manageBookmarks)
+    }
+    
+    @MainActor
+    var syncCredentialsPausedMetadata: SyncPausedErrorMetadata {
+        return SyncPausedErrorMetadata(syncPausedTitle: UserText.syncLimitExceededTitle,
+                                       syncPausedMessage: UserText.credentialsLimitExceededDescription,
+                                       syncPausedButtonTitle: UserText.credentialsLimitExceededAction,
+                                       syncPausedAction: manageLogins)
+    }
+
+    var syncPausedChangedPublisher: AnyPublisher<Void, Never> {
+        isSyncPausedChangedPublisher.eraseToAnyPublisher()
+    }
+
+    func syncDidTurnOff() {
+        resetErrors()
+    }
+}
+
+protocol SyncAdapterErrorHandler {
+    func handleBookmarkError(_ error: Error)
+    func handleCredentialError(_ error: Error)
+    func syncBookmarksSucceded()
 }

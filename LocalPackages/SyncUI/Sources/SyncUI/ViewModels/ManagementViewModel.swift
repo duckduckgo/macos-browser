@@ -30,8 +30,22 @@ public protocol ManagementViewModel: ObservableObject {
     var isCreatingAccount: Bool { get }
     var shouldShowErrorMessage: Bool { get set }
     var syncErrorMessage: SyncErrorMessage? { get }
+    var isSyncPaused: Bool { get }
     var isSyncBookmarksPaused: Bool { get }
     var isSyncCredentialsPaused: Bool { get }
+    var syncPausedTitle: String? { get }
+    var syncPausedMessage: String? { get }
+    var syncPausedButtonTitle: String? { get }
+    var syncPausedButtonAction: (() -> Void)? { get }
+    var syncBookmarksPausedTitle: String { get }
+    var syncBookmarksPausedMessage: String { get }
+    var syncBookmarksPausedButtonTitle: String { get }
+    var syncBookmarksPausedButtonAction: (() -> Void)? { get }
+    var syncCredentialsPausedTitle: String { get }
+    var syncCredentialsPausedMessage: String { get }
+    var syncCredentialsPausedButtonTitle: String { get }
+    var syncCredentialsPausedButtonAction: (() -> Void)? { get }
+
 
     var invalidBookmarksTitles: [String] { get }
     var invalidCredentialsTitles: [String] { get }

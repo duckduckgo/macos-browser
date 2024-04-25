@@ -168,25 +168,35 @@ extension NSAlert {
         return alert
     }
 
-    static func syncBookmarksPaused() -> NSAlert {
+    static func syncPaused(title: String, informative: String) -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = UserText.syncBookmarkPausedAlertTitle
-        alert.informativeText = UserText.syncBookmarkPausedAlertDescription
+        alert.messageText = title
+        alert.informativeText = informative
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
         alert.addButton(withTitle: UserText.learnMore)
         return alert
     }
 
-    static func syncCredentialsPaused() -> NSAlert {
-        let alert = NSAlert()
-        alert.messageText = UserText.syncCredentialsPausedAlertTitle
-        alert.informativeText = UserText.syncCredentialsPausedAlertDescription
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.learnMore)
-        return alert
-    }
+//    static func syncBookmarksPaused() -> NSAlert {
+//        let alert = NSAlert()
+//        alert.messageText = UserText.syncBookmarkPausedAlertTitle
+//        alert.informativeText = UserText.syncBookmarkPausedAlertDescription
+//        alert.alertStyle = .warning
+//        alert.addButton(withTitle: UserText.ok)
+//        alert.addButton(withTitle: UserText.learnMore)
+//        return alert
+//    }
+//
+//    static func syncCredentialsPaused() -> NSAlert {
+//        let alert = NSAlert()
+//        alert.messageText = UserText.syncCredentialsPausedAlertTitle
+//        alert.informativeText = UserText.syncCredentialsPausedAlertDescription
+//        alert.alertStyle = .warning
+//        alert.addButton(withTitle: UserText.ok)
+//        alert.addButton(withTitle: UserText.learnMore)
+//        return alert
+//    }
 
     static func dataSyncingDisabledByFeatureFlag(showLearnMore: Bool, upgradeRequired: Bool = false) -> NSAlert {
         let alert = NSAlert()

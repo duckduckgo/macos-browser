@@ -39,6 +39,54 @@ extension SyncDevice {
 }
 
 final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
+    var syncPausedTitle: String? {
+        return syncPreferencesErrorHandler.syncPausedMetadata?.syncPausedTitle
+    }
+
+    var syncPausedMessage: String? {
+        return syncPreferencesErrorHandler.syncPausedMetadata?.syncPausedMessage
+    }
+
+    var syncPausedButtonTitle: String? {
+        return syncPreferencesErrorHandler.syncPausedMetadata?.syncPausedButtonTitle
+    }
+
+    var syncPausedButtonAction: (() -> Void)? {
+        return syncPreferencesErrorHandler.syncPausedMetadata?.syncPausedAction
+    }
+
+    var syncBookmarksPausedTitle: String {
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.syncPausedTitle
+    }
+
+    var syncBookmarksPausedMessage: String {
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.syncPausedMessage
+    }
+
+    var syncBookmarksPausedButtonTitle: String {
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.syncPausedButtonTitle
+    }
+
+    var syncBookmarksPausedButtonAction: (() -> Void)? {
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.syncPausedAction
+    }
+
+    var syncCredentialsPausedTitle: String {
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.syncPausedTitle
+    }
+
+    var syncCredentialsPausedMessage: String {
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.syncPausedMessage
+    }
+
+    var syncCredentialsPausedButtonTitle: String {
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.syncPausedButtonTitle
+    }
+
+    var syncCredentialsPausedButtonAction: (() -> Void)? {
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.syncPausedAction
+    }
+
 
     struct Consts {
         static let syncPausedStateChanged = Notification.Name("com.duckduckgo.app.SyncPausedStateChanged")
@@ -82,9 +130,9 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    @Published var isSyncBookmarksPaused: Bool
-
-    @Published var isSyncCredentialsPaused: Bool
+    @Published var isSyncPaused: Bool = false
+    @Published var isSyncBookmarksPaused: Bool = false
+    @Published var isSyncCredentialsPaused: Bool = false
 
     @Published var invalidBookmarksTitles: [String] = []
     @Published var invalidCredentialsTitles: [String] = []
@@ -105,6 +153,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var isAccountRecoveryAvailable: Bool = true
     @Published var isAppVersionNotSupported: Bool = true
 
+    private let syncPreferencesErrorHandler: any SyncPreferencesErrorHandler
+
     private func updateSyncFeatureFlags(_ syncFeatureFlags: SyncFeatureFlags) {
         isDataSyncingAvailable = syncFeatureFlags.contains(.dataSyncing)
         isConnectingDevicesAvailable = syncFeatureFlags.contains(.connectFlows)
@@ -123,7 +173,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncCredentialsAdapter: SyncCredentialsAdapter,
         appearancePreferences: AppearancePreferences = .shared,
         managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
-        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared
+        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
+        syncPreferencesErrorHandler: any SyncPreferencesErrorHandler
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
@@ -131,11 +182,12 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.appearancePreferences = appearancePreferences
         self.syncFeatureFlags = syncService.featureFlags
         self.userAuthenticator = userAuthenticator
+        self.syncPreferencesErrorHandler = syncPreferencesErrorHandler
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
-        isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
-        isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+//        isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
+//        isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
 
         self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
@@ -143,6 +195,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         updateSyncFeatureFlags(self.syncFeatureFlags)
         setUpObservables()
         setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
+        updateSyncPausedState()
+    }
+
+    private func updateSyncPausedState() {
+        self.isSyncPaused = syncPreferencesErrorHandler.isSyncPaused
+        self.isSyncBookmarksPaused = syncPreferencesErrorHandler.isSyncBookmarksPaused
+        self.isSyncCredentialsPaused = syncPreferencesErrorHandler.isSyncCredentialsPaused
     }
 
     private func updateInvalidObjects() {
@@ -199,13 +258,21 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             }
             .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: Self.Consts.syncPausedStateChanged)
+        syncPreferencesErrorHandler.syncPausedChangedPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
-                self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+                self?.updateSyncPausedState()
             }
             .store(in: &cancellables)
+
+//        NotificationCenter.default.publisher(for: Self.Consts.syncPausedStateChanged)
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] _ in
+//                self?.updateSyncPausedState()
+////                self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
+////                self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+//            }
+//            .store(in: &cancellables)
 
         let screenIsLockedPublisher = DistributedNotificationCenter.default
             .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
@@ -240,8 +307,9 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             do {
                 try await syncService.disconnect()
                 managementDialogModel.endFlow()
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+                syncPreferencesErrorHandler.syncDidTurnOff()
+//                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+//                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncLogoutError(error: error)))
@@ -392,8 +460,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 try await syncService.deleteAccount()
                 managementDialogModel.endFlow()
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+                syncPreferencesErrorHandler.syncDidTurnOff()
+//                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+//                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncDeleteAccountError(error: error)))
@@ -688,4 +757,23 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool) {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
     }
+}
+
+protocol SyncPreferencesErrorHandler: ObservableObject {
+    var isSyncPaused: Bool { get }
+    var isSyncBookmarksPaused: Bool { get }
+    var isSyncCredentialsPaused: Bool { get }
+    var syncPausedChangedPublisher: AnyPublisher<Void, Never> { get }
+    var syncPausedMetadata: SyncPausedErrorMetadata? { get }
+    var syncBookmarksPausedMetadata: SyncPausedErrorMetadata { get }
+    var syncCredentialsPausedMetadata: SyncPausedErrorMetadata { get }
+
+    func syncDidTurnOff()
+}
+
+struct SyncPausedErrorMetadata {
+    let syncPausedTitle: String
+    let syncPausedMessage: String
+    let syncPausedButtonTitle: String
+    let syncPausedAction: (() -> Void)?
 }

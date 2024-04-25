@@ -42,21 +42,25 @@ final class SyncPreferencesTests: XCTestCase {
     var ddgSyncing: MockDDGSyncing!
     var syncBookmarksAdapter: SyncBookmarksAdapter!
     var syncCredentialsAdapter: SyncCredentialsAdapter!
-    var appearancePersistor = MockPersistor()
+    var appearancePersistor = MockAppearancePreferencesPersistor()
     var appearancePreferences: AppearancePreferences!
     var syncPreferences: SyncPreferences!
+    var errorHandler: MockSyncPreferencesErrorHandler!
     var testRecoveryCode = "some code"
+    var cancellables: Set<AnyCancellable>!
 
     var bookmarksDatabase: CoreDataDatabase!
     var location: URL!
 
     override func setUp() {
+        cancellables = []
         setUpDatabase()
         appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
         ddgSyncing = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
+        errorHandler = MockSyncPreferencesErrorHandler()
 
-        syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences)
-        syncCredentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: AutofillSecureVaultFactory)
+        syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences, syncAdapterErrorHandler: SyncErrorHandler())
+        syncCredentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: AutofillSecureVaultFactory, syncAdapterErrorHandler: SyncErrorHandler())
 
         syncPreferences = SyncPreferences(
             syncService: ddgSyncing,
@@ -64,13 +68,15 @@ final class SyncPreferencesTests: XCTestCase {
             syncCredentialsAdapter: syncCredentialsAdapter,
             appearancePreferences: appearancePreferences,
             managementDialogModel: managementDialogModel,
-            userAuthenticator: MockUserAuthenticator()
+            userAuthenticator: MockUserAuthenticator(),
+            syncPreferencesErrorHandler: errorHandler
         )
     }
 
     override func tearDown() {
         ddgSyncing = nil
         syncPreferences = nil
+        errorHandler = nil
         tearDownDatabase()
     }
 
@@ -147,86 +153,117 @@ final class SyncPreferencesTests: XCTestCase {
         XCTAssertTrue(ddgSyncing.disconnectCalled)
     }
 
-}
+    // MARK: - SYNC ERRORS
+    @MainActor
+    func test_WhenSyncPausedIsTrue_andChangePublished_isSyncPausedIsUpdated() async {
+        let expectation2 = XCTestExpectation(description: "isSyncPaused received the update")
+        let expectation1 = XCTestExpectation(description: "isSyncPaused published")
+        syncPreferences.$isSyncPaused
+            .dropFirst()
+            .sink { isPaused in
+                XCTAssertTrue(isPaused)
+                expectation2.fulfill()
+            }
+            .store(in: &cancellables)
 
-class MockDDGSyncing: DDGSyncing {
+        Task {
+            errorHandler.isSyncPaused = true
+            errorHandler.isSyncPausedChangedPublisher.send()
+            expectation1.fulfill()
+        }
 
-    let registeredDevices = [RegisteredDevice(id: "1", name: "Device 1", type: "desktop"), RegisteredDevice(id: "2", name: "Device 2", type: "mobile"), RegisteredDevice(id: "3", name: "Device 1", type: "desktop")]
-    var disconnectCalled = false
-
-    var dataProvidersSource: DataProvidersSource?
-
-    @Published var featureFlags: SyncFeatureFlags = .all
-
-    var featureFlagsPublisher: AnyPublisher<SyncFeatureFlags, Never> {
-        $featureFlags.eraseToAnyPublisher()
+        await self.fulfillment(of: [expectation1, expectation2], timeout: 5.0)
     }
 
-    @Published var authState: SyncAuthState = .inactive
+    @MainActor
+    func test_WhenSyncBookmarksPausedIsTrue_andChangePublished_isSyncBookmarksPausedIsUpdated() async {
+        let expectation2 = XCTestExpectation(description: "isSyncBookmarksPaused received the update")
+        let expectation1 = XCTestExpectation(description: "isSyncBookmarksPaused published")
+        syncPreferences.$isSyncBookmarksPaused
+            .dropFirst()
+            .sink { isPaused in
+                XCTAssertTrue(isPaused)
+                expectation2.fulfill()
+            }
+            .store(in: &cancellables)
 
-    var authStatePublisher: AnyPublisher<SyncAuthState, Never> {
-        $authState.eraseToAnyPublisher()
+        Task {
+            errorHandler.isSyncBookmarksPaused = true
+            errorHandler.isSyncPausedChangedPublisher.send()
+            expectation1.fulfill()
+        }
+
+        await self.fulfillment(of: [expectation1, expectation2], timeout: 5.0)
     }
 
-    var account: SyncAccount?
+    @MainActor
+    func test_WhenSyncCredentialsPausedIsTrue_andChangePublished_isSyncCredentialsPausedIsUpdated() async {
+        let expectation2 = XCTestExpectation(description: "isSyncCredentialsPaused received the update")
+        let expectation1 = XCTestExpectation(description: "isSyncCredentialsPaused published")
+        syncPreferences.$isSyncCredentialsPaused
+            .dropFirst()
+            .sink { isPaused in
+                XCTAssertTrue(isPaused)
+                expectation2.fulfill()
+            }
+            .store(in: &cancellables)
 
-    var scheduler: Scheduling
+        Task {
+            errorHandler.isSyncCredentialsPaused = true
+            errorHandler.isSyncPausedChangedPublisher.send()
+            expectation1.fulfill()
+        }
 
-    var syncDailyStats = SyncDailyStats(store: MockKeyValueStore())
-
-    @Published var isSyncInProgress: Bool
-
-    var isSyncInProgressPublisher: AnyPublisher<Bool, Never> {
-        $isSyncInProgress.eraseToAnyPublisher()
+        await self.fulfillment(of: [expectation1, expectation2], timeout: 5.0)
     }
 
-    init(dataProvidersSource: DataProvidersSource? = nil, authState: SyncAuthState, account: SyncAccount? = nil, scheduler: Scheduling = CapturingScheduler(), isSyncInProgress: Bool) {
-        self.dataProvidersSource = dataProvidersSource
-        self.authState = authState
-        self.account = account
-        self.scheduler = scheduler
-        self.isSyncInProgress = isSyncInProgress
+    @MainActor
+    func test_WhenSyncIsTurnedOff_ErrorHandlerSyncDidTurnOffCalled() async {
+        let expectation = XCTestExpectation(description: "Sync Turned off")
+
+        Task {
+            syncPreferences.turnOffSync()
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertTrue(errorHandler.syncDidTurnOffCalled)
     }
 
-    func initializeIfNeeded() {
+    @MainActor
+    func test_WhenAccountRemoved_ErrorHandlerSyncDidTurnOffCalled() async {
+        let expectation = XCTestExpectation(description: "Sync Turned off")
+
+        Task {
+            syncPreferences.deleteAccount()
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertTrue(errorHandler.syncDidTurnOffCalled)
     }
 
-    func createAccount(deviceName: String, deviceType: String) async throws {
+    func test_ErrorHandlerReturnsExpectedSyncBookmarksPausedMetadata() {
+        XCTAssertEqual(syncPreferences.syncBookmarksPausedTitle, MockSyncPreferencesErrorHandler.syncBookmarksPausedData.syncPausedTitle)
+        XCTAssertEqual(syncPreferences.syncBookmarksPausedMessage, MockSyncPreferencesErrorHandler.syncBookmarksPausedData.syncPausedMessage)
+        XCTAssertEqual(syncPreferences.syncBookmarksPausedButtonTitle, MockSyncPreferencesErrorHandler.syncBookmarksPausedData.syncPausedButtonTitle)
+        XCTAssertNotNil(syncPreferences.syncBookmarksPausedButtonAction)
     }
 
-    func login(_ recoveryKey: SyncCode.RecoveryKey, deviceName: String, deviceType: String) async throws -> [RegisteredDevice] {
-        return []
+    func test_ErrorHandlerReturnsExpectedSyncCredentialsPausedMetadata() {
+        XCTAssertEqual(syncPreferences.syncCredentialsPausedTitle, MockSyncPreferencesErrorHandler.syncCredentialsPausedData.syncPausedTitle)
+        XCTAssertEqual(syncPreferences.syncCredentialsPausedMessage, MockSyncPreferencesErrorHandler.syncCredentialsPausedData.syncPausedMessage)
+        XCTAssertEqual(syncPreferences.syncCredentialsPausedButtonTitle, MockSyncPreferencesErrorHandler.syncCredentialsPausedData.syncPausedButtonTitle)
+        XCTAssertNotNil(syncPreferences.syncCredentialsPausedButtonAction)
     }
 
-    func remoteConnect() throws -> RemoteConnecting {
-        return MockRemoteConnecting()
+    func test_ErrorHandlerReturnsExpectedSynclsPausedMetadata() {
+        XCTAssertEqual(syncPreferences.syncPausedTitle, MockSyncPreferencesErrorHandler.synclsPausedData.syncPausedTitle)
+        XCTAssertEqual(syncPreferences.syncPausedMessage, MockSyncPreferencesErrorHandler.synclsPausedData.syncPausedMessage)
+        XCTAssertEqual(syncPreferences.syncPausedButtonTitle, MockSyncPreferencesErrorHandler.synclsPausedData.syncPausedButtonTitle)
+        XCTAssertNil(syncPreferences.syncPausedButtonAction)
     }
 
-    func transmitRecoveryKey(_ connectCode: SyncCode.ConnectCode) async throws {
-    }
-
-    func disconnect() async throws {
-        disconnectCalled = true
-    }
-
-    func disconnect(deviceId: String) async throws {
-    }
-
-    func fetchDevices() async throws -> [RegisteredDevice] {
-        return registeredDevices
-    }
-
-    func updateDeviceName(_ name: String) async throws -> [RegisteredDevice] {
-        return []
-    }
-
-    func deleteAccount() async throws {
-    }
-
-    var serverEnvironment: ServerEnvironment = .production
-
-    func updateServerEnvironment(_ serverEnvironment: ServerEnvironment) {
-    }
 }
 
 class CapturingScheduler: Scheduling {
@@ -258,30 +295,4 @@ struct MockRemoteConnecting: RemoteConnecting {
 
     func stopPolling() {
     }
-}
-
-struct MockPersistor: AppearancePreferencesPersistor {
-
-    var homeButtonPosition: HomeButtonPosition = .hidden
-
-    var showFullURL: Bool = false
-
-    var showAutocompleteSuggestions: Bool = false
-
-    var currentThemeName: String = ""
-
-    var defaultPageZoom: CGFloat = 1.0
-
-    var favoritesDisplayMode: String?
-
-    var isFavoriteVisible: Bool = true
-
-    var isContinueSetUpVisible: Bool = true
-
-    var isRecentActivityVisible: Bool = true
-
-    var showBookmarksBar: Bool = false
-
-    var bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
-
 }

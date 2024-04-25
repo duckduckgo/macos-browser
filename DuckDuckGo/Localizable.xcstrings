@@ -45684,6 +45684,66 @@
         }
       }
     },
+    "prefrences.sync.bookmarks-limit-exceeded-action" : {
+      "comment" : "Button title for sync bookmarks limits exceeded warning to go to manage bookmarks",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manage Bookmarks"
+          }
+        }
+      }
+    },
+    "prefrences.sync.bookmarks-limit-exceeded-description" : {
+      "comment" : "Description for sync bookmarks limits exceeded warning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark limit exceeded. Delete some to resume syncing."
+          }
+        }
+      }
+    },
+    "prefrences.sync.credentials-limit-exceeded-action" : {
+      "comment" : "Button title for sync credentials limits exceeded warning to go to manage passwords",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manage passwords…"
+          }
+        }
+      }
+    },
+    "prefrences.sync.credentials-limit-exceeded-description" : {
+      "comment" : "Description for sync credentials limits exceeded warning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Logins limit exceeded. Delete some to resume syncing."
+          }
+        }
+      }
+    },
+    "prefrences.sync.limit-exceeded-title" : {
+      "comment" : "Title for sync limits exceeded warning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync Paused"
+          }
+        }
+      }
+    },
     "print.menu.item" : {
       "comment" : "Menu item title",
       "extractionState" : "extracted_with_value",
