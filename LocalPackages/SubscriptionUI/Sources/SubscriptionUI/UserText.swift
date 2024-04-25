@@ -64,8 +64,8 @@ enum UserText {
 
     static let addToAnotherDeviceButton = NSLocalizedString("subscription.preferences.add.to.another.device.button", value: "Add to Another Device…", comment: "Button to add subscription to another device")
     static let manageSubscriptionButton = NSLocalizedString("subscription.preferences.manage.subscription.button", value: "Manage Subscription", comment: "Button to manage subscription")
-    static let changePlanOrBillingButton = NSLocalizedString("subscription.preferences.change.plan.or.billing.button", value: "Change Plan or Billing...", comment: "Button to add subscription to another device")
-    static let removeFromThisDeviceButton = NSLocalizedString("subscription.preferences.remove.from.this.device.button", value: "Remove From This Device...", comment: "Button to remove subscription from this device")
+    static let changePlanOrBillingButton = NSLocalizedString("subscription.preferences.change.plan.or.billing.button", value: "Change Plan or Billing…", comment: "Button to add subscription to another device")
+    static let removeFromThisDeviceButton = NSLocalizedString("subscription.preferences.remove.from.this.device.button", value: "Remove From This Device…", comment: "Button to remove subscription from this device")
 
     // MARK: Preferences when subscription is inactive
     static let preferencesSubscriptionInactiveHeader = NSLocalizedString("subscription.preferences.subscription.inactive.header", value: "Subscribe to Privacy Pro", comment: "Header for the subscription preferences pane when the subscription is inactive")
