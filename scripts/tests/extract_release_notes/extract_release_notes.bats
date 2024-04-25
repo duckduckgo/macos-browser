@@ -72,3 +72,24 @@ main() {
 	[ "$status" -eq 0 ]
 	[ "$output" == "$(<no-pp-output-asana.txt)" ]
 }
+
+# bats test_tags=placeholder-pp, raw
+@test "placeholder-pp raw output" {
+	run main -r < placeholder-pp.txt
+	[ "$status" -eq 0 ]
+	[ "$output" == "$(<no-pp-output-raw.txt)" ]
+}
+
+# bats test_tags=placeholder-pp, html
+@test "placeholder-pp HTML output" {
+	run main -h < placeholder-pp.txt
+	[ "$status" -eq 0 ]
+	[ "$output" == "$(<no-pp-output-html.txt)" ]
+}
+
+# bats test_tags=placeholder-pp, asana
+@test "placeholder-pp Asana output" {
+	run main -a < placeholder-pp.txt
+	[ "$status" -eq 0 ]
+	[ "$output" == "$(<no-pp-output-asana.txt)" ]
+}
