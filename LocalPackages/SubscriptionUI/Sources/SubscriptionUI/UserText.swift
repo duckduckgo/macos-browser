@@ -81,6 +81,7 @@ enum UserText {
     // MARK: Preferences when subscription is expired
     static let preferencesSubscriptionExpiredCaption = NSLocalizedString("subscription.preferences.subscription.expired.caption", value: "Subscribe again to continue using Privacy Pro.", comment: "Caption for the subscription preferences pane when the subscription activation is pending")
 
+    static let viewPlansExpiredButtonTitle = NSLocalizedString("subscription.preferences.button.view.plans", value: "View Plans…", comment: "Button for viewing subscription plans on expired subscription")
     static let manageDevicesButton = NSLocalizedString("subscription.preferences.manage.devices.button", value: "Manage Devices", comment: "Button to manage devices")
 
     // MARK: - Change plan or billing dialogs
