@@ -188,6 +188,10 @@ public struct PreferencesSubscriptionView: View {
              Button(UserText.viewPlansExpiredButtonTitle) { model.purchaseAction() }
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
             Menu {
+                Button(UserText.addToAnotherDeviceButton) {
+                    model.userEventHandler(.addToAnotherDeviceClick)
+                    showingSheet.toggle()
+                }
                 Button(UserText.removeFromThisDeviceButton, action: {
                     showingRemoveConfirmationDialog.toggle()
                 })
