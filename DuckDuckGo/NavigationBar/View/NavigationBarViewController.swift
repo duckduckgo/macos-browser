@@ -289,43 +289,12 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func toggleNetworkProtectionPopover() {
-        let featureVisibility = DefaultNetworkProtectionVisibility()
-        guard featureVisibility.isNetworkProtectionBetaVisible() else {
-            featureVisibility.disableForWaitlistUsers()
-            LocalPinningManager.shared.unpin(.networkProtection)
+        guard DefaultSubscriptionFeatureAvailability().isFeatureAvailable,
+              NetworkProtectionKeychainTokenStore().isFeatureActivated else {
             return
         }
 
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-            let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
-
-            if accountManager.accessToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
-                print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
-                return
-            }
-        }
-
-        // Note: the following code is quite contrived but we're aiming to hotfix issues without mixing subscription and
-        // waitlist logic.  This should be cleaned up once waitlist can safely be removed.
-
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
-            }
-        } else {
-            // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
-            // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
-            // 3. If the user has no state of any kind, show the waitlist screen.
-
-            if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
-                NetworkProtectionWaitlistViewControllerPresenter.show()
-            } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
-            } else {
-                NetworkProtectionWaitlistViewControllerPresenter.show()
-            }
-        }
+        popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -951,14 +920,8 @@ extension NavigationBarViewController: NSMenuDelegate {
     // MARK: - VPN
 
     func showNetworkProtectionStatus() {
-        let featureVisibility = DefaultNetworkProtectionVisibility()
-
-        if featureVisibility.isNetworkProtectionBetaVisible() {
-            popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
-                                                  withDelegate: networkProtectionButtonModel)
-        } else {
-            featureVisibility.disableForWaitlistUsers()
-        }
+        popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
+                                              withDelegate: networkProtectionButtonModel)
     }
 
     /// Sets up the VPN button.
