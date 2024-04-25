@@ -126,13 +126,19 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             notificationsAgentIsRunning: true
         )
 
+        let privacyProInfo = VPNMetadata.PrivacyProInfo(
+            betaParticipant: false,
+            subscriptionActive: true
+        )
+
         return VPNMetadata(
             appInfo: appInfo,
             deviceInfo: deviceInfo,
             networkInfo: networkInfo,
             vpnState: vpnState,
             vpnSettingsState: vpnSettingsState,
-            loginItemState: loginItemState
+            loginItemState: loginItemState,
+            privacyProInfo: privacyProInfo
         )
     }
 
