@@ -27,6 +27,15 @@ public enum DataBrokerProtectionSchedulerStatus: Codable {
     case running
 }
 
+public enum DataBrokerProtectionCurrentOperation: String, Codable {
+    case queued
+    case all
+    case scanAll
+    case scheduledQueued
+    case optOutAll
+    case idle
+}
+
 public enum DataBrokerProtectionSchedulerError: Error {
     case loginItemDoesNotHaveNecessaryPermissions
     case appInWrongDirectory
@@ -75,6 +84,8 @@ public protocol DataBrokerProtectionScheduler {
 
     var status: DataBrokerProtectionSchedulerStatus { get }
     var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
+    var currentOperationPublisher: Published<DataBrokerProtectionCurrentOperation>.Publisher { get }
+    var currentOperation: DataBrokerProtectionCurrentOperation { get }
 
     func startScheduler(showWebView: Bool)
     func stopScheduler()
@@ -122,6 +133,15 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let emailService: EmailServiceProtocol
     private let captchaService: CaptchaServiceProtocol
     private let userNotificationService: DataBrokerProtectionUserNotificationService
+
+    @Published
+    public var currentOperation: DataBrokerProtectionCurrentOperation = .idle {
+        didSet {
+            os_log("Current scheduler operation set to %{public}@...", log: .dataBrokerProtection, currentOperation.rawValue)
+        }
+    }
+
+    public var currentOperationPublisher: Published<DataBrokerProtectionCurrentOperation>.Publisher { $currentOperation }
 
     /// Ensures that only one scheduler operation is executed at the same time.
     ///
@@ -188,6 +208,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
             }
             self.lastSchedulerSessionStartTimestamp = Date()
             self.status = .running
+            self.currentOperation = .scheduledQueued
             os_log("Scheduler running...", log: .dataBrokerProtection)
             self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] errors in
                 if let errors = errors {
@@ -201,6 +222,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                     }
                 }
                 self?.status = .idle
+                self?.currentOperation = .idle
                 completion(.finished)
             }
         }
@@ -215,6 +237,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public func runAllOperations(showWebView: Bool = false) {
         os_log("Running all operations...", log: .dataBrokerProtection)
+        self.currentOperation = .all
         self.dataBrokerProcessor.runAllOperations(showWebView: showWebView) { [weak self] errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
@@ -226,12 +249,14 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                     os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.runAllOperations in dataBrokerProcessor.runAllOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
+            self?.currentOperation = .idle
         }
     }
 
     public func runQueuedOperations(showWebView: Bool = false,
                                     completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
+        self.currentOperation = .queued
         dataBrokerProcessor.runQueuedOperations(showWebView: showWebView,
                                                 completion: { [weak self] errors in
             if let errors = errors {
@@ -244,6 +269,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                     os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.runQueuedOperations in dataBrokerProcessor.runQueuedOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
+            self?.currentOperation = .idle
             completion?(errors)
         })
 
@@ -255,6 +281,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
         userNotificationService.requestNotificationPermission()
 
+        currentOperation = .scanAll
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
         dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] errors in
             guard let self = self else { return }
@@ -285,7 +312,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                     os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.scanAllBrokers in dataBrokerProcessor.runAllScanOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
-
+            self.currentOperation = .idle
             completion?(errors)
         }
     }
@@ -293,6 +320,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     public func optOutAllBrokers(showWebView: Bool = false,
                                  completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
+        currentOperation = .optOutAll
         self.dataBrokerProcessor.runAllOptOutOperations(showWebView: showWebView,
                                                         completion: { [weak self] errors in
             if let errors = errors {
@@ -305,7 +333,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                     os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
-
+            self?.currentOperation = .idle
             completion?(errors)
         })
     }

@@ -23,6 +23,10 @@ import Foundation
 /// Do not use this for any production code.
 ///
 final class DataBrokerProtectionNoOpScheduler: DataBrokerProtectionScheduler {
+    private var internalCurrentOperationPublisher: Published<DataBrokerProtectionCurrentOperation> = .init(initialValue: .idle)
+    var currentOperationPublisher: Published<DataBrokerProtectionCurrentOperation>.Publisher {
+        internalCurrentOperationPublisher.projectedValue
+    }
 
     private(set) public var status: DataBrokerProtectionSchedulerStatus = .idle
 
@@ -31,7 +35,7 @@ final class DataBrokerProtectionNoOpScheduler: DataBrokerProtectionScheduler {
     public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher {
         internalStatusPublisher.projectedValue
     }
-
+    var currentOperation: DataBrokerProtectionCurrentOperation = .idle
     func startScheduler(showWebView: Bool) { }
     func stopScheduler() { }
     func optOutAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) { }

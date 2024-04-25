@@ -41,6 +41,14 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
         ipcClient.startScheduler(showWebView: showWebView)
     }
 
+    public var currentOperation: DataBrokerProtectionCurrentOperation {
+        ipcClient.schedulerCurrentOperation
+    }
+
+    public var currentOperationPublisher: Published<DataBrokerProtectionCurrentOperation>.Publisher {
+        ipcClient.schedulerCurrentOperationPublisher
+    }
+
     public func stopScheduler() {
         ipcClient.stopScheduler()
     }

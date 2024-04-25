@@ -90,6 +90,11 @@ public final class DataBrokerProtectionBackgroundManager {
             return
         }
 
+        guard scheduler.currentOperation == .idle else {
+            os_log("Scheduler already running operations, returning...", log: .dataBrokerProtection)
+            return
+        }
+
         scheduler.runQueuedOperations(showWebView: false) { [weak self] errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {

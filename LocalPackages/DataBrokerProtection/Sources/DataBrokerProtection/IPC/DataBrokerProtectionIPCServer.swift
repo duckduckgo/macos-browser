@@ -177,6 +177,20 @@ public final class DataBrokerProtectionIPCServer {
 // MARK: - Outgoing communication to the clients
 
 extension DataBrokerProtectionIPCServer: IPCClientInterface {
+    public func schedulerCurrentOperationChanges(_ status: DataBrokerProtectionCurrentOperation) {
+        let payload: Data
+
+        do {
+            payload = try JSONEncoder().encode(status)
+        } catch {
+            return
+        }
+
+        xpc.forEachClient { client in
+            client.schedulerCurrentOperationChanges(payload)
+        }
+    }
+    
 
     public func schedulerStatusChanges(_ status: DataBrokerProtectionSchedulerStatus) {
         let payload: Data

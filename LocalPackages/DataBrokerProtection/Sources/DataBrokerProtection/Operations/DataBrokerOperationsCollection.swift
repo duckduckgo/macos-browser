@@ -78,6 +78,8 @@ final class DataBrokerOperationsCollection: Operation {
         self.pixelHandler = pixelHandler
         self.showWebView = showWebView
         self.userNotificationService = userNotificationService
+
+        os_log("Create operation: %{public}@ DataBroker %{public}d", log: .dataBrokerProtection, String(describing: id.uuidString), dataBrokerID)
         super.init()
     }
 
@@ -172,7 +174,7 @@ final class DataBrokerOperationsCollection: Operation {
                 continue
             }
             do {
-                os_log("Running operation: %{public}@", log: .dataBrokerProtection, String(describing: operationData))
+                os_log("Running operation: %{public}@ DataBroker %{public}d", log: .dataBrokerProtection, String(describing: id.uuidString), dataBrokerID)
 
                 try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
                                                                                 brokerProfileQueryData: brokerProfileData,
@@ -215,6 +217,6 @@ final class DataBrokerOperationsCollection: Operation {
         didChangeValue(forKey: #keyPath(isExecuting))
         didChangeValue(forKey: #keyPath(isFinished))
 
-        os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
+        os_log("Finished operation: %{public}@ DataBroker %{public}d", log: .dataBrokerProtection, String(describing: id.uuidString), dataBrokerID)
     }
 }

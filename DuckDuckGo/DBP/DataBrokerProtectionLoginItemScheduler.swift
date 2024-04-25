@@ -47,6 +47,14 @@ final class DataBrokerProtectionLoginItemScheduler {
 }
 
 extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler {
+    var currentOperationPublisher: Published<DataBrokerProtection.DataBrokerProtectionCurrentOperation>.Publisher {
+        ipcScheduler.currentOperationPublisher
+    }
+
+    var currentOperation: DataBrokerProtectionCurrentOperation {
+        ipcScheduler.currentOperation
+    }
+
     var status: DataBrokerProtection.DataBrokerProtectionSchedulerStatus {
         ipcScheduler.status
     }

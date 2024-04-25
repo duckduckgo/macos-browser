@@ -25,6 +25,7 @@ import XPCHelper
 ///
 public protocol IPCClientInterface: AnyObject {
     func schedulerStatusChanges(_ status: DataBrokerProtectionSchedulerStatus)
+    func schedulerCurrentOperationChanges(_ status: DataBrokerProtectionCurrentOperation)
 }
 
 public protocol DBPLoginItemStatusChecker {
@@ -36,6 +37,7 @@ public protocol DBPLoginItemStatusChecker {
 @objc
 protocol XPCClientInterface: NSObjectProtocol {
     func schedulerStatusChanged(_ payload: Data)
+    func schedulerCurrentOperationChanges(_ payload: Data)
 }
 
 public final class DataBrokerProtectionIPCClient: NSObject {
@@ -54,6 +56,13 @@ public final class DataBrokerProtectionIPCClient: NSObject {
 
     public var schedulerStatusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher {
         $schedulerStatus
+    }
+
+    @Published
+    private(set) public var schedulerCurrentOperation: DataBrokerProtectionCurrentOperation = .idle
+
+    public var schedulerCurrentOperationPublisher: Published<DataBrokerProtectionCurrentOperation>.Publisher {
+        $schedulerCurrentOperation
     }
 
     // MARK: - Initializers
@@ -231,5 +240,13 @@ extension DataBrokerProtectionIPCClient: XPCClientInterface {
         }
 
         schedulerStatus = status
+    }
+
+    func schedulerCurrentOperationChanges(_ payload: Data) {
+        guard let currentOperation = try? JSONDecoder().decode(DataBrokerProtectionCurrentOperation.self, from: payload) else {
+            return
+        }
+
+        self.schedulerCurrentOperation = currentOperation
     }
 }

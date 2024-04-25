@@ -46,6 +46,9 @@ final class IPCServiceManager {
 
         ipcServer.serverDelegate = self
         ipcServer.activate()
+
+        subscribeToSchedulerStatusChanges()
+        subscribeToSchedulerCurrentOperationChanges()
     }
 
     private func subscribeToSchedulerStatusChanges() {
@@ -53,6 +56,15 @@ final class IPCServiceManager {
             .subscribe(on: DispatchQueue.main)
             .sink { [weak self] status in
                 self?.ipcServer.schedulerStatusChanges(status)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToSchedulerCurrentOperationChanges() {
+        scheduler.currentOperationPublisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                self?.ipcServer.schedulerCurrentOperationChanges(status)
             }
             .store(in: &cancellables)
     }

@@ -58,10 +58,12 @@ final class DataBrokerProtectionProcessor {
     func runAllScanOperations(showWebView: Bool = false,
                               completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         operationQueue.cancelAllOperations()
+        os_log("Processor - start run all scan operations", log: .dataBrokerProtection)
+
         runOperations(operationType: .scan,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
-            os_log("Scans done", log: .dataBrokerProtection)
+            os_log("Processor - start run all scan done", log: .dataBrokerProtection)
             completion?(errors)
             self.calculateMisMatches()
         }
@@ -75,30 +77,34 @@ final class DataBrokerProtectionProcessor {
     func runAllOptOutOperations(showWebView: Bool = false,
                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         operationQueue.cancelAllOperations()
+        os_log("Processor - start run all opt-out operations", log: .dataBrokerProtection)
+
         runOperations(operationType: .optOut,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
-            os_log("Optouts done", log: .dataBrokerProtection)
+            os_log("Processor - opt-out operations done", log: .dataBrokerProtection)
             completion?(errors)
         }
     }
 
     func runQueuedOperations(showWebView: Bool = false,
                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
+        os_log("Processor - start run queued operations", log: .dataBrokerProtection)
         runOperations(operationType: .all,
                       priorityDate: Date(),
                       showWebView: showWebView) { errors in
-            os_log("Queued operations done", log: .dataBrokerProtection)
+            os_log("Processor - queued operations done", log: .dataBrokerProtection)
             completion?(errors)
         }
     }
 
     func runAllOperations(showWebView: Bool = false,
                           completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
+        os_log("Processor - start run all operations", log: .dataBrokerProtection)
         runOperations(operationType: .all,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
-            os_log("Queued operations done", log: .dataBrokerProtection)
+            os_log("Processor - all operations done", log: .dataBrokerProtection)
             completion?(errors)
         }
     }
