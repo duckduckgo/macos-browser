@@ -2,7 +2,7 @@ name: PR Checks
 
 on: 
   push:
-    branches: [ main, "release/**", "dominik/release-notes-html" ]
+    branches: [ main, "release/**" ]
   pull_request:
   workflow_call:
     inputs:
