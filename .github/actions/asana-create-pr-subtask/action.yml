@@ -24,16 +24,16 @@ runs:
   steps:
       - name: "Map GitHub to Asana Assignee"
         id: map-github-to-asana-user
-        shell: bash
-        run: |
-          echo assignee_id=$(jq -r .${{ github.event.requested_reviewer.login }} < ${{ github.action_path }}/user_ids.json) >> "$GITHUB_OUTPUT"
-
+        uses: ./.github/actions/map-github-user-to-asana-user-id
+        with:
+          github-user: ${{ inputs.github-reviewer-user }}
+        
       - name: "Create PR Subtask"
         shell: bash
         env:
           ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
           ASANA_TASK_ID: ${{ inputs.asana-task-id }}
-          ASANA_ASSIGNEE_ID: ${{ steps.map-github-to-asana-user.outputs.assignee_id }}
+          ASANA_ASSIGNEE_ID: ${{ steps.map-github-to-asana-user.outputs.asana-user-id }}
           GITHUB_PR_URL: ${{ inputs.github-pr-url }}
         run: |
           ${{ github.action_path }}/asana-create-pr-subtask.sh
