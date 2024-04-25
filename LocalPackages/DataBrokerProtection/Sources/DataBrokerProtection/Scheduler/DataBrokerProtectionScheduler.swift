@@ -251,6 +251,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public func startManualScan(showWebView: Bool = false,
                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+        let startTime = Date()
         stopScheduler()
 
         userNotificationService.requestNotificationPermission()
@@ -286,7 +287,22 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 }
             }
 
+            fireManualScanCompletionPixel(startTime: startTime)
             completion?(errors)
+        }
+    }
+
+    private func fireManualScanCompletionPixel(startTime: Date) {
+        do {
+            let profile = try dataManager.fetchProfile(ignoresCache: true)
+
+            if let profile = profile {
+                let durationSinceStart = Date().timeIntervalSince(startTime) * 1000
+                self.pixelHandler.fire(.initialScanTotalDuration(duration: durationSinceStart.rounded(.towardZero),
+                                                                 profileQueries: profile.profileQueries.count))
+            }
+        } catch {
+            os_log("Manual Scan Error when trying to fetch the profile to get the profile queries", log: .dataBrokerProtection)
         }
     }
 

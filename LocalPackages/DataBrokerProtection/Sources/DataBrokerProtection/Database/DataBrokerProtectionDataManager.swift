@@ -36,6 +36,10 @@ extension DataBrokerProtectionDataManaging {
     func fetchBrokerProfileQueryData() throws -> [BrokerProfileQueryData] {
         try fetchBrokerProfileQueryData(ignoresCache: false)
     }
+
+    public func fetchProfile() throws -> DataBrokerProtectionProfile? {
+        try fetchProfile()
+    }
 }
 
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
@@ -68,8 +72,8 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         cache.profile = profile
     }
 
-    public func fetchProfile() throws -> DataBrokerProtectionProfile? {
-        if cache.profile != nil {
+    public func fetchProfile(ignoresCache: Bool = false) throws -> DataBrokerProtectionProfile? {
+        if cache.profile != nil && !ignoresCache {
             os_log("Returning cached profile", log: .dataBrokerProtection)
             return cache.profile
         }
