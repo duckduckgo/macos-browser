@@ -1,4 +1,0 @@
-<h3 style="font-size:14px">What's new</h3>
-<ul>
-<li>&lt;-- Add release notes here --&gt;</li>
-</ul>
