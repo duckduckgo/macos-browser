@@ -190,7 +190,6 @@ extension DataBrokerProtectionIPCServer: IPCClientInterface {
             client.schedulerCurrentOperationChanges(payload)
         }
     }
-    
 
     public func schedulerStatusChanges(_ status: DataBrokerProtectionSchedulerStatus) {
         let payload: Data
