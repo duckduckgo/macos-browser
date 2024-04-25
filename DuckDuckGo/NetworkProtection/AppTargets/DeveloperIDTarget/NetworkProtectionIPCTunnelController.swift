@@ -26,7 +26,7 @@ import PixelKit
 ///
 final class NetworkProtectionIPCTunnelController {
 
-    enum RequestError: CustomNSError {
+    enum RequestError: CustomNSError, LocalizedError {
         case notAuthorizedToEnableLoginItem
         case internalLoginItemError(_ error: Error)
 
@@ -51,16 +51,19 @@ final class NetworkProtectionIPCTunnelController {
     private let loginItemsManager: LoginItemsManaging
     private let ipcClient: NetworkProtectionIPCClient
     private let pixelKit: PixelFiring?
+    private let errorRecorder: VPNOperationErrorRecorder
 
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
          loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          ipcClient: NetworkProtectionIPCClient,
-         pixelKit: PixelFiring? = PixelKit.shared) {
+         pixelKit: PixelFiring? = PixelKit.shared,
+         errorRecorder: VPNOperationErrorRecorder = VPNOperationErrorRecorder()) {
 
         self.featureVisibility = featureVisibility
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
         self.pixelKit = pixelKit
+        self.errorRecorder = errorRecorder
     }
 
     // MARK: - Login Items Manager
@@ -84,9 +87,11 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
 
     @MainActor
     func start() async {
+        errorRecorder.beginRecordingIPCStart()
         pixelKit?.fire(StartAttempt.begin)
 
         func handleFailure(_ error: Error) {
+            errorRecorder.recordIPCStartFailure(error)
             log(error)
             pixelKit?.fire(StartAttempt.failure(error), frequency: .dailyAndCount)
         }
@@ -156,7 +161,7 @@ extension NetworkProtectionIPCTunnelController: TunnelController {
     }
 }
 
-// MARK: - Start Attempts
+// MARK: - Start Attempts: Pixels
 
 extension NetworkProtectionIPCTunnelController {
 
