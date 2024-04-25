@@ -128,7 +128,8 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
 
         let privacyProInfo = VPNMetadata.PrivacyProInfo(
             betaParticipant: false,
-            subscriptionActive: true
+            hasPrivacyProAccount: true,
+            hasVPNEntitlement: true
         )
 
         return VPNMetadata(
