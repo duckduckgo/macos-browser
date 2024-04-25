@@ -87,6 +87,7 @@ public struct UserDefaultsWrapper<T> {
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
         case preferNewTabsToWindows = "preferences.tabs.prefer-new-tabs-to-windows"
         case switchToNewTabWhenOpened = "preferences.tabs.switch-to-new-tab-when-opened"
+        case newTabPosition = "preferences.tabs.new-tab-position"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 

@@ -102,6 +102,7 @@ final class TabCollectionViewModel: NSObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    private var tabsPreferences: TabsPreferences
     private var startupPreferences: StartupPreferences
     private var homePage: Tab.TabContent {
         var homePage: Tab.TabContent = .newtab
@@ -117,12 +118,14 @@ final class TabCollectionViewModel: NSObject {
         selectionIndex: Int = 0,
         pinnedTabsManager: PinnedTabsManager?,
         burnerMode: BurnerMode = .regular,
-        startupPreferences: StartupPreferences = StartupPreferences.shared
+        startupPreferences: StartupPreferences = StartupPreferences.shared,
+        tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
         self.burnerMode = burnerMode
         self.startupPreferences = startupPreferences
+        self.tabsPreferences = tabsPreferences
         super.init()
 
         subscribeToTabs()
@@ -321,6 +324,10 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
+    func insertNewTab(after parentTab: Tab, with content: Tab.TabContent = .newtab, selected: Bool = true) {
+        insert(Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), after: parentTab, selected: selected)
+    }
+
     func insert(_ tab: Tab, at index: TabIndex, selected: Bool = true) {
         guard changesEnabled else { return }
         guard let tabCollection = tabCollection(for: index) else {
@@ -360,6 +367,18 @@ final class TabCollectionViewModel: NSObject {
             self.insert(tab, after: parentTab, selected: selected)
         } else {
             self.insert(tab, at: .unpinned(0))
+        }
+    }
+
+    func insertOrAppendNewTab(_ content: Tab.TabContent = .newtab, selected: Bool = true, forceChange: Bool = false) {
+        insertOrAppend(tab: Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), selected: selected, forceChange: forceChange)
+    }
+
+    func insertOrAppend(tab: Tab, selected: Bool, forceChange: Bool = false) {
+        if tabsPreferences.newTabPosition == .nextToCurrent, let selectedTab {
+            self.insert(tab, after: selectedTab, selected: selected)
+        } else {
+            append(tab: tab, selected: selected)
         }
     }
 

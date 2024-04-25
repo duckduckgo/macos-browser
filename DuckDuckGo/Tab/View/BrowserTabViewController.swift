@@ -547,7 +547,8 @@ final class BrowserTabViewController: NSViewController {
                       shouldLoadInBackground: true,
                       burnerMode: tabCollectionViewModel.burnerMode,
                       webViewSize: view.frame.size)
-        tabCollectionViewModel.append(tab: tab, selected: true)
+
+        tabCollectionViewModel.insertOrAppend(tab: tab, selected: true)
     }
 
     // MARK: - Browser Tabs

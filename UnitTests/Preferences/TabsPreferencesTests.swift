@@ -22,6 +22,7 @@ import XCTest
 class MockTabsPreferencesPersistor: TabsPreferencesPersistor {
     var preferNewTabsToWindows: Bool = false
     var switchToNewTabWhenOpened: Bool = false
+    var newTabPosition: NewTabPosition = .atEnd
 }
 
 final class TabsPreferencesTests: XCTestCase {
@@ -30,10 +31,12 @@ final class TabsPreferencesTests: XCTestCase {
         let mockPersistor = MockTabsPreferencesPersistor()
         mockPersistor.preferNewTabsToWindows = true
         mockPersistor.switchToNewTabWhenOpened = true
+        mockPersistor.newTabPosition = .nextToCurrent
         let tabsPreferences = TabsPreferences(persistor: mockPersistor)
 
         XCTAssertTrue(tabsPreferences.preferNewTabsToWindows)
         XCTAssertTrue(tabsPreferences.switchToNewTabWhenOpened)
+        XCTAssertEqual(tabsPreferences.newTabPosition, .nextToCurrent)
     }
 
     func testWhenPreferencesUpdatedThenPersistorUpdates() {
@@ -41,8 +44,10 @@ final class TabsPreferencesTests: XCTestCase {
         let tabsPreferences = TabsPreferences(persistor: mockPersistor)
         tabsPreferences.preferNewTabsToWindows = true
         tabsPreferences.switchToNewTabWhenOpened = true
+        tabsPreferences.newTabPosition = .nextToCurrent
 
         XCTAssertTrue(mockPersistor.preferNewTabsToWindows)
         XCTAssertTrue(mockPersistor.switchToNewTabWhenOpened)
+        XCTAssertEqual(mockPersistor.newTabPosition, .nextToCurrent)
     }
 }

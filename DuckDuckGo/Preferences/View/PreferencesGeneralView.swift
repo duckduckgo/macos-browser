@@ -56,6 +56,17 @@ extension Preferences {
                         ToggleMenuItem(UserText.preferNewTabsToWindows, isOn: $tabsModel.preferNewTabsToWindows)
                         ToggleMenuItem(UserText.switchToNewTabWhenOpened, isOn: $tabsModel.switchToNewTabWhenOpened)
                     }
+
+                    PreferencePaneSubSection {
+                        HStack {
+                            Picker(UserText.newTabPositionTitle, selection: $tabsModel.newTabPosition) {
+                                ForEach(NewTabPosition.allCases, id: \.self) { position in
+                                    Text(UserText.newTabPositionMode(for: position)).tag(position)
+                                }
+                            }
+                            .fixedSize()
+                        }
+                    }
                 }
 
                 // SECTION 3: Home Page

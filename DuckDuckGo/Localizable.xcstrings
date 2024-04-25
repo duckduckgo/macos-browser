@@ -11656,6 +11656,30 @@
         }
       }
     },
+    "context.menu.new.tab.mode.at.end" : {
+      "comment" : "Preferences > Tabs > At end of list",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "At the end of tabs list"
+          }
+        }
+      }
+    },
+    "context.menu.new.tab.mode.next.to.current" : {
+      "comment" : "Preferences > Tabs > Next to current tab",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Next to the current tab"
+          }
+        }
+      }
+    },
     "copy" : {
       "comment" : "Copy button",
       "extractionState" : "extracted_with_value",
@@ -43245,6 +43269,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Стартовая страница"
+          }
+        }
+      }
+    },
+    "preferences-tabs.new.tab.position.title" : {
+      "comment" : "Title for new tab positioning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open new tabs"
           }
         }
       }
