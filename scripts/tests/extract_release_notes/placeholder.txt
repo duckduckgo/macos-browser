@@ -1,0 +1,14 @@
+Note: This task's description is managed automatically.
+Only the Release notes section below should be modified manually.
+Please do not adjust formatting.
+
+Release notes
+
+    <-- Add release notes here -->
+
+For Privacy Pro subscribers
+
+    <-- Add release notes here -->
+
+
+This release includes:

@@ -1,0 +1,7 @@
+You can now find browser windows listed in the "Window" app menu and in the Dock menu.
+We also added "Duplicate Tab" to the app menu so you can use it as an action in Apple Shortcuts.
+When watching videos in Duck Player, clicking endscreen recommendations will now open those videos in the same tab.
+The bug that duplicated sites in your browsing history has been fixed, and the visual glitching that sometimes occurred during session restore and app launch has been addressed.
+For Privacy Pro subscribers
+VPN updates! More detailed connection info in the VPN dashboard, plus animations and usability improvements.
+Visit https://duckduckgo.com/pro for more information. Privacy Pro is currently available to U.S. residents only.
