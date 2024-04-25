@@ -1,1 +1,0 @@
-<ul><li>&lt;-- Add release notes here --&gt;</li></ul>
