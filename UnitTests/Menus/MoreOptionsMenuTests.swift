@@ -195,19 +195,11 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return !visible
     }
 
-    func isNetworkProtectionBetaVisible() -> Bool {
-        return visible
-    }
-
     func canStartVPN() async throws -> Bool {
         return false
     }
 
     func disableForAllUsers() async {
-        // intentional no-op
-    }
-
-    func disableForWaitlistUsers() {
         // intentional no-op
     }
 
