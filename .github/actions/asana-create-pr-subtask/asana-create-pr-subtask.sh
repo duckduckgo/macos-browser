@@ -10,7 +10,7 @@ pr_prefix="PR:"
 
 # Fetch the subtasks of a task with the given ASANA_TASK_ID.
 _fetch_subtasks() {
-    local url="${asana_api_url}/tasks/${ASANA_TASK_ID}/subtasks?opt_fields=name,completed,parent.name"
+    local url="${asana_api_url}/tasks/${ASANA_TASK_ID}/subtasks?opt_fields=name,completed,parent.name,assignee"
 
     local response="$(curl -fLSs "$url" -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}")"
 
@@ -19,7 +19,7 @@ _fetch_subtasks() {
     # replace the new line with a comma
 	# remove the trailing comma at the end of the line.
     local subtasks=$(jq -c '.data[]
-        | {task_id: .gid, task_name: .name, task_completed: .completed, parent_name: .parent.name}' <<< "$response" \
+        | {task_id: .gid, task_name: .name, task_completed: .completed, assignee: .assignee.gid, parent_name: .parent.name}' <<< "$response" \
         | tr '\n' ',' \
 		| sed 's/,$//')
 
@@ -47,12 +47,14 @@ _check_pr_subtask_exist() {
     # read each line of the array
     # extract the task name and trim leading and trailing white spaces
     # extract the parent name and trim leading and trailing white spaces
-    # checks if the task name has 'PR:' prefix and if contains the parent name
+    # extract the assignee name
+    # checks if the task name has 'PR:' prefix and if contains the parent name and if it's assigned to the reviewer
     echo "$response" | jq -c '.[]' | while read item; do
         task_name=$(jq -r '.task_name' <<< "$item" | awk '{$1=$1};1')
         parent_name=$(jq -r '.parent_name' <<< "$item" | awk '{$1=$1};1')
+        assignee=$(jq -r '.assignee' <<< "$item")
 
-        if [[ "$task_name" == "${pr_prefix}"* && "$task_name" == *"$parent_name"* ]]; then
+        if [[ "$task_name" == "${pr_prefix}"* && "$task_name" == *"$parent_name"* && "$assignee" == "$ASANA_ASSIGNEE_ID" ]]; then
             echo "$item"
         fi
     done
@@ -78,7 +80,7 @@ EOF
 }
 
 # Assigns a reviewer to the existing PR subtask and update the task status if it is marked 'completed'
-_assign_reviewer_to_existing_pr_subtask_and_update_status() {
+_mark_task_uncompleted_if_needed() {
     local pr_subtask="$1"
     
     # get the task id
@@ -86,33 +88,19 @@ _assign_reviewer_to_existing_pr_subtask_and_update_status() {
     # get the completed status
     local task_status_completed=$(echo "$pr_subtask" | jq -r '.task_completed')
     
-    local url="${asana_api_url}/tasks/${task_id}?opt_fields=gid"
-    local payload=""
-
-    # if the status is completed mark the task uncompleted and assign the reviewer.
+    # if the status is completed mark the task uncompleted.
     if [ "$task_status_completed" = true ]; then
-        payload=$(cat <<EOF
+        local url="${asana_api_url}/tasks/${task_id}?opt_fields=gid"
+        local payload=$(cat <<EOF
         {
             "data": {
-                "assignee": "${ASANA_ASSIGNEE_ID}",
                 "completed": false
             }
         }
 EOF
 )
-    # otherwise just assign the reviewer
-    else
-        payload=$(cat <<EOF
-        {
-            "data": {
-                "assignee": "${ASANA_ASSIGNEE_ID}"
-            }
-        }
-EOF
-)
+        _execute_create_or_update_asana_task_request PUT "$url" "$payload"
     fi
-
-    _execute_create_or_update_asana_task_request PUT "$url" "$payload"
 }
 
 # Executes an Asana request to create or update a Subtask
@@ -139,10 +127,10 @@ main() {
     # check if the PR subtask already exist
     local pr_subtask=$(_check_pr_subtask_exist "$subtasks")
 
-    # if the PR subtask exist, assign the reviewer and mark the task uncompleted the task if it is completed
+    # if the PR subtask exist, mark the task uncompleted if it the task is marked completed
     # otherwise, create the PR subtask and assign it to the reviewer
     if [[ -n "$pr_subtask" ]]; then
-        _assign_reviewer_to_existing_pr_subtask_and_update_status "$pr_subtask"
+        _mark_task_uncompleted_if_needed "$pr_subtask"
     else
         _create_pr_subtask
     fi
