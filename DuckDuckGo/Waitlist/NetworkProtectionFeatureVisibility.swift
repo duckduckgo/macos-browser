@@ -124,7 +124,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     }
 
     func disableForAllUsers() async {
-        await featureDisabler.disable(keepAuthToken: true, uninstallSystemExtension: false)
+        await featureDisabler.disable(uninstallSystemExtension: false)
     }
 
     /// A method meant to be called safely from different places to disable the VPN if the user isn't meant to have access to it.

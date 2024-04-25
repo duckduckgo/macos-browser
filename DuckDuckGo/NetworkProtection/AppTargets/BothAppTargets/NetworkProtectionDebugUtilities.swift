@@ -55,7 +55,7 @@ final class NetworkProtectionDebugUtilities {
     // MARK: - Debug commands for the extension
 
     func resetAllState(keepAuthToken: Bool) async {
-        let uninstalledSuccessfully = await networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
+        let uninstalledSuccessfully = await networkProtectionFeatureDisabler.disable(uninstallSystemExtension: true)
 
         guard uninstalledSuccessfully else {
             return

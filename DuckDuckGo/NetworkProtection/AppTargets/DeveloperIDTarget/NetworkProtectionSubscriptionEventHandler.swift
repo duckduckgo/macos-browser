@@ -109,7 +109,7 @@ final class NetworkProtectionSubscriptionEventHandler {
         print("[NetP Subscription] Deleted NetP auth token after signing out from Privacy Pro")
 
         Task {
-            await networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+            await networkProtectionFeatureDisabler.disable(uninstallSystemExtension: false)
         }
     }
 

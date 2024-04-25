@@ -116,7 +116,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                                    userDefaults: .netP,
                                                    locationFormatter: DefaultVPNLocationFormatter(),
                                                    uninstallHandler: { [weak self] in
-                _ = await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
+                _ = await self?.networkProtectionFeatureDisabler.disable(uninstallSystemExtension: true)
             })
             popover.delegate = delegate
 
