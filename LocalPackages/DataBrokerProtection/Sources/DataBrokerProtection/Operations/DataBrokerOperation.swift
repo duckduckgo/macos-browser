@@ -199,13 +199,15 @@ extension DataBrokerOperation {
     }
 
     private func fireSiteLoadingPixel(startTime: Date, hasError: Bool) {
-        let dataBrokerURL = self.query.dataBroker.url
-        let durationInMs = (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)
-        pixelHandler.fire(.initialScanSiteLoadDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))
+        if stageCalculator.isManualScan {
+            let dataBrokerURL = self.query.dataBroker.url
+            let durationInMs = (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)
+            pixelHandler.fire(.initialScanSiteLoadDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))
+        }
     }
 
     func firePostLoadingDurationPixel(hasError: Bool) {
-        if let postLoadingSiteStartTime = self.postLoadingSiteStartTime {
+        if stageCalculator.isManualScan, let postLoadingSiteStartTime = self.postLoadingSiteStartTime {
             let dataBrokerURL = self.query.dataBroker.url
             let durationInMs = (Date().timeIntervalSince(postLoadingSiteStartTime) * 1000).rounded(.towardZero)
             pixelHandler.fire(.initialScanPostLoadingDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))

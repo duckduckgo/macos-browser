@@ -48,6 +48,7 @@ extension OperationsManager {
                       runner: WebOperationRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
+                      isManual: Bool,
                       shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await runOperation(operationData: operationData,
@@ -57,7 +58,7 @@ extension OperationsManager {
                                runner: runner,
                                pixelHandler: pixelHandler,
                                showWebView: false,
-                               isManualScan: false,
+                               isManualScan: isManual,
                                userNotificationService: userNotificationService,
                                shouldRunNextStep: shouldRunNextStep)
     }

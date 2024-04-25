@@ -38,6 +38,7 @@ enum Stage: String {
 
 protocol StageDurationCalculator {
     var attemptId: UUID { get }
+    var isManualScan: Bool { get }
 
     func durationSinceLastStage() -> Double
     func durationSinceStartTime() -> Double
@@ -62,7 +63,7 @@ protocol StageDurationCalculator {
 }
 
 final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator {
-    private let isManualScan: Bool
+    let isManualScan: Bool
     let handler: EventMapping<DataBrokerProtectionPixels>
     let attemptId: UUID
     let dataBroker: String
