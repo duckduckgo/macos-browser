@@ -36,12 +36,12 @@ final class DataBrokerProtectionLoginItemScheduler {
     // MARK: - Login Item Management
 
     func disableLoginItem() {
-        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerDisableLoginItemDaily, frequency: .dailyOnly)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerDisableLoginItemDaily, frequency: .daily)
         loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 
     func enableLoginItem() {
-        DataBrokerProtectionLoginItemPixels.fire(pixel: .dataBrokerEnableLoginItemDaily, frequency: .dailyOnly)
+        DataBrokerProtectionLoginItemPixels.fire(pixel: GeneralPixel.dataBrokerEnableLoginItemDaily, frequency: .daily)
         loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
     }
 }
@@ -55,10 +55,10 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
         ipcScheduler.statusPublisher
     }
 
-    func scanAllBrokers(showWebView: Bool,
-                        completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+    func startManualScan(showWebView: Bool,
+                         completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         enableLoginItem()
-        ipcScheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
+        ipcScheduler.startManualScan(showWebView: showWebView, completion: completion)
     }
 
     func startScheduler(showWebView: Bool) {
@@ -82,6 +82,10 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
     func runQueuedOperations(showWebView: Bool,
                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         ipcScheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
+    }
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        ipcScheduler.getDebugMetadata(completion: completion)
     }
 }
 

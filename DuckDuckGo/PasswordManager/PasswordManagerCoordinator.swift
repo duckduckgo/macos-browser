@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Combine
 import Common
+import PixelKit
 
 protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 
@@ -91,7 +92,7 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
 
     func askToUnlock(completionHandler: @escaping () -> Void) {
         switch bitwardenManagement.status {
-        case .disabled, .notInstalled, .oldVersion, .missingHandshake, .handshakeNotApproved, .error, .accessToContainersNotApproved:
+        case .disabled, .notInstalled, .oldVersion, .incompatible, .missingHandshake, .handshakeNotApproved, .error, .accessToContainersNotApproved:
             Task {
                 await WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
             }
@@ -247,7 +248,7 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
             return
         }
 
-        Pixel.fire(.bitwardenPasswordAutofilled)
+        PixelKit.fire(GeneralPixel.bitwardenPasswordAutofilled)
     }
 
     func reportPasswordSave() {
@@ -255,7 +256,7 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
             return
         }
 
-        Pixel.fire(.bitwardenPasswordSaved)
+        PixelKit.fire(GeneralPixel.bitwardenPasswordSaved)
     }
 
     // MARK: - Cache

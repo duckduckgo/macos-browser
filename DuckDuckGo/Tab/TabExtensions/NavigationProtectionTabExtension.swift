@@ -22,6 +22,7 @@ import Common
 import Foundation
 import Navigation
 import WebKit
+import PixelKit
 
 final class NavigationProtectionTabExtension {
 
@@ -30,7 +31,7 @@ final class NavigationProtectionTabExtension {
     private static let debugEvents = EventMapping<AMPProtectionDebugEvents> { event, _, _, _ in
         switch event {
         case .ampBlockingRulesCompilationFailed:
-            Pixel.fire(.ampBlockingRulesCompilationFailed)
+            PixelKit.fire(GeneralPixel.ampBlockingRulesCompilationFailed)
         }
     }
 

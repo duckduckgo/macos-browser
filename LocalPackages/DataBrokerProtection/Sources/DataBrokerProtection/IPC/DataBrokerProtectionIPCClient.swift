@@ -27,6 +27,11 @@ public protocol IPCClientInterface: AnyObject {
     func schedulerStatusChanges(_ status: DataBrokerProtectionSchedulerStatus)
 }
 
+public protocol DBPLoginItemStatusChecker {
+    func doesHaveNecessaryPermissions() -> Bool
+    func isInCorrectDirectory() -> Bool
+}
+
 /// This is the XPC interface with parameters that can be packed properly
 @objc
 protocol XPCClientInterface: NSObjectProtocol {
@@ -36,6 +41,7 @@ protocol XPCClientInterface: NSObjectProtocol {
 public final class DataBrokerProtectionIPCClient: NSObject {
 
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let loginItemStatusChecker: DBPLoginItemStatusChecker
 
     // MARK: - XPC Communication
 
@@ -52,8 +58,9 @@ public final class DataBrokerProtectionIPCClient: NSObject {
 
     // MARK: - Initializers
 
-    public init(machServiceName: String, pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
+    public init(machServiceName: String, pixelHandler: EventMapping<DataBrokerProtectionPixels>, loginItemStatusChecker: DBPLoginItemStatusChecker) {
         self.pixelHandler = pixelHandler
+        self.loginItemStatusChecker = loginItemStatusChecker
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
         let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
 
@@ -65,6 +72,18 @@ public final class DataBrokerProtectionIPCClient: NSObject {
         super.init()
 
         xpc.delegate = self
+        xpc.onDisconnect = { [weak self] in
+            guard let self else { return }
+            Task { @MainActor in
+                try await Task.sleep(interval: .seconds(1))
+                // By calling register we make sure that XPC will connect as soon as it
+                // becomes available again, as requests are queued.  This helps ensure
+                // that the client app will always be connected to XPC.
+                self.register()
+            }
+        }
+
+        self.register()
     }
 }
 
@@ -73,7 +92,6 @@ public final class DataBrokerProtectionIPCClient: NSObject {
 extension DataBrokerProtectionIPCClient: IPCServerInterface {
 
     public func register() {
-        self.pixelHandler.fire(.ipcServerRegister)
         xpc.execute(call: { server in
             server.register()
         }, xpcReplyErrorHandler: { _ in
@@ -83,20 +101,22 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     }
 
     public func startScheduler(showWebView: Bool) {
-        self.pixelHandler.fire(.ipcServerStartScheduler)
+        self.pixelHandler.fire(.ipcServerStartSchedulerCalledByApp)
         xpc.execute(call: { server in
             server.startScheduler(showWebView: showWebView)
-        }, xpcReplyErrorHandler: { _ in
+        }, xpcReplyErrorHandler: { error in
+            self.pixelHandler.fire(.ipcServerStartSchedulerXPCError(error: error))
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
         })
     }
 
     public func stopScheduler() {
-        self.pixelHandler.fire(.ipcServerStopScheduler)
+        self.pixelHandler.fire(.ipcServerStopSchedulerCalledByApp)
         xpc.execute(call: { server in
             server.stopScheduler()
-        }, xpcReplyErrorHandler: { _ in
+        }, xpcReplyErrorHandler: { error in
+            self.pixelHandler.fire(.ipcServerStopSchedulerXPCError(error: error))
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
         })
@@ -116,16 +136,42 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-    public func scanAllBrokers(showWebView: Bool,
-                               completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
-        self.pixelHandler.fire(.ipcServerScanAllBrokers)
+    public func startManualScan(showWebView: Bool,
+                                completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
+        self.pixelHandler.fire(.ipcServerScanAllBrokersCalledByApp)
+
+        guard loginItemStatusChecker.doesHaveNecessaryPermissions() else {
+            self.pixelHandler.fire(.ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions)
+            let errors = DataBrokerProtectionSchedulerErrorCollection(oneTimeError: DataBrokerProtectionSchedulerError.loginItemDoesNotHaveNecessaryPermissions)
+            completion(errors)
+            return
+        }
+
+        guard loginItemStatusChecker.isInCorrectDirectory() else {
+            self.pixelHandler.fire(.ipcServerScanAllBrokersAttemptedToCallInWrongDirectory)
+            let errors = DataBrokerProtectionSchedulerErrorCollection(oneTimeError: DataBrokerProtectionSchedulerError.appInWrongDirectory)
+            completion(errors)
+            return
+        }
+
         xpc.execute(call: { server in
-            server.scanAllBrokers(showWebView: showWebView) { errors in
-                self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: errors?.oneTimeError))
+            server.startManualScan(showWebView: showWebView) { errors in
+                if let error = errors?.oneTimeError {
+                    let nsError = error as NSError
+                    let interruptedError = DataBrokerProtectionSchedulerError.operationsInterrupted as NSError
+                    if nsError.domain == interruptedError.domain,
+                       nsError.code == interruptedError.code {
+                        self.pixelHandler.fire(.ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption)
+                    } else {
+                        self.pixelHandler.fire(.ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: error))
+                    }
+                } else {
+                    self.pixelHandler.fire(.ipcServerScanAllBrokersCompletionCalledOnAppWithoutError)
+                }
                 completion(errors)
             }
         }, xpcReplyErrorHandler: { error in
-            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error))
+            self.pixelHandler.fire(.ipcServerScanAllBrokersXPCError(error: error))
             completion(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: error))
         })
     }
@@ -162,6 +208,15 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
             os_log("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
+        })
+    }
+
+    public func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        xpc.execute(call: { server in
+            server.getDebugMetadata(completion: completion)
+        }, xpcReplyErrorHandler: { error in
+            os_log("Error \(error.localizedDescription)")
+            completion(nil)
         })
     }
 }

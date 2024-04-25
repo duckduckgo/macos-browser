@@ -20,14 +20,13 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
+import PixelKit
+
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
-
-#if SUBSCRIPTION
 import Subscription
 import SubscriptionUI
-#endif
 
 // swiftlint:disable:next type_body_length
 final class NavigationBarViewController: NSViewController {
@@ -297,7 +296,6 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        #if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
             let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
@@ -307,7 +305,6 @@ final class NavigationBarViewController: NSViewController {
                 return
             }
         }
-        #endif
 
         // Note: the following code is quite contrived but we're aiming to hotfix issues without mixing subscription and
         // waitlist logic.  This should be cleaned up once waitlist can safely be removed.
@@ -612,9 +609,9 @@ final class NavigationBarViewController: NSViewController {
             logoWidth.constant = sizeClass.logoWidth
         }
 
-        let heightChange: DispatchWorkItem
-        if animated {
-            heightChange = DispatchWorkItem {
+        let heightChange: () -> Void
+        if animated && view.window != nil {
+            heightChange = {
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.1
                     performResize()
@@ -631,25 +628,36 @@ final class NavigationBarViewController: NSViewController {
             self.daxFadeInAnimation = fadeIn
         } else {
             daxLogo.alphaValue = sizeClass.isLogoVisible ? 1 : 0
-            heightChange = DispatchWorkItem {
+            heightChange = {
                 performResize()
             }
         }
-        DispatchQueue.main.async(execute: heightChange)
-        self.heightChangeAnimation = heightChange
+        if view.window == nil {
+            // update synchronously for off-screen view
+            heightChange()
+        } else {
+            let dispatchItem = DispatchWorkItem(block: heightChange)
+            DispatchQueue.main.async(execute: dispatchItem)
+            self.heightChangeAnimation = dispatchItem
+        }
     }
 
     private func subscribeToDownloads() {
         downloadListCoordinator.updates
+            .filter { update in
+                // filter download completion events only
+                if case .updated(let oldValue) = update.kind,
+                   oldValue.progress != nil && update.item.progress == nil {
+                    return true
+                } else {
+                    return false
+                }
+            }
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
                 guard let self else { return }
 
-                if case .updated(let oldValue) = update.kind,
-                    DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
-                    update.item.destinationURL != nil,
-                    update.item.tempURL == nil,
-                    oldValue.tempURL != nil, // download finished
+                if DownloadsPreferences.shared.shouldOpenPopupOnCompletion,
                     !update.item.isBurner,
                     WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window {
 
@@ -658,11 +666,11 @@ final class NavigationBarViewController: NSViewController {
                                                                   downloadsDelegate: self)
                 } else if update.item.isBurner {
                     invalidateDownloadButtonHidingTimer()
-                    updateDownloadsButton(updatingFromPinnedViewsNotification: false)
                 }
                 updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
+
         downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
             .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
@@ -710,10 +718,11 @@ final class NavigationBarViewController: NSViewController {
         }
 
         popovers.passwordManagementDomain = nil
-        guard let url = url, let domain = url.host else {
+        guard let url = url, let hostAndPort = url.hostAndPort() else {
             return
         }
-        popovers.passwordManagementDomain = domain
+
+        popovers.passwordManagementDomain = hostAndPort
     }
 
     private func updateHomeButton() {
@@ -1007,6 +1016,11 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
 
+    func optionsButtonMenuRequestedBookmarkAllOpenTabs(_ sender: NSMenuItem) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
+    }
+
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu) {
         popovers.showBookmarkListPopover(usingView: bookmarkListButton,
                                          withDelegate: self,
@@ -1051,17 +1065,14 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
     }
 
-#if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
-        Pixel.fire(.privacyProOfferScreenImpression)
+        PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
     }
-#endif
-
 }
 
 // MARK: - NSPopoverDelegate

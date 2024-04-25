@@ -107,26 +107,25 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        enum Event {
-            case instant
-            case didCommit
-        }
         tab.$content
-            .map { [tab] content -> AnyPublisher<Event, Never> in
+            .map { [tab] content -> AnyPublisher<Void, Never> in
                 switch content {
-                case .url(let url, _, source: .webViewUpdated),
-                     .url(let url, _, source: .link):
-
-                    // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
-                    return tab.$committedURL.filter { committedURL in
-                        committedURL == url
-                    }.map { _ in
-                        .didCommit
-                    }.eraseToAnyPublisher()
-
                 case .url(_, _, source: .userEntered(_, downloadRequested: true)):
                     // don‘t update the address bar for download navigations
                     return Empty().eraseToAnyPublisher()
+
+                case .url(let url, _, source: .webViewUpdated),
+                     .url(let url, _, source: .link):
+
+                    guard !url.isEmpty, url != .blankPage else { fallthrough }
+
+                    // Only display the Tab content URL update matching its Security Origin
+                    // see https://github.com/mozilla-mobile/firefox-ios/wiki/WKWebView-navigation-and-security-considerations
+                    return tab.$securityOrigin
+                        .filter { tabSecurityOrigin in
+                            url.securityOrigin == tabSecurityOrigin
+                        }
+                        .asVoid().eraseToAnyPublisher()
 
                 case .url(_, _, source: .pendingStateRestoration),
                      .url(_, _, source: .loadedByStateRestoration),
@@ -145,7 +144,7 @@ final class TabViewModel {
                      .subscription,
                      .identityTheftRestoration:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
-                    return Just( .instant ).eraseToAnyPublisher()
+                    return Just( () ).eraseToAnyPublisher()
                 }
             }
             .switchToLatest()
@@ -291,7 +290,7 @@ final class TabViewModel {
     }
 
     private func updateTitle() { // swiftlint:disable:this cyclomatic_complexity
-        let title: String
+        var title: String
         switch tab.content {
         // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
         case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
@@ -324,6 +323,9 @@ final class TabViewModel {
             } else {
                 title = addressBarString
             }
+        }
+        if title.isEmpty {
+            title = UserText.tabUntitledTitle
         }
         if self.title != title {
             self.title = title

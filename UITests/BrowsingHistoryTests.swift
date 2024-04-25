@@ -27,6 +27,10 @@ class BrowsingHistoryTests: XCTestCase {
     private var addressBarTextField: XCUIElement!
     private let lengthForRandomPageTitle = 8
 
+    override class func setUp() {
+        UITests.firstRun()
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()

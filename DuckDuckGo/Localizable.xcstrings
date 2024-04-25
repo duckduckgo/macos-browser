@@ -481,6 +481,12 @@
         }
       }
     },
+    "1." : {
+
+    },
+    "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder." : {
+
+    },
     "about.app_name" : {
       "comment" : "Application name to be displayed in the About dialog",
       "extractionState" : "extracted_with_value",
@@ -6253,6 +6259,42 @@
         }
       }
     },
+    "bitwarden.incompatible" : {
+      "comment" : "Message that warns user that specific Bitwarden app vesions are not compatible with this app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please revert to an older version by following these steps:"
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible.step.1" : {
+      "comment" : "First step to downgrade Bitwarden",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Download v2014.2.1"
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible.step.2" : {
+      "comment" : "Second step to downgrade Bitwarden",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder."
+          }
+        }
+      }
+    },
     "bitwarden.install" : {
       "comment" : "Button to install Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -7432,6 +7474,66 @@
         }
       }
     },
+    "bookmark.all.tabs" : {
+      "comment" : "Menu item for bookmarking all the open tabs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Tabs mit Lesezeichen versehen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark All Tabs…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir todas las pestañas a marcadores…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter tous les onglets aux signets…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea un segnalibro con tutte le schede…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle tabbladen toevoegen als bladwijzer…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj wszystkie karty do zakładek…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar todos os separadores…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить все вкладки в закладки…"
+          }
+        }
+      }
+    },
     "bookmark.dialog.add" : {
       "comment" : "Button to confim a bookmark creation",
       "extractionState" : "extracted_with_value",
@@ -7559,55 +7661,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Seite als Lesezeichen markieren"
+            "value" : "Diese Seite mit einem Lesezeichen versehen…"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Bookmark This Page"
+            "value" : "Bookmark This Page…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Marcar esta página"
+            "value" : "Marcar esta página…"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter cette page aux signets"
+            "value" : "Ajouter cette page aux signets…"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crea un segnalibro per questa pagina"
+            "value" : "Crea un segnalibro per questa pagina…"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bladwijzer toevoegen aan deze pagina"
+            "value" : "Bladwijzer toevoegen voor deze pagina…"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dodaj tę stronę do zakładek"
+            "value" : "Dodaj tę stronę do zakładek…"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Marcar esta página"
+            "value" : "Marcar esta página…"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сохранить в закладках"
+            "value" : "Сохранить страницу в закладках…"
           }
         }
       }
@@ -8618,6 +8720,66 @@
         }
       }
     },
+    "bookmarks.dialog.action.addAllBookmarks" : {
+      "comment" : "CTA title for saving multiple Bookmarks at once",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen speichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer les signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers opslaan"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранение закладок"
+          }
+        }
+      }
+    },
     "bookmarks.dialog.action.addBookmark" : {
       "comment" : "CTA title for adding a Bookmark",
       "extractionState" : "extracted_with_value",
@@ -8734,6 +8896,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить папку"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.allTabs.message.add" : {
+      "comment" : "Bookmark creation for all open tabs dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Lesezeichen werden in einem neuen Ordner gespeichert:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "These bookmarks will be saved in a new folder:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estos marcadores se guardarán en una nueva carpeta:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ces signets seront enregistrés dans un nouveau dossier:"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questi segnalibri verranno salvati in una nuova cartella:"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze bladwijzers worden opgeslagen in een nieuwe map:"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te zakładki zostaną zapisane w nowym folderze:"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estes marcadores serão guardados numa nova pasta:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эти закладки будут сохранены в новой папке:"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.allTabs.title.add" : {
+      "comment" : "Title of dialog to bookmark all open tabs. E.g. 'Bookmark Open Tabs (42)'",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offene Tabs mit Lesezeichen versehen (%d)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark Open Tabs (%d)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir pestañas abiertas (%d)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter les onglets ouverts (%d) aux signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungere ai segnalibri le schede aperte (%d)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d geopende tabbladen toevoegen als bladwijzer"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj otwarte karty (%d) do zakładek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar separadores abertos (%d)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить открытые вкладки (%d) в закладки"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.folderName" : {
+      "comment" : "Folder name field label for Bookmarks folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordnername"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Folder Name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de la carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom du dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome della cartella"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naam van de map"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nazwa folderu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome da pasta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название папки"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.folderName.value" : {
+      "comment" : "The suggested name of the folder that will contain the bookmark tabs. Eg. 2024-02-12 - Tabs (42)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ – Tabs (%2$d)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - Tabs (%2$d)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Pestañas (%2$d)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Onglets (%2$d)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Schede (%2$d)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Tabbladen (%2$d)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Karty (%2$d)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Separadores (%2$d)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Вкладки (%2$d)"
           }
         }
       }
@@ -13288,6 +13690,9 @@
           }
         }
       }
+    },
+    "Download v2014.2.1" : {
+
     },
     "download.finishing" : {
       "comment" : "Download being finished information text",
@@ -20015,6 +20420,7 @@
     },
     "Hide" : {
       "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30323,7 +30729,7 @@
     },
     "newTab.setup.survey.day.0.action" : {
       "comment" : "Action title of the Day 0 survey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30383,7 +30789,7 @@
     },
     "newTab.setup.survey.day.0.summary" : {
       "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30443,7 +30849,7 @@
     },
     "newTab.setup.survey.day.0.title" : {
       "comment" : "Title of the Day 0 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30683,7 +31089,7 @@
     },
     "newTab.setup.survey.day.14.action" : {
       "comment" : "Action title of the Day 14 survey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30743,7 +31149,7 @@
     },
     "newTab.setup.survey.day.14.summary" : {
       "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30803,7 +31209,7 @@
     },
     "newTab.setup.survey.day.14.title" : {
       "comment" : "Title of the Day 14 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -45699,6 +46105,9 @@
         }
       }
     },
+    "Privacy Pro" : {
+
+    },
     "private.search.explenation" : {
       "comment" : "feature explanation in settings",
       "extractionState" : "extracted_with_value",
@@ -47964,6 +48373,7 @@
     },
     "Show left of the back button" : {
       "comment" : "Preferences > Home Button > left position item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48017,6 +48427,7 @@
     },
     "Show Left of the Back Button" : {
       "comment" : "Main Menu > View > Home Button > left position item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48282,6 +48693,7 @@
     },
     "Show right of the reload button" : {
       "comment" : "Preferences > Home Button > right position item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48335,6 +48747,7 @@
     },
     "Show Right of the Reload Button" : {
       "comment" : "Main Menu > View > Home Button > right position item",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -49819,6 +50232,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закладки"
+          }
+        }
+      }
+    },
+    "tab.empty.title" : {
+      "comment" : "Title for an empty tab without a title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Titel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Untitled"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin título"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans titre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Titel"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naamloos"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez tytułu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem título"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без названия"
           }
         }
       }

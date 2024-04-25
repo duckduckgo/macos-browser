@@ -33,6 +33,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
+    func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
@@ -41,12 +42,13 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState?
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
@@ -194,6 +196,10 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @objc func bookmarkThisPageAction(_ sender: Any) {
         delegate?.tabBarViewItemBookmarkThisPageAction(self)
+    }
+
+    @objc func bookmarkAllOpenTabsAction(_ sender: Any) {
+        delegate?.tabBarViewItemBookmarkAllOpenTabsAction(self)
     }
 
     private var lastKnownIndexPath: IndexPath?
@@ -446,7 +452,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         switch delegate?.tabBarViewItemAudioState(self) {
         case .muted:
             mutedTabIcon.isHidden = false
-        default:
+        case .unmuted, .none:
             mutedTabIcon.isHidden = true
         }
     }
@@ -486,16 +492,19 @@ extension TabBarViewItem: NSMenuDelegate {
         // Section 1
         addDuplicateMenuItem(to: menu)
         addPinMenuItem(to: menu)
-        menu.addItem(NSMenuItem.separator())
+        addMuteUnmuteMenuItem(to: menu)
+        menu.addItem(.separator())
 
         // Section 2
-        addBookmarkMenuItem(to: menu)
         addFireproofMenuItem(to: menu)
-
-        addMuteUnmuteMenuItem(to: menu)
-        menu.addItem(NSMenuItem.separator())
+        addBookmarkMenuItem(to: menu)
+        menu.addItem(.separator())
 
         // Section 3
+        addBookmarkAllTabsMenuItem(to: menu)
+        menu.addItem(.separator())
+
+        // Section 4
         addCloseMenuItem(to: menu)
         addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
@@ -525,6 +534,13 @@ extension TabBarViewItem: NSMenuDelegate {
         menu.addItem(bookmarkMenuItem)
     }
 
+    private func addBookmarkAllTabsMenuItem(to menu: NSMenu) {
+        let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(bookmarkAllOpenTabsAction(_:)), keyEquivalent: "")
+        bookmarkMenuItem.target = self
+        bookmarkMenuItem.isEnabled = delegate?.tabBarViewAllItemsCanBeBookmarked(self) ?? false
+        menu.addItem(bookmarkMenuItem)
+    }
+
     private func addFireproofMenuItem(to menu: NSMenu) {
         var menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
         menuItem.isEnabled = false
@@ -540,15 +556,12 @@ extension TabBarViewItem: NSMenuDelegate {
     }
 
     private func addMuteUnmuteMenuItem(to menu: NSMenu) {
-        let audioState = delegate?.tabBarViewItemAudioState(self) ?? .notSupported
+        guard let audioState = delegate?.tabBarViewItemAudioState(self) else { return }
 
-        if audioState != .notSupported {
-            menu.addItem(NSMenuItem.separator())
-            let menuItemTitle = audioState == .muted ? UserText.unmuteTab : UserText.muteTab
-            let muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
-            muteUnmuteMenuItem.target = self
-            menu.addItem(muteUnmuteMenuItem)
-        }
+        let menuItemTitle = audioState == .muted ? UserText.unmuteTab : UserText.muteTab
+        let muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
+        muteUnmuteMenuItem.target = self
+        menu.addItem(muteUnmuteMenuItem)
     }
 
     private func addCloseMenuItem(to menu: NSMenu) {

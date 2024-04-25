@@ -25,6 +25,7 @@ import Common
 protocol DBPUIScanOps: AnyObject {
     func startScan() -> Bool
     func updateCacheWithCurrentScans() async
+    func getBackgroundAgentMetadata() async -> DBPBackgroundAgentMetadata?
 }
 
 final class DBPUIViewModel {
@@ -74,7 +75,7 @@ final class DBPUIViewModel {
 
 extension DBPUIViewModel: DBPUIScanOps {
     func startScan() -> Bool {
-        scheduler.scanAllBrokers()
+        scheduler.startManualScan()
         return true
     }
 
@@ -84,6 +85,14 @@ extension DBPUIViewModel: DBPUIScanOps {
         } catch {
             os_log("DBPUIViewModel error: updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
             pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPUIViewModel.updateCacheWithCurrentScans"))
+        }
+    }
+
+    func getBackgroundAgentMetadata() async -> DBPBackgroundAgentMetadata? {
+        return await withCheckedContinuation { continuation in
+            scheduler.getDebugMetadata { metadata in
+                continuation.resume(returning: metadata)
+            }
         }
     }
 }

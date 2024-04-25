@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if SUBSCRIPTION
-
 import BrowserServicesKit
 import Common
 import Combine
@@ -72,7 +70,7 @@ extension IdentityTheftRestorationPagesUserScript: WKScriptMessageHandler {
 /// Use Subscription sub-feature
 ///
 final class IdentityTheftRestorationPagesFeature: Subfeature {
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
 
     var featureName = "useIdentityTheftRestoration"
 
@@ -101,5 +99,3 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
         }
     }
 }
-
-#endif

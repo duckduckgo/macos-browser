@@ -24,6 +24,7 @@ import Foundation
 extension URL.NavigationalScheme {
 
     static let duck = URL.NavigationalScheme(rawValue: "duck")
+    static let javascript = URL.NavigationalScheme(rawValue: "javascript")
 
     static var validSchemes: [URL.NavigationalScheme] {
         return [.http, .https, .file]
@@ -278,6 +279,14 @@ extension URL {
         return string
     }
 
+    func hostAndPort() -> String? {
+        guard let host else { return nil }
+
+        guard let port = port else { return host }
+
+        return "\(host):\(port)"
+    }
+
 #if !SANDBOX_TEST_TOOL
     func toString(forUserInput input: String, decodePunycode: Bool = true) -> String {
         let hasInputScheme = input.hasOrIsPrefix(of: self.separatedScheme ?? "")
@@ -323,7 +332,7 @@ extension URL {
     }
 
     var isExternalSchemeLink: Bool {
-        return !["https", "http", "about", "file", "blob", "data", "ftp"].contains(scheme)
+        return ![.https, .http, .about, .file, .blob, .data, .ftp, .javascript].contains(navigationalScheme)
     }
 
     // MARK: - DuckDuckGo
@@ -524,6 +533,8 @@ extension URL {
 
     static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!
 
+    static var touchIDAndPassword = URL(string: "x-apple.systempreferences:com.apple.preferences.password")!
+
     // MARK: - Blob URLs
 
     var isBlobURL: Bool {
@@ -546,10 +557,8 @@ extension URL {
         return self.absoluteString
     }
 
-    public func isChild(of url: URL) -> Bool {
-        var components = URLComponents(string: url.absoluteString)
-        components?.query = nil
-
-        return self.absoluteString.hasPrefix(components?.url?.absoluteString ?? url.absoluteString)
+    public func isChild(of parentURL: URL) -> Bool {
+        guard let parentURLHost = parentURL.host, self.isPart(ofDomain: parentURLHost) else { return false }
+        return pathComponents.starts(with: parentURL.pathComponents)
     }
 }

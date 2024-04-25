@@ -18,6 +18,7 @@
 
 #if DEBUG
 
+import AppKit
 import Combine
 import Foundation
 import NetworkProtection
@@ -63,9 +64,19 @@ final class IPCClientMock: NetworkProtectionIPCClient {
     }
     var ipcControllerErrorMessageObserver: any NetworkProtection.ControllerErrorMesssageObserver = ControllerErrorMesssageObserverMock()
 
-    func start() {}
+    final class DataVolumeObserverMock: NetworkProtection.DataVolumeObserver {
+        var publisher: AnyPublisher<DataVolume, Never> = PassthroughSubject().eraseToAnyPublisher()
+        var recentValue: DataVolume = .init()
+    }
+    var ipcDataVolumeObserver: any NetworkProtection.DataVolumeObserver = DataVolumeObserverMock()
 
-    func stop() {}
+    func start(completion: @escaping (Error?) -> Void) {
+        completion(nil)
+    }
+
+    func stop(completion: @escaping (Error?) -> Void) {
+        completion(nil)
+    }
 
 }
 

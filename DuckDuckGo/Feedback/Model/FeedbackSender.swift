@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import Networking
+import PixelKit
 
 final class FeedbackSender {
 
@@ -43,7 +44,7 @@ final class FeedbackSender {
         request.fetch { _, error in
             if let error = error {
                 os_log("FeedbackSender: Failed to submit feedback %s", type: .error, error.localizedDescription)
-                Pixel.fire(.debug(event: .feedbackReportingFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.feedbackReportingFailed, error: error))
             }
         }
     }

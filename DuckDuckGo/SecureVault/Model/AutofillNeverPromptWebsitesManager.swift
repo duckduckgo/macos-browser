@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import PixelKit
 
 final class AutofillNeverPromptWebsitesManager {
 
@@ -27,7 +28,7 @@ final class AutofillNeverPromptWebsitesManager {
 
     private let secureVault: (any AutofillSecureVault)?
 
-    public init(secureVault: (any AutofillSecureVault)? = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)) {
+    public init(secureVault: (any AutofillSecureVault)? = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared)) {
         self.secureVault = secureVault
 
         fetchNeverPromptWebsites()
@@ -48,7 +49,7 @@ final class AutofillNeverPromptWebsitesManager {
             fetchNeverPromptWebsites()
             return id
         } catch {
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             throw error
         }
     }
@@ -64,7 +65,7 @@ final class AutofillNeverPromptWebsitesManager {
             fetchNeverPromptWebsites()
             return true
         } catch {
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             return false
         }
     }
@@ -77,7 +78,7 @@ final class AutofillNeverPromptWebsitesManager {
         do {
             neverPromptWebsites = try secureVault.neverPromptWebsites()
         } catch {
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             neverPromptWebsites = []
         }
     }

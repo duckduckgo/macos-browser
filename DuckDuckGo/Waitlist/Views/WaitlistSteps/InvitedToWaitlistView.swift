@@ -136,7 +136,7 @@ struct NetworkProtectionInvitedToWaitlistViewData: InvitedToWaitlistViewData {
 
         .init(imageName: "Card-16",
                   title: UserText.networkProtectionWaitlistInvitedSection3Title,
-                  subtitle: UserText.networkProtectionWaitlistInvitedSection3Subtitle),
+                  subtitle: UserText.networkProtectionWaitlistInvitedSection3Subtitle)
     ]
 }
 

@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Combine
 import Foundation
 import SecureStorage
+import PixelKit
 
 final class AutofillTabExtension: TabExtension {
 
@@ -148,7 +149,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
     }
 
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
-        Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+        PixelKit.fire(GeneralPixel.formAutofilled(kind: type.formAutofillKind))
 
         if type.formAutofillKind == .password &&
             passwordManagerCoordinator.isEnabled {
@@ -162,12 +163,12 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         }
     }
 
-    func secureVaultInitFailed(_ error: SecureStorageError) {
-        SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
+    func secureVaultError(_ error: SecureStorageError) {
+        SecureVaultReporter.shared.secureVaultError(error)
     }
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
-        Pixel.fire(.jsPixel(pixel))
+        PixelKit.fire(GeneralPixel.jsPixel(pixel))
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
@@ -206,7 +207,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 }
 
 extension AutofillType {
-    var formAutofillKind: Pixel.Event.FormAutofillKind {
+    var formAutofillKind: GeneralPixel.FormAutofillKind {
         switch self {
         case .password: return .password
         case .card: return .card

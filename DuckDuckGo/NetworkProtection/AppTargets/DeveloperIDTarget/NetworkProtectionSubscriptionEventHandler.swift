@@ -16,13 +16,12 @@
 //  limitations under the License.
 //
 
-#if SUBSCRIPTION
-
 import Combine
 import Foundation
 import Subscription
 import NetworkProtection
 import NetworkProtectionUI
+import Common
 
 final class NetworkProtectionSubscriptionEventHandler {
 
@@ -115,5 +114,3 @@ final class NetworkProtectionSubscriptionEventHandler {
     }
 
 }
-
-#endif

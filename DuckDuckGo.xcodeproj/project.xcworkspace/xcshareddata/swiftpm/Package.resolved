@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/apple-toolbox.git",
       "state" : {
-        "revision" : "d51beaf1736013b530576ace13a16d6d1a63742c",
-        "version" : "2.0.0"
+        "revision" : "ab53ca41e9044a20eab7e53249526fadcf9acc9f",
+        "version" : "3.1.1"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "b0749d25996c0fa18be07b7851f02ebb3b9fab50",
-        "version" : "134.0.1"
+        "revision" : "b1501e60d245625d4a5d42a61b329364134f0879",
+        "version" : "140.0.1"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "47d3d90aee3c52b6f61d04ceae426e607df62347",
-        "version" : "2.5.2"
+        "revision" : "0a4caaf7a81eea2cece651ef4b17331fa0634dff",
+        "version" : "2.6.0"
       }
     },
     {
@@ -138,7 +138,7 @@
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax",
+      "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
         "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
         "version" : "509.1.1"
@@ -167,8 +167,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
-        "revision" : "a6b7ba151d9dc6684484f3785293875ec01cc1ff",
-        "version" : "1.2.2"
+        "revision" : "6c84fd19139414fc0edbf9673ade06e532a564f0",
+        "version" : "2.0.0"
       }
     },
     {

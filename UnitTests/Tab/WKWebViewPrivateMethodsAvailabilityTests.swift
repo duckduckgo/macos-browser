@@ -39,6 +39,11 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         XCTAssertTrue(WKBackForwardList.instancesRespond(to: WKBackForwardList.removeAllItemsSelector))
     }
 
+    func testWebViewRespondsTo_pageMutedState() {
+        XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.setPageMuted))
+        XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.mediaMutedState))
+    }
+
     func testWKWebpagePreferencesCustomHeaderFieldsSupported() {
         XCTAssertTrue(NavigationPreferences.customHeadersSupported)
         let testHeaders = ["X-CUSTOM-HEADER": "TEST"]

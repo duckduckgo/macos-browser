@@ -93,7 +93,8 @@ final class MainViewController: NSViewController {
                 serverInfoObserver: ipcClient.ipcServerInfoObserver,
                 connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: connectivityIssuesObserver,
-                controllerErrorMessageObserver: controllerErrorMessageObserver
+                controllerErrorMessageObserver: controllerErrorMessageObserver,
+                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
             )
         }()
 
@@ -188,7 +189,6 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
-        presentWaitlistThankYouPromptIfNecessary()
 
         refreshNetworkProtectionMessages()
 
@@ -303,13 +303,20 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToTitleChange(of selectedTabViewModel: TabViewModel?) {
-        guard let window = self.view.window else { return }
-        selectedTabViewModel?.$title
+        guard let selectedTabViewModel else { return }
+
+        // Only subscribe once the view is added to the window.
+        let windowPublisher = view.publisher(for: \.window).filter({ $0 != nil }).prefix(1).asVoid()
+
+        windowPublisher
+            .combineLatest(selectedTabViewModel.$title) { $1 }
             .map {
                 $0.truncated(length: MainMenu.Constants.maxTitleLength)
             }
             .receive(on: DispatchQueue.main)
-            .assign(to: \.title, onWeaklyHeld: window)
+            .sink { [weak self] title in
+                self?.view.window?.title = title
+            }
             .store(in: &tabViewModelCancellables)
     }
 
@@ -428,16 +435,6 @@ final class MainViewController: NSViewController {
             return
         }
         NSApp.mainMenuTyped.stopMenuItem.isEnabled = selectedTabViewModel.isLoading
-    }
-
-    func presentWaitlistThankYouPromptIfNecessary() {
-        guard let window = self.view.window else {
-            assertionFailure("Couldn't get main view controller's window")
-            return
-        }
-
-        let presenter = WaitlistThankYouPromptPresenter()
-        presenter.presentThankYouPromptIfNecessary(in: window)
     }
 
     // MARK: - First responder
