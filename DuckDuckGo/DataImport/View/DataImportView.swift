@@ -47,7 +47,7 @@ struct DataImportView: ModalView {
             viewBody()
                 .padding(.leading, 20)
                 .padding(.trailing, 20)
-                .padding(.bottom, 32)
+                .padding(.bottom, 20)
 
             // if import in progress…
             if let importProgress = model.importProgress {
@@ -96,6 +96,7 @@ struct DataImportView: ModalView {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func viewBody() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             // body
@@ -112,6 +113,8 @@ struct DataImportView: ModalView {
                 // Bookmarks/Passwords checkboxes
                 DataImportTypePicker(viewModel: $model)
                     .disabled(model.isImportSourcePickerDisabled)
+
+                importPasswordSubtitle()
 
             case .moreInfo:
                 // you will be asked for your keychain password blah blah...
@@ -148,6 +151,10 @@ struct DataImportView: ModalView {
                     model.selectFile()
                 } onFileDrop: { url in
                     model.initiateImport(fileURL: url)
+                }
+
+                if dataType == .passwords {
+                    importPasswordSubtitle()
                 }
 
             case .summary(let dataTypes, let isFileImport):
@@ -191,6 +198,12 @@ struct DataImportView: ModalView {
                 .disabled(model.buttons[idx].isDisabled)
             }
         }
+    }
+
+    private func importPasswordSubtitle() -> some View {
+        Text(UserText.importDataSubtitle)
+            .font(.subheadline)
+            .padding(.top, 16)
     }
 
     private func handleImportProgress(_ progress: TaskProgress<DataImportViewModel, Never, DataImportProgressEvent>) async {

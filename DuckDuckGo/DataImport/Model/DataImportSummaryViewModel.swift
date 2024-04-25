@@ -55,5 +55,10 @@ struct DataImportSummaryViewModel {
             dataTypes.contains(dataType) ? results.last(where: { $0.dataType == dataType }) : nil
         }
     }
+}
 
+extension DataImportSummaryViewModel {
+    func resultsFiltered(by dataType: DataType) -> [DataTypeImportResult] {
+        results.filter { $0.dataType == dataType }
+    }
 }

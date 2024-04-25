@@ -22,6 +22,7 @@ struct DataImportSummaryView: View {
 
     typealias DataType = DataImport.DataType
     typealias Summary = DataImport.DataTypeSummary
+    typealias DataTypeImportResult = DataImportViewModel.DataTypeImportResult
 
     let model: DataImportSummaryViewModel
 
@@ -43,7 +44,7 @@ struct DataImportSummaryView: View {
                     Text("Import Results:", comment: "Data Import result summary headline")
 
                 case .importComplete(.bookmarks),
-                     .fileImportComplete(.bookmarks):
+                        .fileImportComplete(.bookmarks):
                     Text("Bookmarks Import Complete:", comment: "Bookmarks Data Import result summary headline")
 
                 case .fileImportComplete(.passwords):
@@ -51,10 +52,10 @@ struct DataImportSummaryView: View {
                 }
             }().padding(.bottom, 4)
 
-            ForEach(model.results, id: \.dataType) { item in
-                Group {
-                    switch (item.dataType, item.result) {
-                    case (.bookmarks, .success(let summary)):
+            VStack {
+                ForEach(model.resultsFiltered(by: .bookmarks), id: \.dataType) { item in
+                    switch item.result {
+                    case (.success(let summary)):
                         HStack {
                             successImage()
                             Text("Bookmarks:",
@@ -64,6 +65,7 @@ struct DataImportSummaryView: View {
                             Spacer()
                         }
                         if summary.duplicate > 0 {
+                            lineSeparator()
                             HStack {
                                 skippedImage()
                                 Text("Duplicate Bookmarks Skipped:",
@@ -74,6 +76,7 @@ struct DataImportSummaryView: View {
                             }
                         }
                         if summary.failed > 0 {
+                            lineSeparator()
                             HStack {
                                 failureImage()
                                 Text("Bookmark import failed:",
@@ -84,7 +87,7 @@ struct DataImportSummaryView: View {
                             }
                         }
 
-                    case (.bookmarks, .failure(let error)) where error.errorType == .noData:
+                    case (.failure(let error)) where error.errorType == .noData:
                         HStack {
                             skippedImage()
                             Text("Bookmarks:",
@@ -94,15 +97,23 @@ struct DataImportSummaryView: View {
                             Spacer()
                         }
 
-                    case (.bookmarks, .failure):
+                    case (.failure):
                         HStack {
                             failureImage()
                             Text("Bookmark import failed.",
                                  comment: "Data import summary message of failed bookmarks import.")
                             Spacer()
                         }
+                    }
+                }
+            }
+            .padding()
+            .roundedBorder()
 
-                    case (.passwords, .failure(let error)):
+            VStack {
+                ForEach(model.resultsFiltered(by: .passwords), id: \.dataType) { item in
+                    switch item.result {
+                    case (.failure(let error)):
                         if error.errorType == .noData {
                             HStack {
                                 skippedImage()
@@ -121,7 +132,7 @@ struct DataImportSummaryView: View {
                             }
                         }
 
-                    case (.passwords, .success(let summary)):
+                    case (.success(let summary)):
                         HStack {
                             successImage()
                             Text("Passwords:",
@@ -131,6 +142,7 @@ struct DataImportSummaryView: View {
                             Spacer()
                         }
                         if summary.failed > 0 {
+                            lineSeparator()
                             HStack {
                                 failureImage()
                                 Text("Password import failed: ",
@@ -142,13 +154,12 @@ struct DataImportSummaryView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 10)
-                .padding(.bottom, 8)
-                .roundedBorder()
             }
+            .padding()
+            .roundedBorder()
+
         }
     }
-
 }
 
 private func successImage() -> some View {
@@ -170,7 +181,7 @@ private func lineSeparator() -> some View {
     Rectangle()
         .fill(Color(.blackWhite10))
         .frame(height: 1)
-        .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
+        .padding(.init(top: 5, leading: 10, bottom: 8, trailing: 0))
 }
 
 #if DEBUG
@@ -179,13 +190,13 @@ private func lineSeparator() -> some View {
         HStack {
             DataImportSummaryView(model: .init(source: .chrome, results: [
                 .init(.bookmarks, .success(.init(successful: 123, duplicate: 456, failed: 7890))),
-//                .init(.passwords, .success(.init(successful: 123, duplicate: 456, failed: 7890))),
-//                .init(.bookmarks, .failure(DataImportViewModel.TestImportError(action: .bookmarks, errorType: .dataCorrupted))),
-//                .init(.bookmarks, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
-//                .init(.passwords, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
-//                .init(.passwords, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
-//                .init(.passwords, .success(.init(successful: 100, duplicate: 0, failed: 0)))
-                .init(.passwords, .success(.init(successful: 100, duplicate: 30, failed: 40)))
+                //                .init(.passwords, .success(.init(successful: 123, duplicate: 456, failed: 7890))),
+                //                .init(.bookmarks, .failure(DataImportViewModel.TestImportError(action: .bookmarks, errorType: .dataCorrupted))),
+                //                .init(.bookmarks, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
+                //                .init(.passwords, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
+                //                .init(.passwords, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
+                //                .init(.passwords, .success(.init(successful: 100, duplicate: 0, failed: 0)))
+                    .init(.passwords, .success(.init(successful: 100, duplicate: 30, failed: 40)))
             ]))
             .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
             Spacer()
