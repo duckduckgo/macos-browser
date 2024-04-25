@@ -26,7 +26,7 @@ import PixelKit
 ///
 final class NetworkProtectionIPCTunnelController {
 
-    enum RequestError: CustomNSError, LocalizedError {
+    enum RequestError: CustomNSError {
         case notAuthorizedToEnableLoginItem
         case internalLoginItemError(_ error: Error)
 
