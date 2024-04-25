@@ -2,7 +2,3 @@
 <ul>
 <li>&lt;-- Add release notes here --&gt;</li>
 </ul>
-<h3 style="font-size:14px">For Privacy Pro subscribers</h3>
-<ul>
-<li>&lt;-- Add release notes here --&gt;</li>
-</ul>
