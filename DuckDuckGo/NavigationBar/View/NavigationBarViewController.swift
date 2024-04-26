@@ -677,6 +677,7 @@ final class NavigationBarViewController: NSViewController {
                 guard total > 0, completed < total else { return nil }
                 return Double(completed) / Double(total)
             }
+            .dropFirst()
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak downloadsProgressView] progress in
                 guard let downloadsProgressView else { return }
