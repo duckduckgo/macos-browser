@@ -233,6 +233,24 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true)
             }
+        case .tunnelStopAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStopAttempt,
+                    frequency: .standard,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStopFailure(error),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelStopSuccess,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
         case .tunnelUpdateAttempt(let step):
             switch step {
             case .begin:
@@ -248,6 +266,24 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .success:
                 PixelKit.fire(
                     NetworkProtectionPixelEvent.networkProtectionTunnelUpdateSuccess,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            }
+        case .tunnelWakeAttempt(let step):
+            switch step {
+            case .begin:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelWakeAttempt,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .failure(let error):
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelWakeFailure(error),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelWakeSuccess,
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true)
             }
@@ -422,30 +458,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
         try? loadDefaultPixelHeaders(from: options)
-    }
-
-    // MARK: - Start/Stop Tunnel
-
-    override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
-        super.stopTunnel(with: reason) {
-            Task {
-                completionHandler()
-
-                // From what I'm seeing in my tests the next call to start the tunnel is MUCH
-                // less likely to fail if we force this extension to exit when the tunnel is killed.
-                //
-                // Ref: https://app.asana.com/0/72649045549333/1204668639086684/f
-                //
-                exit(EXIT_SUCCESS)
-            }
-        }
-    }
-
-    override func cancelTunnelWithError(_ error: Error?) {
-        Task {
-            super.cancelTunnelWithError(error)
-            exit(EXIT_SUCCESS)
-        }
     }
 
     // MARK: - Pixels
