@@ -164,6 +164,12 @@ final class CircularProgressView: NSView {
         guard !isBackgroundAnimating || !animated else {
             // will call `updateProgressState` on animation completion
             completion(false)
+            // if background animation is in progress but 1.0 was received before
+            // the `progress = nil` update – complete the progress animation
+            // before hiding
+            if progress == nil && oldValue == 1.0, animated {
+                updateProgress(from: 0, to: 1, animated: animated) { _ in }
+            }
             return
         }
 
@@ -177,7 +183,7 @@ final class CircularProgressView: NSView {
                 completion(true)
             }
         case (true, true):
-            updateProgress(oldValue: oldValue, animated: animated, completion: completion)
+            updateProgress(from: oldValue, to: progress, animated: animated, completion: completion)
         case (false, false):
             backgroundLayer.removeAllAnimations()
             progressLayer.removeAllAnimations()
@@ -190,7 +196,8 @@ final class CircularProgressView: NSView {
         backgroundLayer.strokeEnd = 1.0
         progressLayer.strokeStart = 1.0
         progressLayer.strokeEnd = 1.0
-
+        progressLayer.presentation()?.strokeStart = 1.0
+        progressLayer.presentation()?.strokeEnd = 1.0
         guard animated else {
             backgroundLayer.strokeStart = 0.0
             completion()
@@ -216,7 +223,7 @@ final class CircularProgressView: NSView {
         }
     }
 
-    private func updateProgress(oldValue: Double?, animated: Bool, completion: @escaping (Bool) -> Void) {
+    private func updateProgress(from oldValue: Double?, to progress: Double?, animated: Bool, completion: @escaping (Bool) -> Void) {
         guard let progress else {
             assertionFailure("Unexpected flow")
             completion(false)
@@ -226,7 +233,6 @@ final class CircularProgressView: NSView {
         let newStrokeStart = 1.0 - (progress >= 0.0
                                     ? CGFloat(progress)
                                     : max(Constants.indeterminateProgressValue, min(0.9, 1.0 - currentStrokeStart)))
-
         guard animated else {
             progressLayer.strokeStart = newStrokeStart
 
@@ -274,7 +280,7 @@ final class CircularProgressView: NSView {
         guard let progress, progress == value else { return }
 
         if let oldValue, oldValue < 0, value != progress, animated {
-            updateProgress(oldValue: value, animated: animated) { _ in }
+            updateProgress(from: value, to: progress, animated: animated) { _ in }
             return
         }
 
@@ -530,12 +536,69 @@ struct CircularProgress: NSViewRepresentable {
                             perform {
                                 progress = 1
                             }
-                            perform {
-                                progress = nil
+                            Task {
+                                perform {
+                                    progress = nil
+                                }
                             }
                         }
                     } label: {
                         Text(verbatim: "0->1->nil").frame(width: 120)
+                    }
+
+                    Button {
+                        Task {
+                            progress = nil
+                            perform {
+                                progress = 1
+                            }
+                            Task {
+                                perform {
+                                    progress = nil
+                                }
+                            }
+                        }
+                    } label: {
+                        Text(verbatim: "nil->1->nil").frame(width: 120)
+                    }
+
+                    Button {
+                        Task {
+                            progress = nil
+                            perform {
+                                progress = 1
+                            }
+                            Task {
+                                perform {
+                                    progress = nil
+                                }
+                                Task {
+                                    perform {
+                                        progress = nil
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        Text(verbatim: "nil->1->nil->nil").frame(width: 120)
+                    }
+
+                    Button {
+                        Task {
+                            progress = nil
+                            perform {
+                                progress = 0
+                            }
+                            try await Task.sleep(interval: 0.2)
+                            for p in [0.26, 0.64, 0.95, 1, nil] {
+                                perform {
+                                    progress = p
+                                }
+                                try await Task.sleep(interval: 0.001)
+                            }
+                        }
+                    } label: {
+                        Text(verbatim: "nil->0.2…1->nil").frame(width: 120)
                     }
 
                     Button {
@@ -581,7 +644,7 @@ struct CircularProgress: NSViewRepresentable {
                         .background(Color.white)
                     Spacer()
                 }
-            }.frame(width: 600, height: 400)
+            }.frame(width: 600, height: 470)
         }
     }
     return ProgressPreview()

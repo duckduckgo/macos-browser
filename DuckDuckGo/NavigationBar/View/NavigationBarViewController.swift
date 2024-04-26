@@ -673,13 +673,18 @@ final class NavigationBarViewController: NSViewController {
 
         downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
             .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
-            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .map { (total, completed) -> Double? in
                 guard total > 0, completed < total else { return nil }
                 return Double(completed) / Double(total)
             }
+            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak downloadsProgressView] progress in
-                downloadsProgressView?.setProgress(progress, animated: true)
+                guard let downloadsProgressView else { return }
+                if progress == nil, downloadsProgressView.progress != 1 {
+                    // show download completed animation before hiding
+                    downloadsProgressView.setProgress(1, animated: true)
+                }
+                downloadsProgressView.setProgress(progress, animated: true)
             }
             .store(in: &downloadsCancellables)
     }
