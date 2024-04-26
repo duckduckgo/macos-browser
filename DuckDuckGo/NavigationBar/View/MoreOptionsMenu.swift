@@ -28,6 +28,7 @@ import Subscription
 protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem)
+    func optionsButtonMenuRequestedBookmarkAllOpenTabs(_ sender: NSMenuItem)
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
@@ -169,6 +170,10 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func bookmarkPage(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkThisPage(sender)
+    }
+
+    @objc func bookmarkAllOpenTabs(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedBookmarkAllOpenTabs(sender)
     }
 
     @objc func openBookmarks(_ sender: NSMenuItem) {
@@ -633,6 +638,12 @@ final class BookmarksSubMenu: NSMenu {
             .withAccessibilityIdentifier("MoreOptionsMenu.bookmarkPage")
 
         bookmarkPageItem.isEnabled = tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
+
+        let bookmarkAllTabsItem = addItem(withTitle: UserText.bookmarkAllTabs, action: #selector(MoreOptionsMenu.bookmarkAllOpenTabs(_:)), keyEquivalent: "d")
+            .withModifierMask([.command, .shift])
+            .targetting(target)
+
+        bookmarkAllTabsItem.isEnabled = tabCollectionViewModel.canBookmarkAllOpenTabs()
 
         addItem(NSMenuItem.separator())
 

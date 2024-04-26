@@ -104,6 +104,15 @@ public final class BookmarkStoreMock: BookmarkStore {
         capturedBookmark = bookmark
     }
 
+    var bookmarkFolderWithIdCalled = false
+    var capturedFolderId: String?
+    var bookmarkFolder: BookmarkFolder?
+    func bookmarkFolder(withId id: String) -> BookmarkFolder? {
+        bookmarkFolderWithIdCalled = true
+        capturedFolderId = id
+        return bookmarkFolder
+    }
+
     var updateFolderCalled = false
     func update(folder: BookmarkFolder) {
         updateFolderCalled = true
@@ -131,6 +140,16 @@ public final class BookmarkStoreMock: BookmarkStore {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary {
         importBookmarksCalled = true
         return BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
+    }
+
+    var saveBookmarksInNewFolderNamedCalled = false
+    var capturedWebsitesInfo: [WebsiteInfo]?
+    var capturedNewFolderName: String?
+    func saveBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType) {
+        saveBookmarksInNewFolderNamedCalled = true
+        capturedWebsitesInfo = websitesInfo
+        capturedNewFolderName = folderName
+        capturedParentFolderType = parent
     }
 
     var canMoveObjectWithUUIDCalled = false

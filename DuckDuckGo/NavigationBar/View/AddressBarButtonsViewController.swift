@@ -770,7 +770,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let url = tabViewModel.tab.content.userEditableUrl
         let isNewTabOrOnboarding = [.newtab, .onboarding].contains(tabViewModel.tab.content)
-        let isHypertextUrl = (url?.navigationalScheme?.isHypertextScheme == true && url?.isDuckPlayer == false)
+        let isHypertextUrl = url?.navigationalScheme?.isHypertextScheme == true && url?.isDuckPlayer == false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
         let isLocalUrl = url?.isLocalURL ?? false

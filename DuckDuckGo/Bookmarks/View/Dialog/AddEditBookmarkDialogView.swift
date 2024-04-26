@@ -55,7 +55,7 @@ struct AddEditBookmarkDialogView: ModalView {
             isDefaultActionDisabled: viewModel.bookmarkModel.isDefaultActionDisabled,
             defaultAction: viewModel.bookmarkModel.addOrSave
         )
-        .frame(width: 448, height: 288)
+        .frame(width: 448)
     }
 
     private var addFolderView: some View {

@@ -53,7 +53,9 @@ final class HistoryMenu: NSMenu {
             reopenLastClosedMenuItem
             recentlyClosedMenuItem
             reopenAllWindowsFromLastSessionMenuItem
-            NSMenuItem.separator()
+
+            clearAllHistorySeparator
+            clearAllHistoryMenuItem
         }
 
         reopenMenuItemKeyEquivalentManager.reopenLastClosedMenuItem = reopenLastClosedMenuItem
