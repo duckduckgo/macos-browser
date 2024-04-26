@@ -30,11 +30,14 @@ public protocol DataBrokerProtectionDataManaging {
     func fetchBrokerProfileQueryData(ignoresCache: Bool) throws -> [BrokerProfileQueryData]
     func prepareBrokerProfileQueryDataCache() throws
     func hasMatches() throws -> Bool
+
+    /// Tries to fetch the profile from the DB skipping the cache
+    func forceFetchProfile() throws -> DataBrokerProtectionProfile?
 }
 
 extension DataBrokerProtectionDataManaging {
     func fetchBrokerProfileQueryData() throws -> [BrokerProfileQueryData] {
-        try fetchBrokerProfileQueryData(ignoresCache: false)
+        try fetchBrokerProfileQueryData()
     }
 
     public func fetchProfile() throws -> DataBrokerProtectionProfile? {
@@ -72,12 +75,20 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         cache.profile = profile
     }
 
-    public func fetchProfile(ignoresCache: Bool = false) throws -> DataBrokerProtectionProfile? {
-        if cache.profile != nil && !ignoresCache {
+    public func fetchProfile() throws -> DataBrokerProtectionProfile? {
+        if cache.profile != nil {
             os_log("Returning cached profile", log: .dataBrokerProtection)
             return cache.profile
         }
 
+        return try fetchProfileFromDB()
+    }
+
+    public func forceFetchProfile() throws -> DataBrokerProtectionProfile? {
+        return try fetchProfileFromDB()
+    }
+
+    private func fetchProfileFromDB() throws -> DataBrokerProtectionProfile? {
         if let profile = try database.fetchProfile() {
             cache.profile = profile
             return profile

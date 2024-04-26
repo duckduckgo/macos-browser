@@ -294,7 +294,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     private func fireManualScanCompletionPixel(startTime: Date) {
         do {
-            let profile = try dataManager.fetchProfile(ignoresCache: true)
+            let profile = try dataManager.forceFetchProfile()
 
             if let profile = profile {
                 let durationSinceStart = Date().timeIntervalSince(startTime) * 1000
