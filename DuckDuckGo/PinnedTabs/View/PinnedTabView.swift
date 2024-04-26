@@ -224,7 +224,9 @@ struct PinnedTabInnerView: View {
                     .resizable()
                 mutedTabIndicator
             }
-        } else if let domain = model.content.url?.host, let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain), let firstLetter = eTLDplus1.capitalized.first.flatMap(String.init) {
+        } else if let domain = model.content.userEditableUrl?.host,
+                  let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain),
+                  let firstLetter = eTLDplus1.capitalized.first.flatMap(String.init) {
             ZStack {
                 Rectangle()
                     .foregroundColor(.forString(eTLDplus1))

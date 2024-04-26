@@ -704,7 +704,7 @@ final class NavigationBarViewController: NSViewController {
         passwordManagementButton.menu = menu
         passwordManagementButton.toolTip = UserText.autofillShortcutTooltip
 
-        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
+        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.userEditableUrl
 
         passwordManagementButton.image = .passwordManagement
 
