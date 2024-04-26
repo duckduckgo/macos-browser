@@ -43,9 +43,9 @@ on:
         required: true
       MM_WEBHOOK_URL:
         required: true
-      AWS_ACCESS_KEY_ID_RELEASE_S3:
+      TEST_AWS_ACCESS_KEY_ID_RELEASE_S3:
         required: true
-      AWS_SECRET_ACCESS_KEY_RELEASE_S3:
+      TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3:
         required: true
 
 jobs:
@@ -123,8 +123,8 @@ jobs:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
       MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
-      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      TEST_AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
   
   mattermost:
     

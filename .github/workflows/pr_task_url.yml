@@ -33,7 +33,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
+        ASANA_PROJECT_ID: ${{ vars.TEST_MACOS_APP_BOARD_ASANA_PROJECT_ID }}
       run: |
         project_ids="$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${{ steps.get-task-id.outputs.task_id }}?opt_fields=projects" \
           -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
@@ -127,7 +127,7 @@ jobs:
       if: ${{ needs.assert-project-membership.result.failure == '0' }}
       env:
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
+        ASANA_PROJECT_ID: ${{ vars.TEST_MACOS_APP_BOARD_ASANA_PROJECT_ID }}
       run: |
         curl -fLSs -X POST "https://app.asana.com/api/1.0/sections/${{ vars.MACOS_APP_BOARD_WAITING_FOR_RELEASE_SECTION_ID }}/addTask" \
           -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \

@@ -79,13 +79,13 @@ on:
         required: true
       MM_WEBHOOK_URL:
         required: true
-      AWS_ACCESS_KEY_ID:
+      TEST_AWS_ACCESS_KEY_ID:
         required: true
-      AWS_ACCESS_KEY_ID_RELEASE_S3:
+      TEST_AWS_ACCESS_KEY_ID_RELEASE_S3:
         required: true
-      AWS_SECRET_ACCESS_KEY:
+      TEST_AWS_SECRET_ACCESS_KEY:
         required: true
-      AWS_SECRET_ACCESS_KEY_RELEASE_S3:
+      TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3:
         required: true
 
 jobs:
@@ -194,10 +194,10 @@ jobs:
       id: upload-dsyms-to-s3
       if: ${{ env.upload-to == 's3' }}
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-        DSYM_S3_PATH: s3://${{ vars.DSYM_BUCKET_NAME }}/${{ vars.DSYM_BUCKET_PREFIX }}/${{ steps.set-outputs.outputs.dsym-name }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        DSYM_S3_PATH: s3://${{ vars.TEST_DSYM_BUCKET_NAME }}/${{ vars.TEST_DSYM_BUCKET_PREFIX }}/${{ steps.set-outputs.outputs.dsym-name }}
       run: |
         echo "dsym-s3-path=${DSYM_S3_PATH}" >> $GITHUB_OUTPUT
         aws s3 cp ${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }} ${{ env.DSYM_S3_PATH }}
@@ -280,11 +280,11 @@ jobs:
     - name: Upload DMG to S3
       if: ${{ env.upload-to == 's3' }}
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
-        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-        RELEASE_BUCKET_NAME: ${{ vars.RELEASE_BUCKET_NAME }}
-        RELEASE_BUCKET_PREFIX: ${{ vars.RELEASE_BUCKET_PREFIX }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+        AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        RELEASE_BUCKET_NAME: ${{ vars.TEST_RELEASE_BUCKET_NAME }}
+        RELEASE_BUCKET_PREFIX: ${{ vars.TEST_RELEASE_BUCKET_PREFIX }}
       run: |
         aws s3 cp \
           ${{ github.workspace }}/${{ steps.create-dmg.outputs.dmg }} \
@@ -295,7 +295,7 @@ jobs:
       if: ${{ env.upload-to == 's3' }}
       uses: ./.github/actions/asana-log-message
       env:
-        DMG_URL: ${{ vars.DMG_URL_ROOT }}${{ steps.create-dmg.outputs.dmg }}
+        DMG_URL: ${{ vars.TEST_DMG_URL_ROOT }}${{ steps.create-dmg.outputs.dmg }}
         TAG: ${{ env.app-version }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       with:

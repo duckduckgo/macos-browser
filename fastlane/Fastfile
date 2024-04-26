@@ -203,9 +203,9 @@ platform :mac do
   desc 'Prepares new internal release on top of an existing one'
   lane :bump_internal_release do |options|
     begin
-      unless git_branch.start_with?(RELEASE_BRANCH)
-        UI.abort_with_message!("Incorrect branch. Branch name must start with '#{RELEASE_BRANCH}/'.")
-      end
+      # unless git_branch.start_with?(RELEASE_BRANCH)
+      #   UI.abort_with_message!("Incorrect branch. Branch name must start with '#{RELEASE_BRANCH}/'.")
+      # end
 
       update_embedded_files = options[:update_embedded_files].nil? ? true : options[:update_embedded_files]
       current_version = macos_current_version
@@ -376,7 +376,7 @@ platform :mac do
   private_lane :macos_codefreeze_prechecks do
     ensure_git_status_clean 
 
-    ensure_git_branch(branch: DEFAULT_BRANCH)
+    # ensure_git_branch(branch: DEFAULT_BRANCH)
     git_pull
 
     git_submodule_update(recursive: true, init: true)
@@ -389,9 +389,9 @@ platform :mac do
   # - Validates not committed changes 
   #
   private_lane :macos_codefreeze_resume_prechecks do
-    unless git_branch.start_with?(RELEASE_BRANCH) 
-      UI.abort_with_message!("Not in a resumable state: should be a #{RELEASE_BRANCH} branch")
-    end
+    # unless git_branch.start_with?(RELEASE_BRANCH)
+    #   UI.abort_with_message!("Not in a resumable state: should be a #{RELEASE_BRANCH} branch")
+    # end
 
     git_status = sh("git", "status")
     message = 'There are no changes in the current branch.'
