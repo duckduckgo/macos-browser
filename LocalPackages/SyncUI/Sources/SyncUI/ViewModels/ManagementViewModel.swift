@@ -46,7 +46,6 @@ public protocol ManagementViewModel: ObservableObject {
     var syncCredentialsPausedButtonTitle: String { get }
     var syncCredentialsPausedButtonAction: (() -> Void)? { get }
 
-
     var invalidBookmarksTitles: [String] { get }
     var invalidCredentialsTitles: [String] { get }
 

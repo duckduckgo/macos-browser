@@ -87,7 +87,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.syncPausedAction
     }
 
-
     struct Consts {
         static let syncPausedStateChanged = Notification.Name("com.duckduckgo.app.SyncPausedStateChanged")
     }

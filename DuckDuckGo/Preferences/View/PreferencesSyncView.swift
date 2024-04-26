@@ -29,7 +29,7 @@ struct SyncView: View {
             let syncPreferences = SyncPreferences(
                 syncService: syncService,
                 syncBookmarksAdapter: syncDataProviders.bookmarksAdapter,
-                syncCredentialsAdapter: syncDataProviders.credentialsAdapter, 
+                syncCredentialsAdapter: syncDataProviders.credentialsAdapter,
                 syncPreferencesErrorHandler: syncDataProviders.syncErrorHandler
             )
             SyncUI.ManagementView(model: syncPreferences)
