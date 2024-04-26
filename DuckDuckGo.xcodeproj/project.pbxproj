@@ -1089,7 +1089,6 @@
 		4B2D06292A11C0C900DE1F49 /* Bundle+VPN.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D605E2A0B29FA00BCD287 /* Bundle+VPN.swift */; };
 		4B2D062A2A11C0C900DE1F49 /* NetworkProtectionOptionKeyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D605F2A0B29FA00BCD287 /* NetworkProtectionOptionKeyExtension.swift */; };
 		4B2D062C2A11C0E100DE1F49 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 4B2D062B2A11C0E100DE1F49 /* Networking */; };
-		4B2D062D2A11C12300DE1F49 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
 		4B2D06322A11C1D300DE1F49 /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */; };
 		4B2D06332A11C1E300DE1F49 /* OptionalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */; };
 		4B2D065B2A11D1FF00DE1F49 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC322A11B509001D9AC5 /* Logging.swift */; };
@@ -1494,7 +1493,6 @@
 		7B97CD5D2B7E0BCE004FEF43 /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
 		7B97CD5E2B7E0BEA004FEF43 /* OptionalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */; };
 		7B97CD5F2B7E0BF7004FEF43 /* NSApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C8F622591021700748EB7 /* NSApplicationExtension.swift */; };
-		7B97CD602B7E0C2E004FEF43 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
 		7BA076BB2B65D61400D7FB72 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA076BA2B65D61400D7FB72 /* NetworkProtectionProxy */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */; };
@@ -3279,6 +3277,7 @@
 		7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAppEvents.swift; sourceTree = "<group>"; };
 		7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAgentNotificationsPresenter.swift; sourceTree = "<group>"; };
 		7B3618C12ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionNavBarPopoverManager.swift; sourceTree = "<group>"; };
+		7B427BA82BD81D8C0014AE6C /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSimulateFailureMenu.swift; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
@@ -4716,6 +4715,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
+				7B427BA82BD81D8C0014AE6C /* BrowserServicesKit */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
@@ -10508,7 +10508,6 @@
 				4B25377A2A11C01700610219 /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				B65DA5F42A77D3FA00CBEE8D /* BundleExtension.swift in Sources */,
 				EE66418D2B9B1981005BCD17 /* NetworkProtectionTokenStore+SubscriptionTokenKeychainStorage.swift in Sources */,
-				4B2D062D2A11C12300DE1F49 /* Logging.swift in Sources */,
 				7B2E52252A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift in Sources */,
 				B602E8232A1E260E006D261F /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				4B2D062A2A11C0C900DE1F49 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
@@ -10670,7 +10669,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B97CD5C2B7E0BBB004FEF43 /* UserDefaultsWrapper.swift in Sources */,
-				7B97CD602B7E0C2E004FEF43 /* Logging.swift in Sources */,
 				7B97CD5E2B7E0BEA004FEF43 /* OptionalExtension.swift in Sources */,
 				7B97CD5F2B7E0BF7004FEF43 /* NSApplicationExtension.swift in Sources */,
 				7BDA36F52B7E055800AD5388 /* MacTransparentProxyProvider.swift in Sources */,
@@ -12726,7 +12724,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = "138.0.0-1";
+				version = 140.0.3;
 			};
 		};
 		4311906792B7676CE9535D76 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
