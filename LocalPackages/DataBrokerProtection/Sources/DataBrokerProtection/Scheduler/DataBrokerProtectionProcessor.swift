@@ -55,8 +55,8 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runAllScanOperations(showWebView: Bool = false,
-                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+    func startManualScans(showWebView: Bool = false,
+                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         operationQueue.cancelAllOperations()
         runOperations(operationType: .scan,
                       priorityDate: nil,
@@ -114,7 +114,7 @@ final class DataBrokerProtectionProcessor {
                                completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
 
         // Before running new operations we check if there is any updates to the broker files.
-        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
+        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: nil) {
             let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }

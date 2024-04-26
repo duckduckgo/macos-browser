@@ -48,26 +48,13 @@ fetch_current_release_notes() {
 	curl -fLSs "${asana_api_url}/tasks/${release_task_id}?opt_fields=notes" \
 		-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
 		| jq -r .data.notes \
-		| "${cwd}"/extract_release_notes.sh
+		| "${cwd}"/extract_release_notes.sh -a
 }
 
 get_task_id() {
 	local url="$1"
 	if [[ "$url" =~ ${task_url_regex} ]]; then
 		echo "${BASH_REMATCH[1]}"
-	fi
-}
-
-construct_release_notes() {
-	local escaped_release_note
-
-	if [[ -n "${release_notes[*]}" ]]; then
-		printf '%s' '<ul>'
-		for release_note in "${release_notes[@]}"; do
-			escaped_release_note="$(sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' <<< "${release_note}")"
-			printf '%s' "<li>${escaped_release_note}</li>"
-		done
-		printf '%s' '</ul>'
 	fi
 }
 
@@ -89,7 +76,7 @@ construct_release_task_description() {
 	printf '%s' 'Please do not adjust formatting.'
 
 	printf '%s' '<h1>Release notes</h1>'
-	construct_release_notes
+	printf '%s' "$release_notes"
 
 	printf '%s' '<h2>This release includes:</h2>'
 	construct_this_release_includes
@@ -105,7 +92,7 @@ construct_release_announcement_task_description() {
 	printf '%s' '</ul>\n<hr>'
 	
 	printf '%s' '<h1>Release notes</h1>'
-	construct_release_notes
+	printf '%s' "$release_notes"
 	printf '%s' '\n'
 	printf '%s' '<h2>This release includes:</h2>'
 
@@ -282,10 +269,8 @@ handle_internal_release() {
 	done <<< "$(find_task_urls_in_git_log "$last_release_tag")"
 
 	# 2. Fetch current release notes from Asana release task.
-	local release_notes=()
-	while read -r line; do
-		release_notes+=("$line")
-	done <<< "$(fetch_current_release_notes "${release_task_id}")"
+	local release_notes
+	release_notes="$(fetch_current_release_notes "${release_task_id}")"
 
 	# 3. Construct new release task description
 	local html_notes
@@ -325,10 +310,8 @@ handle_public_release() {
 	complete_tasks "${task_ids[@]}"
 
 	# 5. Fetch current release notes from Asana release task.
-	local release_notes=()
-	while read -r line; do
-		release_notes+=("$line")
-	done <<< "$(fetch_current_release_notes "${release_task_id}")"
+	local release_notes
+	release_notes="$(fetch_current_release_notes "${release_task_id}")"
 
 	# 6. Construct release announcement task description
 	local html_notes

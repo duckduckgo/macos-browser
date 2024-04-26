@@ -227,7 +227,7 @@ class ErrorPageTests: XCTestCase {
 
         await fulfillment(of: [eServerQueried], timeout: 5)
         _=try await eNavigationSucceeded.value
-        XCTAssertEqual(tab1.content.url, .test)
+        XCTAssertEqual(tab1.content.urlForWebView, .test)
         XCTAssertNil(tab1.error)
     }
 

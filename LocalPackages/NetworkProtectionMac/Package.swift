@@ -31,11 +31,11 @@ let package = Package(
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "138.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "141.1.1"),
+        .package(url: "https://github.com/airbnb/lottie-spm", exact: "4.4.1"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../LoginItems"),
-        .package(path: "../PixelKit"),
     ],
     targets: [
         // MARK: - NetworkProtectionIPC
@@ -45,6 +45,7 @@ let package = Package(
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "XPCHelper", package: "XPCHelper"),
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
@@ -57,7 +58,7 @@ let package = Package(
             name: "NetworkProtectionProxy",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
-                .product(name: "PixelKit", package: "PixelKit"),
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
@@ -70,9 +71,10 @@ let package = Package(
             name: "NetworkProtectionUI",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
+                .product(name: "PixelKit", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
                 .product(name: "LoginItems", package: "LoginItems"),
-                .product(name: "PixelKit", package: "PixelKit"),
+                .product(name: "Lottie", package: "lottie-spm")
             ],
             resources: [
                 .copy("Resources/Assets.xcassets")
@@ -88,7 +90,7 @@ let package = Package(
                 "NetworkProtectionUI",
                 .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit"),
                 .product(name: "LoginItems", package: "LoginItems"),
-                .product(name: "PixelKitTestingUtilities", package: "PixelKit"),
+                .product(name: "PixelKitTestingUtilities", package: "BrowserServicesKit"),
             ]
         ),
     ]

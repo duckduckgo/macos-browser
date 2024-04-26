@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Common
 import Foundation
 import Subscription
 import NetworkProtection
