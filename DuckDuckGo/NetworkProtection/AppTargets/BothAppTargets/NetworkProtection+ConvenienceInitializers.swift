@@ -29,7 +29,7 @@ extension NetworkProtectionDeviceManager {
         let settings = VPNSettings(defaults: .netP)
         let keyStore = NetworkProtectionKeychainKeyStore()
         let tokenStore = NetworkProtectionKeychainTokenStore()
-        return NetworkProtectionDeviceManager(settings: settings,
+        return NetworkProtectionDeviceManager(environment: settings.selectedEnvironment,
                                               tokenStore: tokenStore,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents,
@@ -40,7 +40,7 @@ extension NetworkProtectionDeviceManager {
 extension NetworkProtectionCodeRedemptionCoordinator {
     convenience init() {
         let settings = VPNSettings(defaults: .netP)
-        self.init(settings: settings,
+        self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents,
                   isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable)
@@ -72,7 +72,7 @@ extension NetworkProtectionLocationListCompositeRepository {
     convenience init() {
         let settings = VPNSettings(defaults: .netP)
         self.init(
-            settings: settings,
+            environment: settings.selectedEnvironment,
             tokenStore: NetworkProtectionKeychainTokenStore(),
             errorEvents: .networkProtectionAppDebugEvents,
             isSubscriptionEnabled: DefaultSubscriptionFeatureAvailability().isFeatureAvailable
