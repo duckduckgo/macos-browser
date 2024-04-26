@@ -727,7 +727,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
         case .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders:
             return "bookmarks_migration_could_not_prepare_multiple_favorite_folders"
-
         case .syncSentUnauthenticatedRequest: return "sync_sent_unauthenticated_request"
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
         case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"

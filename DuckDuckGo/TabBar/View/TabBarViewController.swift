@@ -1049,6 +1049,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
         bookmarkTab(with: url, title: tabViewModel.title)
     }
 
+    func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        tabCollectionViewModel.canBookmarkAllOpenTabs()
+    }
+
+    func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: TabBarViewItem) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
+    }
+
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
             assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
