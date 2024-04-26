@@ -24,6 +24,7 @@ import NetworkProtection
 import NetworkExtension
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import Subscription
 
 struct VPNMetadata: Encodable {
 
@@ -72,12 +73,19 @@ struct VPNMetadata: Encodable {
         let notificationsAgentIsRunning: Bool
     }
 
+    struct PrivacyProInfo: Encodable {
+        let betaParticipant: Bool
+        let hasPrivacyProAccount: Bool
+        let hasVPNEntitlement: Bool
+    }
+
     let appInfo: AppInfo
     let deviceInfo: DeviceInfo
     let networkInfo: NetworkInfo
     let vpnState: VPNState
     let vpnSettingsState: VPNSettingsState
     let loginItemState: LoginItemState
+    let privacyProInfo: PrivacyProInfo
 
     func toPrettyPrintedJSON() -> String? {
         let encoder = JSONEncoder()
@@ -138,6 +146,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         let vpnState = await collectVPNState()
         let vpnSettingsState = collectVPNSettingsState()
         let loginItemState = collectLoginItemState()
+        let privacyProInfo = await collectPrivacyProInfo()
 
         return VPNMetadata(
             appInfo: appInfoMetadata,
@@ -145,7 +154,8 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             networkInfo: networkInfoMetadata,
             vpnState: vpnState,
             vpnSettingsState: vpnSettingsState,
-            loginItemState: loginItemState
+            loginItemState: loginItemState,
+            privacyProInfo: privacyProInfo
         )
     }
 
@@ -280,6 +290,22 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             showInMenuBarEnabled: settings.showInMenuBar,
             selectedServer: settings.selectedServer.stringValue ?? "automatic",
             selectedEnvironment: settings.selectedEnvironment.rawValue
+        )
+    }
+
+    func collectPrivacyProInfo() async -> VPNMetadata.PrivacyProInfo {
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        let waitlistStore = WaitlistKeychainStore(
+            waitlistIdentifier: NetworkProtectionWaitlist.identifier,
+            keychainAppGroup: NetworkProtectionWaitlist.keychainAppGroup
+        )
+
+        let hasVPNEntitlement = (try? await accountManager.hasEntitlement(for: .networkProtection).get()) ?? false
+
+        return .init(
+            betaParticipant: waitlistStore.isInvited,
+            hasPrivacyProAccount: accountManager.isUserAuthenticated,
+            hasVPNEntitlement: hasVPNEntitlement
         )
     }
 
