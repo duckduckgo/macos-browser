@@ -39,7 +39,7 @@ protocol NetworkProtectionFeatureVisibility {
     var onboardStatusPublisher: AnyPublisher<OnboardingStatus, Never> { get }
 }
 
-struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {    
+struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private static var subscriptionAuthTokenPrefix: String { "ddg:" }
     private let featureDisabler: NetworkProtectionFeatureDisabling
     private let featureOverrides: WaitlistBetaOverriding
