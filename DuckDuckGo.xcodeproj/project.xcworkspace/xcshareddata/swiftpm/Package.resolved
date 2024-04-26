@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sam/disable-on-demand-when-user-initiates-shutdown",
-        "revision" : "110366dc1cd84de2dba23bd2615d1b3fe96c7aa5"
+        "revision" : "7149df917b7237721160d528f0389eba874a912b"
       }
     },
     {
