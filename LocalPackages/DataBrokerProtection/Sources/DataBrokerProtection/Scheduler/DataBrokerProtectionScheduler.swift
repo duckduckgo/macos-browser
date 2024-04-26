@@ -296,13 +296,10 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     private func fireManualScanCompletionPixel(startTime: Date) {
         do {
-            let profile = try dataManager.forceFetchProfile()
-
-            if let profile = profile {
-                let durationSinceStart = Date().timeIntervalSince(startTime) * 1000
-                self.pixelHandler.fire(.initialScanTotalDuration(duration: durationSinceStart.rounded(.towardZero),
-                                                                 profileQueries: profile.profileQueries.count))
-            }
+            let profileQueries = try dataManager.profileQueries()
+            let durationSinceStart = Date().timeIntervalSince(startTime) * 1000
+            self.pixelHandler.fire(.initialScanTotalDuration(duration: durationSinceStart.rounded(.towardZero),
+                                                             profileQueries: profileQueries))
         } catch {
             os_log("Manual Scan Error when trying to fetch the profile to get the profile queries", log: .dataBrokerProtection)
         }
