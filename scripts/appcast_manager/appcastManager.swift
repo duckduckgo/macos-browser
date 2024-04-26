@@ -112,7 +112,13 @@ DESCRIPTION
     exit(0)
 
 case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
-    guard let dmgPath = arguments.parameters["--dmg"], let releaseNotesPath = arguments.parameters["--release-notes"] else {
+    guard let dmgPath = arguments.parameters["--dmg"] else {
+        print("Missing required parameters")
+        exit(1)
+    }
+    let releaseNotesPath = arguments.parameters["--release-notes"]
+    let releaseNotesHTMLPath = arguments.parameters["--release-notes-html"]
+    guard releaseNotesPath != nil || releaseNotesHTMLPath != nil else {
         print("Missing required parameters")
         exit(1)
     }
@@ -120,7 +126,11 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
 
     print("➡️  Action: Add to internal channel")
     print("➡️  DMG Path: \(dmgPath)")
-    print("➡️  Release Notes Path: \(releaseNotesPath)")
+    if let releaseNotesPath {
+        print("➡️  Release Notes Path: \(releaseNotesPath)")
+    } else if releaseNotesHTMLPath {
+        print("➡️  Release Notes HTML Path: \(releaseNotesHTMLPath)")
+    }
     if isCI, let keyFile {
         print("➡️  Key file: \(keyFile)")
     }
@@ -133,7 +143,11 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     }
 
     // Handle release notes file
-    handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: specificDir, dmgURL: dmgURL)
+    if let releaseNotesPath {
+        handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: specificDir, dmgURL: dmgURL)
+    } else if let releaseNotesHTMLPath {
+        handleReleaseNotesHTML(path: releaseNotesHTMLPath, updatesDirectoryURL: specificDir, dmgURL: dmgURL)
+    }
 
     // Extract version number from DMG file name
     let versionNumber = getVersionNumberFromDMGFileName(dmgURL: dmgURL)
