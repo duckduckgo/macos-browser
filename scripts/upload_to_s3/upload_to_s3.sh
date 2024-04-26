@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Constants
-S3_PATH="s3://ddg-staticcdn/macos-desktop-browser/"
-CDN_PATH="https://staticcdn.duckduckgo.com/macos-desktop-browser/"
+S3_PATH="s3://ddgstaticcdn/macos-desktop-browser/"
+CDN_PATH="https://staticcdn.kapusta.cc/macos-desktop-browser/"
 
 # Defaults
 if [[ -n "$CI" ]]; then
