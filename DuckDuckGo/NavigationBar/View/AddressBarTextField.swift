@@ -858,6 +858,11 @@ extension AddressBarTextField {
     }
 
 }
+extension AddressBarTextField.Value? {
+    var isEmpty: Bool {
+        self?.isEmpty ?? true
+    }
+}
 
 // MARK: - NSTextFieldDelegate
 extension AddressBarTextField: NSTextFieldDelegate {

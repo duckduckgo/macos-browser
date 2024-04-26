@@ -466,7 +466,10 @@ protocol NewWindowPolicyDecisionMaker {
             } else if content != self.content {
                 self.content = content
             }
-        } else if self.content.isUrl {
+        } else if self.content.isUrl,
+                  // DuckURLSchemeHandler redirects duck:// address to a simulated request
+                  // ignore webView.url temporarily switching to `nil`
+                  self.content.urlForWebView?.isDuckPlayer != true {
             // when e.g. opening a download in new tab - web view restores `nil` after the navigation is interrupted
             // maybe it worths adding another content type like .interruptedLoad(URL) to display a URL in the address bar
             self.content = .none

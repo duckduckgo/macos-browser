@@ -71,10 +71,10 @@ private extension NSMenuItem {
             image = TabViewModel.Favicon.home
             title = UserText.tabHomeTitle
         case .settings:
-            image = TabViewModel.Favicon.preferences
+            image = TabViewModel.Favicon.settings
             title = UserText.tabPreferencesTitle
         case .bookmarks:
-            image = TabViewModel.Favicon.preferences
+            image = TabViewModel.Favicon.bookmarks
             title = UserText.tabPreferencesTitle
         case .url, .subscription, .identityTheftRestoration:
             image = recentlyClosedTab.favicon
