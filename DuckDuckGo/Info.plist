@@ -543,7 +543,7 @@
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast2.xml</string>
+	<string>https://staticcdn.kapusta.cc/macos-desktop-browser/appcast2.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>ZaO/DNMzMPBldh40b5xVrpNBmqRkuGY0BNRCUng2qRo=</string>
 	<key>SUScheduledCheckInterval</key>
