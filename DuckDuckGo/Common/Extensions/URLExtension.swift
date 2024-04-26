@@ -148,6 +148,10 @@ extension URL {
     static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
         return settings.appendingPathComponent(pane.rawValue)
     }
+
+    var isSettingsURL: Bool {
+        isChild(of: .settings) && (pathComponents.isEmpty || PreferencePaneIdentifier(url: self) != nil)
+    }
 #endif
 
     enum Invalid {
