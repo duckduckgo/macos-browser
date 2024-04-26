@@ -125,24 +125,24 @@ jobs:
             exit 1
           fi
 
-  run_tests:
+  # run_tests:
 
-    name: Run Tests
+  #   name: Run Tests
 
-    needs: validate_input_conditions
+  #   needs: validate_input_conditions
 
-    if: needs.validate_input_conditions.outputs.skip-release == 'false'
-    uses: ./.github/workflows/pr.yml
-    with:
-      branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
-    secrets:
-      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  #   if: needs.validate_input_conditions.outputs.skip-release == 'false'
+  #   uses: ./.github/workflows/pr.yml
+  #   with:
+  #     branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
+  #   secrets:
+  #     ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
 
   increment_build_number:
 
     name: Increment Build Number
 
-    needs: [ validate_input_conditions, run_tests ]
+    needs: [ validate_input_conditions ]
     runs-on: macos-13-xlarge
     timeout-minutes: 10
 

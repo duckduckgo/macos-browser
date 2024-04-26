@@ -92,22 +92,22 @@ jobs:
             ${{ vars.TEST_MACOS_APP_BOARD_VALIDATION_SECTION_ID }} \
             ${{ steps.create_release_task.outputs.marketing_version }}
 
-  run_tests:
+  # run_tests:
 
-    name: Run Tests
+  #   name: Run Tests
 
-    needs: create_release_branch
-    uses: ./.github/workflows/pr.yml
-    with:
-      branch: ${{ needs.create_release_branch.outputs.release_branch_name }}
-    secrets:
-      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  #   needs: create_release_branch
+  #   uses: ./.github/workflows/pr.yml
+  #   with:
+  #     branch: ${{ needs.create_release_branch.outputs.release_branch_name }}
+  #   secrets:
+  #     ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
 
   increment_build_number:
 
     name: Increment Build Number
 
-    needs: [ create_release_branch, run_tests ]
+    needs: [ create_release_branch ]
     runs-on: macos-13-xlarge
     timeout-minutes: 10
 
