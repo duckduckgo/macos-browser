@@ -1286,8 +1286,6 @@
 		4B9DB0552A983B55000927DB /* MockWaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB04F2A983B55000927DB /* MockWaitlistStorage.swift */; };
 		4B9DB0562A983B55000927DB /* MockNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0502A983B55000927DB /* MockNotificationService.swift */; };
 		4B9DB0572A983B55000927DB /* MockNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0502A983B55000927DB /* MockNotificationService.swift */; };
-		4B9DB0582A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0512A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift */; };
-		4B9DB0592A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0512A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift */; };
 		4B9DB05A2A983B55000927DB /* MockWaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0522A983B55000927DB /* MockWaitlistRequest.swift */; };
 		4B9DB05B2A983B55000927DB /* MockWaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0522A983B55000927DB /* MockWaitlistRequest.swift */; };
 		4B9DB05C2A983B55000927DB /* WaitlistViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0532A983B55000927DB /* WaitlistViewModelTests.swift */; };
@@ -3149,7 +3147,6 @@
 		4B9DB01C2A983B24000927DB /* NotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		4B9DB04F2A983B55000927DB /* MockWaitlistStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockWaitlistStorage.swift; sourceTree = "<group>"; };
 		4B9DB0502A983B55000927DB /* MockNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockNotificationService.swift; sourceTree = "<group>"; };
-		4B9DB0512A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockNetworkProtectionCodeRedeemer.swift; sourceTree = "<group>"; };
 		4B9DB0522A983B55000927DB /* MockWaitlistRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockWaitlistRequest.swift; sourceTree = "<group>"; };
 		4B9DB0532A983B55000927DB /* WaitlistViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistViewModelTests.swift; sourceTree = "<group>"; };
 		4BA1A69A258B076900F6F690 /* FileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStore.swift; sourceTree = "<group>"; };
@@ -5462,7 +5459,6 @@
 				317295D02AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift */,
 				4B9DB04F2A983B55000927DB /* MockWaitlistStorage.swift */,
 				4B9DB0502A983B55000927DB /* MockNotificationService.swift */,
-				4B9DB0512A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift */,
 				4B9DB0522A983B55000927DB /* MockWaitlistRequest.swift */,
 			);
 			path = Mocks;
@@ -10328,7 +10324,6 @@
 				3706FE5E293F661700E42796 /* DataImportMocks.swift in Sources */,
 				3706FE5F293F661700E42796 /* CrashReportTests.swift in Sources */,
 				B60C6F7F29B1B41D007BFAA8 /* TestRunHelperInitializer.m in Sources */,
-				4B9DB0592A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift in Sources */,
 				9F0FFFBF2BCCAF1F007C87DD /* BookmarkAllTabsDialogViewModelMock.swift in Sources */,
 				3706FE61293F661700E42796 /* PinnedTabsViewModelTests.swift in Sources */,
 				3706FE62293F661700E42796 /* PasswordManagementListSectionTests.swift in Sources */,
@@ -11575,7 +11570,6 @@
 				AA0F3DB7261A566C0077F2D9 /* SuggestionLoadingMock.swift in Sources */,
 				B6E6BA162BA2CF5F008AA7E1 /* SandboxTestToolNotifications.swift in Sources */,
 				B60C6F8129B1B4AD007BFAA8 /* TestRunHelper.swift in Sources */,
-				4B9DB0582A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift in Sources */,
 				9F872DA02B90644800138637 /* ContextualMenuTests.swift in Sources */,
 				4B9292BE2667103100AD2C21 /* PasteboardFolderTests.swift in Sources */,
 				4B9292C52667104B00AD2C21 /* CoreDataTestUtilities.swift in Sources */,
