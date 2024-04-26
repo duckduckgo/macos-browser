@@ -80,7 +80,7 @@ public protocol DataBrokerProtectionScheduler {
     func stopScheduler()
 
     func optOutAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    func startManualScan(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func startManualScan(showWebView: Bool, startTime: Date, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runQueuedOperations(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runAllOperations(showWebView: Bool)
 
@@ -98,8 +98,8 @@ extension DataBrokerProtectionScheduler {
         runAllOperations(showWebView: false)
     }
 
-    public func startManualScan() {
-        startManualScan(showWebView: false, completion: nil)
+    public func startManualScan(startTime: Date) {
+        startManualScan(showWebView: false, startTime: startTime, completion: nil)
     }
 }
 
@@ -250,6 +250,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func startManualScan(showWebView: Bool = false,
+                                startTime: Date,
                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
         let startTime = Date()
         stopScheduler()

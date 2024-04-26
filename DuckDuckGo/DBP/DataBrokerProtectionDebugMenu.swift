@@ -227,7 +227,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         os_log("Running scan operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.scheduler.startManualScan(showWebView: showWebView) { errors in
+        DataBrokerProtectionManager.shared.scheduler.startManualScan(showWebView: showWebView, startTime: Date()) { errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
                     os_log("scan operations finished, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)

@@ -137,6 +137,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     }
 
     public func startManualScan(showWebView: Bool,
+                                startTime: Date,
                                 completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         self.pixelHandler.fire(.ipcServerScanAllBrokersCalledByApp)
 
@@ -155,7 +156,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         }
 
         xpc.execute(call: { server in
-            server.startManualScan(showWebView: showWebView) { errors in
+            server.startManualScan(showWebView: showWebView, startTime: startTime) { errors in
                 if let error = errors?.oneTimeError {
                     let nsError = error as NSError
                     let interruptedError = DataBrokerProtectionSchedulerError.operationsInterrupted as NSError

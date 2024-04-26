@@ -302,7 +302,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     }
 
     func startScanAndOptOut() -> Bool {
-        return scanDelegate?.startScan() ?? false
+        return scanDelegate?.startScan(startDate: Date()) ?? false
     }
 
     func getInitialScanState() async -> DBPUIInitialScanState {
