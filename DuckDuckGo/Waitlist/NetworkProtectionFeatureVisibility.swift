@@ -166,29 +166,11 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     }
 
     private var isWaitlistBetaActive: Bool {
-        switch featureOverrides.waitlistActive {
-        case .useRemoteValue:
-            guard privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive) else {
-                return false
-            }
-
-            return true
-        case .on:
-            return true
-        case .off:
-            return false
-        }
+        true
     }
 
     private var isWaitlistEnabled: Bool {
-        switch featureOverrides.waitlistEnabled {
-        case .useRemoteValue:
-            return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlist)
-        case .on:
-            return true
-        case .off:
-            return false
-        }
+        true
     }
 
     func disableForAllUsers() async {

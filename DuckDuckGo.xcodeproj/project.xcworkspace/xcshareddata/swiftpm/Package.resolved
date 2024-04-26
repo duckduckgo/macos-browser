@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "michal/stripe-repurchase",
-        "revision" : "ebd554e54e0c155b237b7dca0a25399047b34892"
+        "revision" : "9ebcfd17a2dd1422407a24e9e4331a46c3b7733a",
+        "version" : "141.1.1"
       }
     },
     {

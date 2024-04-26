@@ -174,12 +174,12 @@ extension WindowControllersManager {
            let firstTab = tabCollection.tabs.first,
            case .newtab = firstTab.content,
            !newTab {
-            firstTab.setContent(url.map { .url($0, source: source) } ?? .newtab)
+            firstTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
         } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-            tab.setContent(url.map { .url($0, source: source) } ?? .newtab)
+            tab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
         } else {
             let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
-            newTab.setContent(url.map { .url($0, source: source) } ?? .newtab)
+            newTab.setContent(url.map { .contentFromURL($0, source: source) } ?? .newtab)
             tabCollectionViewModel.append(tab: newTab)
         }
     }

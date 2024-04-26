@@ -225,9 +225,9 @@ final class AddressBarViewController: NSViewController {
             passiveTextField.stringValue = ""
             return
         }
-        tabViewModel.$passiveAddressBarString
+        tabViewModel.$passiveAddressBarAttributedString
             .receive(on: DispatchQueue.main)
-            .assign(to: \.stringValue, onWeaklyHeld: passiveTextField)
+            .assign(to: \.attributedStringValue, onWeaklyHeld: passiveTextField)
             .store(in: &tabViewModelCancellables)
     }
 
@@ -239,9 +239,9 @@ final class AddressBarViewController: NSViewController {
 
         func shouldShowLoadingIndicator(for tabViewModel: TabViewModel, isLoading: Bool, error: Error?) -> Bool {
             if isLoading,
-               let url = tabViewModel.tab.content.url,
-               [.http, .https].contains(url.navigationalScheme),
-               url.isDuckDuckGoSearch == false,
+               let url = tabViewModel.tab.content.urlForWebView,
+               url.navigationalScheme?.isHypertextScheme == true,
+               !url.isDuckDuckGoSearch, !url.isDuckPlayer,
                error == nil {
                 return true
             } else {
@@ -259,7 +259,7 @@ final class AddressBarViewController: NSViewController {
             .sink { [weak self] value in
                 guard tabViewModel.isLoading,
                       let progressIndicator = self?.progressIndicator,
-                      progressIndicator.isShown
+                      progressIndicator.isProgressShown
                 else { return }
 
                 progressIndicator.increaseProgress(to: value)
@@ -274,7 +274,7 @@ final class AddressBarViewController: NSViewController {
                 if shouldShowLoadingIndicator(for: tabViewModel, isLoading: isLoading, error: error) {
                     progressIndicator.show(progress: tabViewModel.progress, startTime: tabViewModel.loadingStartTime)
 
-                } else if progressIndicator.isShown {
+                } else if progressIndicator.isProgressShown {
                     progressIndicator.finishAndHide()
                 }
             }
@@ -364,7 +364,7 @@ final class AddressBarViewController: NSViewController {
         case .suggestion(let suggestionViewModel):
             switch suggestionViewModel.suggestion {
             case .phrase, .unknown: self.mode = .editing(isUrl: false)
-            case .website, .bookmark, .historyEntry: self.mode = .editing(isUrl: true)
+            case .website, .bookmark, .historyEntry, .internalPage: self.mode = .editing(isUrl: true)
             }
         }
     }
