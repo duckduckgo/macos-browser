@@ -225,9 +225,9 @@ final class AddressBarViewController: NSViewController {
             passiveTextField.stringValue = ""
             return
         }
-        tabViewModel.$passiveAddressBarString
+        tabViewModel.$passiveAddressBarAttributedString
             .receive(on: DispatchQueue.main)
-            .assign(to: \.stringValue, onWeaklyHeld: passiveTextField)
+            .assign(to: \.attributedStringValue, onWeaklyHeld: passiveTextField)
             .store(in: &tabViewModelCancellables)
     }
 
@@ -259,7 +259,7 @@ final class AddressBarViewController: NSViewController {
             .sink { [weak self] value in
                 guard tabViewModel.isLoading,
                       let progressIndicator = self?.progressIndicator,
-                      progressIndicator.isShown
+                      progressIndicator.isProgressShown
                 else { return }
 
                 progressIndicator.increaseProgress(to: value)
@@ -274,7 +274,7 @@ final class AddressBarViewController: NSViewController {
                 if shouldShowLoadingIndicator(for: tabViewModel, isLoading: isLoading, error: error) {
                     progressIndicator.show(progress: tabViewModel.progress, startTime: tabViewModel.loadingStartTime)
 
-                } else if progressIndicator.isShown {
+                } else if progressIndicator.isProgressShown {
                     progressIndicator.finishAndHide()
                 }
             }

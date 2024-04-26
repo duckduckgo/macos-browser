@@ -275,7 +275,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard view.window?.isPopUpWindow == false else { return }
         bookmarkButton.setAccessibilityIdentifier("AddressBarButtonsViewController.bookmarkButton")
         let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
-        var showBookmarkButton: Bool {
+        var shouldShowBookmarkButton: Bool {
             guard let tabViewModel, tabViewModel.canBeBookmarked else { return false }
 
             var isUrlBookmarked = false
@@ -287,7 +287,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
         }
 
-        bookmarkButton.isHidden = !showBookmarkButton
+        bookmarkButton.isShown = shouldShowBookmarkButton
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: GeneralPixel.AccessPoint) {
@@ -299,7 +299,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let bookmarkPopover = bookmarkPopoverCreatingIfNeeded()
         if !bookmarkPopover.isShown {
-            bookmarkButton.isHidden = false
+            bookmarkButton.isShown = true
             bookmarkPopover.isNew = result.isNew
             bookmarkPopover.bookmark = bookmark
             bookmarkPopover.show(positionedBelow: bookmarkButton)
@@ -319,7 +319,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }()
 
         if query.permissions.contains(.camera)
-            || (query.permissions.contains(.microphone) && microphoneButton.isHidden && !cameraButton.isHidden) {
+            || (query.permissions.contains(.microphone) && microphoneButton.isHidden && cameraButton.isShown) {
             button = cameraButton
         } else {
             assert(query.permissions.count == 1)
@@ -342,9 +342,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 return
             }
         }
-        guard !button.isHidden,
-              !permissionButtons.isHidden
-        else { return }
+        guard button.isShown, permissionButtons.isShown else { return }
 
         (popover.contentViewController as? PermissionAuthorizationViewController)?.query = query
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
@@ -389,7 +387,7 @@ final class AddressBarButtonsViewController: NSViewController {
     func updateButtons() {
         stopAnimationsAfterFocus()
 
-        clearButton.isHidden = !(isTextFieldEditorFirstResponder && !(textFieldValue?.isEmpty ?? true))
+        clearButton.isShown = isTextFieldEditorFirstResponder && !textFieldValue.isEmpty
 
         updatePrivacyEntryPointButton()
         updateImageButton()
@@ -690,14 +688,14 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updatePermissionButtons() {
-        permissionButtons.isHidden = isTextFieldEditorFirstResponder
-        || isAnyTrackerAnimationPlaying
-        || (tabViewModel?.isShowingErrorPage ?? true)
+        guard let tabViewModel else { return }
+
+        permissionButtons.isShown = !isTextFieldEditorFirstResponder
+        && !isAnyTrackerAnimationPlaying
+        && !tabViewModel.isShowingErrorPage
         defer {
             showOrHidePermissionPopoverIfNeeded()
         }
-
-        guard let tabViewModel else { return }
 
         geolocationButton.buttonState = tabViewModel.usedPermissions.geolocation
 
@@ -771,21 +769,24 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let tabViewModel else { return }
 
         let url = tabViewModel.tab.content.userEditableUrl
+        let isNewTabOrOnboarding = [.newtab, .onboarding].contains(tabViewModel.tab.content)
         let isHypertextUrl = url?.navigationalScheme?.isHypertextScheme == true && url?.isDuckPlayer == false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
         let isLocalUrl = url?.isLocalURL ?? false
 
         // Privacy entry point button
-        privacyEntryPointButton.isHidden = isEditingMode
-        || isTextFieldEditorFirstResponder
-        || !isHypertextUrl
-        || tabViewModel.isShowingErrorPage
-        || isTextFieldValueText
-        || isLocalUrl
-        imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
-        || !privacyEntryPointButton.isHidden
-        || isAnyTrackerAnimationPlaying
+        privacyEntryPointButton.isShown = !isEditingMode
+        && !isTextFieldEditorFirstResponder
+        && isHypertextUrl
+        && !tabViewModel.isShowingErrorPage
+        && !isTextFieldValueText
+        && !isLocalUrl
+
+        imageButtonWrapper.isShown = view.window?.isPopUpWindow != true
+        && (isHypertextUrl || isTextFieldEditorFirstResponder || isEditingMode || isNewTabOrOnboarding)
+        && privacyEntryPointButton.isHidden
+        && !isAnyTrackerAnimationPlaying
     }
 
     private func updatePrivacyEntryPointIcon() {
@@ -796,7 +797,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard !isAnyShieldAnimationPlaying else { return }
 
         switch tabViewModel.tab.content {
-        case .url(let url, _, _):
+        case .url(let url, _, _), .identityTheftRestoration(let url), .subscription(let url):
             guard let host = url.host else { break }
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
@@ -824,8 +825,7 @@ final class AddressBarButtonsViewController: NSViewController {
     let trackerAnimationImageProvider = TrackerAnimationImageProvider()
 
     private func animateTrackers() {
-        guard !privacyEntryPointButton.isHidden,
-              let tabViewModel else { return }
+        guard privacyEntryPointButton.isShown, let tabViewModel else { return }
 
         switch tabViewModel.tab.content {
         case .url(let url, _, _):
@@ -835,7 +835,7 @@ final class AddressBarButtonsViewController: NSViewController {
             }
 
             var animationView: LottieAnimationView
-            if url.scheme == "http" {
+            if url.navigationalScheme == .http {
                 animationView = shieldDotAnimationView
             } else {
                 animationView = shieldAnimationView
@@ -878,7 +878,7 @@ final class AddressBarButtonsViewController: NSViewController {
                                 shieldAnimations: Bool = true,
                                 badgeAnimations: Bool = true) {
         func stopAnimation(_ animationView: LottieAnimationView) {
-            if animationView.isAnimationPlaying || !animationView.isHidden {
+            if animationView.isAnimationPlaying || animationView.isShown {
                 animationView.isHidden = true
                 animationView.stop()
             }
