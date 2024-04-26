@@ -124,7 +124,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
-        let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, 
+        let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name,
                                                                           handler: pixelHandler,
                                                                           isManualScan: isManual)
 
