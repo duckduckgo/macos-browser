@@ -31,16 +31,6 @@ final class SyncCredentialsAdapter {
     let syncAdapterErrorHandler: SyncAdapterErrorHandler
     let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
-//    @UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false)
-//    private var isSyncCredentialsPaused: Bool {
-//        didSet {
-//            NotificationCenter.default.post(name: SyncPreferences.Consts.syncPausedStateChanged, object: nil)
-//        }
-//    }
-//
-//    @UserDefaultsWrapper(key: .syncCredentialsPausedErrorDisplayed, defaultValue: false)
-//    private var didShowCredentialsSyncPausedError: Bool
-
     init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory,
          syncAdapterErrorHandler: SyncAdapterErrorHandler) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
@@ -80,42 +70,13 @@ final class SyncCredentialsAdapter {
                 log: OSLog.sync,
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
-                    self?.syncAdapterErrorHandler.syncBookmarksSucceded()
-//                    self?.isSyncCredentialsPaused = false
-//                    self?.didShowCredentialsSyncPausedError = false
+                    self?.syncAdapterErrorHandler.syncCredentialsSucceded()
                 }
             )
 
             syncErrorCancellable = provider.syncErrorPublisher
                 .sink { [weak self] error in
                     self?.syncAdapterErrorHandler.handleCredentialError(error)
-//                    switch error {
-//                    case let syncError as SyncError:
-//                        self?.syncAdapterErrorHandler
-//                        PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsFailed, error: syncError))
-//                        switch syncError {
-//                        case .unexpectedStatusCode(409):
-//                            // If credentials count limit has been exceeded
-//                            self?.isSyncCredentialsPaused = true
-//                            PixelKit.fire(GeneralPixel.syncCredentialsCountLimitExceededDaily, frequency: .daily)
-//                            self?.showSyncPausedAlert()
-//                        case .unexpectedStatusCode(413):
-//                            // If credentials request size limit has been exceeded
-//                            self?.isSyncCredentialsPaused = true
-//                            PixelKit.fire(GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .daily)
-//                            self?.showSyncPausedAlert()
-//                        default:
-//                            break
-//                        }
-//                    default:
-//                        let nsError = error as NSError
-//                        if nsError.domain != NSURLErrorDomain {
-//                            let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
-//                            let params = processedErrors.errorPixelParameters
-//                            PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsFailed, error: error), withAdditionalParameters: params)
-//                        }
-//                    }
-//                    os_log(.error, log: OSLog.sync, "Credentials Sync error: %{public}s", String(reflecting: error))
                 }
 
             self.provider = provider
@@ -126,25 +87,6 @@ final class SyncCredentialsAdapter {
             PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsProviderInitializationFailed, error: error), withAdditionalParameters: params)
         }
     }
-
-//    private func showSyncPausedAlert() {
-//        guard !didShowCredentialsSyncPausedError else { return }
-//        Task {
-//            await MainActor.run {
-//                let alert = NSAlert.syncCredentialsPaused()
-//                let response = alert.runModal()
-//                didShowCredentialsSyncPausedError = true
-//
-//                switch response {
-//                case .alertSecondButtonReturn:
-//                    alert.window.sheetParent?.endSheet(alert.window)
-//                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-//                default:
-//                    break
-//                }
-//            }
-//        }
-//    }
 
     private var syncDidCompleteSubject = PassthroughSubject<Void, Never>()
     private var syncErrorCancellable: AnyCancellable?

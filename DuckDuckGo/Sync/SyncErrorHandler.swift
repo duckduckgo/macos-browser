@@ -66,9 +66,12 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
 
     var isSyncPausedChangedPublisher = PassthroughSubject<Void, Never>()
 
-    private var currentError: AsyncErrorType?
+    private var currentSyncAllPausedError: AsyncErrorType?
 
-    public init() {
+    let alertPresenter: AlertPresenter
+
+    public init(alertPresenter: AlertPresenter = StandardAlertPresenter()) {
+        self.alertPresenter = alertPresenter
         super.init { event, _, _, _ in
             PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))
         }
@@ -85,12 +88,24 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
     private let addErrorSubject: PassthroughSubject<Bool, Never> = .init()
     public let objectWillChange = ObservableObjectPublisher()
 
-    private func resetErrors() {
+    private func resetBookmarksErrors() {
         isSyncBookmarksPaused = false
-        isSyncCredentialsPaused = false
-        isSyncPaused = false
         didShowBookmarksSyncPausedError = false
-        currentError = nil
+        resetGeneralErrors()
+    }
+
+    private func resetCredentialsErrors() {
+        isSyncCredentialsPaused = false
+        didShowCredentialsSyncPausedError = false
+        resetGeneralErrors()
+    }
+
+    private func resetGeneralErrors() {
+        isSyncPaused = false
+        didShowInvalidLoginSyncPausedError = false
+        lastErrorNotificationTime = nil
+        currentSyncAllPausedError = nil
+        nonActionableErrorCount = 0
     }
 
     private func shouldShowAlertForNonActionableError() -> Bool {
@@ -107,14 +122,14 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
             nonActionableErrorCount = 0
         }
         let twelveHoursAgo = Calendar.current.date(byAdding: .hour, value: -12, to: Date())!
-        let noSuccessfulSyncInLast12h = nonActionableErrorCount > 0 && lastSyncSuccessTime ?? Date() <= twelveHoursAgo
+        let noSuccessfulSyncInLast12h = nonActionableErrorCount > 1 && lastSyncSuccessTime ?? Date() <= twelveHoursAgo
 
         return lastErrorNotificationWasMoreThan24hAgo &&
         (areThere10ConsecutiveError || noSuccessfulSyncInLast12h)
     }
 
     private var syncPausedMessage: String? {
-        guard let error = currentError else { return nil }
+        guard let error = currentSyncAllPausedError else { return nil }
         switch error {
         case .invalidLoginCredentials:
             return "Invalid Login"
@@ -129,7 +144,7 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
     }
 
     private var syncPausedButtonTitle: String? {
-        guard let error = currentError else { return nil }
+        guard let error = currentSyncAllPausedError else { return nil }
         switch error {
         case .invalidLoginCredentials:
             return "Invalid Login"
@@ -146,10 +161,14 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
 }
 
 extension SyncErrorHandler: SyncAdapterErrorHandler {
+    func syncCredentialsSucceded() {
+        lastSyncSuccessTime = Date()
+        resetCredentialsErrors()
+    }
 
     func syncBookmarksSucceded() {
         lastSyncSuccessTime = Date()
-        resetErrors()
+        resetBookmarksErrors()
     }
 
     func handleBookmarkError(_ error: Error) {
@@ -163,31 +182,7 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
     private func handleError(_ error: Error, modelType: ModelType) {
         switch error {
         case let syncError as SyncError:
-            PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: syncError))
-            switch syncError {
-            case .unexpectedStatusCode(409):
-                switch modelType {
-                case .bookmarks:
-                    syncIsPaused(errorType: .bookmarksCountLimitExceeded)
-                case .credentials:
-                    syncIsPaused(errorType: .credentialsCountLimitExceeded)
-                }
-            case .unexpectedStatusCode(413):
-                switch modelType {
-                case .bookmarks:
-                    syncIsPaused(errorType: .bookmarksRequestSizeLimitExceeded)
-                case .credentials:
-                    syncIsPaused(errorType: .credentialsRequestSizeLimitExceeded)
-                }
-            case .unexpectedStatusCode(401):
-                syncIsPaused(errorType: .invalidLoginCredentials)
-            case .unexpectedStatusCode(400):
-                syncIsPaused(errorType: .unknown)
-            case .unexpectedStatusCode(418), .unexpectedStatusCode(429):
-                syncIsPaused(errorType: .tooManyRequests)
-            default:
-                break
-            }
+            handleSyncError(syncError, modelType: modelType)
         default:
             let nsError = error as NSError
             if nsError.domain != NSURLErrorDomain {
@@ -198,8 +193,35 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
         }
     }
 
+    private func handleSyncError(_ syncError: SyncError, modelType: ModelType) {
+        PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: syncError))
+        switch syncError {
+        case .unexpectedStatusCode(409):
+            switch modelType {
+            case .bookmarks:
+                syncIsPaused(errorType: .bookmarksCountLimitExceeded)
+            case .credentials:
+                syncIsPaused(errorType: .credentialsCountLimitExceeded)
+            }
+        case .unexpectedStatusCode(413):
+            switch modelType {
+            case .bookmarks:
+                syncIsPaused(errorType: .bookmarksRequestSizeLimitExceeded)
+            case .credentials:
+                syncIsPaused(errorType: .credentialsRequestSizeLimitExceeded)
+            }
+        case .unexpectedStatusCode(401):
+            syncIsPaused(errorType: .invalidLoginCredentials)
+        case .unexpectedStatusCode(400):
+            syncIsPaused(errorType: .unknown)
+        case .unexpectedStatusCode(418), .unexpectedStatusCode(429):
+            syncIsPaused(errorType: .tooManyRequests)
+        default:
+            break
+        }
+    }
+
     private func syncIsPaused(errorType: AsyncErrorType) {
-        currentError = errorType
         showSyncPausedAlertIfNeeded(for: errorType)
         switch errorType {
         case .bookmarksCountLimitExceeded:
@@ -215,8 +237,10 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
             self.isSyncCredentialsPaused = true
             PixelKit.fire(GeneralPixel.syncCredentialsRequestSizeLimitExceededDaily, frequency: .daily)
         case .invalidLoginCredentials:
+            currentSyncAllPausedError = errorType
             self.isSyncPaused = true
         case .tooManyRequests, .unknown:
+            currentSyncAllPausedError = errorType
             self.isSyncPaused = true
         }
     }
@@ -226,19 +250,11 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
             await MainActor.run {
                 var alert: NSAlert
                 switch errorType {
-                case .bookmarksCountLimitExceeded:
+                case .bookmarksCountLimitExceeded, .bookmarksRequestSizeLimitExceeded:
                     guard !didShowBookmarksSyncPausedError else { return }
                     alert = NSAlert.syncPaused(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncBookmarkPausedAlertDescription)
                     didShowBookmarksSyncPausedError = true
-                case .credentialsCountLimitExceeded:
-                    guard !didShowCredentialsSyncPausedError else { return }
-                    alert = NSAlert.syncPaused(title: UserText.syncCredentialsPausedAlertTitle, informative: UserText.syncCredentialsPausedAlertDescription)
-                    didShowCredentialsSyncPausedError = true
-                case .bookmarksRequestSizeLimitExceeded:
-                    guard !didShowBookmarksSyncPausedError else { return }
-                    alert = NSAlert.syncPaused(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncBookmarkPausedAlertDescription)
-                    didShowBookmarksSyncPausedError = true
-                case .credentialsRequestSizeLimitExceeded:
+                case .credentialsCountLimitExceeded, .credentialsRequestSizeLimitExceeded:
                     guard !didShowCredentialsSyncPausedError else { return }
                     alert = NSAlert.syncPaused(title: UserText.syncCredentialsPausedAlertTitle, informative: UserText.syncCredentialsPausedAlertDescription)
                     didShowCredentialsSyncPausedError = true
@@ -251,16 +267,7 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
                     alert = NSAlert.syncPaused(title: "Non Actionable Error", informative: "Non Actionable Error")
                     lastErrorNotificationTime = Date()
                 }
-
-                let response = alert.runModal()
-
-                switch response {
-                case .alertSecondButtonReturn:
-                    alert.window.sheetParent?.endSheet(alert.window)
-                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-                default:
-                    break
-                }
+                alertPresenter.showAlert(alert)
             }
         }
     }
@@ -311,7 +318,7 @@ extension SyncErrorHandler: SyncPreferencesErrorHandler {
                                        syncPausedButtonTitle: UserText.bookmarksLimitExceededAction,
                                        syncPausedAction: manageBookmarks)
     }
-    
+
     @MainActor
     var syncCredentialsPausedMetadata: SyncPausedErrorMetadata {
         return SyncPausedErrorMetadata(syncPausedTitle: UserText.syncLimitExceededTitle,
@@ -325,7 +332,8 @@ extension SyncErrorHandler: SyncPreferencesErrorHandler {
     }
 
     func syncDidTurnOff() {
-        resetErrors()
+        resetBookmarksErrors()
+        resetCredentialsErrors()
     }
 }
 
@@ -333,4 +341,25 @@ protocol SyncAdapterErrorHandler {
     func handleBookmarkError(_ error: Error)
     func handleCredentialError(_ error: Error)
     func syncBookmarksSucceded()
+    func syncCredentialsSucceded()
+}
+
+public protocol AlertPresenter {
+    func showAlert(_ alert: NSAlert)
+}
+
+public struct StandardAlertPresenter: AlertPresenter {
+    public init () {}
+    @MainActor
+    public func showAlert(_ alert: NSAlert) {
+        let response = alert.runModal()
+
+        switch response {
+        case .alertSecondButtonReturn:
+            alert.window.sheetParent?.endSheet(alert.window)
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+        default:
+            break
+        }
+    }
 }

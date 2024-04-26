@@ -265,15 +265,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             }
             .store(in: &cancellables)
 
-//        NotificationCenter.default.publisher(for: Self.Consts.syncPausedStateChanged)
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] _ in
-//                self?.updateSyncPausedState()
-////                self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
-////                self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
-//            }
-//            .store(in: &cancellables)
-
         let screenIsLockedPublisher = DistributedNotificationCenter.default
             .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
             .map { _ in true }
@@ -308,8 +299,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 try await syncService.disconnect()
                 managementDialogModel.endFlow()
                 syncPreferencesErrorHandler.syncDidTurnOff()
-//                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
-//                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncLogoutError(error: error)))
@@ -461,8 +450,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 try await syncService.deleteAccount()
                 managementDialogModel.endFlow()
                 syncPreferencesErrorHandler.syncDidTurnOff()
-//                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
-//                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
                 PixelKit.fire(DebugEvent(GeneralPixel.syncDeleteAccountError(error: error)))
