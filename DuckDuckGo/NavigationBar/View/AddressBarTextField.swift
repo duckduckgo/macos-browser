@@ -275,7 +275,7 @@ final class AddressBarTextField: NSTextField {
         guard let selectedTabViewModel = selectedTabViewModel ?? tabCollectionViewModel.selectedTabViewModel else { return }
 
         let addressBarString = addressBarString ?? selectedTabViewModel.addressBarString
-        let isSearch = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
+        let isSearch = selectedTabViewModel.tab.content.userEditableUrl?.isDuckDuckGoSearch ?? false
         self.value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
         clearUndoManager()
     }

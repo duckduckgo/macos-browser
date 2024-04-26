@@ -461,7 +461,7 @@ protocol NewWindowPolicyDecisionMaker {
         if let url = webView.url {
             let content = TabContent.contentFromURL(url, source: .webViewUpdated)
 
-            if self.content.isUrl, self.content.url == url {
+            if self.content.isUrl, self.content.urlForWebView == url {
                 // ignore content updates when tab.content has userEntered or credential set but equal url as it comes from the WebView url updated event
             } else if content != self.content {
                 self.content = content
@@ -579,7 +579,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor
     var currentHistoryItem: BackForwardListItem? {
         webView.backForwardList.currentItem.map(BackForwardListItem.init)
-        ?? (content.url ?? navigationDelegate.currentNavigation?.url).map { url in
+        ?? (content.urlForWebView ?? navigationDelegate.currentNavigation?.url).map { url in
             BackForwardListItem(kind: .url(url), title: webView.title ?? title, identity: nil)
         }
     }
@@ -608,7 +608,11 @@ protocol NewWindowPolicyDecisionMaker {
 
         let canGoBack = webView.canGoBack
         let canGoForward = webView.canGoForward
-        let canReload = self.content.userEditableUrl != nil
+        let canReload = if case .url(let url, credential: _, source: _) = content, !(url.isDuckPlayer || url.isDuckURLScheme) {
+            true
+        } else {
+            false
+        }
 
         if canGoBack != self.canGoBack {
             self.canGoBack = canGoBack
@@ -721,7 +725,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         if startupPreferences.launchToCustomHomePage,
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
-            setContent(.url(customURL, credential: nil, source: .ui))
+            setContent(.contentFromURL(customURL, source: .ui))
         } else {
             setContent(.newtab)
         }
@@ -895,9 +899,10 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     func requestFireproofToggle() {
-        guard let url = content.userEditableUrl,
-              let host = url.host
-        else { return }
+        guard case .url(let url, _, _) = content,
+              url.navigationalScheme?.isHypertextScheme == true,
+              !url.isDuckPlayer,
+              let host = url.host else { return }
 
         _ = FireproofDomains.shared.toggle(domain: host)
     }
@@ -992,7 +997,7 @@ protocol NewWindowPolicyDecisionMaker {
             if cachedFavicon != favicon {
                 favicon = cachedFavicon
             }
-        } else if oldValue?.url?.host != url.host {
+        } else if oldValue?.urlForWebView?.host != url.host {
             // If the domain matches the previous value, just keep the same favicon
             favicon = nil
         }
@@ -1031,7 +1036,7 @@ extension Tab: FaviconUserScriptDelegate {
                            for documentUrl: URL) {
         guard documentUrl != .error else { return }
         faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
-            guard documentUrl == self.content.url, let favicon = favicon else {
+            guard documentUrl == self.content.urlForWebView, let favicon = favicon else {
                 return
             }
             self.favicon = favicon.image
@@ -1098,7 +1103,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
                 // credential is removed from the URL and set to TabContent to be used on next Challenge
                 self.content = .url(navigationAction.url.removingBasicAuthCredential(), credential: credential, source: .webViewUpdated)
                 // reload URL without credentialss
-                request.url = self.content.url!
+                request.url = self.content.urlForWebView!
                 navigator.load(request)
             }
         }

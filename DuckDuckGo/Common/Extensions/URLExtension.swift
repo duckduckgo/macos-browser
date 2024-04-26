@@ -30,6 +30,11 @@ extension URL.NavigationalScheme {
         return [.http, .https, .file]
     }
 
+    /// HTTP or HTTPS
+    var isHypertextScheme: Bool {
+        Self.hypertextSchemes.contains(self)
+    }
+
 }
 
 extension URL {
