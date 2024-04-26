@@ -28,7 +28,7 @@ final class TabViewModel {
         static let home = NSImage.homeFavicon
         static let duckPlayer = NSImage.duckPlayerSettings
         static let burnerHome = NSImage.burnerTabFavicon
-        static let preferences = NSImage.preferences
+        static let settings = NSImage.settingsMulticolor16
         static let bookmarks = NSImage.bookmarksFolder
         static let emailProtection = NSImage.emailProtectionIcon
         static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
@@ -133,7 +133,7 @@ final class TabViewModel {
                 case .url(let url, _, source: .webViewUpdated),
                      .url(let url, _, source: .link):
 
-                    guard !url.isEmpty, url != .blankPage else { fallthrough }
+                    guard !url.isEmpty, url != .blankPage, !url.isDuckPlayer else { fallthrough }
 
                     // Only display the Tab content URL update matching its Security Origin
                     // see https://github.com/mozilla-mobile/firefox-ios/wiki/WKWebView-navigation-and-security-considerations
@@ -367,7 +367,7 @@ final class TabViewModel {
         case .newtab:
             Favicon.home
         case .settings:
-            Favicon.preferences
+            Favicon.settings
         case .bookmarks:
             Favicon.bookmarks
         case .subscription:
