@@ -128,7 +128,7 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     print("➡️  DMG Path: \(dmgPath)")
     if let releaseNotesPath {
         print("➡️  Release Notes Path: \(releaseNotesPath)")
-    } else if releaseNotesHTMLPath {
+    } else if let releaseNotesHTMLPath {
         print("➡️  Release Notes HTML Path: \(releaseNotesHTMLPath)")
     }
     if isCI, let keyFile {
