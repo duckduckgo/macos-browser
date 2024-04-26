@@ -18,12 +18,12 @@ jobs:
 
     steps:
 
-      - name: Assert main branch
-        run: |
-          if [ "${{ github.ref_name }}" != "main" ]; then
-            echo "👎 Not the main branch"
-            exit 1
-          fi
+      # - name: Assert main branch
+      #   run: |
+      #     if [ "${{ github.ref_name }}" != "main" ]; then
+      #       echo "👎 Not the main branch"
+      #       exit 1
+      #     fi
 
       - name: Check out the code
         uses: actions/checkout@v4

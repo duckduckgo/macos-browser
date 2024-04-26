@@ -37,13 +37,13 @@ jobs:
 
     steps:
 
-      - name: Assert release branch
-        run: |
-          case "${{ github.ref_name }}" in
-            release/*) ;;
-            main) ;;
-            *) echo "👎 Not a release or main branch"; exit 1 ;;
-          esac
+      # - name: Assert release branch
+      #   run: |
+      #     case "${{ github.ref_name }}" in
+      #       release/*) ;;
+      #       main) ;;
+      #       *) echo "👎 Not a release or main branch"; exit 1 ;;
+      #     esac
 
       - name: Check out the code
         uses: actions/checkout@v4
@@ -184,7 +184,7 @@ jobs:
           BRANCH: ${{ needs.validate_input_conditions.outputs.release-branch }}
         run: |
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
-          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.task-id }} ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
+          ./scripts/update_asana_for_release.sh internal ${{ steps.task-id.outputs.task-id }} ${{ vars.TEST_MACOS_APP_BOARD_VALIDATION_SECTION_ID }} "${version}"
 
   prepare_release:
     name: Prepare Release
@@ -214,10 +214,10 @@ jobs:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
       MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      TEST_AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+      TEST_AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+      TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
@@ -244,7 +244,7 @@ jobs:
       branch: ${{ needs.validate_input_conditions.outputs.release-branch }}
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      TEST_AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
       GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
       SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}

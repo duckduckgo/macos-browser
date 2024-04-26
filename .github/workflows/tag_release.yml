@@ -69,13 +69,13 @@ jobs:
 
     steps:
 
-    - name: Assert release branch
-      run: |
-        case "${{ env.BRANCH }}" in
-          release/*) ;;
-          hotfix/*) ;;
-          *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
-        esac
+    # - name: Assert release branch
+    #   run: |
+    #     case "${{ env.BRANCH }}" in
+    #       release/*) ;;
+    #       hotfix/*) ;;
+    #       *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
+    #     esac
 
     - name: Check out the code
       uses: actions/checkout@v4
@@ -141,7 +141,7 @@ jobs:
           DMG_VERSION=${PROMOTED_TAG//-/.}
         fi
         echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
-        echo "DMG_URL=${{ vars.DMG_URL_ROOT }}duckduckgo-${DMG_VERSION}.dmg" >> $GITHUB_ENV
+        echo "DMG_URL=${{ vars.TEST_DMG_URL_ROOT }}duckduckgo-${DMG_VERSION}.dmg" >> $GITHUB_ENV
         echo "RELEASE_URL=https://github.com/${{ github.repository }}/releases/tag/${TAG}" >> $GITHUB_ENV
         if [[ ${{ steps.create-tag.outputs.tag-created }} == "false" ]]; then
           last_release_tag=$(gh api /repos/${{ github.repository }}/releases/latest --jq '.tag_name')

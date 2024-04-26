@@ -40,9 +40,9 @@ on:
         required: true
       APPLE_API_KEY_ISSUER:
         required: true
-      AWS_ACCESS_KEY_ID:
+      TEST_AWS_ACCESS_KEY_ID:
         required: true
-      AWS_SECRET_ACCESS_KEY:
+      TEST_AWS_SECRET_ACCESS_KEY:
         required: true
       MATCH_PASSWORD:
         required: true
@@ -67,14 +67,14 @@ jobs:
 
     steps:
 
-    - name: Assert release branch
-      if: env.destination == 'appstore'
-      run: |
-        case "${branch}" in
-          release/*) ;;
-          hotfix/*) ;;
-          *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
-        esac
+    # - name: Assert release branch
+    #   if: env.destination == 'appstore'
+    #   run: |
+    #     case "${branch}" in
+    #       release/*) ;;
+    #       hotfix/*) ;;
+    #       *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
+    #     esac
 
     - name: Register SSH keys for submodules access
       uses: webfactory/ssh-agent@v0.7.0
@@ -130,10 +130,10 @@ jobs:
       id: upload-dsyms-to-s3
       if: ${{ env.upload-to == 's3' }}
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-        DSYM_S3_PATH: s3://${{ vars.DSYM_BUCKET_NAME }}/${{ vars.DSYM_BUCKET_PREFIX }}/DuckDuckGo-AppStore-${{ env.app-version }}-dSYM.zip
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        DSYM_S3_PATH: s3://${{ vars.TEST_DSYM_BUCKET_NAME }}/${{ vars.TEST_DSYM_BUCKET_PREFIX }}/DuckDuckGo-AppStore-${{ env.app-version }}-dSYM.zip
       run: |
         echo "dsym-s3-path=${DSYM_S3_PATH}" >> $GITHUB_OUTPUT
         aws s3 cp ${{ env.dsym-path }} ${{ env.DSYM_S3_PATH }}
