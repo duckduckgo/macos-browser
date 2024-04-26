@@ -252,7 +252,8 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     public func startManualScan(showWebView: Bool = false,
                                 startTime: Date,
                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
-        let startTime = Date()
+        pixelHandler.fire(.initialScanPreStartDuration(duration: (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)))
+        let backgroundAgentManualScanStartTime = Date()
         stopScheduler()
 
         userNotificationService.requestNotificationPermission()
@@ -288,7 +289,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 }
             }
 
-            fireManualScanCompletionPixel(startTime: startTime)
+            fireManualScanCompletionPixel(startTime: backgroundAgentManualScanStartTime)
             completion?(errors)
         }
     }

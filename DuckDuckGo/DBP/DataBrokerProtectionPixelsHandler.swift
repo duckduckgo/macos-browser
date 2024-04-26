@@ -102,7 +102,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .generateEmailHTTPErrorDaily,
                     .initialScanTotalDuration,
                     .initialScanSiteLoadDuration,
-                    .initialScanPostLoadingDuration:
+                    .initialScanPostLoadingDuration,
+                    .initialScanPreStartDuration:
                 PixelKit.fire(event)
 
             case .homeViewShowNoPermissionError,

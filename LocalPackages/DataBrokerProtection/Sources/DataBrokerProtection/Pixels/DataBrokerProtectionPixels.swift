@@ -179,6 +179,7 @@ public enum DataBrokerProtectionPixels {
     case initialScanTotalDuration(duration: Double, profileQueries: Int)
     case initialScanSiteLoadDuration(duration: Double, hasError: Bool, brokerURL: String)
     case initialScanPostLoadingDuration(duration: Double, hasError: Bool, brokerURL: String)
+    case initialScanPreStartDuration(duration: Double)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -295,6 +296,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .initialScanTotalDuration: return "m_mac_dbp_initial_scan_duration"
         case .initialScanSiteLoadDuration: return "m_mac_dbp_scan_broker_site_loaded"
         case .initialScanPostLoadingDuration: return "m_mac_dbp_initial_scan_broker_post_loading"
+        case .initialScanPreStartDuration: return "m_mac_dbp_initial_scan_pre_start_duration"
         }
     }
 
@@ -439,6 +441,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL]
         case .initialScanPostLoadingDuration(let duration, let hasError, let brokerURL):
             return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL]
+        case .initialScanPreStartDuration(let duration):
+            return [Consts.durationInMs: String(duration)]
         }
     }
 }
@@ -527,7 +531,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .webUILoadingSuccess,
                     .initialScanTotalDuration,
                     .initialScanSiteLoadDuration,
-                    .initialScanPostLoadingDuration:
+                    .initialScanPostLoadingDuration,
+                    .initialScanPreStartDuration:
 
                 PixelKit.fire(event)
 
