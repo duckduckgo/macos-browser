@@ -202,7 +202,7 @@ extension AutoconsentUserScript {
             return
         }
 
-        guard [.http, .https].contains(url.navigationalScheme) else {
+        guard url.navigationalScheme?.isHypertextScheme == true else {
             // ignore special schemes
             os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, messageData.url)
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection

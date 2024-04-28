@@ -127,6 +127,19 @@ extension TunnelControllerIPCService: IPCServerInterface {
         completion(nil)
     }
 
+    func fetchLastError(completion: @escaping (Error?) -> Void) {
+        Task {
+            guard #available(macOS 13.0, *),
+                  let connection = await tunnelController.connection else {
+
+                completion(nil)
+                return
+            }
+
+            connection.fetchLastDisconnectError(completionHandler: completion)
+        }
+    }
+
     func resetAll(uninstallSystemExtension: Bool) async {
         try? await networkExtensionController.deactivateSystemExtension()
     }

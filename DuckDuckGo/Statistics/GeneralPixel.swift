@@ -311,6 +311,10 @@ enum GeneralPixel: PixelKitEventV2 {
     // Tracks installation without tracking retention.
     case installationAttribution
 
+    case secureVaultKeystoreEventL1KeyMigration
+    case secureVaultKeystoreEventL2KeyMigration
+    case secureVaultKeystoreEventL2KeyPasswordMigration
+
     var name: String {
         switch self {
 
@@ -723,7 +727,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
         case .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders:
             return "bookmarks_migration_could_not_prepare_multiple_favorite_folders"
-
         case .syncSentUnauthenticatedRequest: return "sync_sent_unauthenticated_request"
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
         case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"
@@ -764,6 +767,10 @@ enum GeneralPixel: PixelKitEventV2 {
 
             // Installation Attribution
         case .installationAttribution: return "m_mac_install"
+
+        case .secureVaultKeystoreEventL1KeyMigration: return "m_mac_secure_vault_keystore_event_l1-key-migration"
+        case .secureVaultKeystoreEventL2KeyMigration: return "m_mac_secure_vault_keystore_event_l2-key-migration"
+        case .secureVaultKeystoreEventL2KeyPasswordMigration: return "m_mac_secure_vault_keystore_event_l2-key-password-migration"
         }
     }
 

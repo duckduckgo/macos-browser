@@ -27,7 +27,7 @@ final class MockAutofillActionBuilder: AutofillActionBuilder {
     var mockPresenter: MockAutofillActionPresenter?
 
     func buildExecutor() -> AutofillActionExecutor? {
-        guard let secureVault = try? MockSecureVaultFactory.makeVault(errorReporter: nil) else { return nil }
+        guard let secureVault = try? MockSecureVaultFactory.makeVault(reporter: nil) else { return nil }
         let syncService = MockDDGSyncing(authState: .inactive, scheduler: CapturingScheduler(), isSyncInProgress: false)
         let executor = MockAutofillActionExecutor(userAuthenticator: UserAuthenticatorMock(), secureVault: secureVault, syncService: syncService)
         self.mockExecutor = executor

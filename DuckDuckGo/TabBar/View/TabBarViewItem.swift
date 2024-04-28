@@ -33,6 +33,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCanBeDuplicated(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBePinned(_ tabBarViewItem: TabBarViewItem) -> Bool
     func tabBarViewItemCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
+    func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
@@ -41,6 +42,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
@@ -196,6 +198,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemBookmarkThisPageAction(self)
     }
 
+    @objc func bookmarkAllOpenTabsAction(_ sender: Any) {
+        delegate?.tabBarViewItemBookmarkAllOpenTabsAction(self)
+    }
+
     private var lastKnownIndexPath: IndexPath?
 
     @IBAction func closeButtonAction(_ sender: Any) {
@@ -253,7 +259,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         }.store(in: &cancellables)
 
         tabViewModel.tab.$content.sink { [weak self] content in
-            self?.currentURL = content.url
+            self?.currentURL = content.userEditableUrl
         }.store(in: &cancellables)
 
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
@@ -486,16 +492,19 @@ extension TabBarViewItem: NSMenuDelegate {
         // Section 1
         addDuplicateMenuItem(to: menu)
         addPinMenuItem(to: menu)
-        menu.addItem(NSMenuItem.separator())
+        addMuteUnmuteMenuItem(to: menu)
+        menu.addItem(.separator())
 
         // Section 2
-        addBookmarkMenuItem(to: menu)
         addFireproofMenuItem(to: menu)
-
-        addMuteUnmuteMenuItem(to: menu)
-        menu.addItem(NSMenuItem.separator())
+        addBookmarkMenuItem(to: menu)
+        menu.addItem(.separator())
 
         // Section 3
+        addBookmarkAllTabsMenuItem(to: menu)
+        menu.addItem(.separator())
+
+        // Section 4
         addCloseMenuItem(to: menu)
         addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
@@ -525,6 +534,13 @@ extension TabBarViewItem: NSMenuDelegate {
         menu.addItem(bookmarkMenuItem)
     }
 
+    private func addBookmarkAllTabsMenuItem(to menu: NSMenu) {
+        let bookmarkMenuItem = NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(bookmarkAllOpenTabsAction(_:)), keyEquivalent: "")
+        bookmarkMenuItem.target = self
+        bookmarkMenuItem.isEnabled = delegate?.tabBarViewAllItemsCanBeBookmarked(self) ?? false
+        menu.addItem(bookmarkMenuItem)
+    }
+
     private func addFireproofMenuItem(to menu: NSMenu) {
         var menuItem = NSMenuItem(title: UserText.fireproofSite, action: #selector(fireproofSiteAction(_:)), keyEquivalent: "")
         menuItem.isEnabled = false
@@ -542,7 +558,6 @@ extension TabBarViewItem: NSMenuDelegate {
     private func addMuteUnmuteMenuItem(to menu: NSMenu) {
         guard let audioState = delegate?.tabBarViewItemAudioState(self) else { return }
 
-        menu.addItem(NSMenuItem.separator())
         let menuItemTitle = audioState == .muted ? UserText.unmuteTab : UserText.muteTab
         let muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
         muteUnmuteMenuItem.target = self

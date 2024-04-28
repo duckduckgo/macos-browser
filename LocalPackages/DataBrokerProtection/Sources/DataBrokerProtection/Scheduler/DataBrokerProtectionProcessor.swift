@@ -24,13 +24,6 @@ protocol OperationRunnerProvider {
     func getOperationRunner() -> WebOperationRunner
 }
 
-private enum DataBrokerProtectionProcessorFunction {
-    case runAllScanOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    case runAllOptOutOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    case runQueuedOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    case runAllOperations(pendingCompletion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-}
-
 final class DataBrokerProtectionProcessor {
     private let database: DataBrokerProtectionRepository
     private let config: SchedulerConfig
@@ -41,8 +34,6 @@ final class DataBrokerProtectionProcessor {
     private let userNotificationService: DataBrokerProtectionUserNotificationService
     private let engagementPixels: DataBrokerProtectionEngagementPixels
     private let eventPixels: DataBrokerProtectionEventPixels
-
-    private var currentlyRunningOperationsForFunction: DataBrokerProtectionProcessorFunction?
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
@@ -64,10 +55,9 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runAllScanOperations(showWebView: Bool = false,
-                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
-        interruptCurrentlyRunningFunction()
-        currentlyRunningOperationsForFunction = .runAllScanOperations(pendingCompletion: completion)
+    func startManualScans(showWebView: Bool = false,
+                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+        operationQueue.cancelAllOperations()
         runOperations(operationType: .scan,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
@@ -84,8 +74,7 @@ final class DataBrokerProtectionProcessor {
 
     func runAllOptOutOperations(showWebView: Bool = false,
                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
-        interruptCurrentlyRunningFunction()
-        currentlyRunningOperationsForFunction = .runAllOptOutOperations(pendingCompletion: completion)
+        operationQueue.cancelAllOperations()
         runOperations(operationType: .optOut,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
@@ -96,8 +85,6 @@ final class DataBrokerProtectionProcessor {
 
     func runQueuedOperations(showWebView: Bool = false,
                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
-        interruptCurrentlyRunningFunction()
-        currentlyRunningOperationsForFunction = .runQueuedOperations(pendingCompletion: completion)
         runOperations(operationType: .all,
                       priorityDate: Date(),
                       showWebView: showWebView) { errors in
@@ -108,8 +95,6 @@ final class DataBrokerProtectionProcessor {
 
     func runAllOperations(showWebView: Bool = false,
                           completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
-        interruptCurrentlyRunningFunction()
-        currentlyRunningOperationsForFunction = .runAllOperations(pendingCompletion: completion)
         runOperations(operationType: .all,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
@@ -119,7 +104,7 @@ final class DataBrokerProtectionProcessor {
     }
 
     func stopAllOperations() {
-        interruptCurrentlyRunningFunction()
+        operationQueue.cancelAllOperations()
     }
 
     // MARK: - Private functions
@@ -129,7 +114,7 @@ final class DataBrokerProtectionProcessor {
                                completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
 
         // Before running new operations we check if there is any updates to the broker files.
-        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
+        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: nil) {
             let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
@@ -196,25 +181,6 @@ final class DataBrokerProtectionProcessor {
         }
 
         return collections
-    }
-
-    private func interruptCurrentlyRunningFunction() {
-        operationQueue.cancelAllOperations()
-
-        switch currentlyRunningOperationsForFunction {
-        case .runAllScanOperations(let pendingCompletion),
-                .runAllOptOutOperations(let pendingCompletion),
-                .runQueuedOperations(let pendingCompletion),
-                .runAllOperations(let pendingCompletion):
-
-            if let pendingCompletion = pendingCompletion {
-                // There's a current limitation that if interrupted, we won't propagate the scan errors
-                pendingCompletion(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: DataBrokerProtectionSchedulerError.operationsInterrupted))
-            }
-        case nil:
-            break
-        }
-        currentlyRunningOperationsForFunction = nil
     }
 
     deinit {
