@@ -123,14 +123,6 @@ jobs:
     needs: [assert-project-membership]
 
     steps:
-    - name: Check out the code
-      uses: actions/checkout@v4
-      with:
-        ref: alessandro/create-subtask-on-pr-requested
-        sparse-checkout: |
-          .github
-           scripts
-
     - name: Generate PR URL
       id: pr-url
       run: |
