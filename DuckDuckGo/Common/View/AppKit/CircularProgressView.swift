@@ -167,7 +167,9 @@ final class CircularProgressView: NSView {
             // if background animation is in progress but 1.0 was received before
             // the `progress = nil` update – complete the progress animation
             // before hiding
-            if progress == nil && oldValue == 1.0, animated {
+            if progress == nil && oldValue == 1.0, animated,
+               // shouldn‘t be already animating to 100%
+               progressLayer.strokeStart != 0.0 {
                 updateProgress(from: 0, to: 1, animated: animated) { _ in }
             }
             return
@@ -228,7 +230,7 @@ final class CircularProgressView: NSView {
             completion(false)
             return
         }
-        let currentStrokeStart = (progressLayer.presentation() ?? progressLayer).strokeStart
+        let currentStrokeStart = progressLayer.currentStrokeStart
         let newStrokeStart = 1.0 - (progress >= 0.0
                                     ? CGFloat(progress)
                                     : max(Constants.indeterminateProgressValue, min(0.9, 1.0 - currentStrokeStart)))
@@ -361,7 +363,7 @@ final class CircularProgressView: NSView {
             progressLayer.add(progressEndAnimation, forKey: #keyPath(CAShapeLayer.strokeEnd))
 
             let progressAnimation = CABasicAnimation(keyPath: #keyPath(CAShapeLayer.strokeStart))
-            let currentStrokeStart = (progressLayer.presentation() ?? progressLayer).strokeStart
+            let currentStrokeStart = progressLayer.currentStrokeStart
 
             progressLayer.removeAnimation(forKey: #keyPath(CAShapeLayer.strokeStart))
             progressLayer.strokeStart = 0.0
@@ -379,6 +381,14 @@ final class CircularProgressView: NSView {
 }
 
 private extension CAShapeLayer {
+
+    var currentStrokeStart: CGFloat {
+        if animation(forKey: #keyPath(CAShapeLayer.strokeStart)) != nil,
+           let presentation = self.presentation() {
+            return presentation.strokeStart
+        }
+        return strokeStart
+    }
 
     func configureCircle(radius: CGFloat, lineWidth: CGFloat) {
         self.bounds = CGRect(x: 0, y: 0, width: (radius + lineWidth) * 2, height: (radius + lineWidth) * 2)
@@ -573,6 +583,32 @@ struct CircularProgress: NSViewRepresentable {
                                 }
                                 Task {
                                     perform {
+                                        progress = 1
+                                    }
+                                    Task {
+                                        perform {
+                                            progress = nil
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        Text(verbatim: "nil->1->nil->1->nil").frame(width: 120)
+                    }
+
+                    Button {
+                        Task {
+                            progress = nil
+                            perform {
+                                progress = 1
+                            }
+                            Task {
+                                perform {
+                                    progress = nil
+                                }
+                                Task {
+                                    perform {
                                         progress = nil
                                     }
                                 }
@@ -643,7 +679,7 @@ struct CircularProgress: NSViewRepresentable {
                         .background(Color.white)
                     Spacer()
                 }
-            }.frame(width: 600, height: 470)
+            }.frame(width: 600, height: 500)
         }
     }
     return ProgressPreview()
