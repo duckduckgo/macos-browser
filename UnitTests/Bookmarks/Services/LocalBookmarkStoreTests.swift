@@ -325,21 +325,33 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let folderMO = BookmarkEntity.makeFolder(title: "Parent", parent: rootMO, context: context)
 
-        let bookmark1MO = BookmarkEntity.makeBookmark(title: "Example 1", url: "https://example1.com", parent: folderMO,
-                                                      context: context)
-        let bookmark2MO = BookmarkEntity.makeBookmark(title: "Example 2", url: "https://example2.com", parent: folderMO,
-                                                      context: context)
         let bookmarkStub1MO = BookmarkEntity.makeBookmark(title: "Stub 1", url: "", parent: folderMO,
                                                           context: context)
         bookmarkStub1MO.isStub = true
+
+        let bookmark1MO = BookmarkEntity.makeBookmark(title: "Example 1", url: "https://example1.com", parent: folderMO,
+                                                      context: context)
+
         let bookmarkStub2MO = BookmarkEntity.makeBookmark(title: "Stub 2", url: "", parent: folderMO,
                                                           context: context)
         bookmarkStub2MO.isStub = true
-        let bookmark3MO = BookmarkEntity.makeBookmark(title: "Example 3", url: "https://example3.com", parent: folderMO,
+
+        let bookmark2MO = BookmarkEntity.makeBookmark(title: "Example 2", url: "https://example2.com", parent: folderMO,
                                                       context: context)
+
         let bookmarkStub3MO = BookmarkEntity.makeBookmark(title: "Stub 3", url: "", parent: folderMO,
                                                           context: context)
         bookmarkStub3MO.isStub = true
+        let bookmarkStub4MO = BookmarkEntity.makeBookmark(title: "Stub 4", url: "", parent: folderMO,
+                                                          context: context)
+        bookmarkStub4MO.isStub = true
+
+        let bookmark3MO = BookmarkEntity.makeBookmark(title: "Example 3", url: "https://example3.com", parent: folderMO,
+                                                      context: context)
+
+        let bookmarkStub5MO = BookmarkEntity.makeBookmark(title: "Stub 5", url: "", parent: folderMO,
+                                                          context: context)
+        bookmarkStub5MO.isStub = true
 
         // Save the initial bookmarks state:
 
@@ -365,8 +377,8 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let initialFetchedBookmarkUUIDs = initialParentFolder.children.map(\.id)
         XCTAssertEqual(initialBookmarkUUIDs, initialFetchedBookmarkUUIDs)
 
-        func testMoving(bookmarkUUID: String, toIndex: Int) async -> [String] {
-            let moveBookmarksError = await bookmarkStore.move(objectUUIDs: [bookmarkUUID], toIndex: toIndex, withinParentFolder: .parent(uuid: folderMO.uuid!))
+        func testMoving(bookmarkUUIDs: [String], toIndex: Int) async -> [String] {
+            let moveBookmarksError = await bookmarkStore.move(objectUUIDs: bookmarkUUIDs, toIndex: toIndex, withinParentFolder: .parent(uuid: folderMO.uuid!))
             XCTAssertNil(moveBookmarksError)
 
             guard case let .success(updatedTopLevelEntities) = await bookmarkStore.loadAll(type: .topLevelEntities),
@@ -379,20 +391,29 @@ final class LocalBookmarkStoreTests: XCTestCase {
         }
 
         // Update the order of the bookmarks:
+        // More than one bookmark
+        // To the end
+        var result = await testMoving(bookmarkUUIDs: [bookmark1MO.uuid!, bookmark2MO.uuid!], toIndex: 3)
+        XCTAssertEqual(result, [bookmark3MO.title, bookmark1MO.title, bookmark2MO.title])
+        // To the beginning
+        result = await testMoving(bookmarkUUIDs: [bookmark1MO.uuid!, bookmark2MO.uuid!], toIndex: 0)
+        XCTAssertEqual(result, [bookmark1MO.title, bookmark2MO.title, bookmark3MO.title])
+
+        // Single bookmark
         // Middle to end
-        var result = await testMoving(bookmarkUUID: bookmark2MO.uuid!, toIndex: 3)
+        result = await testMoving(bookmarkUUIDs: [bookmark2MO.uuid!], toIndex: 3)
         XCTAssertEqual(result, [bookmark1MO.title, bookmark3MO.title, bookmark2MO.title])
         // First to Beginning
-        result = await testMoving(bookmarkUUID: bookmark1MO.uuid!, toIndex: 0)
+        result = await testMoving(bookmarkUUIDs: [bookmark1MO.uuid!], toIndex: 0)
         XCTAssertEqual(result, [bookmark1MO.title, bookmark3MO.title, bookmark2MO.title])
         // First to First
-        result = await testMoving(bookmarkUUID: bookmark1MO.uuid!, toIndex: 1)
+        result = await testMoving(bookmarkUUIDs: [bookmark1MO.uuid!], toIndex: 1)
         XCTAssertEqual(result, [bookmark1MO.title, bookmark3MO.title, bookmark2MO.title])
         // First to Second
-        result = await testMoving(bookmarkUUID: bookmark1MO.uuid!, toIndex: 2)
+        result = await testMoving(bookmarkUUIDs: [bookmark1MO.uuid!], toIndex: 2)
         XCTAssertEqual(result, [bookmark3MO.title, bookmark1MO.title, bookmark2MO.title])
         // First to End
-        result = await testMoving(bookmarkUUID: bookmark3MO.uuid!, toIndex: 3)
+        result = await testMoving(bookmarkUUIDs: [bookmark3MO.uuid!], toIndex: 3)
         XCTAssertEqual(result, [bookmark1MO.title, bookmark2MO.title, bookmark3MO.title])
     }
 
