@@ -196,8 +196,7 @@ final class CircularProgressView: NSView {
         backgroundLayer.strokeEnd = 1.0
         progressLayer.strokeStart = 1.0
         progressLayer.strokeEnd = 1.0
-        progressLayer.presentation()?.strokeStart = 1.0
-        progressLayer.presentation()?.strokeEnd = 1.0
+
         guard animated else {
             backgroundLayer.strokeStart = 0.0
             completion()
