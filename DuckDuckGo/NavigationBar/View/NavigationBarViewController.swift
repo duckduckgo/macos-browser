@@ -579,7 +579,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         let heightChange: () -> Void
-        if animated && view.window != nil {
+        if animated, let window = view.window, window.isVisible == true {
             heightChange = {
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.1
@@ -601,13 +601,13 @@ final class NavigationBarViewController: NSViewController {
                 performResize()
             }
         }
-        if view.window == nil {
-            // update synchronously for off-screen view
-            heightChange()
-        } else {
+        if let window = view.window, window.isVisible {
             let dispatchItem = DispatchWorkItem(block: heightChange)
             DispatchQueue.main.async(execute: dispatchItem)
             self.heightChangeAnimation = dispatchItem
+        } else {
+            // update synchronously for off-screen view
+            heightChange()
         }
     }
 
@@ -642,13 +642,19 @@ final class NavigationBarViewController: NSViewController {
 
         downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
             .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
-            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .map { (total, completed) -> Double? in
                 guard total > 0, completed < total else { return nil }
                 return Double(completed) / Double(total)
             }
+            .dropFirst()
+            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak downloadsProgressView] progress in
-                downloadsProgressView?.setProgress(progress, animated: true)
+                guard let downloadsProgressView else { return }
+                if progress == nil, downloadsProgressView.progress != 1 {
+                    // show download completed animation before hiding
+                    downloadsProgressView.setProgress(1, animated: true)
+                }
+                downloadsProgressView.setProgress(progress, animated: true)
             }
             .store(in: &downloadsCancellables)
     }
