@@ -74,6 +74,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let internalUserDecider: InternalUserDecider
     let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
+    private var autoClearHandler: AutoClearHandler!
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
@@ -315,6 +316,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
 #endif
+
+        setUpAutoClearHandler()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -351,6 +354,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DownloadListCoordinator.shared.sync()
         }
         stateRestorationManager?.applicationWillTerminate()
+
+        // Handling of "Burn on quit"
+        if let terminationReply = autoClearHandler.handleAppTermination() {
+            return terminationReply
+        }
 
         return .terminateNow
     }
@@ -550,6 +558,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             PixelKit.fire(GeneralPixel.importDataInitial, frequency: .legacyInitial)
         }
     }
+
+    private func setUpAutoClearHandler() {
+        autoClearHandler = AutoClearHandler(preferences: .shared,
+                                            fireViewModel: FireCoordinator.fireViewModel,
+                                            stateRestorationManager: stateRestorationManager)
+        autoClearHandler.handleAppLaunch()
+        autoClearHandler.onAutoClearCompleted = {
+            NSApplication.shared.reply(toApplicationShouldTerminate: true)
+        }
+    }
+
 }
 
 func updateSubscriptionStatus() {

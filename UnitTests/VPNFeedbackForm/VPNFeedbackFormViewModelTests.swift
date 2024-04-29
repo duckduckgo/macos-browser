@@ -103,7 +103,8 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
         let vpnState = VPNMetadata.VPNState(
             onboardingState: "onboarded",
             connectionState: "connected",
-            lastErrorMessage: "none",
+            lastStartErrorDescription: "none",
+            lastTunnelErrorDescription: "none",
             connectedServer: "Paoli, PA",
             connectedServerIP: "123.123.123.123"
         )
