@@ -33,12 +33,6 @@ public protocol DataBrokerProtectionDataManaging {
     func profileQueriesCount() throws -> Int
 }
 
-extension DataBrokerProtectionDataManaging {
-    public func fetchProfile() throws -> DataBrokerProtectionProfile? {
-        try fetchProfile()
-    }
-}
-
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
     func dataBrokerProtectionDataManagerDidUpdateData()
     func dataBrokerProtectionDataManagerDidDeleteData()
