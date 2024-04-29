@@ -1041,7 +1041,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url else {
+              let url = tabViewModel.tab.content.userEditableUrl else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }

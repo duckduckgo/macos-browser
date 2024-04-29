@@ -29,6 +29,27 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
         }
     }
 
+    @Published
+    var isAutoClearEnabled: Bool {
+        didSet {
+            persistor.autoClearEnabled = isAutoClearEnabled
+            NotificationCenter.default.post(name: .autoClearDidChange,
+                                            object: nil,
+                                            userInfo: nil)
+        }
+    }
+
+    @Published
+    var isWarnBeforeClearingEnabled: Bool {
+        didSet {
+            persistor.warnBeforeClearingEnabled = isWarnBeforeClearingEnabled
+        }
+    }
+
+    @objc func toggleWarnBeforeClearing() {
+        isWarnBeforeClearingEnabled.toggle()
+    }
+
     @MainActor
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
@@ -46,6 +67,8 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
     init(persistor: FireButtonPreferencesPersistor = FireButtonPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         isLoginDetectionEnabled = persistor.loginDetectionEnabled
+        isAutoClearEnabled = persistor.autoClearEnabled
+        isWarnBeforeClearingEnabled = persistor.warnBeforeClearingEnabled
     }
 
     private var persistor: FireButtonPreferencesPersistor
@@ -53,6 +76,8 @@ final class DataClearingPreferences: ObservableObject, PreferencesTabOpening {
 
 protocol FireButtonPreferencesPersistor {
     var loginDetectionEnabled: Bool { get set }
+    var autoClearEnabled: Bool { get set }
+    var warnBeforeClearingEnabled: Bool { get set }
 }
 
 struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersistor {
@@ -60,4 +85,14 @@ struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersisto
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: false)
     var loginDetectionEnabled: Bool
 
+    @UserDefaultsWrapper(key: .autoClearEnabled, defaultValue: false)
+    var autoClearEnabled: Bool
+
+    @UserDefaultsWrapper(key: .warnBeforeClearingEnabled, defaultValue: false)
+    var warnBeforeClearingEnabled: Bool
+
+}
+
+extension Notification.Name {
+    static let autoClearDidChange = Notification.Name("autoClearDidChange")
 }

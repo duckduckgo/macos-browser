@@ -172,6 +172,7 @@ jobs:
     uses: ./.github/workflows/tag_release.yml
     with:
       asana-task-url: ${{ needs.create_release_branch.outputs.asana_task_url }}
+      base-branch: ${{ github.ref_name }}
       branch: ${{ needs.create_release_branch.outputs.release_branch_name }}
       prerelease: true
     secrets:

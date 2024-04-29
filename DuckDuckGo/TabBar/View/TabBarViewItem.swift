@@ -259,7 +259,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         }.store(in: &cancellables)
 
         tabViewModel.tab.$content.sink { [weak self] content in
-            self?.currentURL = content.url
+            self?.currentURL = content.userEditableUrl
         }.store(in: &cancellables)
 
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)

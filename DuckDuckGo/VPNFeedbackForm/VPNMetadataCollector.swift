@@ -50,7 +50,8 @@ struct VPNMetadata: Encodable {
     struct VPNState: Encodable {
         let onboardingState: String
         let connectionState: String
-        let lastErrorMessage: String
+        let lastStartErrorDescription: String
+        let lastTunnelErrorDescription: String
         let connectedServer: String
         let connectedServerIP: String
     }
@@ -118,10 +119,15 @@ protocol VPNMetadataCollector {
 final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     private let statusReporter: NetworkProtectionStatusReporter
+    private let ipcClient: TunnelControllerIPCClient
+    private let defaults: UserDefaults
 
-    init() {
+    init(defaults: UserDefaults = .netP) {
         let ipcClient = TunnelControllerIPCClient()
         ipcClient.register()
+
+        self.ipcClient = ipcClient
+        self.defaults = defaults
 
         self.statusReporter = DefaultNetworkProtectionStatusReporter(
             statusObserver: ipcClient.connectionStatusObserver,
@@ -162,7 +168,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     private func collectAppInfoMetadata() -> VPNMetadata.AppInfo {
         let appVersion = AppVersion.shared.versionAndBuildNumber
-        let versionStore = NetworkProtectionLastVersionRunStore(userDefaults: .netP)
+        let versionStore = NetworkProtectionLastVersionRunStore(userDefaults: defaults)
         let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
         let isInApplicationsDirectory = Bundle.main.isInApplicationsDirectory
 
@@ -231,7 +237,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     func collectVPNState() async -> VPNMetadata.VPNState {
         let onboardingState: String
 
-        switch UserDefaults.netP.networkProtectionOnboardingStatus {
+        switch defaults.networkProtectionOnboardingStatus {
         case .completed:
             onboardingState = "complete"
         case .isOnboarding(let step):
@@ -243,13 +249,16 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             }
         }
 
+        let errorHistory = VPNOperationErrorHistory(ipcClient: ipcClient, defaults: defaults)
+
         let connectionState = String(describing: statusReporter.statusObserver.recentValue)
-        let lastErrorMessage = statusReporter.connectionErrorObserver.recentValue ?? "none"
+        let lastTunnelErrorDescription = await errorHistory.lastTunnelErrorDescription
         let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation ?? "none"
         let connectedServerIP = statusReporter.serverInfoObserver.recentValue.serverAddress ?? "none"
         return .init(onboardingState: onboardingState,
                      connectionState: connectionState,
-                     lastErrorMessage: lastErrorMessage,
+                     lastStartErrorDescription: errorHistory.lastStartErrorDescription,
+                     lastTunnelErrorDescription: lastTunnelErrorDescription,
                      connectedServer: connectedServer,
                      connectedServerIP: connectedServerIP)
     }
@@ -278,7 +287,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     func collectVPNSettingsState() -> VPNMetadata.VPNSettingsState {
-        let settings = VPNSettings(defaults: .netP)
+        let settings = VPNSettings(defaults: defaults)
 
         return .init(
             connectOnLoginEnabled: settings.connectOnLogin,

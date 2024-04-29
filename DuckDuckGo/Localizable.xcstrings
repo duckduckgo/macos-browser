@@ -482,10 +482,56 @@
       }
     },
     "1." : {
-
-    },
-    "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        }
+      }
     },
     "about.app_name" : {
       "comment" : "Application name to be displayed in the About dialog",
@@ -2363,6 +2409,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Имя пользователя"
+          }
+        }
+      }
+    },
+    "auto.clear" : {
+      "comment" : "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Auto-Clear"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrado automático"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacement automatique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancellazione automatica"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch wissen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatyczne czyszczenie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpeza automática"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоочистка"
           }
         }
       }
@@ -5607,6 +5713,66 @@
         }
       }
     },
+    "automatically.clear.data" : {
+      "comment" : "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs und Browserdaten automatisch löschen, wenn DuckDuckGo beendet wird"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically clear tabs and browsing data when DuckDuckGo quits"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borra automáticamente las pestañas y los datos de navegación cuando se cierra DuckDuckGo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer automatiquement les onglets et les données de navigation lorsque DuckDuckGo se ferme"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancella automaticamente schede e dati di navigazione quando chiudi DuckDuckGo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabbladen en browsegegevens automatisch wissen wanneer DuckDuckGo stopt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatycznie czyść karty i dane przeglądania przy wychodzeniu z DuckDuckGo"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpar automaticamente os separadores e os dados de navegação quando o DuckDuckGo fecha"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически закрывает вкладки и стирает данные о посещении сайтов при завершении работы DuckDuckGo."
+          }
+        }
+      }
+    },
     "Birthday" : {
       "comment" : "Title of the section of the Identities manager where the user can add/modify a date of birth",
       "localizations" : {
@@ -6263,10 +6429,58 @@
       "comment" : "Message that warns user that specific Bitwarden app vesions are not compatible with this app",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die folgenden Bitwarden-Versionen sind mit DuckDuckGo inkompatibel: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Bitte kehre zu einer älteren Version zurück, indem du die folgenden Schritte ausführst:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please revert to an older version by following these steps:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las siguientes versiones de Bitwarden son incompatibles con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Vuelve a una versión anterior siguiendo estos pasos:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les versions suivantes de Bitwarden sont incompatibles avec DuckDuckGo : v2024.3.0, v2024.3.2, v2024.4.0 et v2024.4.1. Veuillez revenir à une version antérieure en procédant comme suit :"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le seguenti versioni di Bitwarden non sono compatibili con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. È necessario tornare a una versione precedente seguendo questi passaggi:"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De volgende versies van Bitwarden zijn niet compatibel met DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Volg deze stappen om terug te gaan naar een oudere versie:"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Następujące wersje Bitwarden są niezgodne z DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Przywróć starszą wersję, wykonując następujące czynności:"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As seguintes versões do Bitwarden são incompatíveis com o DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0 e v2024.4.1. Reverte para uma versão mais antiga seguindo estes passos:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "С DuckDuckGo несовместимы следующие версии Bitwarden: 2024.3.0, 2024.3.2, 2024.4.0, 2024.4.1. Вернитесь к более старой версии, выполнив следующие действия:"
           }
         }
       }
@@ -6275,10 +6489,58 @@
       "comment" : "First step to downgrade Bitwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V2014.2.1 herunterladen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Download v2014.2.1"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar v2014.2.1"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Télécharger v2014.2.1"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scarica la versione v2014.2.1"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download v2014.2.1"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pobierz v2014.2.1"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfere a versão v2014.2.1"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скачайте версию 2014.2.1"
           }
         }
       }
@@ -6287,10 +6549,58 @@
       "comment" : "Second step to downgrade Bitwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Öffne die heruntergeladene DMG-Datei und ziehe die Bitwarden-Anwendung auf den Ordner „/Applications“."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Abre el archivo DMG descargado y arrastra la aplicación Bitwarden a\nla carpeta /Applications."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Ouvrez le fichier DMG téléchargé et faites glisser l'application Bitwarden vers\nle dossier /Applications."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Apri il file DMG scaricato e trascina l'applicazione Bitwarden nella\n/cartella Applications."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Open het gedownloade DMG-bestand en sleep de Bitwarden-app naar\n de map /Applications."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Otwórz pobrany plik DMG i przeciągnij aplikację Bitwarden do\nfolderu /Applications."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Abre o ficheiro DMG transferido e arrasta a aplicação Bitwarden para\na pasta /Applications."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Откройте загруженный файл DMG и перетащите приложение Bitwarden в стандартную папку «Программы»."
           }
         }
       }
@@ -11099,6 +11409,66 @@
         }
       }
     },
+    "clear.and.quit" : {
+      "comment" : "Button to clear data and quit the application",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen und Beenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear and Quit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar y salir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer et quitter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancella ed esci"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wissen en stoppen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyczyść i wyjdź"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpar e sair"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить и выйти"
+          }
+        }
+      }
+    },
     "close.other.tabs" : {
       "comment" : "Menu item",
       "extractionState" : "extracted_with_value",
@@ -13219,6 +13589,66 @@
         }
       }
     },
+    "disable.auto.clear.to.enable.session.restore" : {
+      "comment" : "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit. Auto-Clear should match the string with 'auto.clear' key",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deaktiviere das automatische Löschen beim Beenden, um die Sitzungswiederherstellung einzuschalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Disable auto-clear on quit to turn on session restore."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactiva el borrado automático al salir para activar Restaurar sesión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivez l'effacement automatique à la fermeture pour activer la restauration de session."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabilita la cancellazione automatica all'uscita per attivare il ripristino della sessione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schakel automatisch wissen uit wanneer u stopt om het herstellen van de sessie in te schakelen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyłącz automatyczne czyszczenie przy wychodzeniu, aby włączyć przywracanie sesji."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desativa a limpeza automática ao sair para ativar a restauração da sessão."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы активировать восстановление сеанса, отключите автоочистку данных при выходе."
+          }
+        }
+      }
+    },
     "disable.email.protection.mesage" : {
       "comment" : "Message for alert shown when user disables email protection",
       "extractionState" : "extracted_with_value",
@@ -13690,9 +14120,6 @@
           }
         }
       }
-    },
-    "Download v2014.2.1" : {
-
     },
     "download.finishing" : {
       "comment" : "Download being finished information text",
@@ -20420,7 +20847,7 @@
     },
     "Hide" : {
       "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -24791,7 +25218,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Если у вас есть закладки в %@, попробуйте импортировать их вручную."
+            "value" : "Если у вас есть %@-файл с закладками, попробуйте импортировать его вручную."
           }
         }
       }
@@ -24851,7 +25278,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Если у вас есть пароли в %@, попробуйте импортировать их вручную."
+            "value" : "Если у вас есть %@-файл с паролями, попробуйте импортировать его вручную."
           }
         }
       }
@@ -30734,7 +31161,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Teile deine Gedanken"
+            "value" : "Sign Up To Participate"
           }
         },
         "en" : {
@@ -30794,7 +31221,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nimm an unserer kurzen Umfrage teil und hilf uns, den besten Browser zu entwickeln."
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "en" : {
@@ -30854,7 +31281,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sag uns, was dich hierher gebracht hat"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "en" : {
@@ -31094,7 +31521,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hilf uns, uns zu verbessern"
+            "value" : "Sign Up To Participate"
           }
         },
         "en" : {
@@ -31226,43 +31653,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ayúdanos a mejorar"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aidez-nous à nous améliorer"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aiutaci a migliorare"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Help ons om te verbeteren"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pomóż nam we wprowadzaniu ulepszeń"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajuda-nos a melhorar"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Помогите нам стать лучше"
+            "value" : "Share Your Thoughts With Us"
           }
         }
       }
@@ -46228,6 +46655,66 @@
         }
       }
     },
+    "quit.without.clearing" : {
+      "comment" : "Button to quit the application without clearing data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beenden ohne Löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quit Without Clearing"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir sin borrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter sans effacer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esci senza cancellare"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stoppen zonder wissen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyjdź bez czyszczenia"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sair sem limpar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выйти без очистки"
+          }
+        }
+      }
+    },
     "Recently Closed" : {
       "comment" : "Main Menu History item",
       "localizations" : {
@@ -48373,7 +48860,7 @@
     },
     "Show left of the back button" : {
       "comment" : "Preferences > Home Button > left position item",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48427,7 +48914,7 @@
     },
     "Show Left of the Back Button" : {
       "comment" : "Main Menu > View > Home Button > left position item",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48693,7 +49180,7 @@
     },
     "Show right of the reload button" : {
       "comment" : "Preferences > Home Button > right position item",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48747,7 +49234,7 @@
     },
     "Show Right of the Reload Button" : {
       "comment" : "Main Menu > View > Home Button > right position item",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48848,6 +49335,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показывать функции работы с текстом"
+          }
+        }
+      }
+    },
+    "show.data.clearing.settings" : {
+      "comment" : "Button in Settings. It navigates user to Data Clearing Settings. The Data Clearing string should match the string with the preferences.data-clearing key",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen zum Löschen von Daten öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Data Clearing Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir configuración de borrado de datos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres d'effacement des données"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri Impostazioni cancellazione dati"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instellingen voor het wissen van open gegevens"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ustawienia czyszczenia danych"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Definições de limpeza de dados"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть настройки очистки данных"
           }
         }
       }
@@ -52938,6 +53485,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вид"
+          }
+        }
+      }
+    },
+    "warn.before.quit" : {
+      "comment" : "Label after the checkbox in Settings which configures a warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warne mich, dass Tabs und Daten beim Beenden gelöscht werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warn me that tabs and data will be cleared when quitting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertirme de que las pestañas y los datos se borrarán al salir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "M'avertir que les onglets et les données seront effacés à la fermeture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvisa prima di cancellare schede e dati all'uscita"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waarschuwen dat tabbladen en gegevens worden gewist bij het afsluiten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzegaj, że karty i dane zostaną wyczyszczone przy wychodzeniu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avisar-me que os separadores e os dados serão limpos ao sair"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать предупреждение о сбросе вкладок и данных при выходе"
+          }
+        }
+      }
+    },
+    "warn.before.quit.dialog.checkbox.message" : {
+      "comment" : "A label after checkbox to configure the warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes Mal warnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warn me every time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertirme cada vez"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toujours me prévenir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvisa ogni volta"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elke keer waarschuwen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzegaj za każdym razem"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avisar-me sempre"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предупреждать каждый раз"
+          }
+        }
+      }
+    },
+    "warn.before.quit.dialog.header" : {
+      "comment" : "A header of warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs und Browserdaten löschen und DuckDuckGo beenden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear tabs and browsing data and quit DuckDuckGo?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Borrar pestañas y datos de navegación y salir de DuckDuckGo?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer les onglets et les données de navigation et quitter DuckDuckGo ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancellare le schede e i dati di navigazione e uscire da DuckDuckGo?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabbladen en browsergegevens wissen en DuckDuckGo afsluiten?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyczyścić karty i dane przeglądania i wyjść z DuckDuckGo?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpar separadores e dados de navegação e sair do DuckDuckGo?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить вкладки и данные и выйти из DuckDuckGo?"
           }
         }
       }
