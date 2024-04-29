@@ -1,14 +1,14 @@
 name: Create Asana PR subtask
 description: |
-  Creates a PR subtask and assign it to the team member in charge of the GitHub review.
-  If the PR subtask already exist, it ensure the reviewer is assigned and the task is not mark 'completed'.
+  Creates a PR subtask and assigns it to the team member in charge of the GitHub review.
+  If the PR subtask already exists, it ensures the reviewer is assigned and the task is not marked 'completed'.
 inputs:
   access-token:
     description: "Asana access token"
     required: true
     type: string
   asana-task-id:
-    description: "Asana Task Id for the PR"
+    description: "Asana Task ID for the PR"
     required: string
     type: string
   github-reviewer-user:
@@ -22,18 +22,16 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: "Map GitHub to Asana Assignee"
-        id: map-github-to-asana-user
-        uses: ./.github/actions/map-github-user-to-asana-user-id
+      - name: Get Asana user ID
+        id: get-asana-user-id
+        uses: duckduckgo/apple-infra/actions/asana-get-user-id-for-github-handle@main
         with:
-          github-user: ${{ inputs.github-reviewer-user }}
+          access-token: ${{ inputs.access-token }}
+          github-handle: ${{ inputs.github-reviewer-user }}
         
       - name: "Create PR Subtask"
         shell: bash
         env:
           ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-          ASANA_TASK_ID: ${{ inputs.asana-task-id }}
-          ASANA_ASSIGNEE_ID: ${{ steps.map-github-to-asana-user.outputs.asana-user-id }}
-          GITHUB_PR_URL: ${{ inputs.github-pr-url }}
         run: |
-          ${{ github.action_path }}/asana-create-pr-subtask.sh
+          ${{ github.action_path }}/asana-create-pr-subtask.sh ${{ inputs.asana-task-id }} ${{ steps.get-asana-user-id.outputs.user-id }} ${{ inputs.github-pr-url }}
