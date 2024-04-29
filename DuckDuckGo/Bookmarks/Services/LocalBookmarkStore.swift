@@ -605,6 +605,7 @@ final class LocalBookmarkStore: BookmarkStore {
                currentInsertionIndex > objectIndex {
                 adjustedInsertionIndex -= 1
             }
+            let nextInsertionIndex = adjustedInsertionIndex + 1
 
             bookmarkManagedObject.parent = nil
 
@@ -630,7 +631,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 newParentFolder.addToChildren(bookmarkManagedObject)
             }
 
-            currentInsertionIndex = adjustedInsertionIndex + 1
+            currentInsertionIndex = nextInsertionIndex
         }
     }
 
@@ -667,6 +668,7 @@ final class LocalBookmarkStore: BookmarkStore {
                        currentInsertionIndex > currentIndex {
                         adjustedInsertionIndex -= 1
                     }
+                    let nextInsertionIndex = adjustedInsertionIndex + 1
 
                     bookmarkManagedObject.removeFromFavorites(with: favoritesDisplayMode)
 
@@ -694,7 +696,7 @@ final class LocalBookmarkStore: BookmarkStore {
                         bookmarkManagedObject.addToFavorites(folders: favoritesFolders)
                     }
 
-                    currentInsertionIndex = adjustedInsertionIndex + 1
+                    currentInsertionIndex = nextInsertionIndex
                 }
             } else {
                 for bookmarkManagedObject in bookmarkManagedObjects {
