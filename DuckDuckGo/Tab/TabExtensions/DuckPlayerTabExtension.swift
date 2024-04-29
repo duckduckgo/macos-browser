@@ -289,6 +289,9 @@ extension DuckPlayerTabExtension: NavigationResponder {
            let mainFrame = navigationAction.mainFrameTarget {
 
             switch navigationAction.navigationType {
+            case .backForward:
+                // disable redirecting from YT when going back/forward
+                return .next
             case .custom, .redirect(.server):
                 PixelKit.fire(GeneralPixel.duckPlayerViewFromOther)
             case .other:
