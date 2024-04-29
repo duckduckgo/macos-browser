@@ -99,7 +99,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .webUILoadingStarted,
                     .webUILoadingSuccess,
                     .emptyAccessTokenDaily,
-                    .generateEmailHTTPErrorDaily:
+                    .generateEmailHTTPErrorDaily,
+                    .initialScanTotalDuration,
+                    .initialScanSiteLoadDuration,
+                    .initialScanPostLoadingDuration,
+                    .initialScanPreStartDuration:
                 PixelKit.fire(event)
 
             case .homeViewShowNoPermissionError,

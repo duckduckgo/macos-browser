@@ -33,6 +33,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var captchaService: CaptchaServiceProtocol { get }
     var cookieHandler: CookieHandler { get }
     var stageCalculator: StageDurationCalculator { get }
+    var pixelHandler: EventMapping<DataBrokerProtectionPixels> { get }
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
@@ -41,6 +42,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var shouldRunNextStep: () -> Bool { get }
     var retriesCountOnError: Int { get set }
     var clickAwaitTime: TimeInterval { get }
+    var postLoadingSiteStartTime: Date? { get set }
 
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
@@ -151,11 +153,13 @@ extension DataBrokerOperation {
     }
 
     func complete(_ value: ReturnValue) {
+        self.firePostLoadingDurationPixel(hasError: false)
         self.continuation?.resume(returning: value)
         self.continuation = nil
     }
 
     func failed(with error: Error) {
+        self.firePostLoadingDurationPixel(hasError: true)
         self.continuation?.resume(throwing: error)
         self.continuation = nil
     }
@@ -175,6 +179,8 @@ extension DataBrokerOperation {
     // MARK: - CSSCommunicationDelegate
 
     func loadURL(url: URL) async {
+        let webSiteStartLoadingTime = Date()
+
         do {
             // https://app.asana.com/0/1204167627774280/1206912494469284/f
             if query.dataBroker.url == "spokeo.com" {
@@ -183,9 +189,28 @@ extension DataBrokerOperation {
                 }
             }
             try await webViewHandler?.load(url: url)
+            fireSiteLoadingPixel(startTime: webSiteStartLoadingTime, hasError: false)
+            postLoadingSiteStartTime = Date()
             await executeNextStep()
         } catch {
+            fireSiteLoadingPixel(startTime: webSiteStartLoadingTime, hasError: true)
             await onError(error: error)
+        }
+    }
+
+    private func fireSiteLoadingPixel(startTime: Date, hasError: Bool) {
+        if stageCalculator.isManualScan {
+            let dataBrokerURL = self.query.dataBroker.url
+            let durationInMs = (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)
+            pixelHandler.fire(.initialScanSiteLoadDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))
+        }
+    }
+
+    func firePostLoadingDurationPixel(hasError: Bool) {
+        if stageCalculator.isManualScan, let postLoadingSiteStartTime = self.postLoadingSiteStartTime {
+            let dataBrokerURL = self.query.dataBroker.url
+            let durationInMs = (Date().timeIntervalSince(postLoadingSiteStartTime) * 1000).rounded(.towardZero)
+            pixelHandler.fire(.initialScanPostLoadingDuration(duration: durationInMs, hasError: hasError, brokerURL: dataBrokerURL))
         }
     }
 
