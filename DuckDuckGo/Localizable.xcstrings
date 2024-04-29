@@ -11409,18 +11409,6 @@
         }
       }
     },
-    "close.all.other.tabs" : {
-      "comment" : "Menu item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Close All Other Tabs"
-          }
-        }
-      }
-    },
     "clear.and.quit" : {
       "comment" : "Button to clear data and quit the application",
       "extractionState" : "extracted_with_value",
@@ -11477,6 +11465,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Очистить и выйти"
+          }
+        }
+      }
+    },
+    "close.all.other.tabs" : {
+      "comment" : "Menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close All Other Tabs"
           }
         }
       }
@@ -43719,7 +43719,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Prefer new tabs instead of new windows when opening links"
+            "value" : "Open links in new tabs instead of new windows whenever possible"
           }
         }
       }

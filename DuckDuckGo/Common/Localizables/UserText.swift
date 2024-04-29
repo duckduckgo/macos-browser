@@ -609,7 +609,7 @@ struct UserText {
     static let addressLabel = NSLocalizedString("preferences-homepage-address", value: "Address:", comment: "Homepage address field label")
 
     static let tabs = NSLocalizedString("preferences-tabs.title", value: "Tabs", comment: "Title for tabs section in settings")
-    static let preferNewTabsToWindows = NSLocalizedString("preferences-tabs.prefer.new.tabs.to.windows", value: "Prefer new tabs instead of new windows when opening links", comment: "Option to prefer opening new tabs instead of windows when opening links")
+    static let preferNewTabsToWindows = NSLocalizedString("preferences-tabs.prefer.new.tabs.to.windows", value: "Open links in new tabs instead of new windows whenever possible", comment: "Option to prefer opening new tabs instead of windows when opening links")
     static let switchToNewTabWhenOpened = NSLocalizedString("preferences-tabs.switch.tab.when.opened", value: "Always switch to a new tab when opened", comment: "Option to switch to a new tab when it is opened")
     static let newTabPositionTitle = NSLocalizedString("preferences-tabs.new.tab.position.title", value: "Open new tabs", comment: "Title for new tab positioning")
 
