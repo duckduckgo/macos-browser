@@ -296,7 +296,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     private func fireManualScanCompletionPixel(startTime: Date) {
         do {
-            let profileQueries = try dataManager.profileQueries()
+            let profileQueries = try dataManager.profileQueriesCount()
             let durationSinceStart = Date().timeIntervalSince(startTime) * 1000
             self.pixelHandler.fire(.initialScanTotalDuration(duration: durationSinceStart.rounded(.towardZero),
                                                              profileQueries: profileQueries))

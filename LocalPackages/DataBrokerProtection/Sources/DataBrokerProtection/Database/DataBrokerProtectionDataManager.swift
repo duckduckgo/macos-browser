@@ -30,7 +30,7 @@ public protocol DataBrokerProtectionDataManaging {
     func fetchBrokerProfileQueryData(ignoresCache: Bool) throws -> [BrokerProfileQueryData]
     func prepareBrokerProfileQueryDataCache() throws
     func hasMatches() throws -> Bool
-    func profileQueries() throws -> Int
+    func profileQueriesCount() throws -> Int
 }
 
 extension DataBrokerProtectionDataManaging {
@@ -78,7 +78,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         return try fetchProfileFromDB()
     }
 
-    public func profileQueries() throws -> Int {
+    public func profileQueriesCount() throws -> Int {
         guard let profile = try fetchProfileFromDB() else {
             throw DataBrokerProtectionError.dataNotInDatabase
         }
