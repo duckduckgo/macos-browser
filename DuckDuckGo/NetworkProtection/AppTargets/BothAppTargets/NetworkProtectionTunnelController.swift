@@ -480,6 +480,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Starts the VPN connection
     ///
     func start() async {
+        VPNOperationErrorRecorder().beginRecordingControllerStart()
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
                       frequency: .dailyAndCount)
         controllerErrorStore.lastErrorMessage = nil
@@ -525,6 +526,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                               frequency: .dailyAndCount)
             }
         } catch {
+            VPNOperationErrorRecorder().recordControllerStartFailure(error)
+
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndCount, includeAppVersionParameter: true
             )

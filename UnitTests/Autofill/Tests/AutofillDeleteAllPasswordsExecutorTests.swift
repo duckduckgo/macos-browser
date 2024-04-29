@@ -30,7 +30,7 @@ final class AutofillDeleteAllPasswordsExecutorTests: XCTestCase {
     private var syncService: DDGSyncing!
 
     override func setUpWithError() throws {
-        secureVault = try MockSecureVaultFactory.makeVault(errorReporter: nil)
+        secureVault = try MockSecureVaultFactory.makeVault(reporter: nil)
         syncService = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
         sut = .init(userAuthenticator: mockAuthenticator, secureVault: secureVault, syncService: syncService)
     }

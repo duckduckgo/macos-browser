@@ -161,6 +161,13 @@ public enum DataBrokerProtectionPixels {
     // Backend service errors
     case generateEmailHTTPErrorDaily(statusCode: Int, environment: String, wasOnWaitlist: Bool)
     case emptyAccessTokenDaily(environment: String, wasOnWaitlist: Bool, callSite: BackendServiceCallSite)
+
+    // Home View
+    case homeViewShowNoPermissionError
+    case homeViewShowWebUI
+    case homeViewShowBadPathError
+    case homeViewCTAMoveApplicationClicked
+    case homeViewCTAGrantPermissionClicked
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -265,6 +272,13 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Backend service errors
         case .generateEmailHTTPErrorDaily: return "m_mac_dbp_service_email-generate-http-error"
         case .emptyAccessTokenDaily: return "m_mac_dbp_service_empty-auth-token"
+
+            // Home View
+        case .homeViewShowNoPermissionError: return "m_mac_dbp_home_view_show-no-permission-error"
+        case .homeViewShowWebUI: return "m_mac_dbp_home_view_show-web-ui"
+        case .homeViewShowBadPathError: return "m_mac_dbp_home_view_show-bad-path-error"
+        case .homeViewCTAMoveApplicationClicked: return "m_mac_dbp_home_view-cta-move-application-clicked"
+        case .homeViewCTAGrantPermissionClicked: return "m_mac_dbp_home_view-cta-grant-permission-clicked"
         }
     }
 
@@ -357,6 +371,11 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
                 .scanningEventNewMatch,
                 .scanningEventReAppearance,
+                .homeViewShowNoPermissionError,
+                .homeViewShowWebUI,
+                .homeViewShowBadPathError,
+                .homeViewCTAMoveApplicationClicked,
+                .homeViewCTAGrantPermissionClicked,
 
                 .secureVaultInitError,
                 .secureVaultError:
@@ -486,6 +505,14 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .webUILoadingSuccess:
 
                 PixelKit.fire(event)
+
+            case .homeViewShowNoPermissionError,
+                    .homeViewShowWebUI,
+                    .homeViewShowBadPathError,
+                    .homeViewCTAMoveApplicationClicked,
+                    .homeViewCTAGrantPermissionClicked:
+                PixelKit.fire(event, frequency: .dailyAndCount)
+
             }
         }
     }

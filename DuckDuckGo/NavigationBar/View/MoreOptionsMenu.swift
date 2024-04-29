@@ -28,6 +28,7 @@ import Subscription
 protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem)
+    func optionsButtonMenuRequestedBookmarkAllOpenTabs(_ sender: NSMenuItem)
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
@@ -171,6 +172,10 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedBookmarkThisPage(sender)
     }
 
+    @objc func bookmarkAllOpenTabs(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedBookmarkAllOpenTabs(sender)
+    }
+
     @objc func openBookmarks(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkPopover(self)
     }
@@ -301,30 +306,25 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
         let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
+        let networkProtectionItem: NSMenuItem
 
-        if networkProtectionFeatureVisibility.isNetworkProtectionBetaVisible() {
-            let networkProtectionItem: NSMenuItem
+        networkProtectionItem = makeNetworkProtectionItem()
 
-            networkProtectionItem = makeNetworkProtectionItem()
+        items.append(networkProtectionItem)
 
-            items.append(networkProtectionItem)
+        if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
+            Task {
+                let isMenuItemEnabled: Bool
 
-            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
-                Task {
-                    let isMenuItemEnabled: Bool
-
-                    switch await accountManager.hasEntitlement(for: .networkProtection) {
-                    case let .success(result):
-                        isMenuItemEnabled = result
-                    case .failure:
-                        isMenuItemEnabled = false
-                    }
-
-                    networkProtectionItem.isEnabled = isMenuItemEnabled
+                switch await accountManager.hasEntitlement(for: .networkProtection) {
+                case let .success(result):
+                    isMenuItemEnabled = result
+                case .failure:
+                    isMenuItemEnabled = false
                 }
+
+                networkProtectionItem.isEnabled = isMenuItemEnabled
             }
-        } else {
-            networkProtectionFeatureVisibility.disableForWaitlistUsers()
         }
 
 #if DBP
@@ -402,10 +402,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func addPageItems() {
-        guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }
+        guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel,
+              let url = tabViewModel.tab.content.userEditableUrl else { return }
+        let oldItemsCount = items.count
 
         if url.canFireproof, let host = url.host {
-
             let isFireproof = FireproofDomains.shared.isFireproof(fireproofDomain: host)
             let title = isFireproof ? UserText.removeFireproofing : UserText.fireproofSite
             let image: NSImage = isFireproof ? .burn : .fireproof
@@ -413,25 +414,31 @@ final class MoreOptionsMenu: NSMenu {
             addItem(withTitle: title, action: #selector(toggleFireproofing(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(image)
-
         }
 
-        addItem(withTitle: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
-            .targetting(self)
-            .withImage(.findSearch)
-            .withAccessibilityIdentifier("MoreOptionsMenu.findInPage")
+        if tabViewModel.canFindInPage {
+            addItem(withTitle: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
+                .targetting(self)
+                .withImage(.findSearch)
+                .withAccessibilityIdentifier("MoreOptionsMenu.findInPage")
+        }
 
-        addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
-            .targetting(self)
-            .withImage(.share)
-            .withSubmenu(sharingMenu)
+        if tabViewModel.canReload {
+            addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
+                .targetting(self)
+                .withImage(.share)
+                .withSubmenu(sharingMenu)
+        }
 
-        addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
-            .targetting(self)
-            .withImage(.print)
+        if tabViewModel.canPrint {
+            addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
+                .targetting(self)
+                .withImage(.print)
+        }
 
-        addItem(NSMenuItem.separator())
-
+        if items.count > oldItemsCount {
+            addItem(NSMenuItem.separator())
+        }
     }
 
     private func makeNetworkProtectionItem() -> NSMenuItem {
@@ -626,6 +633,12 @@ final class BookmarksSubMenu: NSMenu {
             .withAccessibilityIdentifier("MoreOptionsMenu.bookmarkPage")
 
         bookmarkPageItem.isEnabled = tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
+
+        let bookmarkAllTabsItem = addItem(withTitle: UserText.bookmarkAllTabs, action: #selector(MoreOptionsMenu.bookmarkAllOpenTabs(_:)), keyEquivalent: "d")
+            .withModifierMask([.command, .shift])
+            .targetting(target)
+
+        bookmarkAllTabsItem.isEnabled = tabCollectionViewModel.canBookmarkAllOpenTabs()
 
         addItem(NSMenuItem.separator())
 

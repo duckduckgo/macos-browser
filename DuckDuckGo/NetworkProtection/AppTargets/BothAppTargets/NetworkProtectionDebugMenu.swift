@@ -53,13 +53,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private let excludeLocalNetworksMenuItem = NSMenuItem(title: "excludeLocalNetworks", action: #selector(NetworkProtectionDebugMenu.toggleShouldExcludeLocalRoutes))
 
-    private let enterWaitlistInviteCodeItem = NSMenuItem(title: "Enter Waitlist Invite Code", action: #selector(NetworkProtectionDebugMenu.showNetworkProtectionInviteCodePrompt))
-
-    private let waitlistTokenItem = NSMenuItem(title: "Waitlist Token:")
-    private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
-    private let waitlistInviteCodeItem = NSMenuItem(title: "Waitlist Invite Code:")
-    private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
-
     // swiftlint:disable:next function_body_length
     init() {
         preferredServerMenu = NSMenu { [preferredServerAutomaticItem] in
@@ -143,28 +136,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 NSMenuItem(title: "Set Activation Date to 10 Days Ago", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateTo10DaysAgo))
                     .targetting(self)
             }
-
-            NSMenuItem(title: "NetP Waitlist") {
-                NSMenuItem(title: "Reset Waitlist State", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionWaitlistState))
-                    .targetting(self)
-                NSMenuItem(title: "Reset T&C Acceptance", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionTermsAndConditionsAcceptance))
-                    .targetting(self)
-
-                enterWaitlistInviteCodeItem
-                    .targetting(self)
-
-                NSMenuItem(title: "Send Waitlist Notification", action: #selector(NetworkProtectionDebugMenu.sendNetworkProtectionWaitlistAvailableNotification))
-                    .targetting(self)
-                NSMenuItem.separator()
-
-                waitlistTokenItem
-                waitlistTimestampItem
-                waitlistInviteCodeItem
-                waitlistTermsAndConditionsAcceptedItem
-            }
-
-            NSMenuItem(title: "NetP Waitlist Feature Flag Overrides")
-                .submenu(NetworkProtectionWaitlistFeatureFlagOverridesMenu())
 
             NSMenuItem.separator()
 
@@ -423,10 +394,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             excludedRoutesMenu.addItem(menuItem)
         }
 
-        // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
-        let waitlist = NetworkProtectionWaitlist()
-        enterWaitlistInviteCodeItem.isEnabled = waitlist.waitlistStorage.isOnWaitlist || waitlist.waitlistStorage.isInvited
-
     }
 
     // MARK: - Menu State Update
@@ -437,7 +404,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         updatePreferredServerMenu()
         updateRekeyValidityMenu()
         updateNetworkProtectionMenuItemsState()
-        updateNetworkProtectionItems()
     }
 
     private func updateEnvironmentMenu() {
@@ -504,26 +470,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         disableRekeyingMenuItem.state = settings.disableRekeying ? .on : .off
     }
 
-    private func updateNetworkProtectionItems() {
-        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier, keychainAppGroup: NetworkProtectionWaitlist.keychainAppGroup)
-        waitlistTokenItem.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
-        waitlistInviteCodeItem.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
-
-        if let timestamp = waitlistStorage.getWaitlistTimestamp() {
-            waitlistTimestampItem.title = "Waitlist Timestamp: \(String(describing: timestamp))"
-        } else {
-            waitlistTimestampItem.title = "Waitlist Timestamp: N/A"
-        }
-
-        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
-    }
-
     // MARK: Waitlist
-
-    @objc func sendNetworkProtectionWaitlistAvailableNotification(_ sender: Any?) {
-        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification(completion: nil)
-    }
 
     @objc func resetNetworkProtectionActivationDate(_ sender: Any?) {
         overrideNetworkProtectionActivationDate(to: nil)
@@ -553,52 +500,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             store.updateActivationDate(date)
         } else {
             store.removeDates()
-        }
-    }
-
-    @objc func resetNetworkProtectionWaitlistState(_ sender: Any?) {
-        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionWaitlistSignUpPromptDismissed.rawValue)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-    }
-
-    @objc func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-    }
-
-    @objc func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
-        let code = getInviteCode()
-
-        Task {
-            do {
-                let redeemer = NetworkProtectionCodeRedemptionCoordinator()
-                try await redeemer.redeem(code)
-                NetworkProtectionWaitlist().waitlistStorage.store(inviteCode: code)
-                NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-            } catch {
-                // Do nothing here, this is just a debug menu
-            }
-        }
-    }
-
-    private func getInviteCode() -> String {
-        let alert = NSAlert()
-        alert.addButton(withTitle: "Use Invite Code")
-        alert.addButton(withTitle: "Cancel")
-        alert.messageText = "Enter Invite Code"
-        alert.informativeText = "Please grab a VPN invite code from Asana and enter it here."
-
-        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        alert.accessoryView = textField
-
-        let response = alert.runModal()
-
-        if response == .alertFirstButtonReturn {
-            return textField.stringValue
-        } else {
-            return ""
         }
     }
 

@@ -169,14 +169,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     @MainActor
     func updateVisibility() {
-        // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
-        if vpnVisibility.isNetworkProtectionBetaVisible() {
-            if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                showButton = true
-                return
-            }
-        }
-
         guard !isPinned,
               !popoverManager.isShown,
               !isHavingConnectivityIssues else {

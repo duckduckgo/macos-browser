@@ -65,6 +65,7 @@ final class StatePersistenceService {
 
     func removeLastSessionState() {
         lastSessionStateArchive = nil
+        fileStore.remove(fileAtURL: URL.persistenceLocation(for: self.fileName))
     }
 
     @MainActor

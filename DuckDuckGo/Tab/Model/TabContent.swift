@@ -129,6 +129,8 @@ extension TabContent {
 
         if let settingsPane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
             return .settings(pane: settingsPane)
+        } else if url?.isDuckPlayer == true, let (videoId, timestamp) = url?.youtubeVideoParams {
+            return .url(.duckPlayer(videoId, timestamp: timestamp), credential: nil, source: source)
         } else if let url, let credential = url.basicAuthCredential {
             // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
             return .url(url.removingBasicAuthCredential(), credential: credential, source: source)
@@ -190,19 +192,20 @@ extension TabContent {
         }
     }
 
-    var url: URL? {
-        userEditableUrl
-    }
+    // !!! don‘t add `url` property to avoid ambiguity with the `.url` enum case
+    // use `userEditableUrl` or `urlForWebView` instead.
 
+    /// user-editable URL displayed in the address bar
     var userEditableUrl: URL? {
-        switch self {
-        case .url(let url, credential: _, source: _) where !(url.isDuckPlayer || url.isDuckURLScheme):
-            return url
-        default:
-            return nil
+        let url = urlForWebView
+        if let url, url.isDuckPlayer,
+           let (videoID, timestamp) = url.youtubeVideoParams {
+            return .duckPlayer(videoID, timestamp: timestamp)
         }
+        return url
     }
 
+    /// `real` URL loaded in the web view
     var urlForWebView: URL? {
         switch self {
         case .url(let url, credential: _, source: _):
@@ -290,10 +293,10 @@ extension TabContent {
 
     var canBeBookmarked: Bool {
         switch self {
-        case .subscription, .identityTheftRestoration, .dataBrokerProtection:
+        case .newtab, .onboarding, .none:
             return false
-        default:
-            return isUrl
+        case .url, .settings, .bookmarks, .subscription, .identityTheftRestoration, .dataBrokerProtection:
+            return true
         }
     }
 

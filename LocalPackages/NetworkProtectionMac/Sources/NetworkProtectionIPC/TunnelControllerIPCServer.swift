@@ -45,6 +45,10 @@ public protocol IPCServerInterface: AnyObject {
     ///
     func stop(completion: @escaping (Error?) -> Void)
 
+    /// Fetches the last error directly from the tunnel manager.
+    ///
+    func fetchLastError(completion: @escaping (Error?) -> Void)
+
     /// Debug commands
     ///
     func debugCommand(_ command: DebugCommand) async throws
@@ -70,6 +74,10 @@ protocol XPCServerInterface {
     /// Stop the VPN tunnel.
     ///
     func stop(completion: @escaping (Error?) -> Void)
+
+    /// Fetches the last error directly from the tunnel manager.
+    ///
+    func fetchLastError(completion: @escaping (Error?) -> Void)
 
     /// Debug commands
     ///
@@ -172,6 +180,10 @@ extension TunnelControllerIPCServer: XPCServerInterface {
 
     func stop(completion: @escaping (Error?) -> Void) {
         serverDelegate?.stop(completion: completion)
+    }
+
+    func fetchLastError(completion: @escaping (Error?) -> Void) {
+        serverDelegate?.fetchLastError(completion: completion)
     }
 
     func debugCommand(_ payload: Data, completion: @escaping (Error?) -> Void) {
