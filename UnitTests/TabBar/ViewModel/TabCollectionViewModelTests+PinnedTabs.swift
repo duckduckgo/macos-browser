@@ -170,6 +170,10 @@ extension TabCollectionViewModelTests {
         XCTAssertNotNil(tabCollectionViewModel.selectedTabViewModel)
         tabCollectionViewModel.insertOrAppendNewTab()
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+
+        tabCollectionViewModel.select(at: .pinned(0))
+        tabCollectionViewModel.insertOrAppendNewTab()
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 0))
     }
 
     // MARK: - Remove

@@ -370,13 +370,13 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    func insertOrAppendNewTab(_ content: Tab.TabContent = .newtab, selected: Bool = true, forceChange: Bool = false) {
-        insertOrAppend(tab: Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), selected: selected, forceChange: forceChange)
+    func insertOrAppendNewTab(_ content: Tab.TabContent = .newtab, selected: Bool = true) {
+        insertOrAppend(tab: Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), selected: selected)
     }
 
-    func insertOrAppend(tab: Tab, selected: Bool, forceChange: Bool = false) {
-        if tabsPreferences.newTabPosition == .nextToCurrent, let selectedTab {
-            self.insert(tab, after: selectedTab, selected: selected)
+    func insertOrAppend(tab: Tab, selected: Bool) {
+        if tabsPreferences.newTabPosition == .nextToCurrent, let selectionIndex {
+            self.insert(tab, at: selectionIndex.makeNextUnpinned(), selected: selected)
         } else {
             append(tab: tab, selected: selected)
         }
