@@ -34,4 +34,10 @@ runs:
         env:
           ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
         run: |
-          ${{ github.action_path }}/asana-create-pr-subtask.sh ${{ inputs.asana-task-id }} ${{ steps.get-asana-user-id.outputs.user-id }} ${{ inputs.github-pr-url }}
+          # If the Asana User ID is not found, exit with an error
+          if [[ -z "${{ steps.get-asana-user-id.outputs.user-id }}" ]]; then
+            echo "Error: Failed to get Asana user ID for GitHub user ${{ inputs.github-reviewer-user }}"
+            exit 1
+          else
+            ${{ github.action_path }}/asana-create-pr-subtask.sh ${{ inputs.asana-task-id }} ${{ steps.get-asana-user-id.outputs.user-id }} ${{ inputs.github-pr-url }}
+          fi
