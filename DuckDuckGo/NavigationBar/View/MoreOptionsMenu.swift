@@ -306,30 +306,25 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
         let subscriptionFeatureAvailability = DefaultSubscriptionFeatureAvailability()
+        let networkProtectionItem: NSMenuItem
 
-        if networkProtectionFeatureVisibility.isNetworkProtectionBetaVisible() {
-            let networkProtectionItem: NSMenuItem
+        networkProtectionItem = makeNetworkProtectionItem()
 
-            networkProtectionItem = makeNetworkProtectionItem()
+        items.append(networkProtectionItem)
 
-            items.append(networkProtectionItem)
+        if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
+            Task {
+                let isMenuItemEnabled: Bool
 
-            if subscriptionFeatureAvailability.isFeatureAvailable && accountManager.isUserAuthenticated {
-                Task {
-                    let isMenuItemEnabled: Bool
-
-                    switch await accountManager.hasEntitlement(for: .networkProtection) {
-                    case let .success(result):
-                        isMenuItemEnabled = result
-                    case .failure:
-                        isMenuItemEnabled = false
-                    }
-
-                    networkProtectionItem.isEnabled = isMenuItemEnabled
+                switch await accountManager.hasEntitlement(for: .networkProtection) {
+                case let .success(result):
+                    isMenuItemEnabled = result
+                case .failure:
+                    isMenuItemEnabled = false
                 }
+
+                networkProtectionItem.isEnabled = isMenuItemEnabled
             }
-        } else {
-            networkProtectionFeatureVisibility.disableForWaitlistUsers()
         }
 
 #if DBP

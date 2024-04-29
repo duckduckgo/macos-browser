@@ -109,8 +109,7 @@ enum Preferences {
                     // Opens a new tab
                     Spacer()
                 case .about:
-                    let netPInvitePresenter = NetworkProtectionInvitePresenter()
-                    AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
+                    AboutView(model: AboutModel())
                 }
             }
             .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)

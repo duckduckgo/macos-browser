@@ -65,7 +65,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsEnabled() {
+    func testThatMoreOptionMenuHasTheExpectedItems() {
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
                                          networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
@@ -97,38 +97,6 @@ final class MoreOptionsMenuTests: XCTestCase {
             XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.networkProtection))
             XCTAssertTrue(moreOptionMenu.items[15].isSeparatorItem)
             XCTAssertEqual(moreOptionMenu.items[16].title, UserText.settings)
-        }
-    }
-
-    @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsDisabled() {
-        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                         passwordManagerCoordinator: passwordManagerCoordinator,
-                                         networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: false),
-                                         sharingMenu: NSMenu(),
-                                         internalUserDecider: internalUserDecider)
-
-        XCTAssertEqual(moreOptionMenu.items[0].title, UserText.sendFeedback)
-        XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
-        XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertEqual(moreOptionMenu.items[4].title, UserText.newBurnerWindowMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[5].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[6].title, UserText.zoom)
-        XCTAssertTrue(moreOptionMenu.items[7].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.downloads)
-        XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagement)
-        XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
-
-        if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
-            XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.identityTheftRestorationOptionsMenuItem))
-            XCTAssertTrue(moreOptionMenu.items[15].isSeparatorItem)
-            XCTAssertEqual(moreOptionMenu.items[16].title, UserText.settings)
-        } else {
-            XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
         }
     }
 
@@ -195,19 +163,11 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return !visible
     }
 
-    func isNetworkProtectionBetaVisible() -> Bool {
-        return visible
-    }
-
     func canStartVPN() async throws -> Bool {
         return false
     }
 
     func disableForAllUsers() async {
-        // intentional no-op
-    }
-
-    func disableForWaitlistUsers() {
         // intentional no-op
     }
 

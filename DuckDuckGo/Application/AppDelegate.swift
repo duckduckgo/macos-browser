@@ -326,10 +326,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-        NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
-            // Do nothing when code fetching fails, as the app will try again later
-        }
-
         NetworkProtectionAppEvents().applicationDidBecomeActive()
 
 #if DBP
@@ -599,12 +595,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
-
-            if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
-                if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-                    NetworkProtectionWaitlistViewControllerPresenter.show()
-                }
-            }
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {

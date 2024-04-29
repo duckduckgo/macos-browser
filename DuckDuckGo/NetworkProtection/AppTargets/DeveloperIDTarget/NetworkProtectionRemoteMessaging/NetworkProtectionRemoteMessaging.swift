@@ -132,7 +132,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
 
             // Next, check if the message requires access to NetP but it's not visible:
-            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isNetworkProtectionBetaVisible() {
+            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isVPNVisible() {
                 return false
             }
 
