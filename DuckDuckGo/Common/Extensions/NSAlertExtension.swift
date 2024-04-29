@@ -174,7 +174,7 @@ extension NSAlert {
         alert.informativeText = informative
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.learnMore)
+        alert.addButton(withTitle: UserText.syncErrorAlertAction)
         return alert
     }
 

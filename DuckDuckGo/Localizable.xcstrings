@@ -1414,61 +1414,73 @@
         }
       }
     },
+    "alert.sync-bad-data-error-description" : {
+      "comment" : "Description for alert shown when sync error occurs because of bad data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some bookmarks or passwords are formatted incorrectly or too long and were not synced."
+          }
+        }
+      }
+    },
     "alert.sync-bookmarks-paused-description" : {
       "comment" : "Description for alert shown when sync bookmarks paused for too many items",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Du hast das Limit für die Synchronisierung von Lesezeichen überschritten. Versuche, einige Lesezeichen zu löschen. Bis dieses Problem behoben ist, werden deine Lesezeichen nicht gesichert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You have exceeded the bookmarks sync limit. Try deleting some bookmarks. Until this is resolved your bookmarks will not be backed up."
+            "value" : "You've reached the maximum number of bookmarks. Please delete some bookmarks to resume sync."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Has superado el límite de sincronización de marcadores. Prueba a eliminar algunos marcadores. No se realizará una copia de seguridad de los marcadores hasta que se resuelva esto."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vous avez dépassé le nombre maximal de signets à synchroniser. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos signets."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hai superato il limite di sincronizzazione dei segnalibri. Prova a eliminarne qualcuno. Fino a quando il problema non verrà risolto, non sarà eseguito il backup dei tuoi segnalibri."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Je hebt de synchronisatielimiet voor bladwijzers overschreden. Probeer enkele bladwijzers te verwijderen. Er wordt geen back-up van je bladwijzers gemaakt totdat dit probleem is opgelost."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Przekroczono limit synchronizacji zakładek. Spróbuj usunąć niektóre zakładki. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa zakładek."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Excedeste o limite de sincronização de favoritos. Experimenta eliminar alguns favoritos. Não é possível fazer uma cópia de segurança dos favoritos até este problema estar resolvido."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Вы превысили лимит синхронизации закладок. Попробуйте удалить некоторые из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет."
           }
         }
@@ -1480,55 +1492,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Lesezeichen-Synchronisierung ist angehalten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Bookmarks Sync is Paused"
+            "value" : "Bookmark Sync is Paused"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "La sincronización de marcadores está en pausa"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "La synchronisation des signets est suspendue"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "La sincronizzazione dei segnalibri è in pausa"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Synchronisatie van bladwijzers is gepauzeerd"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Synchronizacja zakładek jest wstrzymana"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "A sincronização de favoritos está em pausa"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Синхронизация закладок приостановлена"
           }
         }
@@ -1540,55 +1552,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Du hast das Limit für die Synchronisierung von Passwörtern überschritten. Versuche, einige Passwörter zu löschen. Bis dieses Problem behoben ist, werden deine Passwörter nicht gesichert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You have exceeded the passwords sync limit. Try deleting some passwords. Until this is resolved your passwords will not be backed up."
+            "value" : "You've reached the maximum number of passwords. Please delete some passwords to resume sync."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ha superado el límite de sincronización de contraseñas. Prueba a eliminar algunas contraseñas. No se realizará una copia de seguridad de las contraseñas hasta que se resuelva esto."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vous avez dépassé le nombre maximal de mots de passe à synchroniser. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos mots de passe."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hai superato il limite di sincronizzazione delle password. Prova a eliminarne qualcuna. Fino a quando il problema non verrà risolto, non sarà eseguito il backup delle tue password."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Je hebt de synchronisatielimiet voor wachtwoorden overschreden. Probeer enkele wachtwoorden te verwijderen. Er wordt geen back-up van je wachtwoorden gemaakt totdat dit probleem is opgelost."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Przekroczono limit synchronizacji haseł. Spróbuj usunąć niektóre hasła. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa haseł."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Excedeste o limite de sincronização de palavras-passe. Experimenta eliminar algumas palavras-passe. Não é possível fazer uma cópia de segurança das palavras-passe até este problema estar resolvido."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Вы превысили лимит синхронизации паролей. Попробуйте удалить некоторые из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет."
           }
         }
@@ -1600,56 +1612,116 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Passwortsynchronisierung ist angehalten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Passwords Sync is Paused"
+            "value" : "Password Sync is Paused"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "La sincronización de contraseñas está en pausa"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "La synchronisation des mots de passe est suspendue"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "La sincronizzazione delle password è in pausa"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Synchronisatie van wachtwoorden is gepauzeerd"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Synchronizacja haseł jest wstrzymana"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "A sincronização de palavras-passe está em pausa"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Синхронизация паролей приостановлена"
+          }
+        }
+      }
+    },
+    "alert.sync-error-action" : {
+      "comment" : "Sync error alert action button title, takes the user to the sync settings page.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync Settings"
+          }
+        }
+      }
+    },
+    "alert.sync-error-title" : {
+      "comment" : "Title for alert shown when sync error occurs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync Error"
+          }
+        }
+      }
+    },
+    "alert.sync-invalid-login-error-description" : {
+      "comment" : "Description for alert shown when sync error occurs because of invalid login credentials",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync encountered an error. Please disable sync and reconnect using your recovery code."
+          }
+        }
+      }
+    },
+    "alert.sync-paused-title" : {
+      "comment" : "Title for alert shown when sync paused for an error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync is Paused"
+          }
+        }
+      }
+    },
+    "alert.sync-too-many-requests-error-description" : {
+      "comment" : "Description for alert shown when sync error occurs because of too many requests",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup is temporarily unavailable."
           }
         }
       }
@@ -1710,6 +1782,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "К сожалению, функция «Синхронизация и резервное копирование» больше не работает в этой версии приложения. Чтобы продолжить, обновите DuckDuckGo до последней версии."
+          }
+        }
+      }
+    },
+    "alert.sync.warning.sync-error" : {
+      "comment" : "Title of the warning message that tells the user that there was an error with the sync feature.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync Error"
           }
         }
       }
@@ -45703,7 +45787,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Bookmark limit exceeded. Delete some to resume syncing."
+            "value" : "You've reached the maximum number of bookmarks. Please delete some to resume sync."
           }
         }
       }
@@ -45727,7 +45811,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Logins limit exceeded. Delete some to resume syncing."
+            "value" : "You've reached the maximum number of passwords. Please delete some to resume sync."
+          }
+        }
+      }
+    },
+    "prefrences.sync.invalid-login-description" : {
+      "comment" : "Description invalid credentials error when syncing.\n   Description of incorrectly formatted data error when syncing.\n   Description of too many requests error when syncing.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync encountered an error. Try disabling sync on this device and then reconnect using another device or your recovery code."
           }
         }
       }

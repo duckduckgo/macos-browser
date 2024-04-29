@@ -128,36 +128,33 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
         (areThere10ConsecutiveError || noSuccessfulSyncInLast12h)
     }
 
+    private var syncPausedTitle: String? {
+        guard let error = currentSyncAllPausedError else { return nil }
+        switch error {
+        case .invalidLoginCredentials:
+            return UserText.syncPausedTitle
+        case .tooManyRequests, .badRequest:
+            return UserText.syncErrorTitle
+        default:
+            assertionFailure("Sync Paused error should be one of those listes")
+            return nil
+        }
+    }
+
     private var syncPausedMessage: String? {
         guard let error = currentSyncAllPausedError else { return nil }
         switch error {
         case .invalidLoginCredentials:
-            return "Invalid Login"
+            return UserText.invalidLoginCredentialErrorDescription
         case .tooManyRequests:
-            return "Too many requests"
-        case .unknown:
-            return "Unknown"
+            return UserText.tooManyRequestsErrorDescription
+        case .badRequest:
+            return UserText.badRequestErrorDescription
         default:
             assertionFailure("Sync Paused error should be one of those listes")
             return nil
         }
     }
-
-    private var syncPausedButtonTitle: String? {
-        guard let error = currentSyncAllPausedError else { return nil }
-        switch error {
-        case .invalidLoginCredentials:
-            return "Invalid Login"
-        case .tooManyRequests:
-            return "Too many requests"
-        case .unknown:
-            return "Unknown"
-        default:
-            assertionFailure("Sync Paused error should be one of those listes")
-            return nil
-        }
-    }
-
 }
 
 extension SyncErrorHandler: SyncAdapterErrorHandler {
@@ -213,7 +210,7 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
         case .unexpectedStatusCode(401):
             syncIsPaused(errorType: .invalidLoginCredentials)
         case .unexpectedStatusCode(400):
-            syncIsPaused(errorType: .unknown)
+            syncIsPaused(errorType: .badRequest)
         case .unexpectedStatusCode(418), .unexpectedStatusCode(429):
             syncIsPaused(errorType: .tooManyRequests)
         default:
@@ -239,7 +236,7 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
         case .invalidLoginCredentials:
             currentSyncAllPausedError = errorType
             self.isSyncPaused = true
-        case .tooManyRequests, .unknown:
+        case .tooManyRequests, .badRequest:
             currentSyncAllPausedError = errorType
             self.isSyncPaused = true
         }
@@ -260,11 +257,15 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
                     didShowCredentialsSyncPausedError = true
                 case .invalidLoginCredentials:
                     guard !didShowInvalidLoginSyncPausedError else { return }
-                    alert = NSAlert.syncPaused(title: "Invalid Credentials", informative: "Invalid Credentials")
+                    alert = NSAlert.syncPaused(title: UserText.syncPausedAlertTitle, informative: UserText.syncInvalidLoginAlertDescription)
                     didShowInvalidLoginSyncPausedError = true
-                case .tooManyRequests, .unknown:
+                case .tooManyRequests:
                     guard shouldShowAlertForNonActionableError() == true else { return }
-                    alert = NSAlert.syncPaused(title: "Non Actionable Error", informative: "Non Actionable Error")
+                    alert = NSAlert.syncPaused(title: UserText.syncErrorAlertTitle, informative: UserText.syncTooManyRequestsAlertDescription)
+                    lastErrorNotificationTime = Date()
+                case .badRequest:
+                    guard shouldShowAlertForNonActionableError() == true else { return }
+                    alert = NSAlert.syncPaused(title: UserText.syncErrorAlertTitle, informative: UserText.syncBadRequestAlertDescription)
                     lastErrorNotificationTime = Date()
                 }
                 alertPresenter.showAlert(alert)
@@ -279,7 +280,7 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
         case credentialsRequestSizeLimitExceeded
         case invalidLoginCredentials
         case tooManyRequests
-        case unknown
+        case badRequest
     }
 
     private enum ModelType {
@@ -305,9 +306,10 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
 extension SyncErrorHandler: SyncPreferencesErrorHandler {
     var syncPausedMetadata: SyncPausedErrorMetadata? {
         guard let syncPausedMessage else { return nil }
-        return SyncPausedErrorMetadata(syncPausedTitle: UserText.syncLimitExceededTitle,
+        guard let syncPausedTitle else { return nil }
+        return SyncPausedErrorMetadata(syncPausedTitle: syncPausedTitle,
                                        syncPausedMessage: syncPausedMessage,
-                                       syncPausedButtonTitle: syncPausedButtonTitle ?? "",
+                                       syncPausedButtonTitle: "",
                                        syncPausedAction: nil)
     }
 
