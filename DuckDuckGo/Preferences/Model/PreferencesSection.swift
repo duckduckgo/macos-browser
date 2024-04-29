@@ -98,7 +98,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
 
 }
 
-enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
+enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIterable {
     case defaultBrowser
     case privateSearch
     case webTrackingProtection

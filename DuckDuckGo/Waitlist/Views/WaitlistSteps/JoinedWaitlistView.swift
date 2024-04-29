@@ -85,17 +85,6 @@ struct JoinedWaitlistView: View {
     }
 }
 
-struct NetworkProtectionJoinedWaitlistViewData: JoinedWaitlistViewData {
-    let headerImageName = "JoinedWaitlistHeader"
-    var title = UserText.networkProtectionWaitlistJoinedTitle
-    var joinedWithNoNotificationSubtitle1 = UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle1
-    var joinedWithNoNotificationSubtitle2 = UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle2
-    var enableNotificationSubtitle = UserText.networkProtectionWaitlistEnableNotifications
-    var buttonConfirmLabel = UserText.networkProtectionWaitlistButtonDone
-    var buttonCancelLabel = UserText.networkProtectionWaitlistButtonNoThanks
-    var buttonEnableNotificationLabel = UserText.networkProtectionWaitlistButtonEnableNotifications
-}
-
 #if DBP
 
 struct DataBrokerProtectionJoinedWaitlistViewData: JoinedWaitlistViewData {

@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Common
 import Foundation
 import Subscription
 import NetworkProtection
@@ -25,19 +26,16 @@ import NetworkProtectionUI
 final class NetworkProtectionSubscriptionEventHandler {
 
     private let accountManager: AccountManager
-    private let networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
     private let userDefaults: UserDefaults
     private var cancellables = Set<AnyCancellable>()
 
     init(accountManager: AccountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)),
-         networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming = NetworkProtectionCodeRedemptionCoordinator(),
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
          userDefaults: UserDefaults = .netP) {
         self.accountManager = accountManager
-        self.networkProtectionRedemptionCoordinator = networkProtectionRedemptionCoordinator
         self.networkProtectionTokenStorage = networkProtectionTokenStorage
         self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
         self.userDefaults = userDefaults
@@ -108,7 +106,7 @@ final class NetworkProtectionSubscriptionEventHandler {
         print("[NetP Subscription] Deleted NetP auth token after signing out from Privacy Pro")
 
         Task {
-            await networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+            await networkProtectionFeatureDisabler.disable(uninstallSystemExtension: false)
         }
     }
 

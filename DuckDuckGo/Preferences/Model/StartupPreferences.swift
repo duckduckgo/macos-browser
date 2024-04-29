@@ -40,22 +40,28 @@ struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
 
 }
 
-final class StartupPreferences: ObservableObject {
+final class StartupPreferences: ObservableObject, PreferencesTabOpening {
 
     static let shared = StartupPreferences()
     private let pinningManager: LocalPinningManager
     private var persistor: StartupPreferencesPersistor
     private var pinnedViewsNotificationCancellable: AnyCancellable?
+    private var dataClearingPreferences: DataClearingPreferences
+    private var dataClearingPreferencesNotificationCancellable: AnyCancellable?
 
     init(pinningManager: LocalPinningManager = LocalPinningManager.shared,
-         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared)) {
+         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared),
+         dataClearingPreferences: DataClearingPreferences = DataClearingPreferences.shared) {
         self.pinningManager = pinningManager
         self.persistor = persistor
+        self.dataClearingPreferences = dataClearingPreferences
         restorePreviousSession = persistor.restorePreviousSession
         launchToCustomHomePage = persistor.launchToCustomHomePage
         customHomePageURL = persistor.customHomePageURL
         updateHomeButtonState()
         listenToPinningManagerNotifications()
+        listenToDataClearingPreferencesNotifications()
+        checkDataClearingStatus()
     }
 
     @Published var restorePreviousSession: Bool {
@@ -126,6 +132,21 @@ final class StartupPreferences: ObservableObject {
                 return
             }
             self.updateHomeButtonState()
+        }
+    }
+
+    private func checkDataClearingStatus() {
+        if dataClearingPreferences.isAutoClearEnabled {
+            restorePreviousSession = false
+        }
+    }
+
+    private func listenToDataClearingPreferencesNotifications() {
+        dataClearingPreferencesNotificationCancellable = NotificationCenter.default.publisher(for: .autoClearDidChange).sink { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+            self.checkDataClearingStatus()
         }
     }
 

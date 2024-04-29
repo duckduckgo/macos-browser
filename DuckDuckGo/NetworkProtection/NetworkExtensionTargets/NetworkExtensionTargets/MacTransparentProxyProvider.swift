@@ -27,7 +27,7 @@ import PixelKit
 
 final class MacTransparentProxyProvider: TransparentProxyProvider {
 
-    static var vpnProxyLogger = Logger(subsystem: OSLog.subsystem, category: "VPN Proxy")
+    static var vpnProxyLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "VPN Proxy")
 
     private var cancellables = Set<AnyCancellable>()
 

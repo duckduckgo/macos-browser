@@ -80,7 +80,7 @@ public protocol DataBrokerProtectionScheduler {
     func stopScheduler()
 
     func optOutAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    func startManualScan(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func startManualScan(showWebView: Bool, startTime: Date, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runQueuedOperations(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runAllOperations(showWebView: Bool)
 
@@ -98,8 +98,8 @@ extension DataBrokerProtectionScheduler {
         runAllOperations(showWebView: false)
     }
 
-    public func startManualScan() {
-        startManualScan(showWebView: false, completion: nil)
+    public func startManualScan(startTime: Date) {
+        startManualScan(showWebView: false, startTime: startTime, completion: nil)
     }
 }
 
@@ -250,7 +250,10 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func startManualScan(showWebView: Bool = false,
+                                startTime: Date,
                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+        pixelHandler.fire(.initialScanPreStartDuration(duration: (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)))
+        let backgroundAgentManualScanStartTime = Date()
         stopScheduler()
 
         userNotificationService.requestNotificationPermission()
@@ -261,7 +264,9 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             self.startScheduler(showWebView: showWebView)
 
-            self.userNotificationService.sendFirstScanCompletedNotification()
+            if errors?.oneTimeError == nil {
+                self.userNotificationService.sendFirstScanCompletedNotification()
+            }
 
             if let hasMatches = try? self.dataManager.hasMatches(),
                 hasMatches {
@@ -284,7 +289,19 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 }
             }
 
+            fireManualScanCompletionPixel(startTime: backgroundAgentManualScanStartTime)
             completion?(errors)
+        }
+    }
+
+    private func fireManualScanCompletionPixel(startTime: Date) {
+        do {
+            let profileQueries = try dataManager.profileQueriesCount()
+            let durationSinceStart = Date().timeIntervalSince(startTime) * 1000
+            self.pixelHandler.fire(.initialScanTotalDuration(duration: durationSinceStart.rounded(.towardZero),
+                                                             profileQueries: profileQueries))
+        } catch {
+            os_log("Manual Scan Error when trying to fetch the profile to get the profile queries", log: .dataBrokerProtection)
         }
     }
 

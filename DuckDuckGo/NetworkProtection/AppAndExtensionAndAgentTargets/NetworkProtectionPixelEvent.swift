@@ -34,9 +34,17 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
     case networkProtectionTunnelStartSuccess
     case networkProtectionTunnelStartFailure(_ error: Error)
 
+    case networkProtectionTunnelStopAttempt
+    case networkProtectionTunnelStopSuccess
+    case networkProtectionTunnelStopFailure(_ error: Error)
+
     case networkProtectionTunnelUpdateAttempt
     case networkProtectionTunnelUpdateSuccess
     case networkProtectionTunnelUpdateFailure(_ error: Error)
+
+    case networkProtectionTunnelWakeAttempt
+    case networkProtectionTunnelWakeSuccess
+    case networkProtectionTunnelWakeFailure(_ error: Error)
 
     case networkProtectionEnableAttemptConnecting
     case networkProtectionEnableAttemptSuccess
@@ -89,6 +97,13 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
+    // Temporary pixels added to verify notification delivery rates:
+    case networkProtectionConnectedNotificationDisplayed
+    case networkProtectionDisconnectedNotificationDisplayed
+    case networkProtectionReconnectingNotificationDisplayed
+    case networkProtectionSupersededNotificationDisplayed
+    case networkProtectionExpiredEntitlementNotificationDisplayed
+
     /// Name of the pixel event
     /// - Unique pixels must end with `_u`
     /// - Daily pixels will automatically have `_d` or `_c` appended to their names
@@ -119,6 +134,15 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
         case .networkProtectionTunnelStartFailure:
             return "netp_tunnel_start_failure"
 
+        case .networkProtectionTunnelStopAttempt:
+            return "netp_tunnel_stop_attempt"
+
+        case .networkProtectionTunnelStopSuccess:
+            return "netp_tunnel_stop_success"
+
+        case .networkProtectionTunnelStopFailure:
+            return "netp_tunnel_stop_failure"
+
         case .networkProtectionTunnelUpdateAttempt:
             return "netp_tunnel_update_attempt"
 
@@ -127,6 +151,15 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
         case .networkProtectionTunnelUpdateFailure:
             return "netp_tunnel_update_failure"
+
+        case .networkProtectionTunnelWakeAttempt:
+            return "netp_tunnel_wake_attempt"
+
+        case .networkProtectionTunnelWakeSuccess:
+            return "netp_tunnel_wake_success"
+
+        case .networkProtectionTunnelWakeFailure:
+            return "netp_tunnel_wake_failure"
 
         case .networkProtectionEnableAttemptConnecting:
             return "netp_ev_enable_attempt"
@@ -247,6 +280,21 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
+
+        case .networkProtectionConnectedNotificationDisplayed:
+            return "netp_connected_notification_displayed"
+
+        case .networkProtectionDisconnectedNotificationDisplayed:
+            return "netp_disconnected_notification_displayed"
+
+        case .networkProtectionReconnectingNotificationDisplayed:
+            return "netp_reconnecting_notification_displayed"
+
+        case .networkProtectionSupersededNotificationDisplayed:
+            return "netp_superseded_notification_displayed"
+
+        case .networkProtectionExpiredEntitlementNotificationDisplayed:
+            return "netp_expired_entitlement_notification_displayed"
         }
     }
 
@@ -300,9 +348,15 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionTunnelStartAttempt,
                 .networkProtectionTunnelStartSuccess,
                 .networkProtectionTunnelStartFailure,
+                .networkProtectionTunnelStopAttempt,
+                .networkProtectionTunnelStopSuccess,
+                .networkProtectionTunnelStopFailure,
                 .networkProtectionTunnelUpdateAttempt,
                 .networkProtectionTunnelUpdateSuccess,
                 .networkProtectionTunnelUpdateFailure,
+                .networkProtectionTunnelWakeAttempt,
+                .networkProtectionTunnelWakeSuccess,
+                .networkProtectionTunnelWakeFailure,
                 .networkProtectionEnableAttemptConnecting,
                 .networkProtectionEnableAttemptSuccess,
                 .networkProtectionEnableAttemptFailure,
@@ -328,7 +382,12 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionRekeyAttempt,
                 .networkProtectionRekeyCompleted,
                 .networkProtectionRekeyFailure,
-                .networkProtectionSystemExtensionActivationFailure:
+                .networkProtectionSystemExtensionActivationFailure,
+                .networkProtectionConnectedNotificationDisplayed,
+                .networkProtectionDisconnectedNotificationDisplayed,
+                .networkProtectionReconnectingNotificationDisplayed,
+                .networkProtectionSupersededNotificationDisplayed,
+                .networkProtectionExpiredEntitlementNotificationDisplayed:
             return nil
         }
     }
@@ -343,7 +402,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
             return error
         case .networkProtectionControllerStartFailure(let error),
                 .networkProtectionTunnelStartFailure(let error),
+                .networkProtectionTunnelStopFailure(let error),
                 .networkProtectionTunnelUpdateFailure(let error),
+                .networkProtectionTunnelWakeFailure(let error),
                 .networkProtectionClientFailedToParseRedeemResponse(let error),
                 .networkProtectionWireguardErrorCannotSetNetworkSettings(let error),
                 .networkProtectionRekeyFailure(let error),
@@ -356,8 +417,12 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionControllerStartSuccess,
                 .networkProtectionTunnelStartAttempt,
                 .networkProtectionTunnelStartSuccess,
+                .networkProtectionTunnelStopAttempt,
+                .networkProtectionTunnelStopSuccess,
                 .networkProtectionTunnelUpdateAttempt,
                 .networkProtectionTunnelUpdateSuccess,
+                .networkProtectionTunnelWakeAttempt,
+                .networkProtectionTunnelWakeSuccess,
                 .networkProtectionEnableAttemptConnecting,
                 .networkProtectionEnableAttemptSuccess,
                 .networkProtectionEnableAttemptFailure,
@@ -387,7 +452,12 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionWireguardErrorCannotStartWireguardBackend,
                 .networkProtectionNoAuthTokenFoundError,
                 .networkProtectionRekeyAttempt,
-                .networkProtectionRekeyCompleted:
+                .networkProtectionRekeyCompleted,
+                .networkProtectionConnectedNotificationDisplayed,
+                .networkProtectionDisconnectedNotificationDisplayed,
+                .networkProtectionReconnectingNotificationDisplayed,
+                .networkProtectionSupersededNotificationDisplayed,
+                .networkProtectionExpiredEntitlementNotificationDisplayed:
             return nil
         }
     }

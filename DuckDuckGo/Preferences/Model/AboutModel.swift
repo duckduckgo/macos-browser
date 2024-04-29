@@ -22,12 +22,6 @@ import Common
 final class AboutModel: ObservableObject, PreferencesTabOpening {
     let appVersion = AppVersion()
 
-    private let netPInvitePresenter: NetworkProtectionInvitePresenting
-
-    init(netPInvitePresenter: NetworkProtectionInvitePresenting) {
-        self.netPInvitePresenter = netPInvitePresenter
-    }
-
     let displayableAboutURL: String = URL.aboutDuckDuckGo
         .toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: false)
 
@@ -38,9 +32,5 @@ final class AboutModel: ObservableObject, PreferencesTabOpening {
 
     func copy(_ value: String) {
         NSPasteboard.general.copy(value)
-    }
-
-    func displayNetPInvite() {
-        netPInvitePresenter.present()
     }
 }

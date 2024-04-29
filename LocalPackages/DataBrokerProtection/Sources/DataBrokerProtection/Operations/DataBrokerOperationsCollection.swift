@@ -181,6 +181,7 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 runner: runner,
                                                                                 pixelHandler: pixelHandler,
                                                                                 showWebView: showWebView,
+                                                                                isManualScan: operationType == .scan,
                                                                                 userNotificationService: userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
@@ -192,8 +193,6 @@ final class DataBrokerOperationsCollection: Operation {
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
                 }
 
-                finish()
-
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 self.error = error
@@ -203,6 +202,8 @@ final class DataBrokerOperationsCollection: Operation {
                                                               withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }
+
+        finish()
     }
 
     private func finish() {

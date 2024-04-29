@@ -29,7 +29,7 @@ protocol NetworkProtectionFeatureDisabling {
     /// - Returns: `true` if the uninstallation was completed.  `false` if it was cancelled by the user or an error.
     ///
     @discardableResult
-    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool
+    func disable(uninstallSystemExtension: Bool) async -> Bool
 
     func stop()
 }
@@ -68,12 +68,11 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     /// This method disables the VPN and clear all of its state.
     ///
     /// - Parameters:
-    ///     - keepAuthToken: If `true`, the auth token will not be removed.
     ///     - includeSystemExtension: Whether this method should uninstall the system extension.
     ///
     @MainActor
     @discardableResult
-    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool {
+    func disable(uninstallSystemExtension: Bool) async -> Bool {
         // We can do this optimistically as it has little if any impact.
         unpinNetworkProtection()
 
@@ -118,10 +117,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         try? await Task.sleep(interval: 0.5)
         disableLoginItems()
 
-        if !keepAuthToken {
-            try? removeAppAuthToken()
-        }
-
         notifyVPNUninstalled()
         isDisabling = false
         return true
@@ -149,10 +144,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     private func unpinNetworkProtection() {
         pinningManager.unpin(.networkProtection)
-    }
-
-    private func removeAppAuthToken() throws {
-        try NetworkProtectionKeychainTokenStore().deleteToken()
     }
 
     private func removeVPNConfiguration() async throws {

@@ -1,7 +1,7 @@
 //
-//  NSStoryboardExtension.swift
+//  BookmarkFolderStoreMock.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-import AppKit
+import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
-extension NSStoryboard {
-
-    static var bookmarks = NSStoryboard(name: "Bookmarks", bundle: .main)
+final class BookmarkFolderStoreMock: BookmarkFoldersStore {
+    var lastBookmarkAllTabsFolderIdUsed: String?
 
 }

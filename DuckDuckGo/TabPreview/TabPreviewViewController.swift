@@ -185,7 +185,7 @@ extension TabPreviewViewController {
             let title: String
             var tabContent: Tab.TabContent
             let shouldShowPreview: Bool
-            var addressBarString: String { tabContent.url?.absoluteString ?? "Default" }
+            var addressBarString: String { tabContent.userEditableUrl?.absoluteString ?? "Default" }
 
             var snapshot: NSImage? {
                 let image = NSImage(size: size)
