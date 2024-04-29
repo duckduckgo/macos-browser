@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "graeme/vpn-server-failure-detection-recovery",
-        "revision" : "0406ce052f0e0486f2e09f4906b9d6f3e347f1f4"
+        "revision" : "e0a145685b49652f79b7f930b11b7d4cb078867b"
       }
     },
     {
@@ -120,7 +120,7 @@
     {
       "identity" : "swift-argument-parser",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-argument-parser",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
       "state" : {
         "revision" : "46989693916f56d1186bd59ac15124caef896560",
         "version" : "1.3.1"
