@@ -123,18 +123,12 @@ jobs:
     needs: [assert-project-membership]
 
     steps:
-    - name: Generate PR URL
-      id: pr-url
-      run: |
-        echo "url=https://github.com/${{ github.repository }}/pull/${{ github.event.number }}" >> "$GITHUB_OUTPUT"
-
     - name: Create or Update PR Subtask
       uses: duckduckgo/apple-infra/actions/asana-create-pr-subtask@main
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         asana-task-id: ${{ needs.assert-project-membership.outputs.task_id }}
         github-reviewer-user: ${{ github.event.requested_reviewer.login }}
-        github-pr-url: ${{ steps.pr-url.outputs.url }}
 
   # When a PR is merged, move the task to the Waiting for Release section of the App Board.
   mark-waiting-for-release:
