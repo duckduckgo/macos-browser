@@ -16,12 +16,12 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-import Sparkle
+import AppKit
 import BrowserServicesKit
-import SwiftUIExtensions
+import Combine
+import Foundation
 import PixelKit
+import Sparkle
 
 #if SPARKLE
 
@@ -63,14 +63,38 @@ final class UpdateController: NSObject {
 
     private var internalUserDecider: InternalUserDecider
 
+    private var updaterWindowsCancellable: AnyCancellable?
+
     private func configureUpdater() {
-    // The default configuration of Sparkle updates is in Info.plist
-    updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
+        // The default configuration of Sparkle updates is in Info.plist
+        updater = SPUStandardUpdaterController(updaterDelegate: self, userDriverDelegate: self)
 
 #if DEBUG
         updater.updater.automaticallyChecksForUpdates = false
         updater.updater.updateCheckInterval = 0
 #endif
+
+        subscribeToAppWindows()
+    }
+
+    func subscribeToAppWindows() {
+        // observe updater windows and App isActive state
+        updaterWindowsCancellable = NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)
+            .compactMap { _ -> [NSWindow]? in
+                let updaterWindows = NSApp.windows.filter {
+                    ["SUUpdateAlert", "SUStatusController"].contains($0.windowController?.className)
+                }
+                guard !updaterWindows.isEmpty else { return nil }
+                return updaterWindows
+            }
+            .removeDuplicates()
+            .combineLatest(NSApp.isActivePublisher())
+            .sink { (updaterWindows, appIsActive) in
+                // display updater windows on top when the app is active
+                for window in updaterWindows {
+                    window.level = appIsActive ? .modalPanel: .normal
+                }
+            }
     }
 
     private func showNotSupportedInfo() {
@@ -83,7 +107,6 @@ final class UpdateController: NSObject {
 }
 
 extension UpdateController: SPUStandardUserDriverDelegate {
-
 }
 
 extension UpdateController: SPUUpdaterDelegate {
