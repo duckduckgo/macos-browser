@@ -137,7 +137,7 @@ jobs:
         echo "url=https://github.com/${{ github.repository }}/pull/${{ github.event.number }}" >> "$GITHUB_OUTPUT"
 
     - name: Create or Update PR Subtask
-      uses: ./.github/actions/asana-create-pr-subtask
+      uses: duckduckgo/apple-infra/actions/asana-create-pr-subtask@main
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         asana-task-id: ${{ needs.assert-project-membership.outputs.task_id }}
