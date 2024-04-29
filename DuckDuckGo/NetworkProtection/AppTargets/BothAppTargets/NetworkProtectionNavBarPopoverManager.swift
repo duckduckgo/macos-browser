@@ -116,7 +116,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                                    userDefaults: .netP,
                                                    locationFormatter: DefaultVPNLocationFormatter(),
                                                    uninstallHandler: { [weak self] in
-                _ = await self?.networkProtectionFeatureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: true)
+                _ = await self?.networkProtectionFeatureDisabler.disable(uninstallSystemExtension: true)
             })
             popover.delegate = delegate
 
@@ -138,13 +138,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
             networkProtectionPopover.close()
             self.networkProtectionPopover = nil
         } else {
-            let featureVisibility = DefaultNetworkProtectionVisibility()
-
-            if featureVisibility.isNetworkProtectionBetaVisible() {
-                show(positionedBelow: view, withDelegate: delegate)
-            } else {
-                featureVisibility.disableForWaitlistUsers()
-            }
+            show(positionedBelow: view, withDelegate: delegate)
         }
     }
 

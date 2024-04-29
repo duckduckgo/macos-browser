@@ -88,7 +88,8 @@ enum Preferences {
                     GeneralView(startupModel: StartupPreferences.shared,
                                 downloadsModel: DownloadsPreferences.shared,
                                 searchModel: SearchPreferences.shared,
-                                tabsModel: TabsPreferences.shared)
+                                tabsModel: TabsPreferences.shared,
+                                dataClearingModel: DataClearingPreferences.shared)
                 case .sync:
                     SyncView()
                 case .appearance:
@@ -109,8 +110,7 @@ enum Preferences {
                     // Opens a new tab
                     Spacer()
                 case .about:
-                    let netPInvitePresenter = NetworkProtectionInvitePresenter()
-                    AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
+                    AboutView(model: AboutModel())
                 }
             }
             .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)

@@ -55,6 +55,8 @@ public struct UserDefaultsWrapper<T> {
         case grammarCheckEnabledOnce = "grammar.check.enabled.once"
 
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
+        case autoClearEnabled = "preferences.auto-clear-enabled"
+        case warnBeforeClearingEnabled = "preferences.warn-before-clearing-enabled"
         case gpcEnabled = "preferences.gpc-enabled"
         case selectedDownloadLocationKey = "preferences.download-location"
         case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
@@ -78,6 +80,8 @@ public struct UserDefaultsWrapper<T> {
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
+        case appTerminationHandledCorrectly = "app.termination.handled.correctly"
+        case restoreTabsOnStartup = "restore.tabs.on.startup"
 
         case restorePreviousSession = "preferences.startup.restore-previous-session"
         case launchToCustomHomePage = "preferences.startup.launch-to-custom-home-page"

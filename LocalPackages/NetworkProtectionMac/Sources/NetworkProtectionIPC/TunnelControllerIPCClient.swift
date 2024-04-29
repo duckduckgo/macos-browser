@@ -172,6 +172,12 @@ extension TunnelControllerIPCClient: IPCServerInterface {
         }, xpcReplyErrorHandler: completion)
     }
 
+    public func fetchLastError(completion: @escaping (Error?) -> Void) {
+        xpc.execute(call: { server in
+            server.fetchLastError(completion: completion)
+        }, xpcReplyErrorHandler: completion)
+    }
+
     public func debugCommand(_ command: DebugCommand) async throws {
         guard let payload = try? JSONEncoder().encode(command) else {
             return

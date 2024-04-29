@@ -289,43 +289,12 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func toggleNetworkProtectionPopover() {
-        let featureVisibility = DefaultNetworkProtectionVisibility()
-        guard featureVisibility.isNetworkProtectionBetaVisible() else {
-            featureVisibility.disableForWaitlistUsers()
-            LocalPinningManager.shared.unpin(.networkProtection)
+        guard DefaultSubscriptionFeatureAvailability().isFeatureAvailable,
+              NetworkProtectionKeychainTokenStore().isFeatureActivated else {
             return
         }
 
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-            let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
-
-            if accountManager.accessToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
-                print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
-                return
-            }
-        }
-
-        // Note: the following code is quite contrived but we're aiming to hotfix issues without mixing subscription and
-        // waitlist logic.  This should be cleaned up once waitlist can safely be removed.
-
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
-            }
-        } else {
-            // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
-            // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
-            // 3. If the user has no state of any kind, show the waitlist screen.
-
-            if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
-                NetworkProtectionWaitlistViewControllerPresenter.show()
-            } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
-            } else {
-                NetworkProtectionWaitlistViewControllerPresenter.show()
-            }
-        }
+        popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -610,7 +579,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         let heightChange: () -> Void
-        if animated && view.window != nil {
+        if animated, let window = view.window, window.isVisible == true {
             heightChange = {
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.1
@@ -632,13 +601,13 @@ final class NavigationBarViewController: NSViewController {
                 performResize()
             }
         }
-        if view.window == nil {
-            // update synchronously for off-screen view
-            heightChange()
-        } else {
+        if let window = view.window, window.isVisible {
             let dispatchItem = DispatchWorkItem(block: heightChange)
             DispatchQueue.main.async(execute: dispatchItem)
             self.heightChangeAnimation = dispatchItem
+        } else {
+            // update synchronously for off-screen view
+            heightChange()
         }
     }
 
@@ -673,13 +642,19 @@ final class NavigationBarViewController: NSViewController {
 
         downloadListCoordinator.progress.publisher(for: \.totalUnitCount)
             .combineLatest(downloadListCoordinator.progress.publisher(for: \.completedUnitCount))
-            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .map { (total, completed) -> Double? in
                 guard total > 0, completed < total else { return nil }
                 return Double(completed) / Double(total)
             }
+            .dropFirst()
+            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak downloadsProgressView] progress in
-                downloadsProgressView?.setProgress(progress, animated: true)
+                guard let downloadsProgressView else { return }
+                if progress == nil, downloadsProgressView.progress != 1 {
+                    // show download completed animation before hiding
+                    downloadsProgressView.setProgress(1, animated: true)
+                }
+                downloadsProgressView.setProgress(progress, animated: true)
             }
             .store(in: &downloadsCancellables)
     }
@@ -698,7 +673,7 @@ final class NavigationBarViewController: NSViewController {
         passwordManagementButton.menu = menu
         passwordManagementButton.toolTip = UserText.autofillShortcutTooltip
 
-        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url
+        let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.userEditableUrl
 
         passwordManagementButton.image = .passwordManagement
 
@@ -951,14 +926,8 @@ extension NavigationBarViewController: NSMenuDelegate {
     // MARK: - VPN
 
     func showNetworkProtectionStatus() {
-        let featureVisibility = DefaultNetworkProtectionVisibility()
-
-        if featureVisibility.isNetworkProtectionBetaVisible() {
-            popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
-                                                  withDelegate: networkProtectionButtonModel)
-        } else {
-            featureVisibility.disableForWaitlistUsers()
-        }
+        popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
+                                              withDelegate: networkProtectionButtonModel)
     }
 
     /// Sets up the VPN button.

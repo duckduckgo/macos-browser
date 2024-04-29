@@ -298,7 +298,7 @@ final class TabCollectionViewModelTests: XCTestCase {
 
         persistor.newTabPosition = .nextToCurrent
         tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(), pinnedTabsManager: PinnedTabsManager(),
-                                                            tabsPreferences: TabsPreferences(persistor: persistor))
+                                                        tabsPreferences: TabsPreferences(persistor: persistor))
 
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.select(at: .unpinned(0))
