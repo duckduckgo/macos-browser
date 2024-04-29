@@ -28,6 +28,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
     case networkProtectionControllerStartAttempt
     case networkProtectionControllerStartSuccess
+    case networkProtectionControllerStartCancelled
     case networkProtectionControllerStartFailure(_ error: Error)
 
     case networkProtectionTunnelStartAttempt
@@ -114,6 +115,9 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
 
         case .networkProtectionControllerStartSuccess:
             return "netp_controller_start_success"
+
+        case .networkProtectionControllerStartCancelled:
+            return "netp_controller_start_cancelled"
 
         case .networkProtectionControllerStartFailure:
             return "netp_controller_start_failure"
@@ -322,6 +326,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionNewUser,
                 .networkProtectionControllerStartAttempt,
                 .networkProtectionControllerStartSuccess,
+                .networkProtectionControllerStartCancelled,
                 .networkProtectionControllerStartFailure,
                 .networkProtectionTunnelStartAttempt,
                 .networkProtectionTunnelStartSuccess,
@@ -388,6 +393,7 @@ enum NetworkProtectionPixelEvent: PixelKitEventV2 {
                 .networkProtectionNewUser,
                 .networkProtectionControllerStartAttempt,
                 .networkProtectionControllerStartSuccess,
+                .networkProtectionControllerStartCancelled,
                 .networkProtectionTunnelStartAttempt,
                 .networkProtectionTunnelStartSuccess,
                 .networkProtectionTunnelStopAttempt,
