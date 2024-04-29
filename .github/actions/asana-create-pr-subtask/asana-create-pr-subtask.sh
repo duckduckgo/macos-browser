@@ -73,16 +73,16 @@ _create_pr_subtask() {
 	local url="${asana_api_url}/tasks/${asana_task_id}/subtasks?opt_fields=gid"
 
 	local payload
-	payload=$(cat <<EOF
-	{
-		"data": {
-			"assignee": "${asana_assignee_id}",
-			"notes": "${pr_prefix} ${github_pr_url}",
-			"name": "${pr_prefix} ${parent_task_name}"
+	payload=$(cat <<-EOF
+		{
+			"data": {
+				"assignee": "${asana_assignee_id}",
+				"notes": "${pr_prefix} ${github_pr_url}",
+				"name": "${pr_prefix} ${parent_task_name}"
+			}
 		}
-	}
-EOF
-)
+		EOF
+	)
 
 	_execute_create_or_update_asana_task_request POST "$url" "$payload"
 }
