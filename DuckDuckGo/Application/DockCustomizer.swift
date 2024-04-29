@@ -28,6 +28,8 @@ protocol DockCustomization {
 
 final class DockCustomizer: DockCustomization {
 
+    let positionProvider: DockPositionProviding = DockPositionProvider()
+
     var isAddedToDock: Bool {
         // Checks if the current application is already in the Dock
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
@@ -80,6 +82,7 @@ final class DockCustomizer: DockCustomization {
             return false
         }
 
+        let appDict: [String: AnyObject]
         // Find the app in recent apps
         if let recentAppIndex = recentApps.firstIndex(where: { appDict in
             if let tileData = appDict["tile-data"] as? [String: AnyObject],
@@ -88,14 +91,28 @@ final class DockCustomizer: DockCustomization {
             }
             return false
         }) {
-            let appDict = recentApps[recentAppIndex]
-            // Move from recent to persistent
-            persistentApps.append(appDict)
+            // Use existing dictonary from recentApps
+            appDict = recentApps[recentAppIndex]
         } else {
             // Create the dictionary for the current application if not found in recent apps
-            let appDict: [String: AnyObject] = ["tile-data": ["file-data": ["_CFURLString": "file://" + appPath + "/", "_CFURLStringType": 0]] as AnyObject]
-            persistentApps.append(appDict)
+            appDict = ["tile-type": "file-tile" as AnyObject,
+                       "tile-data": [
+                            "dock-extra": 0 as AnyObject,
+                            "file-type": 1 as AnyObject,
+                            "file-data": [
+                                "_CFURLString": "file://" + appPath + "/",
+                                "_CFURLStringType": 15
+                            ],
+                            "file-label": "DuckDuckGo" as AnyObject,
+                            "bundle-identifier": bundleIdentifier as AnyObject,
+                            "is-beta": 0 as AnyObject
+                        ] as AnyObject
+            ]
         }
+
+        // Insert to persistent apps
+        let index = positionProvider.newDockIndex(from: makeDockApps(from: persistentApps))
+        persistentApps.insert(appDict, at: index)
 
         // Update the plist
         dockPlistDict["persistent-apps"] = persistentApps as AnyObject?
@@ -130,4 +147,20 @@ final class DockCustomizer: DockCustomization {
         task.arguments = ["Dock"]
         task.launch()
     }
+}
+
+extension DockCustomizer {
+
+    func makeDockApps(from persistentApps: [[String: AnyObject]]) -> [DockApp] {
+        return persistentApps.map { appDict in
+            let tileData = appDict["tile-data"] as? [String: AnyObject]
+            if let appBundleIdentifier = tileData?["bundle-identifier"] as? String,
+               let dockApp = DockApp(rawValue: appBundleIdentifier.lowercased()) {
+                return dockApp
+            } else {
+                return .unknown
+            }
+        }
+    }
+
 }
