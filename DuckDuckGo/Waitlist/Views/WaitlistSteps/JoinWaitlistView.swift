@@ -73,16 +73,6 @@ struct JoinWaitlistView: View {
     }
 }
 
-struct NetworkProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
-    let headerImageName = "JoinWaitlistHeader"
-    let title = UserText.networkProtectionWaitlistJoinTitle
-    let subtitle1 = UserText.networkProtectionWaitlistJoinSubtitle1
-    let subtitle2 = UserText.networkProtectionWaitlistJoinSubtitle2
-    let availabilityDisclaimer = UserText.networkProtectionWaitlistAvailabilityDisclaimer
-    let buttonCloseLabel = UserText.networkProtectionWaitlistButtonClose
-    let buttonJoinWaitlistLabel = UserText.networkProtectionWaitlistButtonJoinWaitlist
-}
-
 #if DBP
 
 struct DataBrokerProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {

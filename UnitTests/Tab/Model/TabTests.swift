@@ -368,7 +368,7 @@ final class TabTests: XCTestCase {
 extension Tab {
     var url: URL? {
         get {
-            content.url
+            content.userEditableUrl
         }
         set {
             setContent(newValue.map { TabContent.url($0, source: .link) } ?? .newtab)
