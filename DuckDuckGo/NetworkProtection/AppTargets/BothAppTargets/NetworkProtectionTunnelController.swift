@@ -564,7 +564,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
             if case StartError.cancelled = error {
                 PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionControllerStartCancelled, frequency: .dailyAndCount, includeAppVersionParameter: true
+                    NetworkProtectionPixelEvent.networkProtectionControllerStartSuccess, frequency: .dailyAndCount, includeAppVersionParameter: true
                 )
             } else {
                 PixelKit.fire(
