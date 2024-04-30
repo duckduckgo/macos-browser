@@ -124,7 +124,7 @@ jobs:
 
     steps:
     - name: Create or Update PR Subtask
-      uses: duckduckgo/apple-infra/actions/asana-create-pr-subtask@main
+      uses: duckduckgo/apple-toolbox/actions/asana-create-pr-subtask@main
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         asana-task-id: ${{ needs.assert-project-membership.outputs.task_id }}
