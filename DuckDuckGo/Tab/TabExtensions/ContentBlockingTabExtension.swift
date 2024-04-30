@@ -139,7 +139,7 @@ extension ContentBlockingTabExtension: ContentBlockerRulesUserScriptDelegate {
 
     func contentBlockerRulesUserScript(_ script: ContentBlockerRulesUserScript, detectedTracker tracker: DetectedRequest) {
         trackersSubject.send(DetectedTracker(request: tracker, type: .tracker))
-        if tracker.state == BlockingState.blocked && tracker.ownerName == "Facebook, Inc." {
+        if tracker.state == BlockingState.blocked && tracker.ownerName == fbBlockingEnabledProvider.fbEntity {
             fbBlockingEnabledProvider.trackerDetected()
         }
     }

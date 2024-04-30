@@ -30,6 +30,8 @@ final class FBProtectionTabExtension {
 
     private var cancellables = Set<AnyCancellable>()
 
+    let fbEntity = "Facebook, Inc."
+
     var fbBlockingEnabled = true
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging,
@@ -129,6 +131,7 @@ extension FBProtectionTabExtension: NavigationResponder {
 
 protocol FbBlockingEnabledProvider {
     var fbBlockingEnabled: Bool { get }
+    var fbEntity: String { get }
     func trackerDetected()
 }
 
