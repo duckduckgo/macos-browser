@@ -339,8 +339,12 @@ extension HomePage.Models {
         }
 
         private var shouldDockCardBeVisible: Bool {
+#if !APPSTORE
             shouldShowAddToDockSetting &&
             !dockCustomizer.isAddedToDock
+#else
+            return false
+#endif
         }
 
         private var shouldImportCardBeVisible: Bool {

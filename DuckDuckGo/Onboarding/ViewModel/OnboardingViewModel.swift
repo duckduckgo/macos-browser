@@ -109,13 +109,25 @@ final class OnboardingViewModel: ObservableObject {
     @MainActor
     func onSetDefaultPressed() {
         delegate?.onboardingDidRequestSetDefault { [weak self] in
+#if !APPSTORE
             self?.state = .addToDock
+#else
+            self?.state = .startBrowsing
+            Self.isOnboardingFinished = true
+            self?.delegate?.onboardingHasFinished()
+#endif
         }
     }
 
     @MainActor
     func onSetDefaultSkipped() {
+#if !APPSTORE
         state = .addToDock
+#else
+        state = .startBrowsing
+        Self.isOnboardingFinished = true
+        delegate?.onboardingHasFinished()
+#endif
     }
 
     @MainActor
