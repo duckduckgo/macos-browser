@@ -610,15 +610,15 @@ struct UserText {
 
     static let tabs = NSLocalizedString("preferences-tabs.title", value: "Tabs", comment: "Title for tabs section in settings")
     static let preferNewTabsToWindows = NSLocalizedString("preferences-tabs.prefer.new.tabs.to.windows", value: "Open links in new tabs instead of new windows whenever possible", comment: "Option to prefer opening new tabs instead of windows when opening links")
-    static let switchToNewTabWhenOpened = NSLocalizedString("preferences-tabs.switch.tab.when.opened", value: "Always switch to a new tab when opened", comment: "Option to switch to a new tab when it is opened")
-    static let newTabPositionTitle = NSLocalizedString("preferences-tabs.new.tab.position.title", value: "Open new tabs", comment: "Title for new tab positioning")
+    static let switchToNewTabWhenOpened = NSLocalizedString("preferences-tabs.switch.tab.when.opened", value: "When opening links, switch to the new tab or window immediately", comment: "Option to switch to a new tab/window when it is opened")
+    static let newTabPositionTitle = NSLocalizedString("preferences-tabs.new.tab.position.title", value: "When creating a new tab", comment: "Title for new tab positioning")
 
     static func newTabPositionMode(for position: NewTabPosition) -> String {
         switch position {
         case .atEnd:
-            return NSLocalizedString("context.menu.new.tab.mode.at.end", value: "At the end of tabs list", comment: "Preferences > Tabs > At end of list")
+            return NSLocalizedString("context.menu.new.tab.mode.at.end", value: "Add to the right of other tabs", comment: "Preferences > Tabs > At end of list")
         case .nextToCurrent:
-            return NSLocalizedString("context.menu.new.tab.mode.next.to.current", value: "Next to the current tab", comment: "Preferences > Tabs > Next to current tab")
+            return NSLocalizedString("context.menu.new.tab.mode.next.to.current", value: "Add to the right of the current tab", comment: "Preferences > Tabs > Next to current tab")
         }
     }
 

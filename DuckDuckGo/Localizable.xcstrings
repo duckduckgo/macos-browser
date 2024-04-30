@@ -12033,7 +12033,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "At the end of tabs list"
+            "value" : "Add to the right of other tabs"
           }
         }
       }
@@ -12045,7 +12045,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Next to the current tab"
+            "value" : "Add to the right of the current tab"
           }
         }
       }
@@ -43707,7 +43707,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Open new tabs"
+            "value" : "When creating a new tab"
           }
         }
       }
@@ -43725,13 +43725,13 @@
       }
     },
     "preferences-tabs.switch.tab.when.opened" : {
-      "comment" : "Option to switch to a new tab when it is opened",
+      "comment" : "Option to switch to a new tab/window when it is opened",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Always switch to a new tab when opened"
+            "value" : "When opening links, switch to the new tab or window immediately"
           }
         }
       }
