@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sam/remove-subscription-bsk-dependency",
-        "revision" : "2158b99acaa664ddf32fd13b7ef40affe2c5fba9"
+        "revision" : "0c569fa98de345b8f6d8411512ffdeeb148d248e"
       }
     },
     {
