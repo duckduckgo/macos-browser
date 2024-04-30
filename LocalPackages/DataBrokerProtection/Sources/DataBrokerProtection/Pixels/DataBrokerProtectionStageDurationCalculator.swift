@@ -38,6 +38,7 @@ enum Stage: String {
 
 protocol StageDurationCalculator {
     var attemptId: UUID { get }
+    var isManualScan: Bool { get }
 
     func durationSinceLastStage() -> Double
     func durationSinceStartTime() -> Double
@@ -62,6 +63,7 @@ protocol StageDurationCalculator {
 }
 
 final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator {
+    let isManualScan: Bool
     let handler: EventMapping<DataBrokerProtectionPixels>
     let attemptId: UUID
     let dataBroker: String
@@ -74,12 +76,14 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),
          dataBroker: String,
-         handler: EventMapping<DataBrokerProtectionPixels>) {
+         handler: EventMapping<DataBrokerProtectionPixels>,
+         isManualScan: Bool = false) {
         self.attemptId = attemptId
         self.startTime = startTime
         self.lastStateTime = startTime
         self.dataBroker = dataBroker
         self.handler = handler
+        self.isManualScan = isManualScan
     }
 
     /// Returned in milliseconds
@@ -159,11 +163,11 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
     }
 
     func fireScanSuccess(matchesFound: Int) {
-        handler.fire(.scanSuccess(dataBroker: dataBroker, matchesFound: matchesFound, duration: durationSinceStartTime(), tries: 1))
+        handler.fire(.scanSuccess(dataBroker: dataBroker, matchesFound: matchesFound, duration: durationSinceStartTime(), tries: 1, isManualScan: isManualScan))
     }
 
     func fireScanFailed() {
-        handler.fire(.scanFailed(dataBroker: dataBroker, duration: durationSinceStartTime(), tries: 1))
+        handler.fire(.scanFailed(dataBroker: dataBroker, duration: durationSinceStartTime(), tries: 1, isManualScan: isManualScan))
     }
 
     func fireScanError(error: Error) {
@@ -200,7 +204,8 @@ final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator
                 dataBroker: dataBroker,
                 duration: durationSinceStartTime(),
                 category: errorCategory.toString,
-                details: error.localizedDescription
+                details: error.localizedDescription,
+                isManualScan: isManualScan
             )
         )
     }

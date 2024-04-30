@@ -41,6 +41,8 @@ final class ScanOperation: DataBrokerOperation {
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
     let clickAwaitTime: TimeInterval
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    var postLoadingSiteStartTime: Date?
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
@@ -51,6 +53,7 @@ final class ScanOperation: DataBrokerOperation {
          operationAwaitTime: TimeInterval = 3,
          clickAwaitTime: TimeInterval = 0,
          stageDurationCalculator: StageDurationCalculator,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -63,6 +66,7 @@ final class ScanOperation: DataBrokerOperation {
         self.shouldRunNextStep = shouldRunNextStep
         self.clickAwaitTime = clickAwaitTime
         self.cookieHandler = cookieHandler
+        self.pixelHandler = pixelHandler
     }
 
     func run(inputValue: InputValue,

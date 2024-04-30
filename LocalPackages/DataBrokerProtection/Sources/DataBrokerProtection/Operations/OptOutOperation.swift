@@ -40,6 +40,8 @@ final class OptOutOperation: DataBrokerOperation {
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
     let clickAwaitTime: TimeInterval
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    var postLoadingSiteStartTime: Date?
 
     // Captcha is a third-party resource that sometimes takes more time to load
     // if we are not able to get the captcha information. We will try to run the action again
@@ -57,6 +59,7 @@ final class OptOutOperation: DataBrokerOperation {
          operationAwaitTime: TimeInterval = 3,
          clickAwaitTime: TimeInterval = 40,
          stageCalculator: StageDurationCalculator,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -69,6 +72,7 @@ final class OptOutOperation: DataBrokerOperation {
         self.shouldRunNextStep = shouldRunNextStep
         self.clickAwaitTime = clickAwaitTime
         self.cookieHandler = cookieHandler
+        self.pixelHandler = pixelHandler
     }
 
     func run(inputValue: ExtractedProfile,
