@@ -26,6 +26,7 @@ enum DockApp: String, CaseIterable {
     case opera = "/Applications/Opera.app/"
     case arc = "/Applications/Arc.app/"
     case safari = "/Applications/Safari.app/"
+    case safariLong = "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app/"
     case unknown = ""
 
     var url: URL {
@@ -47,7 +48,8 @@ final class DockPositionProvider: DockPositionProviding {
         .brave,
         .opera,
         .arc,
-        .safari
+        .safari,
+        .safariLong
     ]
 
     private var defaultBrowserProvider: DefaultBrowserProvider
