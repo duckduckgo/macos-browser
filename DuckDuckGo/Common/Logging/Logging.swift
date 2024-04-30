@@ -29,7 +29,6 @@ extension OSLog {
         case fire = "Fire"
         case dataImportExport = "Data Import/Export"
         case pixel = "Pixel"
-        case contentBlocking = "Content Blocking"
         case httpsUpgrade = "HTTPS Upgrade"
         case favicons = "Favicons"
         case autoLock = "Auto-Lock"
@@ -58,7 +57,6 @@ extension OSLog {
     @OSLogWrapper(.fire) static var fire
     @OSLogWrapper(.dataImportExport) static var dataImportExport
     @OSLogWrapper(.pixel) static var pixel
-    @OSLogWrapper(.contentBlocking) static var contentBlocking
     @OSLogWrapper(.httpsUpgrade) static var httpsUpgrade
     @OSLogWrapper(.favicons) static var favicons
     @OSLogWrapper(.autoLock) static var autoLock
