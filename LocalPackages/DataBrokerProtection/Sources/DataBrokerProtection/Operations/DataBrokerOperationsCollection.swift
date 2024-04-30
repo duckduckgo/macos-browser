@@ -19,13 +19,91 @@
 import Foundation
 import Common
 
-protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
-                                        didError error: Error,
-                                        whileRunningBrokerOperationData: BrokerOperationData,
-                                        withDataBrokerName dataBrokerName: String?)
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
-                                        didErrorBeforeStartingBrokerOperations error: Error)
+protocol DataBrokerOperationsBuilder {
+    func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
+                                              operationType: DataBrokerOperationsCollection.OperationType,
+                                              priorityDate: Date?,
+                                              showWebView: Bool,
+                                              database: DataBrokerProtectionRepository,
+                                              intervalBetweenOperations: TimeInterval?,
+                                              notificationCenter: NotificationCenter,
+                                              runner: WebOperationRunner,
+                                              pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                                              userNotificationService: DataBrokerProtectionUserNotificationService) -> [DataBrokerOperationsCollection]
+
+}
+
+final class DefaultDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
+    func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
+                                              operationType: DataBrokerOperationsCollection.OperationType,
+                                              priorityDate: Date?,
+                                              showWebView: Bool,
+                                              database: DataBrokerProtectionRepository,
+                                              intervalBetweenOperations: TimeInterval? = nil,
+                                              notificationCenter: NotificationCenter = NotificationCenter.default,
+                                              runner: WebOperationRunner,
+                                              pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                                              userNotificationService: DataBrokerProtectionUserNotificationService) -> [DataBrokerOperationsCollection] {
+
+        var collections: [DataBrokerOperationsCollection] = []
+        var visitedDataBrokerIDs: Set<Int64> = []
+
+        for queryData in brokerProfileQueriesData {
+
+            guard let dataBrokerID = queryData.dataBroker.id else { continue }
+
+            let groupedBrokerQueries = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }
+            let filteredAndSortedOperationsData = filterAndSortOperationsData(brokerProfileQueriesData: groupedBrokerQueries,
+                                                                              operationType: operationType,
+                                                                              priorityDate: priorityDate)
+
+            if !visitedDataBrokerIDs.contains(dataBrokerID) {
+                let collection = DataBrokerOperationsCollection(database: database,
+                                                                operationType: operationType,
+                                                                intervalBetweenOperations: intervalBetweenOperations,
+                                                                priorityDate: priorityDate,
+                                                                notificationCenter: notificationCenter,
+                                                                runner: runner,
+                                                                pixelHandler: pixelHandler,
+                                                                userNotificationService: userNotificationService,
+                                                                operationData: filteredAndSortedOperationsData,
+                                                                profileQueryData: groupedBrokerQueries,
+                                                                showWebView: showWebView)
+                collections.append(collection)
+
+                visitedDataBrokerIDs.insert(dataBrokerID)
+            }
+        }
+
+        return collections
+    }
+
+    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData],
+                                             operationType: DataBrokerOperationsCollection.OperationType,
+                                             priorityDate: Date?) -> [BrokerOperationData] {
+        let operationsData: [BrokerOperationData]
+
+        switch operationType {
+        case .optOut:
+            operationsData = brokerProfileQueriesData.flatMap { $0.optOutOperationsData }
+        case .scan:
+            operationsData = brokerProfileQueriesData.compactMap { $0.scanOperationData }
+        case .all:
+            operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
+        }
+
+        let filteredAndSortedOperationsData: [BrokerOperationData]
+
+        if let priorityDate = priorityDate {
+            filteredAndSortedOperationsData = operationsData
+                .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
+                .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
+        } else {
+            filteredAndSortedOperationsData = operationsData
+        }
+
+        return filteredAndSortedOperationsData
+    }
 }
 
 final class DataBrokerOperationsCollection: Operation {
@@ -37,13 +115,12 @@ final class DataBrokerOperationsCollection: Operation {
     }
 
     public var error: Error?
-    public weak var errorDelegate: DataBrokerOperationsCollectionErrorDelegate?
 
-    private let dataBrokerID: Int64
-    private let database: DataBrokerProtectionRepository
     private let id = UUID()
     private var _isExecuting = false
     private var _isFinished = false
+
+    private let database: DataBrokerProtectionRepository
     private let intervalBetweenOperations: TimeInterval? // The time in seconds to wait in-between operations
     private let priorityDate: Date? // The date to filter and sort operations priorities
     private let operationType: OperationType
@@ -52,23 +129,25 @@ final class DataBrokerOperationsCollection: Operation {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let showWebView: Bool
     private let userNotificationService: DataBrokerProtectionUserNotificationService
+    private let operationData: [BrokerOperationData]
+    private let profileQueryData: [BrokerProfileQueryData]
 
     deinit {
         os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 
-    init(dataBrokerID: Int64,
-         database: DataBrokerProtectionRepository,
+    init(database: DataBrokerProtectionRepository,
          operationType: OperationType,
-         intervalBetweenOperations: TimeInterval? = nil,
+         intervalBetweenOperations: TimeInterval?,
          priorityDate: Date? = nil,
          notificationCenter: NotificationCenter = NotificationCenter.default,
          runner: WebOperationRunner,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          userNotificationService: DataBrokerProtectionUserNotificationService,
+         operationData: [BrokerOperationData],
+         profileQueryData: [BrokerProfileQueryData],
          showWebView: Bool) {
 
-        self.dataBrokerID = dataBrokerID
         self.database = database
         self.intervalBetweenOperations = intervalBetweenOperations
         self.priorityDate = priorityDate
@@ -78,6 +157,8 @@ final class DataBrokerOperationsCollection: Operation {
         self.pixelHandler = pixelHandler
         self.showWebView = showWebView
         self.userNotificationService = userNotificationService
+        self.operationData = operationData
+        self.profileQueryData = profileQueryData
         super.init()
     }
 
@@ -113,58 +194,15 @@ final class DataBrokerOperationsCollection: Operation {
         }
     }
 
-    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerOperationData] {
-        let operationsData: [BrokerOperationData]
-
-        switch operationType {
-        case .optOut:
-            operationsData = brokerProfileQueriesData.flatMap { $0.optOutOperationsData }
-        case .scan:
-            operationsData = brokerProfileQueriesData.compactMap { $0.scanOperationData }
-        case .all:
-            operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
-        }
-
-        let filteredAndSortedOperationsData: [BrokerOperationData]
-
-        if let priorityDate = priorityDate {
-            filteredAndSortedOperationsData = operationsData
-                .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
-                .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
-        } else {
-            filteredAndSortedOperationsData = operationsData
-        }
-
-        return filteredAndSortedOperationsData
-    }
-
-    // swiftlint:disable:next function_body_length
     private func runOperation() async {
-        let allBrokerProfileQueryData: [BrokerProfileQueryData]
 
-        do {
-            allBrokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
-        } catch {
-            os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
-            errorDelegate?.dataBrokerOperationsCollection(self, didErrorBeforeStartingBrokerOperations: error)
-            return
-        }
-
-        let brokerProfileQueriesData = allBrokerProfileQueryData.filter { $0.dataBroker.id == dataBrokerID }
-
-        let filteredAndSortedOperationsData = filterAndSortOperationsData(brokerProfileQueriesData: brokerProfileQueriesData,
-                                                                          operationType: operationType,
-                                                                          priorityDate: priorityDate)
-
-        os_log("filteredAndSortedOperationsData count: %{public}d for brokerID %{public}d", log: .dataBrokerProtection, filteredAndSortedOperationsData.count, dataBrokerID)
-
-        for operationData in filteredAndSortedOperationsData {
+        for operationData in operationData {
             if isCancelled {
                 os_log("Cancelled operation, returning...", log: .dataBrokerProtection)
                 return
             }
 
-            let brokerProfileData = brokerProfileQueriesData.filter {
+            let brokerProfileData = profileQueryData.filter {
                 $0.dataBroker.id == operationData.brokerId && $0.profileQuery.id == operationData.profileQueryId
             }.first
 
@@ -196,10 +234,10 @@ final class DataBrokerOperationsCollection: Operation {
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 self.error = error
-                errorDelegate?.dataBrokerOperationsCollection(self,
-                                                              didError: error,
-                                                              whileRunningBrokerOperationData: operationData,
-                                                              withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
+                if let error = error as? DataBrokerProtectionError,
+                   let dataBrokerName = profileQueryData.first?.dataBroker.name {
+                    pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
+                }
             }
         }
 

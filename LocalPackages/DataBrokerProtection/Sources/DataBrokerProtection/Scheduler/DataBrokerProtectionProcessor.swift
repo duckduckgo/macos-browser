@@ -34,13 +34,15 @@ final class DataBrokerProtectionProcessor {
     private let userNotificationService: DataBrokerProtectionUserNotificationService
     private let engagementPixels: DataBrokerProtectionEngagementPixels
     private let eventPixels: DataBrokerProtectionEventPixels
+    private let operationsBuilder: DataBrokerOperationsBuilder
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
-         userNotificationService: DataBrokerProtectionUserNotificationService) {
+         userNotificationService: DataBrokerProtectionUserNotificationService,
+         operationsBuilder: DataBrokerOperationsBuilder = DefaultDataBrokerOperationsBuilder()) {
 
         self.database = database
         self.config = config
@@ -52,6 +54,7 @@ final class DataBrokerProtectionProcessor {
         self.userNotificationService = userNotificationService
         self.engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
         self.eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
+        self.operationsBuilder = operationsBuilder
     }
 
     // MARK: - Public functions
@@ -129,10 +132,16 @@ final class DataBrokerProtectionProcessor {
 
         do {
             let brokersProfileData = try database.fetchAllBrokerProfileQueryData()
-            dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
-                                                                                      operationType: operationType,
-                                                                                      priorityDate: priorityDate,
-                                                                                      showWebView: showWebView)
+            dataBrokerOperationCollections = self.operationsBuilder.createDataBrokerOperationCollections(from: brokersProfileData,
+                                                                                                         operationType: operationType,
+                                                                                                         priorityDate: priorityDate,
+                                                                                                         showWebView: showWebView,
+                                                                                                         database: database, 
+                                                                                                         intervalBetweenOperations: 2,
+                                                                                                         notificationCenter: .default,
+                                                                                                         runner: operationRunnerProvider.getOperationRunner(),
+                                                                                                         pixelHandler: pixelHandler,
+                                                                                                         userNotificationService: userNotificationService)
 
             for collection in dataBrokerOperationCollections {
                 operationQueue.addOperation(collection)
@@ -152,58 +161,7 @@ final class DataBrokerProtectionProcessor {
         }
     }
 
-    private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
-                                                      operationType: DataBrokerOperationsCollection.OperationType,
-                                                      priorityDate: Date?,
-                                                      showWebView: Bool) -> [DataBrokerOperationsCollection] {
-
-        var collections: [DataBrokerOperationsCollection] = []
-        var visitedDataBrokerIDs: Set<Int64> = []
-
-        for queryData in brokerProfileQueriesData {
-            guard let dataBrokerID = queryData.dataBroker.id else { continue }
-
-            if !visitedDataBrokerIDs.contains(dataBrokerID) {
-                let collection = DataBrokerOperationsCollection(dataBrokerID: dataBrokerID,
-                                                                database: database,
-                                                                operationType: operationType,
-                                                                intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,
-                                                                priorityDate: priorityDate,
-                                                                notificationCenter: notificationCenter,
-                                                                runner: operationRunnerProvider.getOperationRunner(),
-                                                                pixelHandler: pixelHandler,
-                                                                userNotificationService: userNotificationService,
-                                                                showWebView: showWebView)
-                collection.errorDelegate = self
-                collections.append(collection)
-
-                visitedDataBrokerIDs.insert(dataBrokerID)
-            }
-        }
-
-        return collections
-    }
-
     deinit {
         os_log("Deinit DataBrokerProtectionProcessor", log: .dataBrokerProtection)
-    }
-}
-
-extension DataBrokerProtectionProcessor: DataBrokerOperationsCollectionErrorDelegate {
-
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection, didErrorBeforeStartingBrokerOperations error: Error) {
-
-    }
-
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
-                                        didError error: Error,
-                                        whileRunningBrokerOperationData: BrokerOperationData,
-                                        withDataBrokerName dataBrokerName: String?) {
-        if let error = error as? DataBrokerProtectionError,
-           let dataBrokerName = dataBrokerName {
-            pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
-        } else {
-            os_log("Cant handle error", log: .dataBrokerProtection)
-        }
     }
 }
