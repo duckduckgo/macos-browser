@@ -28,7 +28,23 @@ protocol DockCustomization {
 
 final class DockCustomizer: DockCustomization {
 
-    let positionProvider: DockPositionProviding = DockPositionProvider()
+    static func appDict(appPath: String, bundleIdentifier: String) -> [String: AnyObject] {
+        return ["tile-type": "file-tile" as AnyObject,
+                "tile-data": [
+                    "dock-extra": 0 as AnyObject,
+                    "file-type": 1 as AnyObject,
+                    "file-data": [
+                        "_CFURLString": "file://" + appPath + "/",
+                        "_CFURLStringType": 15
+                    ],
+                    "file-label": "DuckDuckGo" as AnyObject,
+                    "bundle-identifier": bundleIdentifier as AnyObject,
+                    "is-beta": 0 as AnyObject
+                ] as AnyObject
+        ]
+    }
+
+    let positionProvider: DockPositionProviding = DockPositionProvider(defaultBrowserProvider: SystemDefaultBrowserProvider())
 
     var isAddedToDock: Bool {
         // Checks if the current application is already in the Dock
@@ -95,23 +111,11 @@ final class DockCustomizer: DockCustomization {
             appDict = recentApps[recentAppIndex]
         } else {
             // Create the dictionary for the current application if not found in recent apps
-            appDict = ["tile-type": "file-tile" as AnyObject,
-                       "tile-data": [
-                            "dock-extra": 0 as AnyObject,
-                            "file-type": 1 as AnyObject,
-                            "file-data": [
-                                "_CFURLString": "file://" + appPath + "/",
-                                "_CFURLStringType": 15
-                            ],
-                            "file-label": "DuckDuckGo" as AnyObject,
-                            "bundle-identifier": bundleIdentifier as AnyObject,
-                            "is-beta": 0 as AnyObject
-                        ] as AnyObject
-            ]
+            appDict = Self.appDict(appPath: appPath, bundleIdentifier: bundleIdentifier)
         }
 
         // Insert to persistent apps
-        let index = positionProvider.newDockIndex(from: makeDockApps(from: persistentApps))
+        let index = positionProvider.newDockIndex(from: makeAppURLs(from: persistentApps))
         persistentApps.insert(appDict, at: index)
 
         // Update the plist
@@ -151,14 +155,15 @@ final class DockCustomizer: DockCustomization {
 
 extension DockCustomizer {
 
-    func makeDockApps(from persistentApps: [[String: AnyObject]]) -> [DockApp] {
-        return persistentApps.map { appDict in
-            let tileData = appDict["tile-data"] as? [String: AnyObject]
-            if let appBundleIdentifier = tileData?["bundle-identifier"] as? String,
-               let dockApp = DockApp(rawValue: appBundleIdentifier.lowercased()) {
-                return dockApp
+    func makeAppURLs(from persistentApps: [[String: AnyObject]]) -> [URL] {
+        return persistentApps.compactMap { appDict in
+            if let tileData = appDict["tile-data"] as? [String: AnyObject],
+               let appBundleIdentifier = tileData["file-data"] as? [String: AnyObject],
+               let urlString = appBundleIdentifier["_CFURLString"] as? String,
+               let url = URL(string: urlString) {
+                return url
             } else {
-                return .unknown
+                return nil
             }
         }
     }

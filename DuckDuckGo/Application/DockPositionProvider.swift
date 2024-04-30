@@ -18,24 +18,26 @@
 
 import Foundation
 
-enum DockApp: String {
-    case chrome = "com.google.chrome"
-    case firefox = "org.mozilla.firefox"
-    case edge = "com.microsoft.msedge"
-    case brave = "com.brave.browser"
-    case opera = "com.operasoftware.opera"
-    case arc = "company.thebrowser.browser"
-    case safari = "com.apple.safari"
+enum DockApp: String, CaseIterable {
+    case chrome = "/Applications/Google Chrome.app/"
+    case firefox = "/Applications/Firefox.app/"
+    case edge = "/Applications/Microsoft Edge.app/"
+    case brave = "/Applications/Brave Browser.app/"
+    case opera = "/Applications/Opera.app/"
+    case arc = "/Applications/Arc.app/"
+    case safari = "/Applications/Safari.app/"
     case unknown = ""
+
+    var url: URL {
+        return URL(string: "file://" + self.rawValue)!
+    }
 }
 
 protocol DockPositionProviding {
-
-    func newDockIndex(from currentApps: [DockApp]) -> Int
-
+    func newDockIndex(from currentAppURLs: [URL]) -> Int
 }
 
-/// Class to determine the new dock position
+/// Class to determine the best positioning in the Dock
 final class DockPositionProvider: DockPositionProviding {
 
     private let preferredOrder: [DockApp] = [
@@ -48,16 +50,29 @@ final class DockPositionProvider: DockPositionProviding {
         .safari
     ]
 
-    /// Determines the new dock index for a new app based on the preferred order
-    /// - Parameter currentApps: The list of currently docked apps
-    /// - Returns: The index at which the new app should be placed
-    func newDockIndex(from currentApps: [DockApp]) -> Int {
+    private var defaultBrowserProvider: DefaultBrowserProvider
+
+    init(defaultBrowserProvider: DefaultBrowserProvider) {
+        self.defaultBrowserProvider = defaultBrowserProvider
+    }
+
+    /// Determines the new dock index for a new app based on the default browser or preferred order
+    func newDockIndex(from currentAppURLs: [URL]) -> Int {
+        // Place next to the default browser
+        if !defaultBrowserProvider.isDefault,
+           let defaultBrowserURL = defaultBrowserProvider.defaultBrowserURL,
+           let position = currentAppURLs.firstIndex(of: defaultBrowserURL) {
+            return position + 1
+        }
+
+        // Place based on the preferred order
         for app in preferredOrder {
-            if let position = currentApps.firstIndex(of: app) {
+            if let position = currentAppURLs.firstIndex(of: app.url) {
                 return position + 1
             }
         }
 
-        return currentApps.count
+        // Otherwise, place at the end
+        return currentAppURLs.count
     }
 }
