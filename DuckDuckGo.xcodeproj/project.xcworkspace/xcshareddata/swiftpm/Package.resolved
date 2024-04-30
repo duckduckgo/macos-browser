@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "2681b5271a4e0582f175771737617adb8a4d6e78",
-        "version" : "142.0.0"
+        "branch" : "dominik/sync-enable-field-validation",
+        "revision" : "b117aa5db149dcb6c1b2b7a76a42c2f39e095ef3"
       }
     },
     {
