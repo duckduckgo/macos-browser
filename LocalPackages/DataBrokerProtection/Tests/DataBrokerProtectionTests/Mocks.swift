@@ -868,6 +868,7 @@ final class MockAppVersion: AppVersionNumberProvider {
 }
 
 final class MockStageDurationCalculator: StageDurationCalculator {
+    var isManualScan: Bool = false
     var attemptId: UUID = UUID()
     var stage: Stage?
 

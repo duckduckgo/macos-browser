@@ -224,11 +224,12 @@ extension DownloadsTabExtension: NavigationResponder {
         let task = downloadManager.add(download, fromBurnerWindow: self.isBurner, delegate: self, destination: .auto)
 
         var isMainFrameNavigationActionWithNoHistory: Bool {
-            guard let navigationAction,
+            // get the first navigation action in the redirect series
+            guard let navigationAction = navigationAction?.redirectHistory?.first ?? navigationAction,
                   navigationAction.isForMainFrame,
                   navigationAction.isTargetingNewWindow,
                   // webView has no navigation history (downloaded navigationAction has started from an empty state)
-                  (navigationAction.redirectHistory?.first ?? navigationAction).fromHistoryItemIdentity == nil
+                  navigationAction.fromHistoryItemIdentity == nil
             else { return false }
             return true
         }
