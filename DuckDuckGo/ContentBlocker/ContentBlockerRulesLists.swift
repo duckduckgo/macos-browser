@@ -27,14 +27,6 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         static let clickToLoadRulesListName = "ClickToLoad"
     }
 
-    func MD5(data: Data) -> String {
-        let digest = Insecure.MD5.hash(data: data)
-
-        return digest.map {
-            String(format: "%02hhx", $0)
-        }.joined()
-    }
-
     private let adClickAttribution: AdClickAttributing
 
     init(trackerDataManager: TrackerDataManager, adClickAttribution: AdClickAttributing) {
