@@ -655,21 +655,37 @@ final class LocalBookmarkStore: BookmarkStore {
                currentInsertionIndex > objectIndex {
                 adjustedInsertionIndex -= 1
             }
+            let nextInsertionIndex = adjustedInsertionIndex + 1
 
             bookmarkManagedObject.parent = nil
 
             // Removing the bookmark from its current parent may have removed it from the collection it is about to be added to, so re-check
             // the bounds before adding it back.
             if adjustedInsertionIndex < newParentFolder.childrenArray.count {
-                newParentFolder.insertIntoChildren(bookmarkManagedObject, at: adjustedInsertionIndex)
+                // Handle stubs
+                let allChildren = (newParentFolder.children?.array as? [BookmarkEntity]) ?? []
+                if newParentFolder.childrenArray.count != allChildren.count {
+                    var correctedIndex = 0
+
+                    while adjustedInsertionIndex > 0 && correctedIndex < allChildren.count {
+                        if allChildren[correctedIndex].isStub == false {
+                            adjustedInsertionIndex -= 1
+                        }
+                        correctedIndex += 1
+                    }
+                    newParentFolder.insertIntoChildren(bookmarkManagedObject, at: correctedIndex)
+                } else {
+                    newParentFolder.insertIntoChildren(bookmarkManagedObject, at: adjustedInsertionIndex)
+                }
             } else {
                 newParentFolder.addToChildren(bookmarkManagedObject)
             }
 
-            currentInsertionIndex = adjustedInsertionIndex + 1
+            currentInsertionIndex = nextInsertionIndex
         }
     }
 
+    // swiftlint:disable:next function_body_length
     func moveFavorites(with objectUUIDs: [String], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
 
         applyChangesAndSave(changes: { [weak self] context in
@@ -692,27 +708,45 @@ final class LocalBookmarkStore: BookmarkStore {
                 return (try? context.fetch(entityFetchRequest))?.first
             }
 
-            if let index = index, index < (displayedFavoritesFolder.favorites?.count ?? 0) {
+            if let index = index, index < displayedFavoritesFolder.favoritesArray.count {
                 var currentInsertionIndex = max(index, 0)
 
                 for bookmarkManagedObject in bookmarkManagedObjects {
                     var adjustedInsertionIndex = currentInsertionIndex
 
-                    if let currentIndex = displayedFavoritesFolder.favorites?.index(of: bookmarkManagedObject),
+                    if let currentIndex = displayedFavoritesFolder.favoritesArray.firstIndex(of: bookmarkManagedObject),
                        currentInsertionIndex > currentIndex {
                         adjustedInsertionIndex -= 1
                     }
+                    let nextInsertionIndex = adjustedInsertionIndex + 1
 
                     bookmarkManagedObject.removeFromFavorites(with: favoritesDisplayMode)
-                    if adjustedInsertionIndex < (displayedFavoritesFolder.favorites?.count ?? 0) {
-                        bookmarkManagedObject.addToFavorites(insertAt: adjustedInsertionIndex,
-                                                             favoritesRoot: displayedFavoritesFolder)
-                        bookmarkManagedObject.addToFavorites(folders: favoritesFoldersWithoutDisplayed)
+
+                    if adjustedInsertionIndex < displayedFavoritesFolder.favoritesArray.count {
+                        // Handle stubs
+                        let allChildren = (displayedFavoritesFolder.favorites?.array as? [BookmarkEntity]) ?? []
+                        if displayedFavoritesFolder.favoritesArray.count != allChildren.count {
+                            var correctedIndex = 0
+
+                            while adjustedInsertionIndex > 0 && correctedIndex < allChildren.count {
+                                if allChildren[correctedIndex].isStub == false {
+                                    adjustedInsertionIndex -= 1
+                                }
+                                correctedIndex += 1
+                            }
+                            bookmarkManagedObject.addToFavorites(insertAt: correctedIndex,
+                                                                 favoritesRoot: displayedFavoritesFolder)
+                            bookmarkManagedObject.addToFavorites(folders: favoritesFoldersWithoutDisplayed)
+                        } else {
+                            bookmarkManagedObject.addToFavorites(insertAt: adjustedInsertionIndex,
+                                                                 favoritesRoot: displayedFavoritesFolder)
+                            bookmarkManagedObject.addToFavorites(folders: favoritesFoldersWithoutDisplayed)
+                        }
                     } else {
                         bookmarkManagedObject.addToFavorites(folders: favoritesFolders)
                     }
 
-                    currentInsertionIndex = adjustedInsertionIndex + 1
+                    currentInsertionIndex = nextInsertionIndex
                 }
             } else {
                 for bookmarkManagedObject in bookmarkManagedObjects {
