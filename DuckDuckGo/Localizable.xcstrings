@@ -4959,6 +4959,18 @@
         }
       }
     },
+    "autofill.popover.auto-pinned.text" : {
+      "comment" : "Text confirming the password manager has been pinned to the toolbar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Shortcut Added!"
+          }
+        }
+      }
+    },
     "autofill.popover.autosave.button.text" : {
       "comment" : "Button to view the recently autosaved password",
       "extractionState" : "extracted_with_value",
@@ -22204,6 +22216,18 @@
         }
       }
     },
+    "import.browser.data.shortcuts" : {
+      "comment" : "Import Browser Data dialog title for final stage when choosing shortcuts to enable",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Customize your experience"
+          }
+        }
+      }
+    },
     "import.browser.data.source.subtitle" : {
       "comment" : "Subtitle explaining where users can find imported passwords.",
       "extractionState" : "extracted_with_value",
@@ -22211,7 +22235,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Passwords will be stored securely on your device. Find them in DuckDuckGo Settings > Passwords & Autofill."
+            "value" : "Access and manage your passwords in DuckDuckGo Settings > Passwords & Autofill."
           }
         }
       }
@@ -24920,6 +24944,9 @@
           }
         }
       }
+    },
+    "Keep passwords nearby in the address bar" : {
+      "comment" : "Description for the setting to enable the passwords shortcut"
     },
     "learnmore.link" : {
       "comment" : "Learn More link",
@@ -45892,6 +45919,9 @@
         }
       }
     },
+    "Put your favorite bookmarks in easy reach" : {
+      "comment" : "Description for the setting to enable the bookmarks bar"
+    },
     "quit" : {
       "comment" : "Quit button",
       "extractionState" : "extracted_with_value",
@@ -47989,6 +48019,9 @@
         }
       }
     },
+    "Show Bookmarks Bar" : {
+      "comment" : "Title for the setting to enable the bookmarks bar"
+    },
     "Show Bookmarks Shortcut" : {
       "comment" : "Main Menu View item",
       "localizations" : {
@@ -48308,6 +48341,9 @@
           }
         }
       }
+    },
+    "Show Passwords Shortcut" : {
+      "comment" : "Title for the setting to enable the passwords shortcut"
     },
     "Show Previous Tab" : {
       "comment" : "Main Menu Window item",

@@ -118,7 +118,7 @@ func bookmarksSuccessSummary(_ summary: DataImport.DataTypeSummary) -> some View
         if summary.failed > 0 {
             lineSeparator()
             importSummaryRow(image: .failed,
-                             text: "Bookmark import failed: ",
+                             text: "Bookmark import failed:",
                              comment: "Data import summary format of how many bookmarks (%lld) failed to import.",
                              count: summary.failed)
         }
@@ -134,7 +134,7 @@ private func passwordsSuccessSummary(_ summary: DataImport.DataTypeSummary) -> s
         if summary.failed > 0 {
             lineSeparator()
             importSummaryRow(image: .failed,
-                             text: "Password import failed:",
+                             text: "Password import failed: ",
                              comment: "Data import summary format of how many passwords (%lld) failed to import.",
                              count: summary.failed)
         }
@@ -155,7 +155,7 @@ private func importSummaryRow(image: Image, text: LocalizedStringKey, comment: S
             .frame(width: 16, height: 16)
             .padding(.trailing, 14)
         Text(text, comment: comment)
-        Text(" ")
+        Text(verbatim: " ")
         if let count = count {
             Text(String(count)).bold()
         }

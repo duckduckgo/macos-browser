@@ -70,6 +70,7 @@ struct DataImportViewModel {
         case fileImport(dataType: DataType, summary: Set<DataType> = [])
         case summary(Set<DataType>, isFileImport: Bool = false)
         case feedback
+        case shortcuts
 
         var isFileImport: Bool {
             if case .fileImport = self { true } else { false }
@@ -630,11 +631,13 @@ extension DataImportViewModel {
             if let screen = screenForNextDataTypeRemainingToImport(after: DataType.allCases.last(where: dataTypes.contains)) {
                 return .next(screen)
             } else {
-                return .done
+                return .next(.shortcuts)
             }
 
         case .feedback:
             return .submit
+        case .shortcuts:
+            return .done
         }
     }
 

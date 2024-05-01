@@ -456,8 +456,9 @@ struct UserText {
     static let importPasswords = NSLocalizedString("import.browser.data.passwords", value: "Import passwords…", comment: "Opens Import Browser Data dialog")
 
     static let importDataTitle = NSLocalizedString("import.browser.data", value: "Import to DuckDuckGo", comment: "Import Browser Data dialog title")
+    static let importDataShortcutsTitle = NSLocalizedString("import.browser.data.shortcuts", value: "Customize your experience", comment: "Import Browser Data dialog title for final stage when choosing shortcuts to enable")
     static let importDataSourceTitle = NSLocalizedString("import.browser.data.source.title", value: "Import from", comment: "Import Browser Data title for option to choose source browser to import from")
-    static let importDataSubtitle = NSLocalizedString("import.browser.data.source.subtitle", value: "Passwords will be stored securely on your device. Find them in DuckDuckGo Settings > Passwords & Autofill.", comment: "Subtitle explaining where users can find imported passwords.")
+    static let importDataSubtitle = NSLocalizedString("import.browser.data.source.subtitle", value: "Access and manage your passwords in DuckDuckGo Settings > Passwords & Autofill.", comment: "Subtitle explaining where users can find imported passwords.")
 
     static let exportLogins = NSLocalizedString("export.logins.data", value: "Export passwords…", comment: "Opens Export Logins Data dialog")
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
@@ -991,6 +992,8 @@ struct UserText {
     static let passwordManagerAutosaveButtonText = NSLocalizedString("autofill.popover.autosave.button.text",
                                                                       value: "View",
                                                                       comment: "Button to view the recently autosaved password")
+
+    static let passwordManagerAutoPinnedPopoverText = NSLocalizedString("autofill.popover.auto-pinned.text", value: "Shortcut Added!", comment: "Text confirming the password manager has been pinned to the toolbar")
 
     static func openPasswordManagerButton(managerName: String) -> String {
         let localized = NSLocalizedString("autofill.popover.open-password-manager", value: "Open %@", comment: "Open password manager button")

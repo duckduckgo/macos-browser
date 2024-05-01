@@ -286,4 +286,5 @@ final class NavigationBarPopovers: PopoverPresenter {
 
 extension Notification.Name {
     static let loginAutoSaved = Notification.Name(rawValue: "loginAutoSaved")
+    static let passwordsAutoPinned = Notification.Name(rawValue: "passwordsAutoPinned")
 }
