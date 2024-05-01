@@ -25,8 +25,10 @@ class ClickToLoadTDSTests: XCTestCase {
 
     func testEnsureClickToLoadTDSCompiles() throws {
 
-        let trackerManager = TrackerDataManager(etag: nil,
-                                         data: nil,
+        let trackerData = AppTrackerDataSetProvider().embeddedData
+        let etag = AppTrackerDataSetProvider().embeddedDataEtag
+        let trackerManager = TrackerDataManager(etag: etag,
+                                         data: trackerData,
                                          embeddedDataProvider: AppTrackerDataSetProvider())
         let mockAdAttributing = MockAttributing()
 
@@ -35,10 +37,10 @@ class ClickToLoadTDSTests: XCTestCase {
         let tdsName = ContentBlockerRulesLists.Constants.clickToLoadRulesListName
 
         let ctlRules = ruleSets.first(where: { $0.name == tdsName})
-        let ctlFallback = ctlRules?.fallbackTrackerData
-        let tds = ctlFallback?.tds
+        let ctlTrackerData = ctlRules?.trackerData
+        let ctlTds = ctlTrackerData?.tds
 
-        let builder = ContentBlockerRulesBuilder(trackerData: tds!)
+        let builder = ContentBlockerRulesBuilder(trackerData: ctlTds!)
 
         let rules = builder.buildRules(withExceptions: [],
                                        andTemporaryUnprotectedDomains: [],

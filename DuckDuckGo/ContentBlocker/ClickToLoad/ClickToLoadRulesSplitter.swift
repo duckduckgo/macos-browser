@@ -36,16 +36,15 @@ struct ClickToLoadRulesSplitter {
 
     func split() -> (withoutBlockCTL: ContentBlockerRulesList, withBlockCTL: ContentBlockerRulesList)? {
         let splitTDS = rulesList.trackerData != nil ? split(trackerData: rulesList.trackerData!) : nil
-        let splitFallbackTDS = split(trackerData: rulesList.fallbackTrackerData)
 
-        if splitTDS != nil || splitFallbackTDS != nil {
+        if splitTDS != nil {
             return (
                 ContentBlockerRulesList(name: rulesList.name,
-                                        trackerData: splitTDS?.withoutBlockCTL ?? rulesList.trackerData,
-                                        fallbackTrackerData: splitFallbackTDS?.withoutBlockCTL ?? rulesList.fallbackTrackerData),
+                                        trackerData: splitTDS?.withoutBlockCTL,
+                                        fallbackTrackerData: split(trackerData: rulesList.fallbackTrackerData)!.withoutBlockCTL),
                 ContentBlockerRulesList(name: ContentBlockerRulesLists.Constants.clickToLoadRulesListName,
-                                        trackerData: splitTDS?.withBlockCTL ?? rulesList.trackerData,
-                                        fallbackTrackerData: splitFallbackTDS?.withBlockCTL ?? rulesList.fallbackTrackerData)
+                                        trackerData: splitTDS?.withBlockCTL,
+                                        fallbackTrackerData: split(trackerData: rulesList.fallbackTrackerData)!.withBlockCTL)
             )
         }
         return nil
