@@ -106,4 +106,6 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         XCTAssert(mockQueue.operations.filter { !$0.isCancelled }.count == 10)
         XCTAssert(mockQueue.operations.filter { $0.isCancelled }.count >= 0)
     }
+
+    // TODO: More tests to be added as we define expected interruption behavior
 }

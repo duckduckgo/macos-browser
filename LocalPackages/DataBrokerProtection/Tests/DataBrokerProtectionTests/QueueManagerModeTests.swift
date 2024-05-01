@@ -28,6 +28,7 @@ final class QueueManagerModeTests: XCTestCase {
         // When
         let result = sut.canInterrupt(forNewMode: .manual)
 
+        // Then
         XCTAssertTrue(result)
     }
 
@@ -38,6 +39,7 @@ final class QueueManagerModeTests: XCTestCase {
         // When
         let result = sut.canInterrupt(forNewMode: .queued)
 
+        // Then
         XCTAssertTrue(result)
     }
 
@@ -48,6 +50,7 @@ final class QueueManagerModeTests: XCTestCase {
         // When
         let result = sut.canInterrupt(forNewMode: .queued)
 
+        // Then
         XCTAssertFalse(result)
     }
 
@@ -58,6 +61,9 @@ final class QueueManagerModeTests: XCTestCase {
         // When
         let result = sut.canInterrupt(forNewMode: .manual)
 
+        // Then
         XCTAssertTrue(result)
     }
+
+    // TODO: More tests to be added as we define expected interruption behaviorgst
 }
