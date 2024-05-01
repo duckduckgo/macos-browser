@@ -572,7 +572,9 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 )
             }
 
-            await stop()
+            if await isConnected {
+                await stop()
+            }
 
             // Always keep the first error message shown, as it's the more actionable one.
             if controllerErrorStore.lastErrorMessage == nil {
