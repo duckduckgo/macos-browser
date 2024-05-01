@@ -59,7 +59,7 @@ final class DataBrokerProtectionProcessor {
                           completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
 
         operationQueue.cancelAllOperations()
-        runOperations(operationType: .scan,
+        runOperations(operationType: .manualScan,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
             os_log("Scans done", log: .dataBrokerProtection)
