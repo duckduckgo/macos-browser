@@ -23,7 +23,6 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
-@MainActor
 class ErrorPageTests: XCTestCase {
 
     var window: NSWindow!
@@ -146,6 +145,7 @@ class ErrorPageTests: XCTestCase {
 
     // MARK: - Tests
 
+    @MainActor
     func testWhenPageFailsToLoad_errorPageShown() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
@@ -186,6 +186,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(tab.content.userEditableUrl, .test)
     }
 
+    @MainActor
     func testWhenTabWithNoConnectionErrorActivated_reloadTriggered() async throws {
         // open 2 Tabs with newtab page
         let tab1 = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
@@ -231,6 +232,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertNil(tab1.error)
     }
 
+    @MainActor
     func testWhenTabWithConnectionLostErrorActivatedAndReloadFailsAgain_errorPageIsShownOnce() async throws {
         // open 2 Tabs with newtab page
         // navigate to a failing url right away
@@ -284,6 +286,7 @@ class ErrorPageTests: XCTestCase {
         withExtendedLifetime(c) {}
     }
 
+    @MainActor
     func testWhenTabWithOtherErrorActivated_reloadNotTriggered() async throws {
         // open 2 Tabs with newtab page
         // navigate to a failing url right away
@@ -314,6 +317,7 @@ class ErrorPageTests: XCTestCase {
         withExtendedLifetime(c) {}
     }
 
+    @MainActor
     func testWhenGoingBackToFailingPage_reloadIsTriggered() async throws {
         // open Tab with newtab page
         // navigate to a failing url right away
@@ -366,6 +370,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertTrue(tab.canReload)
     }
 
+    @MainActor
     func testWhenGoingBackToFailingPageAndItFailsAgain_errorPageIsUpdated() async throws {
         // open Tab with newtab page
         // navigate to a failing url right away
@@ -424,6 +429,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertTrue(tab.canReload)
     }
 
+    @MainActor
     func testWhenPageLoadedAndFailsOnRefreshAndOnConsequentRefresh_errorPageIsUpdatedKeepingForwardHistory() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
@@ -500,6 +506,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertTrue(tab.canReload)
     }
 
+    @MainActor
     func testWhenPageLoadedAndFailsOnRefreshAndSucceedsOnConsequentRefresh_forwardHistoryIsPreserved() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
@@ -568,6 +575,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertTrue(tab.canReload)
     }
 
+    @MainActor
     func testWhenReloadingBySubmittingSameURL_errorPageRemainsSame() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
@@ -643,6 +651,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertTrue(tab.canReload)
     }
 
+    @MainActor
     func testWhenGoingToAnotherUrlFails_newBackForwardHistoryItemIsAdded() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
@@ -718,6 +727,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertTrue(tab.canReload)
     }
 
+    @MainActor
     func testWhenGoingToAnotherUrlSucceeds_newBackForwardHistoryItemIsAdded() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
@@ -787,6 +797,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertTrue(tab.canReload)
     }
 
+    @MainActor
     func testWhenLoadingFailsAfterSessionRestoration_navigationHistoryIsPreserved() async throws {
         schemeHandler.middleware = [{ _ in
             .failure(NSError.noConnection)
@@ -827,6 +838,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertTrue(tab.canReload)
     }
 
+    @MainActor
     func testPinnedTabDoesNotNavigateAway() async throws {
         schemeHandler.middleware = [{ _ in
             return .ok(.html(Self.testHtml))
@@ -874,6 +886,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(viewModel.tabs.count, 1)
     }
 
+    @MainActor
     func testWhenPageFailsToLoadAfterRedirect_errorPageShown() async throws {
         // open Tab with newtab page
         let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
