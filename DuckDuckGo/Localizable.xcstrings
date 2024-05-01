@@ -43464,6 +43464,18 @@
         }
       }
     },
+    "preferences.add-to-dock" : {
+      "comment" : "Action button to add the app to the Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add to Dock…"
+          }
+        }
+      }
+    },
     "preferences.always-on" : {
       "comment" : "Status indicator of a browser privacy protection feature.",
       "extractionState" : "extracted_with_value",
@@ -44904,6 +44916,18 @@
         }
       }
     },
+    "preferences.is-added-to-dock" : {
+      "comment" : "Indicates that the browser is the added to macOS system Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo is added to the Dock."
+          }
+        }
+      }
+    },
     "preferences.main-settings" : {
       "comment" : "Section header in Preferences for main settings",
       "extractionState" : "extracted_with_value",
@@ -44960,6 +44984,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Основные настройки"
+          }
+        }
+      }
+    },
+    "preferences.not-added-to-dock" : {
+      "comment" : "Indicate that the browser is not added to macOS system Dock",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo is not added to the Dock."
           }
         }
       }
@@ -45380,6 +45416,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Заново открыть все окна из последнего сеанса"
+          }
+        }
+      }
+    },
+    "preferences.shortcuts" : {
+      "comment" : "Name of the preferences section related to shortcuts",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Shortcuts"
           }
         }
       }

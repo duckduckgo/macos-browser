@@ -28,12 +28,46 @@ extension Preferences {
         @ObservedObject var startupModel: StartupPreferences
         @ObservedObject var downloadsModel: DownloadsPreferences
         @ObservedObject var searchModel: SearchPreferences
+        @ObservedObject var dockCustomizer: DockCustomizer
         @State private var showingCustomHomePageSheet = false
+        @State private var isAddedToDock = false
 
         var body: some View {
             PreferencePane(UserText.general) {
 
-                // SECTION 1: On Startup
+                // SECTION 1: Shortcuts
+                PreferencePaneSection(UserText.shortcuts, spacing: 4) {
+                    PreferencePaneSubSection {
+                        HStack {
+                            if isAddedToDock || dockCustomizer.isAddedToDock {
+                                HStack {
+                                    Image(.successCheckmark)
+                                    Text(UserText.isAddedToDock)
+                                }
+                                .transition(.opacity)
+                                .padding(.trailing, 8)
+                            } else {
+                                HStack {
+                                    Image(.warning).foregroundColor(Color(.linkBlue))
+                                    Text(UserText.isNotAddedToDock)
+                                }
+                                .padding(.trailing, 8)
+                                Button(action: {
+                                    withAnimation {
+                                        dockCustomizer.addToDock()
+                                        isAddedToDock = true
+                                    }
+                                }) {
+                                    Text(UserText.addToDock)
+                                        .fixedSize(horizontal: true, vertical: false)
+                                        .multilineTextAlignment(.center)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // SECTION 2: On Startup
                 PreferencePaneSection(UserText.onStartup) {
 
                     PreferencePaneSubSection {
@@ -49,7 +83,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 2: Home Page
+                // SECTION 3: Home Page
                 PreferencePaneSection(UserText.homePage) {
 
                     PreferencePaneSubSection {
@@ -93,12 +127,12 @@ extension Preferences {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
-                // SECTION 3: Search Settings
+                // SECTION 4: Search Settings
                 PreferencePaneSection(UserText.privateSearch) {
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions).accessibilityIdentifier("PreferencesGeneralView.showAutocompleteSuggestions")
                 }
 
-                // SECTION 4: Downloads
+                // SECTION 5: Downloads
                 PreferencePaneSection(UserText.downloads) {
                     PreferencePaneSubSection {
                         ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,

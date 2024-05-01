@@ -26,7 +26,7 @@ protocol DockCustomization {
     func addToDock() -> Bool
 }
 
-final class DockCustomizer: DockCustomization {
+final class DockCustomizer: DockCustomization, ObservableObject {
 
     static func appDict(appPath: String, bundleIdentifier: String) -> [String: AnyObject] {
         return ["tile-type": "file-tile" as AnyObject,
