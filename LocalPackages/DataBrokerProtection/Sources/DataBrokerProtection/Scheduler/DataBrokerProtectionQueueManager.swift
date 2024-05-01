@@ -1,0 +1,192 @@
+//
+//  DataBrokerProtectionQueueManager.swift
+//
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Common
+import Foundation
+
+protocol DataBrokerProtectionOperationQueue {
+    func cancelAllOperations()
+    func addOperation(_ op: Operation)
+    func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void)
+}
+
+extension OperationQueue: DataBrokerProtectionOperationQueue {}
+
+protocol DataBrokerProtectionQueueManager {
+    var mode: QueueManagerMode { get }
+    init(operationQueue: DataBrokerProtectionOperationQueue,
+         operationsBuilder: DataBrokerOperationsCollectionBuilder,
+         mismatchCalculator: MismatchCalculator,
+         brokerUpdater: DataBrokerProtectionBrokerUpdater?)
+    func startManualScans(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func runAllOptOutOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func runQueuedOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func runAllOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func stopAllOperations()
+}
+
+enum QueueManagerMode {
+    case manual
+    case queued
+    case idle
+
+    func canInterrupt(forNewMode newMode: QueueManagerMode) -> Bool {
+        switch (self, newMode) {
+        case (_, .manual):
+            return true
+        case (.idle, .queued):
+            return true
+        case (.manual, .queued):
+            return false
+        default:
+            return false
+        }
+    }
+}
+
+final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueManager {
+
+    private(set) var mode: QueueManagerMode = .idle
+
+    private let operationQueue: DataBrokerProtectionOperationQueue
+    private let operationsBuilder: DataBrokerOperationsCollectionBuilder
+    private let mismatchCalculator: MismatchCalculator
+    private let brokerUpdater: DataBrokerProtectionBrokerUpdater?
+
+    init(operationQueue: DataBrokerProtectionOperationQueue,
+         operationsBuilder: DataBrokerOperationsCollectionBuilder,
+         mismatchCalculator: MismatchCalculator,
+         brokerUpdater: DataBrokerProtectionBrokerUpdater?) {
+
+        self.operationQueue = operationQueue
+        self.operationsBuilder = operationsBuilder
+        self.mismatchCalculator = mismatchCalculator
+        self.brokerUpdater = brokerUpdater
+    }
+
+    func startManualScans(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+
+        guard mode.canInterrupt(forNewMode: .manual) else { return }
+        mode = .manual
+
+        // New Manual scans ALWAYS interrupt (i.e cancel) ANY current Manual/Scheduled scans
+        operationQueue.cancelAllOperations()
+
+        // Add manual operations to queue
+        addOperationCollections(withType: .scan, showWebView: showWebView, operationDependencies: operationDependencies) { [weak self] errors in
+            os_log("Manual scans completed", log: .dataBrokerProtection)
+            completion?(errors)
+            self?.mismatchCalculator.calculateMismatches()
+        }
+    }
+
+    func runAllOptOutOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+        // TODO: Correct interruption/cancellation behavior
+        // operationQueue.cancelAllOperations()
+
+        addOperationCollections(withType: .optOut, showWebView: showWebView, operationDependencies: operationDependencies) { errors in
+            os_log("Opt-Outs completed", log: .dataBrokerProtection)
+            completion?(errors)
+        }
+    }
+
+    func runQueuedOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+
+        guard mode.canInterrupt(forNewMode: .queued) else { return }
+        mode = .queued
+
+        addOperationCollections(withType: .all,
+                                priorityDate: Date(),
+                                showWebView: showWebView,
+                                operationDependencies: operationDependencies) { errors in
+            os_log("Queued operations completed", log: .dataBrokerProtection)
+            completion?(errors)
+        }
+    }
+
+    func runAllOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+        // TODO: Correct interruption/cancellation behavior
+        addOperationCollections(withType: .all,
+                                showWebView: showWebView,
+                                operationDependencies: operationDependencies) { errors in
+            os_log("All operations completed", log: .dataBrokerProtection)
+            completion?(errors)
+        }
+    }
+
+    func stopAllOperations() {
+         operationQueue.cancelAllOperations()
+    }
+}
+
+private extension DefaultDataBrokerProtectionQueueManager {
+
+    typealias OperationType = DataBrokerOperationsCollection.OperationType
+
+    func addOperationCollections(withType type: OperationType,
+                                 priorityDate: Date? = nil,
+                                 showWebView: Bool,
+                                 operationDependencies: OperationDependencies,
+                                 completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
+
+        // Update broker files if applicable
+        brokerUpdater?.checkForUpdatesInBrokerJSONFiles()
+
+        // Fire Pixels
+        firePixels(operationDependencies: operationDependencies)
+
+        // Use builder to build operations
+        let operations: [DataBrokerOperationsCollection]
+        do {
+
+            operations = try operationsBuilder.operationCollections(operationType: type,
+                                                                    priorityDate: priorityDate,
+                                                                    showWebView: showWebView,
+                                                                    operationDependencies: operationDependencies)
+
+            for collection in operations {
+                operationQueue.addOperation(collection)
+            }
+        } catch {
+            os_log("DataBrokerProtectionProcessor error: runOperations, error: %{public}@", log: .error, error.localizedDescription)
+            operationQueue.addBarrierBlock {
+                completion(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: error))
+            }
+            return
+        }
+
+        operationQueue.addBarrierBlock {
+            let operationErrors = operations.compactMap { $0.error }
+            let errorCollection = operationErrors.count != 0 ? DataBrokerProtectionSchedulerErrorCollection(operationErrors: operationErrors) : nil
+            completion(errorCollection)
+        }
+    }
+
+    private func firePixels(operationDependencies: OperationDependencies) {
+        let database = operationDependencies.database
+        let pixelHandler = operationDependencies.pixelHandler
+
+        let engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
+        let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
+
+        // This will fire the DAU/WAU/MAU pixels,
+        engagementPixels.fireEngagementPixel()
+        // This will try to fire the event weekly report pixels
+        eventPixels.tryToFireWeeklyPixels()
+    }
+}
