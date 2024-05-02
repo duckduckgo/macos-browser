@@ -1,7 +1,7 @@
 //
-//  NetworkProtectionInviteDialog.swift
+//  WebsiteInfoHelpers.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,21 +16,20 @@
 //  limitations under the License.
 //
 
-import SwiftUI
-import NetworkProtection
-import SwiftUIExtensions
+import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
-struct NetworkProtectionInviteDialog: View {
-    @ObservedObject var model: NetworkProtectionInviteViewModel
+extension WebsiteInfo {
 
-    var body: some View {
-        switch model.currentDialog {
-        case .codeEntry:
-            InviteCodeView(viewModel: model.inviteCodeViewModel)
-        case .success:
-            InviteCodeSuccessView(viewModel: model.successCodeViewModel)
-        case .none:
-            EmptyView()
-        }
+    @MainActor
+    static func makeWebsitesInfo(url: URL, title: String? = nil, occurrences: Int = 1) -> [WebsiteInfo] {
+        (1...occurrences)
+            .map { _ in
+                let tab = Tab(content: .url(url, credential: nil, source: .ui))
+                tab.title = title
+                return tab
+            }
+            .compactMap(WebsiteInfo.init)
     }
+
 }

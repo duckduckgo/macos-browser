@@ -30,6 +30,11 @@ extension URL.NavigationalScheme {
         return [.http, .https, .file]
     }
 
+    /// HTTP or HTTPS
+    var isHypertextScheme: Bool {
+        Self.hypertextSchemes.contains(self)
+    }
+
 }
 
 extension URL {
@@ -137,11 +142,15 @@ extension URL {
     // base url for Error Page Alternate HTML loaded into Web View
     static let error = URL(string: "duck://error")!
 
-    static let dataBrokerProtection = URL(string: "duck://dbp")!
+    static let dataBrokerProtection = URL(string: "duck://personal-information-removal")!
 
 #if !SANDBOX_TEST_TOOL
     static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
         return settings.appendingPathComponent(pane.rawValue)
+    }
+
+    var isSettingsURL: Bool {
+        isChild(of: .settings) && (pathComponents.isEmpty || PreferencePaneIdentifier(url: self) != nil)
     }
 #endif
 
@@ -404,6 +413,10 @@ extension URL {
         return false
     }
 
+    var isEmailProtection: Bool {
+        self.isChild(of: .duckDuckGoEmailLogin) || self == .duckDuckGoEmail
+    }
+
     enum DuckDuckGoParameters: String {
         case search = "q"
         case ia
@@ -547,7 +560,7 @@ extension URL {
         return false
     }
 
-    func stripUnsupportedCredentials() -> String {
+    func strippingUnsupportedCredentials() -> String {
         if self.absoluteString.firstIndex(of: "@") != nil {
             let authPattern = "([^:]+):\\/\\/[^\\/]*@"
             let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
@@ -558,7 +571,14 @@ extension URL {
     }
 
     public func isChild(of parentURL: URL) -> Bool {
-        guard let parentURLHost = parentURL.host, self.isPart(ofDomain: parentURLHost) else { return false }
-        return pathComponents.starts(with: parentURL.pathComponents)
+        if scheme == parentURL.scheme,
+           port == parentURL.port,
+           let parentURLHost = parentURL.host,
+           self.isPart(ofDomain: parentURLHost),
+           pathComponents.starts(with: parentURL.pathComponents) {
+            return true
+        } else {
+            return false
+        }
     }
 }

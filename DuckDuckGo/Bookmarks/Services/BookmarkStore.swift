@@ -48,9 +48,11 @@ protocol BookmarkStore {
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
     func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void)
+    func saveBookmarks(for websitesInfo: [WebsiteInfo], inNewFolderNamed folderName: String, withinParentFolder parent: ParentFolderType)
     func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
     func remove(objectsWithUUIDs: [String], completion: @escaping (Bool, Error?) -> Void)
     func update(bookmark: Bookmark)
+    func bookmarkFolder(withId id: String) -> BookmarkFolder?
     func update(folder: BookmarkFolder)
     func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType)
     func add(objectsWithUUIDs: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void)
@@ -59,6 +61,5 @@ protocol BookmarkStore {
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
-
     func handleFavoritesAfterDisablingSync()
 }

@@ -323,7 +323,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
 
     func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) throws -> [HistoryEvent] {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             guard let scan = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
                 return [HistoryEvent]()
             }
@@ -338,7 +338,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
 
     func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> [HistoryEvent] {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             guard let optOut = try vault.fetchOptOut(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId) else {
                 return [HistoryEvent]()
             }

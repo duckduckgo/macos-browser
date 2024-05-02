@@ -241,7 +241,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
         addressBar.suggestionContainerViewModel = SuggestionContainerViewModel(isHomePage: true, isBurner: false, suggestionContainer: suggestionContainer)
 
         suggestionContainer.getSuggestions(for: enteredString)
-        suggestionLoadingMock.completion!(.init(topHits: [.website(url: url)], duckduckgoSuggestions: [], historyAndBookmarks: []), nil)
+        suggestionLoadingMock.completion!(.init(topHits: [.website(url: url)], duckduckgoSuggestions: [], localSuggestions: []), nil)
 
         addressBar.suggestionViewControllerDidConfirmSelection(addressBar.suggestionViewController)
 

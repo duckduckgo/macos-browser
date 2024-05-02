@@ -35,6 +35,7 @@ protocol OperationsManager {
                       runner: WebOperationRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       showWebView: Bool,
+                      isManualScan: Bool,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
                       shouldRunNextStep: @escaping () -> Bool) async throws
 }
@@ -47,6 +48,7 @@ extension OperationsManager {
                       runner: WebOperationRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
+                      isManual: Bool,
                       shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await runOperation(operationData: operationData,
@@ -56,6 +58,7 @@ extension OperationsManager {
                                runner: runner,
                                pixelHandler: pixelHandler,
                                showWebView: false,
+                               isManualScan: isManual,
                                userNotificationService: userNotificationService,
                                shouldRunNextStep: shouldRunNextStep)
     }
@@ -70,6 +73,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                runner: WebOperationRunner,
                                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                showWebView: Bool = false,
+                               isManualScan: Bool = false,
                                userNotificationService: DataBrokerProtectionUserNotificationService,
                                shouldRunNextStep: @escaping () -> Bool) async throws {
 
@@ -80,6 +84,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                        notificationCenter: notificationCenter,
                                        pixelHandler: pixelHandler,
                                        showWebView: showWebView,
+                                       isManual: isManualScan,
                                        userNotificationService: userNotificationService,
                                        shouldRunNextStep: shouldRunNextStep)
         } else if let optOutOperationData = operationData as? OptOutOperationData {
@@ -102,6 +107,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                    notificationCenter: NotificationCenter,
                                    pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                    showWebView: Bool = false,
+                                   isManual: Bool = false,
                                    userNotificationService: DataBrokerProtectionUserNotificationService,
                                    shouldRunNextStep: @escaping () -> Bool) async throws {
         os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
@@ -118,13 +124,15 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         let eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
-        let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+        let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name,
+                                                                          handler: pixelHandler,
+                                                                          isManualScan: isManual)
 
         do {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
             try database.add(event)
 
-            let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
+            let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, pixelHandler: pixelHandler, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
@@ -322,6 +330,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             try await runner.optOut(profileQuery: brokerProfileQueryData,
                                     extractedProfile: extractedProfile,
                                     stageCalculator: stageDurationCalculator,
+                                    pixelHandler: pixelHandler,
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
 
