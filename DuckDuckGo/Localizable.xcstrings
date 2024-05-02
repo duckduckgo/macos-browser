@@ -5619,7 +5619,7 @@
     },
     "autofill.usernames-and-passwords" : {
       "comment" : "Autofill autosaved data type",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5679,7 +5679,7 @@
     },
     "autofill.view-autofill-content" : {
       "comment" : "View Autofill Content Button name in the autofill settings",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
