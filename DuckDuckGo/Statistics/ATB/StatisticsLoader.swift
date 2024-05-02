@@ -62,6 +62,7 @@ final class StatisticsLoader {
                 }
                 PixelKit.fire(GeneralPixel.serp)
                 self.fireDailyOsVersionCounterPixel()
+                self.fireDockPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
             } else {
@@ -228,6 +229,15 @@ final class StatisticsLoader {
             PixelKit.fire(GeneralPixel.dailyOsVersionCounter,
                           frequency: .legacyDaily,
                           includeAppVersionParameter: false)
+        }
+    }
+
+    private func fireDockPixel() {
+        DispatchQueue.global().asyncAfter(deadline: .now() + Double.random(in: 0.5...5)) {
+            if DockCustomizer().isAddedToDock {
+                PixelKit.fire(GeneralPixel.serpAddedToDock,
+                              includeAppVersionParameter: false)
+            }
         }
     }
 

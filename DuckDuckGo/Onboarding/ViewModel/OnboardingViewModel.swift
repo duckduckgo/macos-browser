@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import PixelKit
 
 protocol OnboardingDelegate: NSObjectProtocol {
 
@@ -53,6 +54,11 @@ final class OnboardingViewModel: ObservableObject {
     @Published var state: OnboardingPhase = .startFlow {
         didSet {
             skipTypingRequested = false
+
+            if state == .addToDock {
+                PixelKit.fire(GeneralPixel.addToDockOnboardingStepPresented,
+                              includeAppVersionParameter: false)
+            }
         }
     }
 
@@ -132,6 +138,8 @@ final class OnboardingViewModel: ObservableObject {
 
     @MainActor
     func onAddToDockPressed() {
+        PixelKit.fire(GeneralPixel.userAddedToDockDuringOnboarding,
+                      includeAppVersionParameter: false)
         delegate?.onboardingDidRequestAddToDock { [weak self] in
             self?.state = .startBrowsing
             Self.isOnboardingFinished = true
@@ -141,6 +149,8 @@ final class OnboardingViewModel: ObservableObject {
 
     @MainActor
     func onAddToDockSkipped() {
+        PixelKit.fire(GeneralPixel.userSkippedAddingToDockFromOnboarding,
+                      includeAppVersionParameter: false)
         state = .startBrowsing
         Self.isOnboardingFinished = true
         delegate?.onboardingHasFinished()

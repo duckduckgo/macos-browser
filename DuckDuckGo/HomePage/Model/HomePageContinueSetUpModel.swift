@@ -176,6 +176,8 @@ extension HomePage.Models {
                     defaultBrowserProvider.openSystemPreferences()
                 }
             case .dock:
+                PixelKit.fire(GeneralPixel.userAddedToDockFromNewTabPageCard,
+                              includeAppVersionParameter: false)
                 dockCustomizer.addToDock()
                 removeItem(for: .dock)
             case .importBookmarksAndPasswords:

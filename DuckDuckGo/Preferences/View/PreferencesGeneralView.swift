@@ -21,6 +21,7 @@ import Combine
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
+import PixelKit
 
 extension Preferences {
 
@@ -54,6 +55,8 @@ extension Preferences {
                                 .padding(.trailing, 8)
                                 Button(action: {
                                     withAnimation {
+                                        PixelKit.fire(GeneralPixel.userAddedToDockFromSettings,
+                                                      includeAppVersionParameter: false)
                                         dockCustomizer.addToDock()
                                         isAddedToDock = true
                                     }
