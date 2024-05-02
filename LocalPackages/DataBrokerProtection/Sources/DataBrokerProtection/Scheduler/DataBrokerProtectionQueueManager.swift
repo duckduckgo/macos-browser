@@ -41,17 +41,18 @@ protocol DataBrokerProtectionQueueManager {
 }
 
 enum QueueManagerMode {
-    case manual
-    case queued
     case idle
+    case manualScan
+    case optOut
+    case queued
 
     func canInterrupt(forNewMode newMode: QueueManagerMode) -> Bool {
         switch (self, newMode) {
-        case (_, .manual):
+        case (_, .manualScan):
             return true
         case (.idle, .queued):
             return true
-        case (.manual, .queued):
+        case (.manualScan, .queued):
             return false
         default:
             return false
@@ -81,8 +82,8 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
 
     func startManualScans(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
 
-        guard mode.canInterrupt(forNewMode: .manual) else { return }
-        mode = .manual
+        guard mode.canInterrupt(forNewMode: .manualScan) else { return }
+        mode = .manualScan
 
         // New Manual scans ALWAYS interrupt (i.e cancel) ANY current Manual/Scheduled scans
         operationQueue.cancelAllOperations()
@@ -120,7 +121,10 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
     }
 
     func runAllOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
-        // TODO: Correct interruption/cancellation behavior
+
+        guard mode.canInterrupt(forNewMode: .queued) else { return }
+        mode = .queued
+
         addOperationCollections(withType: .all,
                                 showWebView: showWebView,
                                 operationDependencies: operationDependencies) { errors in

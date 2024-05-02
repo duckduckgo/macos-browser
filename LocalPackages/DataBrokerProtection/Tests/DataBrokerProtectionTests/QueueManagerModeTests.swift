@@ -26,7 +26,7 @@ final class QueueManagerModeTests: XCTestCase {
         let sut = QueueManagerMode.idle
 
         // When
-        let result = sut.canInterrupt(forNewMode: .manual)
+        let result = sut.canInterrupt(forNewMode: .manualScan)
 
         // Then
         XCTAssertTrue(result)
@@ -45,7 +45,7 @@ final class QueueManagerModeTests: XCTestCase {
 
     func testCurrentModeManual_andNewModeQueued_thenInterruptionNotAllowed() throws {
         // Given
-        let sut = QueueManagerMode.manual
+        let sut = QueueManagerMode.manualScan
 
         // When
         let result = sut.canInterrupt(forNewMode: .queued)
@@ -59,7 +59,7 @@ final class QueueManagerModeTests: XCTestCase {
         let sut = QueueManagerMode.queued
 
         // When
-        let result = sut.canInterrupt(forNewMode: .manual)
+        let result = sut.canInterrupt(forNewMode: .manualScan)
 
         // Then
         XCTAssertTrue(result)

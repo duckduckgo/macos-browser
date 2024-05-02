@@ -24,26 +24,40 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
 
     var sut: DefaultDataBrokerProtectionQueueManager!
 
-    func testWhenStartQueuedScan_andCurrentModeIsManual_thenCurrentOperationsAreNotInterrupted() throws {
-        // Given
-        let mockQueue = MockDataBrokerProtectionOperationQueue()
-        var mockOperations = (1...10).map { MockDataBrokerOperationsCollection(id: $0, operationType: .scan) }
-        let mockOperationsBuilder = MockDataBrokerOperationsCollectionBuilder(operationCollections: mockOperations)
-        let mockDatabase = MockDatabase()
-        let mockPixelHandler = MockPixelHandler()
-        let mockMismatchCalculator = MockMismatchCalculator(database: mockDatabase, pixelHandler: mockPixelHandler)
-        let mockUpdater = MockDataBrokerProtectionBrokerUpdater()
-        let mockSchedulerConfig = MockSchedulerConfig()
-        let mockRunnerProvider = MockRunnerProvider()
-        let mockUserNotification = MockUserNotification()
+    var mockQueue: MockDataBrokerProtectionOperationQueue!
+    var mockOperations: [MockDataBrokerOperationsCollection]!
+    var mockOperationsBuilder: MockDataBrokerOperationsCollectionBuilder!
+    var mockDatabase: MockDatabase!
+    var mockPixelHandler: MockPixelHandler!
+    var mockMismatchCalculator: MockMismatchCalculator!
+    var mockUpdater: MockDataBrokerProtectionBrokerUpdater!
+    var mockSchedulerConfig: MockSchedulerConfig!
+    var mockRunnerProvider: MockRunnerProvider!
+    var mockUserNotification: MockUserNotification!
+    var mockDependencies: DefaultOperationDependencies!
 
-        let mockDependencies = DefaultOperationDependencies(database: mockDatabase,
+    override func setUpWithError() throws {
+        mockQueue = MockDataBrokerProtectionOperationQueue()
+        mockOperations = (1...10).map { MockDataBrokerOperationsCollection(id: $0, operationType: .scan) }
+        mockOperationsBuilder = MockDataBrokerOperationsCollectionBuilder(operationCollections: mockOperations)
+        mockDatabase = MockDatabase()
+        mockPixelHandler = MockPixelHandler()
+        mockMismatchCalculator = MockMismatchCalculator(database: mockDatabase, pixelHandler: mockPixelHandler)
+        mockUpdater = MockDataBrokerProtectionBrokerUpdater()
+        mockSchedulerConfig = MockSchedulerConfig()
+        mockRunnerProvider = MockRunnerProvider()
+        mockUserNotification = MockUserNotification()
+
+        mockDependencies = DefaultOperationDependencies(database: mockDatabase,
                                                             config: mockSchedulerConfig,
                                                             runnerProvider: mockRunnerProvider,
                                                             notificationCenter: .default,
                                                             pixelHandler: mockPixelHandler,
                                                             userNotificationService: mockUserNotification)
+    }
 
+    func testWhenStartQueuedScan_andCurrentModeIsManual_thenCurrentOperationsAreNotInterrupted() throws {
+        // Given
         sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
                                                       operationsBuilder: mockOperationsBuilder,
                                                       mismatchCalculator: mockMismatchCalculator,
@@ -67,24 +81,6 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
 
     func testWhenStartSecondManualScan_andCurrentModeIsManual_thenCurrentOperationsAreInterrupted() throws {
         // Given
-        let mockQueue = MockDataBrokerProtectionOperationQueue()
-        var mockOperations = (1...10).map { MockDataBrokerOperationsCollection(id: $0, operationType: .scan) }
-        let mockOperationsBuilder = MockDataBrokerOperationsCollectionBuilder(operationCollections: mockOperations)
-        let mockDatabase = MockDatabase()
-        let mockPixelHandler = MockPixelHandler()
-        let mockMismatchCalculator = MockMismatchCalculator(database: mockDatabase, pixelHandler: mockPixelHandler)
-        let mockUpdater = MockDataBrokerProtectionBrokerUpdater()
-        let mockSchedulerConfig = MockSchedulerConfig()
-        let mockRunnerProvider = MockRunnerProvider()
-        let mockUserNotification = MockUserNotification()
-
-        let mockDependencies = DefaultOperationDependencies(database: mockDatabase,
-                                                            config: mockSchedulerConfig,
-                                                            runnerProvider: mockRunnerProvider,
-                                                            notificationCenter: .default,
-                                                            pixelHandler: mockPixelHandler,
-                                                            userNotificationService: mockUserNotification)
-
         sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
                                                       operationsBuilder: mockOperationsBuilder,
                                                       mismatchCalculator: mockMismatchCalculator,
