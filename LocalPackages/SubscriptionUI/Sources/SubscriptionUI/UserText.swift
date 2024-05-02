@@ -55,7 +55,7 @@ enum UserText {
     }
 
     static func preferencesSubscriptionExpiredCaption(formattedDate: String) -> String {
-        let localized = NSLocalizedString("subscription.preferences.subscription.expired.caption", value: "Your Privacy Pro subscription expired on %@.", comment: "Caption for the subscription preferences pane when the subscription has expired. The parameter is date of expiry.")
+        let localized = NSLocalizedString("subscription.preferences.subscription.expired.caption", value: "Your Privacy Pro subscription expired on %@", comment: "Caption for the subscription preferences pane when the subscription has expired. The parameter is date of expiry.")
         return String(format: localized, formattedDate)
     }
 
