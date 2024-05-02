@@ -139,25 +139,27 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     }
 
     private func mergeTrackerDataSets(rules: [ContentBlockerRulesManager.Rules]) -> (trackerData: TrackerData, encodedTrackerData: String) {
-        let tdsName = DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName
-        let tdsIndex = contentBlockingManager.currentRules.firstIndex(where: { $0.name == tdsName})
-
         var combinedTrackers: [String: KnownTracker] = [:]
         var combinedEntities: [String: Entity] = [:]
         var combinedDomains: [String: String] = [:]
         var cnames: [TrackerData.CnameDomain: TrackerData.TrackerDomain]? = [:]
 
-        if tdsIndex != nil {
-            cnames = rules[tdsIndex!].trackerData.cnames
-            rules.forEach { ruleSet in
-                ruleSet.trackerData.trackers.forEach { key, value in
+        let setsToCombine = [ DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName, ContentBlockerRulesLists.Constants.clickToLoadRulesListName ]
+
+        setsToCombine.forEach { setName in
+            if let ruleSetIndex = contentBlockingManager.currentRules.firstIndex(where: { $0.name == setName }) {
+                rules[ruleSetIndex].trackerData.trackers.forEach { key, value in
                     combinedTrackers[key] = value
                 }
-                ruleSet.trackerData.entities.forEach { key, value in
+                rules[ruleSetIndex].trackerData.entities.forEach { key, value in
                     combinedEntities[key] = value
                 }
-                ruleSet.trackerData.domains.forEach { key, value in
+                rules[ruleSetIndex].trackerData.domains.forEach { key, value in
                     combinedDomains[key] = value
+                }
+                if setName == DefaultContentBlockerRulesListsSource.Constants.trackerDataSetRulesListName {
+                    // just copy the cnames from the main TDS
+                    cnames = rules[ruleSetIndex].trackerData.cnames
                 }
             }
         }
