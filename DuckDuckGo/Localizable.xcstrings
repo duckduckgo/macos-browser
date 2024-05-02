@@ -4293,55 +4293,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Autovervollständigen sperren, nachdem der Computer inaktiv war für"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Lock autofill after computer is idle for"
+            "value" : "Lock access to passwords and autofill info after computer is idle for"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Bloquear autocompletar cuando el ordenador esté inactivo durante"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Verrouiller la saisie automatique après l'inactivité de l'ordinateur pendant"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Blocca la compilazione automatica quando il computer è inattivo per"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Automatisch invullen vergrendelen nadat de computer inactief is geweest"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Zablokuj autouzupełnianie, gdy komputer jest bezczynny przez"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Bloquear o preenchimento automático depois de o computador estar inativo durante"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Блокировать автозаполнение после простоя компьютера в течение"
           }
         }
@@ -4593,55 +4593,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wenn es nicht gesperrt ist, kann jeder, der Zugriff auf dein Gerät hat, deine Autovervollständigen-Daten verwenden und ändern. Aus Sicherheitsgründen erfordert das Ausfüllen von Kreditkartenformularen immer eine Authentifizierung."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "If not locked, anyone with access to your device will be able to use and modify your autofill data. For security purposes, credit card form fill always requires authentication."
+            "value" : "If not locked, anyone with access to your device will be able to use and modify your autofill info. For security purposes, payment method form fill always requires authentication."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Si no está bloqueado, cualquier persona con acceso a tu dispositivo podrá utilizar y modificar tus datos de autocompletar. Por motivos de seguridad, el formulario de la tarjeta de crédito siempre requiere autenticación."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "En l'absence de verrouillage, toute personne ayant accès à votre appareil pourra utiliser et modifier vos données de saisie automatique. Pour des raisons de sécurité, le formulaire de carte bancaire nécessite une authentification systématique."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Se non è bloccata, chiunque abbia accesso al tuo dispositivo potrà utilizzare e modificare i tuoi dati con compilazione automatica. Per motivi di sicurezza, la compilazione del modulo della carta di credito richiede sempre l'autenticazione."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Indien niet vergrendeld, kan iedereen met toegang tot je apparaat je gegevens voor automatisch invullen gebruiken en wijzigen. Om veiligheidsredenen is verificatie altijd nodig bij het invullen van een creditcardformulier."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "W przypadku braku blokady każda osoba mająca dostęp do Twojego urządzenia będzie mogła używać danych autouzupełniania i je modyfikować. Ze względów bezpieczeństwa uzupełnianie formularza karty kredytowej zawsze wymaga uwierzytelnienia."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Se não estiver bloqueado, qualquer pessoa com acesso ao teu dispositivo poderá utilizar e modificar os teus dados de preenchimento automático. Por motivos de segurança, o preenchimento do formulário de cartão de crédito requer sempre autenticação."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "В отсутствие блокировки любой, у кого появится доступ к устройству, сможет использовать или изменить ваши автозаполняемые данные. Из соображений безопасности при заполнении платежных данных в формах всегда требуется аутентификация."
           }
         }
@@ -5626,7 +5626,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "View Identities…"
+            "value" : "Open Identities…"
           }
         }
       }
@@ -5638,7 +5638,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "View Passwords…"
+            "value" : "Open Passwords…"
           }
         }
       }
@@ -5650,7 +5650,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "View Payment Methods…"
+            "value" : "Open Payment Methods…"
           }
         }
       }
@@ -36993,60 +36993,60 @@
       }
     },
     "pinning.hide-autofill-shortcut" : {
-      "comment" : "Menu item for hiding the autofill shortcut",
+      "comment" : "Menu item for hiding the passwords shortcut",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Autovervollständigungs-Verknüpfung ausblenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Hide Autofill Shortcut"
+            "value" : "Hide Passwords Shortcut"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ocultar acceso directo a Autocompletar"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Masquer le raccourci de saisie automatique"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Nascondi scorciatoia compilazione automatica"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Snelkoppeling voor automatisch invullen verbergen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ukryj skrót do autouzupełniania"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ocultar atalho de preenchimento automático"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Скрыть ярлык для автозаполнения"
           }
         }
@@ -37233,60 +37233,60 @@
       }
     },
     "pinning.show-autofill-shortcut" : {
-      "comment" : "Menu item for showing the autofill shortcut",
+      "comment" : "Menu item for showing the passwords shortcut",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Autofill-Verknüpfung anzeigen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Show Autofill Shortcut"
+            "value" : "Show Passwords Shortcut"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Mostrar acceso directo a Autocompletar"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Afficher le raccourci de saisie automatique"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Mostra scorciatoia compilazione automatica"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Snelkoppeling voor automatisch invullen weergeven"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Pokaż skrót do autouzupełniania"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Mostrar atalho de preenchimento automático"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Показывать ярлык для автозаполнения"
           }
         }
@@ -39871,55 +39871,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Zugang zu deinen Autovervollständigungs-Infos freischalten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "unlock access to your autofill info"
+            "value" : "unlock your passwords and autofill info for you"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "desbloquear el acceso a tu información de autocompletar"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "déverrouiller l'accès à vos informations de saisie automatique"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "sblocca l'accesso alla compilazione automatica delle informazioni"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "toegang tot automatisch ingevulde gegevens ontgrendelen"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "odblokuj dostęp do informacji autouzupełniania"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "desbloquear o acesso às tuas informações de preenchimento automático"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "разблокировать доступ к автозаполняемым данным"
           }
         }
@@ -41731,55 +41731,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Passwort speichern?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Save password?"
+            "value" : "Save Password to DuckDuckGo?"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "¿Guardar contraseña?"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Enregistrer le mot de passe ?"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Salvare password?"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Wachtwoord opslaan?"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Zapisać hasło?"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Guardar palavra-passe?"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Сохранить пароль?"
           }
         }
@@ -42321,6 +42321,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "В обратном алфавитном порядке"
+          }
+        }
+      }
+    },
+    "pm.update-credentials.title" : {
+      "comment" : "Title for the Update Credentials popover",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update Password?"
           }
         }
       }
