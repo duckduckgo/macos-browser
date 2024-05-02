@@ -28,7 +28,20 @@ extension Preferences {
         var body: some View {
             PreferencePane(UserText.dataClearing) {
 
-                // SECTION 1: Fireproof Site
+                // SECTION 1: Automatically Clear Data
+                PreferencePaneSection(UserText.autoClear) {
+
+                    PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.automaticallyClearData, isOn: $model.isAutoClearEnabled)
+                        ToggleMenuItem(UserText.warnBeforeQuit,
+                                       isOn: $model.isWarnBeforeClearingEnabled)
+                        .disabled(!model.isAutoClearEnabled)
+                        .padding(.leading, 16)
+                    }
+
+                }
+
+                // SECTION 2: Fireproof Site
                 PreferencePaneSection(UserText.fireproofSites) {
 
                     PreferencePaneSubSection {

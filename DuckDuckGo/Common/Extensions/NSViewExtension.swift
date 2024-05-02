@@ -79,6 +79,11 @@ extension NSView {
         return self
     }
 
+    var isShown: Bool {
+        get { !isHidden }
+        set { isHidden = !newValue }
+    }
+
     func makeMeFirstResponder() {
         guard let window = window else {
             os_log("%s: Window not available", type: .error, className)

@@ -48,6 +48,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let customURLLabelMenuItem = NSMenuItem(title: "")
 
     private let environmentMenu = NSMenu()
+    private let statusMenuIconMenu = NSMenuItem(title: "Show Status Menu Icon", action: #selector(DataBrokerProtectionDebugMenu.toggleShowStatusMenuItem))
 
     private let webUISettings = DataBrokerProtectionWebUIURLSettings(.dbp)
     private let settings = DataBrokerProtectionSettings(defaults: .dbp)
@@ -147,6 +148,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
             NSMenuItem.separator()
 
+            statusMenuIconMenu.targetting(self)
+
             NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
                 .targetting(self)
             NSMenuItem(title: "Force Profile Removal", action: #selector(DataBrokerProtectionDebugMenu.showForceOptOutWindow))
@@ -172,6 +175,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         updateWaitlistItems()
         updateWebUIMenuItemsState()
         updateEnvironmentMenu()
+        updateShowStatusMenuIconMenu()
     }
 
     // MARK: - Menu functions
@@ -223,7 +227,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         os_log("Running scan operations...", log: .dataBrokerProtection)
         let showWebView = sender.representedObject as? Bool ?? false
 
-        DataBrokerProtectionManager.shared.scheduler.scanAllBrokers(showWebView: showWebView) { errors in
+        DataBrokerProtectionManager.shared.scheduler.startManualScan(showWebView: showWebView, startTime: Date()) { errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
                     os_log("scan operations finished, error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
@@ -366,6 +370,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         }
     }
 
+    @objc private func toggleShowStatusMenuItem() {
+        settings.showInMenuBar.toggle()
+    }
+
     @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
         let title = menuItem.title
         let selectedEnvironment: DataBrokerProtectionSettings.SelectedEnvironment
@@ -447,6 +455,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
         environmentMenu.items.first?.state = selectedEnvironment == .production ? .on: .off
         environmentMenu.items.last?.state = selectedEnvironment == .staging ? .on: .off
+    }
+
+    private func updateShowStatusMenuIconMenu() {
+        statusMenuIconMenu.state = settings.showInMenuBar ? .on : .off
     }
 }
 

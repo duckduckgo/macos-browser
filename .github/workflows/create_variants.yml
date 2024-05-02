@@ -72,11 +72,29 @@ jobs:
           atb-asana-task-id: ${{ vars.DMG_VARIANTS_LIST_TASK_ID }}
           origin-asana-section-id: ${{ vars.DMG_VARIANTS_ORIGIN_SECTION_ID }}
           
-  
+  download-dmg-and-upload-artifact:
+
+    name: Download Release App and upload artifact
+
+    runs-on: macos-13
+    timeout-minutes: 15
+
+    steps:
+      - name: Download release app
+        run: |
+          curl -fLSs "${{ vars.RELEASE_DMG_URL }}" --output duckduckgo.dmg
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: duckduckgo-dmg
+          path: ${{ github.workspace }}/duckduckgo.dmg
+          retention-days: 1
+
   create-variants:
 
     name: Create Variant
-    needs: set-up-variants
+    needs: [set-up-variants, download-dmg-and-upload-artifact]
 
     strategy:
       fail-fast: false
@@ -125,7 +143,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/variants-release-mm-template.json?ref=${{ github.ref }} --jq .download_url) \
+          curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/variants-release-mm-template.json --jq .download_url) \
               --output message-template.json
     
           export MM_USER_HANDLE=$(base64 -d <<< ${{ secrets.MM_HANDLES_BASE64 }} | jq ".${{ github.actor }}" | tr -d '"')

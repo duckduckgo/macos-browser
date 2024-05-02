@@ -71,15 +71,15 @@ private extension NSMenuItem {
             image = TabViewModel.Favicon.home
             title = UserText.tabHomeTitle
         case .settings:
-            image = TabViewModel.Favicon.preferences
+            image = TabViewModel.Favicon.settings
             title = UserText.tabPreferencesTitle
         case .bookmarks:
-            image = TabViewModel.Favicon.preferences
+            image = TabViewModel.Favicon.bookmarks
             title = UserText.tabPreferencesTitle
         case .url, .subscription, .identityTheftRestoration:
             image = recentlyClosedTab.favicon
             image?.size = NSSize.faviconSize
-            title = recentlyClosedTab.title ?? recentlyClosedTab.tabContent.url?.absoluteString ?? ""
+            title = recentlyClosedTab.title ?? recentlyClosedTab.tabContent.userEditableUrl?.absoluteString ?? ""
 
             if title.count > MainMenu.Constants.maxTitleLength {
                 title = String(title.truncated(length: MainMenu.Constants.maxTitleLength))

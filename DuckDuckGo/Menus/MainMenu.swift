@@ -291,6 +291,7 @@ import SubscriptionUI
     func buildBookmarksMenu() -> NSMenuItem {
         NSMenuItem(title: UserText.bookmarks).submenu(bookmarksMenu.buildItems {
             NSMenuItem(title: UserText.bookmarkThisPage, action: #selector(MainViewController.bookmarkThisPage), keyEquivalent: "d")
+            NSMenuItem(title: UserText.bookmarkAllTabs, action: #selector(MainViewController.bookmarkAllOpenTabs), keyEquivalent: [.command, .shift, "d"])
             manageBookmarksMenuItem
             bookmarksMenuToggleBookmarksBarMenuItem
             NSMenuItem.separator()
@@ -557,6 +558,14 @@ import SubscriptionUI
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Open Vanilla Browser", action: #selector(MainViewController.openVanillaBrowser)).withAccessibilityIdentifier("MainMenu.openVanillaBrowser")
             NSMenuItem.separator()
+            NSMenuItem(title: "Tab") {
+                NSMenuItem(title: "Append Tabs") {
+                    NSMenuItem(title: "10 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 10)
+                    NSMenuItem(title: "50 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 50)
+                    NSMenuItem(title: "100 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 100)
+                    NSMenuItem(title: "150 Tabs", action: #selector(MainViewController.addDebugTabs(_:)), representedObject: 150)
+                }
+            }
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
@@ -565,14 +574,13 @@ import SubscriptionUI
                 NSMenuItem(title: "Reset Pinned Tabs", action: #selector(MainViewController.resetPinnedTabs))
                 NSMenuItem(title: "Reset YouTube Overlay Interactions", action: #selector(MainViewController.resetDuckPlayerOverlayInteractions))
                 NSMenuItem(title: "Reset MakeDuckDuckYours user settings", action: #selector(MainViewController.resetMakeDuckDuckGoYoursUserSettings))
-                NSMenuItem(title: "Survey 10% on", action: #selector(MainViewController.in10PercentSurveyOn))
-                NSMenuItem(title: "Survey 10% off", action: #selector(MainViewController.in10PercentSurveyOff))
+                NSMenuItem(title: "Permanent Survey share on", action: #selector(MainViewController.inPermanentSurveyShareOn(_:)))
+                NSMenuItem(title: "Permanent Survey share off", action: #selector(MainViewController.inPermanentSurveyShareOff(_:)))
                 NSMenuItem(title: "Change Activation Date") {
                     NSMenuItem(title: "Today", action: #selector(MainViewController.changeInstallDateToToday), keyEquivalent: "N")
-                    NSMenuItem(title: "Less Than a 1 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan1DayAgo(_:)))
-                    NSMenuItem(title: "More Than 1 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan1DayAgoButLessThan14(_:)))
-                    NSMenuItem(title: "More Than 14 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan14DaysAgoButLessThan15(_:)))
-                    NSMenuItem(title: "More Than 15 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan15DaysAgo(_:)))
+                    NSMenuItem(title: "Less Than a 5 days Ago", action: #selector(MainViewController.changeInstallDateToLessThan5DayAgo(_:)))
+                    NSMenuItem(title: "More Than 5 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan5DayAgoButLessThan9(_:)))
+                    NSMenuItem(title: "More Than 9 Days Ago", action: #selector(MainViewController.changeInstallDateToMoreThan9DaysAgo(_:)))
                 }
                 NSMenuItem(title: "Reset Email Protection InContext Signup Prompt", action: #selector(MainViewController.resetEmailProtectionInContextPrompt))
                 NSMenuItem(title: "Reset Pixels Storage", action: #selector(MainViewController.resetDailyPixels))

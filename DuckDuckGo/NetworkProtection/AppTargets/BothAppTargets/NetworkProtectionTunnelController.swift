@@ -448,14 +448,18 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - Starting & Stopping the VPN
 
-    enum StartError: LocalizedError {
+    enum StartError: LocalizedError, CustomNSError {
+        case cancelled
         case noAuthToken
         case connectionStatusInvalid
         case connectionAlreadyStarted
         case simulateControllerFailureError
+        case startTunnelFailure(_ error: Error)
 
         var errorDescription: String? {
             switch self {
+            case .cancelled:
+                return nil
             case .noAuthToken:
                 return "You need a subscription to start the VPN"
             case .connectionAlreadyStarted:
@@ -473,6 +477,34 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 #endif
             case .simulateControllerFailureError:
                 return "Simulated a controller error as requested"
+            case .startTunnelFailure(let error):
+                return error.localizedDescription
+            }
+        }
+
+        var errorCode: Int {
+            switch self {
+            case .cancelled: return 0
+                // MARK: Setup errors
+            case .noAuthToken: return 1
+            case .connectionStatusInvalid: return 2
+            case .connectionAlreadyStarted: return 3
+            case .simulateControllerFailureError: return 4
+                // MARK: Actual connection attempt issues
+            case .startTunnelFailure: return 100
+            }
+        }
+
+        var errorUserInfo: [String: Any] {
+            switch self {
+            case .cancelled,
+                    .noAuthToken,
+                    .connectionStatusInvalid,
+                    .connectionAlreadyStarted,
+                    .simulateControllerFailureError:
+                return [:]
+            case .startTunnelFailure(let error):
+                return [NSUnderlyingErrorKey: error]
             }
         }
     }
@@ -480,6 +512,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Starts the VPN connection
     ///
     func start() async {
+        VPNOperationErrorRecorder().beginRecordingControllerStart()
         PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionControllerStartAttempt,
                       frequency: .dailyAndCount)
         controllerErrorStore.lastErrorMessage = nil
@@ -501,6 +534,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             } catch {
                 if case NEVPNError.configurationReadWriteFailed = error {
                     onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+
+                    throw StartError.cancelled
                 }
 
                 throw error
@@ -525,11 +560,21 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                               frequency: .dailyAndCount)
             }
         } catch {
-            PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndCount, includeAppVersionParameter: true
-            )
+            VPNOperationErrorRecorder().recordControllerStartFailure(error)
 
-            await stop()
+            if case StartError.cancelled = error {
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionControllerStartCancelled, frequency: .dailyAndCount, includeAppVersionParameter: true
+                )
+            } else {
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionControllerStartFailure(error), frequency: .dailyAndCount, includeAppVersionParameter: true
+                )
+            }
+
+            if await isConnected {
+                await stop()
+            }
 
             // Always keep the first error message shown, as it's the more actionable one.
             if controllerErrorStore.lastErrorMessage == nil {
@@ -574,7 +619,11 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             throw StartError.simulateControllerFailureError
         }
 
-        try tunnelManager.connection.startVPNTunnel(options: options)
+        do {
+            try tunnelManager.connection.startVPNTunnel(options: options)
+        } catch {
+            throw StartError.startTunnelFailure(error)
+        }
 
         PixelKit.fire(
             NetworkProtectionPixelEvent.networkProtectionNewUser,

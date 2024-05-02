@@ -64,6 +64,11 @@ public enum DataBrokerProtectionPixels {
         static let wasOnWaitlist = "was_on_waitlist"
         static let httpCode = "http_code"
         static let backendServiceCallSite = "backend_service_callsite"
+        static let isManualScan = "is_manual_scan"
+        static let durationInMs = "duration_in_ms"
+        static let profileQueries = "profile_queries"
+        static let hasError = "has_error"
+        static let brokerURL = "broker_url"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -100,12 +105,29 @@ public enum DataBrokerProtectionPixels {
     case backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler
 
     // IPC server events
-    case ipcServerStartScheduler
-    case ipcServerStopScheduler
+    case ipcServerStartSchedulerCalledByApp
+    case ipcServerStartSchedulerReceivedByAgent
+    case ipcServerStartSchedulerXPCError(error: Error?)
+
+    case ipcServerStopSchedulerCalledByApp
+    case ipcServerStopSchedulerReceivedByAgent
+    case ipcServerStopSchedulerXPCError(error: Error?)
+
+    case ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions
+    case ipcServerScanAllBrokersAttemptedToCallInWrongDirectory
+    case ipcServerScanAllBrokersCalledByApp
+    case ipcServerScanAllBrokersReceivedByAgent
+    case ipcServerScanAllBrokersXPCError(error: Error?)
+
+    case ipcServerScanAllBrokersCompletedOnAgentWithoutError
+    case ipcServerScanAllBrokersCompletedOnAgentWithError(error: Error?)
+    case ipcServerScanAllBrokersCompletionCalledOnAppWithoutError
+    case ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: Error?)
+    case ipcServerScanAllBrokersInterruptedOnAgent
+    case ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption
+
     case ipcServerOptOutAllBrokers
     case ipcServerOptOutAllBrokersCompletion(error: Error?)
-    case ipcServerScanAllBrokers
-    case ipcServerScanAllBrokersCompletion(error: Error?)
     case ipcServerRunQueuedOperations
     case ipcServerRunQueuedOperationsCompletion(error: Error?)
     case ipcServerRunAllOperations
@@ -121,9 +143,9 @@ public enum DataBrokerProtectionPixels {
     case dataBrokerProtectionNotificationOpenedAllRecordsRemoved
 
     // Scan/Search pixels
-    case scanSuccess(dataBroker: String, matchesFound: Int, duration: Double, tries: Int)
-    case scanFailed(dataBroker: String, duration: Double, tries: Int)
-    case scanError(dataBroker: String, duration: Double, category: String, details: String)
+    case scanSuccess(dataBroker: String, matchesFound: Int, duration: Double, tries: Int, isManualScan: Bool)
+    case scanFailed(dataBroker: String, duration: Double, tries: Int, isManualScan: Bool)
+    case scanError(dataBroker: String, duration: Double, category: String, details: String, isManualScan: Bool)
 
     // KPIs - engagement
     case dailyActiveUser
@@ -144,6 +166,20 @@ public enum DataBrokerProtectionPixels {
     // Backend service errors
     case generateEmailHTTPErrorDaily(statusCode: Int, environment: String, wasOnWaitlist: Bool)
     case emptyAccessTokenDaily(environment: String, wasOnWaitlist: Bool, callSite: BackendServiceCallSite)
+
+    // Home View
+    case homeViewShowNoPermissionError
+    case homeViewShowWebUI
+    case homeViewShowBadPathError
+    case homeViewCTAMoveApplicationClicked
+    case homeViewCTAGrantPermissionClicked
+
+    // Initial scans pixels
+    // https://app.asana.com/0/1204006570077678/1206981742767458/f
+    case initialScanTotalDuration(duration: Double, profileQueries: Int)
+    case initialScanSiteLoadDuration(duration: Double, hasError: Bool, brokerURL: String)
+    case initialScanPostLoadingDuration(duration: Double, hasError: Bool, brokerURL: String)
+    case initialScanPreStartDuration(duration: Double)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -187,12 +223,28 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile: return "m_mac_dbp_background-agent-run-operations-and-start-scheduler-if-possible_no-saved-profile"
         case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler: return "m_mac_dbp_background-agent-run-operations-and-start-scheduler-if-possible_callback_start-scheduler"
 
-        case .ipcServerStartScheduler: return "m_mac_dbp_ipc-server_start-scheduler"
-        case .ipcServerStopScheduler: return "m_mac_dbp_ipc-server_stop-scheduler"
+        case .ipcServerStartSchedulerCalledByApp: return "m_mac_dbp_ipc-server_start-scheduler_called-by-app"
+        case .ipcServerStartSchedulerReceivedByAgent: return "m_mac_dbp_ipc-server_start-scheduler_received-by-agent"
+        case .ipcServerStartSchedulerXPCError: return "m_mac_dbp_ipc-server_start-scheduler_xpc-error"
+
+        case .ipcServerStopSchedulerCalledByApp: return "m_mac_dbp_ipc-server_stop-scheduler_called-by-app"
+        case .ipcServerStopSchedulerReceivedByAgent: return "m_mac_dbp_ipc-server_stop-scheduler_received-by-agent"
+        case .ipcServerStopSchedulerXPCError: return "m_mac_dbp_ipc-server_stop-scheduler_xpc-error"
+
+        case .ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions: return "m_mac_dbp_ipc-server_scan-all-brokers_attempted-to-call-without-login-item-permissions"
+        case .ipcServerScanAllBrokersAttemptedToCallInWrongDirectory: return "m_mac_dbp_ipc-server_scan-all-brokers_attempted-to-call-in-wrong-directory"
+        case .ipcServerScanAllBrokersCalledByApp: return "m_mac_dbp_ipc-server_scan-all-brokers_called-by-app"
+        case .ipcServerScanAllBrokersReceivedByAgent: return "m_mac_dbp_ipc-server_scan-all-brokers_received-by-agent"
+        case .ipcServerScanAllBrokersXPCError: return "m_mac_dbp_ipc-server_scan-all-brokers_xpc-error"
+        case .ipcServerScanAllBrokersCompletedOnAgentWithoutError: return "m_mac_dbp_ipc-server_scan-all-brokers_completed-on-agent_without-error"
+        case .ipcServerScanAllBrokersCompletedOnAgentWithError: return "m_mac_dbp_ipc-server_scan-all-brokers_completed-on-agent_with-error"
+        case .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError: return "m_mac_dbp_ipc-server_scan-all-brokers_completion-called-on-app_without-error"
+        case .ipcServerScanAllBrokersCompletionCalledOnAppWithError: return "m_mac_dbp_ipc-server_scan-all-brokers_completion-called-on-app_with-error"
+        case .ipcServerScanAllBrokersInterruptedOnAgent: return "m_mac_dbp_ipc-server_scan-all-brokers_interrupted-on-agent"
+        case .ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption: return "m_mac_dbp_ipc-server_scan-all-brokers_completion-called-on-app_after-interruption"
+
         case .ipcServerOptOutAllBrokers: return "m_mac_dbp_ipc-server_opt-out-all-brokers"
         case .ipcServerOptOutAllBrokersCompletion: return "m_mac_dbp_ipc-server_opt-out-all-brokers_completion"
-        case .ipcServerScanAllBrokers: return "m_mac_dbp_ipc-server_scan-all-brokers"
-        case .ipcServerScanAllBrokersCompletion: return "m_mac_dbp_ipc-server_scan-all-brokers_completion"
         case .ipcServerRunQueuedOperations: return "m_mac_dbp_ipc-server_run-queued-operations"
         case .ipcServerRunQueuedOperationsCompletion: return "m_mac_dbp_ipc-server_run-queued-operations_completion"
         case .ipcServerRunAllOperations: return "m_mac_dbp_ipc-server_run-all-operations"
@@ -232,6 +284,19 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Backend service errors
         case .generateEmailHTTPErrorDaily: return "m_mac_dbp_service_email-generate-http-error"
         case .emptyAccessTokenDaily: return "m_mac_dbp_service_empty-auth-token"
+
+            // Home View
+        case .homeViewShowNoPermissionError: return "m_mac_dbp_home_view_show-no-permission-error"
+        case .homeViewShowWebUI: return "m_mac_dbp_home_view_show-web-ui"
+        case .homeViewShowBadPathError: return "m_mac_dbp_home_view_show-bad-path-error"
+        case .homeViewCTAMoveApplicationClicked: return "m_mac_dbp_home_view-cta-move-application-clicked"
+        case .homeViewCTAGrantPermissionClicked: return "m_mac_dbp_home_view-cta-grant-permission-clicked"
+
+            // Initial scans pixels
+        case .initialScanTotalDuration: return "m_mac_dbp_initial_scan_duration"
+        case .initialScanSiteLoadDuration: return "m_mac_dbp_scan_broker_site_loaded"
+        case .initialScanPostLoadingDuration: return "m_mac_dbp_initial_scan_broker_post_loading"
+        case .initialScanPreStartDuration: return "m_mac_dbp_initial_scan_pre_start_duration"
         }
     }
 
@@ -324,26 +389,44 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
                 .scanningEventNewMatch,
                 .scanningEventReAppearance,
+                .homeViewShowNoPermissionError,
+                .homeViewShowWebUI,
+                .homeViewShowBadPathError,
+                .homeViewCTAMoveApplicationClicked,
+                .homeViewCTAGrantPermissionClicked,
 
                 .secureVaultInitError,
                 .secureVaultError:
             return [:]
-        case .ipcServerStartScheduler,
-                .ipcServerStopScheduler,
+        case .ipcServerStartSchedulerCalledByApp,
+                .ipcServerStartSchedulerReceivedByAgent,
+                .ipcServerStartSchedulerXPCError,
+                .ipcServerStopSchedulerCalledByApp,
+                .ipcServerStopSchedulerReceivedByAgent,
+                .ipcServerStopSchedulerXPCError,
+                .ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions,
+                .ipcServerScanAllBrokersAttemptedToCallInWrongDirectory,
+                .ipcServerScanAllBrokersCalledByApp,
+                .ipcServerScanAllBrokersReceivedByAgent,
+                .ipcServerScanAllBrokersXPCError,
+                .ipcServerScanAllBrokersCompletedOnAgentWithoutError,
+                .ipcServerScanAllBrokersCompletedOnAgentWithError,
+                .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError,
+                .ipcServerScanAllBrokersCompletionCalledOnAppWithError,
+                .ipcServerScanAllBrokersInterruptedOnAgent,
+                .ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption,
                 .ipcServerOptOutAllBrokers,
                 .ipcServerOptOutAllBrokersCompletion,
-                .ipcServerScanAllBrokers,
-                .ipcServerScanAllBrokersCompletion,
                 .ipcServerRunQueuedOperations,
                 .ipcServerRunQueuedOperationsCompletion,
                 .ipcServerRunAllOperations:
             return [Consts.bundleIDParamKey: Bundle.main.bundleIdentifier ?? "nil"]
-        case .scanSuccess(let dataBroker, let matchesFound, let duration, let tries):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.matchesFoundKey: String(matchesFound), Consts.durationParamKey: String(duration), Consts.triesKey: String(tries)]
-        case .scanFailed(let dataBroker, let duration, let tries):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries)]
-        case .scanError(let dataBroker, let duration, let category, let details):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.errorCategoryKey: category, Consts.errorDetailsKey: details]
+        case .scanSuccess(let dataBroker, let matchesFound, let duration, let tries, let isManualScan):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.matchesFoundKey: String(matchesFound), Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isManualScan: isManualScan.description]
+        case .scanFailed(let dataBroker, let duration, let tries, let isManualScan):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isManualScan: isManualScan.description]
+        case .scanError(let dataBroker, let duration, let category, let details, let isManualScan):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.durationParamKey: String(duration), Consts.errorCategoryKey: category, Consts.errorDetailsKey: details, Consts.isManualScan: isManualScan.description]
         case .generateEmailHTTPErrorDaily(let statusCode, let environment, let wasOnWaitlist):
             return [Consts.environmentKey: environment,
                     Consts.httpCode: String(statusCode),
@@ -352,6 +435,14 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.environmentKey: environment,
                     Consts.wasOnWaitlist: String(wasOnWaitlist),
                     Consts.backendServiceCallSite: backendServiceCallSite.rawValue]
+        case .initialScanTotalDuration(let duration, let profileQueries):
+            return [Consts.durationInMs: String(duration), Consts.profileQueries: String(profileQueries)]
+        case .initialScanSiteLoadDuration(let duration, let hasError, let brokerURL):
+            return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL]
+        case .initialScanPostLoadingDuration(let duration, let hasError, let brokerURL):
+            return [Consts.durationInMs: String(duration), Consts.hasError: hasError.description, Consts.brokerURL: brokerURL]
+        case .initialScanPreStartDuration(let duration):
+            return [Consts.durationInMs: String(duration)]
         }
     }
 }
@@ -373,10 +464,27 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .secureVaultInitError(let error),
                     .secureVaultError(let error):
                 PixelKit.fire(DebugEvent(event, error: error))
-            case .ipcServerOptOutAllBrokersCompletion(error: let error),
-                    .ipcServerScanAllBrokersCompletion(error: let error),
+            case .ipcServerStartSchedulerXPCError(error: let error),
+                    .ipcServerStopSchedulerXPCError(error: let error),
+                    .ipcServerScanAllBrokersXPCError(error: let error),
+                    .ipcServerScanAllBrokersCompletedOnAgentWithError(error: let error),
+                    .ipcServerScanAllBrokersCompletionCalledOnAppWithError(error: let error),
+                    .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
-                PixelKit.fire(DebugEvent(event, error: error))
+                PixelKit.fire(DebugEvent(event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
+            case .ipcServerStartSchedulerCalledByApp,
+                    .ipcServerStartSchedulerReceivedByAgent,
+                    .ipcServerStopSchedulerCalledByApp,
+                    .ipcServerStopSchedulerReceivedByAgent,
+                    .ipcServerScanAllBrokersAttemptedToCallWithoutLoginItemPermissions,
+                    .ipcServerScanAllBrokersAttemptedToCallInWrongDirectory,
+                    .ipcServerScanAllBrokersCalledByApp,
+                    .ipcServerScanAllBrokersReceivedByAgent,
+                    .ipcServerScanAllBrokersCompletedOnAgentWithoutError,
+                    .ipcServerScanAllBrokersCompletionCalledOnAppWithoutError,
+                    .ipcServerScanAllBrokersInterruptedOnAgent,
+                    .ipcServerScanAllBrokersCompletionCalledOnAppAfterInterruption:
+                PixelKit.fire(event, frequency: .dailyAndCount, includeAppVersionParameter: true)
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -397,10 +505,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
                     .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
                     .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
-                    .ipcServerStartScheduler,
-                    .ipcServerStopScheduler,
                     .ipcServerOptOutAllBrokers,
-                    .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
                     .ipcServerRunAllOperations,
                     .scanSuccess,
@@ -423,9 +528,21 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .scanningEventReAppearance,
                     .webUILoadingFailed,
                     .webUILoadingStarted,
-                    .webUILoadingSuccess:
+                    .webUILoadingSuccess,
+                    .initialScanTotalDuration,
+                    .initialScanSiteLoadDuration,
+                    .initialScanPostLoadingDuration,
+                    .initialScanPreStartDuration:
 
                 PixelKit.fire(event)
+
+            case .homeViewShowNoPermissionError,
+                    .homeViewShowWebUI,
+                    .homeViewShowBadPathError,
+                    .homeViewCTAMoveApplicationClicked,
+                    .homeViewCTAGrantPermissionClicked:
+                PixelKit.fire(event, frequency: .dailyAndCount)
+
             }
         }
     }

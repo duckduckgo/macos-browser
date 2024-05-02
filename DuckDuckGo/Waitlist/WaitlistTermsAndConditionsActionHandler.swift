@@ -26,21 +26,6 @@ protocol WaitlistTermsAndConditionsActionHandler {
     mutating func didAccept()
 }
 
-struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {
-    @UserDefaultsWrapper(key: .networkProtectionTermsAndConditionsAccepted, defaultValue: false)
-    var acceptedTermsAndConditions: Bool
-
-    func didShow() {
-        // Intentional no-op
-    }
-
-    mutating func didAccept() {
-        acceptedTermsAndConditions = true
-        // Remove delivered NetP notifications in case the user didn't click them.
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NetworkProtectionWaitlist.notificationIdentifier])
-    }
-}
-
 #if DBP
 
 struct DataBrokerProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {

@@ -30,12 +30,7 @@ public protocol DataBrokerProtectionDataManaging {
     func fetchBrokerProfileQueryData(ignoresCache: Bool) throws -> [BrokerProfileQueryData]
     func prepareBrokerProfileQueryDataCache() throws
     func hasMatches() throws -> Bool
-}
-
-extension DataBrokerProtectionDataManaging {
-    func fetchBrokerProfileQueryData() throws -> [BrokerProfileQueryData] {
-        try fetchBrokerProfileQueryData(ignoresCache: false)
-    }
+    func profileQueriesCount() throws -> Int
 }
 
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
@@ -74,6 +69,18 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
             return cache.profile
         }
 
+        return try fetchProfileFromDB()
+    }
+
+    public func profileQueriesCount() throws -> Int {
+        guard let profile = try fetchProfileFromDB() else {
+            throw DataBrokerProtectionError.dataNotInDatabase
+        }
+
+        return profile.profileQueries.count
+    }
+
+    private func fetchProfileFromDB() throws -> DataBrokerProtectionProfile? {
         if let profile = try database.fetchProfile() {
             cache.profile = profile
             return profile
@@ -287,7 +294,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     }
 
     func startScanAndOptOut() -> Bool {
-        return scanDelegate?.startScan() ?? false
+        return scanDelegate?.startScan(startDate: Date()) ?? false
     }
 
     func getInitialScanState() async -> DBPUIInitialScanState {
@@ -322,5 +329,11 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
                     result.append(dataBroker)
                 }
             }
+    }
+
+    func getBackgroundAgentMetadata() async -> DBPUIDebugMetadata {
+        let metadata = await scanDelegate?.getBackgroundAgentMetadata()
+
+        return mapper.mapToUIDebugMetadata(metadata: metadata, brokerProfileQueryData: brokerProfileQueryData)
     }
 }

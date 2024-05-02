@@ -30,6 +30,7 @@ extension Preferences {
         @ObservedObject var downloadsModel: DownloadsPreferences
         @ObservedObject var searchModel: SearchPreferences
         @ObservedObject var dockCustomizer: DockCustomizer
+        @ObservedObject var dataClearingModel: DataClearingPreferences
         @State private var showingCustomHomePageSheet = false
         @State private var isAddedToDock = false
 
@@ -80,9 +81,19 @@ extension Preferences {
                             Text(UserText.reopenAllWindowsFromLastSession).tag(true)
                                 .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker.reopenAllWindowsFromLastSession")
                         }, label: {})
-                            .pickerStyle(.radioGroup)
-                            .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
-                            .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
+                        .pickerStyle(.radioGroup)
+                        .disabled(dataClearingModel.isAutoClearEnabled)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                        .accessibilityIdentifier("PreferencesGeneralView.stateRestorePicker")
+                        if dataClearingModel.isAutoClearEnabled {
+                            VStack(alignment: .leading, spacing: 1) {
+                                TextMenuItemCaption(UserText.disableAutoClearToEnableSessionRestore)
+                                TextButton(UserText.showDataClearingSettings) {
+                                    startupModel.show(url: .settingsPane(.dataClearing))
+                                }
+                            }
+                            .padding(.leading, 19)
+                        }
                     }
                 }
 

@@ -55,6 +55,8 @@ public struct UserDefaultsWrapper<T> {
         case grammarCheckEnabledOnce = "grammar.check.enabled.once"
 
         case loginDetectionEnabled = "fireproofing.login-detection-enabled"
+        case autoClearEnabled = "preferences.auto-clear-enabled"
+        case warnBeforeClearingEnabled = "preferences.warn-before-clearing-enabled"
         case gpcEnabled = "preferences.gpc-enabled"
         case selectedDownloadLocationKey = "preferences.download-location"
         case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
@@ -78,6 +80,8 @@ public struct UserDefaultsWrapper<T> {
         case lastCrashReportCheckDate = "last.crash.report.check.date"
 
         case fireInfoPresentedOnce = "fire.info.presented.once"
+        case appTerminationHandledCorrectly = "app.termination.handled.correctly"
+        case restoreTabsOnStartup = "restore.tabs.on.startup"
 
         case restorePreviousSession = "preferences.startup.restore-previous-session"
         case launchToCustomHomePage = "preferences.startup.launch-to-custom-home-page"
@@ -112,11 +116,8 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
-        case homePageShowSurveyDay0 = "home.page.show.survey.0"
-        case homePageShowSurveyDay0in10Percent = "home.page.show.survey.0.in.10.pervent"
-        case homePageShowSurveyDay14in10Percent = "home.page.show.survey.0.in.14.pervent"
-        case homePageUserInteractedWithSurveyDay0 = "home.page.user.interacted.with.survey.0"
-        case homePageShowSurveyDay14 = "home.page.show.survey.14"
+        case homePageUserInSurveyShare = "home.page.user.in.survey.share"
+        case homePageShowPermanentSurvey = "home.page.show.import.permanent.survey"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"

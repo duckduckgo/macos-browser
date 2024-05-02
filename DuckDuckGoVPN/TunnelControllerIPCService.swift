@@ -50,6 +50,7 @@ final class TunnelControllerIPCService {
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
         subscribeToServerChanges()
+        subscribeToDataVolumeUpdates()
 
         server.serverDelegate = self
     }
@@ -84,6 +85,15 @@ final class TunnelControllerIPCService {
             }
             .store(in: &cancellables)
     }
+
+    private func subscribeToDataVolumeUpdates() {
+        statusReporter.dataVolumeObserver.publisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] dataVolume in
+                self?.server.dataVolumeUpdated(dataVolume)
+            }
+            .store(in: &cancellables)
+    }
 }
 
 // MARK: - Requests from the client
@@ -115,6 +125,19 @@ extension TunnelControllerIPCService: IPCServerInterface {
         // that the requested operation was executed fully.  Failure to complete the
         // operation will be handled entirely within the tunnel controller.
         completion(nil)
+    }
+
+    func fetchLastError(completion: @escaping (Error?) -> Void) {
+        Task {
+            guard #available(macOS 13.0, *),
+                  let connection = await tunnelController.connection else {
+
+                completion(nil)
+                return
+            }
+
+            connection.fetchLastDisconnectError(completionHandler: completion)
+        }
     }
 
     func resetAll(uninstallSystemExtension: Bool) async {

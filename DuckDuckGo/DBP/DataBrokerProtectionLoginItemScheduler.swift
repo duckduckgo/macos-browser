@@ -55,10 +55,11 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
         ipcScheduler.statusPublisher
     }
 
-    func scanAllBrokers(showWebView: Bool,
-                        completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+    func startManualScan(showWebView: Bool,
+                         startTime: Date,
+                         completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         enableLoginItem()
-        ipcScheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
+        ipcScheduler.startManualScan(showWebView: showWebView, startTime: startTime, completion: completion)
     }
 
     func startScheduler(showWebView: Bool) {
@@ -82,6 +83,10 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
     func runQueuedOperations(showWebView: Bool,
                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         ipcScheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
+    }
+
+    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        ipcScheduler.getDebugMetadata(completion: completion)
     }
 }
 

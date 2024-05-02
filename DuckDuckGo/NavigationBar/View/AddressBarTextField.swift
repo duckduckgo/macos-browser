@@ -22,6 +22,7 @@ import Combine
 import Common
 import Suggestions
 import Subscription
+import BrowserServicesKit
 
 final class AddressBarTextField: NSTextField {
 
@@ -233,7 +234,7 @@ final class AddressBarTextField: NSTextField {
         case .suggestion(let suggestionViewModel):
             let suggestion = suggestionViewModel.suggestion
             switch suggestion {
-            case .website, .bookmark, .historyEntry:
+            case .website, .bookmark, .historyEntry, .internalPage:
                 restoreValue(Value(stringValue: suggestionViewModel.autocompletionString, userTyped: true))
             case .phrase(phrase: let phase):
                 restoreValue(Value.text(phase, userTyped: false))
@@ -259,7 +260,7 @@ final class AddressBarTextField: NSTextField {
             switch self.value {
             case .suggestion(let suggestionViewModel):
                 switch suggestionViewModel.suggestion {
-                case .phrase, .website, .bookmark, .historyEntry: return false
+                case .phrase, .website, .bookmark, .historyEntry, .internalPage: return false
                 case .unknown: return true
                 }
             case .text(_, userTyped: true), .url(_, _, userTyped: true): return false
@@ -275,7 +276,7 @@ final class AddressBarTextField: NSTextField {
         guard let selectedTabViewModel = selectedTabViewModel ?? tabCollectionViewModel.selectedTabViewModel else { return }
 
         let addressBarString = addressBarString ?? selectedTabViewModel.addressBarString
-        let isSearch = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
+        let isSearch = selectedTabViewModel.tab.content.userEditableUrl?.isDuckDuckGoSearch ?? false
         self.value = Value(stringValue: addressBarString, userTyped: false, isSearch: isSearch)
         clearUndoManager()
     }
@@ -418,7 +419,8 @@ final class AddressBarTextField: NSTextField {
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
              .historyEntry(title: _, url: let url, allowedInTopHits: _),
-             .website(url: let url):
+             .website(url: let url),
+             .internalPage(title: _, url: let url):
             finalUrl = url
             userEnteredValue = url.absoluteString
         case .phrase(phrase: let phrase),
@@ -802,7 +804,8 @@ extension AddressBarTextField {
                 self = Suffix.visit(host: host)
 
             case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
-                    .historyEntry(title: _, url: let url, allowedInTopHits: _):
+                 .historyEntry(title: _, url: let url, allowedInTopHits: _),
+                 .internalPage(title: _, url: let url):
                 if let title = suggestionViewModel.title,
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
@@ -855,6 +858,11 @@ extension AddressBarTextField {
         }
     }
 
+}
+extension AddressBarTextField.Value? {
+    var isEmpty: Bool {
+        self?.isEmpty ?? true
+    }
 }
 
 // MARK: - NSTextFieldDelegate

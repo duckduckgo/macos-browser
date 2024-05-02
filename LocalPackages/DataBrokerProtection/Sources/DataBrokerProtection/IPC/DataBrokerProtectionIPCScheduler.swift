@@ -23,7 +23,6 @@ import Common
 /// A scheduler that works through IPC to request the scheduling to a different process
 ///
 public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionScheduler {
-
     private let ipcClient: DataBrokerProtectionIPCClient
 
     public init(ipcClient: DataBrokerProtectionIPCClient) {
@@ -52,10 +51,11 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
         ipcClient.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    public func scanAllBrokers(showWebView: Bool,
-                               completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+    public func startManualScan(showWebView: Bool,
+                                startTime: Date,
+                                completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         let completion = completion ?? { _ in }
-        ipcClient.scanAllBrokers(showWebView: showWebView, completion: completion)
+        ipcClient.startManualScan(showWebView: showWebView, startTime: startTime, completion: completion)
     }
 
     public func runQueuedOperations(showWebView: Bool,
@@ -66,5 +66,9 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
 
     public func runAllOperations(showWebView: Bool) {
         ipcClient.runAllOperations(showWebView: showWebView)
+    }
+
+    public func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
+        ipcClient.getDebugMetadata(completion: completion)
     }
 }

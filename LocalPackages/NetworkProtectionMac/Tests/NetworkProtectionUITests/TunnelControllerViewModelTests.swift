@@ -36,12 +36,14 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let connectionErrorObserver: ConnectionErrorObserver
         let connectivityIssuesObserver: ConnectivityIssueObserver
         let controllerErrorMessageObserver: ControllerErrorMesssageObserver
+        let dataVolumeObserver: DataVolumeObserver
 
         init(status: ConnectionStatus,
              isHavingConnectivityIssues: Bool = false,
              serverInfo: NetworkProtectionStatusServerInfo = MockStatusReporter.defaultServerInfo,
              tunnelErrorMessage: String? = nil,
-             controllerErrorMessage: String? = nil) {
+             controllerErrorMessage: String? = nil,
+             dataVolume: DataVolume = .init()) {
 
             let mockStatusObserver = MockConnectionStatusObserver()
             mockStatusObserver.subject.send(status)
@@ -62,6 +64,10 @@ final class TunnelControllerViewModelTests: XCTestCase {
             let mockControllerErrorMessageObserver = MockControllerErrorMesssageObserver()
             mockControllerErrorMessageObserver.subject.send(controllerErrorMessage)
             controllerErrorMessageObserver = mockControllerErrorMessageObserver
+
+            let mockDataVolumeObserver = MockDataVolumeObserver()
+            mockDataVolumeObserver.subject.send(dataVolume)
+            dataVolumeObserver = mockDataVolumeObserver
         }
 
         func forceRefresh() {
@@ -104,6 +110,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         let isToggleOn = model.isToggleOn.wrappedValue
@@ -124,6 +132,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnecting)
@@ -151,6 +161,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         let isToggleOn = model.isToggleOn.wrappedValue
@@ -160,7 +172,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOn)
         XCTAssertTrue(model.showServerDetails)
         XCTAssertEqual(model.serverAddress, mockServerIP)
-        XCTAssertEqual(model.serverLocation, "El Segundo, CA...")
+        XCTAssertEqual(model.serverLocation, "El Segundo, United States...")
     }
 
     /// We expect the model to properly reflect the connecting status.
@@ -173,12 +185,32 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusConnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOff)
         XCTAssertFalse(model.showServerDetails)
+    }
+
+    /// We expect the model to properly reflect the data volume.
+    ///
+    @MainActor
+    func testProperlyReflectsDataVolume() async throws {
+        let controller = MockTunnelController()
+        let statusReporter = MockStatusReporter(status: .connected(connectedDate: Date()),
+                                                dataVolume: .init(bytesSent: 512000, bytesReceived: 1024000))
+        let model = TunnelControllerViewModel(
+            controller: controller,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
+            statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
+            appLauncher: MockAppLauncher())
+
+        XCTAssertEqual(model.formattedDataVolume, .init(dataSent: "512 KB", dataReceived: "1 MB"))
     }
 
     /// We expect that setting the model's `isRunning` to `true`, will start the VPN.
@@ -191,6 +223,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
         let networkProtectionWasStarted = expectation(description: "The model started the VPN when appropriate")
 
@@ -221,6 +255,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter,
+            vpnSettings: .init(defaults: .standard),
+            locationFormatter: MockVPNLocationFormatter(),
             appLauncher: MockAppLauncher())
 
         let networkProtectionWasStopped = expectation(description: "The model stopped the VPN when appropriate")
