@@ -18,7 +18,7 @@
 
 import Foundation
 import UserNotifications
-import Subscription
+import BrowserServicesKit
 
 protocol WaitlistViewControllerPresenter {
     static func show(completion: (() -> Void)?)
@@ -27,45 +27,6 @@ protocol WaitlistViewControllerPresenter {
 extension WaitlistViewControllerPresenter {
     static func show(completion: (() -> Void)? = nil) {
         Self.show(completion: nil)
-    }
-}
-
-struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
-
-    @MainActor
-    static func show(completion: (() -> Void)? = nil) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-            return
-        }
-
-        // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
-        // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,
-        // preventing any state changing from occurring.
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            let status = settings.authorizationStatus
-            let state = WaitlistViewModel.NotificationPermissionState.from(status)
-
-            DispatchQueue.main.async {
-                let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist(),
-                                                  notificationPermissionState: state,
-                                                  showNotificationSuccessState: true,
-                                                  termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler(),
-                                                  featureSetupHandler: NetworkProtectionWaitlistFeatureSetupHandler())
-
-                let viewController = WaitlistModalViewController(viewModel: viewModel, contentView: NetworkProtectionWaitlistRootView())
-                windowController.mainViewController.beginSheet(viewController) { _ in
-                    // If the user dismissed the waitlist flow without signing up, hide the button.
-                    let waitlist = NetworkProtectionWaitlist()
-                    if !waitlist.waitlistStorage.isOnWaitlist {
-                        waitlist.waitlistSignUpPromptDismissed = true
-                        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-                    }
-
-                    completion?()
-                }
-            }
-        }
     }
 }
 

@@ -776,7 +776,7 @@ extension BrowserTabViewController: NSDraggingDestination {
             return true
         }
 
-        selectedTab.setContent(.url(url, source: .appOpenUrl))
+        selectedTab.setContent(.contentFromURL(url, source: .appOpenUrl))
         return true
     }
 

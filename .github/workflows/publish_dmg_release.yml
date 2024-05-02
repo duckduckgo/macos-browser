@@ -145,14 +145,14 @@ jobs:
         run: |
           curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes" \
             -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-            | jq -r .data.notes \
-            | ./scripts/extract_release_notes.sh > release_notes.txt
-          release_notes="$(<release_notes.txt)"
-          if [[ ${#release_notes} == 0 || "$release_notes" == "<-- Add release notes here -->" ]]; then
-            echo "::error::Release notes are empty. Please add release notes to the Asana task and restart the workflow."
+            | jq -r .data.notes > release_task_content.txt
+          raw_release_notes="$(./scripts/extract_release_notes.sh -r < release_task_content.txt)"
+          if [[ ${#raw_release_notes} == 0 || "$raw_release_notes" == *"<-- Add release notes here -->"* ]]; then
+            echo "::error::Release notes are empty or contain a placeholder. Please add release notes to the Asana task and restart the workflow."
             exit 1
           fi
-          echo "RELEASE_NOTES_FILE=release_notes.txt" >> $GITHUB_ENV
+          ./scripts/extract_release_notes.sh < release_task_content.txt > release_notes.html
+          echo "RELEASE_NOTES_FILE=release_notes.html" >> $GITHUB_ENV
 
       - name: Set up Sparkle tools
         env:
@@ -189,21 +189,21 @@ jobs:
               ./scripts/appcast_manager/appcastManager.swift \
                 --release-to-internal-channel \
                 --dmg ${DMG_PATH} \
-                --release-notes release_notes.txt \
+                --release-notes-html release_notes.html \
                 --key sparkle_private_key
               ;;
             "public")
               ./scripts/appcast_manager/appcastManager.swift \
                 --release-to-public-channel \
                 --version ${VERSION} \
-                --release-notes release_notes.txt \
+                --release-notes-html release_notes.html \
                 --key sparkle_private_key
               ;;
             "hotfix")
               ./scripts/appcast_manager/appcastManager.swift \
                 --release-hotfix-to-public-channel \
                 --dmg ${DMG_PATH} \
-                --release-notes release_notes.txt \
+                --release-notes-html release_notes.html \
                 --key sparkle_private_key
               ;;
             *)

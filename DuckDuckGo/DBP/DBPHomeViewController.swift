@@ -112,8 +112,9 @@ final class DBPHomeViewController: NSViewController {
 
     override func viewDidLayout() {
         super.viewDidLayout()
-        dataBrokerProtectionViewController.view.frame = view.bounds
-        errorViewController.view.frame = view.bounds
+        if let currentChildViewController = currentChildViewController {
+            currentChildViewController.view.frame = view.bounds
+        }
     }
 
     private func setupUI() {

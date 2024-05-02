@@ -19,6 +19,7 @@
 import Foundation
 import SwiftUI
 import Subscription
+import BrowserServicesKit
 
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
@@ -98,7 +99,7 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
 
 }
 
-enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
+enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable, CaseIterable {
     case defaultBrowser
     case privateSearch
     case webTrackingProtection

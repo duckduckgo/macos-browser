@@ -55,9 +55,6 @@ extension Preferences {
                                 .multilineTextAlignment(.leading)
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
-                                .onTapGesture(count: 12) {
-                                    model.displayNetPInvite()
-                                }
                                 .contextMenu(ContextMenu(menuItems: {
                                     Button(UserText.copy, action: {
                                         model.copy(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
