@@ -31,11 +31,13 @@ final class MoreOptionsMenuTests: XCTestCase {
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     @MainActor
     lazy var moreOptionMenu: MoreOptionsMenu! = {
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: passwordManagerCoordinator,
                                    networkProtectionFeatureVisibility: networkProtectionVisibilityMock,
                                    sharingMenu: NSMenu(),
-                                   internalUserDecider: internalUserDecider)
+                                   internalUserDecider: internalUserDecider, 
+                                   accountManager: accountManager)
         menu.actionDelegate = capturingActionDelegate
         return menu
     }()
@@ -66,11 +68,13 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     @MainActor
     func testThatMoreOptionMenuHasTheExpectedItems() {
+        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
                                          networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
                                          sharingMenu: NSMenu(),
-                                         internalUserDecider: internalUserDecider)
+                                         internalUserDecider: internalUserDecider,
+                                         accountManager: accountManager)
 
         XCTAssertEqual(moreOptionMenu.items[0].title, UserText.sendFeedback)
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
