@@ -138,10 +138,7 @@ extension HomePage.Models {
                     defaultBrowserProvider.openSystemPreferences()
                 }
             case .dock:
-                PixelKit.fire(GeneralPixel.userAddedToDockFromNewTabPageCard,
-                              includeAppVersionParameter: false)
-                dockCustomizer.addToDock()
-                removeItem(for: .dock)
+                performDockAction()
             case .importBookmarksAndPasswords:
                 dataImportProvider.showImportWindow(completion: {self.refreshFeaturesMatrix()})
             case .duckplayer:
@@ -163,6 +160,13 @@ extension HomePage.Models {
                 DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
 #endif
             }
+        }
+
+        func performDockAction() {
+            PixelKit.fire(GeneralPixel.userAddedToDockFromNewTabPageCard,
+                          includeAppVersionParameter: false)
+            dockCustomizer.addToDock()
+            removeItem(for: .dock)
         }
 
         func removeItem(for featureType: FeatureType) {
