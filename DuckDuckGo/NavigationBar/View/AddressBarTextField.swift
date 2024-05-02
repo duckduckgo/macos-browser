@@ -22,6 +22,7 @@ import Combine
 import Common
 import Suggestions
 import Subscription
+import BrowserServicesKit
 
 final class AddressBarTextField: NSTextField {
 
