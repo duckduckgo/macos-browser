@@ -39,6 +39,7 @@ final class SaveCredentialsViewController: NSViewController {
         return controller
     }
 
+    @IBOutlet var ddgPasswordManagerTitle: NSView!
     @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var passwordManagerTitle: NSView!
     @IBOutlet var passwordManagerAccountLabel: NSTextField!
@@ -157,11 +158,11 @@ final class SaveCredentialsViewController: NSViewController {
             editButton.isHidden = true
             doneButton.isHidden = true
 
-            titleLabel.isHidden = passwordManagerCoordinator.isEnabled
+            ddgPasswordManagerTitle.isHidden = passwordManagerCoordinator.isEnabled
             passwordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || passwordManagerCoordinator.isLocked
             passwordManagerAccountLabel.stringValue = UserText.passwordManagementSaveCredentialsAccountLabel(activeVault: passwordManagerCoordinator.activeVaultEmail ?? "")
             unlockPasswordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || !passwordManagerCoordinator.isLocked
-            titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
+            titleLabel.stringValue = credentials?.account.id == nil ? UserText.pmSaveCredentialsEditableTitle : UserText.pmUpdateCredentialsTitle
             usernameField.makeMeFirstResponder()
         } else {
             notNowSegmentedControl.isHidden = true
