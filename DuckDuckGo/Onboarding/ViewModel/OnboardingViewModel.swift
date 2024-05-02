@@ -59,6 +59,10 @@ final class OnboardingViewModel: ObservableObject {
                 PixelKit.fire(GeneralPixel.addToDockOnboardingStepPresented,
                               includeAppVersionParameter: false)
             }
+            if state == .startBrowsing {
+                PixelKit.fire(GeneralPixel.startBrowsingOnboardingStepPresented,
+                              includeAppVersionParameter: false)
+            }
         }
     }
 
