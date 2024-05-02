@@ -28,7 +28,7 @@ protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
                                         didErrorBeforeStartingBrokerOperations error: Error)
 }
 
-final class DataBrokerOperationsCollection: Operation {
+internal class DataBrokerOperationsCollection: Operation {
 
     enum OperationType {
         case scan

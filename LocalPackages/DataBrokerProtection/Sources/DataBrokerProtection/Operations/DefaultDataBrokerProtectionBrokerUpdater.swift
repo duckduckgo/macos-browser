@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionBrokerUpdater.swift
+//  DefaultDataBrokerProtectionBrokerUpdater.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -98,7 +98,13 @@ final class AppVersionNumber: AppVersionNumberProvider {
     var versionNumber: String = AppVersion.shared.versionNumber
 }
 
-public struct DataBrokerProtectionBrokerUpdater {
+protocol DataBrokerProtectionBrokerUpdater {
+    static func provide() -> DefaultDataBrokerProtectionBrokerUpdater?
+    func updateBrokers()
+    func checkForUpdatesInBrokerJSONFiles()
+}
+
+public struct DefaultDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrokerUpdater {
 
     private let repository: BrokerUpdaterRepository
     private let resources: ResourcesRepository
@@ -118,9 +124,9 @@ public struct DataBrokerProtectionBrokerUpdater {
         self.pixelHandler = pixelHandler
     }
 
-    public static func provide() -> DataBrokerProtectionBrokerUpdater? {
+    public static func provide() -> DefaultDataBrokerProtectionBrokerUpdater? {
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
-            return DataBrokerProtectionBrokerUpdater(vault: vault)
+            return DefaultDataBrokerProtectionBrokerUpdater(vault: vault)
         }
 
         os_log("Error when trying to create vault for data broker protection updater debug menu item", log: .dataBrokerProtection)

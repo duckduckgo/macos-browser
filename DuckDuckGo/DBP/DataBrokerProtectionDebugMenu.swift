@@ -331,7 +331,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func forceBrokerJSONFilesUpdate() {
-        if let updater = DataBrokerProtectionBrokerUpdater.provide() {
+        if let updater = DefaultDataBrokerProtectionBrokerUpdater.provide() {
             updater.updateBrokers()
         }
     }

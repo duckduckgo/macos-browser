@@ -116,8 +116,7 @@ final class DataBrokerProtectionProcessor {
 
         // Before running new operations we check if there is any updates to the broker files.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
-            let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
-            brokerUpdater.checkForUpdatesInBrokerJSONFiles()
+            let brokerUpdater = DefaultDataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
         }
 
         // This will fire the DAU/WAU/MAU pixels,
