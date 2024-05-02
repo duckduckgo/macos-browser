@@ -25,9 +25,9 @@ import PixelKit
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
 
-    let accountManager: AccountManager
+    let accountManager: AccountManaging
 
-    public init(accountManager: AccountManager) {
+    public init(accountManager: AccountManaging) {
         self.accountManager = accountManager
     }
 

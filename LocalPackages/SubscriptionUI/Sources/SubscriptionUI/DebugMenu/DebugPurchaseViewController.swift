@@ -34,7 +34,7 @@ public final class DebugPurchaseViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(accountManager: AccountManager) {
+    public init(accountManager: AccountManaging) {
         manager = PurchaseManager.shared
         model = DebugPurchaseModel(manager: manager, accountManager: accountManager)
 

@@ -57,7 +57,7 @@ final class MoreOptionsMenu: NSMenu {
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
     private lazy var sharingMenu: NSMenu = SharingMenu(title: UserText.shareMenuItem)
-    private let accountManager: AccountManager
+    private let accountManager: AccountManaging
 
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
 
@@ -71,7 +71,7 @@ final class MoreOptionsMenu: NSMenu {
          networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager),
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
-         accountManager: AccountManager) {
+         accountManager: AccountManaging) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager

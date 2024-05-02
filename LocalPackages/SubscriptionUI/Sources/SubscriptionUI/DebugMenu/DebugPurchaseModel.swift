@@ -30,7 +30,7 @@ public final class DebugPurchaseModel: ObservableObject {
 
     init(manager: PurchaseManager,
          subscriptions: [SubscriptionRowModel] = [],
-         accountManager: AccountManager) {
+         accountManager: AccountManaging) {
         self.purchaseManager = manager
         self.subscriptions = subscriptions
         self.appStorePurchaseFlow = AppStorePurchaseFlow(accountManager: accountManager)

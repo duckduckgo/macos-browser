@@ -40,10 +40,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     var window: NSWindow? {
         WindowControllersManager.shared.lastKeyMainWindowController?.window
     }
-    let accountManager: AccountManager
+    let accountManager: AccountManaging
     let stripePurchaseFlow: StripePurchaseFlow
 
-    public init(accountManager: AccountManager) {
+    public init(accountManager: AccountManaging) {
         self.accountManager = accountManager
         self.stripePurchaseFlow = StripePurchaseFlow(accountManager: accountManager)
     }

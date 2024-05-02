@@ -46,7 +46,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let defaults: UserDefaults
-    let accountManager: AccountManager
+    let accountManager: AccountManaging
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
@@ -54,7 +54,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
          featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
          defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection,
-         accountManager: AccountManager) {
+         accountManager: AccountManaging) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation

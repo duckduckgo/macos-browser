@@ -35,7 +35,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
-    private let accountManager: AccountManager
+    private let accountManager: AccountManaging
     private let openURLHandler: (URL) -> Void
     public let userEventHandler: (UserEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
@@ -88,7 +88,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
-                accountManager: AccountManager) {
+                accountManager: AccountManaging) {
         self.accountManager = accountManager
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
@@ -284,7 +284,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    private func updateAllEntitlement(with cachePolicy: AccountManager.CachePolicy) async {
+    private func updateAllEntitlement(with cachePolicy: AccountManaging.CachePolicy) async {
         switch await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: cachePolicy) {
         case let .success(result):
             hasAccessToVPN = result

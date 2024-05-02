@@ -22,14 +22,14 @@ import SwiftUI
 
 public final class SubscriptionAccessViewController: NSViewController {
 
-    private let accountManager: AccountManager
+    private let accountManager: AccountManaging
     private var actionHandlers: SubscriptionAccessActionHandlers
 
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(accountManager: AccountManager, actionHandlers: SubscriptionAccessActionHandlers) {
+    public init(accountManager: AccountManaging, actionHandlers: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
         self.actionHandlers = actionHandlers
         super.init(nibName: nil, bundle: nil)

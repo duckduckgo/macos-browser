@@ -29,7 +29,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private var purchasePlatformItem: NSMenuItem?
 
     var currentViewController: () -> NSViewController?
-    let accountManager: AccountManager
+    let accountManager: AccountManaging
 
     private var _purchaseManager: Any?
     @available(macOS 12.0, *)
@@ -50,7 +50,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
-                accountManager: AccountManager) {
+                accountManager: AccountManaging) {
         self.currentEnvironment = currentEnvironment
         self.updateEnvironment = updateEnvironment
         self.isInternalTestingEnabled = isInternalTestingEnabled

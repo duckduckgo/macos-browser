@@ -36,7 +36,7 @@ final class MoreOptionsMenuTests: XCTestCase {
                                    passwordManagerCoordinator: passwordManagerCoordinator,
                                    networkProtectionFeatureVisibility: networkProtectionVisibilityMock,
                                    sharingMenu: NSMenu(),
-                                   internalUserDecider: internalUserDecider, 
+                                   internalUserDecider: internalUserDecider,
                                    accountManager: accountManager)
         menu.actionDelegate = capturingActionDelegate
         return menu
