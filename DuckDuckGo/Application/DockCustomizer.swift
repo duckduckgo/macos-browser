@@ -26,77 +26,48 @@ protocol DockCustomization {
     func addToDock() -> Bool
 }
 
-final class DockCustomizer: DockCustomization, ObservableObject {
+final class DockCustomizer: DockCustomization {
 
-    static func appDict(appPath: String, bundleIdentifier: String) -> [String: AnyObject] {
-        return ["tile-type": "file-tile" as AnyObject,
-                "tile-data": [
-                    "dock-extra": 0 as AnyObject,
-                    "file-type": 1 as AnyObject,
-                    "file-data": [
-                        "_CFURLString": "file://" + appPath + "/",
-                        "_CFURLStringType": 15
-                    ],
-                    "file-label": "DuckDuckGo" as AnyObject,
-                    "bundle-identifier": bundleIdentifier as AnyObject,
-                    "is-beta": 0 as AnyObject
-                ] as AnyObject
-        ]
+    private let positionProvider: DockPositionProviding
+
+    init(positionProvider: DockPositionProviding = DockPositionProvider()) {
+        self.positionProvider = positionProvider
     }
 
-    let positionProvider: DockPositionProviding = DockPositionProvider(defaultBrowserProvider: SystemDefaultBrowserProvider())
-
-    var isAddedToDock: Bool {
-        // Checks if the current application is already in the Dock
-        guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
-            return false
-        }
-
-        guard let dockPlistDict = dockPlistDict else {
-            return false
-        }
-
-        if let persistentApps = dockPlistDict["persistent-apps"] as? [[String: AnyObject]] {
-            return persistentApps.contains { appDict in
-                if let tileData = appDict["tile-data"] as? [String: AnyObject],
-                   let appBundleIdentifier = tileData["bundle-identifier"] as? String {
-                    return appBundleIdentifier == bundleIdentifier
-                }
-                return false
-            }
-        }
-
-        return false
-    }
-
-    private var dockPlistURL: URL {
-        let dockPlistPath = NSString(string: "~/Library/Preferences/com.apple.dock.plist").expandingTildeInPath
-        return URL(fileURLWithPath: dockPlistPath)
-    }
+    private var dockPlistURL: URL = URL(fileURLWithPath: NSString(string: "~/Library/Preferences/com.apple.dock.plist").expandingTildeInPath)
 
     private var dockPlistDict: [String: AnyObject]? {
         return NSDictionary(contentsOf: dockPlistURL) as? [String: AnyObject]
     }
 
-    @discardableResult
-    func addToDock() -> Bool {
-        let appPath = Bundle.main.bundleURL.path
-
-        guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+    // This checks whether the bundle identifier of the current bundle
+    // is present in the 'persistent-apps' array of the Dock's plist.
+    var isAddedToDock: Bool {
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier,
+              let dockPlistDict = dockPlistDict,
+              let persistentApps = dockPlistDict["persistent-apps"] as? [[String: AnyObject]] else {
             return false
         }
 
-        guard var dockPlistDict = dockPlistDict else {
+        return persistentApps.contains(where: { ($0["tile-data"] as? [String: AnyObject])?["bundle-identifier"] as? String == bundleIdentifier })
+    }
+
+    // Adds a dictionary representing the application, either by using an existing 
+    // one from 'recent-apps' or creating a new one if the application isn't recently used.
+    // It then inserts this dictionary into the 'persistent-apps' list at a position
+    // determined by `positionProvider`. Following the plist update, it schedules the Dock
+    // to restart after a brief delay to apply the changes.
+    @discardableResult
+    func addToDock() -> Bool {
+        let appPath = Bundle.main.bundleURL.path
+        guard !isAddedToDock,
+              let bundleIdentifier = Bundle.main.bundleIdentifier,
+              var dockPlistDict = dockPlistDict else {
             return false
         }
 
         var persistentApps = dockPlistDict["persistent-apps"] as? [[String: AnyObject]] ?? []
         let recentApps = dockPlistDict["recent-apps"] as? [[String: AnyObject]] ?? []
-
-        // Check if the application is already in the Dock
-        if isAddedToDock {
-            return false
-        }
 
         let appDict: [String: AnyObject]
         // Find the app in recent apps
@@ -123,26 +94,18 @@ final class DockCustomizer: DockCustomization, ObservableObject {
         dockPlistDict["recent-apps"] = recentApps as AnyObject?
 
         // Update mod-count
-        if let modCount = dockPlistDict["mod-count"] as? Int {
-            dockPlistDict["mod-count"] = modCount + 1 as AnyObject?
-        } else {
-            assertionFailure("mod-count modification failed")
-        }
+        dockPlistDict["mod-count"] = ((dockPlistDict["mod-count"] as? Int) ?? 0) + 1 as AnyObject
 
-        // Write changes to the plist
         do {
             try (dockPlistDict as NSDictionary).write(to: dockPlistURL)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.restartDock()
+            }
+            return true
         } catch {
             os_log(.error, "Error writing to Dock plist: %{public}@", error.localizedDescription)
             return false
         }
-
-        // Restart the Dock to apply changes
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.restartDock()
-        }
-
-        return true
     }
 
     private func restartDock() {
@@ -151,11 +114,8 @@ final class DockCustomizer: DockCustomization, ObservableObject {
         task.arguments = ["Dock"]
         task.launch()
     }
-}
 
-extension DockCustomizer {
-
-    func makeAppURLs(from persistentApps: [[String: AnyObject]]) -> [URL] {
+    private func makeAppURLs(from persistentApps: [[String: AnyObject]]) -> [URL] {
         return persistentApps.compactMap { appDict in
             if let tileData = appDict["tile-data"] as? [String: AnyObject],
                let appBundleIdentifier = tileData["file-data"] as? [String: AnyObject],
@@ -168,4 +128,19 @@ extension DockCustomizer {
         }
     }
 
+    static func appDict(appPath: String, bundleIdentifier: String) -> [String: AnyObject] {
+        return ["tile-type": "file-tile" as AnyObject,
+                "tile-data": [
+                    "dock-extra": 0 as AnyObject,
+                    "file-type": 1 as AnyObject,
+                    "file-data": [
+                        "_CFURLString": "file://" + appPath + "/",
+                        "_CFURLStringType": 15
+                    ],
+                    "file-label": "DuckDuckGo" as AnyObject,
+                    "bundle-identifier": bundleIdentifier as AnyObject,
+                    "is-beta": 0 as AnyObject
+                ] as AnyObject
+        ]
+    }
 }

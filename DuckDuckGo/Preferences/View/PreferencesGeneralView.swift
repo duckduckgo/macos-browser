@@ -29,10 +29,10 @@ extension Preferences {
         @ObservedObject var startupModel: StartupPreferences
         @ObservedObject var downloadsModel: DownloadsPreferences
         @ObservedObject var searchModel: SearchPreferences
-        @ObservedObject var dockCustomizer: DockCustomizer
         @ObservedObject var dataClearingModel: DataClearingPreferences
         @State private var showingCustomHomePageSheet = false
         @State private var isAddedToDock = false
+        var dockCustomizer: DockCustomizer
 
         var body: some View {
             PreferencePane(UserText.general) {

@@ -54,7 +54,7 @@ final class DockPositionProvider: DockPositionProviding {
 
     private var defaultBrowserProvider: DefaultBrowserProvider
 
-    init(defaultBrowserProvider: DefaultBrowserProvider) {
+    init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider()) {
         self.defaultBrowserProvider = defaultBrowserProvider
     }
 

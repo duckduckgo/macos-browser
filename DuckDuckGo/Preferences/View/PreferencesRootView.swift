@@ -88,8 +88,8 @@ enum Preferences {
                     GeneralView(startupModel: StartupPreferences.shared,
                                 downloadsModel: DownloadsPreferences.shared,
                                 searchModel: SearchPreferences.shared,
-                                dockCustomizer: DockCustomizer(),
-                                dataClearingModel: DataClearingPreferences.shared)
+                                dataClearingModel: DataClearingPreferences.shared,
+                                dockCustomizer: DockCustomizer())
                 case .sync:
                     SyncView()
                 case .appearance:
