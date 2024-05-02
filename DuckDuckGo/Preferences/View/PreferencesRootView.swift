@@ -167,7 +167,8 @@ enum Preferences {
                             return
                         }
 
-                        await SubscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
+                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(accountManager: AppDelegate.accountManager)
+                        await subscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
                     }
                 }
             },
@@ -177,7 +178,7 @@ enum Preferences {
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
-                                                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+                                                accountManager: AppDelegate.accountManager)
         }
     }
 }

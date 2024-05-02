@@ -752,7 +752,7 @@ extension MainViewController {
     /// Clears the PrivacyPro state to make testing easier.
     ///
     private func clearPrivacyProState() {
-        AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).signOut()
+        AppDelegate.accountManager.signOut()
         resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
 

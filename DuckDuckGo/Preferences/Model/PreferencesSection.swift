@@ -63,7 +63,7 @@ struct PreferencesSection: Hashable, Identifiable {
 
             var shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
 
-            if AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).isUserAuthenticated {
+            if AppDelegate.accountManager.isUserAuthenticated {
                 shouldHidePrivacyProDueToNoProducts = false
             }
 

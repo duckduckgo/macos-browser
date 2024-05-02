@@ -50,7 +50,7 @@ final class NetworkProtectionAppEvents {
     private let featureDisabler: NetworkProtectionFeatureDisabling
     private let defaults: UserDefaults
 
-    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+    init(featureVisibility: NetworkProtectionFeatureVisibility,
          featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
          defaults: UserDefaults = .netP) {
 

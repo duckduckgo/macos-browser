@@ -46,7 +46,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let defaults: UserDefaults
-    let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
     let accountManager: AccountManager
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
@@ -54,14 +53,15 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
          featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides(),
          featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
          defaults: UserDefaults = .netP,
-         log: OSLog = .networkProtection) {
+         log: OSLog = .networkProtection,
+         accountManager: AccountManager) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.featureDisabler = featureDisabler
         self.featureOverrides = featureOverrides
         self.defaults = defaults
-        self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
+        self.accountManager = accountManager
     }
 
     var isInstalled: Bool {

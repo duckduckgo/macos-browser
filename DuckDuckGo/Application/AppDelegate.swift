@@ -34,7 +34,6 @@ import ServiceManagement
 import SyncDataProviders
 import UserNotifications
 import Lottie
-
 import NetworkProtection
 import Subscription
 
@@ -86,10 +85,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     // Needs to be lazy as indirectly depends on AppDelegate
-    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+    private let networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler
 
 #if DBP
-    private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
+    private let dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler
 #endif
 
     private var didFinishLaunching = false
@@ -104,6 +103,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     static var isNewUser: Bool {
         return firstLaunchDate >= Date.weekAgo
     }
+
+    public static let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
     // swiftlint:disable:next function_body_length
     override init() {
@@ -183,6 +184,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     #else
         SubscriptionPurchaseEnvironment.current = .stripe
     #endif
+
+        networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(accountManager: AppDelegate.accountManager)
+#if DBP
+        dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler(accountManager: AppDelegate.accountManager)
+#endif
     }
 
     static func configurePixelKit() {
@@ -261,10 +267,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
 
         Task {
-            let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-            if let token = accountManager.accessToken {
+            if let token = AppDelegate.accountManager.accessToken {
                 _ = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
-                _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
+                _ = await AppDelegate.accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
             }
         }
 
@@ -306,7 +311,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 
-        NetworkProtectionAppEvents().applicationDidFinishLaunching()
+        let defaultNetworkProtectionVisibility = DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager)
+        NetworkProtectionAppEvents(featureVisibility: defaultNetworkProtectionVisibility).applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 
 #if DBP
@@ -326,7 +332,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-        NetworkProtectionAppEvents().applicationDidBecomeActive()
+        let defaultNetworkProtectionVisibility = DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager)
+        NetworkProtectionAppEvents(featureVisibility: defaultNetworkProtectionVisibility).applicationDidBecomeActive()
 
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidBecomeActive()
@@ -565,21 +572,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-}
+    func updateSubscriptionStatus() {
+        Task {
+           guard let token = AppDelegate.accountManager.accessToken else { return }
 
-func updateSubscriptionStatus() {
-    Task {
-        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-
-        guard let token = accountManager.accessToken else { return }
-
-        if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
-            if subscription.isActive {
-                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
+            if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+                if subscription.isActive {
+                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
+                }
             }
-        }
 
-        _ = await accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
+            _ = await AppDelegate.accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
+        }
     }
 }
 

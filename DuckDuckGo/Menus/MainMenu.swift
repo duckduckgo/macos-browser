@@ -540,7 +540,7 @@ import SubscriptionUI
             toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
-            if DefaultNetworkProtectionVisibility().isVPNVisible() {
+            if DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager).isVPNVisible() {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = false
                 toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             } else {
@@ -622,21 +622,19 @@ import SubscriptionUI
             let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
 
-            SubscriptionDebugMenu(
-                currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
-                updateEnvironment: {
-                    guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
-                    currentEnvironmentWrapper.wrappedValue = newEnvironment
-                    SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment
-                    VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
-                },
-                isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
-                updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
-                currentViewController: {
-                    WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+            SubscriptionDebugMenu(currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
+                                  updateEnvironment: {
+                guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
+                currentEnvironmentWrapper.wrappedValue = newEnvironment
+                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment
+                VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
             },
-                subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)
-            )
+                                  isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                                  currentViewController: {
+                WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+            },
+                                  accountManager: AppDelegate.accountManager)
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }

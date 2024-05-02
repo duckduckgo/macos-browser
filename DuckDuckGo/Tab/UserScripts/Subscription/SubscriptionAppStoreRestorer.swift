@@ -25,8 +25,14 @@ import PixelKit
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
 
+    let accountManager: AccountManager
+
+    public init(accountManager: AccountManager) {
+        self.accountManager = accountManager
+    }
+
     // swiftlint:disable:next cyclomatic_complexity
-    static func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
+    func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
 
         let progressViewController = await ProgressViewController(title: UserText.restoringSubscriptionTitle)
         defer {
@@ -63,7 +69,8 @@ struct SubscriptionAppStoreRestorer {
             }
         }
 
-        let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+        let appStoreRestoreFlow = AppStoreRestoreFlow(accountManager: accountManager)
+        let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
 
         switch result {
         case .success:
@@ -78,13 +85,13 @@ struct SubscriptionAppStoreRestorer {
             switch error {
             case .missingAccountOrTransactions:
                 SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
-                await windowController.showSubscriptionNotFoundAlert()
+//                await windowController.showSubscriptionNotFoundAlert()
             case .subscriptionExpired:
                 SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
-                await windowController.showSubscriptionInactiveAlert()
+//                await windowController.showSubscriptionInactiveAlert()
             case .pastTransactionAuthenticationError, .failedToObtainAccessToken, .failedToFetchAccountDetails, .failedToFetchSubscriptionDetails:
                 SubscriptionErrorReporter.report(subscriptionActivationError: .generalError)
-                await windowController.showSomethingWentWrongAlert()
+//                await windowController.showSomethingWentWrongAlert()
             }
         }
     }
