@@ -185,6 +185,10 @@
 		31A2FD172BAB41C500D0E741 /* DataBrokerProtectionVisibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A2FD162BAB41C500D0E741 /* DataBrokerProtectionVisibilityTests.swift */; };
 		31A2FD182BAB43BA00D0E741 /* DataBrokerProtectionVisibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A2FD162BAB41C500D0E741 /* DataBrokerProtectionVisibilityTests.swift */; };
 		31A3A4E32B0C115F0021063C /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 31A3A4E22B0C115F0021063C /* DataBrokerProtection */; };
+		31A83FB52BE28D7D00F74E67 /* UserText+DBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A83FB42BE28D7D00F74E67 /* UserText+DBP.swift */; };
+		31A83FB62BE28D7D00F74E67 /* UserText+DBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A83FB42BE28D7D00F74E67 /* UserText+DBP.swift */; };
+		31A83FB72BE28D8A00F74E67 /* UserText+DBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A83FB42BE28D7D00F74E67 /* UserText+DBP.swift */; };
+		31A83FB82BE28D8A00F74E67 /* UserText+DBP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A83FB42BE28D7D00F74E67 /* UserText+DBP.swift */; };
 		31AA6B972B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31AA6B962B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift */; };
 		31AA6B982B960BA50025014E /* DataBrokerProtectionLoginItemPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31AA6B962B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift */; };
 		31B4AF532901A4F20013585E /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4AF522901A4F20013585E /* NSEventExtension.swift */; };
@@ -2850,6 +2854,7 @@
 		3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureDisabler.swift; sourceTree = "<group>"; };
 		3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionAppEvents.swift; sourceTree = "<group>"; };
 		31A2FD162BAB41C500D0E741 /* DataBrokerProtectionVisibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionVisibilityTests.swift; sourceTree = "<group>"; };
+		31A83FB42BE28D7D00F74E67 /* UserText+DBP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserText+DBP.swift"; sourceTree = "<group>"; };
 		31AA6B962B960B870025014E /* DataBrokerProtectionLoginItemPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemPixels.swift; sourceTree = "<group>"; };
 		31B4AF522901A4F20013585E /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
 		31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRoundedCornersShape.swift; sourceTree = "<group>"; };
@@ -6798,6 +6803,7 @@
 			children = (
 				AA80EC53256BE3BC007083E7 /* UserText.swift */,
 				4B4D60D22A0C84F700BCD287 /* UserText+NetworkProtection.swift */,
+				31A83FB42BE28D7D00F74E67 /* UserText+DBP.swift */,
 			);
 			path = Localizables;
 			sourceTree = "<group>";
@@ -9981,6 +9987,7 @@
 				3706FC2F293F65D500E42796 /* MouseOverButton.swift in Sources */,
 				3706FC30293F65D500E42796 /* FireInfoViewController.swift in Sources */,
 				B6F1B02F2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */,
+				31A83FB62BE28D7D00F74E67 /* UserText+DBP.swift in Sources */,
 				56BA1E832BAC506F001CF69F /* SSLErrorPageUserScript.swift in Sources */,
 				3706FC31293F65D500E42796 /* PermissionButton.swift in Sources */,
 				3706FC32293F65D500E42796 /* MoreOptionsMenu.swift in Sources */,
@@ -10682,6 +10689,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31A83FB72BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
 				9D9AE92C2AAB84FF0026E7DC /* DBPMocks.swift in Sources */,
 				7B0099792B65013800FE7C31 /* BrowserWindowManager.swift in Sources */,
 				9D9AE9292AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */,
@@ -10695,6 +10703,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31A83FB82BE28D8A00F74E67 /* UserText+DBP.swift in Sources */,
 				7B1459542B7D437200047F2C /* BrowserWindowManager.swift in Sources */,
 				9D9AE92D2AAB84FF0026E7DC /* DBPMocks.swift in Sources */,
 				9D9AE92A2AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */,
@@ -11457,6 +11466,7 @@
 				B634DBDF293C8F7F00C3C99E /* Tab+UIDelegate.swift in Sources */,
 				B6F1B02E2BCE6B47005E863C /* TunnelControllerProvider.swift in Sources */,
 				37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */,
+				31A83FB52BE28D7D00F74E67 /* UserText+DBP.swift in Sources */,
 				4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */,
 				4B677442255DBEEA00025BD8 /* Database.swift in Sources */,
 				1DDC85032B83903E00670238 /* PreferencesWebTrackingProtectionView.swift in Sources */,
