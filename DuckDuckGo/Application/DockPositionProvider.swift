@@ -27,7 +27,6 @@ enum DockApp: String, CaseIterable {
     case arc = "/Applications/Arc.app/"
     case safari = "/Applications/Safari.app/"
     case safariLong = "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app/"
-    case unknown = ""
 
     var url: URL {
         return URL(string: "file://" + self.rawValue)!
