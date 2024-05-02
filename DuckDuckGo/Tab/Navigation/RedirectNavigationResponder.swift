@@ -19,6 +19,7 @@
 import Navigation
 import Foundation
 import Subscription
+import BrowserServicesKit
 
 struct RedirectNavigationResponder: NavigationResponder {
 
