@@ -216,7 +216,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
             self.status = .running
             os_log("Scheduler running...", log: .dataBrokerProtection)
             self.currentOperation = .queued
-            self.queueManager.runQueuedOperations(showWebView: showWebView,
+            self.queueManager.startScheduledOperationsIfPermitted(showWebView: showWebView,
                                                   operationDependencies: self.operationDependencies) { [weak self] errors in
                 if let errors = errors {
                     if let oneTimeError = errors.oneTimeError {
@@ -251,7 +251,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
         os_log("Running queued operations...", log: .dataBrokerProtection)
         self.currentOperation = .queued
-        queueManager.runQueuedOperations(showWebView: showWebView,
+        queueManager.startScheduledOperationsIfPermitted(showWebView: showWebView,
                                               operationDependencies: operationDependencies) { [weak self] errors in
 
             if let errors = errors {
@@ -280,7 +280,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         userNotificationService.requestNotificationPermission()
         self.currentOperation = .manualScan
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        queueManager.startManualScans(showWebView: showWebView,
+        queueManager.startImmediateOperationsIfPermitted(showWebView: showWebView,
                                       operationDependencies: operationDependencies) { [weak self ]errors in
             guard let self = self else { return }
 
@@ -338,8 +338,8 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
         self.currentOperation = .optOutAll
 
-        queueManager.runAllOptOutOperations(showWebView: showWebView,
-                                                 operationDependencies: operationDependencies) { [weak self] errors in
+        queueManager.startOptOutOperations(showWebView: showWebView,
+                                           operationDependencies: operationDependencies) { [weak self] errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
                     os_log("Error during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)

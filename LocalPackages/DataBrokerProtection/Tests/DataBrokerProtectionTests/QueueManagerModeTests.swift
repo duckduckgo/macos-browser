@@ -21,49 +21,61 @@ import XCTest
 
 final class QueueManagerModeTests: XCTestCase {
 
-    func testCurrentModeIdle_andNewModeManual_thenInterruptionAllowed() throws {
+    func testCurrentModeIdle_andNewModeImmediate_thenInterruptionAllowed() throws {
         // Given
         let sut = QueueManagerMode.idle
 
         // When
-        let result = sut.canInterrupt(forNewMode: .manualScan)
+        let result = sut.canInterrupt(forNewMode: .immediate)
 
         // Then
         XCTAssertTrue(result)
     }
 
-    func testCurrentModeIdle_andNewModeQueued_thenInterruptionAllowed() throws {
+    func testCurrentModeIdle_andNewModeScheduled_thenInterruptionAllowed() throws {
         // Given
         let sut = QueueManagerMode.idle
 
         // When
-        let result = sut.canInterrupt(forNewMode: .queued)
+        let result = sut.canInterrupt(forNewMode: .scheduled)
 
         // Then
         XCTAssertTrue(result)
     }
 
-    func testCurrentModeManual_andNewModeQueued_thenInterruptionNotAllowed() throws {
+    func testCurrentModeImmediate_andNewModeScheduled_thenInterruptionNotAllowed() throws {
         // Given
-        let sut = QueueManagerMode.manualScan
+        let sut = QueueManagerMode.immediate
 
         // When
-        let result = sut.canInterrupt(forNewMode: .queued)
+        let result = sut.canInterrupt(forNewMode: .scheduled)
 
         // Then
         XCTAssertFalse(result)
     }
 
-    func testCurrentModeQueued_andNewModeManual_thenInterruptionAllowed() throws {
+    func testCurrentModeScheduled_andNewModeImmediate_thenInterruptionAllowed() throws {
         // Given
-        let sut = QueueManagerMode.queued
+        let sut = QueueManagerMode.scheduled
 
         // When
-        let result = sut.canInterrupt(forNewMode: .manualScan)
+        let result = sut.canInterrupt(forNewMode: .immediate)
 
         // Then
         XCTAssertTrue(result)
     }
 
-    // TODO: More tests to be added as we define expected interruption behaviorgst
+    func testCurrentModeImmediate_andNewModeImmediate_thenInterruptionAllowed() throws {
+        // Given
+        let sut = QueueManagerMode.immediate
+
+        // When
+        let result = sut.canInterrupt(forNewMode: .immediate)
+
+        // Then
+        XCTAssertTrue(result)
+    }
+
+    // TODO: Confirm all state change behavior
+    // TODO: Add Opt-out State Tests when behavior defined
 }

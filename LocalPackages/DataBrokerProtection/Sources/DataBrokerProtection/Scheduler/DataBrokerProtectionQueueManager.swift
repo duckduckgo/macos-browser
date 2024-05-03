@@ -29,29 +29,39 @@ extension OperationQueue: DataBrokerProtectionOperationQueue {}
 
 protocol DataBrokerProtectionQueueManager {
     var mode: QueueManagerMode { get }
+
     init(operationQueue: DataBrokerProtectionOperationQueue,
          operationsBuilder: DataBrokerOperationsCollectionBuilder,
          mismatchCalculator: MismatchCalculator,
          brokerUpdater: DataBrokerProtectionBrokerUpdater?)
-    func startManualScans(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    func runAllOptOutOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    func runQueuedOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+
+    func startImmediateOperationsIfPermitted(showWebView: Bool,
+                                             operationDependencies: OperationDependencies,
+                                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    func startScheduledOperationsIfPermitted(showWebView: Bool,
+                                             operationDependencies: OperationDependencies,
+                                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+
+    func startOptOutOperations(showWebView: Bool,
+                               operationDependencies: OperationDependencies,
+                               completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+
     func stopAllOperations()
 }
 
 enum QueueManagerMode {
     case idle
-    case manualScan
+    case immediate
     case optOut
-    case queued
+    case scheduled
 
     func canInterrupt(forNewMode newMode: QueueManagerMode) -> Bool {
         switch (self, newMode) {
-        case (_, .manualScan):
+        case (_, .immediate):
             return true
-        case (.idle, .queued):
+        case (.idle, .scheduled):
             return true
-        case (.manualScan, .queued):
+        case (.immediate, .scheduled):
             return false
         default:
             return false
@@ -79,10 +89,12 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
         self.brokerUpdater = brokerUpdater
     }
 
-    func startManualScans(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+    func startImmediateOperationsIfPermitted(showWebView: Bool,
+                                             operationDependencies: OperationDependencies,
+                                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
 
-        guard mode.canInterrupt(forNewMode: .manualScan) else { return }
-        mode = .manualScan
+        guard mode.canInterrupt(forNewMode: .immediate) else { return }
+        mode = .immediate
 
         // New Manual scans ALWAYS interrupt (i.e cancel) ANY current Manual/Scheduled scans
         operationQueue.cancelAllOperations()
@@ -95,26 +107,31 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
         }
     }
 
-    func runAllOptOutOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
-        // TODO: Correct interruption/cancellation behavior
-        // operationQueue.cancelAllOperations()
+    func startScheduledOperationsIfPermitted(showWebView: Bool,
+                                             operationDependencies: OperationDependencies,
+                                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
 
-        addOperationCollections(withType: .optOut, showWebView: showWebView, operationDependencies: operationDependencies) { errors in
-            os_log("Opt-Outs completed", log: .dataBrokerProtection)
-            completion?(errors)
-        }
-    }
-
-    func runQueuedOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
-
-        guard mode.canInterrupt(forNewMode: .queued) else { return }
-        mode = .queued
+        guard mode.canInterrupt(forNewMode: .scheduled) else { return }
+        mode = .scheduled
 
         addOperationCollections(withType: .all,
                                 priorityDate: Date(),
                                 showWebView: showWebView,
                                 operationDependencies: operationDependencies) { errors in
             os_log("Queued operations completed", log: .dataBrokerProtection)
+            completion?(errors)
+        }
+    }
+
+    func startOptOutOperations(showWebView: Bool,
+                               operationDependencies: OperationDependencies,
+                               completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+
+        // TODO: Correct interruption/cancellation behavior
+        // operationQueue.cancelAllOperations()
+
+        addOperationCollections(withType: .optOut, showWebView: showWebView, operationDependencies: operationDependencies) { errors in
+            os_log("Opt-Outs completed", log: .dataBrokerProtection)
             completion?(errors)
         }
     }

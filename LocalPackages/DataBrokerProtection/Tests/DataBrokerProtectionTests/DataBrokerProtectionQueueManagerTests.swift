@@ -64,7 +64,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
                                                       brokerUpdater: mockUpdater)
 
         // When
-        sut.startManualScans(showWebView: false, operationDependencies: mockDependencies) { _ in }
+        sut.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
 
         // Then
         XCTAssert(mockQueue.didCallCancelCount == 1)
@@ -73,7 +73,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         mockOperations = (11...20).map { MockDataBrokerOperationsCollection(id: $0, operationType: .scan) }
         mockOperationsBuilder.operationCollections = mockOperations
 
-        sut.runQueuedOperations(showWebView: false, operationDependencies: mockDependencies) { _ in }
+        sut.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
 
         XCTAssert(mockQueue.didCallCancelCount == 1)
         XCTAssert(mockQueue.operationCount == 10)
@@ -87,7 +87,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
                                                       brokerUpdater: mockUpdater)
 
         // When
-        sut.startManualScans(showWebView: false, operationDependencies: mockDependencies) { _ in }
+        sut.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
 
         // Then
         XCTAssert(mockQueue.didCallCancelCount == 1)
@@ -96,12 +96,10 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         mockOperations = (11...20).map { MockDataBrokerOperationsCollection(id: $0, operationType: .scan) }
         mockOperationsBuilder.operationCollections = mockOperations
 
-        sut.startManualScans(showWebView: false, operationDependencies: mockDependencies) { _ in }
+        sut.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
 
         XCTAssert(mockQueue.didCallCancelCount == 2)
         XCTAssert(mockQueue.operations.filter { !$0.isCancelled }.count == 10)
         XCTAssert(mockQueue.operations.filter { $0.isCancelled }.count >= 0)
     }
-
-    // TODO: More tests to be added as we define expected interruption behavior
 }
