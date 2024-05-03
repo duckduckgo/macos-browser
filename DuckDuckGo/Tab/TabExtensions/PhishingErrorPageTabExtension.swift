@@ -82,26 +82,32 @@ final class PhishingErrorPageTabExtension {
 extension PhishingErrorPageTabExtension: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard shouldBypassPhishingError == false else { return .allow }
+        // Check if the navigation action is a reload action
+        if navigationAction.navigationType != .reload {
+            // If it's not a reload action, reset the flag
+            shouldBypassPhishingError = false
+        }
         let urlString = navigationAction.url.absoluteString
         // Check the URL
         if urlString.contains("notarootkit.com") {
             loadPhishingErrorHTML(url: navigationAction.url, alternate: false, errorCode: 1)
-            return .allow
+            // Navigate back programmatically to fix the BackForwardList
+            webView?.goBack()
+            return .cancel
         }
         return .allow
     }
 
-    @MainActor
-    func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
-        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust else { return nil }
-        guard shouldBypassPhishingError else { return nil}
-        guard navigation?.url == webView?.url else { return nil }
-        guard let credential = urlCredentialCreator.urlCredentialFrom(trust: challenge.protectionSpace.serverTrust) else { return nil }
-
-        shouldBypassPhishingError = false
-        return .credential(credential)
-    }
+//    @MainActor
+//    func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
+//        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust else { return nil }
+//        guard shouldBypassPhishingError else { return nil }
+//        guard navigation?.url == webView?.url else { return nil }
+//        guard let credential = urlCredentialCreator.urlCredentialFrom(trust: challenge.protectionSpace.serverTrust) else { return nil }
+//
+//        shouldBypassPhishingError = false
+//        return .credential(credential)
+//    }
 }
 
 protocol PhishingErrorPageTabExtensionProtocol: AnyObject, NavigationResponder {}
