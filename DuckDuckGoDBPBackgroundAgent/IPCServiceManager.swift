@@ -112,11 +112,6 @@ extension IPCServiceManager: IPCServerInterface {
         }
     }
 
-    func runAllOperations(showWebView: Bool) {
-        pixelHandler.fire(.ipcServerRunAllOperations)
-        scheduler.runAllOperations(showWebView: showWebView)
-    }
-
     func openBrowser(domain: String) {
         Task { @MainActor in
             browserWindowManager.show(domain: domain)

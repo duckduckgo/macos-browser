@@ -76,10 +76,6 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
         ipcScheduler.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func runAllOperations(showWebView: Bool) {
-        ipcScheduler.runAllOperations(showWebView: showWebView)
-    }
-
     func runQueuedOperations(showWebView: Bool,
                              completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
         ipcScheduler.runQueuedOperations(showWebView: showWebView, completion: completion)

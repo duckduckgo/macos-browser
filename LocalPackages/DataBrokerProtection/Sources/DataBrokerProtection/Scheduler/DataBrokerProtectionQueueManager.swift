@@ -36,7 +36,6 @@ protocol DataBrokerProtectionQueueManager {
     func startManualScans(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runAllOptOutOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func runQueuedOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    func runAllOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
     func stopAllOperations()
 }
 
@@ -116,19 +115,6 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
                                 showWebView: showWebView,
                                 operationDependencies: operationDependencies) { errors in
             os_log("Queued operations completed", log: .dataBrokerProtection)
-            completion?(errors)
-        }
-    }
-
-    func runAllOperations(showWebView: Bool, operationDependencies: OperationDependencies, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
-
-        guard mode.canInterrupt(forNewMode: .queued) else { return }
-        mode = .queued
-
-        addOperationCollections(withType: .all,
-                                showWebView: showWebView,
-                                operationDependencies: operationDependencies) { errors in
-            os_log("All operations completed", log: .dataBrokerProtection)
             completion?(errors)
         }
     }

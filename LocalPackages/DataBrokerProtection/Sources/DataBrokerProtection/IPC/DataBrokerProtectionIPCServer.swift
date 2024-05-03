@@ -99,7 +99,6 @@ public protocol IPCServerInterface: AnyObject {
                          completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
     func runQueuedOperations(showWebView: Bool,
                              completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func runAllOperations(showWebView: Bool)
 
     // MARK: - Debugging Features
 
@@ -141,7 +140,6 @@ protocol XPCServerInterface {
                          completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
     func runQueuedOperations(showWebView: Bool,
                              completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func runAllOperations(showWebView: Bool)
 
     // MARK: - Debugging Features
 
@@ -224,10 +222,6 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
     func runQueuedOperations(showWebView: Bool,
                              completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
         serverDelegate?.runQueuedOperations(showWebView: showWebView, completion: completion)
-    }
-
-    func runAllOperations(showWebView: Bool) {
-        serverDelegate?.runAllOperations(showWebView: showWebView)
     }
 
     func openBrowser(domain: String) {

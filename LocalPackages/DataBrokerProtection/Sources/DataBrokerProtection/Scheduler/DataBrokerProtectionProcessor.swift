@@ -94,16 +94,6 @@ final class DataBrokerProtectionProcessor {
         }
     }
 
-    func runAllOperations(showWebView: Bool = false,
-                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
-        runOperations(operationType: .all,
-                      priorityDate: nil,
-                      showWebView: showWebView) { errors in
-            os_log("Queued operations done", log: .dataBrokerProtection)
-            completion?(errors)
-        }
-    }
-
     func stopAllOperations() {
         operationQueue.cancelAllOperations()
     }

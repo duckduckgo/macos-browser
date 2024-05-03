@@ -130,7 +130,6 @@ public enum DataBrokerProtectionPixels {
     case ipcServerOptOutAllBrokersCompletion(error: Error?)
     case ipcServerRunQueuedOperations
     case ipcServerRunQueuedOperationsCompletion(error: Error?)
-    case ipcServerRunAllOperations
 
     // DataBrokerProtection User Notifications
     case dataBrokerProtectionNotificationSentFirstScanComplete
@@ -247,7 +246,6 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .ipcServerOptOutAllBrokersCompletion: return "m_mac_dbp_ipc-server_opt-out-all-brokers_completion"
         case .ipcServerRunQueuedOperations: return "m_mac_dbp_ipc-server_run-queued-operations"
         case .ipcServerRunQueuedOperationsCompletion: return "m_mac_dbp_ipc-server_run-queued-operations_completion"
-        case .ipcServerRunAllOperations: return "m_mac_dbp_ipc-server_run-all-operations"
 
             // User Notifications
         case .dataBrokerProtectionNotificationSentFirstScanComplete:
@@ -418,8 +416,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .ipcServerOptOutAllBrokers,
                 .ipcServerOptOutAllBrokersCompletion,
                 .ipcServerRunQueuedOperations,
-                .ipcServerRunQueuedOperationsCompletion,
-                .ipcServerRunAllOperations:
+                .ipcServerRunQueuedOperationsCompletion:
             return [Consts.bundleIDParamKey: Bundle.main.bundleIdentifier ?? "nil"]
         case .scanSuccess(let dataBroker, let matchesFound, let duration, let tries, let isManualScan):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.matchesFoundKey: String(matchesFound), Consts.durationParamKey: String(duration), Consts.triesKey: String(tries), Consts.isManualScan: isManualScan.description]
@@ -507,7 +504,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
                     .ipcServerOptOutAllBrokers,
                     .ipcServerRunQueuedOperations,
-                    .ipcServerRunAllOperations,
                     .scanSuccess,
                     .scanFailed,
                     .scanError,

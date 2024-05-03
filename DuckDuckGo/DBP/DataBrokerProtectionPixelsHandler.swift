@@ -76,7 +76,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
                     .ipcServerOptOutAllBrokers,
                     .ipcServerRunQueuedOperations,
-                    .ipcServerRunAllOperations,
                     .scanSuccess,
                     .scanFailed,
                     .scanError,

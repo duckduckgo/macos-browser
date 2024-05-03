@@ -191,18 +191,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-    public func runAllOperations(showWebView: Bool) {
-        self.pixelHandler.fire(.ipcServerRunAllOperations)
-        xpc.execute(call: { server in
-            server.runAllOperations(showWebView: showWebView)
-        }, xpcReplyErrorHandler: { _ in
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
-    }
-
     public func openBrowser(domain: String) {
-        self.pixelHandler.fire(.ipcServerRunAllOperations)
         xpc.execute(call: { server in
             server.openBrowser(domain: domain)
         }, xpcReplyErrorHandler: { error in

@@ -64,10 +64,6 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
         ipcClient.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 
-    public func runAllOperations(showWebView: Bool) {
-        ipcClient.runAllOperations(showWebView: showWebView)
-    }
-
     public func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
         ipcClient.getDebugMetadata(completion: completion)
     }
