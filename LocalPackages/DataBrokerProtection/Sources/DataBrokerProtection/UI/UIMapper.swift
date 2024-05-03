@@ -56,10 +56,15 @@ struct MapperToUI {
         // not by the total real cans that the app is doing.
         let profileQueriesGroupedByBroker = Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.name })
 
-        let totalScans = profileQueriesGroupedByBroker.reduce(0) { accumulator, element in
+        // We don't want to consider deprecated queries when reporting manual scans to the UI
+        let filteredProfileQueriesGroupedByBroker = profileQueriesGroupedByBroker.mapValues { queries in
+            queries.filter { !$0.profileQuery.deprecated }
+        }
+
+        let totalScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
             return accumulator + element.value.totalScans
         }
-        let currentScans = profileQueriesGroupedByBroker.reduce(0) { accumulator, element in
+        let currentScans = filteredProfileQueriesGroupedByBroker.reduce(0) { accumulator, element in
             return accumulator + element.value.currentScans
         }
 
@@ -333,23 +338,15 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
 
     var totalScans: Int {
         guard let broker = self.first?.dataBroker else { return 0 }
-
-        let areAllQueriesDeprecated = allSatisfy { $0.profileQuery.deprecated }
-
-        if areAllQueriesDeprecated {
-            return 0
-        } else {
-            return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
-        }
+        return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
     }
 
     var currentScans: Int {
         guard let broker = self.first?.dataBroker else { return 0 }
 
-        let areAllQueriesDeprecated = allSatisfy { $0.profileQuery.deprecated }
         let didAllQueriesFinished = allSatisfy { $0.scanOperationData.lastRunDate != nil }
 
-        if areAllQueriesDeprecated || !didAllQueriesFinished {
+        if !didAllQueriesFinished {
             return 0
         } else {
             return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
