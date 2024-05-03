@@ -27,12 +27,16 @@ import Subscription
 ///
 final class NetworkProtectionBouncer {
 
+    let accountManager: AccountManager
+
+    init(accountManager: AccountManager) {
+        self.accountManager = accountManager
+    }
+
     /// Simply verifies that the VPN feature is enabled and if not, takes care of killing the
     /// current app.
     ///
     func requireAuthTokenOrKillApp(controller: TunnelController) async {
-
-        let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
         guard !accountManager.isUserAuthenticated else {
             return
         }
