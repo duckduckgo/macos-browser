@@ -140,7 +140,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private lazy var queueManager: DataBrokerProtectionQueueManager = {
         let operationQueue = OperationQueue()
         operationQueue.maxConcurrentOperationCount = DataBrokerProtectionSchedulerConfig().concurrentOperationsDifferentBrokers
-        let operationsBuilder = DefaultDataBrokerOperationsCollectionBuilder()
+        let operationsBuilder = DefaultDataBrokerOperationsBuilder()
         let mismatchCalculator = MismatchCalculatorUseCase(database: dataManager.database,
                                                            pixelHandler: pixelHandler)
 

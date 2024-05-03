@@ -31,7 +31,7 @@ protocol DataBrokerProtectionQueueManager {
     var mode: QueueManagerMode { get }
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
-         operationsBuilder: DataBrokerOperationsCollectionBuilder,
+         operationsBuilder: DataBrokerOperationsBuilder,
          mismatchCalculator: MismatchCalculator,
          brokerUpdater: DataBrokerProtectionBrokerUpdater?)
 
@@ -74,12 +74,12 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
     private(set) var mode: QueueManagerMode = .idle
 
     private let operationQueue: DataBrokerProtectionOperationQueue
-    private let operationsBuilder: DataBrokerOperationsCollectionBuilder
+    private let operationsBuilder: DataBrokerOperationsBuilder
     private let mismatchCalculator: MismatchCalculator
     private let brokerUpdater: DataBrokerProtectionBrokerUpdater?
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
-         operationsBuilder: DataBrokerOperationsCollectionBuilder,
+         operationsBuilder: DataBrokerOperationsBuilder,
          mismatchCalculator: MismatchCalculator,
          brokerUpdater: DataBrokerProtectionBrokerUpdater?) {
 
@@ -143,7 +143,7 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
 
 private extension DefaultDataBrokerProtectionQueueManager {
 
-    typealias OperationType = DataBrokerOperationsCollection.OperationType
+    typealias OperationType = DataBrokerOperation.OperationType
 
     func addOperationCollections(withType type: OperationType,
                                  priorityDate: Date? = nil,
@@ -158,7 +158,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
         firePixels(operationDependencies: operationDependencies)
 
         // Use builder to build operations
-        let operations: [DataBrokerOperationsCollection]
+        let operations: [DataBrokerOperation]
         do {
 
             operations = try operationsBuilder.operationCollections(operationType: type,

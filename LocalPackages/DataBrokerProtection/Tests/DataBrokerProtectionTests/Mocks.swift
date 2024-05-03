@@ -983,18 +983,18 @@ final class MockDataBrokerProtectionOperationQueue: OperationQueue {
     }
 }
 
-final class MockDataBrokerOperationsCollectionBuilder: DataBrokerOperationsCollectionBuilder {
+final class MockDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
 
-    var operationCollections: [DataBrokerOperationsCollection] = []
+    var operationCollections: [DataBrokerOperation] = []
 
-    init(operationCollections: [DataBrokerOperationsCollection]) {
+    init(operationCollections: [DataBrokerOperation]) {
         self.operationCollections = operationCollections
     }
 
     func operationCollections(operationType: OperationType,
                               priorityDate: Date?,
                               showWebView: Bool,
-                              operationDependencies: any OperationDependencies) throws -> [DataBrokerOperationsCollection] {
+                              operationDependencies: any OperationDependencies) throws -> [DataBrokerOperation] {
         operationCollections
     }
 }
@@ -1045,7 +1045,7 @@ final class MockRunnerProvider: OperationRunnerProvider {
     }
 }
 
-final class MockDataBrokerOperationsCollection: DataBrokerOperationsCollection {
+final class MockDataBrokerOperation: DataBrokerOperation {
     convenience init(id: Int64, operationType: OperationType) {
         self.init(dataBrokerID: id,
                   database: MockDatabase(),

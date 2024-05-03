@@ -48,7 +48,7 @@ struct EmptyCookieHandler: CookieHandler {
     }
 }
 
-final class DebugScanOperation: DataBrokerOperation {
+final class DebugScanOperation: DataBrokerTask {
     typealias ReturnValue = DebugScanReturnValue
     typealias InputValue = Void
 

@@ -87,7 +87,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
               pixelHandler: EventMapping<DataBrokerProtectionPixels>,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
-        let scan = ScanOperation(
+        let scan = ScanTask(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
             query: profileQuery,
@@ -106,7 +106,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
                 pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
-        let optOut = OptOutOperation(
+        let optOut = OptOutTask(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
             query: profileQuery,

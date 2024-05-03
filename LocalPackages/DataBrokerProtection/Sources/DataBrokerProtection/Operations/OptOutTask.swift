@@ -1,5 +1,5 @@
 //
-//  OptOutOperation.swift
+//  OptOutTask.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import BrowserServicesKit
 import UserScript
 import Common
 
-final class OptOutOperation: DataBrokerOperation {
+final class OptOutTask: DataBrokerTask {
     typealias ReturnValue = Void
     typealias InputValue = ExtractedProfile
 

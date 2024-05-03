@@ -1,5 +1,5 @@
 //
-//  DataBrokerOperationsCollectionBuilder.swift
+//  DataBrokerOperationsBuilder.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import Common
 import Foundation
 
-typealias OperationType = DataBrokerOperationsCollection.OperationType
+typealias OperationType = DataBrokerOperation.OperationType
 
 protocol OperationDependencies {
     var database: DataBrokerProtectionRepository { get }
@@ -39,29 +39,29 @@ struct DefaultOperationDependencies: OperationDependencies {
     let userNotificationService: DataBrokerProtectionUserNotificationService
 }
 
-protocol DataBrokerOperationsCollectionBuilder {
+protocol DataBrokerOperationsBuilder {
     func operationCollections(operationType: OperationType,
                               priorityDate: Date?,
                               showWebView: Bool,
-                              operationDependencies: OperationDependencies) throws -> [DataBrokerOperationsCollection]
+                              operationDependencies: OperationDependencies) throws -> [DataBrokerOperation]
 }
 
-final class DefaultDataBrokerOperationsCollectionBuilder: DataBrokerOperationsCollectionBuilder {
+final class DefaultDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
 
     func operationCollections(operationType: OperationType,
                               priorityDate: Date?,
                               showWebView: Bool,
-                              operationDependencies: OperationDependencies) throws -> [DataBrokerOperationsCollection] {
+                              operationDependencies: OperationDependencies) throws -> [DataBrokerOperation] {
 
         let brokerProfileQueryData = try operationDependencies.database.fetchAllBrokerProfileQueryData()
-        var collections: [DataBrokerOperationsCollection] = []
+        var collections: [DataBrokerOperation] = []
         var visitedDataBrokerIDs: Set<Int64> = []
 
         for queryData in brokerProfileQueryData {
             guard let dataBrokerID = queryData.dataBroker.id else { continue }
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
-                let collection = DataBrokerOperationsCollection(dataBrokerID: dataBrokerID,
+                let collection = DataBrokerOperation(dataBrokerID: dataBrokerID,
                                                                 database: operationDependencies.database,
                                                                 operationType: operationType,
                                                                 intervalBetweenOperations: operationDependencies.config.intervalBetweenSameBrokerOperations,

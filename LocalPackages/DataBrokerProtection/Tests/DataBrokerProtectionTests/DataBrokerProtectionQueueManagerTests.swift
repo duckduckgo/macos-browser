@@ -25,8 +25,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
     var sut: DefaultDataBrokerProtectionQueueManager!
 
     var mockQueue: MockDataBrokerProtectionOperationQueue!
-    var mockOperations: [MockDataBrokerOperationsCollection]!
-    var mockOperationsBuilder: MockDataBrokerOperationsCollectionBuilder!
+    var mockOperations: [MockDataBrokerOperation]!
+    var mockOperationsBuilder: MockDataBrokerOperationsBuilder!
     var mockDatabase: MockDatabase!
     var mockPixelHandler: MockPixelHandler!
     var mockMismatchCalculator: MockMismatchCalculator!
@@ -38,8 +38,8 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
 
     override func setUpWithError() throws {
         mockQueue = MockDataBrokerProtectionOperationQueue()
-        mockOperations = (1...10).map { MockDataBrokerOperationsCollection(id: $0, operationType: .scan) }
-        mockOperationsBuilder = MockDataBrokerOperationsCollectionBuilder(operationCollections: mockOperations)
+        mockOperations = (1...10).map { MockDataBrokerOperation(id: $0, operationType: .scan) }
+        mockOperationsBuilder = MockDataBrokerOperationsBuilder(operationCollections: mockOperations)
         mockDatabase = MockDatabase()
         mockPixelHandler = MockPixelHandler()
         mockMismatchCalculator = MockMismatchCalculator(database: mockDatabase, pixelHandler: mockPixelHandler)
@@ -70,7 +70,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         XCTAssert(mockQueue.didCallCancelCount == 1)
         XCTAssert(mockQueue.operationCount == 10)
 
-        mockOperations = (11...20).map { MockDataBrokerOperationsCollection(id: $0, operationType: .scan) }
+        mockOperations = (11...20).map { MockDataBrokerOperation(id: $0, operationType: .scan) }
         mockOperationsBuilder.operationCollections = mockOperations
 
         sut.startScheduledOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
@@ -93,7 +93,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         XCTAssert(mockQueue.didCallCancelCount == 1)
         XCTAssert(mockQueue.operationCount == 10)
 
-        mockOperations = (11...20).map { MockDataBrokerOperationsCollection(id: $0, operationType: .scan) }
+        mockOperations = (11...20).map { MockDataBrokerOperation(id: $0, operationType: .scan) }
         mockOperationsBuilder.operationCollections = mockOperations
 
         sut.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }

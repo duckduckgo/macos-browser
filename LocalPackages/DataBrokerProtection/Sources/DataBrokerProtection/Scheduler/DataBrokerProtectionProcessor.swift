@@ -99,7 +99,7 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Private functions
-    private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
+    private func runOperations(operationType: DataBrokerOperation.OperationType,
                                priorityDate: Date?,
                                showWebView: Bool,
                                completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
@@ -107,6 +107,7 @@ final class DataBrokerProtectionProcessor {
         // Before running new operations we check if there is any updates to the broker files.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
             let brokerUpdater = DefaultDataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
+            brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
 
         // This will fire the DAU/WAU/MAU pixels,
@@ -114,7 +115,7 @@ final class DataBrokerProtectionProcessor {
         // This will try to fire the event weekly report pixels
         eventPixels.tryToFireWeeklyPixels()
 
-        let dataBrokerOperationCollections: [DataBrokerOperationsCollection]
+        let dataBrokerOperationCollections: [DataBrokerOperation]
 
         do {
             let brokersProfileData = try database.fetchAllBrokerProfileQueryData()
@@ -142,18 +143,18 @@ final class DataBrokerProtectionProcessor {
     }
 
     private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
-                                                      operationType: DataBrokerOperationsCollection.OperationType,
+                                                      operationType: DataBrokerOperation.OperationType,
                                                       priorityDate: Date?,
-                                                      showWebView: Bool) -> [DataBrokerOperationsCollection] {
+                                                      showWebView: Bool) -> [DataBrokerOperation] {
 
-        var collections: [DataBrokerOperationsCollection] = []
+        var collections: [DataBrokerOperation] = []
         var visitedDataBrokerIDs: Set<Int64> = []
 
         for queryData in brokerProfileQueriesData {
             guard let dataBrokerID = queryData.dataBroker.id else { continue }
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
-                let collection = DataBrokerOperationsCollection(dataBrokerID: dataBrokerID,
+                let collection = DataBrokerOperation(dataBrokerID: dataBrokerID,
                                                                 database: database,
                                                                 operationType: operationType,
                                                                 intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,
@@ -178,13 +179,13 @@ final class DataBrokerProtectionProcessor {
     }
 }
 
-extension DataBrokerProtectionProcessor: DataBrokerOperationsCollectionErrorDelegate {
+extension DataBrokerProtectionProcessor: DataBrokerOperationErrorDelegate {
 
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection, didErrorBeforeStartingBrokerOperations error: Error) {
+    func dataBrokerOperation(_ dataBrokerOperation: DataBrokerOperation, didErrorBeforeStartingBrokerOperations error: Error) {
 
     }
 
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+    func dataBrokerOperation(_ dataBrokerOperation: DataBrokerOperation,
                                         didError error: Error,
                                         whileRunningBrokerOperationData: BrokerOperationData,
                                         withDataBrokerName dataBrokerName: String?) {
