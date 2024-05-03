@@ -167,10 +167,6 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return false
     }
 
-    func disableForAllUsers() async {
-        // intentional no-op
-    }
-
     var isEligibleForThankYouMessage: Bool {
         false
     }

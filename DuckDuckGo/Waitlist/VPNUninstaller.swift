@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionFeatureDisabler.swift
+//  VPNUninstaller.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -25,16 +25,14 @@ import NetworkProtectionUI
 import LoginItems
 import SystemExtensions
 
-protocol NetworkProtectionFeatureDisabling {
+protocol VPNUninstalling {
     /// - Returns: `true` if the uninstallation was completed.  `false` if it was cancelled by the user or an error.
     ///
     @discardableResult
-    func disable(uninstallSystemExtension: Bool) async -> Bool
-
-    func stop()
+    func uninstall(removeSystemExtension: Bool) async -> Bool
 }
 
-final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling {
+final class VPNUninstaller: VPNUninstalling {
     private let log: OSLog
     private let loginItemsManager: LoginItemsManager
     private let pinningManager: LocalPinningManager
@@ -72,20 +70,20 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     ///
     @MainActor
     @discardableResult
-    func disable(uninstallSystemExtension: Bool) async -> Bool {
+    func uninstall(removeSystemExtension: Bool) async -> Bool {
         // We can do this optimistically as it has little if any impact.
         unpinNetworkProtection()
 
         // To disable NetP we need the login item to be running
         // This should be fine though as we'll disable them further down below
-        guard canUninstall(includingSystemExtension: uninstallSystemExtension) else {
+        guard canUninstall(includingSystemExtension: removeSystemExtension) else {
             return true
         }
 
         isDisabling = true
 
         defer {
-            resetUserDefaults(uninstallSystemExtension: uninstallSystemExtension)
+            resetUserDefaults(uninstallSystemExtension: removeSystemExtension)
         }
 
         enableLoginItems()
@@ -93,9 +91,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         // Allow some time for the login items to fully launch
         try? await Task.sleep(interval: 0.5)
 
-        if uninstallSystemExtension {
+        if removeSystemExtension {
             do {
-                try await removeSystemExtension()
+                try await self.removeSystemExtension()
             } catch {
                 return false
             }
@@ -120,12 +118,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         notifyVPNUninstalled()
         isDisabling = false
         return true
-    }
-
-    func stop() {
-        ipcClient.stop { _ in
-            // Intentional no-op
-        }
     }
 
     private func enableLoginItems() {

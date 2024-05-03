@@ -37,6 +37,7 @@ import Lottie
 
 import NetworkProtection
 import Subscription
+import NetworkProtectionIPC
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -86,7 +87,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     // Needs to be lazy as indirectly depends on AppDelegate
-    private lazy var networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+    private lazy var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler = {
+
+        let ipcClient = TunnelControllerIPCClient()
+        let tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+        let vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
+
+        return NetworkProtectionSubscriptionEventHandler(
+            tunnelController: tunnelController,
+            vpnUninstaller: vpnUninstaller)
+    }()
 
 #if DBP
     private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()

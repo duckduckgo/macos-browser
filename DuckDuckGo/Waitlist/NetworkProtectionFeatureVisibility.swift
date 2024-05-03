@@ -32,7 +32,6 @@ protocol NetworkProtectionFeatureVisibility {
     func canStartVPN() async throws -> Bool
     func isVPNVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
-    func disableForAllUsers() async
     @discardableResult
     func disableIfUserHasNoAccess() async -> Bool
 
@@ -41,7 +40,7 @@ protocol NetworkProtectionFeatureVisibility {
 
 struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private static var subscriptionAuthTokenPrefix: String { "ddg:" }
-    private let featureDisabler: NetworkProtectionFeatureDisabling
+    private let vpnUninstaller: VPNUninstalling
     private let featureOverrides: WaitlistBetaOverriding
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let privacyConfigurationManager: PrivacyConfigurationManaging
@@ -52,13 +51,13 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides(),
-         featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         vpnUninstaller: VPNUninstalling = VPNUninstaller(),
          defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
-        self.featureDisabler = featureDisabler
+        self.vpnUninstaller = vpnUninstaller
         self.featureOverrides = featureOverrides
         self.defaults = defaults
         self.accountManager = AccountManager(subscriptionAppGroup: subscriptionAppGroup)
@@ -123,10 +122,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         defaults.networkProtectionOnboardingStatusPublisher
     }
 
-    func disableForAllUsers() async {
-        await featureDisabler.disable(uninstallSystemExtension: false)
-    }
-
     /// A method meant to be called safely from different places to disable the VPN if the user isn't meant to have access to it.
     ///
     @discardableResult
@@ -135,7 +130,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return false
         }
 
-        await disableForAllUsers()
+        await vpnUninstaller.uninstall(removeSystemExtension: false)
         return true
     }
 }

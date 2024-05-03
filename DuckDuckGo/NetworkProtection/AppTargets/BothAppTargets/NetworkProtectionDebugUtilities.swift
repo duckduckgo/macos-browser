@@ -30,7 +30,7 @@ import NetworkProtectionIPC
 final class NetworkProtectionDebugUtilities {
 
     private let ipcClient: TunnelControllerIPCClient
-    private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler
+    private let vpnUninstaller: VPNUninstaller
 
     // MARK: - Login Items Management
 
@@ -49,13 +49,13 @@ final class NetworkProtectionDebugUtilities {
         let ipcClient = TunnelControllerIPCClient()
 
         self.ipcClient = ipcClient
-        self.networkProtectionFeatureDisabler = NetworkProtectionFeatureDisabler(ipcClient: ipcClient)
+        self.vpnUninstaller = VPNUninstaller(ipcClient: ipcClient)
     }
 
     // MARK: - Debug commands for the extension
 
     func resetAllState(keepAuthToken: Bool) async {
-        let uninstalledSuccessfully = await networkProtectionFeatureDisabler.disable(uninstallSystemExtension: true)
+        let uninstalledSuccessfully = await vpnUninstaller.uninstall(removeSystemExtension: true)
 
         guard uninstalledSuccessfully else {
             return
@@ -71,8 +71,8 @@ final class NetworkProtectionDebugUtilities {
     }
 
     func removeSystemExtensionAndAgents() async throws {
-        try await networkProtectionFeatureDisabler.removeSystemExtension()
-        networkProtectionFeatureDisabler.disableLoginItems()
+        try await vpnUninstaller.removeSystemExtension()
+        vpnUninstaller.disableLoginItems()
     }
 
     func sendTestNotificationRequest() async throws {

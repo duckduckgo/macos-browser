@@ -54,7 +54,6 @@ final class VPNUninstaller: VPNUninstalling {
         }
 
         defaults.networkProtectionShouldShowVPNUninstalledMessage = true
-
         exit(EXIT_SUCCESS)
     }
 }
