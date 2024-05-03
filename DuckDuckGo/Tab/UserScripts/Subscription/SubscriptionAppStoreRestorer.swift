@@ -26,6 +26,10 @@ import PixelKit
 struct SubscriptionAppStoreRestorer {
 
     let accountManager: AccountManaging
+    @MainActor
+    var window: NSWindow? {
+        WindowControllersManager.shared.lastKeyMainWindowController?.window
+    }
 
     public init(accountManager: AccountManaging) {
         self.accountManager = accountManager
@@ -85,14 +89,53 @@ struct SubscriptionAppStoreRestorer {
             switch error {
             case .missingAccountOrTransactions:
                 SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
-//                await windowController.showSubscriptionNotFoundAlert()
+                await showSubscriptionNotFoundAlert()
             case .subscriptionExpired:
                 SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
-//                await windowController.showSubscriptionInactiveAlert()
+                await showSubscriptionInactiveAlert()
             case .pastTransactionAuthenticationError, .failedToObtainAccessToken, .failedToFetchAccountDetails, .failedToFetchSubscriptionDetails:
                 SubscriptionErrorReporter.report(subscriptionActivationError: .generalError)
-//                await windowController.showSomethingWentWrongAlert()
+                await showSomethingWentWrongAlert()
             }
         }
+    }
+}
+
+@available(macOS 12.0, *)
+extension SubscriptionAppStoreRestorer {
+
+    /*
+     WARNING: DUPLICATED CODE
+     This code will be moved as part of https://app.asana.com/0/0/1207157941206686/f
+     */
+
+    // MARK: - UI interactions
+
+    @MainActor
+    func showSomethingWentWrongAlert() {
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
+        guard let window else { return }
+
+        window.show(.somethingWentWrongAlert())
+    }
+
+    @MainActor
+    func showSubscriptionNotFoundAlert() {
+        guard let window else { return }
+
+        window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
+            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        })
+    }
+
+    @MainActor
+    func showSubscriptionInactiveAlert() {
+        guard let window else { return }
+
+        window.show(.subscriptionInactiveAlert(), firstButtonAction: {
+            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
+        })
     }
 }
