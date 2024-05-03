@@ -32,8 +32,7 @@ protocol NetworkProtectionFeatureVisibility {
     func canStartVPN() async throws -> Bool
     func isVPNVisible() -> Bool
     func shouldUninstallAutomatically() -> Bool
-    @discardableResult
-    func disableIfUserHasNoAccess() async -> Bool
+    func disableIfUserHasNoAccess() async throws
 
     var onboardStatusPublisher: AnyPublisher<OnboardingStatus, Never> { get }
 }
@@ -124,13 +123,11 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 
     /// A method meant to be called safely from different places to disable the VPN if the user isn't meant to have access to it.
     ///
-    @discardableResult
-    func disableIfUserHasNoAccess() async -> Bool {
+    func disableIfUserHasNoAccess() async throws {
         guard shouldUninstallAutomatically() else {
-            return false
+            return
         }
 
-        await vpnUninstaller.uninstall(removeSystemExtension: false)
-        return true
+        try await vpnUninstaller.uninstall(removeSystemExtension: false)
     }
 }

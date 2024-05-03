@@ -116,7 +116,7 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                                                    userDefaults: .netP,
                                                    locationFormatter: DefaultVPNLocationFormatter(),
                                                    uninstallHandler: { [weak self] in
-                _ = await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
+                _ = try? await self?.vpnUninstaller.uninstall(removeSystemExtension: true)
             })
             popover.delegate = delegate
 

@@ -26,15 +26,45 @@ import LoginItems
 import SystemExtensions
 
 protocol VPNUninstalling {
-    /// - Returns: `true` if the uninstallation was completed.  `false` if it was cancelled by the user or an error.
-    ///
-    @discardableResult
-    func uninstall(removeSystemExtension: Bool) async -> Bool
+    func uninstall(removeSystemExtension: Bool) async throws
 }
 
 final class VPNUninstaller: VPNUninstalling {
+
+    enum UninstallCancellationReason: String {
+        case alreadyUninstalling
+        case alreadyUninstalled
+    }
+
+    enum UninstallError: CustomNSError {
+        case cancelled(reason: UninstallCancellationReason)
+        case runAgentError(_ error: Error)
+        case systemExtensionError(_ error: Error)
+        case vpnConfigurationError(_ error: Error)
+
+        var errorCode: Int {
+            switch self {
+            case .cancelled: return 0
+            case .runAgentError: return 1
+            case .systemExtensionError: return 2
+            case .vpnConfigurationError: return 3
+            }
+        }
+
+        var errorUserInfo: [String: Any] {
+            switch self {
+            case .cancelled(let reason):
+                return ["reason": reason.rawValue]
+            case .runAgentError(let error),
+                    .systemExtensionError(let error),
+                    .vpnConfigurationError(let error):
+                return [NSUnderlyingErrorKey: error as NSError]
+            }
+        }
+    }
+
     private let log: OSLog
-    private let loginItemsManager: LoginItemsManager
+    private let loginItemsManager: LoginItemsManaging
     private let pinningManager: LocalPinningManager
     private let settings: VPNSettings
     private let userDefaults: UserDefaults
@@ -44,7 +74,7 @@ final class VPNUninstaller: VPNUninstalling {
     @MainActor
     private var isDisabling = false
 
-    init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
+    init(loginItemsManager: LoginItemsManaging = LoginItemsManager(),
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .netP,
          settings: VPNSettings = .init(defaults: .netP),
@@ -61,26 +91,22 @@ final class VPNUninstaller: VPNUninstalling {
         self.ipcClient = ipcClient
     }
 
-    @MainActor
-    private func canUninstall(includingSystemExtension: Bool) -> Bool {
-        !isDisabling && vpnMenuLoginItem.status.isInstalled
-    }
-
     /// This method disables the VPN and clear all of its state.
     ///
     /// - Parameters:
     ///     - includeSystemExtension: Whether this method should uninstall the system extension.
     ///
     @MainActor
-    @discardableResult
-    func uninstall(removeSystemExtension: Bool) async -> Bool {
+    func uninstall(removeSystemExtension: Bool) async throws {
         // We can do this optimistically as it has little if any impact.
         unpinNetworkProtection()
 
-        // To disable NetP we need the login item to be running
-        // This should be fine though as we'll disable them further down below
-        guard canUninstall(includingSystemExtension: removeSystemExtension) else {
-            return true
+        guard !isDisabling else {
+            throw UninstallError.cancelled(reason: .alreadyUninstalling)
+        }
+
+        guard vpnMenuLoginItem.status.isInstalled else {
+            throw UninstallError.cancelled(reason: .alreadyUninstalled)
         }
 
         isDisabling = true
@@ -89,7 +115,11 @@ final class VPNUninstaller: VPNUninstalling {
             resetUserDefaults(uninstallSystemExtension: removeSystemExtension)
         }
 
-        enableLoginItems()
+        do {
+            try enableLoginItems()
+        } catch {
+            throw UninstallError.runAgentError(error)
+        }
 
         // Allow some time for the login items to fully launch
         try? await Task.sleep(interval: 0.5)
@@ -98,7 +128,7 @@ final class VPNUninstaller: VPNUninstalling {
             do {
                 try await self.removeSystemExtension()
             } catch {
-                return false
+                throw UninstallError.systemExtensionError(error)
             }
         }
 
@@ -109,6 +139,10 @@ final class VPNUninstaller: VPNUninstalling {
                 break // Removal succeeded, break out of the while loop and continue with the rest of uninstallation
             } catch {
                 print("Failed to remove VPN configuration, with error: \(error.localizedDescription)")
+
+                if attemptNumber == 3 {
+                    throw UninstallError.vpnConfigurationError(error)
+                }
             }
 
             attemptNumber += 1
@@ -120,11 +154,10 @@ final class VPNUninstaller: VPNUninstalling {
 
         notifyVPNUninstalled()
         isDisabling = false
-        return true
     }
 
-    private func enableLoginItems() {
-        loginItemsManager.enableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
+    private func enableLoginItems() throws {
+        try loginItemsManager.throwingEnableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
     }
 
     func disableLoginItems() {

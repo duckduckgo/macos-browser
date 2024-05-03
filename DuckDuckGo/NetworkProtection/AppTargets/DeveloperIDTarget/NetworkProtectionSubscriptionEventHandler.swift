@@ -110,7 +110,7 @@ final class NetworkProtectionSubscriptionEventHandler {
         print("[NetP Subscription] Deleted NetP auth token after signing out from Privacy Pro")
 
         Task {
-            await vpnUninstaller.uninstall(removeSystemExtension: false)
+            try? await vpnUninstaller.uninstall(removeSystemExtension: false)
         }
     }
 
