@@ -436,7 +436,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 }
 
 extension SubscriptionPagesUseSubscriptionFeature {
-    
+
     /*
      WARNING:
      This code will be moved as part of https://app.asana.com/0/0/1207157941206686/f

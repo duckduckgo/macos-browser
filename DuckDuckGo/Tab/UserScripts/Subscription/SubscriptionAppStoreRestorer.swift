@@ -35,7 +35,7 @@ struct SubscriptionAppStoreRestorer {
         self.accountManager = accountManager
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func restoreAppStoreSubscription(mainViewController: MainViewController, windowController: MainWindowController) async {
 
         let progressViewController = await ProgressViewController(title: UserText.restoringSubscriptionTitle)
