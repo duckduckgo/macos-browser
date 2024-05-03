@@ -30506,6 +30506,18 @@
         }
       }
     },
+    "newTab.setup.dock.confirmation" : {
+      "comment" : "Confirmation title after user clicks on 'Add to Dock' card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Added to your Dock!"
+          }
+        }
+      }
+    },
     "newTab.setup.dock.summary" : {
       "comment" : "Summary of the 'Add App to the Dock' card",
       "extractionState" : "extracted_with_value",

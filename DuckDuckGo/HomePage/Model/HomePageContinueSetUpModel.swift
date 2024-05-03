@@ -189,7 +189,6 @@ extension HomePage.Models {
             PixelKit.fire(GeneralPixel.userAddedToDockFromNewTabPageCard,
                           includeAppVersionParameter: false)
             dockCustomizer.addToDock()
-            removeItem(for: .dock)
         }
 
         func removeItem(for featureType: FeatureType) {
@@ -498,6 +497,15 @@ extension HomePage.Models {
                 return message.action.actionTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Get Started"
+            }
+        }
+
+        var confirmation: String? {
+            switch self {
+            case .dock:
+                return UserText.newTabSetUpDockConfirmation
+            default:
+                return nil
             }
         }
 
