@@ -65,7 +65,7 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            try await featureVisibility.disableIfUserHasNoAccess()
+            await featureVisibility.disableIfUserHasNoAccess()
             restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
         }
     }
@@ -74,7 +74,7 @@ final class NetworkProtectionAppEvents {
     ///
     func applicationDidBecomeActive() {
         Task { @MainActor in
-            try await featureVisibility.disableIfUserHasNoAccess()
+            await featureVisibility.disableIfUserHasNoAccess()
         }
     }
 

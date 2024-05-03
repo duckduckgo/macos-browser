@@ -171,7 +171,7 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         false
     }
 
-    func disableIfUserHasNoAccess() async -> Bool {
+    func disableIfUserHasNoAccess() async {
         return false
     }
 }
