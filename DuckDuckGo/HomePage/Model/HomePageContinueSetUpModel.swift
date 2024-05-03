@@ -131,24 +131,15 @@ extension HomePage.Models {
         @MainActor func performAction(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
-                do {
-                    PixelKit.fire(GeneralPixel.defaultRequestedFromHomepageSetupView)
-                    try defaultBrowserProvider.presentDefaultBrowserPrompt()
-                } catch {
-                    defaultBrowserProvider.openSystemPreferences()
-                }
+                performDefaultBrowserAction()
             case .dock:
                 performDockAction()
             case .importBookmarksAndPasswords:
-                dataImportProvider.showImportWindow(completion: {self.refreshFeaturesMatrix()})
+                performImportBookmarksAndPasswordsAction()
             case .duckplayer:
-                if let videoUrl = URL(string: duckPlayerURL) {
-                    let tab = Tab(content: .url(videoUrl, source: .link), shouldLoadInBackground: true)
-                    tabCollectionViewModel.append(tab: tab)
-                }
+                performDuckPlayerAction()
             case .emailProtection:
-                let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true)
-                tabCollectionViewModel.append(tab: tab)
+                performEmailProtectionAction()
             case .permanentSurvey:
                 visitSurvey()
             case .networkProtectionRemoteMessage(let message):
@@ -156,10 +147,42 @@ extension HomePage.Models {
             case .dataBrokerProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
             case .dataBrokerProtectionWaitlistInvited:
-#if DBP
-                DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
-#endif
+                performDataBrokerProtectionWaitlistInvitedAction()
             }
+        }
+
+        private func performDefaultBrowserAction() {
+            do {
+                PixelKit.fire(GeneralPixel.defaultRequestedFromHomepageSetupView)
+                try defaultBrowserProvider.presentDefaultBrowserPrompt()
+            } catch {
+                defaultBrowserProvider.openSystemPreferences()
+            }
+        }
+
+        private func performImportBookmarksAndPasswordsAction() {
+            dataImportProvider.showImportWindow(completion: { self.refreshFeaturesMatrix() })
+        }
+
+        @MainActor
+        private func performDuckPlayerAction() {
+            if let videoUrl = URL(string: duckPlayerURL) {
+                let tab = Tab(content: .url(videoUrl, source: .link), shouldLoadInBackground: true)
+                tabCollectionViewModel.append(tab: tab)
+            }
+        }
+
+        @MainActor
+        private func performEmailProtectionAction() {
+            let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true)
+            tabCollectionViewModel.append(tab: tab)
+        }
+
+        @MainActor
+        private func performDataBrokerProtectionWaitlistInvitedAction() {
+        #if DBP
+            DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
+        #endif
         }
 
         func performDockAction() {
