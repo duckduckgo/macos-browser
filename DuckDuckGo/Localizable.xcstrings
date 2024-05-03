@@ -17978,55 +17978,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Berichte, die an DuckDuckGo gesendet werden, sind 100 % anonym und enthalten nur deine Nachricht, die DuckDuckGo-App-Version und deine macOS-Version."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version."
+            "value" : "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo browser version, and your macOS version."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Los informes enviados a DuckDuckGo son 100 % anónimos y solo incluyen tu mensaje, la versión de la aplicación DuckDuckGo y tu versión de macOS."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Les rapports envoyés à DuckDuckGo sont 100 % anonymes et n'incluent que votre message, la version de l'application DuckDuckGo et la version de votre macOS."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "I report inviati a DuckDuckGo sono anonimi al 100% e includono solo il tuo messaggio, la versione dell'app DuckDuckGo e la tua versione macOS."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Rapporten die naar DuckDuckGo worden verzonden, zijn 100% anoniem en bevatten alleen je bericht, de versie van de DuckDuckGo-app en je versie van macOS."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Raporty wysyłane do DuckDuckGo są stuprocentowo anonimowe i zawierają jedynie wiadomość, wersję aplikacji DuckDuckGo oraz wersję systemu macOS."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Os relatórios enviados para a DuckDuckGo são 100% anónimos e incluem apenas a tua mensagem, a versão da aplicação DuckDuckGo e a versão do teu macOS."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Отчеты, отправляемые в DuckDuckGo, на 100% анонимны. В отчет входит только написанное вами сообщение и сведения о версии приложения DuckDuckGo и операционной системы (macOS)."
           }
         }
@@ -47992,55 +47992,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dein Feedback hilft uns, die DuckDuckGo-App zu verbessern."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your feedback will help us improve the DuckDuckGo app."
+            "value" : "Your feedback will help us improve the DuckDuckGo browser."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Tus comentarios nos ayudarán a mejorar la aplicación DuckDuckGo."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Vos commentaires nous aideront à améliorer l'application DuckDuckGo."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Il tuo feedback ci aiuterà a migliorare l'app DuckDuckGo."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Jouw feedback zal ons helpen de DuckDuckGo-app te verbeteren."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Twoja opinia pomoże nam w ulepszaniu aplikacji DuckDuckGo."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "O teu feedback ajuda-nos a melhorar a aplicação DuckDuckGo."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ваш отзыв поможет нам улучшить приложение DuckDuckGo."
           }
         }
