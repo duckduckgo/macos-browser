@@ -38,6 +38,7 @@ final class VPNUninstaller: VPNUninstalling {
     private let pinningManager: LocalPinningManager
     private let settings: VPNSettings
     private let userDefaults: UserDefaults
+    private let vpnMenuLoginItem: LoginItem
     private let ipcClient: TunnelControllerIPCClient
 
     @MainActor
@@ -48,6 +49,7 @@ final class VPNUninstaller: VPNUninstalling {
          userDefaults: UserDefaults = .netP,
          settings: VPNSettings = .init(defaults: .netP),
          ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(),
+         vpnMenuLoginItem: LoginItem = .vpnMenu,
          log: OSLog = .networkProtection) {
 
         self.log = log
@@ -55,12 +57,13 @@ final class VPNUninstaller: VPNUninstalling {
         self.pinningManager = pinningManager
         self.settings = settings
         self.userDefaults = userDefaults
+        self.vpnMenuLoginItem = vpnMenuLoginItem
         self.ipcClient = ipcClient
     }
 
     @MainActor
     private func canUninstall(includingSystemExtension: Bool) -> Bool {
-        !isDisabling && LoginItem.vpnMenu.status.isInstalled
+        !isDisabling && vpnMenuLoginItem.status.isInstalled
     }
 
     /// This method disables the VPN and clear all of its state.
