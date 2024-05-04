@@ -179,6 +179,12 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
     private func handleError(_ error: Error, modelType: ModelType) {
         switch error {
         case let syncError as SyncError:
+            switch modelType {
+            case .bookmarks:
+                PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: syncError))
+            case .credentials:
+                PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsFailed, error: syncError))
+            }
             handleSyncError(syncError, modelType: modelType)
         default:
             let nsError = error as NSError
@@ -191,12 +197,6 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
     }
 
     private func handleSyncError(_ syncError: SyncError, modelType: ModelType) {
-        switch modelType {
-        case .bookmarks:
-            PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: syncError))
-        case .credentials:
-            PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsFailed, error: syncError))
-        }
         switch syncError {
         case .unexpectedStatusCode(409):
             switch modelType {
