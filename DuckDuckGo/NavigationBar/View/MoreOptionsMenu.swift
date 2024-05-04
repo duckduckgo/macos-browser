@@ -21,7 +21,6 @@ import Combine
 import Common
 import BrowserServicesKit
 import PixelKit
-
 import NetworkProtection
 import Subscription
 

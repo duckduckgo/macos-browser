@@ -64,6 +64,15 @@ enum TabIndex: Equatable, Comparable {
         }
     }
 
+    func makeNextUnpinned() -> TabIndex {
+        switch self {
+        case .pinned:
+            return .unpinned(0)
+        case let .unpinned(index):
+            return .unpinned(index + 1)
+        }
+    }
+
     func isInSameSection(as other: TabIndex) -> Bool {
         switch (self, other) {
         case (.pinned, .unpinned), (.unpinned, .pinned):

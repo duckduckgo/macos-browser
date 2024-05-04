@@ -47,7 +47,7 @@ jobs:
 
       - name: Get Asana user ID
         id: get-asana-user-id
-        uses: duckduckgo/apple-infra/actions/asana-get-user-id-for-github-handle@main
+        uses: duckduckgo/apple-toolbox/actions/asana-get-user-id-for-github-handle@main
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           github-handle: ${{ github.actor }}

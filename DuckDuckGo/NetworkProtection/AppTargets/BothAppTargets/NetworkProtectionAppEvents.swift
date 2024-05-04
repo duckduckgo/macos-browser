@@ -72,7 +72,6 @@ final class NetworkProtectionAppEvents {
             }
 
             restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
-            refreshNetworkProtectionServers()
         }
     }
 
@@ -97,19 +96,4 @@ final class NetworkProtectionAppEvents {
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
 
-    /// Fetches a new list of VPN servers, and updates the existing set.
-    ///
-    private func refreshNetworkProtectionServers() {
-        Task {
-            let serverCount: Int
-            do {
-                serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList().count
-            } catch {
-                os_log("Failed to update DuckDuckGo VPN servers", log: .networkProtection, type: .error)
-                return
-            }
-
-            os_log("Successfully updated DuckDuckGo VPN servers; total server count = %{public}d", log: .networkProtection, serverCount)
-        }
-    }
 }
