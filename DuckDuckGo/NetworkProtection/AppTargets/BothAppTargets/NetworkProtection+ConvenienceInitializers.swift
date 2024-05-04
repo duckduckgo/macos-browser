@@ -21,6 +21,7 @@ import NetworkProtection
 import NetworkProtectionIPC
 import Common
 import Subscription
+import BrowserServicesKit
 
 extension NetworkProtectionDeviceManager {
 

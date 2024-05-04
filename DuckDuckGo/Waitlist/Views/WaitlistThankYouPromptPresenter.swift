@@ -18,7 +18,7 @@
 
 import AppKit
 import Foundation
-import Subscription
+import BrowserServicesKit
 import PixelKit
 
 final class WaitlistThankYouPromptPresenter {
