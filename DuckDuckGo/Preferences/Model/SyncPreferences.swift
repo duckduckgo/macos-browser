@@ -185,8 +185,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
-//        isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
-//        isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
 
         self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self

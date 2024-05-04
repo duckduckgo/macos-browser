@@ -1303,10 +1303,58 @@
       "comment" : "Description for alert shown when sync error occurs because of bad data",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Lesezeichen oder Passwörter sind falsch formatiert oder zu lang und wurden nicht synchronisiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Some bookmarks or passwords are formatted incorrectly or too long and were not synced."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunos marcadores o contraseñas tienen un formato incorrecto o demasiado largo y no se han sincronizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certains signets ou mots de passe sont mal formatés ou trop longs et n'ont pas été synchronisés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcuni segnalibri o password sono formattati in modo errato o sono troppo lunghi e non sono stati sincronizzati."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommige bladwijzers of wachtwoorden hebben de verkeerd indeling of te lang en werden niet gesynchroniseerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektóre zakładki lub hasła mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alguns marcadores ou palavras-passe estão formatados incorretamente ou são demasiado longos e não foram sincronizados."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые закладки или пароли не синхронизируются из-за неверного формата или превышения ограничений по длине."
           }
         }
       }
@@ -1317,8 +1365,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Du hast das Limit für die Synchronisierung von Lesezeichen überschritten. Versuche, einige Lesezeichen zu löschen. Bis dieses Problem behoben ist, werden deine Lesezeichen nicht gesichert."
+            "state" : "translated",
+            "value" : "Du hast die maximale Anzahl von Lesezeichen erreicht. Bitte lösche einige Lesezeichen, um die Synchronisierung fortzusetzen."
           }
         },
         "en" : {
@@ -1329,44 +1377,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Has superado el límite de sincronización de marcadores. Prueba a eliminar algunos marcadores. No se realizará una copia de seguridad de los marcadores hasta que se resuelva esto."
+            "state" : "translated",
+            "value" : "Has alcanzado el número máximo de marcadores. Elimina algunos marcadores para reanudar la sincronización."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Vous avez dépassé le nombre maximal de signets à synchroniser. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos signets."
+            "state" : "translated",
+            "value" : "Vous avez atteint le nombre maximal de signets. Veuillez en supprimer quelques-uns pour reprendre la synchronisation."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Hai superato il limite di sincronizzazione dei segnalibri. Prova a eliminarne qualcuno. Fino a quando il problema non verrà risolto, non sarà eseguito il backup dei tuoi segnalibri."
+            "state" : "translated",
+            "value" : "Hai raggiunto il numero massimo di segnalibri. Elimina alcuni segnalibri per riprendere la sincronizzazione."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Je hebt de synchronisatielimiet voor bladwijzers overschreden. Probeer enkele bladwijzers te verwijderen. Er wordt geen back-up van je bladwijzers gemaakt totdat dit probleem is opgelost."
+            "state" : "translated",
+            "value" : "Je hebt het maximumaantal bladwijzers bereikt. Verwijder enkele bladwijzers om de synchronisatie te hervatten."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Przekroczono limit synchronizacji zakładek. Spróbuj usunąć niektóre zakładki. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa zakładek."
+            "state" : "translated",
+            "value" : "Osiągnięto maksymalną liczbę zakładek. Usuń część zakładek, aby wznowić synchronizację."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Excedeste o limite de sincronização de favoritos. Experimenta eliminar alguns favoritos. Não é possível fazer uma cópia de segurança dos favoritos até este problema estar resolvido."
+            "state" : "translated",
+            "value" : "Atingiste o número máximo de marcadores. Elimina alguns marcadores para retomar a sincronização."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Вы превысили лимит синхронизации закладок. Попробуйте удалить некоторые из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет."
+            "state" : "translated",
+            "value" : "Достигнуто максимальное число закладок. Чтобы возобновить синхронизацию, удалите некоторые из них."
           }
         }
       }
@@ -1377,7 +1425,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Lesezeichen-Synchronisierung ist angehalten"
           }
         },
@@ -1389,43 +1437,43 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "La sincronización de marcadores está en pausa"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "La synchronisation des signets est suspendue"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "La sincronizzazione dei segnalibri è in pausa"
+            "state" : "translated",
+            "value" : "Sync dei segnalibri è in pausa"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Synchronisatie van bladwijzers is gepauzeerd"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Synchronizacja zakładek jest wstrzymana"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "A sincronização de favoritos está em pausa"
+            "state" : "translated",
+            "value" : "A sincronização de marcadores está em pausa"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Синхронизация закладок приостановлена"
           }
         }
@@ -1437,8 +1485,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Du hast das Limit für die Synchronisierung von Passwörtern überschritten. Versuche, einige Passwörter zu löschen. Bis dieses Problem behoben ist, werden deine Passwörter nicht gesichert."
+            "state" : "translated",
+            "value" : "Du hast die maximale Anzahl von Passwörtern erreicht. Lösche Passwörter, um die Synchronisierung fortzusetzen."
           }
         },
         "en" : {
@@ -1449,44 +1497,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ha superado el límite de sincronización de contraseñas. Prueba a eliminar algunas contraseñas. No se realizará una copia de seguridad de las contraseñas hasta que se resuelva esto."
+            "state" : "translated",
+            "value" : "Has alcanzado el número máximo de contraseñas. Elimina algunas contraseñas para reanudar la sincronización."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Vous avez dépassé le nombre maximal de mots de passe à synchroniser. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos mots de passe."
+            "state" : "translated",
+            "value" : "Vous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Hai superato il limite di sincronizzazione delle password. Prova a eliminarne qualcuna. Fino a quando il problema non verrà risolto, non sarà eseguito il backup delle tue password."
+            "state" : "translated",
+            "value" : "Hai raggiunto il numero massimo di password. Elimina alcune password per riprendere la sincronizzazione."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Je hebt de synchronisatielimiet voor wachtwoorden overschreden. Probeer enkele wachtwoorden te verwijderen. Er wordt geen back-up van je wachtwoorden gemaakt totdat dit probleem is opgelost."
+            "state" : "translated",
+            "value" : "Je hebt het maximumaantal wachtwoorden bereikt. Verwijder enkele wachtwoorden om de synchronisatie te hervatten."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Przekroczono limit synchronizacji haseł. Spróbuj usunąć niektóre hasła. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa haseł."
+            "state" : "translated",
+            "value" : "Osiągnięto maksymalną liczbę haseł. Usuń część haseł, aby wznowić synchronizację."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Excedeste o limite de sincronização de palavras-passe. Experimenta eliminar algumas palavras-passe. Não é possível fazer uma cópia de segurança das palavras-passe até este problema estar resolvido."
+            "state" : "translated",
+            "value" : "Atingiste o número máximo de palavras-passe. Elimina algumas palavras-passe para retomar a sincronização."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Вы превысили лимит синхронизации паролей. Попробуйте удалить некоторые из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет."
+            "state" : "translated",
+            "value" : "Достигнуто максимальное число паролей. Чтобы возобновить синхронизацию, удалите некоторые из них."
           }
         }
       }
@@ -1497,8 +1545,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Passwortsynchronisierung ist angehalten"
+            "state" : "translated",
+            "value" : "Kennwortsynchronisierung ist angehalten"
           }
         },
         "en" : {
@@ -1509,43 +1557,43 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "La sincronización de contraseñas está en pausa"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "La synchronisation des mots de passe est suspendue"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "La sincronizzazione delle password è in pausa"
+            "state" : "translated",
+            "value" : "Sync delle password è in pausa"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Synchronisatie van wachtwoorden is gepauzeerd"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Synchronizacja haseł jest wstrzymana"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "A sincronização de palavras-passe está em pausa"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Синхронизация паролей приостановлена"
           }
         }
@@ -1555,10 +1603,58 @@
       "comment" : "Sync error alert action button title, takes the user to the sync settings page.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierungseinstellungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages de synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni Sync"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie-instellingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustawienia synchronizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definições de sincronização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация настроек"
           }
         }
       }
@@ -1567,10 +1663,58 @@
       "comment" : "Title for alert shown when sync error occurs",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierungsfehler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync Error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errore di sincronizzazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatiefout"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Błąd synchronizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro de sincronização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка синхронизации"
           }
         }
       }
@@ -1579,10 +1723,58 @@
       "comment" : "Description for alert shown when sync error occurs because of invalid login credentials",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync hat einen Fehler festgestellt. Bitte deaktiviere die Synchronisierung und stelle die Verbindung mit deinem Wiederherstellungscode wieder her."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync encountered an error. Please disable sync and reconnect using your recovery code."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha producido un error en la sincronización. Desactiva la sincronización y vuelve a conectarte con tu código de recuperación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation a rencontré une erreur. Veuillez désactiver la synchronisation et vous reconnecter à l’aide de votre code de récupération."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync ha riscontrato un errore. Disattiva la sincronizzazione e riconnettiti utilizzando il codice di ripristino."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is een fout opgetreden bij het synchroniseren. Schakel de synchronisatie uit en maak opnieuw verbinding met je herstelcode."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podczas synchronizacji wystąpił błąd. Wyłącz synchronizację i ponownie nawiąż połączenie za pomocą kodu odzyskiwania."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro durante a sincronização. Desativa a sincronização e inicia sessão novamente com o teu código de recuperação."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка синхронизации. Отключите ее и выполните повторную привязку с помощью кода восстановления."
           }
         }
       }
@@ -1591,10 +1783,58 @@
       "comment" : "Title for alert shown when sync paused for an error",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung angehalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync is Paused"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización está en pausa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation est suspendue"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync è in pausa"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie is gepauzeerd"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizacja jest wstrzymana"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A sincronização está em pausa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация приостановлена"
           }
         }
       }
@@ -1603,10 +1843,58 @@
       "comment" : "Description for alert shown when sync error occurs because of too many requests",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup ist vorübergehend nicht verfügbar."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync & Backup is temporarily unavailable."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sincronización y la copia de seguridad no están disponibles temporalmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup est temporairement indisponible."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync & Backup non è temporaneamente disponibile."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "'Synchronisatie en back-up' is tijdelijk niet beschikbaar."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkcja Sync & Backup jest tymczasowo niedostępna."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Sync & Backup está temporariamente indisponível."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Функция «Синхронизация и резервное копирование» временно недоступна."
           }
         }
       }
@@ -1675,10 +1963,58 @@
       "comment" : "Title of the warning message that tells the user that there was an error with the sync feature.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierungsfehler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync Error"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de sincronización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de synchronisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errore di sincronizzazione"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatiefout"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Błąd synchronizacji"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro de sincronização"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка синхронизации"
           }
         }
       }
@@ -45175,10 +45511,58 @@
       "comment" : "Button title for sync bookmarks limits exceeded warning to go to manage bookmarks",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen verwalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Manage Bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer les signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestisci segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers beheren"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zarządzaj zakładkami"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerir marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Управление закладками"
           }
         }
       }
@@ -45187,10 +45571,58 @@
       "comment" : "Description for sync bookmarks limits exceeded warning",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast die maximale Anzahl von Lesezeichen erreicht. Lösche Lesezeichen, um die Synchronisierung fortzusetzen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "You've reached the maximum number of bookmarks. Please delete some to resume sync."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has alcanzado el número máximo de marcadores. Elimina algunos para reanudar la sincronización."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez atteint le nombre maximal de signets. Veuillez en supprimer quelques-uns pour reprendre la synchronisation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai raggiunto il numero massimo di segnalibri. Eliminane alcuni per riprendere la sincronizzazione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt het maximumaantal bladwijzers bereikt. Verwijder er een paar om de synchronisatie te hervatten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Osiągnięto maksymalną liczbę zakładek. Usuń część z nich, aby wznowić synchronizację."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atingiste o número máximo de marcadores. Elimina algumas para retomar a sincronização."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Достигнуто максимальное число закладок. Чтобы возобновить синхронизацию, удалите некоторые из них."
           }
         }
       }
@@ -45199,10 +45631,58 @@
       "comment" : "Button title for sync credentials limits exceeded warning to go to manage passwords",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwörter verwalten …"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Manage passwords…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administrar contraseñas..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer les mots de passe…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestisci password…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachtwoorden beheren …"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zarządzaj hasłami…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerir palavras-passe…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Управление паролями..."
           }
         }
       }
@@ -45211,10 +45691,58 @@
       "comment" : "Description for sync credentials limits exceeded warning",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast die maximale Anzahl von Passwörtern erreicht. Lösche einige, um die Synchronisierung fortzusetzen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "You've reached the maximum number of passwords. Please delete some to resume sync."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has alcanzado el número máximo de contraseñas. Elimina algunas para reanudar la sincronización."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai raggiunto il numero massimo di password. Eliminane alcuni per riprendere la sincronizzazione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt het maximumaantal wachtwoorden bereikt. Verwijder er een paar om de synchronisatie te hervatten."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Osiągnięto maksymalną liczbę haseł. Usuń część z nich, aby wznowić synchronizację."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atingiste o número máximo de palavras-passe. Elimina algumas para retomar a sincronização."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Достигнуто максимальное число паролей. Чтобы возобновить синхронизацию, удалите некоторые из них."
           }
         }
       }
@@ -45223,10 +45751,58 @@
       "comment" : "Description invalid credentials error when syncing.\n   Description of incorrectly formatted data error when syncing.\n   Description of too many requests error when syncing.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei der Synchronisierung ist ein Fehler aufgetreten. Versuche, die Synchronisierung auf diesem Gerät zu deaktivieren, und stelle dann die Verbindung mit einem anderen Gerät oder deinem Wiederherstellungscode wieder her."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync encountered an error. Try disabling sync on this device and then reconnect using another device or your recovery code."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha producido un error en la sincronización. Intenta desactivar la sincronización en este dispositivo y, a continuación, vuelve a conectarte con otro dispositivo o con tu código de recuperación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchronisation a rencontré une erreur. Essayez de désactiver la synchronisation sur cet appareil, puis reconnectez-vous à l’aide d’un autre appareil ou de votre code de récupération."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync ha riscontrato un errore. Prova a disattivare la sincronizzazione su questo dispositivo e riconnettiti utilizzando un altro dispositivo o il codice di ripristino."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is een fout opgetreden bij het synchroniseren. Probeer synchronisatie op dit apparaat uit te schakelen en maak dan opnieuw verbinding met een ander apparaat of met je herstelcode."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podczas synchronizacji wystąpił błąd. Spróbuj wyłączyć synchronizację na tym urządzeniu, a następnie ponownie nawiąż połączenie za pomocą innego urządzenia lub kodu odzyskiwania."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erro durante a sincronização. Experimenta desativar a sincronização neste dispositivo e, em seguida, inicia sessão novamente noutro dispositivo ou com o teu código de recuperação."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка синхронизации. Попробуйте отключить синхронизацию на этом устройстве, а затем выполнить повторную привязку с помощью другого устройства или кода восстановления."
           }
         }
       }
@@ -45235,10 +45811,58 @@
       "comment" : "Title for sync limits exceeded warning",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung angehalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync Paused"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización pausada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation suspendue"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione in pausa"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie onderbroken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizacja wstrzymana"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronização em pausa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синхронизация на паузе"
           }
         }
       }
@@ -45304,7 +45928,56 @@
       }
     },
     "Privacy Pro" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        }
+      }
     },
     "private.search.explenation" : {
       "comment" : "feature explanation in settings",
@@ -49315,7 +49988,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ohne Titel"
+            "value" : "Senza titolo"
           }
         },
         "nl" : {
