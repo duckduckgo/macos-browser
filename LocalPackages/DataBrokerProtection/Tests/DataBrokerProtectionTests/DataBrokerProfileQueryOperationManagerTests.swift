@@ -966,21 +966,6 @@ final class MockWebOperationRunner: WebOperationRunner {
     }
 }
 
-extension ScanOperationData {
-
-    static var mock: ScanOperationData {
-        .init(
-            brokerId: 1,
-            profileQueryId: 1,
-            historyEvents: [HistoryEvent]()
-        )
-    }
-
-    static func mockWith(historyEvents: [HistoryEvent]) -> ScanOperationData {
-        ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents)
-    }
-}
-
 extension OptOutOperationData {
 
     static func mock(with extractedProfile: ExtractedProfile) -> OptOutOperationData {
@@ -1052,17 +1037,6 @@ extension DataBroker {
                 maintenanceScan: 0
             )
         )
-    }
-}
-
-extension ProfileQuery {
-
-    static var mock: ProfileQuery {
-        .init(id: 1, firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980)
-    }
-
-    static var mockWithoutId: ProfileQuery {
-        .init(firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980)
     }
 }
 

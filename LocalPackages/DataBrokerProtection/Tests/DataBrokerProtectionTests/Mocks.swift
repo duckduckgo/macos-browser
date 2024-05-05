@@ -960,3 +960,74 @@ final class MockDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBa
         statusCode = nil
     }
 }
+
+final class MockSchedulerConfig: SchedulerConfig {
+    let concurrentOperationsDifferentBrokers = 1
+    let intervalBetweenSameBrokerOperations: TimeInterval = 1
+}
+
+final class MockRunnerProvider: OperationRunnerProvider {
+
+    func getOperationRunner() -> any WebOperationRunner {
+        MockWebOperationRunner()
+    }
+}
+
+final class MockPixelHandler: EventMapping<DataBrokerProtectionPixels> {
+
+    init() {
+        super.init { event, _, _, _ in }
+    }
+}
+
+extension ProfileQuery {
+
+    static var mock: ProfileQuery {
+        .init(id: 1, firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980)
+    }
+
+    static var mockWithoutId: ProfileQuery {
+        .init(firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980)
+    }
+}
+
+extension ScanOperationData {
+
+    static var mock: ScanOperationData {
+        .init(
+            brokerId: 1,
+            profileQueryId: 1,
+            historyEvents: [HistoryEvent]()
+        )
+    }
+
+    static func mockWith(historyEvents: [HistoryEvent]) -> ScanOperationData {
+        ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents)
+    }
+
+    static func mock(withBrokerId brokerId: Int64) -> ScanOperationData {
+        .init(
+            brokerId: brokerId,
+            profileQueryId: 1,
+            historyEvents: [HistoryEvent]()
+        )
+    }
+}
+
+extension DataBroker {
+
+    static func mock(withId id: Int64) -> DataBroker {
+        DataBroker(
+            id: id,
+            name: "Test broker",
+            url: "testbroker.com",
+            steps: [Step](),
+            version: "1.0",
+            schedulingConfig: DataBrokerScheduleConfig(
+                retryError: 0,
+                confirmOptOutScan: 0,
+                maintenanceScan: 0
+            )
+        )
+    }
+}
