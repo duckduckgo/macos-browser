@@ -112,6 +112,14 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         static let tolerance: TimeInterval = 20 * 60 // 20 minutes
     }
 
+    private enum DataBrokerProtectionCurrentOperation {
+        case idle
+        case queued
+        case manualScan
+        case optOutAll
+        case all
+    }
+
     private let privacyConfigManager: PrivacyConfigurationManaging
     private let contentScopeProperties: ContentScopeProperties
     private let dataManager: DataBrokerProtectionDataManager
@@ -122,6 +130,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let emailService: EmailServiceProtocol
     private let captchaService: CaptchaServiceProtocol
     private let userNotificationService: DataBrokerProtectionUserNotificationService
+    private var currentOperation: DataBrokerProtectionCurrentOperation = .idle
 
     /// Ensures that only one scheduler operation is executed at the same time.
     ///
@@ -186,9 +195,16 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 completion(.finished)
                 return
             }
+
+            guard self.currentOperation != .manualScan else {
+                os_log("Manual scan in progress, returning...", log: .dataBrokerProtection)
+                completion(.finished)
+                return
+            }
             self.lastSchedulerSessionStartTimestamp = Date()
             self.status = .running
             os_log("Scheduler running...", log: .dataBrokerProtection)
+            self.currentOperation = .queued
             self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] errors in
                 if let errors = errors {
                     if let oneTimeError = errors.oneTimeError {
@@ -201,6 +217,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                     }
                 }
                 self?.status = .idle
+                self?.currentOperation = .idle
                 completion(.finished)
             }
         }
@@ -214,7 +231,13 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func runAllOperations(showWebView: Bool = false) {
+        guard self.currentOperation != .manualScan else {
+            os_log("Manual scan in progress, returning...", log: .dataBrokerProtection)
+            return
+        }
+
         os_log("Running all operations...", log: .dataBrokerProtection)
+        self.currentOperation = .all
         self.dataBrokerProcessor.runAllOperations(showWebView: showWebView) { [weak self] errors in
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
@@ -226,12 +249,19 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                     os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.runAllOperations in dataBrokerProcessor.runAllOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
+            self?.currentOperation = .idle
         }
     }
 
     public func runQueuedOperations(showWebView: Bool = false,
                                     completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+        guard self.currentOperation != .manualScan else {
+            os_log("Manual scan in progress, returning...", log: .dataBrokerProtection)
+            return
+        }
+
         os_log("Running queued operations...", log: .dataBrokerProtection)
+        self.currentOperation = .queued
         dataBrokerProcessor.runQueuedOperations(showWebView: showWebView,
                                                 completion: { [weak self] errors in
             if let errors = errors {
@@ -245,6 +275,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 }
             }
             completion?(errors)
+            self?.currentOperation = .idle
         })
 
     }
@@ -257,7 +288,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         stopScheduler()
 
         userNotificationService.requestNotificationPermission()
-
+        self.currentOperation = .manualScan
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
         dataBrokerProcessor.startManualScans(showWebView: showWebView) { [weak self] errors in
             guard let self = self else { return }
@@ -288,7 +319,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                     os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
-
+            self.currentOperation = .idle
             fireManualScanCompletionPixel(startTime: backgroundAgentManualScanStartTime)
             completion?(errors)
         }
@@ -307,7 +338,14 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public func optOutAllBrokers(showWebView: Bool = false,
                                  completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+
+        guard self.currentOperation != .manualScan else {
+            os_log("Manual scan in progress, returning...", log: .dataBrokerProtection)
+            return
+        }
+
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
+        self.currentOperation = .optOutAll
         self.dataBrokerProcessor.runAllOptOutOperations(showWebView: showWebView,
                                                         completion: { [weak self] errors in
             if let errors = errors {
@@ -320,7 +358,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                     os_log("Operation error(s) during DefaultDataBrokerProtectionScheduler.optOutAllBrokers in dataBrokerProcessor.runAllOptOutOperations(), count: %{public}d", log: .dataBrokerProtection, operationErrors.count)
                 }
             }
-
+            self?.currentOperation = .idle
             completion?(errors)
         })
     }
