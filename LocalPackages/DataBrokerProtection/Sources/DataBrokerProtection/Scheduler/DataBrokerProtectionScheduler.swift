@@ -150,7 +150,6 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                                                                captchaService: captchaService)
 
         return DataBrokerProtectionProcessor(database: dataManager.database,
-                                             config: DataBrokerProtectionSchedulerConfig(),
                                              operationRunnerProvider: runnerProvider,
                                              notificationCenter: notificationCenter,
                                              pixelHandler: pixelHandler,

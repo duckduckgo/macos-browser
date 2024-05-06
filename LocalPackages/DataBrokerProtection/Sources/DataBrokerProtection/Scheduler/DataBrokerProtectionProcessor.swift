@@ -26,7 +26,7 @@ protocol OperationRunnerProvider {
 
 final class DataBrokerProtectionProcessor {
     private let database: DataBrokerProtectionRepository
-    private let config: SchedulerConfig
+    private let config: DataBrokerProtectionProcessorConfiguration
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
@@ -36,7 +36,7 @@ final class DataBrokerProtectionProcessor {
     private let eventPixels: DataBrokerProtectionEventPixels
 
     init(database: DataBrokerProtectionRepository,
-         config: SchedulerConfig,
+         config: DataBrokerProtectionProcessorConfiguration = DataBrokerProtectionProcessorConfiguration(),
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
@@ -48,7 +48,6 @@ final class DataBrokerProtectionProcessor {
         self.notificationCenter = notificationCenter
         self.operationQueue = OperationQueue()
         self.pixelHandler = pixelHandler
-        self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
         self.userNotificationService = userNotificationService
         self.engagementPixels = DataBrokerProtectionEngagementPixels(database: database, handler: pixelHandler)
         self.eventPixels = DataBrokerProtectionEventPixels(database: database, handler: pixelHandler)
@@ -109,11 +108,12 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Private functions
-    private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
+    private func runOperations(operationType: OperationType,
                                priorityDate: Date?,
                                showWebView: Bool,
                                completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
 
+        self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsFor(operationType)
         // Before running new operations we check if there is any updates to the broker files.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
             let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
@@ -153,7 +153,7 @@ final class DataBrokerProtectionProcessor {
     }
 
     private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
-                                                      operationType: DataBrokerOperationsCollection.OperationType,
+                                                      operationType: OperationType,
                                                       priorityDate: Date?,
                                                       showWebView: Bool) -> [DataBrokerOperationsCollection] {
 
