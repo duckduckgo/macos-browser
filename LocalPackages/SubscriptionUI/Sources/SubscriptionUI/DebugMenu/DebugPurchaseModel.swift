@@ -23,12 +23,12 @@ import Subscription
 @available(macOS 12.0, *)
 public final class DebugPurchaseModel: ObservableObject {
 
-    var purchaseManager: PurchaseManager
+    var purchaseManager: StorePurchaseManager
     let appStorePurchaseFlow: AppStorePurchaseFlow
 
     @Published var subscriptions: [SubscriptionRowModel]
 
-    init(manager: PurchaseManager,
+    init(manager: StorePurchaseManager,
          subscriptions: [SubscriptionRowModel] = [],
          accountManager: AccountManaging) {
         self.purchaseManager = manager

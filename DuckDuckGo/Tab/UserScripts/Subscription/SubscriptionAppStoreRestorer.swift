@@ -49,7 +49,7 @@ struct SubscriptionAppStoreRestorer {
             mainViewController.presentAsSheet(progressViewController)
         }
 
-        let syncResult = await PurchaseManager.shared.syncAppleIDAccount()
+        let syncResult = await StorePurchaseManager.shared.syncAppleIDAccount()
 
         switch syncResult {
         case .success:

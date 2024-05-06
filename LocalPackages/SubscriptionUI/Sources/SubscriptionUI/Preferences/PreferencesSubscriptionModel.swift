@@ -36,6 +36,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
     private let accountManager: AccountManaging
+    private let subscriptionService: SubscriptionService
     private let openURLHandler: (URL) -> Void
     public let userEventHandler: (UserEvent) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
@@ -88,8 +89,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
-                accountManager: AccountManaging) {
+                accountManager: AccountManaging,
+                subscriptionService: SubscriptionService) {
         self.accountManager = accountManager
+        self.subscriptionService = subscriptionService
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler
         self.sheetActionHandler = sheetActionHandler
@@ -186,7 +189,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         case .stripe:
             Task {
                 guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
-                      case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                      case let .success(response) = await subscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
                 openURLHandler(customerPortalURL)
@@ -196,7 +199,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func confirmIfSignedInToSameAccount() async -> Bool {
         if #available(macOS 12.0, *) {
-            guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return false }
+            guard let lastTransactionJWSRepresentation = await StorePurchaseManager.mostRecentTransaction() else { return false }
 
             switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
@@ -269,11 +272,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @MainActor
     private func updateSubscription(with cachePolicy: SubscriptionService.CachePolicy) async {
         guard let token = accountManager.accessToken else {
-            SubscriptionService.signOut()
+            subscriptionService.signOut()
             return
         }
 
-        switch await SubscriptionService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
+        switch await subscriptionService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
         case .success(let subscription):
             updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
             subscriptionPlatform = subscription.platform

@@ -25,7 +25,7 @@ import Subscription
 @available(macOS 12.0, *)
 public final class DebugPurchaseViewController: NSViewController {
 
-    private let manager: PurchaseManager
+    private let manager: StorePurchaseManager
     private let model: DebugPurchaseModel
 
     private var cancellables = Set<AnyCancellable>()
@@ -35,7 +35,7 @@ public final class DebugPurchaseViewController: NSViewController {
     }
 
     public init(accountManager: AccountManaging) {
-        manager = PurchaseManager.shared
+        manager = StorePurchaseManager.shared
         model = DebugPurchaseModel(manager: manager, accountManager: accountManager)
 
         super.init(nibName: nil, bundle: nil)

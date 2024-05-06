@@ -30,15 +30,16 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     var currentViewController: () -> NSViewController?
     let accountManager: AccountManaging
+    let subscriptionService: SubscriptionService
 
     private var _purchaseManager: Any?
     @available(macOS 12.0, *)
-    fileprivate var purchaseManager: PurchaseManager {
+    fileprivate var purchaseManager: StorePurchaseManager {
         if _purchaseManager == nil {
-            _purchaseManager = PurchaseManager()
+            _purchaseManager = StorePurchaseManager()
         }
         // swiftlint:disable:next force_cast
-        return _purchaseManager as! PurchaseManager
+        return _purchaseManager as! StorePurchaseManager
     }
 
     required init(coder: NSCoder) {
@@ -50,13 +51,15 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
-                accountManager: AccountManaging) {
+                accountManager: AccountManaging,
+                subscriptionService: SubscriptionService) {
         self.currentEnvironment = currentEnvironment
         self.updateEnvironment = updateEnvironment
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
         self.accountManager = accountManager
+        self.subscriptionService = subscriptionService
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
     }
@@ -216,7 +219,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func getSubscriptionDetails() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+            switch await subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")
             case .failure(let error):

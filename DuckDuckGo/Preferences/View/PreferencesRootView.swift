@@ -167,7 +167,7 @@ enum Preferences {
                             return
                         }
 
-                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(accountManager: AppDelegate.accountManager)
+                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(accountManager: AppDelegate.accountManager, subscriptionErrorReporter: SubscriptionErrorReporter())
                         await subscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
                     }
                 }

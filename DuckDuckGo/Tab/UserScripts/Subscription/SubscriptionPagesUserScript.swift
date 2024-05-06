@@ -31,9 +31,7 @@ public extension Notification.Name {
     static let subscriptionPageCloseAndOpenPreferences = Notification.Name("com.duckduckgo.subscriptionPage.CloseAndOpenPreferences")
 }
 
-///
 /// The user script that will be the broker for all subscription features
-///
 public final class SubscriptionPagesUserScript: NSObject, UserScript, UserScriptMessaging {
     public var source: String = ""
 
@@ -66,7 +64,7 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandlerWithReply {
     }
 }
 
-// MARK: - Fallback for macOS 10.15
+/// Fallback for macOS 10.15
 extension SubscriptionPagesUserScript: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         // unsupported
@@ -245,7 +243,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 await mainViewController?.presentAsSheet(progressViewController)
 
                 // Check for active subscriptions
-                if await PurchaseManager.hasActiveSubscription() {
+                if await StorePurchaseManager.hasActiveSubscription() {
                     PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
                     os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
                     SubscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)

@@ -104,6 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return firstLaunchDate >= Date.weekAgo
     }
 
+    let subscriptionPurchaseEnvironment: SubscriptionPurchaseEnvironment = SubscriptionPurchaseEnvironment(subscriptionService: <#T##SubscriptionService#>)
     public static let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
     // swiftlint:disable:next function_body_length
@@ -182,7 +183,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     #if APPSTORE || !STRIPE
         SubscriptionPurchaseEnvironment.current = .appStore
     #else
-        SubscriptionPurchaseEnvironment.current = .stripe
+        subscriptionPurchaseEnvironment.current = .stripe
     #endif
 
         networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(accountManager: AppDelegate.accountManager)
@@ -264,11 +265,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
                                                      defaultValue: defaultEnvironment).wrappedValue
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
+        subscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
 
         Task {
             if let token = AppDelegate.accountManager.accessToken {
-                _ = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
+                _ = await subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
                 _ = await AppDelegate.accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
             }
         }
@@ -576,7 +577,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task {
            guard let token = AppDelegate.accountManager.accessToken else { return }
 
-            if case .success(let subscription) = await SubscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+            if case .success(let subscription) = await subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
                 if subscription.isActive {
                     PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
                 }
