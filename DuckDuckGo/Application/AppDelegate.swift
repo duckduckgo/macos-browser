@@ -449,7 +449,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .filter { $0 }
             .asVoid()
             .sink { [weak syncService] in
-                PixelKit.fire(GeneralPixel.syncDaily, frequency: .daily)
+                PixelKit.fire(GeneralPixel.syncDaily, frequency: .legacyDaily)
                 syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
                     PixelKit.fire(GeneralPixel.syncSuccessRateDaily, withAdditionalParameters: params)
                 })
