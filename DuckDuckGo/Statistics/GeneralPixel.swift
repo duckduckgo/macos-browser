@@ -157,6 +157,15 @@ enum GeneralPixel: PixelKitEventV2 {
     case passwordImportKeychainPrompt
     case passwordImportKeychainPromptDenied
 
+    // Autocomplete
+    case autocompleteClickPhrase
+    case autocompleteClickWebsite
+    case autocompleteClickBookmark
+    case autocompleteClickFavorite
+    case autocompleteClickHistory
+    case autocompleteToggledOff
+    case autocompleteToggledOn
+
     // MARK: - Debug
 
     case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -524,6 +533,15 @@ enum GeneralPixel: PixelKitEventV2 {
             // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
         case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
+
+            // Autocomplete
+        case .autocompleteClickPhrase: return "m_mac_autocomplete_click_phrase"
+        case .autocompleteClickWebsite: return "m_mac_autocomplete_click_website"
+        case .autocompleteClickBookmark: return "m_mac_autocomplete_click_bookmark"
+        case .autocompleteClickFavorite: return "m_mac_autocomplete_click_favorite"
+        case .autocompleteClickHistory: return "m_mac_autocomplete_click_history"
+        case .autocompleteToggledOff: return "m_mac_autocomplete_toggled_off"
+        case .autocompleteToggledOn: return "m_mac_autocomplete_toggled_on"
 
             // DEBUG
         case .assertionFailure:
