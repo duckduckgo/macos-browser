@@ -109,16 +109,53 @@ final class DuckPlayer {
 
     // MARK: - Common Message Handlers
 
-    public func handleSetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
-        guard let userValues: UserValues = DecodableHelper.decode(from: params) else {
-            assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
-            return nil
+    enum MessageOrigin {
+        case duckPlayer, serpOverlay, youtubeOverlay
+
+        init?(url: URL) {
+            switch url.host {
+            case "duckduckgo.com":
+                self = .serpOverlay
+            case "www.youtube.com":
+                self = .youtubeOverlay
+            default:
+                return nil
+            }
         }
+    }
 
-        self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
-        self.preferences.duckPlayerMode = userValues.duckPlayerMode
+    public func handleSetUserValuesMessage(from origin: MessageOrigin) -> (_ params: Any, _ message: UserScriptMessage) -> Encodable? {
 
-        return encodeUserValues()
+        return { [weak self] params, _ -> Encodable? in
+            guard let self else {
+                return nil
+            }
+            guard let userValues: UserValues = DecodableHelper.decode(from: params) else {
+                assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
+                return nil
+            }
+
+            self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
+            self.preferences.duckPlayerMode = userValues.duckPlayerMode
+
+            switch userValues.duckPlayerMode {
+            case .enabled:
+                switch origin {
+                case .duckPlayer:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysDuckPlayer)
+                case .serpOverlay:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlaySERP)
+                case .youtubeOverlay:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlayYoutube)
+                }
+            case .alwaysAsk:
+                PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
+            case .disabled:
+                PixelKit.fire(GeneralPixel.duckPlayerSettingNever)
+            }
+
+            return self.encodeUserValues()
+        }
     }
 
     public func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
@@ -150,16 +187,6 @@ final class DuckPlayer {
             modeCancellable = preferences.$duckPlayerMode
                 .removeDuplicates()
                 .dropFirst(1)
-                .handleEvents(receiveOutput: { mode in
-                    switch mode {
-                    case .enabled:
-                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlways)
-                    case .alwaysAsk:
-                        PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
-                    case .disabled:
-                        PixelKit.fire(GeneralPixel.duckPlayerSettingNever)
-                    }
-                })
                 .prepend(preferences.duckPlayerMode)
                 .assign(to: \.mode, onWeaklyHeld: self)
         } else {

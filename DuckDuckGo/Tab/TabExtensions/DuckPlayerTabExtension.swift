@@ -312,7 +312,8 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return
         }
         if navigation.url.isDuckPlayer {
-            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView, frequency: .legacyDaily)
+            let setting = duckPlayer.mode == .enabled ? "always" : "default"
+            PixelKit.fire(GeneralPixel.duckPlayerDailyUniqueView, frequency: .legacyDaily, withAdditionalParameters: ["setting": setting])
         }
     }
 

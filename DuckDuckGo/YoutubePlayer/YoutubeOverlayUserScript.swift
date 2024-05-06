@@ -60,7 +60,11 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch MessageNames(rawValue: methodName) {
         case .setUserValues:
-            return DuckPlayer.shared.handleSetUserValues
+            guard let url = webView?.url, let origin = DuckPlayer.MessageOrigin(url: url) else {
+                assertionFailure("YoutubeOverlayUserScript: Unexpected message origin: \(String(describing: webView?.url))")
+                return nil
+            }
+            return DuckPlayer.shared.handleSetUserValuesMessage(from: origin)
         case .getUserValues:
             return DuckPlayer.shared.handleGetUserValues
         case .openDuckPlayer:
