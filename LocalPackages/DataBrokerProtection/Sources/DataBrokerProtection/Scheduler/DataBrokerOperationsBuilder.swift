@@ -21,29 +21,11 @@ import Foundation
 
 typealias OperationType = DataBrokerOperation.OperationType
 
-protocol OperationDependencies {
-    var database: DataBrokerProtectionRepository { get }
-    var config: SchedulerConfig { get }
-    var runnerProvider: JobRunnerProvider { get }
-    var notificationCenter: NotificationCenter { get }
-    var pixelHandler: EventMapping<DataBrokerProtectionPixels> { get }
-    var userNotificationService: DataBrokerProtectionUserNotificationService { get }
-}
-
-struct DefaultOperationDependencies: OperationDependencies {
-    let database: DataBrokerProtectionRepository
-    let config: SchedulerConfig
-    let runnerProvider: JobRunnerProvider
-    let notificationCenter: NotificationCenter
-    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
-    let userNotificationService: DataBrokerProtectionUserNotificationService
-}
-
 protocol DataBrokerOperationsBuilder {
     func operations(operationType: OperationType,
                     priorityDate: Date?,
                     showWebView: Bool,
-                    operationDependencies: OperationDependencies) throws -> [DataBrokerOperation]
+                    operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation]
 }
 
 final class DefaultDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
@@ -51,7 +33,7 @@ final class DefaultDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
     func operations(operationType: OperationType,
                     priorityDate: Date?,
                     showWebView: Bool,
-                    operationDependencies: OperationDependencies) throws -> [DataBrokerOperation] {
+                    operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation] {
 
         let brokerProfileQueryData = try operationDependencies.database.fetchAllBrokerProfileQueryData()
         var operations: [DataBrokerOperation] = []
@@ -62,15 +44,10 @@ final class DefaultDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
                 let collection = DataBrokerOperation(dataBrokerID: dataBrokerID,
-                                                                database: operationDependencies.database,
                                                                 operationType: operationType,
-                                                                intervalBetweenOperations: operationDependencies.config.intervalBetweenSameBrokerOperations,
                                                                 priorityDate: priorityDate,
-                                                                notificationCenter: operationDependencies.notificationCenter,
-                                                                runner: operationDependencies.runnerProvider.getJobRunner(),
-                                                                pixelHandler: operationDependencies.pixelHandler,
-                                                                userNotificationService: operationDependencies.userNotificationService,
-                                                                showWebView: showWebView)
+                                                                showWebView: showWebView,
+                                                                operationDependencies: operationDependencies)
                 operations.append(collection)
                 visitedDataBrokerIDs.insert(dataBrokerID)
             }
