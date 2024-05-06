@@ -29,7 +29,7 @@ final class DataBrokerOperationsBuilderTests: XCTestCase {
     private var mockRunnerProvider: MockRunnerProvider!
     private var mockPixelHandler: MockPixelHandler!
     private var mockUserNotification: MockUserNotification!
-    var mockDependencies: DefaultOperationDependencies!
+    var mockDependencies: DefaultDataBrokerOperationDependencies!
 
     override func setUpWithError() throws {
         mockDatabase = MockDatabase()
@@ -38,8 +38,8 @@ final class DataBrokerOperationsBuilderTests: XCTestCase {
         mockPixelHandler = MockPixelHandler()
         mockUserNotification = MockUserNotification()
 
-        mockDependencies = DefaultOperationDependencies(database: mockDatabase,
-                                                        config: mockSchedulerConfig,
+        mockDependencies = DefaultDataBrokerOperationDependencies(database: mockDatabase,
+                                                        brokerTimeInterval: mockSchedulerConfig.intervalBetweenSameBrokerOperations,
                                                         runnerProvider: mockRunnerProvider,
                                                         notificationCenter: .default,
                                                         pixelHandler: mockPixelHandler,
