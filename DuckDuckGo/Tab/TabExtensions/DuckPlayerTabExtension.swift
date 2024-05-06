@@ -273,6 +273,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         // when currently displayed content is the Duck Player and loading a YouTube URL, don‘t override it
         if navigationAction.targetFrame?.url.isDuckPlayer == true,
            navigationAction.targetFrame?.url.youtubeVideoID == videoID {
+            PixelKit.fire(GeneralPixel.duckPlayerWatchOnYoutube)
             return .next
 
         // If this is a child tab of a Duck Player and it's loading a YouTube URL, don‘t override it

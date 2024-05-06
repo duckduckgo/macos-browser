@@ -85,6 +85,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerSettingAlwaysOverlayYoutube
     case duckPlayerSettingNever
     case duckPlayerSettingBackToDefault
+    case duckPlayerWatchOnYoutube
 
     // Dashboard
     case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
@@ -428,6 +429,8 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_duck-player_setting_never"
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
+        case .duckPlayerWatchOnYoutube:
+            return "m_mac_duck-player_watch_on_youtube"
 
         case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
