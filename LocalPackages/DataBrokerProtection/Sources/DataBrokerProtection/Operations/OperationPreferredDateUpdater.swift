@@ -51,20 +51,20 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                                                                            and: profileQueryId) else { return }
 
         try updateScanJobDataDates(origin: origin,
+                                   brokerId: brokerId,
+                                   profileQueryId: profileQueryId,
+                                   extractedProfileId: extractedProfileId,
+                                   schedulingConfig: schedulingConfig,
+                                   brokerProfileQuery: brokerProfileQuery)
+
+        // We only need to update the optOut date if we have an extracted profile ID
+        if let extractedProfileId = extractedProfileId {
+            try updateOptOutJobDataDates(origin: origin,
                                          brokerId: brokerId,
                                          profileQueryId: profileQueryId,
                                          extractedProfileId: extractedProfileId,
                                          schedulingConfig: schedulingConfig,
                                          brokerProfileQuery: brokerProfileQuery)
-
-        // We only need to update the optOut date if we have an extracted profile ID
-        if let extractedProfileId = extractedProfileId {
-            try updateOptOutJobDataDates(origin: origin,
-                                               brokerId: brokerId,
-                                               profileQueryId: profileQueryId,
-                                               extractedProfileId: extractedProfileId,
-                                               schedulingConfig: schedulingConfig,
-                                               brokerProfileQuery: brokerProfileQuery)
         }
     }
 
@@ -89,11 +89,11 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
     }
 
     private func updateScanJobDataDates(origin: OperationPreferredDateUpdaterOrigin,
-                                              brokerId: Int64,
-                                              profileQueryId: Int64,
-                                              extractedProfileId: Int64?,
-                                              schedulingConfig: DataBrokerScheduleConfig,
-                                              brokerProfileQuery: BrokerProfileQueryData) throws {
+                                        brokerId: Int64,
+                                        profileQueryId: Int64,
+                                        extractedProfileId: Int64?,
+                                        schedulingConfig: DataBrokerScheduleConfig,
+                                        brokerProfileQuery: BrokerProfileQueryData) throws {
 
         let currentScanPreferredRunDate = brokerProfileQuery.scanJobData.preferredRunDate
 
@@ -115,11 +115,11 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
     }
 
     private func updateOptOutJobDataDates(origin: OperationPreferredDateUpdaterOrigin,
-                                                brokerId: Int64,
-                                                profileQueryId: Int64,
-                                                extractedProfileId: Int64?,
-                                                schedulingConfig: DataBrokerScheduleConfig,
-                                                brokerProfileQuery: BrokerProfileQueryData) throws {
+                                          brokerId: Int64,
+                                          profileQueryId: Int64,
+                                          extractedProfileId: Int64?,
+                                          schedulingConfig: DataBrokerScheduleConfig,
+                                          brokerProfileQuery: BrokerProfileQueryData) throws {
 
         let optOutJob = brokerProfileQuery.optOutJobData.filter { $0.extractedProfile.id == extractedProfileId }.first
         let currentOptOutPreferredRunDate = optOutJob?.preferredRunDate
