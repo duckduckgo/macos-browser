@@ -172,17 +172,15 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             }
             .store(in: &cancellables)
 
-        if DDGSync.isFieldValidationEnabled {
-            syncService.isSyncInProgressPublisher
-                .removeDuplicates()
-                .filter { !$0 }
-                .asVoid()
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] in
-                    self?.updateInvalidObjects()
-                }
-                .store(in: &cancellables)
-        }
+        syncService.isSyncInProgressPublisher
+            .removeDuplicates()
+            .filter { !$0 }
+            .asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.updateInvalidObjects()
+            }
+            .store(in: &cancellables)
 
         $syncErrorMessage
             .map { $0 != nil }

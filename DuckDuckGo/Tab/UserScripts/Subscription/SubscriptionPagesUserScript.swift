@@ -105,6 +105,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         static let subscriptionsUnknownPriceClicked = "subscriptionsUnknownPriceClicked"
         static let subscriptionsAddEmailSuccess = "subscriptionsAddEmailSuccess"
         static let subscriptionsWelcomeFaqClicked = "subscriptionsWelcomeFaqClicked"
+        static let getAccessToken = "getAccessToken"
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -124,6 +125,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case Handlers.subscriptionsUnknownPriceClicked: return subscriptionsUnknownPriceClicked
         case Handlers.subscriptionsAddEmailSuccess: return subscriptionsAddEmailSuccess
         case Handlers.subscriptionsWelcomeFaqClicked: return subscriptionsWelcomeFaqClicked
+        case Handlers.getAccessToken: return getAccessToken
         default:
             return nil
         }
@@ -142,11 +144,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let authToken = accountManager.authToken, accountManager.accessToken != nil {
-            return Subscription(token: authToken)
-        } else {
-            return Subscription(token: "")
-        }
+        let authToken = accountManager.authToken ?? ""
+        return Subscription(token: authToken)
     }
 
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -449,6 +448,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     func subscriptionsWelcomeFaqClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
         PixelKit.fire(PrivacyProPixel.privacyProWelcomeFAQClick, frequency: .unique)
         return nil
+    }
+
+    func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        if let accessToken = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).accessToken {
+            return ["token": accessToken]
+        } else {
+            return [String: String]()
+        }
     }
 
     // MARK: Push actions

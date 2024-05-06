@@ -105,6 +105,22 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
+    func testWhenScansHaveDeprecatedProfileQueriesThatDidNotRun_thenThoseAreNotTakenIntoAccount() {
+        let brokerProfileQueryData: [BrokerProfileQueryData] = [
+            .mock(dataBrokerName: "Broker #1", lastRunDate: Date(), extractedProfile: .mockWithRemovedDate),
+            .mock(dataBrokerName: "Broker #1", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #1", lastRunDate: nil, deprecated: true),
+            .mock(dataBrokerName: "Broker #2", lastRunDate: Date()),
+            .mock(dataBrokerName: "Broker #3", lastRunDate: Date(), extractedProfile: .mockWithRemovedDate, deprecated: true)
+        ]
+
+        let result = sut.initialScanState(brokerProfileQueryData)
+
+        XCTAssertEqual(result.scanProgress.totalScans, 2)
+        XCTAssertEqual(result.scanProgress.currentScans, 2)
+        XCTAssertEqual(result.resultsFound.count, 1)
+    }
+
     func testInProgressAndCompletedOptOuts_areMappedCorrectly() {
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
             .mock(extractedProfile: .mockWithRemovedDate),

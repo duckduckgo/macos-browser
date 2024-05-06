@@ -24,6 +24,16 @@ import WebKit
 enum NavigationDecision {
     case allow(NewWindowPolicy)
     case cancel
+
+    /**
+     * Replaces `.tab` with `.window` when user prefers windows over tabs.
+     */
+    func preferringTabsToWindows(_ prefersTabsToWindows: Bool) -> NavigationDecision {
+        guard case .allow(let targetKind) = self, !prefersTabsToWindows else {
+            return self
+        }
+        return .allow(targetKind.preferringTabsToWindows(prefersTabsToWindows))
+    }
 }
 
 @MainActor
@@ -34,6 +44,8 @@ final class ContextMenuManager: NSObject {
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
     private var linkURL: String?
+
+    private var tabsPreferences: TabsPreferences
 
     private var isEmailAddress: Bool {
         guard let linkURL, let url = URL(string: linkURL) else {
@@ -52,7 +64,9 @@ final class ContextMenuManager: NSObject {
     fileprivate weak var webView: WKWebView?
 
     @MainActor
-    init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>) {
+    init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>,
+         tabsPreferences: TabsPreferences = TabsPreferences.shared) {
+        self.tabsPreferences = tabsPreferences
         super.init()
 
         userScriptCancellable = contextMenuScriptPublisher.sink { [weak self] contextMenuScript in
@@ -360,8 +374,8 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in
-            .allow(.tab(selected: false, burner: burner))
+        onNewWindow = { [weak self] _ in
+            .allow(.tab(selected: self?.tabsPreferences.switchToNewTabWhenOpened ?? false, burner: burner, contextMenuInitiated: true))
         }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }

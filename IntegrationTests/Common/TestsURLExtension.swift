@@ -37,7 +37,7 @@ extension URL {
         let url = URL.testsServer
            .appendingPathComponent("filename")  // "http://localhost:8085/filename"
            .appendingTestParameters(status: 301,
-                               reason: "Moved"
+                               reason: "Moved",
                                data: Data(),
                                headers: ["Location": "/redirect-location.html"])
         Tab.setUrl(url)

@@ -287,6 +287,33 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndCount,
                     includeAppVersionParameter: true)
             }
+        case .failureRecoveryAttempt(let step):
+            switch step {
+            case .started:
+                PixelKit.fire(
+                    VPNFailureRecoveryPixel.vpnFailureRecoveryStarted,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true
+                )
+            case .completed(.healthy):
+                PixelKit.fire(
+                    VPNFailureRecoveryPixel.vpnFailureRecoveryCompletedHealthy,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true
+                )
+            case .completed(.unhealthy):
+                PixelKit.fire(
+                    VPNFailureRecoveryPixel.vpnFailureRecoveryCompletedUnhealthy,
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true
+                )
+            case .failed(let error):
+                PixelKit.fire(
+                    VPNFailureRecoveryPixel.vpnFailureRecoveryFailed(error),
+                    frequency: .dailyAndCount,
+                    includeAppVersionParameter: true
+                )
+            }
         }
     }
 
@@ -300,6 +327,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Initialization
 
+    @MainActor
     @objc public init() {
         let isSubscriptionEnabled = false
 
@@ -360,6 +388,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     /// Observe server changes to broadcast those changes through distributed notifications.
     ///
+    @MainActor
     private func observeServerChanges() {
         lastSelectedServerInfoPublisher.sink { [weak self] server in
             self?.lastStatusChangeDate = Date()
@@ -404,6 +433,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     /// Broadcasts the current server information.
     ///
+    @MainActor
     private func broadcastLastSelectedServerInfo() {
         broadcast(lastSelectedServerInfo)
     }
