@@ -46,7 +46,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let defaults: UserDefaults
-    let accountManager: AccountManaging
+    private weak var accountManagerDataSource: AccountManagingDataSource?
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
@@ -54,14 +54,14 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
          featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
          defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection,
-         accountManager: AccountManaging) {
+         accountManagerDataSource: AccountManagingDataSource?) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.featureDisabler = featureDisabler
         self.featureOverrides = featureOverrides
         self.defaults = defaults
-        self.accountManager = accountManager
+        self.accountManagerDataSource = accountManagerDataSource
     }
 
     var isInstalled: Bool {
@@ -78,7 +78,12 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return false
         }
 
-        switch await accountManager.hasEntitlement(for: .networkProtection) {
+        guard let accountManagerDataSource else {
+            assertionFailure("Missing accountManagerDataSource")
+            return false
+        }
+
+        switch await accountManagerDataSource.hasEntitlement(for: .networkProtection) {
         case .success(let hasEntitlement):
             return hasEntitlement
         case .failure(let error):
@@ -96,7 +101,11 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return false
         }
 
-        return accountManager.isUserAuthenticated
+        guard let accountManagerDataSource else {
+            assertionFailure("Missing accountManagerDataSource")
+            return false
+        }
+        return accountManagerDataSource.isUserAuthenticated
     }
 
     /// We've had to add this method because accessing the singleton in app delegate is crashing the integration tests.
@@ -108,7 +117,11 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Returns whether the VPN should be uninstalled automatically.
     /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
-        return subscriptionFeatureAvailability.isFeatureAvailable && !accountManager.isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
+        guard let accountManagerDataSource else {
+            assertionFailure("Missing accountManagerDataSource")
+            return false
+        }
+        return subscriptionFeatureAvailability.isFeatureAvailable && !accountManagerDataSource.isUserAuthenticated && LoginItem.vpnMenu.status.isInstalled
     }
 
     /// Whether the user is fully onboarded

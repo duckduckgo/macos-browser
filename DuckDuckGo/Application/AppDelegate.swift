@@ -84,11 +84,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    // Needs to be lazy as indirectly depends on AppDelegate
-    private let networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler
+    private let accountManager: AccountManager
+    private let subscriptionManager: SubscriptionManager
 
+    private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 #if DBP
-    private let dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler
+    private var dataBrokerProtectionSubscriptionEventHandler: DataBrokerProtectionSubscriptionEventHandler?
 #endif
 
     private var didFinishLaunching = false
@@ -103,9 +104,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     static var isNewUser: Bool {
         return firstLaunchDate >= Date.weekAgo
     }
-
-    let subscriptionPurchaseEnvironment: SubscriptionPurchaseEnvironment = SubscriptionPurchaseEnvironment(subscriptionService: <#T##SubscriptionService#>)
-    public static let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
     // swiftlint:disable:next function_body_length
     override init() {
@@ -180,24 +178,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
         )
 
-    #if APPSTORE || !STRIPE
-        SubscriptionPurchaseEnvironment.current = .appStore
-    #else
-        subscriptionPurchaseEnvironment.current = .stripe
-    #endif
+        // Configure subscription
 
-        networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(accountManager: AppDelegate.accountManager)
-#if DBP
-        dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler(accountManager: AppDelegate.accountManager)
-#endif
-    }
-
-    static func configurePixelKit() {
-#if DEBUG
-            Self.setUpPixelKit(dryRun: true)
+#if APPSTORE || !STRIPE
+        let subscriptionPurchaseEnvironment: SubscriptionEnvironment.Platform = .appStore
 #else
-            Self.setUpPixelKit(dryRun: false)
+        let subscriptionPurchaseEnvironment: SubscriptionEnvironment.Platform = .stripe
 #endif
+
+        // Load subscription environment and re-configure SubscriptionManager if needed
+        let serviceEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionEnvironment.ServiceEnvironment.default).wrappedValue
+
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: UserDefaults(suiteName: subscriptionAppGroup) ?? UserDefaults.standard,
+                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
+                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
+        let subscriptionService = SubscriptionService(currentServiceEnvironment: serviceEnvironment)
+        let authService = AuthService(currentServiceEnvironment: serviceEnvironment)
+        accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
+                                        entitlementsCache: entitlementsCache,
+                                        subscriptionService: subscriptionService,
+                                        authService: authService)
+
+
+        if #available(macOS 12.0, iOS 15.0, *) {
+            let storePurchaseManager = StorePurchaseManager()
+            subscriptionManager = SubscriptionManager(storePurchaseManager: storePurchaseManager,
+                                                      accountManager: accountManager,
+                                                      subscriptionService: subscriptionService,
+                                                      authService: authService,
+                                                      currentServiceEnvironment: serviceEnvironment,
+                                                      current: subscriptionPurchaseEnvironment)
+        } else {
+            subscriptionManager = SubscriptionManager(accountManager: accountManager,
+                                                      subscriptionService: subscriptionService,
+                                                      authService: authService,
+                                                      currentServiceEnvironment: serviceEnvironment,
+                                                      current: subscriptionPurchaseEnvironment)
+        }
     }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -214,6 +233,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
+
+        // Configure Event handlers
+        networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(accountManagerDataSource: self)
+#if DBP
+        dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler(accountManagerDataSource: self)
+#endif
     }
 
     // swiftlint:disable:next function_body_length
@@ -261,18 +286,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         startupSync()
 
-        let defaultEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment.default
-
-        let currentEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment,
-                                                     defaultValue: defaultEnvironment).wrappedValue
-        subscriptionPurchaseEnvironment.currentServiceEnvironment = currentEnvironment
-
-        Task {
-            if let token = AppDelegate.accountManager.accessToken {
-                _ = await subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData)
-                _ = await AppDelegate.accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
-            }
-        }
+        subscriptionManager.loadInitialData()
 
         if [.normal, .uiTests].contains(NSApp.runType) {
             stateRestorationManager.applicationDidFinishLaunching()
@@ -310,14 +324,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
-        networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
+        networkProtectionSubscriptionEventHandler?.registerForSubscriptionAccountManagerEvents()
 
-        let defaultNetworkProtectionVisibility = DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager)
-        NetworkProtectionAppEvents(featureVisibility: defaultNetworkProtectionVisibility).applicationDidFinishLaunching()
+        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(accountManagerDataSource: self)).applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 
 #if DBP
-        dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
+        dataBrokerProtectionSubscriptionEventHandler?.registerForSubscriptionAccountManagerEvents()
 #endif
 
 #if DBP
@@ -333,16 +346,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-        let defaultNetworkProtectionVisibility = DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager)
-        NetworkProtectionAppEvents(featureVisibility: defaultNetworkProtectionVisibility).applicationDidBecomeActive()
-
+        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(accountManagerDataSource: self)).applicationDidBecomeActive()
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidBecomeActive()
 #endif
 
         AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.toggleProtectionsCounter.sendEventsIfNeeded()
 
-        updateSubscriptionStatus()
+        subscriptionManager.updateSubscriptionStatus { isActive in
+            if isActive {
+                PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
+            }
+        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -384,9 +399,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         urlEventHandler.handleFiles(files)
     }
 
-    private func applyPreferredTheme() {
-        let appearancePreferences = AppearancePreferences()
-        appearancePreferences.updateUserInterfaceStyle()
+    // MARK: - PixelKit
+
+    static func configurePixelKit() {
+#if DEBUG
+            Self.setUpPixelKit(dryRun: true)
+#else
+            Self.setUpPixelKit(dryRun: false)
+#endif
     }
 
     private static func setUpPixelKit(dryRun: Bool) {
@@ -411,6 +431,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 onComplete(error == nil, error)
             }
         }
+    }
+
+    // MARK: - Theme
+
+    private func applyPreferredTheme() {
+        let appearancePreferences = AppearancePreferences()
+        appearancePreferences.updateUserInterfaceStyle()
     }
 
     // MARK: - Sync
@@ -572,20 +599,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApplication.shared.reply(toApplicationShouldTerminate: true)
         }
     }
-
-    func updateSubscriptionStatus() {
-        Task {
-           guard let token = AppDelegate.accountManager.accessToken else { return }
-
-            if case .success(let subscription) = await subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
-                if subscription.isActive {
-                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActive, frequency: .daily)
-                }
-            }
-
-            _ = await AppDelegate.accountManager.fetchEntitlements(cachePolicy: .reloadIgnoringLocalCacheData)
-        }
-    }
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
@@ -611,4 +624,19 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         completionHandler()
     }
 
+}
+
+extension AppDelegate: AccountManagingDataSource {
+    
+    var accessToken: String? {
+        accountManager.accessToken
+    }
+    
+    func hasEntitlement(for entitlement: Entitlement.ProductName) async -> Result<Bool, Error> {
+        await accountManager.hasEntitlement(for: entitlement)
+    }
+
+    var isUserAuthenticated: Bool {
+        accountManager.isUserAuthenticated
+    }
 }

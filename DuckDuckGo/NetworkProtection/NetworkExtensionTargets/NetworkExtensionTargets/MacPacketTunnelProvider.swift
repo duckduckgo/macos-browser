@@ -350,10 +350,19 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                                                            isSubscriptionEnabled: isSubscriptionEnabled,
                                                                            accessTokenProvider: { nil }
         )
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: UserDefaults(suiteName: Self.subscriptionsAppGroup) ?? UserDefaults.standard,
+                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
+                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
 
-        let accountManager = AccountManager(subscriptionAppGroup: Self.subscriptionsAppGroup, accessTokenStorage: tokenStore)
+        let subscriptionEnvironment: SubscriptionEnvironment.ServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
 
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
+        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment)
+        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment)
+        let accountManager = AccountManager(accessTokenStorage: tokenStore,
+                                            entitlementsCache: entitlementsCache,
+                                            subscriptionService: subscriptionService,
+                                            authService: authService)
+        
         let entitlementsCheck = {
             await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }

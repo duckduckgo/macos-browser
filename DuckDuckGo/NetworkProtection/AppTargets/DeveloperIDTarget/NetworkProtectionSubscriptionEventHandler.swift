@@ -25,17 +25,17 @@ import NetworkProtectionUI
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let accountManager: AccountManaging
+    private weak var accountManagerDataSource: AccountManagingDataSource?
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
     private let userDefaults: UserDefaults
     private var cancellables = Set<AnyCancellable>()
 
-    init(accountManager: AccountManaging,
+    init(accountManagerDataSource: AccountManagingDataSource?,
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
          userDefaults: UserDefaults = .netP) {
-        self.accountManager = accountManager
+        self.accountManagerDataSource = accountManagerDataSource
         self.networkProtectionTokenStorage = networkProtectionTokenStorage
         self.networkProtectionFeatureDisabler = networkProtectionFeatureDisabler
         self.userDefaults = userDefaults
@@ -45,7 +45,11 @@ final class NetworkProtectionSubscriptionEventHandler {
 
     private func subscribeToEntitlementChanges() {
         Task {
-            switch await accountManager.hasEntitlement(for: .networkProtection) {
+            guard let accountManagerDataSource else {
+                assertionFailure("Missing accountManagerDataSource")
+                return
+            }
+            switch await accountManagerDataSource.hasEntitlement(for: .networkProtection) {
             case .success(let hasEntitlements):
                 Task {
                     await handleEntitlementsChange(hasEntitlements: hasEntitlements)
@@ -95,7 +99,11 @@ final class NetworkProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignIn() {
-        guard accountManager.accessToken != nil else {
+        guard let accountManagerDataSource else {
+            assertionFailure("Missing accountManagerDataSource")
+            return
+        }
+        guard accountManagerDataSource.accessToken != nil else {
             assertionFailure("[NetP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }

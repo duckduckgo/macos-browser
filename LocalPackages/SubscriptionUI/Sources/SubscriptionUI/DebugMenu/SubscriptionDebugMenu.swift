@@ -29,8 +29,10 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private var purchasePlatformItem: NSMenuItem?
 
     var currentViewController: () -> NSViewController?
-    let accountManager: AccountManaging
-    let subscriptionService: SubscriptionService
+    let subscriptionManager: SubscriptionManager
+    var accountManager: AccountManaging {
+        subscriptionManager.accountManager
+    }
 
     private var _purchaseManager: Any?
     @available(macOS 12.0, *)
@@ -51,15 +53,13 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
-                accountManager: AccountManaging,
-                subscriptionService: SubscriptionService) {
+                subscriptionManager: SubscriptionManager) {
         self.currentEnvironment = currentEnvironment
         self.updateEnvironment = updateEnvironment
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
-        self.accountManager = accountManager
-        self.subscriptionService = subscriptionService
+        self.subscriptionManager = subscriptionManager
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
         self.submenu = makeSubmenu()
     }
@@ -106,11 +106,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     private func makePurchasePlatformSubmenu() -> NSMenu {
         let menu = NSMenu(title: "Select purchase platform:")
-
-        let currentPlatform = SubscriptionPurchaseEnvironment.current
-
         let appStoreItem = NSMenuItem(title: "App Store", action: #selector(setPlatformToAppStore), target: self)
-        if currentPlatform == .appStore {
+        if subscriptionManager.currentEnvironment.platform == .appStore {
             appStoreItem.state = .on
             appStoreItem.isEnabled = false
             appStoreItem.action = nil
@@ -119,7 +116,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(appStoreItem)
 
         let stripeItem = NSMenuItem(title: "Stripe", action: #selector(setPlatformToStripe), target: self)
-        if currentPlatform == .stripe {
+        if subscriptionManager.currentEnvironment.platform == .stripe {
             stripeItem.state = .on
             stripeItem.isEnabled = false
             stripeItem.action = nil
@@ -179,8 +176,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func showAccountDetails() {
         let title = accountManager.isUserAuthenticated ? "Authenticated" : "Not Authenticated"
         let message = accountManager.isUserAuthenticated ? ["AuthToken: \(accountManager.authToken ?? "")",
-                                                   "AccessToken: \(accountManager.accessToken ?? "")",
-                                                   "Email: \(accountManager.email ?? "")"].joined(separator: "\n") : nil
+                                                                                "AccessToken: \(accountManager.accessToken ?? "")",
+                                                                                "Email: \(accountManager.email ?? "")"].joined(separator: "\n") : nil
         showAlert(title: title, message: message)
     }
 
@@ -188,7 +185,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func validateToken() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await AuthService.validateToken(accessToken: token) {
+            switch await subscriptionManager.authService.validateToken(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Validate token", message: "\(response)")
             case .failure(let error):
@@ -219,7 +216,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func getSubscriptionDetails() {
         Task {
             guard let token = accountManager.accessToken else { return }
-            switch await subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
+            switch await subscriptionManager.subscriptionService.getSubscription(accessToken: token, cachePolicy: .reloadIgnoringLocalCacheData) {
             case .success(let response):
                 showAlert(title: "Subscription info", message: "\(response)")
             case .failure(let error):
@@ -238,7 +235,10 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            currentViewController()?.presentAsSheet(DebugPurchaseViewController(accountManager: accountManager))
+            let storePurchaseManager = StorePurchaseManager()
+            let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager)
+            let vc = DebugPurchaseViewController(storePurchaseManager: storePurchaseManager, appStorePurchaseFlow: appStorePurchaseFlow)
+            currentViewController()?.presentAsSheet(vc)
         }
     }
 
@@ -250,7 +250,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         askAndUpdatePlatform(to: .stripe)
     }
 
-    private func askAndUpdatePlatform(to newPlatform: SubscriptionPurchaseEnvironment.Environment) {
+    private func askAndUpdatePlatform(to newPlatform: SubscriptionEnvironment.Platform) {
         let alert = makeAlert(title: "Are you sure you want to change the purchase platform to \(newPlatform.rawValue.capitalized)",
                               message: "This setting is not persisted between app runs. After restarting the app it returns to the default determined on app's distribution method.",
                               buttonNames: ["Yes", "No"])
@@ -258,7 +258,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
         guard case .alertFirstButtonReturn = response else { return }
 
-        SubscriptionPurchaseEnvironment.current = newPlatform
+//        subscriptionManager.currentEnvironment.platform = newPlatform // TODO: In debug menus set subscription environments in user defaults and restart the app every time the environment is changed
 
         refreshSubmenu()
     }
@@ -297,7 +297,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func restorePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             Task {
-                let appStoreRestoreFlow = AppStoreRestoreFlow(accountManager: accountManager)
+                let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
                 await appStoreRestoreFlow.restoreAccountFromPastPurchase()
             }
         }
