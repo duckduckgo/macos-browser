@@ -116,19 +116,19 @@ final class DataBrokerOperation: Operation {
         }
     }
 
-    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerOperationData] {
-        let operationsData: [BrokerOperationData]
+    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerJobData] {
+        let operationsData: [BrokerJobData]
 
         switch operationType {
         case .optOut:
-            operationsData = brokerProfileQueriesData.flatMap { $0.optOutOperationsData }
+            operationsData = brokerProfileQueriesData.flatMap { $0.optOutJobData }
         case .manualScan:
-            operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanOperationData }
+            operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanJobData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
         }
 
-        let filteredAndSortedOperationsData: [BrokerOperationData]
+        let filteredAndSortedOperationsData: [BrokerJobData]
 
         if let priorityDate = priorityDate {
             filteredAndSortedOperationsData = operationsData

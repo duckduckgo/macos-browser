@@ -194,8 +194,8 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
 
         vault.brokers = [DataBroker.mock]
         vault.profileQueries = [ProfileQuery.mock]
-        vault.scanOperationData = [ScanOperationData.mock]
-        vault.optOutOperationData = [OptOutOperationData.mock(with: ExtractedProfile.mockWithoutRemovedDate)]
+        vault.scanJobData = [ScanJobData.mock]
+        vault.optOutJobData = [OptOutJobData.mock(with: ExtractedProfile.mockWithoutRemovedDate)]
 
         vault.profile = DataBrokerProtectionProfile(
             names: [
@@ -238,7 +238,7 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
 
         vault.brokers = [DataBroker.mock]
         vault.profileQueries = [ProfileQuery.mock]
-        vault.scanOperationData = [ScanOperationData.mock]
+        vault.scanJobData = [ScanJobData.mock]
 
         vault.profile = DataBrokerProtectionProfile(
             names: [

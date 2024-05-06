@@ -50,16 +50,16 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
-            let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
+            let mockScanOperation = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
 
             let extractedProfileSaved = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc")
 
-            let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved)]
+            let optOutData = [OptOutJobData.mock(with: extractedProfileSaved)]
 
             let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker,
                                                                 profileQuery: mockProfileQuery,
-                                                                scanOperationData: mockScanOperation,
-            optOutOperationsData: optOutData)
+                                                                scanJobData: mockScanOperation,
+            optOutJobData: optOutData)
             mockDatabase.brokerProfileQueryDataToReturn = [mockBrokerProfileQuery]
 
             mockWebOperationRunner.scanResults = []
@@ -68,8 +68,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: extractedProfileSaved)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: extractedProfileSaved)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -98,18 +98,18 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
-            let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
+            let mockScanOperation = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
 
             let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc", identifier: "abc")
             let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz", identifier: "zxz")
 
-            let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved1),
-                              OptOutOperationData.mock(with: extractedProfileSaved2)]
+            let optOutData = [OptOutJobData.mock(with: extractedProfileSaved1),
+                              OptOutJobData.mock(with: extractedProfileSaved2)]
 
             let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker,
                                                                 profileQuery: mockProfileQuery,
-                                                                scanOperationData: mockScanOperation,
-            optOutOperationsData: optOutData)
+                                                                scanJobData: mockScanOperation,
+            optOutJobData: optOutData)
             mockDatabase.brokerProfileQueryDataToReturn = [mockBrokerProfileQuery]
 
             mockWebOperationRunner.scanResults = [extractedProfileSaved1]
@@ -118,9 +118,9 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: extractedProfileSaved1),
-                                           OptOutOperationData.mock(with: extractedProfileSaved2)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: extractedProfileSaved1),
+                                           OptOutJobData.mock(with: extractedProfileSaved2)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -149,18 +149,18 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
-            let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
+            let mockScanOperation = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
 
             let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc")
             let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz")
 
-            let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved1),
-                              OptOutOperationData.mock(with: extractedProfileSaved2)]
+            let optOutData = [OptOutJobData.mock(with: extractedProfileSaved1),
+                              OptOutJobData.mock(with: extractedProfileSaved2)]
 
             let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker,
                                                                 profileQuery: mockProfileQuery,
-                                                                scanOperationData: mockScanOperation,
-            optOutOperationsData: optOutData)
+                                                                scanJobData: mockScanOperation,
+            optOutJobData: optOutData)
             mockDatabase.brokerProfileQueryDataToReturn = [mockBrokerProfileQuery]
 
             mockWebOperationRunner.scanResults = [extractedProfileSaved1, extractedProfileSaved2]
@@ -169,9 +169,9 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: extractedProfileSaved1),
-                                           OptOutOperationData.mock(with: extractedProfileSaved2)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: extractedProfileSaved1),
+                                           OptOutJobData.mock(with: extractedProfileSaved2)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -195,7 +195,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mockWithoutId,
-                    scanOperationData: .mock
+                    scanJobData: .mock
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -217,7 +217,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mockWithoutId,
                     profileQuery: .mock,
-                    scanOperationData: .mock
+                    scanJobData: .mock
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -238,7 +238,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock
+                    scanJobData: .mock
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -259,7 +259,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock
+                    scanJobData: .mock
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -282,8 +282,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -308,8 +308,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -332,8 +332,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -356,8 +356,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -379,8 +379,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -404,8 +404,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -430,8 +430,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -459,8 +459,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mockWithoutId,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -483,8 +483,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mockWithoutId,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -507,8 +507,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutId)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutId)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -531,8 +531,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -555,8 +555,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mockWithParentOptOut,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -579,8 +579,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -602,8 +602,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -626,8 +626,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -652,8 +652,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mockWithParentOptOut,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -685,8 +685,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -724,8 +724,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -763,8 +763,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
                     profileQuery: .mock,
-                    scanOperationData: .mock,
-                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
+                    scanJobData: .mock,
+                    optOutJobData: [OptOutJobData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
@@ -894,9 +894,9 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
         let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
-        let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
+        let mockScanOperation = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
 
-        let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker, profileQuery: mockProfileQuery, scanOperationData: mockScanOperation)
+        let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker, profileQuery: mockProfileQuery, scanJobData: mockScanOperation)
         mockDatabase.brokerProfileQueryDataToReturn = [mockBrokerProfileQuery]
 
         try sut.updateOperationDataDates(origin: .optOut, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: config, database: mockDatabase)
@@ -919,9 +919,9 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
 
         let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
-        let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
+        let mockScanOperation = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
 
-        let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker, profileQuery: mockProfileQuery, scanOperationData: mockScanOperation)
+        let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker, profileQuery: mockProfileQuery, scanJobData: mockScanOperation)
         mockDatabase.brokerProfileQueryDataToReturn = [mockBrokerProfileQuery]
 
         try sut.updateOperationDataDates(origin: .scan, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: config, database: mockDatabase)
@@ -966,9 +966,9 @@ final class MockWebJobRunner: WebJobRunner {
     }
 }
 
-extension OptOutOperationData {
+extension OptOutJobData {
 
-    static func mock(with extractedProfile: ExtractedProfile) -> OptOutOperationData {
+    static func mock(with extractedProfile: ExtractedProfile) -> OptOutJobData {
         .init(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent](), extractedProfile: extractedProfile)
     }
 }

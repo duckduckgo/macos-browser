@@ -382,7 +382,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         let brokerProfileQueryData = BrokerProfileQueryData(
             dataBroker: scanResult.dataBroker,
             profileQuery: scanResult.profileQuery,
-            scanOperationData: ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent]())
+            scanJobData: ScanJobData(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent]())
         )
         Task {
             do {
@@ -414,9 +414,9 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
         var profileQueryIndex: Int64 = 1
         for profileQuery in profileQueries {
-            let fakeScanOperationData = ScanOperationData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
+            let fakeScanJobData = ScanJobData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
             brokerProfileQueryData.append(
-                .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanOperationData: fakeScanOperationData)
+                .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanJobData: fakeScanJobData)
             )
 
             profileQueryIndex += 1
@@ -438,10 +438,10 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
         var profileQueryIndex: Int64 = 1
         for profileQuery in profileQueries {
-            let fakeScanOperationData = ScanOperationData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
+            let fakeScanJobData = ScanJobData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
             for broker in brokers {
                 brokerProfileQueryData.append(
-                    .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanOperationData: fakeScanOperationData)
+                    .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanJobData: fakeScanJobData)
                 )
             }
 
