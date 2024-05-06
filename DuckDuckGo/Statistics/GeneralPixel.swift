@@ -386,22 +386,22 @@ enum GeneralPixel: PixelKitEventV2 {
                 return "m_mac_\(pixel.pixelName)"
             }
         case .emailEnabledInitial:
-            return "m_mac.enable-email-protection.initial"
+            return "m_mac_enable-email-protection_initial"
 
         case .watchInDuckPlayerInitial:
-            return "m_mac.watch-in-duckplayer.initial"
+            return "m_mac_watch-in-duckplayer_initial"
         case .setAsDefaultInitial:
-            return "m_mac.set-as-default.initial"
+            return "m_mac_set-as-default_initial"
         case .importDataInitial:
-            return "m_mac.import-data.initial"
+            return "m_mac_import-data_initial"
         case .newTabInitial:
-            return "m_mac.new-tab-opened.initial"
+            return "m_mac_new-tab-opened_initial"
         case .favoriteSectionHidden:
-            return "m_mac.favorite-section-hidden"
+            return "m_mac_favorite-section-hidden"
         case .recentActivitySectionHidden:
-            return "m_mac.recent-activity-section-hidden"
+            return "m_mac_recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
-            return "m_mac.continue-setup-section-hidden"
+            return "m_mac_continue-setup-section-hidden"
 
             // Fire Button
         case .fireButtonFirstBurn:
@@ -434,11 +434,11 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_mp_wlr"
 
         case .launchInitial:
-            return "m.mac.first-launch"
+            return "m_mac_first-launch"
         case .serpInitial:
-            return "m.mac.navigation.first-search"
+            return "m_mac_navigation_first-search"
         case .serpDay21to27:
-            return "m.mac.search-day-21-27.initial"
+            return "m_mac_search-day-21-27_initial"
 
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
