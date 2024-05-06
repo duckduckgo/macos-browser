@@ -38,6 +38,7 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemTogglePermissionAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemCloseToTheLeftAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemDuplicateAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemPinAction(_ tabBarViewItem: TabBarViewItem)
@@ -233,6 +234,10 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @objc func closeOtherAction(_ sender: NSMenuItem) {
         delegate?.tabBarViewItemCloseOtherAction(self)
+    }
+
+    @objc func closeToTheLeftAction(_ sender: NSMenuItem) {
+        delegate?.tabBarViewItemCloseToTheLeftAction(self)
     }
 
     @objc func closeToTheRightAction(_ sender: NSMenuItem) {
@@ -506,8 +511,7 @@ extension TabBarViewItem: NSMenuDelegate {
 
         // Section 4
         addCloseMenuItem(to: menu)
-        addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
-        addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
+        addCloseOtherSubmenu(to: menu, tabBarItemState: otherItemsState)
         if !isBurner {
             addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         }
@@ -570,11 +574,33 @@ extension TabBarViewItem: NSMenuDelegate {
         menu.addItem(closeMenuItem)
     }
 
+    private func addCloseOtherSubmenu(to menu: NSMenu, tabBarItemState: OtherTabBarViewItemsState) {
+        let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs)
+        let submenu = NSMenu()
+        submenu.autoenablesItems = false
+
+        addCloseTabsToTheLeftMenuItem(to: submenu, areThereTabsToTheLeft: tabBarItemState.hasItemsToTheLeft)
+        addCloseTabsToTheRightMenuItem(to: submenu, areThereTabsToTheRight: tabBarItemState.hasItemsToTheRight)
+        addCloseOtherMenuItem(to: submenu, areThereOtherTabs: tabBarItemState.hasItemsToTheLeft || tabBarItemState.hasItemsToTheRight)
+
+        closeOtherMenuItem.submenu = submenu
+        menu.addItem(closeOtherMenuItem)
+    }
+
     private func addCloseOtherMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
-        let closeOtherMenuItem = NSMenuItem(title: UserText.closeOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
+        let closeOtherMenuItem = NSMenuItem(title: UserText.closeAllOtherTabs, action: #selector(closeOtherAction(_:)), keyEquivalent: "")
         closeOtherMenuItem.target = self
         closeOtherMenuItem.isEnabled = areThereOtherTabs
         menu.addItem(closeOtherMenuItem)
+    }
+
+    private func addCloseTabsToTheLeftMenuItem(to menu: NSMenu, areThereTabsToTheLeft: Bool) {
+        let closeTabsToTheLeftMenuItem = NSMenuItem(title: UserText.closeTabsToTheLeft,
+                                                     action: #selector(closeToTheLeftAction(_:)),
+                                                     keyEquivalent: "")
+        closeTabsToTheLeftMenuItem.target = self
+        closeTabsToTheLeftMenuItem.isEnabled = areThereTabsToTheLeft
+        menu.addItem(closeTabsToTheLeftMenuItem)
     }
 
     private func addCloseTabsToTheRightMenuItem(to menu: NSMenu, areThereTabsToTheRight: Bool) {

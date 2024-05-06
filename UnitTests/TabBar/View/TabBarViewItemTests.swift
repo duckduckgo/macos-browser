@@ -52,8 +52,16 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(menu.item(at: 7)?.isSeparatorItem ?? false)
         XCTAssertEqual(menu.item(at: 8)?.title, UserText.closeTab)
         XCTAssertEqual(menu.item(at: 9)?.title, UserText.closeOtherTabs)
-        XCTAssertEqual(menu.item(at: 10)?.title, UserText.closeTabsToTheRight)
-        XCTAssertEqual(menu.item(at: 11)?.title, UserText.moveTabToNewWindow)
+        XCTAssertEqual(menu.item(at: 10)?.title, UserText.moveTabToNewWindow)
+
+        // Check "Close Other Tabs" submenu
+        guard let submenu = menu.item(at: 9)?.submenu else {
+            XCTFail("\"Close Other Tabs\" menu item should have a submenu")
+            return
+        }
+        XCTAssertEqual(submenu.item(at: 0)?.title, UserText.closeTabsToTheLeft)
+        XCTAssertEqual(submenu.item(at: 1)?.title, UserText.closeTabsToTheRight)
+        XCTAssertEqual(submenu.item(at: 2)?.title, UserText.closeAllOtherTabs)
     }
 
     func testThatMuteIsShownWhenCurrentAudioStateIsUnmuted() {
@@ -77,7 +85,8 @@ final class TabBarViewItemTests: XCTestCase {
     func testWhenOneTabCloseThenOtherTabsItemIsDisabled() {
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        let item = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeAllOtherTabs }
         XCTAssertFalse(item?.isEnabled ?? true)
     }
 
@@ -85,7 +94,8 @@ final class TabBarViewItemTests: XCTestCase {
         delegate.hasItemsToTheRight = true
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        let item = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeAllOtherTabs }
         XCTAssertTrue(item?.isEnabled ?? false)
     }
 
@@ -104,10 +114,28 @@ final class TabBarViewItemTests: XCTestCase {
         XCTAssertTrue(item?.isEnabled ?? false)
     }
 
+    func testWhenNoTabsToTheLeftThenCloseTabsToTheLeftIsDisabled() {
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeTabsToTheLeft }
+        XCTAssertFalse(item?.isEnabled ?? true)
+    }
+
+    func testWhenTabsToTheLeftThenCloseTabsToTheLeftIsEnabled() {
+        delegate.hasItemsToTheLeft = true
+        tabBarViewItem.menuNeedsUpdate(menu)
+
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeTabsToTheLeft }
+        XCTAssertTrue(item?.isEnabled ?? false)
+    }
+
     func testWhenNoTabsToTheRightThenCloseTabsToTheRightIsDisabled() {
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        let item = menu.items .first { $0.title == UserText.closeTabsToTheRight }
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeTabsToTheRight }
         XCTAssertFalse(item?.isEnabled ?? true)
     }
 
@@ -115,7 +143,8 @@ final class TabBarViewItemTests: XCTestCase {
         delegate.hasItemsToTheRight = true
         tabBarViewItem.menuNeedsUpdate(menu)
 
-        let item = menu.items .first { $0.title == UserText.closeTabsToTheRight }
+        let submenu = menu.items .first { $0.title == UserText.closeOtherTabs }
+        let item = submenu?.submenu?.items .first { $0.title == UserText.closeTabsToTheRight }
         XCTAssertTrue(item?.isEnabled ?? false)
     }
 
