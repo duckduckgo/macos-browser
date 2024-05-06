@@ -23,12 +23,16 @@ import History
 final class ClearThisHistoryMenuItem: NSMenuItem {
 
     // Keep the dateString for alerts so we don't need to use the formatter again
-    func setDateString(_ dateString: String?) {
-        representedObject = dateString
+    func setRepresentingObject(dateString: String?, isToday: Bool) {
+        representedObject = (dateString, isToday)
     }
 
     var dateString: String? {
-        representedObject as? String
+        (representedObject as? (String?, Bool))?.0
+    }
+
+    var isToday: Bool {
+        (representedObject as? (String?, Bool))?.1 ?? false
     }
 
     // Getting visits for the whole menu section in order to perform burning
