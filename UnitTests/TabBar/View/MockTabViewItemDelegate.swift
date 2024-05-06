@@ -24,6 +24,7 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     var mockedCurrentTab: Tab?
 
     var canBookmarkAllOpenTabs = false
+    var hasItemsToTheLeft = false
     var hasItemsToTheRight = false
     var audioState: WKWebView.AudioState?
 
@@ -42,6 +43,10 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+
+    }
+
+    func tabBarViewItemCloseToTheLeftAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
     }
 
@@ -106,7 +111,7 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> DuckDuckGo_Privacy_Browser.OtherTabBarViewItemsState {
-        OtherTabBarViewItemsState(hasItemsToTheLeft: false, hasItemsToTheRight: hasItemsToTheRight)
+        OtherTabBarViewItemsState(hasItemsToTheLeft: hasItemsToTheLeft, hasItemsToTheRight: hasItemsToTheRight)
     }
 
     func clear() {
