@@ -522,6 +522,25 @@ final class ContinueSetUpModelTests: XCTestCase {
 #endif
     }
 
+    @MainActor func test_WhenUserDoesntHaveApplicationInTheDock_ThenAddToDockCardIsDisplayed() {
+        let dockCustomizer = DockCustomizerMock()
+
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, dockCustomizer: dockCustomizer)
+        vm.shouldShowAllFeatures = true
+
+        XCTAssert(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.dock))
+    }
+
+    @MainActor func test_WhenUserHasApplicationInTheDock_ThenAddToDockCardIsNotDisplayed() {
+        let dockCustomizer = DockCustomizerMock()
+        dockCustomizer.addToDock()
+
+        let vm = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults, dockCustomizer: dockCustomizer)
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.dock))
+    }
+
 }
 
 extension HomePage.Models.ContinueSetUpModel {

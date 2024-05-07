@@ -38,6 +38,7 @@ extension Preferences {
             PreferencePane(UserText.general) {
 
                 // SECTION 1: Shortcuts
+#if !APPSTORE
                 PreferencePaneSection(UserText.shortcuts, spacing: 4) {
                     PreferencePaneSubSection {
                         HStack {
@@ -70,7 +71,7 @@ extension Preferences {
                         }
                     }
                 }
-
+#endif
                 // SECTION 2: On Startup
                 PreferencePaneSection(UserText.onStartup) {
 

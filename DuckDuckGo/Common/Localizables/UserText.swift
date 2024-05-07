@@ -594,7 +594,7 @@ struct UserText {
     static let isNotDefaultBrowser = NSLocalizedString("preferences.default-browser.inactive", value: "DuckDuckGo is not your default browser.", comment: "Indicate that the browser is not the default")
     static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default…", comment: "represents a prompt message asking the user to make DuckDuckGo their default browser.")
     static let shortcuts = NSLocalizedString("preferences.shortcuts", value: "Shortcuts", comment: "Name of the preferences section related to shortcuts")
-    static let isAddedToDock = NSLocalizedString("preferences.is-added-to-dock", value: "DuckDuckGo is added to the Dock.", comment: "Indicates that the browser is the added to macOS system Dock")
+    static let isAddedToDock = NSLocalizedString("preferences.is-added-to-dock", value: "DuckDuckGo is added to the Dock.", comment: "Indicates that the browser is added to the macOS system Dock")
     static let isNotAddedToDock = NSLocalizedString("preferences.not-added-to-dock", value: "DuckDuckGo is not added to the Dock.", comment: "Indicate that the browser is not added to macOS system Dock")
     static let addToDock = NSLocalizedString("preferences.add-to-dock", value: "Add to Dock…", comment: "Action button to add the app to the Dock")
     static let onStartup = NSLocalizedString("preferences.on-startup", value: "On Startup", comment: "Name of the preferences section related to app startup")

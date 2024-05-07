@@ -45717,7 +45717,7 @@
       }
     },
     "preferences.is-added-to-dock" : {
-      "comment" : "Indicates that the browser is the added to macOS system Dock",
+      "comment" : "Indicates that the browser is added to the macOS system Dock",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
