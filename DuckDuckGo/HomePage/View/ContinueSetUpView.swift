@@ -18,6 +18,7 @@
 
 import SwiftUI
 import SwiftUIExtensions
+import PixelKit
 
 extension HomePage.Views {
 
@@ -120,6 +121,13 @@ extension HomePage.Views {
                 }
                 .onHover { isHovering in
                     self.isHovering = isHovering
+                }
+                .onAppear {
+                    if featureType == .dock {
+                        PixelKit.fire(GeneralPixel.addToDockNewTabPageCardPresented,
+                                      frequency: .unique,
+                                      includeAppVersionParameter: false)
+                    }
                 }
             }
         }

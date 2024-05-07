@@ -153,6 +153,7 @@ enum GeneralPixel: PixelKitEventV2 {
     case userAddedToDockDuringOnboarding
     case userSkippedAddingToDockFromOnboarding
     case startBrowsingOnboardingStepPresented
+    case addToDockNewTabPageCardPresented
     case userAddedToDockFromNewTabPageCard
     case userAddedToDockFromSettings
     case serpAddedToDock
@@ -529,6 +530,7 @@ enum GeneralPixel: PixelKitEventV2 {
         case .userAddedToDockDuringOnboarding: return "m_mac_user_added_to_dock_during_onboarding"
         case .userSkippedAddingToDockFromOnboarding: return "m_mac_user_skipped_adding_to_dock_from_onboarding"
         case .startBrowsingOnboardingStepPresented: return "m_mac_start_browsing_onboarding_step_presented"
+        case .addToDockNewTabPageCardPresented: return "m_mac_add_to_dock_new_tab_page_card_presented_u"
         case .userAddedToDockFromNewTabPageCard: return "m_mac_user_added_to_dock_from_new_tab_page_card"
         case .userAddedToDockFromSettings: return "m_mac_user_added_to_dock_from_settings"
         case .serpAddedToDock: return "m_mac_serp_added_to_dock"
