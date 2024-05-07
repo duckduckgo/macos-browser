@@ -150,7 +150,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func purchaseAction() {
-        openURLHandler(SubscriptionURL.purchase.subscriptionURL(environment: <#T##SubscriptionEnvironment.ServiceEnvironment#>))
+        openURLHandler(SubscriptionURL.purchase.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment))
     }
 
     enum ChangePlanOrBillingAction {
@@ -185,11 +185,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private func changePlanOrBilling(for environment: SubscriptionEnvironment.Platform) {
         switch environment {
         case .appStore:
-            NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
+            NSWorkspace.shared.open(SubscriptionURL.manageSubscriptionsInAppStore.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment))
         case .stripe:
             Task {
                 guard let accessToken = accountManager.accessToken, let externalID = accountManager.externalID,
-                      case let .success(response) = await subscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                      case let .success(response) = await subscriptionManager.subscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
                 openURLHandler(customerPortalURL)
@@ -199,9 +199,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     private func confirmIfSignedInToSameAccount() async -> Bool {
         if #available(macOS 12.0, *) {
-            guard let lastTransactionJWSRepresentation = await StorePurchaseManager.mostRecentTransaction() else { return false }
-
-            switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
+            guard let lastTransactionJWSRepresentation = await subscriptionManager.getStorePurchaseManager().mostRecentTransaction() else { return false }
+            switch await subscriptionManager.authService.storeLogin(signature: lastTransactionJWSRepresentation) {
             case .success(let response):
                 return response.externalID == accountManager.externalID
             case .failure:
@@ -235,15 +234,15 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openFAQ() {
-        openURLHandler(.subscriptionFAQ)
+        openURLHandler( SubscriptionURL.FAQ.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment))
     }
 
     @MainActor
     func refreshSubscriptionPendingState() {
-        if SubscriptionPurchaseEnvironment.current == .appStore {
+        if subscriptionManager.currentEnvironment.platform == .appStore {
             if #available(macOS 12.0, *) {
                 Task {
-                    let appStoreRestoreFlow = AppStoreRestoreFlow(accountManager: accountManager)
+                    let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
                     await appStoreRestoreFlow.restoreAccountFromPastPurchase()
                     fetchAndUpdateSubscriptionDetails()
                 }
@@ -272,11 +271,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @MainActor
     private func updateSubscription(with cachePolicy: SubscriptionService.CachePolicy) async {
         guard let token = accountManager.accessToken else {
-            subscriptionService.signOut()
+            subscriptionManager.subscriptionService.signOut()
             return
         }
 
-        switch await subscriptionService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
+        switch await subscriptionManager.subscriptionService.getSubscription(accessToken: token, cachePolicy: cachePolicy) {
         case .success(let subscription):
             updateDescription(for: subscription.expiresOrRenewsAt, status: subscription.status, period: subscription.billingPeriod)
             subscriptionPlatform = subscription.platform

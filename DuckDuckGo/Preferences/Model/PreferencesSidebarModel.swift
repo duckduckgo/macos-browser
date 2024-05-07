@@ -42,7 +42,7 @@ final class PreferencesSidebarModel: ObservableObject {
         tabSwitcherTabs: [Tab.TabContent],
         privacyConfigurationManager: PrivacyConfigurationManaging,
         syncService: DDGSyncing,
-        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager)
+        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: AppDelegate.shared.subscriptionManager)
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
@@ -77,7 +77,7 @@ final class PreferencesSidebarModel: ObservableObject {
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
         syncService: DDGSyncing,
-        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager),
+        vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: AppDelegate.shared.subscriptionManager),
         includeDuckPlayer: Bool,
         userDefaults: UserDefaults = .netP
     ) {

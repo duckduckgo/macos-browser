@@ -74,7 +74,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     // MARK: - Subscriptions
 
-    private let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
+    private let accessTokenStorage: SubscriptionTokenKeychainStorage
 
     // MARK: - Debug Options Support
 
@@ -164,7 +164,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
          defaults: UserDefaults,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          notificationCenter: NotificationCenter = .default,
-         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
+         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
+         accessTokenStorage: SubscriptionTokenKeychainStorage) {
 
         self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
@@ -173,6 +174,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         self.settings = settings
         self.defaults = defaults
         self.tokenStore = tokenStore
+        self.accessTokenStorage = accessTokenStorage // = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(Bundle.main.appGroup(bundle: .subs))))
 
         subscribeToSettingsChanges()
         subscribeToStatusChanges()
@@ -793,7 +795,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     }
 
     private func fetchAuthToken() throws -> NSString? {
-        if let accessToken = accountManager.accessToken {
+
+        if let accessToken = try? accessTokenStorage.getAccessToken() {
             os_log(.error, log: .networkProtection, "🟢 TunnelController found token: %{public}d", accessToken)
             return Self.adaptAccessTokenForVPN(accessToken) as NSString?
         }

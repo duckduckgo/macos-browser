@@ -71,7 +71,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     init(popoverManager: NetPPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
-         vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager),
+         vpnVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: AppDelegate.shared.subscriptionManager),
          statusReporter: NetworkProtectionStatusReporter,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 

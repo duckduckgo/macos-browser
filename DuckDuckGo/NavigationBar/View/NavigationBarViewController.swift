@@ -71,6 +71,10 @@ final class NavigationBarViewController: NSViewController {
         return progressView
     }()
 
+    private var subscriptionManager: SubscriptionManager {
+        AppDelegate.shared.subscriptionManager
+    }
+
     var addressBarViewController: AddressBarViewController?
 
     private var tabCollectionViewModel: TabCollectionViewModel
@@ -269,7 +273,7 @@ final class NavigationBarViewController: NSViewController {
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    internalUserDecider: internalUserDecider,
-                                   accountManager: AppDelegate.accountManager)
+                                   accountManager: subscriptionManager.accountManager)
         menu.actionDelegate = self
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
         menu.popUp(positioning: nil, at: location, in: sender)
@@ -898,7 +902,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager).isVPNVisible() {
+        if !isPopUpWindow && DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager).isVPNVisible() {
             let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
@@ -1036,12 +1040,14 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
-        WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+        let url = SubscriptionURL.purchase.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+        WindowControllersManager.shared.showTab(with: .subscription(url))
         PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
     }
 
     func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
-        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
+        let url = SubscriptionURL.identityTheftRestoration.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+        WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
     }
 }
 

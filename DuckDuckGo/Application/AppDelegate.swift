@@ -37,8 +37,16 @@ import Lottie
 import NetworkProtection
 import Subscription
 
-@MainActor
+// @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+
+    /// To be used with very cautiously, this do not replace proper dependency injection
+    static var shared: AppDelegate {
+        guard let delegate = NSApplication.shared.delegate as? AppDelegate else {
+            fatalError("Could not get app delegate ")
+        }
+        return delegate
+    }
 
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
@@ -85,7 +93,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     private let accountManager: AccountManager
-    private let subscriptionManager: SubscriptionManager
+    public let subscriptionManager: SubscriptionManager
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 #if DBP
@@ -178,7 +186,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             privacyConfigManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
         )
 
-        // Configure subscription
+        // MARK: - Configure Subscription
 
 #if APPSTORE || !STRIPE
         let subscriptionPurchaseEnvironment: SubscriptionEnvironment.Platform = .appStore
@@ -200,7 +208,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                         entitlementsCache: entitlementsCache,
                                         subscriptionService: subscriptionService,
                                         authService: authService)
-
 
         if #available(macOS 12.0, iOS 15.0, *) {
             let storePurchaseManager = StorePurchaseManager()
@@ -235,9 +242,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
 
         // Configure Event handlers
-        networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(accountManagerDataSource: self)
+        networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager)
 #if DBP
-        dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler(accountManagerDataSource: self)
+        dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler(subscriptionManager: subscriptionManager)
 #endif
     }
 
@@ -326,7 +333,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         networkProtectionSubscriptionEventHandler?.registerForSubscriptionAccountManagerEvents()
 
-        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(accountManagerDataSource: self)).applicationDidFinishLaunching()
+        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager)).applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 
 #if DBP
@@ -346,7 +353,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(accountManagerDataSource: self)).applicationDidBecomeActive()
+        NetworkProtectionAppEvents(featureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: subscriptionManager)).applicationDidBecomeActive()
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidBecomeActive()
 #endif
@@ -514,7 +521,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     switch response {
                     case .alertSecondButtonReturn:
                         alert.window.sheetParent?.endSheet(alert.window)
-                        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                        DispatchQueue.main.async {
+                            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                        }
                     default:
                         break
                     }
@@ -591,12 +600,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setUpAutoClearHandler() {
-        autoClearHandler = AutoClearHandler(preferences: .shared,
-                                            fireViewModel: FireCoordinator.fireViewModel,
-                                            stateRestorationManager: stateRestorationManager)
-        autoClearHandler.handleAppLaunch()
-        autoClearHandler.onAutoClearCompleted = {
-            NSApplication.shared.reply(toApplicationShouldTerminate: true)
+        DispatchQueue.main.async {
+            self.autoClearHandler = AutoClearHandler(preferences: .shared,
+                                                fireViewModel: FireCoordinator.fireViewModel,
+                                                     stateRestorationManager: self.stateRestorationManager)
+            self.autoClearHandler.handleAppLaunch()
+            self.autoClearHandler.onAutoClearCompleted = {
+                NSApplication.shared.reply(toApplicationShouldTerminate: true)
+            }
         }
     }
 }
@@ -616,7 +627,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .localPush)
+                DispatchQueue.main.async {
+                    DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .localPush)
+                }
             }
 #endif
         }
@@ -624,19 +637,4 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         completionHandler()
     }
 
-}
-
-extension AppDelegate: AccountManagingDataSource {
-    
-    var accessToken: String? {
-        accountManager.accessToken
-    }
-    
-    func hasEntitlement(for entitlement: Entitlement.ProductName) async -> Result<Bool, Error> {
-        await accountManager.hasEntitlement(for: entitlement)
-    }
-
-    var isUserAuthenticated: Bool {
-        accountManager.isUserAuthenticated
-    }
 }

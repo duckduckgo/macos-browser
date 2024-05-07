@@ -540,7 +540,7 @@ import SubscriptionUI
             toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
-            if DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager).isVPNVisible() {
+            if DefaultNetworkProtectionVisibility(subscriptionManager: AppDelegate.shared.subscriptionManager).isVPNVisible() {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = false
                 toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             } else {
@@ -619,14 +619,14 @@ import SubscriptionUI
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
-            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionPurchaseEnvironment.ServiceEnvironment.default)
+            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionEnvironment.ServiceEnvironment.default)
             let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
 
             SubscriptionDebugMenu(currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
                                   updateEnvironment: {
-                guard let newEnvironment = SubscriptionPurchaseEnvironment.ServiceEnvironment(rawValue: $0) else { return }
+                guard let newEnvironment = SubscriptionEnvironment.ServiceEnvironment(rawValue: $0) else { return }
                 currentEnvironmentWrapper.wrappedValue = newEnvironment
-                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment
+//                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment // TODO: reimplement debug menu for change of environment 
                 VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
             },
                                   isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
@@ -634,7 +634,7 @@ import SubscriptionUI
                                   currentViewController: {
                 WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
             },
-                                  accountManager: AppDelegate.accountManager)
+                                  subscriptionManager: AppDelegate.shared.subscriptionManager)
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }

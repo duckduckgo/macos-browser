@@ -61,10 +61,11 @@ struct PreferencesSection: Hashable, Identifiable {
         ]
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
+            let subscriptionManager = AppDelegate.shared.subscriptionManager
+            let platform = subscriptionManager.currentEnvironment.platform
+            var shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
 
-            var shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
-
-            if AppDelegate.accountManager.isUserAuthenticated {
+            if subscriptionManager.accountManager.isUserAuthenticated {
                 shouldHidePrivacyProDueToNoProducts = false
             }
 

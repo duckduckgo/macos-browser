@@ -339,11 +339,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = AppVersion.shared.versionAndBuildNumber
 
+        // MARK: - Configure Subscription
         let settings = VPNSettings(defaults: defaults)
-        let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+        let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
-        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                                            serviceName: Self.tokenServiceName,
                                                                            errorEvents: debugEvents,
@@ -362,10 +362,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                             entitlementsCache: entitlementsCache,
                                             subscriptionService: subscriptionService,
                                             authService: authService)
-        
+
         let entitlementsCheck = {
             await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
+
+        let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings, defaults: defaults)
 
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,

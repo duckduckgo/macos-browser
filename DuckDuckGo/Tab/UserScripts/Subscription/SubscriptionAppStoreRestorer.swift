@@ -25,14 +25,12 @@ import PixelKit
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
 
-    let accountManager: AccountManaging
-    @MainActor
-    var window: NSWindow? {
-        WindowControllersManager.shared.lastKeyMainWindowController?.window
-    }
+    private let subscriptionManager: SubscriptionManager
+    @MainActor var window: NSWindow? { WindowControllersManager.shared.lastKeyMainWindowController?.window }
+    let subscriptionErrorReporter = SubscriptionErrorReporter()
 
-    public init(accountManager: AccountManaging) {
-        self.accountManager = accountManager
+    public init(subscriptionManager: SubscriptionManager) {
+        self.subscriptionManager = subscriptionManager
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
@@ -49,7 +47,7 @@ struct SubscriptionAppStoreRestorer {
             mainViewController.presentAsSheet(progressViewController)
         }
 
-        let syncResult = await StorePurchaseManager.shared.syncAppleIDAccount()
+        let syncResult = await subscriptionManager.getStorePurchaseManager().syncAppleIDAccount()
 
         switch syncResult {
         case .success:
@@ -73,7 +71,7 @@ struct SubscriptionAppStoreRestorer {
             }
         }
 
-        let appStoreRestoreFlow = AppStoreRestoreFlow(accountManager: accountManager)
+        let appStoreRestoreFlow = AppStoreRestoreFlow(subscriptionManager: subscriptionManager)
         let result = await appStoreRestoreFlow.restoreAccountFromPastPurchase()
 
         switch result {
@@ -88,13 +86,13 @@ struct SubscriptionAppStoreRestorer {
 
             switch error {
             case .missingAccountOrTransactions:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
+                subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionNotFound)
                 await showSubscriptionNotFoundAlert()
             case .subscriptionExpired:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
+                subscriptionErrorReporter.report(subscriptionActivationError: .subscriptionExpired)
                 await showSubscriptionInactiveAlert()
             case .pastTransactionAuthenticationError, .failedToObtainAccessToken, .failedToFetchAccountDetails, .failedToFetchSubscriptionDetails:
-                SubscriptionErrorReporter.report(subscriptionActivationError: .generalError)
+                subscriptionErrorReporter.report(subscriptionActivationError: .generalError)
                 await showSomethingWentWrongAlert()
             }
         }
@@ -124,7 +122,8 @@ extension SubscriptionAppStoreRestorer {
         guard let window else { return }
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
-            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            let url = SubscriptionURL.purchase.subscriptionURL(environment: self.subscriptionManager.currentEnvironment.serviceEnvironment)
+            WindowControllersManager.shared.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }
@@ -134,7 +133,8 @@ extension SubscriptionAppStoreRestorer {
         guard let window else { return }
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
-            WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
+            let url = SubscriptionURL.purchase.subscriptionURL(environment: self.subscriptionManager.currentEnvironment.serviceEnvironment)
+            WindowControllersManager.shared.showTab(with: .subscription(url))
             PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }

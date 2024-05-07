@@ -121,10 +121,10 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     private let statusReporter: NetworkProtectionStatusReporter
     private let ipcClient: TunnelControllerIPCClient
     private let defaults: UserDefaults
-    private let accountManager: AccountManager
+    private let accountManager: AccountManaging
 
     init(defaults: UserDefaults = .netP,
-         accountManager: AccountManager) {
+         accountManager: AccountManaging) {
         let ipcClient = TunnelControllerIPCClient()
         ipcClient.register()
         self.accountManager = accountManager

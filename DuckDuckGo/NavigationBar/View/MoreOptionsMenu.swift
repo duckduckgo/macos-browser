@@ -67,7 +67,7 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(accountManager: AppDelegate.accountManager),
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: AppDelegate.shared.subscriptionManager),
          sharingMenu: NSMenu? = nil,
          internalUserDecider: InternalUserDecider,
          accountManager: AccountManaging) {
@@ -388,7 +388,9 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
-        let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+        let subscriptionManager = AppDelegate.shared.subscriptionManager
+        let platform = subscriptionManager.currentEnvironment.platform
+        let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
         if shouldHidePrivacyProDueToNoProducts {
             return []
         }

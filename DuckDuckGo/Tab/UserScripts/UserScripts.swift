@@ -93,7 +93,7 @@ final class UserScripts: UserScriptsProvider {
         }
 
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature(accountManager: AppDelegate.accountManager, subscriptionErrorReporter: SubscriptionErrorReporter()))
+            subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature(subscriptionManager: AppDelegate.shared.subscriptionManager))
             userScripts.append(subscriptionPagesUserScript)
 
             identityTheftRestorationPagesUserScript.registerSubfeature(delegate: IdentityTheftRestorationPagesFeature())

@@ -1537,8 +1537,6 @@
 		7BAF9E4C2A8A3CCA002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BB108592A43375D000AB95F /* PFMoveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB108582A43375D000AB95F /* PFMoveApplication.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		7BBA7CE62BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBA7CE52BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */; };
-		7BBA7CE72BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBA7CE52BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */; };
 		7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
 		7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
 		7BBE2B7B2B61663C00697445 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7BBE2B7A2B61663C00697445 /* NetworkProtectionProxy */; };
@@ -2552,6 +2550,8 @@
 		F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */; };
 		F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */; };
 		F116A7C92BD1929000F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C82BD1929000F3FCF7 /* PixelKitTestingUtilities */; };
+		F118EA7D2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */; };
+		F118EA7E2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */; };
 		F188267C2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */; };
 		F188267D2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */; };
 		F18826802BBEB58100D9AC4F /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
@@ -3318,7 +3318,6 @@
 		7BA7CC4D2AD11F6F0042E5CE /* NetworkProtectionIPCTunnelController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionIPCTunnelController.swift; sourceTree = "<group>"; };
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
-		7BBA7CE52BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift"; sourceTree = "<group>"; };
 		7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugUtilities.swift; sourceTree = "<group>"; };
 		7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCServiceManager.swift; sourceTree = "<group>"; };
 		7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkExtensionController.swift; sourceTree = "<group>"; };
@@ -4034,6 +4033,7 @@
 		EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+VPNAgentConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
+		F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift"; sourceTree = "<group>"; };
 		F119CCC72BE53CE00002B30E /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPixel.swift; sourceTree = "<group>"; };
 		F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyProPixel.swift; sourceTree = "<group>"; };
@@ -4484,14 +4484,6 @@
 				1DC6696F2B6CF0D700AA0645 /* TabSnapshotStore.swift */,
 			);
 			path = Services;
-			sourceTree = "<group>";
-		};
-		1EA7B8D62B7E124E000330A4 /* Subscription */ = {
-			isa = PBXGroup;
-			children = (
-				7BBA7CE52BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */,
-			);
-			path = Subscription;
 			sourceTree = "<group>";
 		};
 		3169132B2BD2C7960051B46D /* ErrorView */ = {
@@ -6528,7 +6520,7 @@
 				4B677422255DBEB800025BD8 /* SmarterEncryption */,
 				B68458AE25C7E75100DC17B6 /* StateRestoration */,
 				B6A9E44E26142AF90067D1B9 /* Statistics */,
-				1EA7B8D62B7E124E000330A4 /* Subscription */,
+				F118EA7B2BEA2B8700F77634 /* Subscription */,
 				AACB8E7224A4C8BC005F2218 /* Suggestions */,
 				3775913429AB99DA00E26367 /* Sync */,
 				AA86491B24D837DE001BABEE /* Tab */,
@@ -8131,6 +8123,14 @@
 				EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */,
 			);
 			path = JSAlert;
+			sourceTree = "<group>";
+		};
+		F118EA7B2BEA2B8700F77634 /* Subscription */ = {
+			isa = PBXGroup;
+			children = (
+				F118EA7C2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */,
+			);
+			path = Subscription;
 			sourceTree = "<group>";
 		};
 		F1B33DF92BAD9C83001128B3 /* Subscription */ = {
@@ -9978,7 +9978,6 @@
 				3706FC19293F65D500E42796 /* NSNotificationName+Favicons.swift in Sources */,
 				3706FC1A293F65D500E42796 /* PinningManager.swift in Sources */,
 				4B37EE782B4CFF3900A89A61 /* DataBrokerProtectionRemoteMessage.swift in Sources */,
-				7BBA7CE72BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
 				3706FC1B293F65D500E42796 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				3706FC1D293F65D500E42796 /* EmailManagerRequestDelegate.swift in Sources */,
 				3706FC1E293F65D500E42796 /* ApplicationVersionReader.swift in Sources */,
@@ -9987,6 +9986,7 @@
 				1DDC85042B83903E00670238 /* PreferencesWebTrackingProtectionView.swift in Sources */,
 				3706FC20293F65D500E42796 /* PreferencesAutofillView.swift in Sources */,
 				3706FC21293F65D500E42796 /* UserText+PasswordManager.swift in Sources */,
+				F118EA7E2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
 				3706FC22293F65D500E42796 /* LoadingProgressView.swift in Sources */,
 				3706FC23293F65D500E42796 /* StatisticsStore.swift in Sources */,
 				1DDD3EBD2B84DCB9004CBF2B /* WebTrackingProtectionPreferences.swift in Sources */,
@@ -10927,7 +10927,6 @@
 				B68C92C1274E3EF4002AC6B0 /* PopUpWindow.swift in Sources */,
 				AA5FA6A0275F948900DCE9C9 /* Favicons.xcdatamodeld in Sources */,
 				3158B1502B0BF75200AF130C /* DataBrokerProtectionLoginItemScheduler.swift in Sources */,
-				7BBA7CE62BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				4B9DB01D2A983B24000927DB /* Waitlist.swift in Sources */,
 				BBDFDC5A2B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */,
@@ -11439,6 +11438,7 @@
 				B6C00ECB292F839D009C73A6 /* AutofillTabExtension.swift in Sources */,
 				B6E319382953446000DD3BCF /* Assertions.swift in Sources */,
 				AAB549DF25DAB8F80058460B /* BookmarkViewModel.swift in Sources */,
+				F118EA7D2BEA2B8700F77634 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift in Sources */,
 				85707F28276A34D900DC0649 /* DaxSpeech.swift in Sources */,
 				31F28C5328C8EECA00119F70 /* DuckURLSchemeHandler.swift in Sources */,
 				AA13DCB4271480B0006D48D3 /* FirePopoverViewModel.swift in Sources */,

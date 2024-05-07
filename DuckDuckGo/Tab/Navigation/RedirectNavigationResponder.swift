@@ -38,10 +38,12 @@ struct RedirectNavigationResponder: NavigationResponder {
 
         if url.pathComponents == URL.privacyPro.pathComponents {
             let isFeatureAvailable = DefaultSubscriptionFeatureAvailability().isFeatureAvailable
-            let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
+            let subscriptionManager = AppDelegate.shared.subscriptionManager
+            let platform = subscriptionManager.currentEnvironment.platform
+            let shouldHidePrivacyProDueToNoProducts = platform == .appStore && subscriptionManager.canPurchase == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
-
-            return isPurchasePageRedirectActive ? URL.subscriptionBaseURL : nil
+            let url = SubscriptionURL.baseURL.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
+            return isPurchasePageRedirectActive ? url : nil
         }
 
         return nil

@@ -29,11 +29,11 @@ import ServiceManagement
 import PixelKit
 import Subscription
 
-private let accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
-
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
-    private let _delegate = DuckDuckGoVPNAppDelegate()
+
+    public let accountManager: AccountManaging
+    private let _delegate: DuckDuckGoVPNAppDelegate
 
     override init() {
         os_log(.error, log: .networkProtection, "🟢 Status Bar Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
@@ -43,6 +43,23 @@ final class DuckDuckGoVPNApplication: NSApplication {
             os_log(.error, log: .networkProtection, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
             exit(0)
         }
+
+        // MARK: - Configure Subscription
+        let settings = VPNSettings(defaults: UserDefaults.netP)
+        let subscriptionEnvironment: SubscriptionEnvironment.ServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
+        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment)
+        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment)
+        let subscriptionsAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: UserDefaults(suiteName: subscriptionsAppGroup) ?? UserDefaults.standard,
+                                                                 key: UserDefaultsCacheKey.subscriptionEntitlements,
+                                                                 settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
+        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionsAppGroup)))
+        accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
+                                            entitlementsCache: entitlementsCache,
+                                            subscriptionService: subscriptionService,
+                                            authService: authService)
+
+        _delegate = DuckDuckGoVPNAppDelegate(bouncer: NetworkProtectionBouncer(accountManager: accountManager), accountManager: accountManager)
 
         super.init()
         self.delegate = _delegate
@@ -67,7 +84,14 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private static let recentThreshold: TimeInterval = 5.0
 
     private let appLauncher = AppLauncher()
-    private let bouncer = NetworkProtectionBouncer(accountManager: accountManager)
+    private let bouncer: NetworkProtectionBouncer
+    private let accountManager: AccountManaging
+
+    public init(bouncer: NetworkProtectionBouncer,
+                accountManager: AccountManaging) {
+        self.bouncer = bouncer
+        self.accountManager = accountManager
+    }
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -150,7 +174,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         networkExtensionBundleID: tunnelExtensionBundleID,
         networkExtensionController: networkExtensionController,
         settings: tunnelSettings,
-        defaults: userDefaults)
+        defaults: userDefaults,
+        accessTokenStorage: SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(Bundle.main.appGroup(bundle: .subs)))))
 
     /// An IPC server that provides access to the tunnel controller.
     ///
@@ -269,8 +294,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
+
+        // let currentServiceEnvironment: SubscriptionEnvironment.ServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
+        // TODO: set SubscriptionEnvironment.ServiceEnvironment across extensions and VPN
 
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
 
@@ -361,7 +389,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private func setUpSubscriptionMonitoring() {
         guard accountManager.isUserAuthenticated else { return }
         let entitlementsCheck = {
-            await accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
+            await self.accountManager.hasEntitlement(for: .networkProtection, cachePolicy: .reloadIgnoringLocalCacheData)
         }
 
         Task {
