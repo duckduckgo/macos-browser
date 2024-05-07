@@ -69,8 +69,7 @@ final class ZoomPopoverViewModelTests: XCTestCase {
     }
 
     @MainActor
-    func test_WhenResetZoomFromPopover_ThenWebViewIsReset() {
-        let notificationExpectation = self.expectation(forNotification: AccessibilityPreferences.zoomPerWebsiteUpdated, object: nil, handler: nil)
+    func test_WhenResetZoomFromPopover_ThenWebViewIsReset() async {
         let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
         tabVM.tab.webView.defaultZoomValue = .percent100
         tabVM.tab.webView.zoomLevel = randomZoomLevel
@@ -78,8 +77,9 @@ final class ZoomPopoverViewModelTests: XCTestCase {
         zoomPopover.reset()
 
         XCTAssertEqual(.percent100, tabVM.tab.webView.zoomLevel)
-        XCTAssertEqual(.percent100, zoomPopover.zoomLevel)
-        wait(for: [notificationExpectation], timeout: 1)
+        await MainActor.run {
+            XCTAssertEqual(.percent100, zoomPopover.zoomLevel)
+        }
     }
 
     @MainActor
