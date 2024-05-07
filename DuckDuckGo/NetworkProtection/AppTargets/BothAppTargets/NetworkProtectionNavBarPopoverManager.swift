@@ -69,7 +69,8 @@ final class NetworkProtectionNavBarPopoverManager: NetPPopoverManager {
                 connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
-                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
+                dataVolumeObserver: ipcClient.ipcDataVolumeObserver,
+                knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
             )
 
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher

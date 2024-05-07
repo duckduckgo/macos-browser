@@ -106,6 +106,7 @@ extension NetworkProtectionStatusView {
         private static let serverInfoDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.serverInfoDispatchQueue", qos: .userInteractive)
         private static let tunnelErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.tunnelErrorDispatchQueue", qos: .userInteractive)
         private static let controllerErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.controllerErrorDispatchQueue", qos: .userInteractive)
+        private static let knownFailureDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.knownFailureDispatchQueue", qos: .userInteractive)
 
         // MARK: - Initialization & Deinitialization
 
@@ -144,6 +145,7 @@ extension NetworkProtectionStatusView {
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
             lastTunnelErrorMessage = statusReporter.connectionErrorObserver.recentValue
             lastControllerErrorMessage = statusReporter.controllerErrorMessageObserver.recentValue
+            knownFailure = statusReporter.knownFailureObserver.recentValue
             showDebugInformation = false
 
             // Particularly useful when unit testing with an initial status of our choosing.
@@ -151,6 +153,7 @@ extension NetworkProtectionStatusView {
             subscribeToConnectivityIssues()
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
+            subscribeToKnownFailures()
             subscribeToDebugInformationChanges()
             refreshLoginItemStatus()
 
@@ -184,6 +187,12 @@ extension NetworkProtectionStatusView {
         func openPrivacyPro() {
             Task {
                 await appLauncher.launchApp(withCommand: .showPrivacyPro)
+            }
+        }
+
+        func openFeedbackForm() {
+            Task {
+                await appLauncher.launchApp(withCommand: .shareFeedback)
             }
         }
 
@@ -235,6 +244,13 @@ extension NetworkProtectionStatusView {
                         self.lastControllerErrorMessage = errorMessage
                     }
                 }.store(in: &cancellables)
+        }
+
+        private func subscribeToKnownFailures() {
+            statusReporter.knownFailureObserver.publisher
+                .subscribe(on: Self.knownFailureDispatchQueue)
+                .assign(to: \.knownFailure, onWeaklyHeld: self)
+                .store(in: &cancellables)
         }
 
         private func subscribeToDebugInformationChanges() {
@@ -339,6 +355,34 @@ extension NetworkProtectionStatusView {
                     }
                 }
 
+            }
+        }
+
+        @Published
+        private var knownFailure: KnownFailure?
+
+        var warningViewModel: WarningView.Model? {
+            if let issueDescription {
+                return WarningView.Model(message: issueDescription, actionTitle: nil, action: nil)
+            }
+
+            if let warningMessage = warningMessage(for: knownFailure) {
+                return WarningView.Model(message: warningMessage,
+                                         actionTitle: UserText.vpnShareFeedback,
+                                         action: openFeedbackForm)
+            }
+
+            return nil
+        }
+
+        func warningMessage(for knownFailure: KnownFailure?) -> String? {
+            guard let knownFailure else { return nil }
+
+            switch (knownFailure.domain, knownFailure.code) {
+            case ("SMAppServiceErrorDomain", 1):
+                return UserText.vpnOperationNotPermittedMessage
+            default:
+                return nil
             }
         }
     }

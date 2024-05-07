@@ -94,7 +94,8 @@ final class MainViewController: NSViewController {
                 connectionErrorObserver: ipcClient.ipcConnectionErrorObserver,
                 connectivityIssuesObserver: connectivityIssuesObserver,
                 controllerErrorMessageObserver: controllerErrorMessageObserver,
-                dataVolumeObserver: ipcClient.ipcDataVolumeObserver
+                dataVolumeObserver: ipcClient.ipcDataVolumeObserver,
+                knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
             )
         }()
 

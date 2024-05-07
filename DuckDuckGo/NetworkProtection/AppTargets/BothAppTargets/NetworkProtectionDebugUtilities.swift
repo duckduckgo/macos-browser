@@ -79,6 +79,14 @@ final class NetworkProtectionDebugUtilities {
         try await ipcClient.debugCommand(.sendTestNotification)
     }
 
+    func simulateKnownFailure() async throws {
+        do {
+            try await ipcClient.debugCommand(.simulateKnownFailure)
+        } catch {
+            NetworkProtectionKnownFailureStore().lastKnownFailure = KnownFailure(error)
+        }
+    }
+
     func expireRegistrationKeyNow() async throws {
         try await ipcClient.debugCommand(.expireRegistrationKey)
     }

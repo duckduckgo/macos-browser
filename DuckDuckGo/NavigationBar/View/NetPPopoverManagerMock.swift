@@ -70,6 +70,12 @@ final class IPCClientMock: NetworkProtectionIPCClient {
     }
     var ipcDataVolumeObserver: any NetworkProtection.DataVolumeObserver = DataVolumeObserverMock()
 
+    final class KnownFailureObserverMock: NetworkProtection.KnownFailureObserver {
+        var publisher: AnyPublisher<KnownFailure?, Never> = PassthroughSubject().eraseToAnyPublisher()
+        var recentValue: KnownFailure?
+    }
+    var ipcKnownFailureObserver: any NetworkProtection.KnownFailureObserver = KnownFailureObserverMock()
+
     func start(completion: @escaping (Error?) -> Void) {
         completion(nil)
     }

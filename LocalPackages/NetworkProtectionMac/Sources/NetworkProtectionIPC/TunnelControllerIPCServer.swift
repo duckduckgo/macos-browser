@@ -165,6 +165,12 @@ extension TunnelControllerIPCServer: IPCClientInterface {
             client.dataVolumeUpdated(payload: payload)
         }
     }
+
+    public func knownFailureUpdated(_ failure: KnownFailure?) {
+        xpc.forEachClient { client in
+            client.knownFailureUpdated(failure: failure)
+        }
+    }
 }
 
 // MARK: - Incoming communication from a client

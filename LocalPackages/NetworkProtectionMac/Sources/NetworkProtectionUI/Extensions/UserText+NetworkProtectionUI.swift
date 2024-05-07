@@ -33,6 +33,8 @@ final class UserText {
     static let vpnLocationConnected = NSLocalizedString("network.protection.vpn.location.connected", value: "Connected Location", comment: "Description of the location type in the VPN status view")
     static let vpnLocationSelected = NSLocalizedString("network.protection.vpn.location.selected", value: "Selected Location", comment: "Description of the location type in the VPN status view")
     static let vpnDataVolume = NSLocalizedString("network.protection.vpn.data-volume", value: "Data Volume", comment: "Title for the data volume section in the VPN status view")
+    static let vpnShareFeedback = NSLocalizedString("network.protection.vpn.share-feedback", value: "Share VPN Feedback…", comment: "Action button title for the Share VPN feedback option")
+    static let vpnOperationNotPermittedMessage = NSLocalizedString("network.protection.vpn.failure.operation-not-permitted", value: "Operation not permitted", comment: "Error message for the Operation Not Permitted error")
 
     // MARK: - Onboarding
 

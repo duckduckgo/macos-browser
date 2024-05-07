@@ -135,7 +135,8 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             connectionErrorObserver: ipcClient.connectionErrorObserver,
             connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
             controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications(),
-            dataVolumeObserver: ipcClient.dataVolumeObserver
+            dataVolumeObserver: ipcClient.dataVolumeObserver,
+            knownFailureObserver: KnownFailureObserverThroughDistributedNotifications()
         )
 
         // Force refresh just in case. A refresh is requested when the IPC client is created, but distributed notifications don't guarantee delivery

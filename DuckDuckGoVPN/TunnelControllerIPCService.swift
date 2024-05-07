@@ -159,6 +159,9 @@ extension TunnelControllerIPCService: IPCServerInterface {
         case .sendTestNotification:
             // Intentional no-op: handled by the extension
             break
+        case .simulateKnownFailure:
+            let simulatedError = NSError(domain: "SMAppServiceErrorDomain", code: 1)
+            throw simulatedError
         case .removeVPNConfiguration:
             await VPNConfigurationManager().removeVPNConfiguration()
 

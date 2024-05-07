@@ -27,6 +27,7 @@ public protocol IPCClientInterface: AnyObject {
     func serverInfoChanged(_ serverInfo: NetworkProtectionStatusServerInfo)
     func statusChanged(_ status: ConnectionStatus)
     func dataVolumeUpdated(_ dataVolume: DataVolume)
+    func knownFailureUpdated(_ failure: KnownFailure?)
 }
 
 /// This is the XPC interface with parameters that can be packed properly
@@ -36,6 +37,7 @@ protocol XPCClientInterface {
     func serverInfoChanged(payload: Data)
     func statusChanged(payload: Data)
     func dataVolumeUpdated(payload: Data)
+    func knownFailureUpdated(failure: KnownFailure?)
 }
 
 public final class TunnelControllerIPCClient {
@@ -50,6 +52,7 @@ public final class TunnelControllerIPCClient {
     public var connectionErrorObserver = ConnectionErrorObserverThroughIPC()
     public var connectionStatusObserver = ConnectionStatusObserverThroughIPC()
     public var dataVolumeObserver = DataVolumeObserverThroughIPC()
+    public var knownFailureObserver = KnownFailureObserverThroughIPC()
 
     /// The delegate.
     ///
@@ -69,7 +72,8 @@ public final class TunnelControllerIPCClient {
             serverInfoObserver: self.serverInfoObserver,
             connectionErrorObserver: self.connectionErrorObserver,
             connectionStatusObserver: self.connectionStatusObserver,
-            dataVolumeObserver: self.dataVolumeObserver
+            dataVolumeObserver: self.dataVolumeObserver,
+            knownFailureObserver: self.knownFailureObserver
         )
 
         xpc = XPCClient(
@@ -102,17 +106,20 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
     let connectionErrorObserver: ConnectionErrorObserverThroughIPC
     let connectionStatusObserver: ConnectionStatusObserverThroughIPC
     let dataVolumeObserver: DataVolumeObserverThroughIPC
+    let knownFailureObserver: KnownFailureObserverThroughIPC
 
     init(clientDelegate: IPCClientInterface?,
          serverInfoObserver: ConnectionServerInfoObserverThroughIPC,
          connectionErrorObserver: ConnectionErrorObserverThroughIPC,
          connectionStatusObserver: ConnectionStatusObserverThroughIPC,
-         dataVolumeObserver: DataVolumeObserverThroughIPC) {
+         dataVolumeObserver: DataVolumeObserverThroughIPC,
+         knownFailureObserver: KnownFailureObserverThroughIPC) {
         self.clientDelegate = clientDelegate
         self.serverInfoObserver = serverInfoObserver
         self.connectionErrorObserver = connectionErrorObserver
         self.connectionStatusObserver = connectionStatusObserver
         self.dataVolumeObserver = dataVolumeObserver
+        self.knownFailureObserver = knownFailureObserver
     }
 
     func errorChanged(error: String?) {
@@ -146,6 +153,11 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
         dataVolumeObserver.publish(dataVolume)
         clientDelegate?.dataVolumeUpdated(dataVolume)
     }
+
+    func knownFailureUpdated(failure: KnownFailure?) {
+        knownFailureObserver.publish(failure)
+        clientDelegate?.knownFailureUpdated(failure)
+    }
 }
 
 // MARK: - Outgoing communication to the server
@@ -160,16 +172,23 @@ extension TunnelControllerIPCClient: IPCServerInterface {
         })
     }
 
+    public func onComplete(_ completion: @escaping (Error?) -> Void) -> (Error?) -> Void {
+        { [weak self] error in
+            self?.xpcDelegate.knownFailureUpdated(failure: .init(error))
+            completion(error)
+        }
+    }
+
     public func start(completion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
-            server.start(completion: completion)
-        }, xpcReplyErrorHandler: completion)
+            server.start(completion: self.onComplete(completion))
+        }, xpcReplyErrorHandler: self.onComplete(completion))
     }
 
     public func stop(completion: @escaping (Error?) -> Void) {
         xpc.execute(call: { server in
-            server.stop(completion: completion)
-        }, xpcReplyErrorHandler: completion)
+            server.stop(completion: self.onComplete(completion))
+        }, xpcReplyErrorHandler: self.onComplete(completion))
     }
 
     public func fetchLastError(completion: @escaping (Error?) -> Void) {
@@ -185,16 +204,16 @@ extension TunnelControllerIPCClient: IPCServerInterface {
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             xpc.execute(call: { server in
-                server.debugCommand(payload) { error in
+                server.debugCommand(payload) { [weak self] error in
                     if let error {
+                        self?.xpcDelegate.knownFailureUpdated(failure: .init(error))
                         continuation.resume(throwing: error)
                     } else {
                         continuation.resume()
                     }
                 }
-            }, xpcReplyErrorHandler: { error in
-                // Intentional no-op as there's no completion block
-                // If you add a completion block, please remember to call it here too!
+            }, xpcReplyErrorHandler: { [weak self] error in
+                self?.xpcDelegate.knownFailureUpdated(failure: .init(error))
                 continuation.resume(throwing: error)
             })
         }

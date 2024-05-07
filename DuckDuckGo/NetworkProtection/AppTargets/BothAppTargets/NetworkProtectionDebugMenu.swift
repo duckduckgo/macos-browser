@@ -92,6 +92,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
                 .targetting(self)
 
+            NSMenuItem(title: "Simulate Known Failure", action: #selector(NetworkProtectionDebugMenu.simulateKnownFailure))
+                .targetting(self)
+
             NSMenuItem(title: "Log Feedback Metadata to Console", action: #selector(NetworkProtectionDebugMenu.logFeedbackMetadataToConsole))
                 .targetting(self)
 
@@ -221,6 +224,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
             } catch {
                 await NSAlert(error: error).runModal()
             }
+        }
+    }
+
+    @objc func simulateKnownFailure(_ sender: Any?) throws {
+        Task { @MainActor in
+            try await debugUtilities.simulateKnownFailure()
         }
     }
 
