@@ -33,6 +33,7 @@ struct ZoomPopoverContentView: View {
             } label: {
                 Text(UserText.resetZoom)
                     .frame(height: 28)
+                    .fixedSize(horizontal: true, vertical: false)
                     .padding(.horizontal, 8)
             }
 
