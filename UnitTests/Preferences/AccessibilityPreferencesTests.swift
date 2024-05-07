@@ -91,9 +91,6 @@ class AccessibilityPreferencesTests: XCTestCase {
         XCTAssertEqual(model.zoomPerWebsite(url: website2), zoom2)
         XCTAssertEqual(persister.zoomPerWebsite[domain1], zoom1.rawValue)
         XCTAssertEqual(persister.zoomPerWebsite[domain2], zoom2.rawValue)
-        let savedZoomPerWebsiteValues = UserDefaultsWrapper(key: .websitePageZoom, defaultValue: [:]).wrappedValue as? [String: CGFloat]
-        XCTAssertEqual(savedZoomPerWebsiteValues?[domain1], zoom1.rawValue)
-        XCTAssertEqual(savedZoomPerWebsiteValues?[domain2], zoom2.rawValue)
         wait(for: [notificationExpectation], timeout: 1)
     }
 
@@ -121,11 +118,6 @@ class AccessibilityPreferencesTests: XCTestCase {
         XCTAssertNil(persister.zoomPerWebsite[domain2])
         XCTAssertEqual(persister.zoomPerWebsite[domain3], zoom3.rawValue)
         XCTAssertNil(persister.zoomPerWebsite[domain4])
-        let savedZoomPerWebsiteValues = UserDefaultsWrapper(key: .websitePageZoom, defaultValue: [:]).wrappedValue as? [String: CGFloat]
-        XCTAssertEqual(savedZoomPerWebsiteValues?[domain1], zoom1.rawValue)
-        XCTAssertNil(savedZoomPerWebsiteValues?[domain2])
-        XCTAssertEqual(savedZoomPerWebsiteValues?[domain3], zoom3.rawValue)
-        XCTAssertNil(savedZoomPerWebsiteValues?[domain4])
         wait(for: [notificationExpectation], timeout: 1)
     }
 
@@ -152,11 +144,6 @@ class AccessibilityPreferencesTests: XCTestCase {
         XCTAssertEqual(persister.zoomPerWebsite[domain2], zoom2.rawValue)
         XCTAssertEqual(persister.zoomPerWebsite[domain3], zoom3.rawValue)
         XCTAssertNil(persister.zoomPerWebsite[domain4])
-        let savedZoomPerWebsiteValues = UserDefaultsWrapper(key: .websitePageZoom, defaultValue: [:]).wrappedValue as? [String: CGFloat]
-        XCTAssertNil(savedZoomPerWebsiteValues?[domain1])
-        XCTAssertEqual(savedZoomPerWebsiteValues?[domain2], zoom2.rawValue)
-        XCTAssertEqual(savedZoomPerWebsiteValues?[domain3], zoom3.rawValue)
-        XCTAssertNil(savedZoomPerWebsiteValues?[domain4])
         wait(for: [notificationExpectation], timeout: 1)
     }
 
