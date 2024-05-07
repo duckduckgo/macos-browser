@@ -32906,6 +32906,18 @@
         }
       }
     },
+    "onboarding.startbrowsing.added-to-dock.text" : {
+      "comment" : "Call to action to start using the app as a browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You’re all set! Find me in your Dock any time.\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possibleu{00A0}🔒"
+          }
+        }
+      }
+    },
     "onboarding.startbrowsing.text" : {
       "comment" : "Call to action to start using the app as a browser",
       "extractionState" : "extracted_with_value",

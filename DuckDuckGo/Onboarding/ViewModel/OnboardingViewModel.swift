@@ -49,6 +49,7 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     var typingDisabled = false
+    var addToDockPressed = false
 
     @Published var skipTypingRequested = false
     @Published var state: OnboardingPhase = .startFlow {
@@ -144,6 +145,7 @@ final class OnboardingViewModel: ObservableObject {
     func onAddToDockPressed() {
         PixelKit.fire(GeneralPixel.userAddedToDockDuringOnboarding,
                       includeAppVersionParameter: false)
+        addToDockPressed = true
         delegate?.onboardingDidRequestAddToDock { [weak self] in
             self?.state = .startBrowsing
             Self.isOnboardingFinished = true
