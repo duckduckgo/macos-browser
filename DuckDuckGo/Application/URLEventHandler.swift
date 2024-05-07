@@ -159,7 +159,7 @@ final class URLEventHandler {
                 WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
                 WindowControllersManager.shared.showLocationPickerSheet()
             case AppLaunchCommand.showPrivacyPro.launchURL:
-                let url = SubscriptionURL.purchase.subscriptionURL(environment: AppDelegate.shared.subscriptionManager.currentEnvironment.serviceEnvironment)
+                let url = SubscriptionURL.purchase.subscriptionURL(environment: Application.appDelegate.subscriptionManager.currentEnvironment.serviceEnvironment)
                 WindowControllersManager.shared.showTab(with: .subscription(url))
                 PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
 #if !APPSTORE && !DEBUG

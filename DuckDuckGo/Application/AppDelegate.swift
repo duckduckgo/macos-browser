@@ -40,14 +40,6 @@ import Subscription
 // @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    /// To be used with very cautiously, this do not replace proper dependency injection
-    static var shared: AppDelegate {
-        guard let delegate = NSApplication.shared.delegate as? AppDelegate else {
-            fatalError("Could not get app delegate ")
-        }
-        return delegate
-    }
-
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
         // Disable CVDisplayLink logs

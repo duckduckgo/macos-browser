@@ -540,7 +540,7 @@ import SubscriptionUI
             toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
             toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
-            if DefaultNetworkProtectionVisibility(subscriptionManager: AppDelegate.shared.subscriptionManager).isVPNVisible() {
+            if DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager).isVPNVisible() {
                 toggleNetworkProtectionShortcutMenuItem.isHidden = false
                 toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             } else {
@@ -634,7 +634,7 @@ import SubscriptionUI
                                   currentViewController: {
                 WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
             },
-                                  subscriptionManager: AppDelegate.shared.subscriptionManager)
+                                  subscriptionManager: Application.appDelegate.subscriptionManager)
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }

@@ -59,7 +59,7 @@ final class VPNPreferencesModel: ObservableObject {
 
     private var onboardingStatus: OnboardingStatus {
         didSet {
-            showUninstallVPN = DefaultNetworkProtectionVisibility(subscriptionManager: AppDelegate.shared.subscriptionManager).isInstalled
+            showUninstallVPN = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager).isInstalled
         }
     }
 

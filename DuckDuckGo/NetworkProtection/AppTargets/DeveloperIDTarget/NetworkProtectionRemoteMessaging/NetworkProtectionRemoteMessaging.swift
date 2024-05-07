@@ -55,7 +55,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.networkProtection(),
         waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection", keychainAppGroup: Bundle.main.appGroup(bundle: .netP)),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
-        networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: AppDelegate.shared.subscriptionManager),
+        networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
     ) {

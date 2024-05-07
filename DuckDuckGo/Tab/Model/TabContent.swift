@@ -117,7 +117,7 @@ extension TabContent {
         }
 
         if let url {
-            let subscriptionManager = AppDelegate.shared.subscriptionManager
+            let subscriptionManager = Application.appDelegate.subscriptionManager
             let environment = subscriptionManager.currentEnvironment.serviceEnvironment
             let subscriptionBaseURL = SubscriptionURL.baseURL.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)
             let identityTheftRestorationURL = SubscriptionURL.identityTheftRestoration.subscriptionURL(environment: subscriptionManager.currentEnvironment.serviceEnvironment)

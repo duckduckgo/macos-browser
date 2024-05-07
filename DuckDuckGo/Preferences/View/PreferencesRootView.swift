@@ -137,7 +137,7 @@ enum Preferences {
                         WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
                     case .openITR:
                         PixelKit.fire(PrivacyProPixel.privacyProIdentityRestorationSettings)
-                        let url = SubscriptionURL.identityTheftRestoration.subscriptionURL(environment: AppDelegate.shared.subscriptionManager.currentEnvironment.serviceEnvironment)
+                        let url = SubscriptionURL.identityTheftRestoration.subscriptionURL(environment: Application.appDelegate.subscriptionManager.currentEnvironment.serviceEnvironment)
                         WindowControllersManager.shared.showTab(with: .identityTheftRestoration(url))
                     case .iHaveASubscriptionClick:
                         PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseClick)
@@ -169,7 +169,7 @@ enum Preferences {
                             return
                         }
 
-                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: AppDelegate.shared.subscriptionManager)
+                        let subscriptionAppStoreRestorer = SubscriptionAppStoreRestorer(subscriptionManager: Application.appDelegate.subscriptionManager)
                         await subscriptionAppStoreRestorer.restoreAppStoreSubscription(mainViewController: mainViewController, windowController: windowControllerManager)
                     }
                 }
@@ -180,7 +180,7 @@ enum Preferences {
             return PreferencesSubscriptionModel(openURLHandler: openURL,
                                                 userEventHandler: handleUIEvent,
                                                 sheetActionHandler: sheetActionHandler,
-                                                subscriptionManager: AppDelegate.shared.subscriptionManager)
+                                                subscriptionManager: Application.appDelegate.subscriptionManager)
         }
     }
 }

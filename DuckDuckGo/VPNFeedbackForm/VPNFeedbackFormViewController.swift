@@ -40,7 +40,7 @@ final class VPNFeedbackFormViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
 
     init() {
-        self.viewModel = VPNFeedbackFormViewModel(metadataCollector: DefaultVPNMetadataCollector(accountManager: AppDelegate.shared.subscriptionManager.accountManager))
+        self.viewModel = VPNFeedbackFormViewModel(metadataCollector: DefaultVPNMetadataCollector(accountManager: Application.appDelegate.subscriptionManager.accountManager))
         super.init(nibName: nil, bundle: nil)
         self.viewModel.delegate = self
     }

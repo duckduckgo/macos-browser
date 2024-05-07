@@ -196,7 +196,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         switch subscriptionPlatform {
         case .appStore:
             if #available(macOS 12.0, *) {
-                let appStorePurchaseFlow = AppStorePurchaseFlow(subscriptionManager: subscriptionManager)
                 return await subscriptionManager.getStorePurchaseManager().subscriptionOptions()
             }
         case .stripe:

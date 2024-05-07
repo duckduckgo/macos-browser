@@ -71,7 +71,7 @@ final class AddressBarTextField: NSTextField {
     private var currentTextDidChangeEvent: TextDidChangeEventType = .none
 
     var subscriptionEnvironment: SubscriptionEnvironment {
-        AppDelegate.shared.subscriptionManager.currentEnvironment
+        Application.appDelegate.subscriptionManager.currentEnvironment
     }
 
     // MARK: - Lifecycle

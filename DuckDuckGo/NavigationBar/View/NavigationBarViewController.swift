@@ -72,7 +72,7 @@ final class NavigationBarViewController: NSViewController {
     }()
 
     private var subscriptionManager: SubscriptionManager {
-        AppDelegate.shared.subscriptionManager
+        Application.appDelegate.subscriptionManager
     }
 
     var addressBarViewController: AddressBarViewController?
@@ -272,6 +272,7 @@ final class NavigationBarViewController: NSViewController {
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
+                                   networkProtectionFeatureVisibility: DefaultNetworkProtectionVisibility(subscriptionManager: Application.appDelegate.subscriptionManager), 
                                    internalUserDecider: internalUserDecider,
                                    accountManager: subscriptionManager.accountManager)
         menu.actionDelegate = self

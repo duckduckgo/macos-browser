@@ -18,7 +18,6 @@
 
 import Foundation
 import Subscription
-import BrowserServicesKit
 
 public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel, PurchaseRestoringSubscriptionAccessModel {
 

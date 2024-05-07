@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import AppKit
 import Subscription
 import BrowserServicesKit
 
@@ -24,6 +25,6 @@ extension DefaultSubscriptionFeatureAvailability {
 
     convenience init() {
         self.init(privacyConfigurationManager: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager,
-                  subscriptionEnvironment: AppDelegate.shared.subscriptionManager.currentEnvironment)
+                  subscriptionEnvironment: Application.appDelegate.subscriptionManager.currentEnvironment)
     }
 }

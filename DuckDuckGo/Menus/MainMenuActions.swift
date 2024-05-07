@@ -789,7 +789,7 @@ extension MainViewController {
     /// Clears the PrivacyPro state to make testing easier.
     ///
     private func clearPrivacyProState() {
-        AppDelegate.shared.subscriptionManager.accountManager.signOut()
+        Application.appDelegate.subscriptionManager.accountManager.signOut()
         resetThankYouModalChecks(nil)
         UserDefaults.netP.networkProtectionEntitlementsExpired = false
 
