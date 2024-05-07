@@ -95,10 +95,12 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     }
 
     private func testSubscription() {
+        SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
+        
         print("USER AUTH \(accountManager.isUserAuthenticated ? "YES" : "NO")")
 
         Task {
-            switch await accountManager.hasEntitlement(for: .dataBrokerProtection) {
+            switch await accountManager.hasEntitlement(for: .dataBrokerProtection, cachePolicy: .reloadIgnoringLocalCacheData) {
             case let .success(result):
                 print("ENTITLEMENT \(result ? "YES" : "NO")")
             case .failure(let error):
