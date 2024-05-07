@@ -31,7 +31,7 @@ struct ZoomPopoverContentView: View {
             Button {
                 viewModel.reset()
             } label: {
-                Text("Reset")
+                Text(UserText.resetZoom)
                     .frame(height: 28)
                     .padding(.horizontal, 8)
             }
