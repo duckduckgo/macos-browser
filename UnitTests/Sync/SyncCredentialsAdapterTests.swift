@@ -73,7 +73,7 @@ final class SyncCredentialsAdapterTests: XCTestCase {
 
 }
 
-class CapturingAdapterErrorHandler: SyncAdapterErrorHandling {
+class CapturingAdapterErrorHandler: SyncErrorHandling {
     var handleBookmarkErrorCalled = false
     var syncCredentialsSuccededCalled = false
     var handleCredentialErrorCalled = false

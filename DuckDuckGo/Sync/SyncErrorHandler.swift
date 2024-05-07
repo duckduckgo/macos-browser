@@ -23,8 +23,8 @@ import PixelKit
 import Persistence
 import Combine
 
-/// The SyncAdapterErrorHandling protocol defines methods for handling sync errors related to specific data types such as bookmarks and credentials.
-protocol SyncAdapterErrorHandling {
+/// The SyncErrorHandling protocol defines methods for handling sync errors related to specific data types such as bookmarks and credentials.
+protocol SyncErrorHandling {
     func handleBookmarkError(_ error: Error)
     func handleCredentialError(_ error: Error)
     func syncBookmarksSucceded()
@@ -165,7 +165,7 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
     }
 }
 
-extension SyncErrorHandler: SyncAdapterErrorHandling {
+extension SyncErrorHandler: SyncErrorHandling {
     func syncCredentialsSucceded() {
         lastSyncSuccessTime = Date()
         resetCredentialsErrors()

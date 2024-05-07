@@ -28,11 +28,11 @@ final class SyncCredentialsAdapter {
 
     private(set) var provider: CredentialsProvider?
     let databaseCleaner: CredentialsDatabaseCleaner
-    let syncAdapterErrorHandler: SyncAdapterErrorHandling
+    let syncAdapterErrorHandler: SyncErrorHandling
     let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
     init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory,
-         syncAdapterErrorHandler: SyncAdapterErrorHandling) {
+         syncAdapterErrorHandler: SyncErrorHandling) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
         self.syncAdapterErrorHandler =  syncAdapterErrorHandler
         databaseCleaner = CredentialsDatabaseCleaner(
