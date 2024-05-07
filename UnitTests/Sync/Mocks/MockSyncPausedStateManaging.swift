@@ -1,5 +1,5 @@
 //
-//  MockSyncPreferencesErrorHandler.swift
+//  MockSyncPausedStateManaging.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,10 +20,10 @@ import Foundation
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockSyncPreferencesErrorHandler: SyncPreferencesErrorHandler {
-    static var syncBookmarksPausedData = SyncPausedErrorMetadata(syncPausedTitle: "Bookmarks Paused", syncPausedMessage: "Something with bookmark is wrong", syncPausedButtonTitle: "Manage Bookmarks", syncPausedAction: {print("something bookmarks")})
-    static var syncCredentialsPausedData = SyncPausedErrorMetadata(syncPausedTitle: "Credentials Paused", syncPausedMessage: "Something with Credentials is wrong", syncPausedButtonTitle: "Manage Credentials", syncPausedAction: {print("something Credentials")})
-    static var synclsPausedData = SyncPausedErrorMetadata(syncPausedTitle: "Paused", syncPausedMessage: "Something is wrong", syncPausedButtonTitle: "", syncPausedAction: nil)
+class MockSyncPausedStateManaging: SyncPausedStateManaging {
+    static var syncBookmarksPausedData = SyncPausedMessageData(title: "Bookmarks Paused", description: "Something with bookmark is wrong", buttonTitle: "Manage Bookmarks", action: {print("something bookmarks")})
+    static var syncCredentialsPausedData = SyncPausedMessageData(title: "Credentials Paused", description: "Something with Credentials is wrong", buttonTitle: "Manage Credentials", action: {print("something Credentials")})
+    static var syncIsPausedData = SyncPausedMessageData(title: "Paused", description: "Something is wrong", buttonTitle: "", action: nil)
 
     var isSyncPausedChangedPublisher = PassthroughSubject<Void, Never>()
 
@@ -39,15 +39,15 @@ class MockSyncPreferencesErrorHandler: SyncPreferencesErrorHandler {
         isSyncPausedChangedPublisher.eraseToAnyPublisher()
     }
 
-    var syncPausedMetadata: SyncPausedErrorMetadata? {
-        return Self.synclsPausedData
+    var syncPausedMetadata: SyncPausedMessageData? {
+        return Self.syncIsPausedData
     }
 
-    var syncBookmarksPausedMetadata: SyncPausedErrorMetadata {
+    var syncBookmarksPausedMetadata: SyncPausedMessageData {
         return Self.syncBookmarksPausedData
     }
 
-    var syncCredentialsPausedMetadata: SyncPausedErrorMetadata {
+    var syncCredentialsPausedMetadata: SyncPausedMessageData {
         return Self.syncCredentialsPausedData
     }
 

@@ -27,6 +27,19 @@ import PDFKit
 import Navigation
 import PixelKit
 
+/// The SyncPausedStateManaging protocol manages sync error states. It provides properties and methods to detect and handle changes in the synchronization status, aiding in error user notification.
+protocol SyncPausedStateManaging: ObservableObject {
+    var isSyncPaused: Bool { get }
+    var isSyncBookmarksPaused: Bool { get }
+    var isSyncCredentialsPaused: Bool { get }
+    var syncPausedChangedPublisher: AnyPublisher<Void, Never> { get }
+    var syncPausedMetadata: SyncPausedMessageData? { get }
+    var syncBookmarksPausedMetadata: SyncPausedMessageData { get }
+    var syncCredentialsPausedMetadata: SyncPausedMessageData { get }
+
+    func syncDidTurnOff()
+}
+
 extension SyncDevice {
     init(_ account: SyncAccount) {
         self.init(kind: .current, name: account.deviceName, id: account.deviceId)
@@ -40,51 +53,51 @@ extension SyncDevice {
 
 final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     var syncPausedTitle: String? {
-        return syncPreferencesErrorHandler.syncPausedMetadata?.syncPausedTitle
+        return syncPreferencesErrorHandler.syncPausedMetadata?.title
     }
 
     var syncPausedMessage: String? {
-        return syncPreferencesErrorHandler.syncPausedMetadata?.syncPausedMessage
+        return syncPreferencesErrorHandler.syncPausedMetadata?.description
     }
 
     var syncPausedButtonTitle: String? {
-        return syncPreferencesErrorHandler.syncPausedMetadata?.syncPausedButtonTitle
+        return syncPreferencesErrorHandler.syncPausedMetadata?.buttonTitle
     }
 
     var syncPausedButtonAction: (() -> Void)? {
-        return syncPreferencesErrorHandler.syncPausedMetadata?.syncPausedAction
+        return syncPreferencesErrorHandler.syncPausedMetadata?.action
     }
 
     var syncBookmarksPausedTitle: String {
-        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.syncPausedTitle
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.title
     }
 
     var syncBookmarksPausedMessage: String {
-        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.syncPausedMessage
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.description
     }
 
     var syncBookmarksPausedButtonTitle: String {
-        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.syncPausedButtonTitle
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.buttonTitle
     }
 
     var syncBookmarksPausedButtonAction: (() -> Void)? {
-        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.syncPausedAction
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.action
     }
 
     var syncCredentialsPausedTitle: String {
-        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.syncPausedTitle
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.title
     }
 
     var syncCredentialsPausedMessage: String {
-        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.syncPausedMessage
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.description
     }
 
     var syncCredentialsPausedButtonTitle: String {
-        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.syncPausedButtonTitle
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.buttonTitle
     }
 
     var syncCredentialsPausedButtonAction: (() -> Void)? {
-        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.syncPausedAction
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.action
     }
 
     struct Consts {
@@ -152,7 +165,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var isAccountRecoveryAvailable: Bool = true
     @Published var isAppVersionNotSupported: Bool = true
 
-    private let syncPreferencesErrorHandler: any SyncPreferencesErrorHandler
+    private let syncPreferencesErrorHandler: any SyncPausedStateManaging
 
     private func updateSyncFeatureFlags(_ syncFeatureFlags: SyncFeatureFlags) {
         isDataSyncingAvailable = syncFeatureFlags.contains(.dataSyncing)
@@ -173,7 +186,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         appearancePreferences: AppearancePreferences = .shared,
         managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
-        syncPreferencesErrorHandler: any SyncPreferencesErrorHandler
+        syncPreferencesErrorHandler: any SyncPausedStateManaging
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
@@ -743,21 +756,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 }
 
-protocol SyncPreferencesErrorHandler: ObservableObject {
-    var isSyncPaused: Bool { get }
-    var isSyncBookmarksPaused: Bool { get }
-    var isSyncCredentialsPaused: Bool { get }
-    var syncPausedChangedPublisher: AnyPublisher<Void, Never> { get }
-    var syncPausedMetadata: SyncPausedErrorMetadata? { get }
-    var syncBookmarksPausedMetadata: SyncPausedErrorMetadata { get }
-    var syncCredentialsPausedMetadata: SyncPausedErrorMetadata { get }
-
-    func syncDidTurnOff()
-}
-
-struct SyncPausedErrorMetadata {
-    let syncPausedTitle: String
-    let syncPausedMessage: String
-    let syncPausedButtonTitle: String
-    let syncPausedAction: (() -> Void)?
+struct SyncPausedMessageData {
+    let title: String
+    let description: String
+    let buttonTitle: String
+    let action: (() -> Void)?
 }

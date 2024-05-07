@@ -677,7 +677,7 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 }
 
-class CapturingAlertPresenter: AlertPresenter {
+class CapturingAlertPresenter: AlertPresenting {
     var showAlertCalled = false
     var capturedAlert: NSAlert?
     var showAlertCount = 0

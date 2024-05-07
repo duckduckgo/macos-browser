@@ -45,7 +45,7 @@ final class SyncPreferencesTests: XCTestCase {
     var appearancePersistor = MockAppearancePreferencesPersistor()
     var appearancePreferences: AppearancePreferences!
     var syncPreferences: SyncPreferences!
-    var errorHandler: MockSyncPreferencesErrorHandler!
+    var errorHandler: MockSyncPausedStateManaging!
     var testRecoveryCode = "some code"
     var cancellables: Set<AnyCancellable>!
 
@@ -57,7 +57,7 @@ final class SyncPreferencesTests: XCTestCase {
         setUpDatabase()
         appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
         ddgSyncing = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
-        errorHandler = MockSyncPreferencesErrorHandler()
+        errorHandler = MockSyncPausedStateManaging()
 
         syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences, syncAdapterErrorHandler: SyncErrorHandler())
         syncCredentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: AutofillSecureVaultFactory, syncAdapterErrorHandler: SyncErrorHandler())
@@ -244,23 +244,23 @@ final class SyncPreferencesTests: XCTestCase {
     }
 
     func test_ErrorHandlerReturnsExpectedSyncBookmarksPausedMetadata() {
-        XCTAssertEqual(syncPreferences.syncBookmarksPausedTitle, MockSyncPreferencesErrorHandler.syncBookmarksPausedData.syncPausedTitle)
-        XCTAssertEqual(syncPreferences.syncBookmarksPausedMessage, MockSyncPreferencesErrorHandler.syncBookmarksPausedData.syncPausedMessage)
-        XCTAssertEqual(syncPreferences.syncBookmarksPausedButtonTitle, MockSyncPreferencesErrorHandler.syncBookmarksPausedData.syncPausedButtonTitle)
+        XCTAssertEqual(syncPreferences.syncBookmarksPausedTitle, MockSyncPausedStateManaging.syncBookmarksPausedData.title)
+        XCTAssertEqual(syncPreferences.syncBookmarksPausedMessage, MockSyncPausedStateManaging.syncBookmarksPausedData.description)
+        XCTAssertEqual(syncPreferences.syncBookmarksPausedButtonTitle, MockSyncPausedStateManaging.syncBookmarksPausedData.buttonTitle)
         XCTAssertNotNil(syncPreferences.syncBookmarksPausedButtonAction)
     }
 
     func test_ErrorHandlerReturnsExpectedSyncCredentialsPausedMetadata() {
-        XCTAssertEqual(syncPreferences.syncCredentialsPausedTitle, MockSyncPreferencesErrorHandler.syncCredentialsPausedData.syncPausedTitle)
-        XCTAssertEqual(syncPreferences.syncCredentialsPausedMessage, MockSyncPreferencesErrorHandler.syncCredentialsPausedData.syncPausedMessage)
-        XCTAssertEqual(syncPreferences.syncCredentialsPausedButtonTitle, MockSyncPreferencesErrorHandler.syncCredentialsPausedData.syncPausedButtonTitle)
+        XCTAssertEqual(syncPreferences.syncCredentialsPausedTitle, MockSyncPausedStateManaging.syncCredentialsPausedData.title)
+        XCTAssertEqual(syncPreferences.syncCredentialsPausedMessage, MockSyncPausedStateManaging.syncCredentialsPausedData.description)
+        XCTAssertEqual(syncPreferences.syncCredentialsPausedButtonTitle, MockSyncPausedStateManaging.syncCredentialsPausedData.buttonTitle)
         XCTAssertNotNil(syncPreferences.syncCredentialsPausedButtonAction)
     }
 
-    func test_ErrorHandlerReturnsExpectedSynclsPausedMetadata() {
-        XCTAssertEqual(syncPreferences.syncPausedTitle, MockSyncPreferencesErrorHandler.synclsPausedData.syncPausedTitle)
-        XCTAssertEqual(syncPreferences.syncPausedMessage, MockSyncPreferencesErrorHandler.synclsPausedData.syncPausedMessage)
-        XCTAssertEqual(syncPreferences.syncPausedButtonTitle, MockSyncPreferencesErrorHandler.synclsPausedData.syncPausedButtonTitle)
+    func test_ErrorHandlerReturnsExpectedSyncIsPausedMetadata() {
+        XCTAssertEqual(syncPreferences.syncPausedTitle, MockSyncPausedStateManaging.syncIsPausedData.title)
+        XCTAssertEqual(syncPreferences.syncPausedMessage, MockSyncPausedStateManaging.syncIsPausedData.description)
+        XCTAssertEqual(syncPreferences.syncPausedButtonTitle, MockSyncPausedStateManaging.syncIsPausedData.buttonTitle)
         XCTAssertNil(syncPreferences.syncPausedButtonAction)
     }
 

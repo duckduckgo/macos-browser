@@ -23,6 +23,14 @@ import PixelKit
 import Persistence
 import Combine
 
+/// The SyncAdapterErrorHandling protocol defines methods for handling sync errors related to specific data types such as bookmarks and credentials.
+protocol SyncAdapterErrorHandling {
+    func handleBookmarkError(_ error: Error)
+    func handleCredentialError(_ error: Error)
+    func syncBookmarksSucceded()
+    func syncCredentialsSucceded()
+}
+
 public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
 
     @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
@@ -39,7 +47,7 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
         }
     }
 
-    @UserDefaultsWrapper(key: .synclsPaused, defaultValue: false)
+    @UserDefaultsWrapper(key: .syncIsPaused, defaultValue: false)
     private (set) var isSyncPaused: Bool {
         didSet {
             isSyncPausedChangedPublisher.send()
@@ -68,9 +76,9 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
 
     private var currentSyncAllPausedError: AsyncErrorType?
 
-    let alertPresenter: AlertPresenter
+    let alertPresenter: AlertPresenting
 
-    public init(alertPresenter: AlertPresenter = StandardAlertPresenter()) {
+    public init(alertPresenter: AlertPresenting = StandardAlertPresenter()) {
         self.alertPresenter = alertPresenter
         super.init { event, _, _, _ in
             PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))
@@ -157,7 +165,7 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
     }
 }
 
-extension SyncErrorHandler: SyncAdapterErrorHandler {
+extension SyncErrorHandler: SyncAdapterErrorHandling {
     func syncCredentialsSucceded() {
         lastSyncSuccessTime = Date()
         resetCredentialsErrors()
@@ -308,30 +316,30 @@ extension SyncErrorHandler: SyncAdapterErrorHandler {
 
 }
 
-extension SyncErrorHandler: SyncPreferencesErrorHandler {
-    var syncPausedMetadata: SyncPausedErrorMetadata? {
+extension SyncErrorHandler: SyncPausedStateManaging {
+    var syncPausedMetadata: SyncPausedMessageData? {
         guard let syncPausedMessage else { return nil }
         guard let syncPausedTitle else { return nil }
-        return SyncPausedErrorMetadata(syncPausedTitle: syncPausedTitle,
-                                       syncPausedMessage: syncPausedMessage,
-                                       syncPausedButtonTitle: "",
-                                       syncPausedAction: nil)
+        return SyncPausedMessageData(title: syncPausedTitle,
+                                       description: syncPausedMessage,
+                                       buttonTitle: "",
+                                       action: nil)
     }
 
     @MainActor
-    var syncBookmarksPausedMetadata: SyncPausedErrorMetadata {
-        return SyncPausedErrorMetadata(syncPausedTitle: UserText.syncLimitExceededTitle,
-                                       syncPausedMessage: UserText.bookmarksLimitExceededDescription,
-                                       syncPausedButtonTitle: UserText.bookmarksLimitExceededAction,
-                                       syncPausedAction: manageBookmarks)
+    var syncBookmarksPausedMetadata: SyncPausedMessageData {
+        return SyncPausedMessageData(title: UserText.syncLimitExceededTitle,
+                                     description: UserText.bookmarksLimitExceededDescription,
+                                     buttonTitle: UserText.bookmarksLimitExceededAction,
+                                     action: manageBookmarks)
     }
 
     @MainActor
-    var syncCredentialsPausedMetadata: SyncPausedErrorMetadata {
-        return SyncPausedErrorMetadata(syncPausedTitle: UserText.syncLimitExceededTitle,
-                                       syncPausedMessage: UserText.credentialsLimitExceededDescription,
-                                       syncPausedButtonTitle: UserText.credentialsLimitExceededAction,
-                                       syncPausedAction: manageLogins)
+    var syncCredentialsPausedMetadata: SyncPausedMessageData {
+        return SyncPausedMessageData(title: UserText.syncLimitExceededTitle,
+                                     description: UserText.credentialsLimitExceededDescription,
+                                     buttonTitle: UserText.credentialsLimitExceededAction,
+                                     action: manageLogins)
     }
 
     var syncPausedChangedPublisher: AnyPublisher<Void, Never> {
@@ -341,32 +349,5 @@ extension SyncErrorHandler: SyncPreferencesErrorHandler {
     func syncDidTurnOff() {
         resetBookmarksErrors()
         resetCredentialsErrors()
-    }
-}
-
-protocol SyncAdapterErrorHandler {
-    func handleBookmarkError(_ error: Error)
-    func handleCredentialError(_ error: Error)
-    func syncBookmarksSucceded()
-    func syncCredentialsSucceded()
-}
-
-public protocol AlertPresenter {
-    func showAlert(_ alert: NSAlert)
-}
-
-public struct StandardAlertPresenter: AlertPresenter {
-    public init () {}
-    @MainActor
-    public func showAlert(_ alert: NSAlert) {
-        let response = alert.runModal()
-
-        switch response {
-        case .alertSecondButtonReturn:
-            alert.window.sheetParent?.endSheet(alert.window)
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-        default:
-            break
-        }
     }
 }

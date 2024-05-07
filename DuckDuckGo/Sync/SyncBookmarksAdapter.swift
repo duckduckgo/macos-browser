@@ -41,7 +41,7 @@ final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
-    let syncAdapterErrorHandler: SyncAdapterErrorHandler
+    let syncAdapterErrorHandler: SyncAdapterErrorHandling
 
     @Published
     var isFaviconsFetchingEnabled: Bool = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false).wrappedValue {
@@ -66,7 +66,7 @@ final class SyncBookmarksAdapter {
         database: CoreDataDatabase,
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
         appearancePreferences: AppearancePreferences = .shared,
-        syncAdapterErrorHandler: SyncAdapterErrorHandler
+        syncAdapterErrorHandler: SyncAdapterErrorHandling
     ) {
         self.database = database
         self.bookmarkManager = bookmarkManager
