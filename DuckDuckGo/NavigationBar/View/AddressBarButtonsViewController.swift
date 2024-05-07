@@ -164,7 +164,6 @@ final class AddressBarButtonsViewController: NSViewController {
         didSet {
             if isMouseOverNavigationBar != oldValue {
                 updateBookmarkButtonVisibility()
-                updateZoomButtonVisibility()
             }
         }
     }
@@ -320,7 +319,7 @@ final class AddressBarButtonsViewController: NSViewController {
         && !isTextFieldEditorFirstResponder
         && !isAnyTrackerAnimationPlaying
         && !isAnyShieldAnimationPlaying
-        && (hasNonDefaultZoom || isMouseOverNavigationBar || zoomPopover?.isShown == true)
+        && (hasNonDefaultZoom || zoomPopover?.isShown == true)
 
         zoomButton.isHidden = !shouldShowZoom
     }
