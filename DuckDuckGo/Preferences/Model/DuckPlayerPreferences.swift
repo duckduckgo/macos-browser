@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
+import PixelKit
 
 protocol DuckPlayerPreferencesPersistor {
     /// The persistor hadles raw Bool values but each one translates into a DuckPlayerMode:
@@ -48,6 +49,14 @@ final class DuckPlayerPreferences: ObservableObject {
     var duckPlayerMode: DuckPlayerMode {
         didSet {
             persistor.duckPlayerModeBool = duckPlayerMode.boolValue
+            switch duckPlayerMode {
+            case .enabled:
+                PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysSettings)
+            case .alwaysAsk:
+                PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
+            case .disabled:
+                PixelKit.fire(GeneralPixel.duckPlayerSettingNever)
+            }
         }
     }
 
