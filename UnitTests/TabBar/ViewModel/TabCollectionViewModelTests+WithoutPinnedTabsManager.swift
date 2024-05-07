@@ -231,6 +231,16 @@ extension TabCollectionViewModelTests {
 
     // MARK: - Insert
 
+    func test_WithoutPinnedTabsManager_WhenInsertNewTabIsCalledThenNewTabIsAlsoSelected() {
+        let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(0))
+        XCTAssertNotNil(tabCollectionViewModel.selectedTabViewModel)
+        tabCollectionViewModel.insertNewTab(after: tabCollectionViewModel.selectedTabViewModel!.tab)
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
+    }
+
     func test_WithoutPinnedTabsManager_WhenInsertChildAndParentIsntPartOfTheTabCollection_ThenNoChildIsInserted() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
 
@@ -282,6 +292,28 @@ extension TabCollectionViewModelTests {
         tabCollectionViewModel.insert(tab, selected: false)
 
         XCTAssert(tab === tabCollectionViewModel.tabViewModel(at: 2)?.tab)
+    }
+
+    // MARK: - Insert or Append
+
+    func test_WithoutPinnedTabsManager_WhenInsertOrAppendCalledPreferencesAreRespected() {
+        let persistor = MockTabsPreferencesPersistor()
+        var tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(), pinnedTabsManager: nil,
+                                                            tabsPreferences: TabsPreferences(persistor: persistor))
+
+        let index = tabCollectionViewModel.tabCollection.tabs.count
+        tabCollectionViewModel.insertOrAppendNewTab()
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: index))
+
+        persistor.newTabPosition = .nextToCurrent
+        tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(), pinnedTabsManager: nil,
+                                                            tabsPreferences: TabsPreferences(persistor: persistor))
+
+        tabCollectionViewModel.appendNewTab()
+        tabCollectionViewModel.select(at: .unpinned(0))
+        XCTAssertNotNil(tabCollectionViewModel.selectedTabViewModel)
+        tabCollectionViewModel.insertOrAppendNewTab()
+        XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
     }
 
     // MARK: - Remove

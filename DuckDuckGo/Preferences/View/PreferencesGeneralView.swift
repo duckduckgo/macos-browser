@@ -29,6 +29,7 @@ extension Preferences {
         @ObservedObject var startupModel: StartupPreferences
         @ObservedObject var downloadsModel: DownloadsPreferences
         @ObservedObject var searchModel: SearchPreferences
+        @ObservedObject var tabsModel: TabsPreferences
         @ObservedObject var dataClearingModel: DataClearingPreferences
         @State private var showingCustomHomePageSheet = false
         @State private var isAddedToDock = false
@@ -98,7 +99,26 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 3: Home Page
+                // SECTION 3: Tabs
+                PreferencePaneSection(UserText.tabs) {
+                    PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.preferNewTabsToWindows, isOn: $tabsModel.preferNewTabsToWindows)
+                        ToggleMenuItem(UserText.switchToNewTabWhenOpened, isOn: $tabsModel.switchToNewTabWhenOpened)
+                    }
+
+                    PreferencePaneSubSection {
+                        HStack {
+                            Picker(UserText.newTabPositionTitle, selection: $tabsModel.newTabPosition) {
+                                ForEach(NewTabPosition.allCases, id: \.self) { position in
+                                    Text(UserText.newTabPositionMode(for: position)).tag(position)
+                                }
+                            }
+                            .fixedSize()
+                        }
+                    }
+                }
+
+                // SECTION 4: Home Page
                 PreferencePaneSection(UserText.homePage) {
 
                     PreferencePaneSubSection {
@@ -142,12 +162,12 @@ extension Preferences {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
-                // SECTION 4: Search Settings
+                // SECTION 5: Search Settings
                 PreferencePaneSection(UserText.privateSearch) {
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $searchModel.showAutocompleteSuggestions).accessibilityIdentifier("PreferencesGeneralView.showAutocompleteSuggestions")
                 }
 
-                // SECTION 5: Downloads
+                // SECTION 6: Downloads
                 PreferencePaneSection(UserText.downloads) {
                     PreferencePaneSubSection {
                         ToggleMenuItem(UserText.downloadsOpenPopupOnCompletion,
