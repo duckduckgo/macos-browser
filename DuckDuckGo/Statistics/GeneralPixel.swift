@@ -83,7 +83,9 @@ enum GeneralPixel: PixelKitEventV2 {
     case duckPlayerSettingAlwaysOverlaySERP
     case duckPlayerSettingAlwaysOverlayYoutube
     case duckPlayerSettingAlwaysSettings
-    case duckPlayerSettingNever
+    case duckPlayerSettingNeverOverlaySERP
+    case duckPlayerSettingNeverOverlayYoutube
+    case duckPlayerSettingNeverSettings
     case duckPlayerSettingBackToDefault
     case duckPlayerWatchOnYoutube
 
@@ -425,8 +427,12 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_duck-player_setting_always_overlay_serp"
         case .duckPlayerSettingAlwaysOverlayYoutube:
             return "m_mac_duck-player_setting_always_overlay_youtube"
-        case .duckPlayerSettingNever:
-            return "m_mac_duck-player_setting_never"
+        case .duckPlayerSettingNeverOverlaySERP:
+            return "m_mac_duck-player_setting_never_overlay_serp"
+        case .duckPlayerSettingNeverOverlayYoutube:
+            return "m_mac_duck-player_setting_never_overlay_youtube"
+        case .duckPlayerSettingNeverSettings:
+            return "m_mac_duck-player_setting_never_settings"
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
         case .duckPlayerWatchOnYoutube:

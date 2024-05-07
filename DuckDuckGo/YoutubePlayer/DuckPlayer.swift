@@ -151,7 +151,14 @@ final class DuckPlayer {
             case .alwaysAsk:
                 PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
             case .disabled:
-                PixelKit.fire(GeneralPixel.duckPlayerSettingNever)
+                switch origin {
+                case .serpOverlay:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlaySERP)
+                case .youtubeOverlay:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlayYoutube)
+                default:
+                    break
+                }
             }
 
             return self.encodeUserValues()

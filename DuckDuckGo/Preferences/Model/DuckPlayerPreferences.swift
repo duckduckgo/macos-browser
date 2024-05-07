@@ -55,7 +55,7 @@ final class DuckPlayerPreferences: ObservableObject {
             case .alwaysAsk:
                 PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
             case .disabled:
-                PixelKit.fire(GeneralPixel.duckPlayerSettingNever)
+                PixelKit.fire(GeneralPixel.duckPlayerSettingNeverSettings)
             }
         }
     }
