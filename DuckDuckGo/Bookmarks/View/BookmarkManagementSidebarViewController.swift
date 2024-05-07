@@ -89,6 +89,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         tabSwitcherButton.menu = NSMenu {
             for content in Tab.TabContent.displayableTabTypes {
                 NSMenuItem(title: content.title!, representedObject: content)
+                    .withAccessibilityIdentifier("BookmarkManagementSidebarViewController.\(content.title!)")
             }
         }
 

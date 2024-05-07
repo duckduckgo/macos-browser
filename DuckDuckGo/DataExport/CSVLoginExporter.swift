@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import PixelKit
 
 final class CSVLoginExporter {
 
@@ -49,7 +50,7 @@ final class CSVLoginExporter {
                 }
             }
         } catch {
-            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.secureVaultError(error: error)))
             throw error
         }
 

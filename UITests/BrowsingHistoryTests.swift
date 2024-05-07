@@ -27,6 +27,10 @@ class BrowsingHistoryTests: XCTestCase {
     private var addressBarTextField: XCUIElement!
     private let lengthForRandomPageTitle = 8
 
+    override class func setUp() {
+        UITests.firstRun()
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
@@ -72,7 +76,7 @@ class BrowsingHistoryTests: XCTestCase {
             "The address bar text field didn't become available in a reasonable timeframe."
         )
 
-        addressBarTextField.typeText("\(url.absoluteString)\r")
+        addressBarTextField.typeURL(url)
         XCTAssertTrue(
             app.windows.webViews[historyPageTitleExpectedToBeFirstInRecentlyVisited]
                 .waitForExistence(timeout: UITests.Timeouts.elementExistence),
@@ -100,7 +104,7 @@ class BrowsingHistoryTests: XCTestCase {
             "The address bar text field didn't become available in a reasonable timeframe."
         )
 
-        addressBarTextField.typeText("\(url.absoluteString)\r")
+        addressBarTextField.typeURL(url)
         XCTAssertTrue(
             app.windows.webViews[historyPageTitleExpectedToBeFirstInTodayHistory].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
@@ -129,14 +133,14 @@ class BrowsingHistoryTests: XCTestCase {
             addressBarTextField.waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "The address bar text field didn't become available in a reasonable timeframe."
         )
-        addressBarTextField.typeText("\(urlForFirstTab.absoluteString)\r")
+        addressBarTextField.typeURL(urlForFirstTab)
         XCTAssertTrue(
             app.windows.webViews[titleOfFirstTabWhichShouldRestore].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."
         )
         app.typeKey("t", modifierFlags: .command)
 
-        addressBarTextField.typeText("\(urlForSecondTab.absoluteString)\r")
+        addressBarTextField.typeURL(urlForSecondTab)
         XCTAssertTrue(
             app.windows.webViews[titleOfSecondTabWhichShouldRestore].waitForExistence(timeout: UITests.Timeouts.elementExistence),
             "Visited site didn't load with the expected title in a reasonable timeframe."

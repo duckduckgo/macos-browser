@@ -42,8 +42,8 @@ extension UserText {
     static let networkProtectionInviteSuccessMessage = "DuckDuckGo's VPN secures all of your device's Internet traffic anytime, anywhere."
 
     // MARK: - Navigation Bar Status View
-    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Send VPN Feedback' in the VPN status view that's shown in the navigation bar
-    static let networkProtectionNavBarStatusViewShareFeedback = "Send VPN Feedback…"
+    // "network.protection.navbar.status.view.share.feedback" - Menu item for 'Share VPN Feedback' in the VPN status view that's shown in the navigation bar
+    static let networkProtectionNavBarStatusViewShareFeedback = "Share VPN Feedback…"
     // "network.protection.status.menu.vpn.settings" - The status menu 'VPN Settings' menu item
     static let networkProtectionNavBarStatusMenuVPNSettings = "VPN Settings…"
     // "network.protection.status.menu.faq" - The status menu 'FAQ' menu item
@@ -67,162 +67,10 @@ extension UserText {
     // "network.protection.system.extension.unknown.activation.error" - Message shown to users when they try to enable NetP and there is an unexpected activation error.
     static let networkProtectionUnknownActivationError = "There as an unexpected error. Please try again."
     // "network.protection.system.extension.please.reboot" - Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation
-    static let networkProtectionPleaseReboot = "Please reboot to activate the VPN"
+    static let networkProtectionPleaseReboot = "VPN update available. Restart your Mac to reconnect."
 }
 
-// MARK: - VPN Waitlist
-
 extension UserText {
-
-    // "network-protection.waitlist.notification.title" - Title for VPN waitlist notification
-    static let networkProtectionWaitlistNotificationTitle = "DuckDuckGo VPN beta is ready!"
-    // "network-protection.waitlist.notification.text" - Title for VPN waitlist notification
-    static let networkProtectionWaitlistNotificationText = "Open your invite"
-
-    // "network-protection.waitlist.join.title" - Title for VPN join waitlist screen
-    static let networkProtectionWaitlistJoinTitle = "DuckDuckGo VPN Beta"
-    // "network-protection.waitlist.join.subtitle.1" - First subtitle for VPN join waitlist screen
-    static let networkProtectionWaitlistJoinSubtitle1 = "Secure your connection anytime, anywhere with DuckDuckGo VPN."
-    // "network-protection.waitlist.join.subtitle.2" - Second subtitle for VPN join waitlist screen
-    static let networkProtectionWaitlistJoinSubtitle2 = "Join the waitlist, and we’ll notify you when it’s your turn."
-
-    // "network-protection.waitlist.joined.title" - Title for VPN joined waitlist screen
-    static let networkProtectionWaitlistJoinedTitle = "You’re on the list!"
-    // "network-protection.waitlist.joined.with-notifications.subtitle.1" - Subtitle 1 for VPN joined waitlist screen when notifications are enabled
-    static let networkProtectionWaitlistJoinedWithNotificationsSubtitle1 = "New invites are sent every few days, on a first come, first served basis."
-    // "network-protection.waitlist.joined.with-notifications.subtitle.2" - Subtitle 2 for VPN joined waitlist screen when notifications are enabled
-    static let networkProtectionWaitlistJoinedWithNotificationsSubtitle2 = "We’ll notify you when your invite is ready."
-    // "network-protection.waitlist.enable-notifications" - Enable notifications prompt for VPN joined waitlist screen
-    static let networkProtectionWaitlistEnableNotifications = "Want to get a notification when your VPN invite is ready?"
-
-    // "network-protection.waitlist.invited.title" - Title for VPN invited screen
-    static let networkProtectionWaitlistInvitedTitle = "You’re invited to try\nDuckDuckGo VPN beta!"
-    // "network-protection.waitlist.invited.subtitle" - Subtitle for VPN invited screen
-    static let networkProtectionWaitlistInvitedSubtitle = "Get an extra layer of protection online with the VPN built for speed and simplicity. Encrypt your internet connection across your entire device and hide your location and IP address from sites you visit."
-
-    // "network-protection.waitlist.invited.section-1.title" - Title for section 1 of the VPN invited screen
-    static let networkProtectionWaitlistInvitedSection1Title = "Full-device coverage"
-    // "network-protection.waitlist.invited.section-1.subtitle" - Subtitle for section 1 of the VPN invited screen
-    static let networkProtectionWaitlistInvitedSection1Subtitle = "Encrypt online traffic across your browsers and apps."
-
-    // "network-protection.waitlist.invited.section-2.title" - Title for section 2 of the VPN invited screen
-    static let networkProtectionWaitlistInvitedSection2Title = "Fast, reliable, and easy to use"
-    // "network-protection.waitlist.invited.section-2.subtitle" - Subtitle for section 2 of the VPN invited screen
-    static let networkProtectionWaitlistInvitedSection2Subtitle = "No need for a separate app. Connect in one click and see your connection status at a glance."
-
-    // "network-protection.waitlist.invited.section-3.title" - Title for section 3 of the VPN invited screen
-    static let networkProtectionWaitlistInvitedSection3Title = "Strict no-logging policy"
-    // "network-protection.waitlist.invited.section-3.subtitle" - Subtitle for section 3 of the VPN invited screen
-    static let networkProtectionWaitlistInvitedSection3Subtitle = "We do not log or save any data that can connect you to your online activity."
-
-    // "network-protection.waitlist.enable.title" - Title for VPN enable screen
-    static let networkProtectionWaitlistEnableTitle = "Ready to enable DuckDuckGo VPN?"
-    // "network-protection.waitlist.enable.subtitle" - Subtitle for VPN enable screen
-    static let networkProtectionWaitlistEnableSubtitle = "Look for the globe icon in the browser toolbar or in the Mac menu bar.\n\nYou'll be asked to Allow a VPN connection once when setting up DuckDuckGo VPN the first time."
-
-    // "network-protection.waitlist.availability-disclaimer" - Availability disclaimer for VPN join waitlist screen
-    static let networkProtectionWaitlistAvailabilityDisclaimer = "DuckDuckGo VPN is free to use during the beta."
-
-    // "network-protection.waitlist.button.close" - Close button for VPN join waitlist screen
-    static let networkProtectionWaitlistButtonClose = "Close"
-    // "network-protection.waitlist.button.done" - Close button for VPN joined waitlist screen
-    static let networkProtectionWaitlistButtonDone = "Done"
-    // "network-protection.waitlist.button.dismiss" - Dismiss button for VPN join waitlist screen
-    static let networkProtectionWaitlistButtonDismiss = "Dismiss"
-    // "network-protection.waitlist.button.cancel" - Cancel button for VPN join waitlist screen
-    static let networkProtectionWaitlistButtonCancel = "Cancel"
-    // "network-protection.waitlist.button.no-thanks" - No Thanks button for VPN joined waitlist screen
-    static let networkProtectionWaitlistButtonNoThanks = "No Thanks"
-    // "network-protection.waitlist.button.get-started" - Get Started button for VPN joined waitlist screen
-    static let networkProtectionWaitlistButtonGetStarted = "Get Started"
-    // "network-protection.waitlist.button.got-it" - Got It button for VPN joined waitlist screen
-    static let networkProtectionWaitlistButtonGotIt = "Got It"
-    // "network-protection.waitlist.button.enable-notifications" - Enable Notifications button for VPN joined waitlist screen
-    static let networkProtectionWaitlistButtonEnableNotifications = "Enable Notifications"
-    // "network-protection.waitlist.button.join-waitlist" - Join Waitlist button for VPN join waitlist screen
-    static let networkProtectionWaitlistButtonJoinWaitlist = "Join the Waitlist"
-    // "network-protection.waitlist.button.agree-and-continue" - Agree and Continue button for VPN join waitlist screen
-    static let networkProtectionWaitlistButtonAgreeAndContinue = "Agree and Continue"
-}
-
-// MARK: - VPN Terms of Service
-
-extension UserText {
-
-    // "network-protection.privacy-policy.title" - Privacy Policy title for VPN
-    static let networkProtectionPrivacyPolicyTitle = "Privacy Policy"
-
-    // "network-protection.privacy-policy.section.1.title" - Privacy Policy title for VPN
-    static let networkProtectionPrivacyPolicySection1Title = "We don’t ask for any personal information from you in order to use this beta service."
-    // "network-protection.privacy-policy.section.1.list" - Privacy Policy list for VPN (Markdown version)
-    static let networkProtectionPrivacyPolicySection1ListMarkdown = "This Privacy Policy is for our limited waitlist beta VPN product.\n\nOur main [Privacy Policy](https://duckduckgo.com/privacy) also applies here."
-    // "network-protection.privacy-policy.section.1.list" - Privacy Policy list for VPN (Non-Markdown version)
-    static let networkProtectionPrivacyPolicySection1ListNonMarkdown = "This Privacy Policy is for our limited waitlist beta VPN product.\n\nOur main Privacy Policy also applies here."
-
-    // "network-protection.privacy-policy.section.2.title" - Privacy Policy title for VPN
-    static let networkProtectionPrivacyPolicySection2Title = "We don’t keep any logs of your online activity."
-    // "network-protection.privacy-policy.section.2.list" - Privacy Policy list for VPN
-    static let networkProtectionPrivacyPolicySection2List = "That means we have no way to tie what you do online to you as an individual and we don’t have any record of things like:\n    • Website visits\n    • DNS requests\n    • Connections made\n    • IP addresses used\n    • Session lengths"
-
-    // "network-protection.privacy-policy.section.3.title" - Privacy Policy title for VPN
-    static let networkProtectionPrivacyPolicySection3Title = "We only keep anonymous performance metrics that we cannot connect to your online activity."
-    // "network-protection.privacy-policy.section.3.list" - Privacy Policy list for VPN
-    static let networkProtectionPrivacyPolicySection3List = "Our servers store generic usage (for example, CPU load) and diagnostic data (for example, errors), but none of that data is connected to any individual’s activity.\n\nWe use this non-identifying information to monitor and ensure the performance and quality of the service, for example to make sure servers aren’t overloaded."
-
-    // "network-protection.privacy-policy.section.4.title" - Privacy Policy title for VPN
-    static let networkProtectionPrivacyPolicySection4Title = "We use dedicated servers for all VPN traffic."
-    // "network-protection.privacy-policy.section.4.list" - Privacy Policy list for VPN
-    static let networkProtectionPrivacyPolicySection4List = "Dedicated servers means they are not shared with anyone else.\n\nWe rent our servers from providers we carefully selected because they meet our privacy requirements.\n\nWe have strict access controls in place so that only limited DuckDuckGo team members have access to our servers."
-
-    // "network-protection.privacy-policy.section.5.title" - Privacy Policy title for VPN
-    static let networkProtectionPrivacyPolicySection5Title = "We protect and limit use of your data when you communicate directly with DuckDuckGo."
-    // "network-protection.privacy-policy.section.5.list" - Privacy Policy list for VPN
-    static let networkProtectionPrivacyPolicySection5List = "If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n\nIf you participate in a voluntary product survey or questionnaire and agree to provide further feedback, we may contact you using the information you provide.\n\nWe will permanently delete all personal information you provided to us (email, contact information), within 30 days after closing a support case or, in the case of follow up feedback, within 60 days after ending this beta service."
-
-    // "network-protection.terms-of-service.title" - Terms of Service title for VPN
-    static let networkProtectionTermsOfServiceTitle = "Terms of Service"
-
-    // "network-protection.terms-of-service.section.1.title" - Terms of Service title for VPN
-    static let networkProtectionTermsOfServiceSection1Title = "The service is for limited and personal use only."
-    // "network-protection.terms-of-service.section.1.list" - Terms of Service list for VPN
-    static let networkProtectionTermsOfServiceSection1List = "This service is provided for your personal use only.\n\nYou are responsible for all activity in the service that occurs on or through your device.\n\nThis service may only be used through the DuckDuckGo app on the device on which you are given access. If you delete the DuckDuckGo app, you will lose access to the service.\n\nYou may not use this service through a third-party client."
-
-    // "network-protection.terms-of-service.section.2.title" - Terms of Service title for VPN
-    static let networkProtectionTermsOfServiceSection2Title = "You agree to comply with all applicable laws, rules, and regulations."
-    // "network-protection.terms-of-service.section.2.list" - Terms of Service list for VPN (Markdown version)
-    static let networkProtectionTermsOfServiceSection2ListMarkdown = "You agree that you will not use the service for any unlawful, illicit, criminal, or fraudulent purpose, or in any manner that could give rise to civil or criminal liability under applicable law.\n\nYou agree to comply with our [DuckDuckGo Terms of Service](https://duckduckgo.com/terms), which are incorporated by reference."
-    // "network-protection.terms-of-service.section.2.list" - Terms of Service list for VPN (Non-Markdown version)
-    static let networkProtectionTermsOfServiceSection2ListNonMarkdown = "You agree that you will not use the service for any unlawful, illicit, criminal, or fraudulent purpose, or in any manner that could give rise to civil or criminal liability under applicable law.\n\nYou agree to comply with our DuckDuckGo Terms of Service, which are incorporated by reference."
-
-    // "network-protection.terms-of-service.section.3.title" - Terms of Service title for VPN
-    static let networkProtectionTermsOfServiceSection3Title = "You must be eligible to use this service."
-    // "network-protection.terms-of-service.section.3.list" - Terms of Service list for VPN
-    static let networkProtectionTermsOfServiceSection3List = "Access to this beta is randomly awarded. You are responsible for ensuring eligibility.\n\nYou must be at least 18 years old and live in a location where use of a VPN is legal in order to be eligible to use this service."
-
-    // "network-protection.terms-of-service.section.4.title" - Terms of Service title for VPN
-    static let networkProtectionTermsOfServiceSection4Title = "We provide this beta service as-is and without warranty."
-    // "network-protection.terms-of-service.section.4.list" - Terms of Service list for VPN
-    static let networkProtectionTermsOfServiceSection4List = "This service is provided as-is and without warranties or guarantees of any kind.\n\nTo the extent possible under applicable law, DuckDuckGo will not be liable for any damage or loss arising from your use of the service. In any event, the total aggregate liability of DuckDuckGo shall not exceed $25 or the equivalent in your local currency.\n\nWe may in the future transfer responsibility for the service to a subsidiary of DuckDuckGo. If that happens, you agree that references to “DuckDuckGo” will refer to our subsidiary, which will then become responsible for providing the service and for any liabilities relating to it."
-
-    // "network-protection.terms-of-service.section.5.title" - Terms of Service title for VPN
-    static let networkProtectionTermsOfServiceSection5Title = "We may terminate access at any time."
-    // "network-protection.terms-of-service.section.5.list" - Terms of Service list for VPN
-    static let networkProtectionTermsOfServiceSection5List = "We reserve the right to revoke access to the service at any time in our sole discretion.\n\nWe may also terminate access for violation of these terms, including for repeated infringement of the intellectual property rights of others."
-
-    // "network-protection.terms-of-service.section.6.title" - Terms of Service title for VPN
-    static let networkProtectionTermsOfServiceSection6Title = "The service is free during the beta period."
-    // "network-protection.terms-of-service.section.6.list" - Terms of Service list for VPN
-    static let networkProtectionTermsOfServiceSection6List = "Access to this service is currently free of charge, but that is limited to this beta period.\n\nYou understand and agree that this service is provided on a temporary, testing basis only."
-
-    // "network-protection.terms-of-service.section.7.title" - Terms of Service title for VPN
-    static let networkProtectionTermsOfServiceSection7Title = "We are continually updating the service."
-    // "network-protection.terms-of-service.section.7.list" - Terms of Service list for VPN
-    static let networkProtectionTermsOfServiceSection7List = "The service is in beta, and we are regularly changing it.\n\nService coverage, speed, server locations, and quality may vary without warning."
-
-    // "network-protection.terms-of-service.section.8.title" - Terms of Service title for VPN
-    static let networkProtectionTermsOfServiceSection8Title = "We need your feedback."
-    // "network-protection.terms-of-service.section.8.list" - Terms of Service list for VPN
-    static let networkProtectionTermsOfServiceSection8List = "You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n\nIf you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them."
 
     // MARK: - Feedback Form
     // "vpn.feedback-form.title" - Title for each screen of the VPN feedback form
@@ -299,7 +147,7 @@ extension UserText {
     // "vpn.location.description.nearest" - Nearest city setting description
     static let vpnLocationNearest = "Nearest"
     // "vpn.location.description.nearest.available" - Nearest available location setting description
-    static let vpnLocationNearestAvailable = "Nearest available"
+    static let vpnLocationNearestAvailable = "Nearest Location"
     // "vpn.location.nearest.available.title" - Subtitle underneath the nearest available vpn location preference text.
     static let vpnLocationNearestAvailableSubtitle = "Automatically connect to the nearest server we can find."
 
@@ -330,61 +178,16 @@ extension UserText {
     static let uninstallVPNAlertTitle = "Are you sure you want to uninstall the VPN?"
     // "vpn.uninstall.alert.informative.text" - Informative text for the alert that comes up when the user decides to uninstall our VPN
     static let uninstallVPNInformativeText = "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device."
-}
 
-#if DBP
-// MARK: - Data Broker Protection Waitlist
-extension UserText {
-    // "data-broker-protection.privacy-policy.title" - Privacy Policy title for Personal Information Removal
-    static let dataBrokerProtectionPrivacyPolicyTitle = "Privacy Policy"
-    // "data-broker-protection.waitlist.notification.title" - Title for Personal Information Removal waitlist notification
-    static let dataBrokerProtectionWaitlistNotificationTitle = "Personal Information Removal beta is ready!"
-    // "data-broker-protection.waitlist.notification.text" - Title for Personal Information Removal waitlist notification
-    static let dataBrokerProtectionWaitlistNotificationText = "Open your invite"
-    // "data-broker-protection.waitlist.join.title" - Title for Personal Information Removal join waitlist screen
-    static let dataBrokerProtectionWaitlistJoinTitle = "Personal Information Removal Beta"
-    // "data-broker-protection.waitlist.join.subtitle.1" - First subtitle for Personal Information Removal join waitlist screen
-    static let dataBrokerProtectionWaitlistJoinSubtitle1 = "Automatically scan and remove your data from 17+ sites that sell personal information with DuckDuckGo’s Personal Information Removal."
-    // "data-broker-protection.waitlist.joined.title" - Title for Personal Information Removal joined waitlist screen
-    static let dataBrokerProtectionWaitlistJoinedTitle = "You’re on the list!"
-    // "data-broker-protection.waitlist.joined.with-notifications.subtitle.1" - Subtitle 1 for Personal Information Removal joined waitlist screen when notifications are enabled
-    static let dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle1 = "New invites are sent every few days, on a first come, first served basis."
-    // "data-broker-protection.waitlist.joined.with-notifications.subtitle.2" - Subtitle 2 for Personal Information Removal joined waitlist screen when notifications are enabled
-    static let dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle2 = "We’ll notify you when your invite is ready."
-    // "data-broker-protection.waitlist.enable-notifications" - Enable notifications prompt for Personal Information Removal joined waitlist screen
-    static let dataBrokerProtectionWaitlistEnableNotifications = "Want to get a notification when your Personal Information Removal invite is ready?"
-    // "data-broker-protection.waitlist.invited.title" - Title for Personal Information Removal invited screen
-    static let dataBrokerProtectionWaitlistInvitedTitle = "You’re invited to try\nPersonal Information Removal beta!"
-    // "data-broker-protection.waitlist.invited.subtitle" - Subtitle for Personal Information Removal invited screen
-    static let dataBrokerProtectionWaitlistInvitedSubtitle = "Automatically find and remove your personal information – such as your name and address – from 17+ sites that store and sell it, reducing the risk of identity theft and spam."
-    // "data-broker-protection.waitlist.enable.title" - Title for Personal Information Removal enable screen
-    static let dataBrokerProtectionWaitlistEnableTitle = "Let’s get started"
-    // "data-broker-protection.waitlist.enable.subtitle" - Subtitle for Personal Information Removal enable screen
-    static let dataBrokerProtectionWaitlistEnableSubtitle = "We’ll need your name, address and the year you were born in order to find your personal information on data broker sites\n\nThis info is stored securely on your device, and is never sent to DuckDuckGo."
-    // "data-broker-protection.waitlist.availability-disclaimer" - Availability disclaimer for Personal Information Removal join waitlist screen
-    static let dataBrokerProtectionWaitlistAvailabilityDisclaimer = "Personal Information Removal is free during the beta.\nJoin the waitlist and we'll notify you when ready."
-    // "data-broker-protection.waitlist.button.close" - Close button for Personal Information Removal join waitlist screen
-    static let dataBrokerProtectionWaitlistButtonClose = "Close"
-    // "data-broker-protection.waitlist.button.done" - Close button for Personal Information Removal joined waitlist screen
-    static let dataBrokerProtectionWaitlistButtonDone = "Done"
-    // "data-broker-protection.waitlist.button.dismiss" - Dismiss button for Personal Information Removal join waitlist screen
-    static let dataBrokerProtectionWaitlistButtonDismiss = "Dismiss"
-    // "data-broker-protection.waitlist.button.cancel" - Cancel button for Personal Information Removal join waitlist screen
-    static let dataBrokerProtectionWaitlistButtonCancel = "Cancel"
-    // "data-broker-protection.waitlist.button.no-thanks" - No Thanks button for Personal Information Removal joined waitlist screen
-    static let dataBrokerProtectionWaitlistButtonNoThanks = "No Thanks"
-    // "data-broker-protection.waitlist.button.get-started" - Get Started button for Personal Information Removal joined waitlist screen
-    static let dataBrokerProtectionWaitlistButtonGetStarted = "Get Started"
-    // "data-broker-protection.waitlist.button.got-it" - Get started button for Personal Information Removal joined waitlist screen
-    static let dataBrokerProtectionWaitlistButtonGotIt = "Get started"
-    // "data-broker-protection.waitlist.button.enable-notifications" - Enable Notifications button for Personal Information Removal joined waitlist screen
-    static let dataBrokerProtectionWaitlistButtonEnableNotifications = "Enable Notifications"
-    // "data-broker-protection.waitlist.button.join-waitlist" - Join Waitlist button for Personal Information Removal join waitlist screen
-    static let dataBrokerProtectionWaitlistButtonJoinWaitlist = "Join the Waitlist"
-    // "data-broker-protection.waitlist.button.agree-and-continue" - Agree and Continue button for Personal Information Removal join waitlist screen
-    static let dataBrokerProtectionWaitlistButtonAgreeAndContinue = "Agree and Continue"
+    // MARK: - VPN Screen
+    // "network.protection.vpn.location.nearest" - Description of the location type in the VPN status view
+    static let netPVPNLocationNearest = "(Nearest)"
+
+    // "network.protection.vpn.location.subtitle.formatted.city.and.country" - Subtitle for the preferred location item that formats a city and country. E.g Chicago, United States
+    static func netPVPNSettingsLocationSubtitleFormattedCityAndCountry(city: String, country: String) -> String {
+        return "\(city), \(country)"
+    }
 }
-#endif
 
 // MARK: - Thank You Modals
 

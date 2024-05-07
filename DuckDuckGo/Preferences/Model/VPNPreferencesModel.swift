@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
 import Combine
 import Foundation
@@ -111,7 +109,7 @@ final class VPNPreferencesModel: ObservableObject {
 
         switch response {
         case .OK:
-            await NetworkProtectionFeatureDisabler().disable(keepAuthToken: true, uninstallSystemExtension: true)
+            await NetworkProtectionFeatureDisabler().disable(uninstallSystemExtension: true)
         default:
             // intentional no-op
             break
@@ -134,5 +132,3 @@ final class VPNPreferencesModel: ObservableObject {
         return alert
     }
 }
-
-#endif

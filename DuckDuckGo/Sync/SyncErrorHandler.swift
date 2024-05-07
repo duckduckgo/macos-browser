@@ -19,12 +19,13 @@
 import Common
 import DDGSync
 import Foundation
+import PixelKit
 
 public class SyncErrorHandler: EventMapping<SyncError> {
 
     public init() {
         super.init { event, _, _, _ in
-            Pixel.fire(.debug(event: .syncSentUnauthenticatedRequest, error: event))
+            PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))
         }
     }
 

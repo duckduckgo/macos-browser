@@ -23,8 +23,12 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     var mockedCurrentTab: Tab?
 
+    var canBookmarkAllOpenTabs = false
+    var hasItemsToTheLeft = false
     var hasItemsToTheRight = false
-    var audioState: WKWebView.AudioState = .notSupported
+    var audioState: WKWebView.AudioState?
+
+    private(set) var tabBarViewItemBookmarkAllOpenTabsActionCalled = false
 
     func tabBarViewItem(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem, isMouseOver: Bool) {
 
@@ -39,6 +43,10 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     }
 
     func tabBarViewItemCloseOtherAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+
+    }
+
+    func tabBarViewItemCloseToTheLeftAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
     }
 
@@ -70,6 +78,14 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
+    func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> Bool {
+        canBookmarkAllOpenTabs
+    }
+
+    func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
+        tabBarViewItemBookmarkAllOpenTabsActionCalled = true
+    }
+
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) {
 
     }
@@ -86,7 +102,7 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState {
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
         return audioState
     }
 
@@ -95,11 +111,11 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> DuckDuckGo_Privacy_Browser.OtherTabBarViewItemsState {
-        OtherTabBarViewItemsState(hasItemsToTheLeft: false, hasItemsToTheRight: hasItemsToTheRight)
+        OtherTabBarViewItemsState(hasItemsToTheLeft: hasItemsToTheLeft, hasItemsToTheRight: hasItemsToTheRight)
     }
 
     func clear() {
-        self.audioState = .notSupported
+        self.audioState = nil
     }
 
 }

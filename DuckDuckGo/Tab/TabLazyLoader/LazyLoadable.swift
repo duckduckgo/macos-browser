@@ -37,12 +37,13 @@ protocol LazyLoadable: AnyObject, Identifiable {
 extension Tab: LazyLoadable {
     var isUrl: Bool { content.isUrl }
 
-    var url: URL? { content.url }
+    var url: URL? { content.urlForWebView }
 
     var loadingFinishedPublisher: AnyPublisher<Tab, Never> {
-        webViewDidFinishNavigationPublisher
+        navigationStatePublisher.compactMap { $0 }
+            .filter { $0.isCompleted }
             .prefix(1)
-            .map { self }
+            .map { _ in self }
             .eraseToAnyPublisher()
     }
 

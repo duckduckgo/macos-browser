@@ -20,10 +20,12 @@ import Foundation
 import Combine
 import WebKit
 import BrowserServicesKit
+import Common
 
 protocol DBPUIScanOps: AnyObject {
-    func startScan() -> Bool
+    func startScan(startDate: Date) -> Bool
     func updateCacheWithCurrentScans() async
+    func getBackgroundAgentMetadata() async -> DBPBackgroundAgentMetadata?
 }
 
 final class DBPUIViewModel {
@@ -35,6 +37,7 @@ final class DBPUIViewModel {
     private var communicationLayer: DBPUICommunicationLayer?
     private var webView: WKWebView?
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     init(dataManager: DataBrokerProtectionDataManaging,
          scheduler: DataBrokerProtectionScheduler,
@@ -71,12 +74,25 @@ final class DBPUIViewModel {
 }
 
 extension DBPUIViewModel: DBPUIScanOps {
-    func startScan() -> Bool {
-        scheduler.scanAllBrokers()
+    func startScan(startDate: Date) -> Bool {
+        scheduler.startManualScan(startTime: startDate)
         return true
     }
 
     func updateCacheWithCurrentScans() async {
-        _ = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+        do {
+            try dataManager.prepareBrokerProfileQueryDataCache()
+        } catch {
+            os_log("DBPUIViewModel error: updateCacheWithCurrentScans, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DBPUIViewModel.updateCacheWithCurrentScans"))
+        }
+    }
+
+    func getBackgroundAgentMetadata() async -> DBPBackgroundAgentMetadata? {
+        return await withCheckedContinuation { continuation in
+            scheduler.getDebugMetadata { metadata in
+                continuation.resume(returning: metadata)
+            }
+        }
     }
 }

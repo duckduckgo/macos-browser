@@ -18,9 +18,7 @@
 
 import Foundation
 import UserNotifications
-import Subscription
-
-#if NETWORK_PROTECTION || DBP
+import BrowserServicesKit
 
 protocol WaitlistViewControllerPresenter {
     static func show(completion: (() -> Void)?)
@@ -32,61 +30,15 @@ extension WaitlistViewControllerPresenter {
     }
 }
 
-#endif
-
-#if NETWORK_PROTECTION
-
-struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
-
-    @MainActor
-    static func show(completion: (() -> Void)? = nil) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-            return
-        }
-
-        // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
-        // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,
-        // preventing any state changing from occurring.
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            let status = settings.authorizationStatus
-            let state = WaitlistViewModel.NotificationPermissionState.from(status)
-
-            DispatchQueue.main.async {
-                let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist(),
-                                                  notificationPermissionState: state,
-                                                  showNotificationSuccessState: true,
-                                                  termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler(),
-                                                  featureSetupHandler: NetworkProtectionWaitlistFeatureSetupHandler())
-
-                let viewController = WaitlistModalViewController(viewModel: viewModel, contentView: NetworkProtectionWaitlistRootView())
-                windowController.mainViewController.beginSheet(viewController) { _ in
-                    // If the user dismissed the waitlist flow without signing up, hide the button.
-                    let waitlist = NetworkProtectionWaitlist()
-                    if !waitlist.waitlistStorage.isOnWaitlist {
-                        waitlist.waitlistSignUpPromptDismissed = true
-                        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-                    }
-
-                    completion?()
-                }
-            }
-        }
-    }
-}
-
-#endif
-
 #if DBP
 
 struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
 
     static func shouldPresentWaitlist() -> Bool {
-#if SUBSCRIPTION
         if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
             return false
         }
-#endif
+
         let waitlist = DataBrokerProtectionWaitlist()
 
         let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
@@ -99,7 +51,7 @@ struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControll
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
             return
         }
-        DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
+        DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
 
         // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
         // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,

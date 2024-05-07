@@ -17,10 +17,8 @@
 //
 
 import Foundation
-
-#if SUBSCRIPTION
 import Subscription
-#endif
+import BrowserServicesKit
 
 extension DefaultSubscriptionFeatureAvailability {
     convenience init() {

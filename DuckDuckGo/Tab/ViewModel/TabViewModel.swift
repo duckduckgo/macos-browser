@@ -20,17 +20,20 @@ import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
+import WebKit
 
 final class TabViewModel {
 
     enum Favicon {
         static let home = NSImage.homeFavicon
+        static let duckPlayer = NSImage.duckPlayerSettings
         static let burnerHome = NSImage.burnerTabFavicon
-        static let preferences = NSImage.preferences
-        static let bookmarks = NSImage.bookmarks
-        static let dataBrokerProtection = NSImage.dbpIcon
-        static let subscription = NSImage.subscriptionIcon
-        static let identityTheftRestoration = NSImage.itrIcon
+        static let settings = NSImage.settingsMulticolor16
+        static let bookmarks = NSImage.bookmarksFolder
+        static let emailProtection = NSImage.emailProtectionIcon
+        static let dataBrokerProtection = NSImage.personalInformationRemovalMulticolor16
+        static let subscription = NSImage.privacyPro
+        static let identityTheftRestoration = NSImage.identityTheftRestorationMulticolor16
     }
 
     private(set) var tab: Tab
@@ -61,7 +64,8 @@ final class TabViewModel {
     var loadingStartTime: CFTimeInterval?
 
     @Published private(set) var addressBarString: String = ""
-    @Published private(set) var passiveAddressBarString: String = ""
+    @Published private(set) var passiveAddressBarAttributedString = NSAttributedString()
+
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
 
     @Published private(set) var title: String = UserText.tabHomeTitle
@@ -77,6 +81,19 @@ final class TabViewModel {
 
     var canSaveContent: Bool {
         !isShowingErrorPage && canReload && !tab.webView.isInFullScreenMode
+    }
+
+    var canFindInPage: Bool {
+        guard !isShowingErrorPage else { return false }
+        switch tab.content {
+        case .url(let url, _, _):
+            return !(url.isDuckPlayer || url.isDuckURLScheme)
+        case .subscription, .identityTheftRestoration:
+            return true
+
+        case .newtab, .settings, .bookmarks, .onboarding, .dataBrokerProtection, .none:
+            return false
+        }
     }
 
     init(tab: Tab,
@@ -106,45 +123,44 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        enum Event {
-            case instant
-            case didCommit
-        }
         tab.$content
-            .map { [tab] content -> AnyPublisher<Event, Never> in
+            .map { [tab] content -> AnyPublisher<Void, Never> in
                 switch content {
-                case .url(let url, _, source: .webViewUpdated),
-                     .url(let url, _, source: .link):
-
-                    // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
-                    return tab.$committedURL.filter { committedURL in
-                        committedURL == url
-                    }.map { _ in
-                        .didCommit
-                    }.eraseToAnyPublisher()
-
                 case .url(_, _, source: .userEntered(_, downloadRequested: true)):
                     // don‘t update the address bar for download navigations
                     return Empty().eraseToAnyPublisher()
 
+                case .url(let url, _, source: .webViewUpdated),
+                        .url(let url, _, source: .link):
+
+                    guard !url.isEmpty, url != .blankPage, !url.isDuckPlayer else { fallthrough }
+
+                    // Only display the Tab content URL update matching its Security Origin
+                    // see https://github.com/mozilla-mobile/firefox-ios/wiki/WKWebView-navigation-and-security-considerations
+                    return tab.$securityOrigin
+                        .filter { tabSecurityOrigin in
+                            url.securityOrigin == tabSecurityOrigin
+                        }
+                        .asVoid().eraseToAnyPublisher()
+
                 case .url(_, _, source: .pendingStateRestoration),
-                     .url(_, _, source: .loadedByStateRestoration),
-                     .url(_, _, source: .userEntered),
-                     .url(_, _, source: .historyEntry),
-                     .url(_, _, source: .bookmark),
-                     .url(_, _, source: .ui),
-                     .url(_, _, source: .appOpenUrl),
-                     .url(_, _, source: .reload),
-                     .newtab,
-                     .settings,
-                     .bookmarks,
-                     .onboarding,
-                     .none,
-                     .dataBrokerProtection,
-                     .subscription,
-                     .identityTheftRestoration:
+                        .url(_, _, source: .loadedByStateRestoration),
+                        .url(_, _, source: .userEntered),
+                        .url(_, _, source: .historyEntry),
+                        .url(_, _, source: .bookmark),
+                        .url(_, _, source: .ui),
+                        .url(_, _, source: .appOpenUrl),
+                        .url(_, _, source: .reload),
+                        .newtab,
+                        .settings,
+                        .bookmarks,
+                        .onboarding,
+                        .none,
+                        .dataBrokerProtection,
+                        .subscription,
+                        .identityTheftRestoration:
                     // Update the address bar instantly for built-in content types or user-initiated navigations
-                    return Just( .instant ).eraseToAnyPublisher()
+                    return Just( () ).eraseToAnyPublisher()
                 }
             }
             .switchToLatest()
@@ -204,6 +220,7 @@ final class TabViewModel {
             .sink { [weak self] _ in
                 self?.updateTitle()
                 self?.updateFavicon()
+                self?.updateCanBeBookmarked()
             }.store(in: &cancellables)
     }
 
@@ -216,9 +233,8 @@ final class TabViewModel {
 
     private func subscribeToPreferences() {
         self.tab.webView.zoomLevelDelegate = self
-        appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
-            guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
-            self.updatePassiveAddressBarString(showURL: newValue, url: url, hostURL: host)
+        appearancePreferences.$showFullURL.dropFirst().sink { [weak self] showFullURL in
+            self?.updatePassiveAddressBarString(showFullURL: showFullURL)
         }.store(in: &cancellables)
         accessibilityPreferences.$defaultPageZoom.sink { [weak self] newValue in
             guard let self = self else { return }
@@ -256,68 +272,78 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = !isShowingErrorPage && (tab.content.url ?? .blankPage) != .blankPage
-    }
-
-    var tabURL: URL? {
-        return tab.content.url
-    }
-
-    private var tabHostURL: URL? {
-        return tabURL?.root
+        canBeBookmarked = !isShowingErrorPage && tab.content.canBeBookmarked
     }
 
     private func updateAddressBarStrings() {
-        guard tab.content.isUrl, let url = tabURL else {
-            addressBarString = ""
-            passiveAddressBarString = ""
-            return
-        }
-
-        if url.isFileURL {
-            addressBarString = url.absoluteString
-            passiveAddressBarString = url.absoluteString
-            return
-        }
-
-        if url.isDataURL {
-            addressBarString = url.absoluteString
-            passiveAddressBarString = "data:"
-            return
-        }
-
-        if url.isBlobURL {
-            let strippedUrl = url.stripUnsupportedCredentials()
-            addressBarString = strippedUrl
-            passiveAddressBarString = strippedUrl
-            return
-        }
-
-        guard let hostURL = tabHostURL else {
-            // also lands here for about:blank and about:home
-            addressBarString = ""
-            passiveAddressBarString = ""
-            return
-        }
-
-        addressBarString = url.absoluteString
-        updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, hostURL: hostURL)
+        updateAddressBarString()
+        updatePassiveAddressBarString()
     }
 
-    private func updatePassiveAddressBarString(showURL: Bool, url: URL, hostURL: URL) {
-        if showURL {
-            passiveAddressBarString = url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
-        } else {
-            passiveAddressBarString = hostURL.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true).droppingWwwPrefix()
+    private func updateAddressBarString() {
+        addressBarString = {
+            guard ![.none, .onboarding, .newtab].contains(tab.content),
+                  let url = tab.content.userEditableUrl else { return "" }
+
+            if url.isBlobURL {
+                return url.strippingUnsupportedCredentials()
+            }
+            return url.absoluteString
+        }()
+    }
+
+    private func updatePassiveAddressBarString(showFullURL: Bool? = nil) {
+        let showFullURL = showFullURL ?? appearancePreferences.showFullURL
+        passiveAddressBarAttributedString = switch tab.content {
+        case .newtab, .onboarding, .none:
+                .init() // empty
+        case .settings:
+                .settingsTrustedIndicator
+        case .bookmarks:
+                .bookmarksTrustedIndicator
+        case .dataBrokerProtection:
+                .dbpTrustedIndicator
+        case .subscription:
+                .subscriptionTrustedIndicator
+        case .identityTheftRestoration:
+                .identityTheftRestorationTrustedIndicator
+        case .url(let url, _, _) where url.isDuckPlayer:
+                .duckPlayerTrustedIndicator
+        case .url(let url, _, _) where url.isEmailProtection:
+                .emailProtectionTrustedIndicator
+        case .url(let url, _, _):
+            NSAttributedString(string: passiveAddressBarString(with: url, showFullURL: showFullURL))
+        }
+    }
+
+    private func passiveAddressBarString(with url: URL, showFullURL: Bool) -> String {
+        if url.isBlobURL {
+            url.strippingUnsupportedCredentials()
+
+        } else if url.isDataURL {
+            "data:"
+
+        } else if !showFullURL && url.isFileURL {
+            url.lastPathComponent
+
+        } else if !showFullURL && url.host?.isEmpty == false {
+            url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true).droppingWwwPrefix() ?? ""
+
+        } else /* display full url */ {
+            url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
         }
     }
 
     private func updateTitle() { // swiftlint:disable:this cyclomatic_complexity
-        let title: String
+        var title: String
         switch tab.content {
-        // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
+            // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
         case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
-            title = UserText.tabErrorTitle
+            if tab.error?.errorCode == NSURLErrorServerCertificateUntrusted {
+                title = UserText.sslErrorPageTabTitle
+            } else {
+                title = UserText.tabErrorTitle
+            }
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
         case .settings:
@@ -343,53 +369,54 @@ final class TabViewModel {
                 title = addressBarString
             }
         }
+        if title.isEmpty {
+            title = UserText.tabUntitledTitle
+        }
         if self.title != title {
             self.title = title
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func updateFavicon(_ tabFavicon: NSImage?? = .none /* provided from .sink or taken from tab.favicon (optional) if .none */) {
         guard !isShowingErrorPage else {
-            favicon = .alertCircleColor16
+            favicon = errorFaviconToShow(error: tab.error)
             return
         }
-
-        switch tab.content {
+        favicon = switch tab.content {
         case .dataBrokerProtection:
-            favicon = Favicon.dataBrokerProtection
-            return
+            Favicon.dataBrokerProtection
+        case .newtab where tab.burnerMode.isBurner:
+            Favicon.burnerHome
         case .newtab:
-            if tab.burnerMode.isBurner {
-                favicon = Favicon.burnerHome
-            } else {
-                favicon = Favicon.home
-            }
-            return
+            Favicon.home
         case .settings:
-            favicon = Favicon.preferences
-            return
+            Favicon.settings
         case .bookmarks:
-            favicon = Favicon.bookmarks
-            return
+            Favicon.bookmarks
         case .subscription:
-            favicon = Favicon.subscription
-            return
+            Favicon.subscription
         case .identityTheftRestoration:
-            favicon = Favicon.identityTheftRestoration
-            return
-        case .url, .onboarding, .none: break
-        }
-
-        if let favicon: NSImage? = tabFavicon {
-            self.favicon = favicon
-        } else {
-            self.favicon = tab.favicon
+            Favicon.identityTheftRestoration
+        case .url(let url, _, _) where url.isDuckPlayer:
+            Favicon.duckPlayer
+        case .url(let url, _, _) where url.isEmailProtection:
+            Favicon.emailProtection
+        case .url, .onboarding, .none:
+            tabFavicon ?? tab.favicon
         }
     }
 
     func reload() {
         tab.reload()
         updateAddressBarStrings()
+    }
+
+    private func errorFaviconToShow(error: WKError?) -> NSImage {
+        if error?.errorCode == NSURLErrorServerCertificateUntrusted {
+            return .redAlertCircle16
+        }
+        return.alertCircleColor16
     }
 
     // MARK: - Privacy icon animation
@@ -444,4 +471,62 @@ extension TabViewModel: WebViewZoomLevelDelegate {
             accessibilityPreferences.updateZoomPerWebsite(zoomLevel: level, url: urlString)
         }
     }
+}
+
+private extension NSAttributedString {
+
+    private typealias Component = NSAttributedString
+
+    private static let spacer = NSImage() // empty spacer image attachment for Attributed Strings below
+
+    private static let iconBaselineOffset: CGFloat = -3
+    private static let iconSize: CGFloat = 16
+    private static let iconSpacing: CGFloat = 6
+    private static let chevronSize: CGFloat = 12
+    private static let chevronSpacing: CGFloat = 12
+
+    private static let duckDuckGoWithChevronAttributedString = NSAttributedString {
+        // logo
+        Component(image: .homeFavicon, rect: CGRect(x: 0, y: iconBaselineOffset, width: iconSize, height: iconSize))
+        // spacing
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: iconSpacing, height: 1))
+        // DuckDuckGo
+        Component(string: UserText.duckDuckGo)
+
+        // spacing (wide)
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: chevronSpacing, height: 1))
+        // chevron
+        Component(image: .chevronRight12, rect: CGRect(x: 0, y: -1, width: chevronSize, height: chevronSize))
+        // spacing (wide)
+        Component(image: spacer, rect: CGRect(x: 0, y: 0, width: chevronSpacing, height: 1))
+    }
+
+    private static func trustedIndicatorAttributedString(with icon: NSImage, title: String) -> NSAttributedString {
+        NSAttributedString {
+            duckDuckGoWithChevronAttributedString
+
+            // favicon
+            Component(image: icon, rect: CGRect(x: 0, y: iconBaselineOffset, width: icon.size.width, height: icon.size.height))
+            // spacing
+            Component(image: spacer, rect: CGRect(x: 0, y: 0, width: iconSpacing, height: 1))
+            // title
+            Component(string: title)
+        }
+    }
+
+    static let settingsTrustedIndicator = trustedIndicatorAttributedString(with: .settingsMulticolor16,
+                                                                           title: UserText.settings)
+    static let bookmarksTrustedIndicator = trustedIndicatorAttributedString(with: .bookmarksFolder,
+                                                                            title: UserText.bookmarks)
+    static let dbpTrustedIndicator = trustedIndicatorAttributedString(with: .personalInformationRemovalMulticolor16,
+                                                                      title: UserText.tabDataBrokerProtectionTitle)
+    static let subscriptionTrustedIndicator = trustedIndicatorAttributedString(with: .privacyPro,
+                                                                               title: UserText.subscription)
+    static let identityTheftRestorationTrustedIndicator = trustedIndicatorAttributedString(with: .identityTheftRestorationMulticolor16,
+                                                                                           title: UserText.identityTheftRestorationOptionsMenuItem)
+    static let duckPlayerTrustedIndicator = trustedIndicatorAttributedString(with: .duckPlayerSettings,
+                                                                             title: UserText.duckPlayer)
+    static let emailProtectionTrustedIndicator = trustedIndicatorAttributedString(with: .emailProtectionIcon,
+                                                                                  title: UserText.emailProtectionPreferences)
+
 }

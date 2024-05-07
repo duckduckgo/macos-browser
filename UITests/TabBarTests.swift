@@ -28,6 +28,10 @@ class TabBarTests: XCTestCase {
         app.launch()
     }
 
+    override class func setUp() {
+        UITests.firstRun()
+    }
+
     func testWhenClickingAddTab_ThenTabsOpen() throws {
 //        let app = XCUIApplication()
 //

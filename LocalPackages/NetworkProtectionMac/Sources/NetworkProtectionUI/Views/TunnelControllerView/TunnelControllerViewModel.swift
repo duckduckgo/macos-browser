@@ -23,10 +23,19 @@ import SwiftUI
 
 @MainActor
 public final class TunnelControllerViewModel: ObservableObject {
+    public struct FormattedDataVolume: Equatable {
+        public let dataSent: String
+        public let dataReceived: String
+    }
 
     /// The NetP service.
     ///
     private let tunnelController: TunnelController
+
+    /// Whether the VPN is enabled
+    /// This is determined based on the connection status, same as the iOS version
+    @Published
+    public var isVPNEnabled = false
 
     /// The type of extension that's being used for NetP
     ///
@@ -47,6 +56,17 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let statusReporter: NetworkProtectionStatusReporter
 
+    private let vpnSettings: VPNSettings
+
+    private let locationFormatter: VPNLocationFormatting
+
+    private static let byteCountFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.allowsNonnumericFormatting = false
+        formatter.allowedUnits = [.useKB, .useMB, .useGB]
+        return formatter
+    }()
+
     private let appLauncher: AppLaunching
 
     // MARK: - Misc
@@ -61,23 +81,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     private static let statusDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.statusDispatchQueue", qos: .userInteractive)
     private static let connectivityIssuesDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.connectivityIssuesDispatchQueue", qos: .userInteractive)
     private static let serverInfoDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.serverInfoDispatchQueue", qos: .userInteractive)
-
-    // MARK: - Feature Image
-
-    var mainImageAsset: NetworkProtectionAsset {
-        switch connectionStatus {
-        case .connected:
-            return .vpnEnabledImage
-        case .disconnecting:
-            if case .connected = previousConnectionStatus {
-                return .vpnEnabledImage
-            } else {
-                return .vpnDisabledImage
-            }
-        default:
-            return .vpnDisabledImage
-        }
-    }
+    private static let dataVolumeDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.dataVolumeDispatchQueue", qos: .userInteractive)
 
     // MARK: - Initialization & Deinitialization
 
@@ -85,17 +89,23 @@ public final class TunnelControllerViewModel: ObservableObject {
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
                 runLoopMode: RunLoop.Mode? = nil,
+                vpnSettings: VPNSettings,
+                locationFormatter: VPNLocationFormatting,
                 appLauncher: AppLaunching) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher
         self.statusReporter = statusReporter
         self.runLoopMode = runLoopMode
+        self.vpnSettings = vpnSettings
+        self.locationFormatter = locationFormatter
         self.appLauncher = appLauncher
 
         connectionStatus = statusReporter.statusObserver.recentValue
+        formattedDataVolume = statusReporter.dataVolumeObserver.recentValue.formatted(using: Self.byteCountFormatter)
         internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
-        internalServerLocation = statusReporter.serverInfoObserver.recentValue.serverLocation?.serverLocation
+        internalServerAttributes = statusReporter.serverInfoObserver.recentValue.serverLocation
+        internalServerLocation = internalServerAttributes?.serverLocation
 
         // Particularly useful when unit testing with an initial status of our choosing.
         refreshInternalIsRunning()
@@ -103,6 +113,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         subscribeToOnboardingStatusChanges()
         subscribeToStatusChanges()
         subscribeToServerInfoChanges()
+        subscribeToDataVolumeUpdates()
     }
 
     deinit {
@@ -130,6 +141,12 @@ public final class TunnelControllerViewModel: ObservableObject {
 
             Task { @MainActor in
                 self.connectionStatus = status
+                switch status {
+                case .connected, .connecting:
+                    self.isVPNEnabled = true
+                default:
+                    self.isVPNEnabled = false
+                }
             }
         }
             .store(in: &cancellables)
@@ -146,9 +163,19 @@ public final class TunnelControllerViewModel: ObservableObject {
 
             Task { @MainActor in
                 self.internalServerAddress = serverInfo.serverAddress
-                self.internalServerLocation = serverInfo.serverLocation?.serverLocation
+                self.internalServerAttributes = serverInfo.serverLocation
+                self.internalServerLocation = self.internalServerAttributes?.serverLocation
             }
         }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToDataVolumeUpdates() {
+        statusReporter.dataVolumeObserver.publisher
+            .subscribe(on: Self.dataVolumeDispatchQueue)
+            .map { $0.formatted(using: Self.byteCountFormatter) }
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.formattedDataVolume, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
@@ -273,9 +300,7 @@ public final class TunnelControllerViewModel: ObservableObject {
             } else if connectionStatus == .disconnecting {
                 toggleTransition = .switchingOff(locallyInitiated: false)
             }
-        case .switchingOn(let locallyInitiated), .switchingOff(let locallyInitiated):
-            guard !locallyInitiated else { break }
-
+        case .switchingOn, .switchingOff:
             if connectionStatus == .connecting {
                 toggleTransition = .switchingOn(locallyInitiated: false)
             } else if connectionStatus == .disconnecting {
@@ -437,6 +462,36 @@ public final class TunnelControllerViewModel: ObservableObject {
         }
     }
 
+    @Published
+    private var internalServerAttributes: NetworkProtectionServerInfo.ServerAttributes?
+
+    @Published
+    var formattedDataVolume: FormattedDataVolume
+
+    var wantsNearestLocation: Bool {
+        guard case .nearest = vpnSettings.selectedLocation else { return false }
+        return true
+    }
+
+    var emoji: String? {
+        locationFormatter.emoji(for: internalServerAttributes?.country,
+                                preferredLocation: vpnSettings.selectedLocation)
+    }
+
+    var plainLocation: String {
+        locationFormatter.string(from: internalServerLocation,
+                                 preferredLocation: vpnSettings.selectedLocation)
+    }
+
+    @available(macOS 12, *)
+    func formattedLocation(colorScheme: ColorScheme) -> AttributedString {
+        let opacity = colorScheme == .light ? Double(0.6) : Double(0.5)
+        return locationFormatter.string(from: internalServerLocation,
+                                        preferredLocation: vpnSettings.selectedLocation,
+                                        locationTextColor: Color(.defaultText),
+                                        preferredLocationTextColor: Color(.defaultText).opacity(opacity))
+    }
+
     // MARK: - Toggling VPN
 
     /// Start the VPN.
@@ -448,8 +503,6 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         Task { @MainActor in
             await tunnelController.start()
-
-            toggleTransition = .idle
             refreshInternalIsRunning()
         }
     }
@@ -461,7 +514,6 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         Task { @MainActor in
             await tunnelController.stop()
-            toggleTransition = .idle
             refreshInternalIsRunning()
         }
     }
@@ -476,5 +528,12 @@ public final class TunnelControllerViewModel: ObservableObject {
         Task { @MainActor in
             await appLauncher.launchApp(withCommand: .moveAppToApplications)
         }
+    }
+}
+
+extension DataVolume {
+    func formatted(using formatter: ByteCountFormatter) -> TunnelControllerViewModel.FormattedDataVolume {
+        .init(dataSent: formatter.string(fromByteCount: bytesSent),
+              dataReceived: formatter.string(fromByteCount: bytesReceived))
     }
 }

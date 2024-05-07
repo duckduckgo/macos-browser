@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION || DBP
-
 import SwiftUI
 import SwiftUIExtensions
 
@@ -86,23 +84,6 @@ struct JoinedWaitlistView: View {
         .environmentObject(model)
     }
 }
-
-#endif
-
-#if NETWORK_PROTECTION
-
-struct NetworkProtectionJoinedWaitlistViewData: JoinedWaitlistViewData {
-    let headerImageName = "JoinedWaitlistHeader"
-    var title = UserText.networkProtectionWaitlistJoinedTitle
-    var joinedWithNoNotificationSubtitle1 = UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle1
-    var joinedWithNoNotificationSubtitle2 = UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle2
-    var enableNotificationSubtitle = UserText.networkProtectionWaitlistEnableNotifications
-    var buttonConfirmLabel = UserText.networkProtectionWaitlistButtonDone
-    var buttonCancelLabel = UserText.networkProtectionWaitlistButtonNoThanks
-    var buttonEnableNotificationLabel = UserText.networkProtectionWaitlistButtonEnableNotifications
-}
-
-#endif
 
 #if DBP
 

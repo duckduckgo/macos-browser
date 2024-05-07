@@ -20,6 +20,7 @@ import Foundation
 import Suggestions
 import Common
 import History
+import PixelKit
 
 final class SuggestionContainer {
 
@@ -29,15 +30,17 @@ final class SuggestionContainer {
 
     private let historyCoordinating: HistoryCoordinating
     private let bookmarkManager: BookmarkManager
+    private let startupPreferences: StartupPreferences
     private let loading: SuggestionLoading
 
     private var latestQuery: Query?
 
     fileprivate let suggestionsURLSession = URLSession(configuration: .ephemeral)
 
-    init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager) {
+    init(suggestionLoading: SuggestionLoading, historyCoordinating: HistoryCoordinating, bookmarkManager: BookmarkManager, startupPreferences: StartupPreferences = .shared) {
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
+        self.startupPreferences = startupPreferences
         self.loading = suggestionLoading
         self.loading.dataSource = self
     }
@@ -63,7 +66,7 @@ final class SuggestionContainer {
                 os_log("Suggestions: Failed to get suggestions - %s",
                        type: .error,
                        "\(String(describing: error))")
-                Pixel.fire(.debug(event: .suggestionsFetchFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.suggestionsFetchFailed, error: error))
                 return
             }
 
@@ -90,7 +93,23 @@ extension SuggestionContainer: SuggestionLoadingDataSource {
         return historyCoordinating.history ?? []
     }
 
-    func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
+    @MainActor func internalPages(for suggestionLoading: Suggestions.SuggestionLoading) -> [Suggestions.InternalPage] {
+        [
+            // suggestions for Bookmarks&Settings
+            .init(title: UserText.bookmarks, url: .bookmarks),
+            .init(title: UserText.settings, url: .settings),
+        ] + PreferencePaneIdentifier.allCases.map {
+            // preference panes URLs
+            .init(title: UserText.settings + " → " + $0.displayName, url: .settingsPane($0))
+        } + {
+            guard startupPreferences.launchToCustomHomePage,
+                  let homePage = URL(string: startupPreferences.formattedCustomHomePageURL) else { return [] }
+            // home page suggestion
+            return [.init(title: UserText.homePage, url: homePage)]
+        }()
+    }
+
+    @MainActor func bookmarks(for suggestionLoading: SuggestionLoading) -> [Suggestions.Bookmark] {
         bookmarkManager.list?.bookmarks() ?? []
     }
 

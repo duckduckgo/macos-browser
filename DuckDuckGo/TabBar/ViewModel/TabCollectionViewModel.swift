@@ -20,6 +20,7 @@ import Common
 import Foundation
 import Combine
 import History
+import PixelKit
 
 /**
  * The delegate callbacks are triggered for events related to unpinned tabs only.
@@ -101,6 +102,7 @@ final class TabCollectionViewModel: NSObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    private var tabsPreferences: TabsPreferences
     private var startupPreferences: StartupPreferences
     private var homePage: Tab.TabContent {
         var homePage: Tab.TabContent = .newtab
@@ -116,12 +118,14 @@ final class TabCollectionViewModel: NSObject {
         selectionIndex: Int = 0,
         pinnedTabsManager: PinnedTabsManager?,
         burnerMode: BurnerMode = .regular,
-        startupPreferences: StartupPreferences = StartupPreferences.shared
+        startupPreferences: StartupPreferences = StartupPreferences.shared,
+        tabsPreferences: TabsPreferences = TabsPreferences.shared
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
         self.burnerMode = burnerMode
         self.startupPreferences = startupPreferences
+        self.tabsPreferences = tabsPreferences
         super.init()
 
         subscribeToTabs()
@@ -320,6 +324,10 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
+    func insertNewTab(after parentTab: Tab, with content: Tab.TabContent = .newtab, selected: Bool = true) {
+        insert(Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), after: parentTab, selected: selected)
+    }
+
     func insert(_ tab: Tab, at index: TabIndex, selected: Bool = true) {
         guard changesEnabled else { return }
         guard let tabCollection = tabCollection(for: index) else {
@@ -359,6 +367,18 @@ final class TabCollectionViewModel: NSObject {
             self.insert(tab, after: parentTab, selected: selected)
         } else {
             self.insert(tab, at: .unpinned(0))
+        }
+    }
+
+    func insertOrAppendNewTab(_ content: Tab.TabContent = .newtab, selected: Bool = true) {
+        insertOrAppend(tab: Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), selected: selected)
+    }
+
+    func insertOrAppend(tab: Tab, selected: Bool) {
+        if tabsPreferences.newTabPosition == .nextToCurrent, let selectionIndex {
+            self.insert(tab, at: selectionIndex.makeNextUnpinned(), selected: selected)
+        } else {
+            append(tab: tab, selected: selected)
         }
     }
 
@@ -485,6 +505,22 @@ final class TabCollectionViewModel: NSObject {
         } else {
             selectionIndex = nil
         }
+        delegate?.tabCollectionViewModelDidMultipleChanges(self)
+    }
+
+    func removeTabs(before index: Int) {
+        guard changesEnabled else { return }
+
+        tabCollection.removeTabs(before: index)
+
+        if let currentSelection = selectionIndex, currentSelection.isUnpinnedTab {
+            if currentSelection.item < index {
+                selectionIndex = .unpinned(0)
+            } else {
+                selectionIndex = .unpinned(currentSelection.item - index)
+            }
+        }
+
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
@@ -657,7 +693,7 @@ final class TabCollectionViewModel: NSObject {
 
             // Make sure the tab is burner if it is supposed to be
             if newTabs.first(where: { $0.burnerMode != self.burnerMode }) != nil {
-                Pixel.fire(.debug(event: .burnerTabMisplaced))
+                PixelKit.fire(DebugEvent(GeneralPixel.burnerTabMisplaced))
                 fatalError("Error in burner tab management")
             }
         } .store(in: &cancellables)
@@ -759,6 +795,17 @@ extension TabCollectionViewModel {
 
     var isBurner: Bool {
         burnerMode.isBurner
+    }
+
+}
+
+// MARK: - Bookmark All Open Tabs
+
+extension TabCollectionViewModel {
+
+    func canBookmarkAllOpenTabs() -> Bool {
+        // At least two non pinned, non empty (URL only), and not showing an error tabs.
+        tabViewModels.values.filter(\.canBeBookmarked).count >= 2
     }
 
 }

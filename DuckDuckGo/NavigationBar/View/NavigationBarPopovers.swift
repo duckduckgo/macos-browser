@@ -19,19 +19,15 @@
 import Foundation
 import BrowserServicesKit
 import AppKit
-
-#if NETWORK_PROTECTION
 import Combine
 import NetworkProtection
 import NetworkProtectionUI
 import NetworkProtectionIPC
-#endif
 
 protocol PopoverPresenter {
     func show(_ popover: NSPopover, positionedBelow view: NSView)
 }
 
-#if NETWORK_PROTECTION
 protocol NetPPopoverManager: AnyObject {
     var ipcClient: NetworkProtectionIPCClient { get }
     var isShown: Bool { get }
@@ -41,7 +37,6 @@ protocol NetPPopoverManager: AnyObject {
 
     func toggle(positionedBelow view: NSView, withDelegate delegate: NSPopoverDelegate)
 }
-#endif
 
 extension PopoverPresenter {
     func show(_ popover: NSPopover, positionedBelow view: NSView) {
@@ -63,19 +58,12 @@ final class NavigationBarPopovers: PopoverPresenter {
     private(set) var autofillPopoverPresenter: AutofillPopoverPresenter
     private(set) var downloadsPopover: DownloadsPopover?
 
-#if NETWORK_PROTECTION
     private let networkProtectionPopoverManager: NetPPopoverManager
 
     init(networkProtectionPopoverManager: NetPPopoverManager, autofillPopoverPresenter: AutofillPopoverPresenter) {
         self.networkProtectionPopoverManager = networkProtectionPopoverManager
         self.autofillPopoverPresenter = autofillPopoverPresenter
     }
-
-#else
-    init(passwordPopoverPresenter: PasswordPopoverPresenter) {
-        self.passwordPopoverPresenter = passwordPopoverPresenter
-    }
-#endif
 
     var passwordManagementDomain: String? {
         didSet {
@@ -101,11 +89,7 @@ final class NavigationBarPopovers: PopoverPresenter {
 
     @MainActor
     var isNetworkProtectionPopoverShown: Bool {
-#if NETWORK_PROTECTION
         networkProtectionPopoverManager.isShown
-#else
-        return false
-#endif
     }
 
     var bookmarkListPopoverShown: Bool {
@@ -121,7 +105,7 @@ final class NavigationBarPopovers: PopoverPresenter {
     }
 
     func passwordManagementButtonPressed(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        if autofillPopoverPresenter.popoverIsShown == true && view.window == autofillPopoverPresenter.popoverPresentingWindow  {
+        if autofillPopoverPresenter.popoverIsShown == true && view.window == autofillPopoverPresenter.popoverPresentingWindow {
             autofillPopoverPresenter.dismiss()
         } else {
             showPasswordManagementPopover(selectedCategory: nil, usingView: view, withDelegate: delegate)
@@ -129,9 +113,7 @@ final class NavigationBarPopovers: PopoverPresenter {
     }
 
     func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-#if NETWORK_PROTECTION
         networkProtectionPopoverManager.toggle(positionedBelow: view, withDelegate: delegate)
-#endif
     }
 
     func toggleDownloadsPopover(usingView view: NSView, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
@@ -189,11 +171,9 @@ final class NavigationBarPopovers: PopoverPresenter {
             downloadsPopover?.close()
         }
 
-#if NETWORK_PROTECTION
         if networkProtectionPopoverManager.isShown {
             networkProtectionPopoverManager.close()
         }
-#endif
 
         return true
     }
@@ -297,13 +277,11 @@ final class NavigationBarPopovers: PopoverPresenter {
 
     // MARK: - VPN
 
-#if NETWORK_PROTECTION
     func showNetworkProtectionPopover(
         positionedBelow view: NSView,
         withDelegate delegate: NSPopoverDelegate) {
             networkProtectionPopoverManager.show(positionedBelow: view, withDelegate: delegate)
     }
-#endif
 }
 
 extension Notification.Name {

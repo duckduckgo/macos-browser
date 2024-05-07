@@ -161,16 +161,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PixelKitTests"
-               BuildableName = "PixelKitTests"
-               BlueprintName = "PixelKitTests"
-               ReferencedContainer = "container:LocalPackages/PixelKit">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "NetworkProtectionUITests"
                BuildableName = "NetworkProtectionUITests"
                BlueprintName = "NetworkProtectionUITests"

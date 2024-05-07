@@ -20,6 +20,8 @@
 
 import XCTest
 import BrowserServicesKit
+import Common
+import PixelKit
 @testable import DataBrokerProtection
 
 final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
@@ -931,14 +933,13 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 }
 
 final class MockWebOperationRunner: WebOperationRunner {
-
     var shouldScanThrow = false
     var shouldOptOutThrow = false
     var scanResults = [ExtractedProfile]()
     var wasScanCalled = false
     var wasOptOutCalled = false
 
-    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: StageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: StageDurationCalculator, pixelHandler: EventMapping<DataBrokerProtectionPixels>, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
         wasScanCalled = true
 
         if shouldScanThrow {
@@ -948,7 +949,7 @@ final class MockWebOperationRunner: WebOperationRunner {
         }
     }
 
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: StageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: StageDurationCalculator, pixelHandler: EventMapping<DataBrokerProtectionPixels>, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
         wasOptOutCalled = true
 
         if shouldOptOutThrow {

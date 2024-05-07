@@ -54,6 +54,36 @@ jobs:
       env:
         SHELLCHECK_OPTS: -x -P scripts -P scripts/helpers
 
+  bats:
+
+    name: Test Shell Scripts
+
+    runs-on: macos-13
+
+    steps:
+    - name: Check out the code
+      if: github.event_name == 'pull_request' || github.event_name == 'push'
+      uses: actions/checkout@v4
+
+    - name: Check out the code
+      if: github.event_name != 'pull_request' && github.event_name != 'push'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.branch || github.ref_name }}
+
+    - name: Install Bats
+      run: brew install bats-core
+
+    - name: Run Bats tests
+      run: bats --formatter junit scripts/tests/* > bats-tests.xml
+
+    - name: Publish unit tests report
+      uses: mikepenz/action-junit-report@v3
+      if: always() # always run even if the previous step fails
+      with:
+        check_name: "Test Report: Shell Scripts"
+        report_paths: 'bats-tests.xml'
+
   tests:
     name: Test
 
@@ -256,10 +286,6 @@ jobs:
     # workflow_call is used by bump_internal_release and is followed by a proper release job
     if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
 
-    strategy:
-      matrix:
-        scheme: [ "DuckDuckGo Privacy Browser", "DuckDuckGo Privacy Pro" ]
-
     runs-on: macos-13-xlarge
     timeout-minutes: 30
 
@@ -311,7 +337,7 @@ jobs:
       run: |
         export OS_ACTIVITY_MODE=debug
         set -o pipefail && xcodebuild \
-          -scheme "${{ matrix.scheme }}" \
+          -scheme "DuckDuckGo Privacy Browser" \
           -derivedDataPath "DerivedData" \
           -configuration "Release" \
           -skipPackagePluginValidation -skipMacroValidation \
@@ -347,7 +373,7 @@ jobs:
 
   create-asana-task:
     name: Create Asana Task
-    needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
+    needs: [swiftlint, bats, tests, release-build, verify-autoconsent-bundle, private-api]
 
     if: failure() && github.ref_name == 'main' && github.run_attempt == 1
 
@@ -364,7 +390,7 @@ jobs:
 
   close-asana-task:
     name: Close Asana Task
-    needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
+    needs: [swiftlint, bats, tests, release-build, verify-autoconsent-bundle, private-api]
 
     if: success() && github.ref_name == 'main' && github.run_attempt > 1
 

@@ -16,9 +16,8 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
+import PixelKit
 
 protocol VPNFeedbackSender {
     func send(metadata: VPNMetadata, category: VPNFeedbackCategory, userText: String) async throws
@@ -29,10 +28,10 @@ struct DefaultVPNFeedbackSender: VPNFeedbackSender {
     func send(metadata: VPNMetadata, category: VPNFeedbackCategory, userText: String) async throws {
         let urlAllowed: CharacterSet = .alphanumerics.union(.init(charactersIn: "-._~"))
         let encodedUserText = userText.addingPercentEncoding(withAllowedCharacters: urlAllowed) ?? userText
-        let pixelEvent = Pixel.Event.vpnBreakageReport(category: category.rawValue, description: encodedUserText, metadata: metadata.toBase64())
+        let pixelEvent = GeneralPixel.vpnBreakageReport(category: category.rawValue, description: encodedUserText, metadata: metadata.toBase64())
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Pixel.fire(pixelEvent) { error in
+            PixelKit.fire(pixelEvent) { _, error in
                 if let error {
                     continuation.resume(throwing: error)
                 } else {
@@ -43,5 +42,3 @@ struct DefaultVPNFeedbackSender: VPNFeedbackSender {
     }
 
 }
-
-#endif

@@ -54,7 +54,7 @@ extension NetworkExtensionController {
 
         NetworkProtectionLastVersionRunStore(userDefaults: defaults).lastExtensionVersionRun = extensionVersion
 
-        try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
+        try await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
 #endif
     }
 

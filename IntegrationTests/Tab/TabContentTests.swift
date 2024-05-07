@@ -24,7 +24,6 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
-@MainActor
 class TabContentTests: XCTestCase {
 
     var window: NSWindow!
@@ -220,7 +219,7 @@ class TabContentTests: XCTestCase {
             return
         }
 
-        // wait for print dialog to appear
+        // wait for save dialog to appear
         let eSaveDialogShown = expectation(description: "Save dialog shown")
         let getSaveDialog = Task { @MainActor in
             while true {
@@ -277,7 +276,7 @@ class TabContentTests: XCTestCase {
         let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         try await eNewtabPageLoaded.value
 
-        // wait for print dialog to appear
+        // wait for save dialog to appear
         let eSaveDialogShown = expectation(description: "Save dialog shown")
         let getSaveDialog = Task { @MainActor in
             while true {

@@ -30,7 +30,7 @@ enum UserText {
 
     static let personalInformationRemovalServiceTitle = NSLocalizedString("subscription.preferences.services.personal.information.removal.title", value: "Personal Information Removal", comment: "Title for the Personal Information Removal service listed in the subscription preferences pane")
     static let personalInformationRemovalServiceDescription = NSLocalizedString("subscription.preferences.services.personal.information.removal.description", value: "Find and remove your personal information from sites that store and sell it.", comment: "Description for the Personal Information Removal service listed in the subscription preferences pane")
-    static let personalInformationRemovalServiceButtonTitle = NSLocalizedString("subscription.preferences.services.personal.information.removal.button.title", value: "Get Started", comment: "Title for the Personal Information Removal service button to open its settings")
+    static let personalInformationRemovalServiceButtonTitle = NSLocalizedString("subscription.preferences.services.personal.information.removal.button.title", value: "Open", comment: "Title for the Personal Information Removal service button to open its settings")
 
     static let identityTheftRestorationServiceTitle = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.title", value: "Identity Theft Restoration", comment: "Title for the Identity Theft Restoration service listed in the subscription preferences pane")
     static let identityTheftRestorationServiceDescription = NSLocalizedString("subscription.preferences.services.identity.theft.restoration.description", value: "Restore stolen accounts and financial losses in the event of identity theft.", comment: "Description for the Identity Theft Restoration service listed in the subscription preferences pane")
@@ -55,7 +55,7 @@ enum UserText {
     }
 
     static func preferencesSubscriptionExpiredCaption(formattedDate: String) -> String {
-        let localized = NSLocalizedString("subscription.preferences.subscription.expired.caption", value: "Your Privacy Pro subscription expired on %@.", comment: "Caption for the subscription preferences pane when the subscription has expired. The parameter is date of expiry.")
+        let localized = NSLocalizedString("subscription.preferences.subscription.expired.caption", value: "Your Privacy Pro subscription expired on %@", comment: "Caption for the subscription preferences pane when the subscription has expired. The parameter is date of expiry.")
         return String(format: localized, formattedDate)
     }
 
@@ -64,8 +64,8 @@ enum UserText {
 
     static let addToAnotherDeviceButton = NSLocalizedString("subscription.preferences.add.to.another.device.button", value: "Add to Another Device…", comment: "Button to add subscription to another device")
     static let manageSubscriptionButton = NSLocalizedString("subscription.preferences.manage.subscription.button", value: "Manage Subscription", comment: "Button to manage subscription")
-    static let changePlanOrBillingButton = NSLocalizedString("subscription.preferences.change.plan.or.billing.button", value: "Change Plan or Billing...", comment: "Button to add subscription to another device")
-    static let removeFromThisDeviceButton = NSLocalizedString("subscription.preferences.remove.from.this.device.button", value: "Remove From This Device...", comment: "Button to remove subscription from this device")
+    static let changePlanOrBillingButton = NSLocalizedString("subscription.preferences.change.plan.or.billing.button", value: "Change Plan or Billing…", comment: "Button to add subscription to another device")
+    static let removeFromThisDeviceButton = NSLocalizedString("subscription.preferences.remove.from.this.device.button", value: "Remove From This Device…", comment: "Button to remove subscription from this device")
 
     // MARK: Preferences when subscription is inactive
     static let preferencesSubscriptionInactiveHeader = NSLocalizedString("subscription.preferences.subscription.inactive.header", value: "Subscribe to Privacy Pro", comment: "Header for the subscription preferences pane when the subscription is inactive")
@@ -75,12 +75,13 @@ enum UserText {
     static let haveSubscriptionButton = NSLocalizedString("subscription.preferences.i.have.a.subscription.button", value: "I Have a Subscription", comment: "Button enabling user to activate a subscription user bought earlier or on another device")
 
     // MARK: Preferences when subscription activation is pending
-    static let preferencesSubscriptionPendingHeader = NSLocalizedString("subscription.preferences.subscription.pending.header", value: "Your Subscription is Being Activated", comment: "Header for the subscription preferences pane when the subscription activation is pending")
+    static let preferencesSubscriptionPendingHeader = NSLocalizedString("subscription.preferences.subscription.pending.header", value: "Your subscription is being activated", comment: "Header for the subscription preferences pane when the subscription activation is pending")
     static let preferencesSubscriptionPendingCaption = NSLocalizedString("subscription.preferences.subscription.pending.caption", value: "This is taking longer than usual, please check back later.", comment: "Caption for the subscription preferences pane when the subscription activation is pending")
 
     // MARK: Preferences when subscription is expired
     static let preferencesSubscriptionExpiredCaption = NSLocalizedString("subscription.preferences.subscription.expired.caption", value: "Subscribe again to continue using Privacy Pro.", comment: "Caption for the subscription preferences pane when the subscription activation is pending")
 
+    static let viewPlansExpiredButtonTitle = NSLocalizedString("subscription.preferences.button.view.plans", value: "View Plans…", comment: "Button for viewing subscription plans on expired subscription")
     static let manageDevicesButton = NSLocalizedString("subscription.preferences.manage.devices.button", value: "Manage Devices", comment: "Button to manage devices")
 
     // MARK: - Change plan or billing dialogs

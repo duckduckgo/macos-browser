@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import PixelKit
 
 enum PersistedPermissionDecision {
     case deny
@@ -64,7 +65,7 @@ struct PermissionEntity: Equatable {
         guard let domain = managedObject.domainEncrypted as? String,
               let permissionTypeString = managedObject.permissionType,
               let permissionType = PermissionType(rawValue: permissionTypeString) else {
-            Pixel.fire(.debug(event: .permissionDecryptionFailedUnique), limitTo: .dailyFirst)
+            PixelKit.fire(DebugEvent(GeneralPixel.permissionDecryptionFailedUnique), frequency: .daily)
             assertionFailure("\(#file): Failed to create PermissionEntity from PermissionManagedObject")
             return nil
         }

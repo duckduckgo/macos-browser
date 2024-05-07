@@ -70,9 +70,9 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenShouldDownloadResponse_downloadStarts() async throws {
-        let persistor = DownloadsPreferencesUserDefaultsPersistor()
-        persistor.alwaysRequestDownloadLocation = false
-        persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
         let suffix = Int.random(in: 0..<Int.max)
@@ -89,6 +89,227 @@ class DownloadsIntegrationTests: XCTestCase {
 
         XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("fname_\(suffix).dat"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.html)
+    }
+
+    @MainActor
+    func testWhenUnsupportedMimeType_downloadStarts() async throws {
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
+
+        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        let suffix = Int.random(in: 0..<Int.max)
+        let url = URL.testsServer
+            .appendingPathComponent("fname_\(suffix).dat")
+            .appendingTestParameters(data: data.html,
+                                     headers: ["Content-Type": "application/unsupported-mime-type"])
+        let tab = tabViewModel.tab
+        _=await tab.setUrl(url, source: .link)?.result
+
+        let fileUrl = try await downloadTaskFuture.get().output
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
+
+        XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("fname_\(suffix).dat"))
+        XCTAssertEqual(try? Data(contentsOf: fileUrl), data.html)
+    }
+
+    @MainActor
+    func testWhenLocalFile_downloadStartsAlwaysDisplayingSavePanel() async throws {
+        let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let destDirURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: destDirURL, withIntermediateDirectories: true)
+        try data.html.write(to: tempFileURL)
+
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = destDirURL
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
+        persistor.lastUsedCustomDownloadLocation = destDirURL.path
+
+        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        let tab = tabViewModel.tab
+        _=await tab.setUrl(tempFileURL, source: .link)?.result
+
+        let eSaveDialogShown = expectation(description: "Save dialog shown")
+        let getSaveDialog = Task { @MainActor in
+            while true {
+                if let sheet = self.window.sheets.first as? NSSavePanel {
+                    eSaveDialogShown.fulfill()
+                    return sheet
+                }
+                try await Task.sleep(interval: 0.01)
+            }
+        }
+
+        if case .timedOut = await XCTWaiter(delegate: self).fulfillment(of: [eSaveDialogShown], timeout: 5) {
+            getSaveDialog.cancel()
+        }
+        let saveDialog = try await getSaveDialog.value
+        window.endSheet(saveDialog, returnCode: .OK)
+
+        let fileUrl = try await downloadTaskFuture.get().output
+            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError) }.first().promise().get()
+
+        XCTAssertEqual(fileUrl.resolvingSymlinksInPath(), destDirURL.appendingPathComponent(tempFileURL.lastPathComponent).resolvingSymlinksInPath())
+        XCTAssertEqual(try? Data(contentsOf: fileUrl), data.html)
+    }
+
+    @MainActor
+    func testWhenLocalNonExistentFile_loadingFails() async throws {
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
+        let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+
+        let tab = tabViewModel.tab
+        let loadingResult = await tab.setUrl(tempFileURL, source: .link)?.result
+
+        XCTAssertThrowsError(try loadingResult?.get()) { error in
+            XCTAssertEqual((error as? URLError)?.code, .fileDoesNotExist)
+        }
+    }
+
+    @MainActor
+    func testWhenLocalFolder_loadingFails() async throws {
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
+        let dirURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dirURL, withIntermediateDirectories: true)
+
+        let tab = tabViewModel.tab
+        let loadingResult = await tab.setUrl(dirURL, source: .link)?.result
+
+        XCTAssertThrowsError(try loadingResult?.get()) { error in
+            XCTAssertEqual((error as? URLError)?.code, .fileIsDirectory)
+        }
+    }
+
+    @MainActor
+    func testWhenDownloadIsStartedInNewTab_tabIsClosed() async throws {
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
+        let dirURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dirURL, withIntermediateDirectories: true)
+
+        let downloadUrl = URL.testsServer
+            .appendingPathComponent("fname.dat")
+            .appendingTestParameters(data: data.html,
+                                     headers: ["Content-Disposition": "attachment; filename=\"fname.dat\"",
+                                               "Content-Type": "text/html"])
+
+        let pageUrl = URL.testsServer
+            .appendingTestParameters(data: """
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Clickable Body</title>
+            </head>
+            <body onclick="window.open('\(downloadUrl.absoluteString.escapedJavaScriptString())')" style="cursor: pointer;">
+            <h1>Click anywhere on the page to open the link</h1>
+            </body>
+            </html>
+            """.utf8data)
+        let tab = tabViewModel.tab
+        _=await tab.setUrl(pageUrl, source: .link)?.result
+
+        NSApp.activate(ignoringOtherApps: true)
+        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+
+        let e1 = expectation(description: "new tab opened")
+        var e2: XCTestExpectation!
+        let c = tabCollectionViewModel.$selectedTabViewModel.dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] tabViewModel in
+                guard let tabViewModel else { return }
+                print("tabViewModel", tabViewModel.tab, tab)
+                if tabViewModel.tab !== tab {
+                    e1.fulfill()
+                    e2 = expectation(description: "new tab closed")
+                } else {
+                    e2.fulfill()
+                }
+            }
+
+        // click to open a new (download) tab and instantly deactivate it
+        click(tab.webView)
+
+        // download should start in the background tab
+        _=try await downloadTaskFuture.get()
+
+        // expect for the download tab to close
+        await fulfillment(of: [e1, e2], timeout: 10)
+        withExtendedLifetime(c, {})
+    }
+
+    @MainActor
+    func testWhenDownloadIsStartedInNewTabAfterRedirect_tabIsClosed() async throws {
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
+        let dirURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dirURL, withIntermediateDirectories: true)
+
+        let downloadUrl = URL.testsServer
+            .appendingPathComponent("fname.dat")
+            .appendingTestParameters(data: data.html,
+                                     headers: ["Content-Disposition": "attachment; filename=\"fname.dat\"",
+                                               "Content-Type": "text/html"])
+
+        let redirectUrl = URL.testsServer
+            .appendingTestParameters(data: """
+            <html><head>
+            <script>
+              window.location.replace('\(downloadUrl.absoluteString.escapedJavaScriptString())');
+            </script>
+            </head></html>
+            """.utf8data)
+
+        let pageUrl = URL.testsServer
+            .appendingTestParameters(data: """
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Clickable Body</title>
+            </head>
+            <body onclick="window.open('\(redirectUrl.absoluteString.escapedJavaScriptString())')" style="cursor: pointer;">
+            <h1>Click anywhere on the page to open the link</h1>
+            </body>
+            </html>
+            """.utf8data)
+        let tab = tabViewModel.tab
+        _=await tab.setUrl(pageUrl, source: .link)?.result
+
+        NSApp.activate(ignoringOtherApps: true)
+        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+
+        let e1 = expectation(description: "new tab opened")
+        var e2: XCTestExpectation!
+        let c = tabCollectionViewModel.$selectedTabViewModel.dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] tabViewModel in
+                guard let tabViewModel else { return }
+                print("tabViewModel", tabViewModel.tab, tab)
+                if tabViewModel.tab !== tab {
+                    e1.fulfill()
+                    e2 = expectation(description: "new tab closed")
+                } else {
+                    e2.fulfill()
+                }
+            }
+
+        // click to open a new (download) tab and instantly deactivate it
+        click(tab.webView)
+
+        // download should start in the background tab
+        _=try await downloadTaskFuture.get()
+
+        // expect for the download tab to close
+        await fulfillment(of: [e1, e2], timeout: 10)
+        withExtendedLifetime(c, {})
     }
 
     @MainActor
@@ -235,9 +456,9 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigationActionIsData_downloadStarts() async throws {
-        let persistor = DownloadsPreferencesUserDefaultsPersistor()
-        persistor.alwaysRequestDownloadLocation = false
-        persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
 
         let tab = tabViewModel.tab
         // load empty page
@@ -268,9 +489,9 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigationActionIsBlob_downloadStarts() async throws {
-        let persistor = DownloadsPreferencesUserDefaultsPersistor()
-        persistor.alwaysRequestDownloadLocation = false
-        persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
+        let preferences = DownloadsPreferences.shared
+        preferences.alwaysRequestDownloadLocation = false
+        preferences.selectedDownloadLocation = FileManager.default.temporaryDirectory
 
         let tab = tabViewModel.tab
         // load empty page

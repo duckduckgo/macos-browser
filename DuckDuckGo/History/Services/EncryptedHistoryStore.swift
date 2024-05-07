@@ -21,6 +21,7 @@ import Foundation
 import CoreData
 import Combine
 import History
+import PixelKit
 
 final class EncryptedHistoryStore: HistoryStoring {
 
@@ -91,7 +92,7 @@ final class EncryptedHistoryStore: HistoryStoring {
                 }
                 os_log("%d items cleaned from history", log: .history, entriesToDelete.count)
             } catch {
-                Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.historyRemoveFailed, error: error))
                 self.context.reset()
                 return .failure(error)
             }
@@ -100,7 +101,7 @@ final class EncryptedHistoryStore: HistoryStoring {
         do {
             try context.save()
         } catch {
-            Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.historyRemoveFailed, error: error))
             context.reset()
             return .failure(error)
         }
@@ -117,7 +118,7 @@ final class EncryptedHistoryStore: HistoryStoring {
             let history = BrowsingHistory(historyEntries: historyEntries)
             return .success(history)
         } catch {
-            Pixel.fire(.debug(event: .historyReloadFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.historyReloadFailed, error: error))
             return .failure(error)
         }
     }
@@ -133,7 +134,7 @@ final class EncryptedHistoryStore: HistoryStoring {
             }
             try context.save()
         } catch {
-            Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.historyCleanEntriesFailed, error: error))
             context.reset()
             return .failure(error)
         }
@@ -149,7 +150,7 @@ final class EncryptedHistoryStore: HistoryStoring {
             try context.save()
             return .success(())
         } catch {
-            Pixel.fire(.debug(event: .historyCleanVisitsFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.historyCleanVisitsFailed, error: error))
             context.reset()
             return .failure(error)
         }
@@ -174,7 +175,8 @@ final class EncryptedHistoryStore: HistoryStoring {
                 do {
                     fetchedObjects = try self.context.fetch(fetchRequest)
                 } catch {
-                    Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.historySaveFailed, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.historySaveFailedDaily, error: error), frequency: .legacyDaily)
                     promise(.failure(error))
                     return
                 }
@@ -202,14 +204,16 @@ final class EncryptedHistoryStore: HistoryStoring {
                                                            context: self.context)
                 switch insertionResult {
                 case .failure(let error):
-                    Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.historySaveFailed, error: error))
+                    PixelKit.fire(DebugEvent(GeneralPixel.historySaveFailedDaily, error: error), frequency: .legacyDaily)
                     context.reset()
                     promise(.failure(error))
                 case .success(let visitMOs):
                     do {
                         try self.context.save()
                     } catch {
-                        Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                        PixelKit.fire(DebugEvent(GeneralPixel.historySaveFailed, error: error))
+                        PixelKit.fire(DebugEvent(GeneralPixel.historySaveFailedDaily, error: error), frequency: .legacyDaily)
                         context.reset()
                         promise(.failure(HistoryStoreError.savingFailed))
                         return
@@ -259,7 +263,7 @@ final class EncryptedHistoryStore: HistoryStoring {
                         context: NSManagedObjectContext) -> Result<VisitManagedObject, Error> {
         let insertedObject = NSEntityDescription.insertNewObject(forEntityName: VisitManagedObject.className(), into: context)
         guard let visitMO = insertedObject as? VisitManagedObject else {
-            Pixel.fire(.debug(event: .historyInsertVisitFailed))
+            PixelKit.fire(DebugEvent(GeneralPixel.historyInsertVisitFailed))
             context.reset()
             return .failure(HistoryStoreError.savingFailed)
         }
@@ -307,7 +311,7 @@ final class EncryptedHistoryStore: HistoryStoring {
                     context.delete(visit)
                 }
             } catch {
-                Pixel.fire(.debug(event: .historyRemoveVisitsFailed, error: error))
+                PixelKit.fire(DebugEvent(GeneralPixel.historyRemoveVisitsFailed, error: error))
                 return .failure(error)
             }
         }
@@ -315,7 +319,7 @@ final class EncryptedHistoryStore: HistoryStoring {
         do {
             try context.save()
         } catch {
-            Pixel.fire(.debug(event: .historyRemoveVisitsFailed, error: error))
+            PixelKit.fire(DebugEvent(GeneralPixel.historyRemoveVisitsFailed, error: error))
             context.reset()
             return .failure(error)
         }
@@ -343,7 +347,7 @@ fileprivate extension HistoryEntry {
         guard let url = historyEntryMO.urlEncrypted as? URL,
               let identifier = historyEntryMO.identifier,
               let lastVisit = historyEntryMO.lastVisit else {
-            Pixel.fire(.debug(event: .historyEntryDecryptionFailedUnique), limitTo: .dailyFirst)
+            PixelKit.fire(DebugEvent(GeneralPixel.historyEntryDecryptionFailedUnique), frequency: .daily)
             assertionFailure("HistoryEntry: Failed to init HistoryEntry from HistoryEntryManagedObject")
             return nil
         }

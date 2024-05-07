@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if SUBSCRIPTION
-
 import BrowserServicesKit
 import Common
 import Combine
@@ -27,6 +25,7 @@ import WebKit
 import UserScript
 import Subscription
 import SubscriptionUI
+import PixelKit
 
 public extension Notification.Name {
     static let subscriptionPageCloseAndOpenPreferences = Notification.Name("com.duckduckgo.subscriptionPage.CloseAndOpenPreferences")
@@ -78,7 +77,7 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 /// Use Subscription sub-feature
 ///
 final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
     var featureName = "useSubscription"
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
         .exact(hostname: "duckduckgo.com"),
@@ -106,6 +105,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         static let subscriptionsUnknownPriceClicked = "subscriptionsUnknownPriceClicked"
         static let subscriptionsAddEmailSuccess = "subscriptionsAddEmailSuccess"
         static let subscriptionsWelcomeFaqClicked = "subscriptionsWelcomeFaqClicked"
+        static let getAccessToken = "getAccessToken"
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -125,6 +125,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case Handlers.subscriptionsUnknownPriceClicked: return subscriptionsUnknownPriceClicked
         case Handlers.subscriptionsAddEmailSuccess: return subscriptionsAddEmailSuccess
         case Handlers.subscriptionsWelcomeFaqClicked: return subscriptionsWelcomeFaqClicked
+        case Handlers.getAccessToken: return getAccessToken
         default:
             return nil
         }
@@ -143,16 +144,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        if let authToken = accountManager.authToken, accountManager.accessToken != nil {
-            return Subscription(token: authToken)
-        } else {
-            return Subscription(token: "")
-        }
+        let authToken = accountManager.authToken ?? ""
+        return Subscription(token: authToken)
     }
 
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
 
-        DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailSuccess, frequency: .dailyAndCount)
+        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailSuccess, frequency: .dailyAndCount)
 
         guard let subscriptionValues: SubscriptionValues = DecodableHelper.decode(from: params) else {
             assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionValues")
@@ -211,8 +209,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     // swiftlint:disable:next function_body_length cyclomatic_complexity
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
 
-        DailyPixel.fire(pixel: .privacyProPurchaseAttempt, frequency: .dailyAndCount)
-
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseAttempt, frequency: .dailyAndCount)
         struct SubscriptionSelection: Decodable {
             let id: String
         }
@@ -242,9 +239,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                 // Check for active subscriptions
                 if await PurchaseManager.hasActiveSubscription() {
-
-                    Pixel.fire(.privacyProRestoreAfterPurchaseAttempt)
-
+                    PixelKit.fire(PrivacyProPixel.privacyProRestoreAfterPurchaseAttempt)
                     os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
                     SubscriptionErrorReporter.report(subscriptionActivationError: .hasActiveSubscription)
                     await WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionFoundAlert(originalMessage: message)
@@ -290,8 +285,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 switch await AppStorePurchaseFlow.completeSubscriptionPurchase(with: purchaseTransactionJWS, subscriptionAppGroup: subscriptionAppGroup) {
                 case .success(let purchaseUpdate):
                     os_log(.info, log: .subscription, "[Purchase] Purchase complete")
-                    DailyPixel.fire(pixel: .privacyProPurchaseSuccess, frequency: .dailyAndCount)
-                    Pixel.fire(.privacyProSubscriptionActivated, limitTo: .initial)
+                    PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
+                    PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
                 case .failure(let error):
                     switch error {
@@ -344,7 +339,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
 
-        Pixel.fire(.privacyProRestorePurchaseOfferPageEntry)
+        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseOfferPageEntry)
         guard let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController,
               let windowControllerManager = await WindowControllersManager.shared.lastKeyMainWindowController else {
             return nil
@@ -365,7 +360,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }, uiActionHandler: { event in
             switch event {
             case .activateAddEmailClick:
-                DailyPixel.fire(pixel: .privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
+                PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseEmailStart, frequency: .dailyAndCount)
             default:
                 break
             }
@@ -402,14 +397,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .appTrackingProtection:
             NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
         case .vpn:
-            Pixel.fire(.privacyProWelcomeVPN, limitTo: .initial)
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomeVPN, frequency: .unique)
             NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
         case .personalInformationRemoval:
-            Pixel.fire(.privacyProWelcomePersonalInformationRemoval, limitTo: .initial)
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomePersonalInformationRemoval, frequency: .unique)
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             await WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         case .identityTheftRestoration:
-            Pixel.fire(.privacyProWelcomeIdentityRestoration, limitTo: .initial)
+            PixelKit.fire(PrivacyProPixel.privacyProWelcomeIdentityRestoration, frequency: .unique)
             await WindowControllersManager.shared.showTab(with: .identityTheftRestoration(.identityTheftRestoration))
         }
 
@@ -424,20 +419,19 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         await StripePurchaseFlow.completeSubscriptionPurchase(subscriptionAppGroup: subscriptionAppGroup)
         await mainViewController?.dismiss(progressViewController)
 
-        DailyPixel.fire(pixel: .privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
-
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
         return [String: String]() // cannot be nil, the web app expect something back before redirecting the user to the final page
     }
 
     // MARK: Pixel related actions
 
     func subscriptionsMonthlyPriceClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
-        Pixel.fire(.privacyProOfferMonthlyPriceClick)
+        PixelKit.fire(PrivacyProPixel.privacyProOfferMonthlyPriceClick)
         return nil
     }
 
     func subscriptionsYearlyPriceClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
-        Pixel.fire(.privacyProOfferYearlyPriceClick)
+        PixelKit.fire(PrivacyProPixel.privacyProOfferYearlyPriceClick)
         return nil
     }
 
@@ -447,13 +441,21 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func subscriptionsAddEmailSuccess(params: Any, original: WKScriptMessage) async -> Encodable? {
-        Pixel.fire(.privacyProAddEmailSuccess, limitTo: .initial)
+        PixelKit.fire(PrivacyProPixel.privacyProAddEmailSuccess, frequency: .unique)
         return nil
     }
 
     func subscriptionsWelcomeFaqClicked(params: Any, original: WKScriptMessage) async -> Encodable? {
-        Pixel.fire(.privacyProWelcomeFAQClick, limitTo: .initial)
+        PixelKit.fire(PrivacyProPixel.privacyProWelcomeFAQClick, frequency: .unique)
         return nil
+    }
+
+    func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        if let accessToken = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).accessToken {
+            return ["token": accessToken]
+        } else {
+            return [String: String]()
+        }
     }
 
     // MARK: Push actions
@@ -468,7 +470,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
-        let broker = UserScriptMessageBroker(context: SubscriptionPagesUserScript.context, requiresRunInPageContentWorld: true )
+        guard let broker else {
+            assertionFailure("Cannot continue without broker instance")
+            return
+        }
+
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }
 }
@@ -477,7 +483,7 @@ extension MainWindowController {
 
     @MainActor
     func showSomethingWentWrongAlert() {
-        DailyPixel.fire(pixel: .privacyProPurchaseFailure, frequency: .dailyAndCount)
+        PixelKit.fire(PrivacyProPixel.privacyProPurchaseFailure, frequency: .dailyAndCount)
         guard let window else { return }
 
         window.show(.somethingWentWrongAlert())
@@ -489,7 +495,7 @@ extension MainWindowController {
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
             WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
-            Pixel.fire(.privacyProOfferScreenImpression)
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }
 
@@ -499,7 +505,7 @@ extension MainWindowController {
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
             WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
-            Pixel.fire(.privacyProOfferScreenImpression)
+            PixelKit.fire(PrivacyProPixel.privacyProOfferScreenImpression)
         })
     }
 
@@ -513,7 +519,7 @@ extension MainWindowController {
                     let result = await AppStoreRestoreFlow.restoreAccountFromPastPurchase(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
                     switch result {
                     case .success:
-                        DailyPixel.fire(pixel: .privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
+                        PixelKit.fire(PrivacyProPixel.privacyProRestorePurchaseStoreSuccess, frequency: .dailyAndCount)
                     case .failure: break
                     }
                     originalMessage.webView?.reload()
@@ -522,5 +528,3 @@ extension MainWindowController {
         })
     }
 }
-
-#endif

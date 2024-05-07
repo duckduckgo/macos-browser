@@ -145,6 +145,9 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
     private let runnerProvider: OperationRunnerProvider
     private let privacyConfigManager: PrivacyConfigurationManaging
+    private let fakePixelHandler: EventMapping<DataBrokerProtectionPixels> = EventMapping { event, _, _, _ in
+        print(event)
+    }
     private let contentScopeProperties: ContentScopeProperties
     private let csvColumns = ["name_input", "age_input", "city_input", "state_input", "name_scraped", "age_scraped", "address_scraped", "relatives_scraped", "url", "broker name", "screenshot_id", "error", "matched_fields", "result_match", "expected_match"]
 
@@ -174,7 +177,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         self.contentScopeProperties = contentScopeProperties
 
         let fileResources = FileResources()
-        self.brokers = fileResources.fetchBrokerFromResourceFiles() ?? [DataBroker]()
+        self.brokers = (try? fileResources.fetchBrokerFromResourceFiles()) ?? [DataBroker]()
     }
 
     func runAllBrokers() {
@@ -184,18 +187,14 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
         Task.detached {
             var scanResults = [DebugScanReturnValue]()
-            let semaphore = DispatchSemaphore(value: 10)
+
             try await withThrowingTaskGroup(of: DebugScanReturnValue.self) { group in
                 for queryData in brokerProfileQueryData {
-                    semaphore.wait()
                     let debugScanOperation = DebugScanOperation(privacyConfig: self.privacyConfigManager, prefs: self.contentScopeProperties, query: queryData) {
                         true
                     }
 
                     group.addTask {
-                        defer {
-                            semaphore.signal()
-                        }
                         do {
                             return try await debugScanOperation.run(inputValue: (), showWebView: false)
                         } catch {
@@ -351,7 +350,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
                     Task {
                         do {
-                            let extractedProfiles = try await runner.scan(query, stageCalculator: FakeStageDurationCalculator(), showWebView: true) { true }
+                            let extractedProfiles = try await runner.scan(query, stageCalculator: FakeStageDurationCalculator(), pixelHandler: fakePixelHandler, showWebView: true) { true }
 
                             DispatchQueue.main.async {
                                 for extractedProfile in extractedProfiles {
@@ -387,7 +386,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
         )
         Task {
             do {
-                try await runner.optOut(profileQuery: brokerProfileQueryData, extractedProfile: scanResult.extractedProfile, stageCalculator: FakeStageDurationCalculator(), showWebView: true) {
+                try await runner.optOut(profileQuery: brokerProfileQueryData, extractedProfile: scanResult.extractedProfile, stageCalculator: FakeStageDurationCalculator(), pixelHandler: fakePixelHandler, showWebView: true) {
                     true
                 }
 
@@ -477,6 +476,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
 final class FakeStageDurationCalculator: StageDurationCalculator {
     var attemptId: UUID = UUID()
+    var isManualScan: Bool = false
 
     func durationSinceLastStage() -> Double {
         0.0

@@ -18,8 +18,6 @@
 
 import Common
 import Foundation
-
-#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
 import NetworkExtension
@@ -57,7 +55,7 @@ final class NetworkProtectionDebugUtilities {
     // MARK: - Debug commands for the extension
 
     func resetAllState(keepAuthToken: Bool) async {
-        let uninstalledSuccessfully = await networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
+        let uninstalledSuccessfully = await networkProtectionFeatureDisabler.disable(uninstallSystemExtension: true)
 
         guard uninstalledSuccessfully else {
             return
@@ -65,8 +63,6 @@ final class NetworkProtectionDebugUtilities {
 
         settings.resetToDefaults()
 
-        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
-        DefaultWaitlistActivationDateStore(source: .netP).removeDates()
         DefaultHomePageRemoteMessagingStorage.networkProtection().removeStoredAndDismissedMessages()
 
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
@@ -87,5 +83,3 @@ final class NetworkProtectionDebugUtilities {
         try await ipcClient.debugCommand(.expireRegistrationKey)
     }
 }
-
-#endif

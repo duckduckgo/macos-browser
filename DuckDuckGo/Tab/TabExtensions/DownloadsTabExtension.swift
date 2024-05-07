@@ -182,7 +182,8 @@ extension DownloadsTabExtension: NavigationResponder {
             ?? navigationResponse.mainFrameNavigation?.navigationAction
 
         guard navigationResponse.httpResponse?.isSuccessful != false, // download non-http responses
-              !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload
+              !navigationResponse.url.isDirectory, // don‘t download a local directory
+              !responseCanShowMIMEType(navigationResponse) || navigationResponse.shouldDownload
                 // if user pressed Opt+Enter in the Address bar to download from a URL
                 || (navigationResponse.mainFrameNavigation?.redirectHistory.last ?? navigationResponse.mainFrameNavigation?.navigationAction)?.navigationType == .custom(.userRequestedPageDownload)
         else {
@@ -199,6 +200,15 @@ extension DownloadsTabExtension: NavigationResponder {
         return .download
     }
 
+    private func responseCanShowMIMEType(_ response: NavigationResponse) -> Bool {
+        if response.canShowMIMEType {
+            return true
+        } else if response.url.isFileURL {
+            return Bundle.main.fileTypeExtensions.contains(response.url.pathExtension)
+        }
+        return false
+    }
+
     @MainActor
     func navigationAction(_ navigationAction: NavigationAction, didBecome download: WebKitDownload) {
         enqueueDownload(download, withNavigationAction: navigationAction)
@@ -213,16 +223,24 @@ extension DownloadsTabExtension: NavigationResponder {
     func enqueueDownload(_ download: WebKitDownload, withNavigationAction navigationAction: NavigationAction?) {
         let task = downloadManager.add(download, fromBurnerWindow: self.isBurner, delegate: self, destination: .auto)
 
+        var isMainFrameNavigationActionWithNoHistory: Bool {
+            // get the first navigation action in the redirect series
+            guard let navigationAction = navigationAction?.redirectHistory?.first ?? navigationAction,
+                  navigationAction.isForMainFrame,
+                  navigationAction.isTargetingNewWindow,
+                  // webView has no navigation history (downloaded navigationAction has started from an empty state)
+                  navigationAction.fromHistoryItemIdentity == nil
+            else { return false }
+            return true
+        }
+
         // If the download has started from a popup Tab - close it after starting the download
         // e.g. download button on this page:
         // https://en.wikipedia.org/wiki/Guitar#/media/File:GuitareClassique5.png
-        guard let navigationAction,
-              navigationAction.isForMainFrame,
-              navigationAction.isTargetingNewWindow,
-              let webView = download.webView,
-              // webView has no navigation history (downloaded navigationAction has started from an empty state)
-              (navigationAction.redirectHistory?.first ?? navigationAction).fromHistoryItemIdentity == nil
-        else { return }
+        guard let webView = download.webView,
+              isMainFrameNavigationActionWithNoHistory
+                // if converted from navigation response but no page was loaded
+                || navigationAction == nil && webView.backForwardList.currentItem == nil else { return }
 
         self.closeWebView(webView, afterDownloadTaskHasStarted: task)
     }

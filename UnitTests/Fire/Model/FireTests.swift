@@ -94,7 +94,7 @@ final class FireTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 0)
-        XCTAssertEqual(pinnedTabsManager.tabCollection.tabs.map(\.content.url), pinnedTabs.map(\.content.url))
+        XCTAssertEqual(pinnedTabsManager.tabCollection.tabs.map(\.content.userEditableUrl), pinnedTabs.map(\.content.userEditableUrl))
     }
 
     func testWhenBurnAll_ThenAllWebsiteDataAreRemoved() {

@@ -20,7 +20,11 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockFireButtonPreferencesPersistor: FireButtonPreferencesPersistor {
+
+    var autoClearEnabled: Bool = false
+    var warnBeforeClearingEnabled: Bool = false
     var loginDetectionEnabled: Bool = false
+
 }
 
 class DataClearingPreferencesTests: XCTestCase {

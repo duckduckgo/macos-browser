@@ -16,11 +16,10 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Combine
 import NetworkProtection
+import PixelKit
 
 final class VPNLocationViewModel: ObservableObject {
     private static var cachedLocations: [VPNCountryItemModel]?
@@ -65,7 +64,7 @@ final class VPNLocationViewModel: ObservableObject {
     }
 
     func onViewAppeared() async {
-        Pixel.fire(.networkProtectionGeoswitchingOpened)
+        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingOpened)
         await reloadList()
     }
 
@@ -75,14 +74,15 @@ final class VPNLocationViewModel: ObservableObject {
     }
 
     func onNearestItemSelection() async {
-        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount)
+        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount)
         selectedLocation = .nearest
         await reloadList()
     }
 
     func onCountryItemSelection(id: String, cityId: String? = nil) async {
-        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount)
-        let location = NetworkProtectionSelectedLocation(country: id, city: cityId)
+        PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount)
+        let city = cityId == VPNCityItemModel.nearest.id ? nil : cityId
+        let location = NetworkProtectionSelectedLocation(country: id, city: city)
         selectedLocation = .location(location)
         await reloadList()
     }
@@ -95,7 +95,7 @@ final class VPNLocationViewModel: ObservableObject {
     private func reloadList() async {
         guard let locations = try? await locationListRepository.fetchLocationList().sortedByName() else { return }
         if locations.isEmpty {
-            DailyPixel.fire(pixel: .networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount)
+            PixelKit.fire(GeneralPixel.networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount)
         }
         let isNearestSelected = selectedLocation == .nearest
         self.isNearestSelected = isNearestSelected
@@ -208,5 +208,3 @@ private extension String {
         Locale.current.localizedString(forRegionCode: self) ?? ""
     }
 }
-
-#endif

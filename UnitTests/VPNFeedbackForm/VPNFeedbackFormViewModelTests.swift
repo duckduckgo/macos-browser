@@ -19,8 +19,6 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-#if NETWORK_PROTECTION
-
 final class VPNFeedbackFormViewModelTests: XCTestCase {
 
     func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
@@ -105,7 +103,8 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
         let vpnState = VPNMetadata.VPNState(
             onboardingState: "onboarded",
             connectionState: "connected",
-            lastErrorMessage: "none",
+            lastStartErrorDescription: "none",
+            lastTunnelErrorDescription: "none",
             connectedServer: "Paoli, PA",
             connectedServerIP: "123.123.123.123"
         )
@@ -128,13 +127,19 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             notificationsAgentIsRunning: true
         )
 
+        let privacyProInfo = VPNMetadata.PrivacyProInfo(
+            hasPrivacyProAccount: true,
+            hasVPNEntitlement: true
+        )
+
         return VPNMetadata(
             appInfo: appInfo,
             deviceInfo: deviceInfo,
             networkInfo: networkInfo,
             vpnState: vpnState,
             vpnSettingsState: vpnSettingsState,
-            loginItemState: loginItemState
+            loginItemState: loginItemState,
+            privacyProInfo: privacyProInfo
         )
     }
 
@@ -171,5 +176,3 @@ private class MockVPNFeedbackFormViewModelDelegate: VPNFeedbackFormViewModelDele
     }
 
 }
-
-#endif

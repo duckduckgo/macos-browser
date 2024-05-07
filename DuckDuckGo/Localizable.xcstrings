@@ -317,6 +317,7 @@
       }
     },
     "••••••••••••" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -476,6 +477,58 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "⚠️ Мы прекращаем поддержку примечаний."
+          }
+        }
+      }
+    },
+    "1." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1."
           }
         }
       }
@@ -768,6 +821,7 @@
     },
     "Add Folder" : {
       "comment" : "Add Folder popover: Create folder button",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1114,6 +1168,7 @@
     },
     "Address:" : {
       "comment" : "Add Bookmark dialog bookmark url field heading",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2354,6 +2409,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Имя пользователя"
+          }
+        }
+      }
+    },
+    "auto.clear" : {
+      "comment" : "Header of a section in Settings. The setting configures clearing data automatically after quitting the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Auto-Clear"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrado automático"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacement automatique"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancellazione automatica"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch wissen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatyczne czyszczenie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpeza automática"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоочистка"
           }
         }
       }
@@ -3674,6 +3789,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сбросить список исключений?"
+          }
+        }
+      }
+    },
+    "autofill.hide-card-cvv" : {
+      "comment" : "Tooltip for the Autofill panel's Hide CVV button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVV ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide CVV"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar CVV"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer CVV"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi CVV"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVV verbergen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryj CVV"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar CVV"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть CVV-код"
           }
         }
       }
@@ -5298,6 +5473,66 @@
         }
       }
     },
+    "autofill.show-card-cvv" : {
+      "comment" : "Tooltip for the Autofill panel's Show CVV button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVV anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show CVV"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar CVV"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher CVV"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra CVV"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CVV weergeven"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż CVV"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar CVV"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать CVV-код"
+          }
+        }
+      }
+    },
     "autofill.show-password" : {
       "comment" : "Tooltip for the Autofill panel's Show Password button",
       "extractionState" : "extracted_with_value",
@@ -5474,6 +5709,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Просмотреть данные автозаполнения..."
+          }
+        }
+      }
+    },
+    "automatically.clear.data" : {
+      "comment" : "Label after the checkbox in Settings which configures clearing data automatically after quitting the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs und Browserdaten automatisch löschen, wenn DuckDuckGo beendet wird"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically clear tabs and browsing data when DuckDuckGo quits"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borra automáticamente las pestañas y los datos de navegación cuando se cierra DuckDuckGo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer automatiquement les onglets et les données de navigation lorsque DuckDuckGo se ferme"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancella automaticamente schede e dati di navigazione quando chiudi DuckDuckGo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabbladen en browsegegevens automatisch wissen wanneer DuckDuckGo stopt"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatycznie czyść karty i dane przeglądania przy wychodzeniu z DuckDuckGo"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpar automaticamente os separadores e os dados de navegação quando o DuckDuckGo fecha"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматически закрывает вкладки и стирает данные о посещении сайтов при завершении работы DuckDuckGo."
           }
         }
       }
@@ -6126,6 +6421,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Приложение Bitwarden не подтвердило «рукопожатие»."
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible" : {
+      "comment" : "Message that warns user that specific Bitwarden app vesions are not compatible with this app",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die folgenden Bitwarden-Versionen sind mit DuckDuckGo inkompatibel: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Bitte kehre zu einer älteren Version zurück, indem du die folgenden Schritte ausführst:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please revert to an older version by following these steps:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las siguientes versiones de Bitwarden son incompatibles con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Vuelve a una versión anterior siguiendo estos pasos:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les versions suivantes de Bitwarden sont incompatibles avec DuckDuckGo : v2024.3.0, v2024.3.2, v2024.4.0 et v2024.4.1. Veuillez revenir à une version antérieure en procédant comme suit :"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le seguenti versioni di Bitwarden non sono compatibili con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. È necessario tornare a una versione precedente seguendo questi passaggi:"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De volgende versies van Bitwarden zijn niet compatibel met DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Volg deze stappen om terug te gaan naar een oudere versie:"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Następujące wersje Bitwarden są niezgodne z DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Przywróć starszą wersję, wykonując następujące czynności:"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As seguintes versões do Bitwarden são incompatíveis com o DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0 e v2024.4.1. Reverte para uma versão mais antiga seguindo estes passos:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "С DuckDuckGo несовместимы следующие версии Bitwarden: 2024.3.0, 2024.3.2, 2024.4.0, 2024.4.1. Вернитесь к более старой версии, выполнив следующие действия:"
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible.step.1" : {
+      "comment" : "First step to downgrade Bitwarden",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V2014.2.1 herunterladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Download v2014.2.1"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar v2014.2.1"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Télécharger v2014.2.1"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scarica la versione v2014.2.1"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download v2014.2.1"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pobierz v2014.2.1"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfere a versão v2014.2.1"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скачайте версию 2014.2.1"
+          }
+        }
+      }
+    },
+    "bitwarden.incompatible.step.2" : {
+      "comment" : "Second step to downgrade Bitwarden",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Öffne die heruntergeladene DMG-Datei und ziehe die Bitwarden-Anwendung auf den Ordner „/Applications“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "2. Open the downloaded DMG file and drag the Bitwarden application to\nthe /Applications folder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Abre el archivo DMG descargado y arrastra la aplicación Bitwarden a\nla carpeta /Applications."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Ouvrez le fichier DMG téléchargé et faites glisser l'application Bitwarden vers\nle dossier /Applications."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Apri il file DMG scaricato e trascina l'applicazione Bitwarden nella\n/cartella Applications."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Open het gedownloade DMG-bestand en sleep de Bitwarden-app naar\n de map /Applications."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Otwórz pobrany plik DMG i przeciągnij aplikację Bitwarden do\nfolderu /Applications."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Abre o ficheiro DMG transferido e arrasta a aplicação Bitwarden para\na pasta /Applications."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Откройте загруженный файл DMG и перетащите приложение Bitwarden в стандартную папку «Программы»."
           }
         }
       }
@@ -7151,6 +7626,7 @@
     },
     "Bookmark Added" : {
       "comment" : "Bookmark Added popover title",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7308,6 +7784,66 @@
         }
       }
     },
+    "bookmark.all.tabs" : {
+      "comment" : "Menu item for bookmarking all the open tabs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Tabs mit Lesezeichen versehen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark All Tabs…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir todas las pestañas a marcadores…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter tous les onglets aux signets…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea un segnalibro con tutte le schede…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle tabbladen toevoegen als bladwijzer…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj wszystkie karty do zakładek…"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar todos os separadores…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить все вкладки в закладки…"
+          }
+        }
+      }
+    },
     "bookmark.dialog.add" : {
       "comment" : "Button to confim a bookmark creation",
       "extractionState" : "extracted_with_value",
@@ -7435,55 +7971,55 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Seite als Lesezeichen markieren"
+            "value" : "Diese Seite mit einem Lesezeichen versehen…"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Bookmark This Page"
+            "value" : "Bookmark This Page…"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Marcar esta página"
+            "value" : "Marcar esta página…"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter cette page aux signets"
+            "value" : "Ajouter cette page aux signets…"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Crea un segnalibro per questa pagina"
+            "value" : "Crea un segnalibro per questa pagina…"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bladwijzer toevoegen aan deze pagina"
+            "value" : "Bladwijzer toevoegen voor deze pagina…"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dodaj tę stronę do zakładek"
+            "value" : "Dodaj tę stronę do zakładek…"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Marcar esta página"
+            "value" : "Marcar esta página…"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сохранить в закладках"
+            "value" : "Сохранить страницу в закладках…"
           }
         }
       }
@@ -8494,6 +9030,66 @@
         }
       }
     },
+    "bookmarks.dialog.action.addAllBookmarks" : {
+      "comment" : "CTA title for saving multiple Bookmarks at once",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lesezeichen speichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Bookmarks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar marcadores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer les signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva segnalibri"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bladwijzers opslaan"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz zakładki"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar marcadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранение закладок"
+          }
+        }
+      }
+    },
     "bookmarks.dialog.action.addBookmark" : {
       "comment" : "CTA title for adding a Bookmark",
       "extractionState" : "extracted_with_value",
@@ -8610,6 +9206,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добавить папку"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.allTabs.message.add" : {
+      "comment" : "Bookmark creation for all open tabs dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Lesezeichen werden in einem neuen Ordner gespeichert:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "These bookmarks will be saved in a new folder:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estos marcadores se guardarán en una nueva carpeta:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ces signets seront enregistrés dans un nouveau dossier:"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questi segnalibri verranno salvati in una nuova cartella:"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze bladwijzers worden opgeslagen in een nieuwe map:"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te zakładki zostaną zapisane w nowym folderze:"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estes marcadores serão guardados numa nova pasta:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эти закладки будут сохранены в новой папке:"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.allTabs.title.add" : {
+      "comment" : "Title of dialog to bookmark all open tabs. E.g. 'Bookmark Open Tabs (42)'",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offene Tabs mit Lesezeichen versehen (%d)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark Open Tabs (%d)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir pestañas abiertas (%d)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter les onglets ouverts (%d) aux signets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungere ai segnalibri le schede aperte (%d)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d geopende tabbladen toevoegen als bladwijzer"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj otwarte karty (%d) do zakładek"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar separadores abertos (%d)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить открытые вкладки (%d) в закладки"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.folderName" : {
+      "comment" : "Folder name field label for Bookmarks folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordnername"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Folder Name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de la carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom du dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome della cartella"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naam van de map"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nazwa folderu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome da pasta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название папки"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.folderName.value" : {
+      "comment" : "The suggested name of the folder that will contain the bookmark tabs. Eg. 2024-02-12 - Tabs (42)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ – Tabs (%2$d)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ - Tabs (%2$d)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Pestañas (%2$d)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Onglets (%2$d)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Schede (%2$d)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Tabbladen (%2$d)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Karty (%2$d)"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Separadores (%2$d)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - Вкладки (%2$d)"
           }
         }
       }
@@ -8921,7 +9757,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lesezeichen hinzufügen"
+            "value" : "Add Bookmark"
           }
         },
         "en" : {
@@ -8933,43 +9769,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añadir marcador"
+            "value" : "Add Bookmark"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter un signet"
+            "value" : "Add Bookmark"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aggiungi ai segnalibri"
+            "value" : "Add Bookmark"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bladwijzer toevoegen"
+            "value" : "Add Bookmark"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dodaj zakładkę"
+            "value" : "Add Bookmark"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adicionar marcador"
+            "value" : "Add Bookmark"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавить закладку"
+            "value" : "Add Bookmark"
           }
         }
       }
@@ -9041,7 +9877,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lesezeichen bearbeiten"
+            "value" : "Edit Bookmark"
           }
         },
         "en" : {
@@ -9053,43 +9889,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar marcador"
+            "value" : "Edit Bookmark"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Modifier le signet"
+            "value" : "Edit Bookmark"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Modifica segnalibro"
+            "value" : "Edit Bookmark"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bladwijzer bewerken"
+            "value" : "Edit Bookmark"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edytuj zakładkę"
+            "value" : "Edit Bookmark"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Editar marcador"
+            "value" : "Edit Bookmark"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редактировать закладку"
+            "value" : "Edit Bookmark"
           }
         }
       }
@@ -10573,6 +11409,126 @@
         }
       }
     },
+    "clear.and.quit" : {
+      "comment" : "Button to clear data and quit the application",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen und Beenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear and Quit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar y salir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer et quitter"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancella ed esci"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wissen en stoppen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyczyść i wyjdź"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpar e sair"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить и выйти"
+          }
+        }
+      }
+    },
+    "close.all.other.tabs" : {
+      "comment" : "Menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle anderen Tabs schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close All Other Tabs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar todas las demás pestañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer tous les autres onglets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi tutte le altre schede"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle andere tabbladen sluiten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zamknij wszystkie inne karty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar todos os outros separadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть все остальные вкладки"
+          }
+        }
+      }
+    },
     "close.other.tabs" : {
       "comment" : "Menu item",
       "extractionState" : "extracted_with_value",
@@ -10809,6 +11765,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закрыть и вернуться ко вкладке «%@»"
+          }
+        }
+      }
+    },
+    "close.tabs.to.the.left" : {
+      "comment" : "Menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs auf der linken Seite schließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close Tabs to the Left"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar las pestañas a la izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer les onglets à gauche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi le schede a sinistra"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabbladen links sluiten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zamknij karty po lewej stronie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar separadores à esquerda"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть вкладки слева"
           }
         }
       }
@@ -11106,6 +12122,126 @@
         }
       }
     },
+    "context.menu.new.tab.mode.at.end" : {
+      "comment" : "Preferences > Tabs > At end of list",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts neben anderen Tabs hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add to the right of other tabs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a la derecha de otras pestañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à droite des autres onglets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi a destra di altre schede"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toevoegen aan de rechterkant van andere tabbladen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj po prawej stronie innych kart"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar à direita dos outros separadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить справа от остальных вкладок"
+          }
+        }
+      }
+    },
+    "context.menu.new.tab.mode.next.to.current" : {
+      "comment" : "Preferences > Tabs > Next to current tab",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts neben dem aktuellen Tab hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add to the right of the current tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a la derecha de la pestaña actual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à droite de l'onglet actuel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi a destra della scheda attuale"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toevoegen aan de rechterkant van het huidige tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj po prawej stronie bieżącej karty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar à direita do separador atual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить справа от текущей вкладки"
+          }
+        }
+      }
+    },
     "copy" : {
       "comment" : "Copy button",
       "extractionState" : "extracted_with_value",
@@ -11168,6 +12304,7 @@
     },
     "Copy" : {
       "comment" : "Command",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -12407,6 +13544,7 @@
     },
     "Delete" : {
       "comment" : "Command",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -12687,6 +13825,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выключить"
+          }
+        }
+      }
+    },
+    "disable.auto.clear.to.enable.session.restore" : {
+      "comment" : "Information label in Settings. It tells user that to enable session restoration setting they have to disable burn on quit. Auto-Clear should match the string with 'auto.clear' key",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deaktiviere das automatische Löschen beim Beenden, um die Sitzungswiederherstellung einzuschalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Disable auto-clear on quit to turn on session restore."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactiva el borrado automático al salir para activar Restaurar sesión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivez l'effacement automatique à la fermeture pour activer la restauration de session."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabilita la cancellazione automatica all'uscita per attivare il ripristino della sessione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schakel automatisch wissen uit wanneer u stopt om het herstellen van de sessie in te schakelen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyłącz automatyczne czyszczenie przy wychodzeniu, aby włączyć przywracanie sesji."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desativa a limpeza automática ao sair para ativar a restauração da sessão."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы активировать восстановление сеанса, отключите автоочистку данных при выходе."
           }
         }
       }
@@ -14543,66 +15741,6 @@
         }
       }
     },
-    "downloads.restart.item" : {
-      "comment" : "Contextual menu item in downloads manager to restart the download",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stopp"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Stop"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Detener"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arrêter"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Interrompi"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stoppen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zatrzymaj"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Parar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Остановить"
-          }
-        }
-      }
-    },
     "downloads.show-in-finder.item" : {
       "comment" : "Contextual menu item in downloads manager to show the downloaded file in Finder",
       "extractionState" : "extracted_with_value",
@@ -15663,6 +16801,7 @@
     },
     "Edit…" : {
       "comment" : "Command",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -19948,6 +21087,7 @@
     },
     "Hide" : {
       "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -24259,6 +25399,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выберите CSV-файл из %@…"
+          }
+        }
+      }
+    },
+    "import.nodata.bookmarks.subtitle" : {
+      "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du %@ Lesezeichen hast, versuche stattdessen, sie manuell zu importieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If you have %@ bookmarks, try importing them manually instead."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si tienes %@ marcadores, intenta importarlos manualmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous avez %@ signets, essayez plutôt de les importer manuellement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se hai %@ segnalibri, prova a importarli manualmente."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je %@ bladwijzers hebt, probeer ze dan handmatig te importeren."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli masz zakładki %@, spróbuj zaimportować je ręcznie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se tens favoritos do %@, tenta importá-los manualmente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если у вас есть %@-файл с закладками, попробуйте импортировать его вручную."
+          }
+        }
+      }
+    },
+    "import.nodata.passwords.subtitle" : {
+      "comment" : "Data import error subtitle: suggestion to import passwords manually by selecting a CSV or HTML file. The placeholder here represents the source browser, e.g Firefox.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du %@ Passwörter hast, versuche stattdessen, sie manuell zu importieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If you have %@ passwords, try importing them manually instead."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si tiene %@ contraseñas, intenta importarlas manualmente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous avez %@ mots de passe, essayez plutôt de les importer manuellement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se hai %@ password, prova a importarle manualmente."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je %@ wachtwoorden hebt, probeer ze dan handmatig te importeren."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli masz hasła %@, spróbuj zaimportować je ręcznie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se tens palavras-passe do %@, tenta importá-las manualmente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если у вас есть %@-файл с паролями, попробуйте импортировать его вручную."
           }
         }
       }
@@ -30136,12 +31396,12 @@
     },
     "newTab.setup.survey.day.0.action" : {
       "comment" : "Action title of the Day 0 survey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Teile deine Gedanken"
+            "value" : "Sign Up To Participate"
           }
         },
         "en" : {
@@ -30152,56 +31412,56 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Comparte tus ideas"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Partagez votre avis"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Comunicaci la tua opinione"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Deel je gedachten"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Podziel się przemyśleniami"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Partilha as tuas opiniões"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Поделиться соображениями"
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
           }
         }
       }
     },
     "newTab.setup.survey.day.0.summary" : {
       "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nimm an unserer kurzen Umfrage teil und hilf uns, den besten Browser zu entwickeln."
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "en" : {
@@ -30212,56 +31472,56 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Responde a nuestra breve encuesta y ayúdanos a crear el mejor navegador."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Répondez à notre courte enquête et aidez-nous à créer le meilleur navigateur."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Rispondi al nostro breve sondaggio e aiutaci a creare il browser migliore."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Vul onze korte enquête in en help ons de beste browser te bouwen."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Weź udział w krótkiej ankiecie i pomóż nam opracować najlepszą przeglądarkę."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Responde ao nosso curto inquérito e ajuda-nos a criar o melhor navegador."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Пройдите короткий опрос и помогите DuckDuckGo стать лучшим из браузеров."
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         }
       }
     },
     "newTab.setup.survey.day.0.title" : {
       "comment" : "Title of the Day 0 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sag uns, was dich hierher gebracht hat"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "en" : {
@@ -30272,44 +31532,44 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Cuéntanos qué te ha traído hasta aquí"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dites-nous ce qui vous amène ici"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Raccontaci cosa ti ha portato qui"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Vertel ons wat je hier heeft gebracht"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Powiedz nam, co Cię tu sprowadziło"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Diz-nos o que te trouxe aqui"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Что привело вас к нам"
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
           }
         }
       }
@@ -30496,12 +31756,12 @@
     },
     "newTab.setup.survey.day.14.action" : {
       "comment" : "Action title of the Day 14 survey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hilf uns, uns zu verbessern"
+            "value" : "Sign Up To Participate"
           }
         },
         "en" : {
@@ -30509,16 +31769,106 @@
             "state" : "new",
             "value" : "Sign Up To Participate"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up To Participate"
+          }
         }
       }
     },
     "newTab.setup.survey.day.14.summary" : {
       "comment" : "Summary of the card on the new tab page that invites users to partecipate to a survey",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join an interview with a member of our research team to help us build the best browser."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Join an interview with a member of our research team to help us build the best browser."
           }
         }
@@ -30526,8 +31876,14 @@
     },
     "newTab.setup.survey.day.14.title" : {
       "comment" : "Title of the Day 14 durvey of the Set Up section in the home page",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Your Thoughts With Us"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -30537,43 +31893,43 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ayúdanos a mejorar"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aidez-nous à nous améliorer"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aiutaci a migliorare"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Help ons om te verbeteren"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pomóż nam we wprowadzaniu ulepszeń"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajuda-nos a melhorar"
+            "value" : "Share Your Thoughts With Us"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Помогите нам стать лучше"
+            "value" : "Share Your Thoughts With Us"
           }
         }
       }
@@ -30820,7 +32176,7 @@
     },
     "no.access.to.selected.folder" : {
       "comment" : "Alert presented to user if the app doesn't have rights to access selected folder",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30880,7 +32236,7 @@
     },
     "no.access.to.selected.folder.header" : {
       "comment" : "Header of the alert dialog informing user about failed download",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -34811,7 +36167,7 @@
       }
     },
     "Passwords:" : {
-      "comment" : "Data import summary format of how many passwords (%lld) were successfully imported.",
+      "comment" : "Data import summary format of how many passwords were successfully imported.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -42536,6 +43892,246 @@
         }
       }
     },
+    "preferences-tabs.new.tab.position.title" : {
+      "comment" : "Title for new tab positioning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Erstellen eines neuen Tabs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "When creating a new tab"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al crear una nueva pestaña"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lors de la création d'un nouvel onglet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando si crea una nuova scheda"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bij het maken van een nieuw tabblad"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podczas tworzenia nowej karty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao criar um novo separador"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При создании новой вкладки"
+          }
+        }
+      }
+    },
+    "preferences-tabs.prefer.new.tabs.to.windows" : {
+      "comment" : "Option to prefer opening new tabs instead of windows when opening links",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links nach Möglichkeit in neuen Tabs statt in neuen Fenstern öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open links in new tabs instead of new windows whenever possible"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlaces en nuevas pestañas en lugar de nuevas ventanas siempre que sea posible"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les liens dans de nouveaux onglets plutôt que dans de nouvelles fenêtres si possible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri i collegamenti in nuove schede anziché in nuove finestre quando possibile"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links waar mogelijk openen in nieuwe tabbladen in plaats van in nieuwe vensters"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwieraj linki w nowych kartach zamiast w nowych oknach, gdy tylko jest to możliwe"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir links em separadores novos em vez de novas janelas sempre que possível"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По возможности открывать ссылки в новых вкладках, а не окнах"
+          }
+        }
+      }
+    },
+    "preferences-tabs.switch.tab.when.opened" : {
+      "comment" : "Option to switch to a new tab/window when it is opened",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Öffnen von Links sofort zu einem neuen Tab oder Fenster wechseln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "When opening links, switch to the new tab or window immediately"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al abrir enlaces, cambiar a la nueva pestaña o ventana inmediatamente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À l'ouverture des liens, basculer immédiatement sur le nouvel onglet ou la nouvelle fenêtre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando apri i collegamenti, passa immediatamente alla nuova scheda o finestra"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meteen overschakelen naar het nieuwe tabblad of venster bij het openen van links"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwierając linki, natychmiast przełącz na nową kartę lub nowe okno"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao abrir links, mudar imediatamente para o novo separador ou janela"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При открытии ссылки сразу переключаться на ее вкладку или окно"
+          }
+        }
+      }
+    },
+    "preferences-tabs.title" : {
+      "comment" : "Title for tabs section in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tabs"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pestañas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onglets"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schede"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabbladen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Karty"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separadores"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вкладки"
+          }
+        }
+      }
+    },
     "preferences.about" : {
       "comment" : "Title of the option to show the About screen",
       "extractionState" : "extracted_with_value",
@@ -45416,6 +47012,58 @@
         }
       }
     },
+    "Privacy Pro" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Pro"
+          }
+        }
+      }
+    },
     "private.search.explenation" : {
       "comment" : "feature explanation in settings",
       "extractionState" : "extracted_with_value",
@@ -45532,6 +47180,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выйти"
+          }
+        }
+      }
+    },
+    "quit.without.clearing" : {
+      "comment" : "Button to quit the application without clearing data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beenden ohne Löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quit Without Clearing"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir sin borrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter sans effacer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esci senza cancellare"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stoppen zonder wissen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyjdź bez czyszczenia"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sair sem limpar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выйти без очистки"
           }
         }
       }
@@ -45704,6 +47412,7 @@
     },
     "Remove" : {
       "comment" : "Remove bookmark button title",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -47683,6 +49392,7 @@
     },
     "Show left of the back button" : {
       "comment" : "Preferences > Home Button > left position item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -47736,6 +49446,7 @@
     },
     "Show Left of the Back Button" : {
       "comment" : "Main Menu > View > Home Button > left position item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48001,6 +49712,7 @@
     },
     "Show right of the reload button" : {
       "comment" : "Preferences > Home Button > right position item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48054,6 +49766,7 @@
     },
     "Show Right of the Reload Button" : {
       "comment" : "Main Menu > View > Home Button > right position item",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -48154,6 +49867,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показывать функции работы с текстом"
+          }
+        }
+      }
+    },
+    "show.data.clearing.settings" : {
+      "comment" : "Button in Settings. It navigates user to Data Clearing Settings. The Data Clearing string should match the string with the preferences.data-clearing key",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen zum Löschen von Daten öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Data Clearing Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir configuración de borrado de datos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres d'effacement des données"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri Impostazioni cancellazione dati"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instellingen voor het wissen van open gegevens"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ustawienia czyszczenia danych"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Definições de limpeza de dados"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть настройки очистки данных"
           }
         }
       }
@@ -48479,6 +50252,726 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Речь"
+          }
+        }
+      }
+    },
+    "ssl.error.certificate.expired.message" : {
+      "comment" : "Describes an SSL error where a website's security certificate is expired. '%1$@' is a placeholder for the website's domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Sicherheitszertifikat für %1$@ ist abgelaufen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The security certificate for %1$@ is expired."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El certificado de seguridad de %1$@ ha caducado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de sécurité de %1$@ a expiré."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di sicurezza per %1$@ è scaduto."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het beveiligingscertificaat voor %1$@ is verlopen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certyfikat zabezpieczeń dla %1$@ wygasł."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O certificado de segurança de %1$@ expirou."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Срок действия сертификата безопасности сайта %1$@ истек."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to see advanced options on click.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweitert …"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Advanced…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avanzadas..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options avancées"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avanzate…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geavanceerd ..."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaawansowane..."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avançado…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дополнительно..."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.info.body.expired" : {
+      "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es ist möglich, dass die Website falsch konfiguriert ist, ein Angreifer deine Verbindung kompromittiert hat oder deine Systemuhr falsch ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es posible que el sitio web esté mal configurado, que un atacante haya comprometido tu conexión o que el reloj del sistema no sea correcto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il est possible que le site soit mal configuré, qu'un pirate ait compromis votre connexion ou que l'horloge de votre système soit incorrecte."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l'orologio del tuo sistema non sia corretto."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możliwe, że witryna jest błędnie skonfigurowana, osoba atakująca naruszyła połączenie lub ustawienie zegara systemowego jest nieprawidłowe."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É possível que o site esteja mal configurado, que um invasor tenha comprometido a tua ligação ou que o teu relógio do sistema esteja incorreto."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.info.body.wrong.host" : {
+      "comment" : "Body of the text of the Advanced info shown in an error page that warns users of security risks on a website due to SSL issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möglicherweise ist die Website falsch konfiguriert oder ein Angreifer hat deine Verbindung kompromittiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "It’s possible that the website is misconfigured or that an attacker has compromised your connection."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es posible que el sitio web esté mal configurado o que un atacante haya comprometido tu conexión."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il est possible que le site soit mal configuré ou qu'un pirate ait compromis votre connexion."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È possibile che il sito web non sia configurato correttamente o che un malintenzionato abbia compromesso la tua connessione."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mogelijk is de website verkeerd geconfigureerd of heeft een aanvaller je verbinding gecompromitteerd."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Możliwe, że witryna jest błędnie skonfigurowana lub osoba atakująca naruszyła połączenie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É possível que o site esteja mal configurado ou que um invasor tenha comprometido a tua ligação."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Возможно, неверно задана конфигурация сайта либо ваше соединение перехвачено злоумышленником."
+          }
+        }
+      }
+    },
+    "ssl.error.page.advanced.info.title" : {
+      "comment" : "Title of the Advanced info section shown in an error page that warns users of security risks on a website due to SSL issues.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo warnt dich, wenn eine Website ein ungültiges Zertifikat hat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo warns you when a website has an invalid certificate."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo te avisa cuando un sitio web tiene un certificado no válido."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo vous avertit lorsque le certificat d'un site Web n'est pas valide."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo ti avverte quando un sito web ha un certificato non valido."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo waarschuwt je wanneer een website een ongeldig certificaat heeft."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo ostrzega gdy witryna internetowa ma nieprawidłowy certyfikat."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O DuckDuckGo avisa-te quando um site tem um certificado inválido."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DuckDuckGo предупредит вас, если у сайта окажется недействительный сертификат."
+          }
+        }
+      }
+    },
+    "ssl.error.page.body" : {
+      "comment" : "Error description shown in an error page that warns users of security risks on a website due to SSL issues. %1$@ represent the site domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Zertifikat für diese Website ist ungültig. Möglicherweise stellst du eine Verbindung zu einem Server her, der vorgibt, %1$@ zu sein, wodurch deine vertraulichen Daten in Gefahr sein könnten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The certificate for this site is invalid. You might be connecting to a server that is pretending to be %1$@ which could put your confidential information at risk."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El certificado de este sitio no es válido. Puede que te estés conectando a un servidor que se hace pasar por %1$@, lo que podría poner en riesgo tu información confidencial."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de ce site n'est pas valide. Vous vous connectez peut-être à un serveur qui se fait passer pour %1$@, ce qui pourrait mettre vos informations confidentielles en danger."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di questo sito non è valido. Potresti collegarti a un server che finge di essere %1$@ e che potrebbe mettere a rischio le tue informazioni riservate."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het certificaat voor deze website is ongeldig. Mogelijk maak je verbinding met een server die zich voordoet als %1$@, waardoor je vertrouwelijke informatie in gevaar kan komen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certyfikat tej witryny jest nieprawidłowy. Być może łączysz się z serwerem podszywającym się pod %1$@, co może narazić poufne informacje na niebezpieczeństwo."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O certificado deste site é inválido. Podes estar a estabelecer ligação a um servidor que finge ser %1$@, o que pode colocar as tuas informações confidenciais em risco."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сертификат этого сайта недействителен. Возможно, вы пытаетесь подключиться к серверу, который выдает себя за %1$@, что ставит под угрозу вашу конфиденциальную информацию."
+          }
+        }
+      }
+    },
+    "ssl.error.page.header" : {
+      "comment" : "Title shown in an error page that warn users of security risks on a website due to SSL issues",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnung: Diese Website ist möglicherweise unsicher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: This site may be insecure"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertencia: este sitio puede ser inseguro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement : ce site n'est peut-être pas sécurisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attenzione: questo sito potrebbe non essere sicuro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waarschuwing: Deze website is mogelijk onveilig"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzeżenie: ta witryna może być niebezpieczna"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso: este site pode ser inseguro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Внимание! Возможно, сайт небезопасен"
+          }
+        }
+      }
+    },
+    "ssl.error.page.leave.site.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to leave the website and navigate to previous page.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Website verlassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Leave This Site"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir de este sitio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter ce site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esci da questo sito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze website verlaten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opuść tę stronę"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deixar este site"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покинуть сайт"
+          }
+        }
+      }
+    },
+    "ssl.error.page.tab.title" : {
+      "comment" : "Title shown in an error page tab that warn users of security risks on a website due to SSL issues",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnung: Website ist möglicherweise unsicher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warning: Site May Be Insecure"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertencia: el sitio puede ser inseguro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement : le site n'est peut-être pas sécurisé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attenzione: il sito potrebbe non essere sicuro"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waarschuwing: Website mogelijk onveilig"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzeżenie: witryna może być niebezpieczna"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aviso: o site pode ser inseguro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Внимание! Возможно, сайт небезопасен"
+          }
+        }
+      }
+    },
+    "ssl.error.page.visit.site.button" : {
+      "comment" : "Button shown in an error page that warns users of security risks on a website due to SSL issues. The buttons allows the user to visit the website anyway despite the risks.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risiko akzeptieren und Website besuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accept Risk and Visit Site"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar el riesgo y visitar el sitio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accepter le risque et visiter le site"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accetta il rischio e visita il sito"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risico accepteren en site bezoeken"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaakceptuj ryzyko i odwiedź witrynę"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceitar o risco e visitar o site"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Принять риск и перейти на сайт"
+          }
+        }
+      }
+    },
+    "ssl.error.self.signed.message" : {
+      "comment" : "Warns the user that the site's security certificate is self-signed and not trusted. '%1$@' is the site's domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Sicherheitszertifikat für %1$@ wird vom Betriebssystem deines Geräts als nicht vertrauenswürdig eingestuft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The security certificate for %1$@ is not trusted by your device's operating system."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El sistema operativo del dispositivo no confía en el certificado de seguridad de %1$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de sécurité de %1$@ n'est pas approuvé par le système d'exploitation de votre appareil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di sicurezza di %1$@ non è considerato attendibile dal sistema operativo del tuo dispositivo."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het besturingssysteem van je apparaat vertrouwt het beveiligingscertificaat voor %1$@ niet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certyfikat bezpieczeństwa %1$@ nie jest zaufany przez system operacyjny urządzenia."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O sistema operativo do teu dispositivo não confia no certificado de segurança de %1$@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Операционная система вашего устройства не доверяет сертификату безопасности сайта %1$@."
+          }
+        }
+      }
+    },
+    "ssl.error.wrong.host.message" : {
+      "comment" : "Explains an SSL error when a site's certificate doesn't match its domain. '%1$@' is the site's domain.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Sicherheitszertifikat für %1$@ stimmt nicht mit *.%2$@ überein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The security certificate for %1$@ does not match *.%2$@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El certificado de seguridad de %1$@ no coincide con *.%2$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le certificat de sécurité de %1$@ ne correspond pas à *.%2$@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il certificato di protezione per %1$@ non corrisponde a *.%2$@."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het beveiligingscertificaat voor %1$@ komt niet overeen met *.%2$@. "
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certyfikat zabezpieczeń %1$@ nie jest zgodny z *.%2$@."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O certificado de segurança de %1$@ não corresponde a *.%2$@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сертификат безопасности сайта %1$@ не подходит для домена *.%2$@."
           }
         }
       }
@@ -48818,6 +51311,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закладки"
+          }
+        }
+      }
+    },
+    "tab.empty.title" : {
+      "comment" : "Title for an empty tab without a title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Titel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Untitled"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin título"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans titre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senza titolo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naamloos"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez tytułu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem título"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без названия"
           }
         }
       }
@@ -50949,6 +53502,7 @@
     },
     "Try importing bookmarks manually instead." : {
       "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -51002,6 +53556,7 @@
     },
     "Try importing passwords manually instead." : {
       "comment" : "Data import error subtitle: suggestion to import Passwords manually by selecting a CSV or HTML file.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -51462,6 +54017,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вид"
+          }
+        }
+      }
+    },
+    "warn.before.quit" : {
+      "comment" : "Label after the checkbox in Settings which configures a warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warne mich, dass Tabs und Daten beim Beenden gelöscht werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warn me that tabs and data will be cleared when quitting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertirme de que las pestañas y los datos se borrarán al salir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "M'avertir que les onglets et les données seront effacés à la fermeture"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvisa prima di cancellare schede e dati all'uscita"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waarschuwen dat tabbladen en gegevens worden gewist bij het afsluiten"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzegaj, że karty i dane zostaną wyczyszczone przy wychodzeniu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avisar-me que os separadores e os dados serão limpos ao sair"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать предупреждение о сбросе вкладок и данных при выходе"
+          }
+        }
+      }
+    },
+    "warn.before.quit.dialog.checkbox.message" : {
+      "comment" : "A label after checkbox to configure the warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes Mal warnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Warn me every time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advertirme cada vez"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toujours me prévenir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvisa ogni volta"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elke keer waarschuwen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzegaj za każdym razem"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avisar-me sempre"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предупреждать каждый раз"
+          }
+        }
+      }
+    },
+    "warn.before.quit.dialog.header" : {
+      "comment" : "A header of warning before clearing data on the application termination.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabs und Browserdaten löschen und DuckDuckGo beenden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear tabs and browsing data and quit DuckDuckGo?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Borrar pestañas y datos de navegación y salir de DuckDuckGo?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer les onglets et les données de navigation et quitter DuckDuckGo ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancellare le schede e i dati di navigazione e uscire da DuckDuckGo?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabbladen en browsergegevens wissen en DuckDuckGo afsluiten?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyczyścić karty i dane przeglądania i wyjść z DuckDuckGo?"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpar separadores e dados de navegação e sair do DuckDuckGo?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить вкладки и данные и выйти из DuckDuckGo?"
           }
         }
       }

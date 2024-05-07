@@ -27,7 +27,7 @@ import PixelKit
 
 final class MacTransparentProxyProvider: TransparentProxyProvider {
 
-    static var vpnProxyLogger = Logger(subsystem: OSLog.subsystem, category: "VPN Proxy")
+    static var vpnProxyLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "VPN Proxy")
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -73,7 +73,6 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
                        appVersion: AppVersion.shared.versionNumber,
                        source: "vpnProxyExtension",
                        defaultHeaders: [:],
-                       log: .networkProtectionPixel,
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)

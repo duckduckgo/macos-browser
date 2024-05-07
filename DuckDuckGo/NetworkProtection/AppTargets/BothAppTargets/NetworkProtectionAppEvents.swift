@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
 import Common
 import Foundation
 import LoginItems
@@ -73,7 +72,6 @@ final class NetworkProtectionAppEvents {
             }
 
             restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
-            refreshNetworkProtectionServers()
         }
     }
 
@@ -82,10 +80,6 @@ final class NetworkProtectionAppEvents {
     func applicationDidBecomeActive() {
         Task { @MainActor in
             await featureVisibility.disableIfUserHasNoAccess()
-
-#if SUBSCRIPTION
-            await AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)).refreshSubscriptionAndEntitlements()
-#endif
         }
     }
 
@@ -102,21 +96,4 @@ final class NetworkProtectionAppEvents {
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
 
-    /// Fetches a new list of VPN servers, and updates the existing set.
-    ///
-    private func refreshNetworkProtectionServers() {
-        Task {
-            let serverCount: Int
-            do {
-                serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList().count
-            } catch {
-                os_log("Failed to update DuckDuckGo VPN servers", log: .networkProtection, type: .error)
-                return
-            }
-
-            os_log("Successfully updated DuckDuckGo VPN servers; total server count = %{public}d", log: .networkProtection, serverCount)
-        }
-    }
 }
-
-#endif

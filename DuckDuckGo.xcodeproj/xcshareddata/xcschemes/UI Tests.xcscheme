@@ -23,17 +23,16 @@
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug"
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      shouldAutocreateTestPlan = "YES">
+      buildConfiguration = "Review"
+      selectedDebuggerIdentifier = ""
+      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <PreActions>
          <ExecutionAction
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "killall tests-server&#10;# integration tests resources dir&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;&quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
+               scriptText = "&quot;${PROJECT_DIR}/clean-app.sh&quot; review&#10;defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1&#10;killall tests-server&#10;# integration tests resources dir&#10;pushd &quot;${METAL_LIBRARY_OUTPUT_DIR}&quot;&#10;&quot;${BUILT_PRODUCTS_DIR}/tests-server&quot; &amp;&#10;popd&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
@@ -55,6 +54,12 @@
             </ActionContent>
          </ExecutionAction>
       </PostActions>
+      <TestPlans>
+         <TestPlanReference
+            reference = "container:UITests/UI Tests.xctestplan"
+            default = "YES">
+         </TestPlanReference>
+      </TestPlans>
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -65,6 +70,11 @@
                BlueprintName = "UI Tests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "PermissionsTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>

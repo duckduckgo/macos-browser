@@ -18,176 +18,195 @@
 
 import Foundation
 import Common
+import SecureStorage
 
 protocol DataBrokerProtectionRepository {
-    func save(_ profile: DataBrokerProtectionProfile) async -> Bool
-    func fetchProfile() -> DataBrokerProtectionProfile?
-    func deleteProfileData()
+    func save(_ profile: DataBrokerProtectionProfile) async throws
+    func fetchProfile() throws -> DataBrokerProtectionProfile?
+    func deleteProfileData() throws
 
-    func fetchChildBrokers(for parentBroker: String) -> [DataBroker]
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker]
 
     func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws
 
-    func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData?
-    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData]
-    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile]
+    func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) throws -> BrokerProfileQueryData?
+    func fetchAllBrokerProfileQueryData() throws -> [BrokerProfileQueryData]
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile]
 
-    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64)
-    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64)
-    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64)
-    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64)
-    func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64)
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) throws
 
-    func add(_ historyEvent: HistoryEvent)
-    func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent?
-    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) -> [HistoryEvent]
-    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) -> [HistoryEvent]
-    func hasMatches() -> Bool
+    func add(_ historyEvent: HistoryEvent) throws
+    func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) throws -> HistoryEvent?
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) throws -> [HistoryEvent]
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> [HistoryEvent]
+    func hasMatches() throws -> Bool
 
-    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation?
-    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date)
+    func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation?
+    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws
 }
 
 final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
     private static let profileId: Int64 = 1 // At the moment, we only support one profile for DBP.
 
     private let fakeBrokerFlag: DataBrokerDebugFlag
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let vault: (any DataBrokerProtectionSecureVault)?
+    private let secureVaultErrorReporter: SecureVaultReporting?
 
-    init(fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker(), vault: (any DataBrokerProtectionSecureVault)? = nil) {
+    init(fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker(),
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         vault: (any DataBrokerProtectionSecureVault)? = nil,
+         secureVaultErrorReporter: SecureVaultReporting? = DataBrokerProtectionSecureVaultErrorReporter.shared) {
         self.fakeBrokerFlag = fakeBrokerFlag
+        self.pixelHandler = pixelHandler
         self.vault = vault
+        self.secureVaultErrorReporter = secureVaultErrorReporter
     }
 
-    func save(_ profile: DataBrokerProtectionProfile) async -> Bool {
+    func save(_ profile: DataBrokerProtectionProfile) async throws {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
 
             if try vault.fetchProfile(with: Self.profileId) != nil {
                 try await updateProfile(profile, vault: vault)
             } else {
                 try await saveNewProfile(profile, vault: vault)
             }
-
-            return true
         } catch {
-            os_log("Database error: saveProfile, error: %{public}@", log: .error, error.localizedDescription)
-
-            return false
+            os_log("Database error: save profile, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.save profile"))
+            throw error
         }
     }
 
-    public func fetchProfile() -> DataBrokerProtectionProfile? {
+    public func fetchProfile() throws -> DataBrokerProtectionProfile? {
         do {
-            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.fetchProfile(with: Self.profileId)
         } catch {
             os_log("Database error: fetchProfile, error: %{public}@", log: .error, error.localizedDescription)
-            return nil
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchProfile"))
+            throw error
         }
     }
 
-    public func deleteProfileData() {
+    public func deleteProfileData() throws {
         do {
-            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.deleteProfileData()
         } catch {
-            os_log("Database error: removeProfileData, error: %{public}@", log: .error, error.localizedDescription)
-            return
+            os_log("Database error: deleteProfileData, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.deleteProfileData"))
+            throw error
         }
     }
 
-    func fetchChildBrokers(for parentBroker: String) -> [DataBroker] {
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker] {
         do {
-            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.fetchChildBrokers(for: parentBroker)
         } catch {
             os_log("Database error: fetchChildBrokers, error: %{public}@", log: .error, error.localizedDescription)
-            return [DataBroker]()
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchChildBrokers for parentBroker"))
+            throw error
         }
     }
 
     func save(_ extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> Int64 {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
 
-        return try vault.save(extractedProfile: extractedProfile, brokerId: brokerId, profileQueryId: profileQueryId)
+            return try vault.save(extractedProfile: extractedProfile, brokerId: brokerId, profileQueryId: profileQueryId)
+        } catch {
+            os_log("Database error: extractedProfile, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.save extractedProfile brokerId profileQueryId"))
+            throw error
+        }
     }
 
-    func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData? {
+    func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) throws -> BrokerProfileQueryData? {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            if let broker = try vault.fetchBroker(with: brokerId),
-                let profileQuery = try vault.fetchProfileQuery(with: profileQueryId),
-                let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) {
-
-                let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
-
-                return BrokerProfileQueryData(
-                    dataBroker: broker,
-                    profileQuery: profileQuery,
-                    scanOperationData: scanOperation,
-                    optOutOperationsData: optOutOperations
-                )
-            } else {
-                // We should throw here. The caller probably needs to know that some of the
-                // models he was looking for where not found. This will be worked on the error handling task/project.
-                return nil
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+            guard let broker = try vault.fetchBroker(with: brokerId),
+                  let profileQuery = try vault.fetchProfileQuery(with: profileQueryId),
+                  let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
+                let error = DataBrokerProtectionError.dataNotInDatabase
+                os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
+                pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.brokerProfileQueryData for brokerId and profileQueryId"))
+                throw error
             }
+
+            let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
+
+            return BrokerProfileQueryData(
+                dataBroker: broker,
+                profileQuery: profileQuery,
+                scanOperationData: scanOperation,
+                optOutOperationsData: optOutOperations
+            )
         } catch {
             os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
-            return nil
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.brokerProfileQueryData for brokerId and profileQueryId"))
+            throw error
         }
     }
 
-    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile] {
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile] {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.fetchExtractedProfiles(for: brokerId)
         } catch {
-            os_log("Database error: fetchExtractedProfiles for scan, error: %{public}@", log: .error, error.localizedDescription)
-            return [ExtractedProfile]()
+            os_log("Database error: fetchExtractedProfiles, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchExtractedProfiles for brokerId"))
+            throw error
         }
     }
 
-    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
         } catch {
-            os_log("Database error: updatePreferredRunDate for scan, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("Database error: updatePreferredRunDate without extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updatePreferredRunDate date brokerID profileQueryId"))
+            throw error
         }
     }
 
-    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) {
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
 
             try vault.updatePreferredRunDate(
                 date,
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
-                extractedProfileId: extractedProfileId
-            )
+                extractedProfileId: extractedProfileId)
         } catch {
-            os_log("Database error: updatePreferredRunDate for optOut, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("Database error: updatePreferredRunDate with extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updatePreferredRunDate date brokerID profileQueryId extractedProfileID"))
+            throw error
         }
     }
 
-    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.updateLastRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
         } catch {
-            os_log("Database error: updateLastRunDate for scan, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("Database error: updateLastRunDate without extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateLastRunDate date brokerID profileQueryId"))
+            throw error
         }
     }
 
-    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) {
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
 
             try vault.updateLastRunDate(
                 date,
@@ -196,23 +215,26 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 extractedProfileId: extractedProfileId
             )
         } catch {
-            os_log("Database error: updateLastRunDate for optOut, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("Database error: updateLastRunDate with extractedProfileID, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateLastRunDate date brokerId profileQueryId extractedProfileId"))
+            throw error
         }
     }
 
-    func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) {
+    func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) throws {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.updateRemovedDate(for: extractedProfileId, with: date)
         } catch {
-            os_log("Database error: updateRemoveDate, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("Database error: updateRemovedDate, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.updateRemovedDate date on extractedProfileId"))
+            throw error
         }
     }
 
-    func add(_ historyEvent: HistoryEvent) {
+    func add(_ historyEvent: HistoryEvent) throws {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
 
             if  let extractedProfileId = historyEvent.extractedProfileId {
                 try vault.save(historyEvent: historyEvent, brokerId: historyEvent.brokerId, profileQueryId: historyEvent.profileQueryId, extractedProfileId: extractedProfileId)
@@ -220,13 +242,15 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 try vault.save(historyEvent: historyEvent, brokerId: historyEvent.brokerId, profileQueryId: historyEvent.profileQueryId)
             }
         } catch {
-            os_log("Database error: addHistoryEvent, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("Database error: add historyEvent, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.add historyEvent"))
+            throw error
         }
     }
 
-    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
+    func fetchAllBrokerProfileQueryData() throws -> [BrokerProfileQueryData] {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             let brokers = try vault.fetchAllBrokers()
             let profileQueries = try vault.fetchAllProfileQueries(for: Self.profileId)
             var brokerProfileQueryDataList = [BrokerProfileQueryData]()
@@ -252,35 +276,54 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             return brokerProfileQueryDataList
         } catch {
             os_log("Database error: fetchAllBrokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
-            return [BrokerProfileQueryData]()
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchAllBrokerProfileQueryData"))
+            throw error
         }
     }
 
     func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {
-        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
 
-        try vault.save(brokerId: optOut.brokerId,
-                       profileQueryId: optOut.profileQueryId,
-                       extractedProfile: extractedProfile,
-                       lastRunDate: optOut.lastRunDate,
-                       preferredRunDate: optOut.preferredRunDate)
+            try vault.save(brokerId: optOut.brokerId,
+                           profileQueryId: optOut.profileQueryId,
+                           extractedProfile: extractedProfile,
+                           lastRunDate: optOut.lastRunDate,
+                           preferredRunDate: optOut.preferredRunDate)
+        } catch {
+            os_log("Database error: saveOptOutOperation, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.saveOptOutOperation optOut extractedProfile"))
+            throw error
+        }
     }
 
-    func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent? {
+    func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) throws -> HistoryEvent? {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             let events = try vault.fetchEvents(brokerId: brokerId, profileQueryId: profileQueryId)
 
             return events.max(by: { $0.date < $1.date })
         } catch {
             os_log("Database error: fetchLastEvent, error: %{public}@", log: .error, error.localizedDescription)
-            return nil
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "fetchLastEvent brokerId profileQueryId"))
+            throw error
         }
     }
 
-    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) -> [HistoryEvent] {
+    func hasMatches() throws -> Bool {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
+            return try vault.hasMatches()
+        } catch {
+            os_log("Database error: hasMatches, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.hasMatches"))
+            throw error
+        }
+    }
+
+    func fetchScanHistoryEvents(brokerId: Int64, profileQueryId: Int64) throws -> [HistoryEvent] {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             guard let scan = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else {
                 return [HistoryEvent]()
             }
@@ -288,13 +331,14 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             return scan.historyEvents
         } catch {
             os_log("Database error: fetchHistoryEvents, error: %{public}@", log: .error, error.localizedDescription)
-            return [HistoryEvent]()
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "fetchScanHistoryEvents brokerId profileQueryId"))
+            throw error
         }
     }
 
-    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) -> [HistoryEvent] {
+    func fetchOptOutHistoryEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> [HistoryEvent] {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             guard let optOut = try vault.fetchOptOut(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId) else {
                 return [HistoryEvent]()
             }
@@ -302,33 +346,25 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             return optOut.historyEvents
         } catch {
             os_log("Database error: fetchHistoryEvents, error: %{public}@", log: .error, error.localizedDescription)
-            return [HistoryEvent]()
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchOptOutHistoryEvents brokerId profileQueryId extractedProfileId"))
+            throw error
         }
     }
 
-    func hasMatches() -> Bool {
+    func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            return try vault.hasMatches()
-        } catch {
-            os_log("Database error: wereThereAnyMatches, error: %{public}@", log: .error, error.localizedDescription)
-            return false
-        }
-    }
-
-    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
-        do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             return try vault.fetchAttemptInformation(for: extractedProfileId)
         } catch {
             os_log("Database error: fetchAttemptInformation, error: %{public}@", log: .error, error.localizedDescription)
-            return nil
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.fetchAttemptInformation for extractedProfileId"))
+            throw error
         }
     }
 
-    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
+    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws {
         do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: secureVaultErrorReporter)
             try vault.save(extractedProfileId: extractedProfileId,
                            attemptUUID: attemptUUID,
                            dataBroker: dataBroker,
@@ -336,6 +372,8 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                            startTime: startTime)
         } catch {
             os_log("Database error: addAttempt, error: %{public}@", log: .error, error.localizedDescription)
+            pixelHandler.fire(.generalError(error: error, functionOccurredIn: "DataBrokerProtectionDatabase.addAttempt extractedProfileId attemptUUID dataBroker lastStageDate startTime"))
+            throw error
         }
     }
 }
@@ -365,7 +403,7 @@ extension DataBrokerProtectionDatabase {
         let newProfileQueries = profile.profileQueries
         _ = try vault.save(profile: profile)
 
-        if let brokers = FileResources().fetchBrokerFromResourceFiles() {
+        if let brokers = try FileResources().fetchBrokerFromResourceFiles() {
             var brokerIDs = [Int64]()
 
             for broker in brokers {
@@ -387,17 +425,25 @@ extension DataBrokerProtectionDatabase {
 
         let newProfileQueries = profile.profileQueries
 
-        let databaseBrokerProfileQueryData = fetchAllBrokerProfileQueryData()
+        let databaseBrokerProfileQueryData = try fetchAllBrokerProfileQueryData()
         let databaseProfileQueries = databaseBrokerProfileQueryData.map { $0.profileQuery }
 
         // The queries we need to create are the one that exist on the new ones but not in the database
         let profileQueriesToCreate = Set(newProfileQueries).subtracting(Set(databaseProfileQueries))
 
-        // The queries that need update exist in both the new and the database
-        // We assume updated queries will be not deprecated
-        var profileQueriesToUpdate = Array(Set(databaseProfileQueries).intersection(Set(newProfileQueries))).map {
-            $0.with(deprecated: false)
-        }
+        // Updated profile queries. This is only for use for deprecated matches.
+        // We do not use it for updating a particular profile query. The reason is that
+        // updates do not exist because the UI returns a complete profile, and does not
+        // discriminate if a change was something new
+        //
+        // Examples:
+        // - If a user John Doe, Miami, FL. Changes its name to Jonathan, for us it will be a new profile query.
+        // and we should remove the John Doe one.
+        // - The same happens with addresses, if a user changes the address from Miami to Aventura. We want
+        // to delete all profile queries that have Miami, FL as an address, and add the new ones.
+        //
+        var profileQueriesToUpdate = [ProfileQuery]()
+
         // The ones that we need to remove are the ones that exist in the database but not in the new ones
         var profileQueriesToRemove = Set(databaseProfileQueries).subtracting(Set(newProfileQueries))
 
@@ -462,7 +508,7 @@ extension DataBrokerProtectionDatabase {
 
             if !profile.deprecated {
                 for brokerID in brokerIDs where !profile.deprecated {
-                    updatePreferredRunDate(Date(), brokerId: brokerID, profileQueryId: profileQueryID)
+                    try updatePreferredRunDate(Date(), brokerId: brokerID, profileQueryId: profileQueryID)
                 }
             }
         }

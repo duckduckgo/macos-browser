@@ -141,7 +141,7 @@ final class TabBarViewController: NSViewController {
     }
 
     @objc func addButtonAction(_ sender: NSButton) {
-        tabCollectionViewModel.appendNewTab(with: .newtab)
+        tabCollectionViewModel.insertOrAppendNewTab()
     }
 
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
@@ -1041,12 +1041,21 @@ extension TabBarViewController: TabBarViewItemDelegate {
     func tabBarViewItemBookmarkThisPageAction(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tabViewModel = tabCollectionViewModel.tabViewModel(at: indexPath.item),
-              let url = tabViewModel.tab.content.url else {
+              let url = tabViewModel.tab.content.userEditableUrl else {
             os_log("TabBarViewController: Failed to get index path of tab bar view item", type: .error)
             return
         }
 
         bookmarkTab(with: url, title: tabViewModel.title)
+    }
+
+    func tabBarViewAllItemsCanBeBookmarked(_ tabBarViewItem: TabBarViewItem) -> Bool {
+        tabCollectionViewModel.canBookmarkAllOpenTabs()
+    }
+
+    func tabBarViewItemBookmarkAllOpenTabsAction(_ tabBarViewItem: TabBarViewItem) {
+        let websitesInfo = tabCollectionViewModel.tabs.compactMap(WebsiteInfo.init)
+        BookmarksDialogViewFactory.makeBookmarkAllOpenTabsView(websitesInfo: websitesInfo).show()
     }
 
     func tabBarViewItemCloseAction(_ tabBarViewItem: TabBarViewItem) {
@@ -1082,6 +1091,15 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         tabCollectionViewModel.removeAllTabs(except: indexPath.item)
+    }
+
+    func tabBarViewItemCloseToTheLeftAction(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem) else {
+            assertionFailure("TabBarViewController: Failed to get index path of tab bar view item")
+            return
+        }
+
+        tabCollectionViewModel.removeTabs(before: indexPath.item)
     }
 
     func tabBarViewItemCloseToTheRightAction(_ tabBarViewItem: TabBarViewItem) {
@@ -1144,12 +1162,9 @@ extension TabBarViewController: TabBarViewItemDelegate {
         removeFireproofing(from: tab)
     }
 
-    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState {
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState? {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
-              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
-        else {
-            return .notSupported
-        }
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item] else { return nil }
 
         return tab.audioState
     }

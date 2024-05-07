@@ -16,36 +16,7 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import SwiftUI
-
-struct NetworkProtectionWaitlistRootView: View {
-    @EnvironmentObject var model: WaitlistViewModel
-
-    var body: some View {
-        Group {
-            switch model.viewState {
-            case .notOnWaitlist, .joiningWaitlist:
-                JoinWaitlistView(viewData: NetworkProtectionJoinWaitlistViewData())
-            case .joinedWaitlist(let state):
-                JoinedWaitlistView(viewData: NetworkProtectionJoinedWaitlistViewData(),
-                                   notificationsAllowed: state == .notificationAllowed)
-            case .invited:
-                InvitedToWaitlistView(viewData: NetworkProtectionInvitedToWaitlistViewData())
-            case .termsAndConditions:
-                WaitlistTermsAndConditionsView(viewData: NetworkProtectionWaitlistTermsAndConditionsViewData()) {
-                    NetworkProtectionTermsAndConditionsContentView()
-                }
-            case .readyToEnable:
-                EnableWaitlistFeatureView(viewData: EnableNetworkProtectionViewData())
-            }
-        }
-        .environmentObject(model)
-    }
-}
-
-#endif
 
 #if DBP
 

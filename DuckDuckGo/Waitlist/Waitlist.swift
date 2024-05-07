@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Networking
 import UserNotifications
@@ -156,92 +154,6 @@ extension ProductWaitlistRequest {
     }
 }
 
-// MARK: - VPN Waitlist
-
-struct NetworkProtectionWaitlist: Waitlist {
-
-    static let identifier: String = "networkprotection"
-    static let apiProductName: String = "networkprotection_macos"
-    static let keychainAppGroup: String = Bundle.main.appGroup(bundle: .netP)
-
-    static let notificationIdentifier = "com.duckduckgo.macos.browser.network-protection.invite-code-available"
-    static let inviteAvailableNotificationTitle = UserText.networkProtectionWaitlistNotificationTitle
-    static let inviteAvailableNotificationBody = UserText.networkProtectionWaitlistNotificationText
-
-    let waitlistStorage: WaitlistStorage
-    let waitlistRequest: WaitlistRequest
-    private let networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming
-
-    @UserDefaultsWrapper(key: .networkProtectionWaitlistSignUpPromptDismissed, defaultValue: false)
-    var waitlistSignUpPromptDismissed: Bool
-
-    var shouldShowWaitlistViewController: Bool {
-        return isOnWaitlist || readyToAcceptTermsAndConditions
-    }
-
-    var isOnWaitlist: Bool {
-        return waitlistStorage.isOnWaitlist
-    }
-
-    var isInvited: Bool {
-        return waitlistStorage.isInvited
-    }
-
-    var readyToAcceptTermsAndConditions: Bool {
-        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        return waitlistStorage.isInvited && !accepted
-    }
-
-    init() {
-        self.init(
-            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier, keychainAppGroup: Self.keychainAppGroup),
-            request: ProductWaitlistRequest(productName: Self.apiProductName),
-            networkProtectionCodeRedemption: NetworkProtectionCodeRedemptionCoordinator()
-        )
-    }
-
-    init(store: WaitlistStorage, request: WaitlistRequest, networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming) {
-        self.waitlistStorage = store
-        self.waitlistRequest = request
-        self.networkProtectionCodeRedemption = networkProtectionCodeRedemption
-    }
-
-    func fetchNetworkProtectionInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
-        // Never fetch the invite code if the Privacy Pro flag is enabled:
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable {
-            completion(nil)
-            return
-        }
-
-        self.fetchInviteCodeIfAvailable { error in
-            if let error {
-                // Do nothing if the app fails to fetch, as the waitlist is being phased out
-                completion(error)
-            } else if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
-                Task { @MainActor in
-                    do {
-                        try await networkProtectionCodeRedemption.redeem(inviteCode)
-                        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-                        sendInviteCodeAvailableNotification {
-                            DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
-                        }
-                        completion(nil)
-                    } catch {
-                        assertionFailure("Failed to redeem invite code")
-                        completion(.failure(error))
-                    }
-                }
-            } else {
-                completion(nil)
-                assertionFailure("Didn't get error or invite code")
-            }
-        }
-    }
-
-}
-
-#endif
-
 #if DBP
 
 // MARK: - DataBroker Protection Waitlist
@@ -352,7 +264,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
 
         sendInviteCodeAvailableNotification {
             DispatchQueue.main.async {
-                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: GeneralPixel.dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
             }
         }
     }

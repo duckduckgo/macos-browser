@@ -18,6 +18,7 @@
 
 import BrowserServicesKit
 import Foundation
+import SecureStorage
 import XCTest
 
 @testable import DataBrokerProtection
@@ -38,7 +39,7 @@ final class DataBrokerProtectionStageDurationCalculatorTests: XCTestCase {
 
         if let failurePixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last{
             switch failurePixel {
-            case .scanFailed(let broker, _, _):
+            case .scanFailed(let broker, _, _, _):
                 XCTAssertEqual(broker, "broker")
             default: XCTFail("The scan failed pixel should be fired")
             }
@@ -56,7 +57,7 @@ final class DataBrokerProtectionStageDurationCalculatorTests: XCTestCase {
 
         if let failurePixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last{
             switch failurePixel {
-            case .scanError(_, _, let category, _):
+            case .scanError(_, _, let category, _, _):
                 XCTAssertEqual(category, ErrorCategory.clientError(httpCode: 403).toString)
             default: XCTFail("The scan error pixel should be fired")
             }
@@ -74,7 +75,7 @@ final class DataBrokerProtectionStageDurationCalculatorTests: XCTestCase {
 
         if let failurePixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last{
             switch failurePixel {
-            case .scanError(_, _, let category, _):
+            case .scanError(_, _, let category, _, _):
                 XCTAssertEqual(category, ErrorCategory.serverError(httpCode: 500).toString)
             default: XCTFail("The scan error pixel should be fired")
             }
@@ -92,7 +93,7 @@ final class DataBrokerProtectionStageDurationCalculatorTests: XCTestCase {
 
         if let failurePixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last{
             switch failurePixel {
-            case .scanError(_, _, let category, _):
+            case .scanError(_, _, let category, _, _):
                 XCTAssertEqual(category, ErrorCategory.validationError.toString)
             default: XCTFail("The scan error pixel should be fired")
             }
@@ -111,8 +112,27 @@ final class DataBrokerProtectionStageDurationCalculatorTests: XCTestCase {
 
         if let failurePixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last{
             switch failurePixel {
-            case .scanError(_, _, let category, _):
+            case .scanError(_, _, let category, _, _):
                 XCTAssertEqual(category, ErrorCategory.networkError.toString)
+            default: XCTFail("The scan error pixel should be fired")
+            }
+        } else {
+            XCTFail("A pixel should be fired")
+        }
+    }
+
+    func testWhenErrorIsSecureVaultError_thenWeFireScanErorrPixelWithDatabaseErrorCategory() {
+        let sut = DataBrokerProtectionStageDurationCalculator(dataBroker: "broker", handler: handler)
+        let error = SecureStorageError.encodingFailed
+
+        sut.fireScanError(error: error)
+
+        XCTAssertTrue(MockDataBrokerProtectionPixelsHandler.lastPixelsFired.count == 1)
+
+        if let failurePixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last{
+            switch failurePixel {
+            case .scanError(_, _, let category, _, _):
+                XCTAssertEqual(category, "database-error-SecureVaultError-13")
             default: XCTFail("The scan error pixel should be fired")
             }
         } else {
@@ -130,7 +150,7 @@ final class DataBrokerProtectionStageDurationCalculatorTests: XCTestCase {
 
         if let failurePixel = MockDataBrokerProtectionPixelsHandler.lastPixelsFired.last{
             switch failurePixel {
-            case .scanError(_, _, let category, _):
+            case .scanError(_, _, let category, _, _):
                 XCTAssertEqual(category, ErrorCategory.unclassified.toString)
             default: XCTFail("The scan error pixel should be fired")
             }
