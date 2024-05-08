@@ -270,11 +270,13 @@ final class TabViewModelTests: XCTestCase {
         let hostURL = "https://app.asana.com/"
         let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
         AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
-        let tab = Tab(url: url)
-        let tabVM = TabViewModel(tab: tab)
+        var tab = Tab(url: url)
+        var tabVM = TabViewModel(tab: tab)
 
         // WHEN
         AccessibilityPreferences.shared.defaultPageZoom = .percent50
+        tab = Tab(url: url)
+        tabVM = TabViewModel(tab: tab)
 
         // THEN
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
