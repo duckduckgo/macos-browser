@@ -85,13 +85,13 @@ class AccessibilityPreferencesTests: XCTestCase {
         // WHEN
         model.updateZoomPerWebsite(zoomLevel: zoom1, url: website1)
         model.updateZoomPerWebsite(zoomLevel: zoom2, url: website2)
+        wait(for: [notificationExpectation], timeout: 5)
 
         // THEN
         XCTAssertEqual(model.zoomPerWebsite(url: website1), zoom1)
         XCTAssertEqual(model.zoomPerWebsite(url: website2), zoom2)
         XCTAssertEqual(persister.zoomPerWebsite[domain1], zoom1.rawValue)
         XCTAssertEqual(persister.zoomPerWebsite[domain2], zoom2.rawValue)
-        wait(for: [notificationExpectation], timeout: 1)
     }
 
     func test_whenBurningZoomLevels_thenOnlyFireproofSiteZoomLevelAreRetained() {
@@ -108,6 +108,7 @@ class AccessibilityPreferencesTests: XCTestCase {
 
         // WHEN
         model.burnZoomLevels(except: fireProofDomains)
+        wait(for: [notificationExpectation], timeout: 5)
 
         // THEN
         XCTAssertEqual(model.zoomPerWebsite(url: website1), zoom1)
@@ -118,7 +119,6 @@ class AccessibilityPreferencesTests: XCTestCase {
         XCTAssertNil(persister.zoomPerWebsite[domain2])
         XCTAssertEqual(persister.zoomPerWebsite[domain3], zoom3.rawValue)
         XCTAssertNil(persister.zoomPerWebsite[domain4])
-        wait(for: [notificationExpectation], timeout: 1)
     }
 
     func test_whenBurningZoomLevelsPerSites_thenZoomLevelOfTheSiteIsNotRetained() {
@@ -134,6 +134,7 @@ class AccessibilityPreferencesTests: XCTestCase {
 
         // WHEN
         model.burnZoomLevel(of: [domain1, domain4])
+        wait(for: [notificationExpectation], timeout: 5)
 
         // THEN
         XCTAssertNil(model.zoomPerWebsite(url: website1))
@@ -144,7 +145,6 @@ class AccessibilityPreferencesTests: XCTestCase {
         XCTAssertEqual(persister.zoomPerWebsite[domain2], zoom2.rawValue)
         XCTAssertEqual(persister.zoomPerWebsite[domain3], zoom3.rawValue)
         XCTAssertNil(persister.zoomPerWebsite[domain4])
-        wait(for: [notificationExpectation], timeout: 1)
     }
 
 }
