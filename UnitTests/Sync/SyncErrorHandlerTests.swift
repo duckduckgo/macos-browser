@@ -229,19 +229,13 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(409)
 
-        Task {
-            handler.handleBookmarkError(error)
-            expectation.fulfill()
-        }
+        handler.handleBookmarkError(error)
 
         handler = SyncErrorHandler(alertPresenter: alertPresenter)
 
-        Task {
-            handler.handleBookmarkError(error)
-            expectation2.fulfill()
-        }
+        handler.handleBookmarkError(error)
+        expectation2.fulfill()
 
-        await self.fulfillment(of: [expectation, expectation2], timeout: 4.0)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
 
@@ -249,12 +243,8 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(409)
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertTrue(alertPresenter.showAlertCalled)
     }
 
@@ -263,19 +253,13 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(409)
 
-        Task {
-            handler.handleCredentialError(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(error)
+
 
         handler = SyncErrorHandler(alertPresenter: alertPresenter)
 
-        Task {
-            handler.handleCredentialError(error)
-            expectation2.fulfill()
-        }
+        handler.handleCredentialError(error)
 
-        await self.fulfillment(of: [expectation, expectation2], timeout: 4.0)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
 
@@ -283,12 +267,8 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
-        Task {
-            handler.handleBookmarkError(error)
-            expectation.fulfill()
-        }
+        handler.handleBookmarkError(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertTrue(alertPresenter.showAlertCalled)
     }
 
@@ -297,19 +277,12 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
-        Task {
-            handler.handleBookmarkError(error)
-            expectation.fulfill()
-        }
+        handler.handleBookmarkError(error)
 
         handler = SyncErrorHandler(alertPresenter: alertPresenter)
 
-        Task {
-            handler.handleBookmarkError(error)
-            expectation2.fulfill()
-        }
+        handler.handleBookmarkError(error)
 
-        await self.fulfillment(of: [expectation, expectation2], timeout: 4.0)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
 
@@ -317,12 +290,8 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertTrue(alertPresenter.showAlertCalled)
     }
 
@@ -331,19 +300,12 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
-        Task {
-            handler.handleCredentialError(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(error)
 
         handler = SyncErrorHandler(alertPresenter: alertPresenter)
 
-        Task {
-            handler.handleCredentialError(error)
-            expectation2.fulfill()
-        }
+        handler.handleCredentialError(error)
 
-        await self.fulfillment(of: [expectation, expectation2], timeout: 4.0)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
 
@@ -352,19 +314,12 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
-        Task {
-            handler.handleCredentialError(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(error)
 
         handler = SyncErrorHandler(alertPresenter: alertPresenter)
 
-        Task {
-            handler.handleBookmarkError(_:)(error)
-            expectation2.fulfill()
-        }
+        handler.handleBookmarkError(_:)(error)
 
-        await self.fulfillment(of: [expectation, expectation2], timeout: 4.0)
         XCTAssertEqual(alertPresenter.showAlertCount, 2)
     }
 
@@ -372,12 +327,8 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(401)
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertTrue(alertPresenter.showAlertCalled)
     }
 
@@ -386,19 +337,12 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(401)
 
-        Task {
-            handler.handleBookmarkError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleBookmarkError(_:)(error)
 
         handler = SyncErrorHandler(alertPresenter: alertPresenter)
 
-        Task {
-            handler.handleBookmarkError(_:)(error)
-            expectation2.fulfill()
-        }
+        handler.handleBookmarkError(_:)(error)
 
-        await self.fulfillment(of: [expectation, expectation2], timeout: 4.0)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
 
@@ -406,12 +350,8 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(429)
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertFalse(alertPresenter.showAlertCalled)
     }
 
@@ -419,12 +359,8 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(418)
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertFalse(alertPresenter.showAlertCalled)
     }
 
@@ -432,12 +368,8 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(429)
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertFalse(alertPresenter.showAlertCalled)
     }
 
@@ -445,14 +377,10 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(429)
 
-        Task {
-            for _ in 0...8 {
-                handler.handleCredentialError(_:)(error)
-            }
-            expectation.fulfill()
+        for _ in 0...8 {
+            handler.handleCredentialError(_:)(error)
         }
 
-        await self.fulfillment(of: [expectation], timeout: 8.0)
         XCTAssertFalse(alertPresenter.showAlertCalled)
     }
 
@@ -460,14 +388,10 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(429)
 
-        Task {
-            for _ in 0...9 {
-                handler.handleCredentialError(_:)(error)
-            }
-            expectation.fulfill()
+        for _ in 0...9 {
+            handler.handleCredentialError(_:)(error)
         }
 
-        await self.fulfillment(of: [expectation], timeout: 8.0)
         let currentTime = Date()
         let timeDifference = currentTime.timeIntervalSince(userDefaults.value(forKey: UserDefaultsWrapper<Date>.Key.syncLastErrorNotificationTime.rawValue) as! Date)
         XCTAssertTrue(alertPresenter.showAlertCalled)
@@ -478,14 +402,10 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(418)
 
-        Task {
-            for _ in 0...20 {
-                handler.handleCredentialError(_:)(error)
-            }
-            expectation.fulfill()
+        for _ in 0...20 {
+            handler.handleCredentialError(_:)(error)
         }
 
-        await self.fulfillment(of: [expectation], timeout: 8.0)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
 
@@ -504,22 +424,14 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "Secons Error handled")
         let error = SyncError.unexpectedStatusCode(401)
 
-        Task {
-            handler.handleBookmarkError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleBookmarkError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertTrue(handler.isSyncPaused)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
         handler.syncBookmarksSucceded()
 
-        Task {
-            handler.handleBookmarkError(_:)(error)
-            expectation2.fulfill()
-        }
+        handler.handleBookmarkError(_:)(error)
 
-        await self.fulfillment(of: [expectation2], timeout: 4.0)
         XCTAssertTrue(handler.isSyncPaused)
         XCTAssertEqual(alertPresenter.showAlertCount, 2)
     }
@@ -529,22 +441,14 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "Secons Error handled")
         let error = SyncError.unexpectedStatusCode(409)
 
-        Task {
-            handler.handleBookmarkError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleBookmarkError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertTrue(handler.isSyncBookmarksPaused)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
         handler.syncBookmarksSucceded()
 
-        Task {
-            handler.handleBookmarkError(_:)(error)
-            expectation2.fulfill()
-        }
+        handler.handleBookmarkError(_:)(error)
 
-        await self.fulfillment(of: [expectation2], timeout: 4.0)
         XCTAssertTrue(handler.isSyncBookmarksPaused)
         XCTAssertEqual(alertPresenter.showAlertCount, 2)
     }
@@ -554,22 +458,14 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "Secons Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertTrue(handler.isSyncCredentialsPaused)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
         handler.syncCredentialsSucceded()
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation2.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation2], timeout: 4.0)
         XCTAssertTrue(handler.isSyncCredentialsPaused)
         XCTAssertEqual(alertPresenter.showAlertCount, 2)
     }
@@ -584,24 +480,18 @@ final class SyncErrorHandlerTests: XCTestCase {
         XCTAssertTrue(abs(timeDifference) <= 5)
     }
 
-    func test_When400ErrorFiredAfter12HoursFromLastSuccessfulSync_ThenAlertShown() async {
+    func test_When429ErrorFiredAfter12HoursFromLastSuccessfulSync_ThenAlertShown() async {
         let expectation = XCTestExpectation(description: "Error handled")
         let expectation2 = XCTestExpectation(description: "Second Error handled")
-        let error = SyncError.unexpectedStatusCode(400)
+        let error = SyncError.unexpectedStatusCode(429)
         let thirteenHoursAgo = Calendar.current.date(byAdding: .hour, value: -13, to: Date())!
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation.fulfill()
-        }
+
+        handler.handleCredentialError(_:)(error)
 
         userDefaults.set(thirteenHoursAgo, forKey: UserDefaultsWrapper<Date>.Key.syncLastSuccesfullTime.rawValue)
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation2.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation, expectation2], timeout: 4.0)
         XCTAssertTrue(alertPresenter.showAlertCalled)
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
@@ -612,12 +502,8 @@ final class SyncErrorHandlerTests: XCTestCase {
         let thirteenHoursAgo = Calendar.current.date(byAdding: .hour, value: -13, to: Date())!
         userDefaults.set(thirteenHoursAgo, forKey: UserDefaultsWrapper<Date>.Key.syncLastSuccesfullTime.rawValue)
 
-        Task {
-            handler.handleCredentialError(_:)(error)
-            expectation.fulfill()
-        }
+        handler.handleCredentialError(_:)(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertFalse(alertPresenter.showAlertCalled)
     }
 
@@ -626,26 +512,18 @@ final class SyncErrorHandlerTests: XCTestCase {
         let expectation2 = XCTestExpectation(description: "SecondError handled")
         let error = SyncError.unexpectedStatusCode(429)
 
-        Task {
-            for _ in 0...9 {
-                handler.handleCredentialError(_:)(error)
-            }
-            expectation.fulfill()
+        for _ in 0...9 {
+            handler.handleCredentialError(_:)(error)
         }
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertTrue(alertPresenter.showAlertCalled)
         let oneDayAgo = Calendar.current.date(byAdding: .hour, value: -25, to: Date())!
         userDefaults.set(oneDayAgo, forKey: UserDefaultsWrapper<Date>.Key.syncLastErrorNotificationTime.rawValue)
 
-        Task {
-            for _ in 0...9 {
-                handler.handleCredentialError(_:)(error)
-            }
-            expectation2.fulfill()
+        for _ in 0...9 {
+            handler.handleCredentialError(_:)(error)
         }
 
-        await self.fulfillment(of: [expectation2], timeout: 4.0)
         XCTAssertTrue(alertPresenter.showAlertCalled)
         XCTAssertEqual(alertPresenter.showAlertCount, 2)
     }
@@ -679,11 +557,9 @@ final class SyncErrorHandlerTests: XCTestCase {
 
 class CapturingAlertPresenter: AlertPresenting {
     var showAlertCalled = false
-    var capturedAlert: NSAlert?
     var showAlertCount = 0
-    func showAlert(_ alert: NSAlert) {
+    func showSyncPausedAlert(title: String, informative: String) {
         showAlertCalled = true
-        capturedAlert = alert
         showAlertCount += 1
     }
 }

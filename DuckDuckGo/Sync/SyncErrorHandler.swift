@@ -301,37 +301,31 @@ extension SyncErrorHandler: SyncErrorHandling {
 
     // swiftlint:disable:next cyclomatic_complexity
     private func showSyncPausedAlertIfNeeded(for errorType: AsyncErrorType) {
-        Task {
-            await MainActor.run {
-                var alert: NSAlert
-                switch errorType {
-                case .bookmarksCountLimitExceeded, .bookmarksRequestSizeLimitExceeded:
-                    guard !didShowBookmarksSyncPausedError else { return }
-                    alert = NSAlert.syncPaused(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncBookmarkPausedAlertDescription)
-                    didShowBookmarksSyncPausedError = true
-                case .credentialsCountLimitExceeded, .credentialsRequestSizeLimitExceeded:
-                    guard !didShowCredentialsSyncPausedError else { return }
-                    alert = NSAlert.syncPaused(title: UserText.syncCredentialsPausedAlertTitle, informative: UserText.syncCredentialsPausedAlertDescription)
-                    didShowCredentialsSyncPausedError = true
-                case .badRequestBookmarks:
-                    guard !didShowBookmarksSyncPausedError else { return }
-                    alert = NSAlert.syncPaused(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncBookmarksBadRequestAlertDescription)
-                    didShowBookmarksSyncPausedError = true
-                case .badRequestCredentials:
-                    guard !didShowCredentialsSyncPausedError else { return }
-                    alert = NSAlert.syncPaused(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncCredentialsBadRequestAlertDescription)
-                    didShowCredentialsSyncPausedError = true
-                case .invalidLoginCredentials:
-                    guard !didShowInvalidLoginSyncPausedError else { return }
-                    alert = NSAlert.syncPaused(title: UserText.syncPausedAlertTitle, informative: UserText.syncInvalidLoginAlertDescription)
-                    didShowInvalidLoginSyncPausedError = true
-                case .tooManyRequests:
-                    guard shouldShowAlertForNonActionableError() == true else { return }
-                    alert = NSAlert.syncPaused(title: UserText.syncErrorAlertTitle, informative: UserText.syncTooManyRequestsAlertDescription)
-                    lastErrorNotificationTime = Date()
-                }
-                alertPresenter.showAlert(alert)
-            }
+        switch errorType {
+        case .bookmarksCountLimitExceeded, .bookmarksRequestSizeLimitExceeded:
+            guard !didShowBookmarksSyncPausedError else { return }
+            alertPresenter.showSyncPausedAlert(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncBookmarkPausedAlertDescription)
+            didShowBookmarksSyncPausedError = true
+        case .credentialsCountLimitExceeded, .credentialsRequestSizeLimitExceeded:
+            guard !didShowCredentialsSyncPausedError else { return }
+            alertPresenter.showSyncPausedAlert(title: UserText.syncCredentialsPausedAlertTitle, informative: UserText.syncCredentialsPausedAlertDescription)
+            didShowCredentialsSyncPausedError = true
+        case .badRequestBookmarks:
+            guard !didShowBookmarksSyncPausedError else { return }
+            alertPresenter.showSyncPausedAlert(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncBookmarksBadRequestAlertDescription)
+            didShowBookmarksSyncPausedError = true
+        case .badRequestCredentials:
+            guard !didShowCredentialsSyncPausedError else { return }
+            alertPresenter.showSyncPausedAlert(title: UserText.syncBookmarkPausedAlertTitle, informative: UserText.syncCredentialsBadRequestAlertDescription)
+            didShowCredentialsSyncPausedError = true
+        case .invalidLoginCredentials:
+            guard !didShowInvalidLoginSyncPausedError else { return }
+            alertPresenter.showSyncPausedAlert(title: UserText.syncPausedAlertTitle, informative: UserText.syncInvalidLoginAlertDescription)
+            didShowInvalidLoginSyncPausedError = true
+        case .tooManyRequests:
+            guard shouldShowAlertForNonActionableError() == true else { return }
+            alertPresenter.showSyncPausedAlert(title: UserText.syncErrorAlertTitle, informative: UserText.syncTooManyRequestsAlertDescription)
+            lastErrorNotificationTime = Date()
         }
     }
 

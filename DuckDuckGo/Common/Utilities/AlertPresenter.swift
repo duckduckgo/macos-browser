@@ -19,21 +19,26 @@
 import Foundation
 
 public protocol AlertPresenting {
-    func showAlert(_ alert: NSAlert)
+    func showSyncPausedAlert(title: String, informative: String)
 }
 
 public struct StandardAlertPresenter: AlertPresenting {
     public init () {}
     @MainActor
-    public func showAlert(_ alert: NSAlert) {
-        let response = alert.runModal()
+    public func showSyncPausedAlert(title: String, informative: String) {
+        Task {
+            await MainActor.run {
+                let alert =  NSAlert.syncPaused(title: title, informative: informative)
+                let response = alert.runModal()
 
-        switch response {
-        case .alertSecondButtonReturn:
-            alert.window.sheetParent?.endSheet(alert.window)
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
-        default:
-            break
+                switch response {
+                case .alertSecondButtonReturn:
+                    alert.window.sheetParent?.endSheet(alert.window)
+                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                default:
+                    break
+                }
+            }
         }
     }
 }
