@@ -1,5 +1,5 @@
 //
-//  DataBrokerOperationsBuilderTests.swift
+//  DataBrokerOperationsCreatorTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,9 +19,9 @@
 @testable import DataBrokerProtection
 import XCTest
 
-final class DataBrokerOperationsBuilderTests: XCTestCase {
+final class DataBrokerOperationsCreatorTests: XCTestCase {
 
-    private let sut: DataBrokerOperationsBuilder = DefaultDataBrokerOperationsBuilder()
+    private let sut: DataBrokerOperationsCreator = DefaultDataBrokerOperationsCreator()
 
     // Dependencies
     private var mockDatabase: MockDatabase!
@@ -71,7 +71,10 @@ final class DataBrokerOperationsBuilderTests: XCTestCase {
         mockDatabase.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
 
         // When
-        let result = try! sut.operations(operationType: .manualScan, priorityDate: Date(), showWebView: false, operationDependencies: mockDependencies)
+        let result = try! sut.operations(forOperationType: .manualScan,
+                                         withPriorityDate: Date(),
+                                         showWebView: false,
+                                         operationDependencies: mockDependencies)
 
         // Then
         XCTAssert(result.count == 3)

@@ -1,5 +1,5 @@
 //
-//  DataBrokerOperationsBuilder.swift
+//  DataBrokerOperationsCreator.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -21,17 +21,17 @@ import Foundation
 
 typealias OperationType = DataBrokerOperation.OperationType
 
-protocol DataBrokerOperationsBuilder {
-    func operations(operationType: OperationType,
-                    priorityDate: Date?,
+protocol DataBrokerOperationsCreator {
+    func operations(forOperationType operationType: OperationType,
+                    withPriorityDate priorityDate: Date?,
                     showWebView: Bool,
                     operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation]
 }
 
-final class DefaultDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
+final class DefaultDataBrokerOperationsCreator: DataBrokerOperationsCreator {
 
-    func operations(operationType: OperationType,
-                    priorityDate: Date?,
+    func operations(forOperationType operationType: OperationType,
+                    withPriorityDate priorityDate: Date?,
                     showWebView: Bool,
                     operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation] {
 
