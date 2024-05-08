@@ -134,7 +134,7 @@ final class DataBrokerProtectionProcessor {
                                                                       pixelHandler: pixelHandler,
                                                                       userNotificationService: userNotificationService)
 
-            operations = try DefaultDataBrokerOperationsCreator().operations(forOperationType: operationType, 
+            operations = try DefaultDataBrokerOperationsCreator().operations(forOperationType: operationType,
                                                                              withPriorityDate: priorityDate,
                                                                              showWebView: showWebView,
                                                                              operationDependencies: dependencies)
