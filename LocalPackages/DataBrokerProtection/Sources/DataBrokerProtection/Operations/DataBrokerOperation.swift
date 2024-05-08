@@ -25,6 +25,24 @@ enum OperationType {
     case all
 }
 
+protocol DataBrokerOperationDependencies {
+    var database: DataBrokerProtectionRepository { get }
+    var brokerTimeInterval: TimeInterval { get }
+    var runnerProvider: JobRunnerProvider { get }
+    var notificationCenter: NotificationCenter { get }
+    var pixelHandler: EventMapping<DataBrokerProtectionPixels> { get }
+    var userNotificationService: DataBrokerProtectionUserNotificationService { get }
+}
+
+struct DefaultDataBrokerOperationDependencies: DataBrokerOperationDependencies {
+    let database: DataBrokerProtectionRepository
+    let brokerTimeInterval: TimeInterval
+    let runnerProvider: JobRunnerProvider
+    let notificationCenter: NotificationCenter
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    let userNotificationService: DataBrokerProtectionUserNotificationService
+}
+
 final class DataBrokerOperation: Operation {
 
     public var error: Error?
@@ -34,7 +52,7 @@ final class DataBrokerOperation: Operation {
     private let id = UUID()
     private var _isExecuting = false
     private var _isFinished = false
-    private let intervalBetweenOperations: TimeInterval? // The time in seconds to wait in-between operations
+    private let brokerTimeInterval: TimeInterval? // The time in seconds to wait in-between operations
     private let priorityDate: Date? // The date to filter and sort operations priorities
     private let operationType: OperationType
     private let notificationCenter: NotificationCenter
@@ -48,26 +66,21 @@ final class DataBrokerOperation: Operation {
     }
 
     init(dataBrokerID: Int64,
-         database: DataBrokerProtectionRepository,
          operationType: OperationType,
-         intervalBetweenOperations: TimeInterval? = nil,
          priorityDate: Date? = nil,
-         notificationCenter: NotificationCenter = NotificationCenter.default,
-         runner: WebJobRunner,
-         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
-         userNotificationService: DataBrokerProtectionUserNotificationService,
-         showWebView: Bool) {
+         showWebView: Bool,
+         operationDependencies: DataBrokerOperationDependencies) {
 
         self.dataBrokerID = dataBrokerID
-        self.database = database
-        self.intervalBetweenOperations = intervalBetweenOperations
         self.priorityDate = priorityDate
         self.operationType = operationType
-        self.notificationCenter = notificationCenter
-        self.runner = runner
-        self.pixelHandler = pixelHandler
         self.showWebView = showWebView
-        self.userNotificationService = userNotificationService
+        self.database = operationDependencies.database
+        self.brokerTimeInterval = operationDependencies.brokerTimeInterval
+        self.runner = operationDependencies.runnerProvider.getJobRunner()
+        self.notificationCenter = operationDependencies.notificationCenter
+        self.pixelHandler = operationDependencies.pixelHandler
+        self.userNotificationService = operationDependencies.userNotificationService
         super.init()
     }
 
@@ -177,7 +190,7 @@ final class DataBrokerOperation: Operation {
                     return !self.isCancelled
                 })
 
-                if let sleepInterval = intervalBetweenOperations {
+                if let sleepInterval = brokerTimeInterval {
                     os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
                 }

@@ -127,7 +127,12 @@ final class DataBrokerProtectionProcessor {
         do {
             // Note: The next task in this project will inject the dependencies & builder into our new 'QueueManager' type
 
-            let dependencies = DefaultOperationDependencies(database: database, config: config, runnerProvider: jobRunnerProvider, notificationCenter: notificationCenter, pixelHandler: pixelHandler, userNotificationService: userNotificationService)
+            let dependencies = DefaultDataBrokerOperationDependencies(database: database,
+                                                                      brokerTimeInterval: config.intervalBetweenSameBrokerOperations,
+                                                                      runnerProvider: jobRunnerProvider,
+                                                                      notificationCenter: notificationCenter,
+                                                                      pixelHandler: pixelHandler,
+                                                                      userNotificationService: userNotificationService)
 
             operations = try DefaultDataBrokerOperationsBuilder().operations(operationType: operationType, priorityDate: priorityDate, showWebView: showWebView, operationDependencies: dependencies)
 
