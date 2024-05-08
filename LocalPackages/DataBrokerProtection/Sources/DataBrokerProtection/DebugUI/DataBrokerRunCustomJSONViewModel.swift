@@ -143,7 +143,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
     let brokers: [DataBroker]
 
-    private let runnerProvider: OperationRunnerProvider
+    private let runnerProvider: JobRunnerProvider
     private let privacyConfigManager: PrivacyConfigurationManaging
     private let fakePixelHandler: EventMapping<DataBrokerProtectionPixels> = EventMapping { event, _, _, _ in
         print(event)
@@ -168,7 +168,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                                                             sessionKey: sessionKey,
                                                             featureToggles: features)
 
-        self.runnerProvider = DataBrokerOperationRunnerProvider(
+        self.runnerProvider = DataBrokerJobRunnerProvider(
             privacyConfigManager: privacyConfigurationManager,
             contentScopeProperties: contentScopeProperties,
             emailService: EmailService(),
@@ -190,13 +190,13 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
             try await withThrowingTaskGroup(of: DebugScanReturnValue.self) { group in
                 for queryData in brokerProfileQueryData {
-                    let debugScanOperation = DebugScanOperation(privacyConfig: self.privacyConfigManager, prefs: self.contentScopeProperties, query: queryData) {
+                    let debugScanJob = DebugScanJob(privacyConfig: self.privacyConfigManager, prefs: self.contentScopeProperties, query: queryData) {
                         true
                     }
 
                     group.addTask {
                         do {
-                            return try await debugScanOperation.run(inputValue: (), showWebView: false)
+                            return try await debugScanJob.run(inputValue: (), showWebView: false)
                         } catch {
                             return DebugScanReturnValue(brokerURL: "ERROR - with broker: \(queryData.dataBroker.name)", extractedProfiles: [ExtractedProfile](), brokerProfileQueryData: queryData)
                         }
@@ -342,7 +342,7 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
                 let dataBroker = try decoder.decode(DataBroker.self, from: data)
                 self.selectedDataBroker = dataBroker
                 let brokerProfileQueryData = createBrokerProfileQueryData(for: dataBroker)
-                let runner = runnerProvider.getOperationRunner()
+                let runner = runnerProvider.getJobRunner()
                 let group = DispatchGroup()
 
                 for query in brokerProfileQueryData {
@@ -378,11 +378,11 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
     }
 
     func runOptOut(scanResult: ScanResult) {
-        let runner = runnerProvider.getOperationRunner()
+        let runner = runnerProvider.getJobRunner()
         let brokerProfileQueryData = BrokerProfileQueryData(
             dataBroker: scanResult.dataBroker,
             profileQuery: scanResult.profileQuery,
-            scanOperationData: ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent]())
+            scanJobData: ScanJobData(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent]())
         )
         Task {
             do {
@@ -414,9 +414,9 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
         var profileQueryIndex: Int64 = 1
         for profileQuery in profileQueries {
-            let fakeScanOperationData = ScanOperationData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
+            let fakeScanJobData = ScanJobData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
             brokerProfileQueryData.append(
-                .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanOperationData: fakeScanOperationData)
+                .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanJobData: fakeScanJobData)
             )
 
             profileQueryIndex += 1
@@ -438,10 +438,10 @@ final class DataBrokerRunCustomJSONViewModel: ObservableObject {
 
         var profileQueryIndex: Int64 = 1
         for profileQuery in profileQueries {
-            let fakeScanOperationData = ScanOperationData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
+            let fakeScanJobData = ScanJobData(brokerId: 0, profileQueryId: profileQueryIndex, historyEvents: [HistoryEvent]())
             for broker in brokers {
                 brokerProfileQueryData.append(
-                    .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanOperationData: fakeScanOperationData)
+                    .init(dataBroker: broker, profileQuery: profileQuery.with(id: profileQueryIndex), scanJobData: fakeScanJobData)
                 )
             }
 

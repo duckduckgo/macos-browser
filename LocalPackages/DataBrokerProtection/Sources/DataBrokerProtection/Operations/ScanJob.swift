@@ -1,5 +1,5 @@
 //
-//  ScanOperation.swift
+//  ScanJob.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import BrowserServicesKit
 import UserScript
 import Common
 
-final class ScanOperation: DataBrokerOperation {
+final class ScanJob: DataBrokerJob {
     typealias ReturnValue = [ExtractedProfile]
     typealias InputValue = Void
 

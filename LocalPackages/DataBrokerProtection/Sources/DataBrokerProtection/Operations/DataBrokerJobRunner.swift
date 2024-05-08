@@ -1,5 +1,5 @@
 //
-//  DataBrokerOperationRunner.swift
+//  DataBrokerJobRunner.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Common
 
-protocol WebOperationRunner {
+protocol WebJobRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
               stageCalculator: StageDurationCalculator,
@@ -36,7 +36,7 @@ protocol WebOperationRunner {
                 shouldRunNextStep: @escaping () -> Bool) async throws
 }
 
-extension WebOperationRunner {
+extension WebJobRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
               stageCalculator: StageDurationCalculator,
@@ -66,7 +66,7 @@ extension WebOperationRunner {
 }
 
 @MainActor
-final class DataBrokerOperationRunner: WebOperationRunner {
+final class DataBrokerJobRunner: WebJobRunner {
     let privacyConfigManager: PrivacyConfigurationManaging
     let contentScopeProperties: ContentScopeProperties
     let emailService: EmailServiceProtocol
@@ -87,7 +87,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
               pixelHandler: EventMapping<DataBrokerProtectionPixels>,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
-        let scan = ScanOperation(
+        let scan = ScanJob(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
             query: profileQuery,
@@ -106,7 +106,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
                 pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
-        let optOut = OptOutOperation(
+        let optOut = OptOutJob(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
             query: profileQuery,

@@ -28,11 +28,11 @@ protocol OperationsManager {
     // We want to refactor this to return a NSOperation in the future
     // so we have more control of stopping/starting the queue
     // for the time being, shouldRunNextStep: @escaping () -> Bool is being used
-    func runOperation(operationData: BrokerOperationData,
+    func runOperation(operationData: BrokerJobData,
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
-                      runner: WebOperationRunner,
+                      runner: WebJobRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       showWebView: Bool,
                       isManualScan: Bool,
@@ -41,11 +41,11 @@ protocol OperationsManager {
 }
 
 extension OperationsManager {
-    func runOperation(operationData: BrokerOperationData,
+    func runOperation(operationData: BrokerJobData,
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
-                      runner: WebOperationRunner,
+                      runner: WebJobRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
                       isManual: Bool,
@@ -66,18 +66,18 @@ extension OperationsManager {
 
 struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
-    internal func runOperation(operationData: BrokerOperationData,
+    internal func runOperation(operationData: BrokerJobData,
                                brokerProfileQueryData: BrokerProfileQueryData,
                                database: DataBrokerProtectionRepository,
                                notificationCenter: NotificationCenter = NotificationCenter.default,
-                               runner: WebOperationRunner,
+                               runner: WebJobRunner,
                                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                showWebView: Bool = false,
                                isManualScan: Bool = false,
                                userNotificationService: DataBrokerProtectionUserNotificationService,
                                shouldRunNextStep: @escaping () -> Bool) async throws {
 
-        if operationData as? ScanOperationData != nil {
+        if operationData as? ScanJobData != nil {
             try await runScanOperation(on: runner,
                                        brokerProfileQueryData: brokerProfileQueryData,
                                        database: database,
@@ -87,8 +87,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                        isManual: isManualScan,
                                        userNotificationService: userNotificationService,
                                        shouldRunNextStep: shouldRunNextStep)
-        } else if let optOutOperationData = operationData as? OptOutOperationData {
-            try await runOptOutOperation(for: optOutOperationData.extractedProfile,
+        } else if let optOutJobData = operationData as? OptOutJobData {
+            try await runOptOutOperation(for: optOutJobData.extractedProfile,
                                          on: runner,
                                          brokerProfileQueryData: brokerProfileQueryData,
                                          database: database,
@@ -101,7 +101,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
-    internal func runScanOperation(on runner: WebOperationRunner,
+    internal func runScanOperation(on runner: WebJobRunner,
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
                                    notificationCenter: NotificationCenter,
@@ -169,13 +169,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         // This is done inside a transaction on the database side. We insert the extracted profile and then
                         // we insert the opt-out operation, we do not want to do things separately in case creating an opt-out fails
                         // causing the extracted profile to be orphan.
-                        let optOutOperationData = OptOutOperationData(brokerId: brokerId,
+                        let optOutJobData = OptOutJobData(brokerId: brokerId,
                                                                       profileQueryId: profileQueryId,
                                                                       preferredRunDate: preferredRunOperation,
                                                                       historyEvents: [HistoryEvent](),
                                                                       extractedProfile: extractedProfile)
 
-                        try database.saveOptOutOperation(optOut: optOutOperationData, extractedProfile: extractedProfile)
+                        try database.saveOptOutJob(optOut: optOutJobData, extractedProfile: extractedProfile)
 
                         os_log("Creating new opt-out operation data for: %@", log: .dataBrokerProtection, String(describing: extractedProfile.name))
                     }
@@ -269,7 +269,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
     // swiftlint:disable:next function_body_length
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
-                                     on runner: WebOperationRunner,
+                                     on runner: WebJobRunner,
                                      brokerProfileQueryData: BrokerProfileQueryData,
                                      database: DataBrokerProtectionRepository,
                                      notificationCenter: NotificationCenter,

@@ -45,12 +45,12 @@ extension BrokerProfileQueryData {
                 mirrorSites: mirrorSites
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50, deprecated: deprecated),
-            scanOperationData: ScanOperationData(brokerId: 1,
+            scanJobData: ScanJobData(brokerId: 1,
                                                  profileQueryId: 1,
                                                  preferredRunDate: preferredRunDate,
                                                  historyEvents: scanHistoryEvents,
                                                  lastRunDate: lastRunDate),
-            optOutOperationsData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutOperationData]()
+            optOutJobData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutJobData]()
         )
     }
 }
@@ -478,8 +478,8 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     var profile: DataBrokerProtectionProfile?
     var profileQueries = [ProfileQuery]()
     var brokers = [DataBroker]()
-    var scanOperationData = [ScanOperationData]()
-    var optOutOperationData = [OptOutOperationData]()
+    var scanJobData = [ScanJobData]()
+    var optOutJobData = [OptOutJobData]()
     var lastPreferredRunDateOnScan: Date?
 
     typealias DatabaseProvider = SecureStorageDatabaseProviderMock
@@ -498,8 +498,8 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         profile = nil
         profileQueries.removeAll()
         brokers.removeAll()
-        scanOperationData.removeAll()
-        optOutOperationData.removeAll()
+        scanJobData.removeAll()
+        optOutJobData.removeAll()
         lastPreferredRunDateOnScan = nil
     }
 
@@ -565,12 +565,12 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
     }
 
-    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData? {
-        scanOperationData.first
+    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanJobData? {
+        scanJobData.first
     }
 
-    func fetchAllScans() throws -> [ScanOperationData] {
-        return scanOperationData
+    func fetchAllScans() throws -> [ScanJobData] {
+        return scanJobData
     }
 
     func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws {
@@ -585,16 +585,16 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
     }
 
-    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData? {
-        optOutOperationData.first
+    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutJobData? {
+        optOutJobData.first
     }
 
-    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutOperationData] {
-        return optOutOperationData
+    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutJobData] {
+        return optOutJobData
     }
 
-    func fetchAllOptOuts() throws -> [OptOutOperationData] {
-        return optOutOperationData
+    func fetchAllOptOuts() throws -> [OptOutJobData] {
+        return optOutJobData
     }
 
     func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws {
@@ -739,7 +739,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         wasDeleteProfileDataCalled = true
     }
 
-    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {
+    func saveOptOutJob(optOut: OptOutJobData, extractedProfile: ExtractedProfile) throws {
         wasSaveOptOutOperationCalled = true
     }
 
@@ -751,9 +751,9 @@ final class MockDatabase: DataBrokerProtectionRepository {
         }
 
         if let lastHistoryEventToReturn = self.lastHistoryEventToReturn {
-            let scanOperationData = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
+            let scanJobData = ScanJobData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
 
-            return BrokerProfileQueryData(dataBroker: .mock, profileQuery: .mock, scanOperationData: scanOperationData)
+            return BrokerProfileQueryData(dataBroker: .mock, profileQuery: .mock, scanJobData: scanJobData)
         } else {
             return nil
         }
@@ -958,5 +958,71 @@ final class MockDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBa
         fireEmptyAccessTokenWasCalled = false
         fireGenerateEmailHTTPErrorWasCalled = false
         statusCode = nil
+    }
+}
+
+final class MockRunnerProvider: JobRunnerProvider {
+
+    func getJobRunner() -> any WebJobRunner {
+        MockWebJobRunner()
+    }
+}
+
+final class MockPixelHandler: EventMapping<DataBrokerProtectionPixels> {
+
+    init() {
+        super.init { event, _, _, _ in }
+    }
+}
+
+extension ProfileQuery {
+
+    static var mock: ProfileQuery {
+        .init(id: 1, firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980)
+    }
+
+    static var mockWithoutId: ProfileQuery {
+        .init(firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980)
+    }
+}
+
+extension ScanJobData {
+
+    static var mock: ScanJobData {
+        .init(
+            brokerId: 1,
+            profileQueryId: 1,
+            historyEvents: [HistoryEvent]()
+        )
+    }
+
+    static func mockWith(historyEvents: [HistoryEvent]) -> ScanJobData {
+        ScanJobData(brokerId: 1, profileQueryId: 1, historyEvents: historyEvents)
+    }
+
+    static func mock(withBrokerId brokerId: Int64) -> ScanJobData {
+        .init(
+            brokerId: brokerId,
+            profileQueryId: 1,
+            historyEvents: [HistoryEvent]()
+        )
+    }
+}
+
+extension DataBroker {
+
+    static func mock(withId id: Int64) -> DataBroker {
+        DataBroker(
+            id: id,
+            name: "Test broker",
+            url: "testbroker.com",
+            steps: [Step](),
+            version: "1.0",
+            schedulingConfig: DataBrokerScheduleConfig(
+                retryError: 0,
+                confirmOptOutScan: 0,
+                maintenanceScan: 0
+            )
+        )
     }
 }
