@@ -212,21 +212,14 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleBookmarksError409ForTheFirstTime_ThenAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(409)
 
-        Task {
-            handler.handleBookmarkError(error)
-            expectation.fulfill()
-        }
+        handler.handleBookmarkError(error)
 
-        await self.fulfillment(of: [expectation], timeout: 4.0)
         XCTAssertTrue(alertPresenter.showAlertCalled)
     }
 
     func test_WhenHandleBookmarksError409ForTheSecondTime_ThenAlertNotShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(409)
 
         handler.handleBookmarkError(error)
@@ -234,13 +227,11 @@ final class SyncErrorHandlerTests: XCTestCase {
         handler = SyncErrorHandler(alertPresenter: alertPresenter)
 
         handler.handleBookmarkError(error)
-        expectation2.fulfill()
 
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
 
     func test_WhenHandleCredentialsError409ForTheFirstTime_ThenAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(409)
 
         handler.handleCredentialError(_:)(error)
@@ -249,12 +240,9 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleCredentialsError409ForTheSecondTime_ThenAlertNotShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(409)
 
         handler.handleCredentialError(error)
-
 
         handler = SyncErrorHandler(alertPresenter: alertPresenter)
 
@@ -264,7 +252,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleBookmarksError413ForTheFirstTime_ThenAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
         handler.handleBookmarkError(error)
@@ -273,8 +260,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleBookmarksError413ForTheSecondTime_ThenAlertNotShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
         handler.handleBookmarkError(error)
@@ -287,7 +272,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleCredentialsError413ForTheFirstTime_ThenAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
         handler.handleCredentialError(_:)(error)
@@ -296,8 +280,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleCredentialsError413ForTheSecondTime_ThenAlertNotShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
         handler.handleCredentialError(error)
@@ -310,8 +292,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleCredentialsError413_AndThenHandleBookmarksError413_ThenAlertShownTwice() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
         handler.handleCredentialError(error)
@@ -324,7 +304,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleCredentialsError401ForTheFirstTime_ThenAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(401)
 
         handler.handleCredentialError(_:)(error)
@@ -333,8 +312,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleBookmarksError401ForTheSecondTime_ThenNoAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(401)
 
         handler.handleBookmarkError(_:)(error)
@@ -347,7 +324,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleCredentialsError429ForTheFirstTime_ThenNoAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(429)
 
         handler.handleCredentialError(_:)(error)
@@ -356,7 +332,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleBookarksError418ForTheFirstTime_ThenNoAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(418)
 
         handler.handleCredentialError(_:)(error)
@@ -365,7 +340,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_WhenHandleBookarksError429ForTheFirstTime_ThenNoAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(429)
 
         handler.handleCredentialError(_:)(error)
@@ -374,7 +348,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_When429ErrorFired9Times_ThenNoAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(429)
 
         for _ in 0...8 {
@@ -385,7 +358,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_When429ErrorFired10Times_ThenAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(429)
 
         for _ in 0...9 {
@@ -399,7 +371,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_When418ErrorFired10TimesTwice_ThenAlertShownOnce() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(418)
 
         for _ in 0...20 {
@@ -420,8 +391,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_whenSyncBookmarksSucced_ThenError401AlertCanBeShownAgain() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Secons Error handled")
         let error = SyncError.unexpectedStatusCode(401)
 
         handler.handleBookmarkError(_:)(error)
@@ -437,8 +406,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_whenSyncBookmarksSucced_ThenError409AlertCanBeShownAgain() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Secons Error handled")
         let error = SyncError.unexpectedStatusCode(409)
 
         handler.handleBookmarkError(_:)(error)
@@ -454,8 +421,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_whenSyncCredentialsSucced_ThenError413AlertCanBeShownAgain() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Secons Error handled")
         let error = SyncError.unexpectedStatusCode(413)
 
         handler.handleCredentialError(_:)(error)
@@ -481,8 +446,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_When429ErrorFiredAfter12HoursFromLastSuccessfulSync_ThenAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "Second Error handled")
         let error = SyncError.unexpectedStatusCode(429)
         let thirteenHoursAgo = Calendar.current.date(byAdding: .hour, value: -13, to: Date())!
 
@@ -497,7 +460,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_When429ErrorFiredAfter12HoursFromLastSuccessfulSync_ButNoErrorRegisteredBefore_ThenNoAlertShown() async {
-        let expectation = XCTestExpectation(description: "Error handled")
         let error = SyncError.unexpectedStatusCode(418)
         let thirteenHoursAgo = Calendar.current.date(byAdding: .hour, value: -13, to: Date())!
         userDefaults.set(thirteenHoursAgo, forKey: UserDefaultsWrapper<Date>.Key.syncLastSuccesfullTime.rawValue)
@@ -508,8 +470,6 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 
     func test_When429ErrorFired10Times_AndAfter24H_400ErrorFired10TimesAgain_ThenAlertShownTwice() async {
-        let expectation = XCTestExpectation(description: "Error handled")
-        let expectation2 = XCTestExpectation(description: "SecondError handled")
         let error = SyncError.unexpectedStatusCode(429)
 
         for _ in 0...9 {
