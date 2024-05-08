@@ -131,9 +131,20 @@ final class ZoomPopover: NSPopover {
         guard let addressBar,
               let window = addressBar.window else { return .infinite }
         var frame = window.convertToScreen(addressBar.convert(addressBar.bounds, to: nil))
+        frame = frame.insetBy(dx: 0, dy: -window.frame.size.height)
+        return frame
+    }
 
-        frame = frame.insetBy(dx: -36, dy: -window.frame.size.height)
-
+    /// position popover to the right
+    override func adjustFrame(_ frame: NSRect) -> NSRect {
+        let boundingFrame = self.boundingFrame
+        guard !boundingFrame.isInfinite else { return frame }
+        guard let popoverWindow = self.contentViewController?.view.window else {
+            assertionFailure("no popover window")
+            return frame
+        }
+        var frame = frame
+        frame.origin.x = boundingFrame.midX - 36
         return frame
     }
 
