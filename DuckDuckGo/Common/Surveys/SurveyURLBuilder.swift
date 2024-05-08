@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import BrowserServicesKit
 
 final class SurveyURLBuilder {
 
@@ -95,6 +96,23 @@ final class SurveyURLBuilder {
         return components.url
     }
 
+    func addPasswordsCountSurveyParameter(to originalURLString: String) -> URL? {
+        let surveyURLWithParameters = buildSurveyURL(from: originalURLString)
+
+        guard let surveyURLWithParametersString = surveyURLWithParameters?.absoluteString,
+                var components = URLComponents(string: surveyURLWithParametersString),
+                let bucket = passwordsCountBucket() else {
+            return surveyURLWithParameters
+        }
+
+        var queryItems = components.queryItems ?? []
+        queryItems.append(URLQueryItem(name: "saved_passwords", value: bucket))
+
+        components.queryItems = queryItems
+
+        return components.url
+    }
+
     private func queryItem(parameter: SurveyURLParameters, value: String) -> URLQueryItem {
         let urlAllowed: CharacterSet = .alphanumerics.union(.init(charactersIn: "-._~"))
         let sanitizedValue = value.addingPercentEncoding(withAllowedCharacters: urlAllowed)
@@ -103,6 +121,15 @@ final class SurveyURLBuilder {
 
     private func queryItem(parameter: SurveyURLParameters, value: Int) -> URLQueryItem {
         return URLQueryItem(name: parameter.rawValue, value: String(describing: value))
+    }
+
+    private func passwordsCountBucket() -> String? {
+        guard let secureVault = try? AutofillSecureVaultFactory.makeVault(reporter: SecureVaultReporter.shared),
+              let bucket = try? secureVault.accountsCountBucket() else {
+            return nil
+        }
+
+        return bucket
     }
 
 }
