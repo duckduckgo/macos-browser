@@ -19,7 +19,7 @@
 import Common
 import Foundation
 
-typealias OperationType = DataBrokerOperationsCollection.OperationType
+typealias OperationType = DataBrokerOperation.OperationType
 
 protocol OperationDependencies {
     var database: DataBrokerProtectionRepository { get }
@@ -43,7 +43,7 @@ protocol DataBrokerOperationsBuilder {
     func operations(operationType: OperationType,
                     priorityDate: Date?,
                     showWebView: Bool,
-                    operationDependencies: OperationDependencies) throws -> [DataBrokerOperationsCollection]
+                    operationDependencies: OperationDependencies) throws -> [DataBrokerOperation]
 }
 
 final class DefaultDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
@@ -51,17 +51,17 @@ final class DefaultDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
     func operations(operationType: OperationType,
                     priorityDate: Date?,
                     showWebView: Bool,
-                    operationDependencies: OperationDependencies) throws -> [DataBrokerOperationsCollection] {
+                    operationDependencies: OperationDependencies) throws -> [DataBrokerOperation] {
 
         let brokerProfileQueryData = try operationDependencies.database.fetchAllBrokerProfileQueryData()
-        var operations: [DataBrokerOperationsCollection] = []
+        var operations: [DataBrokerOperation] = []
         var visitedDataBrokerIDs: Set<Int64> = []
 
         for queryData in brokerProfileQueryData {
             guard let dataBrokerID = queryData.dataBroker.id else { continue }
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
-                let collection = DataBrokerOperationsCollection(dataBrokerID: dataBrokerID,
+                let collection = DataBrokerOperation(dataBrokerID: dataBrokerID,
                                                                 database: operationDependencies.database,
                                                                 operationType: operationType,
                                                                 intervalBetweenOperations: operationDependencies.config.intervalBetweenSameBrokerOperations,

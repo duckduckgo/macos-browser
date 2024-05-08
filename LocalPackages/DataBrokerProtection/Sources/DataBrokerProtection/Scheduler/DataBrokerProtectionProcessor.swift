@@ -122,7 +122,7 @@ final class DataBrokerProtectionProcessor {
         // This will try to fire the event weekly report pixels
         eventPixels.tryToFireWeeklyPixels()
 
-        let dataBrokerOperationCollections: [DataBrokerOperationsCollection]
+        let dataBrokerOperationCollections: [DataBrokerOperation]
 
         do {
             let brokersProfileData = try database.fetchAllBrokerProfileQueryData()
@@ -152,16 +152,16 @@ final class DataBrokerProtectionProcessor {
     private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
                                                       operationType: OperationType,
                                                       priorityDate: Date?,
-                                                      showWebView: Bool) -> [DataBrokerOperationsCollection] {
+                                                      showWebView: Bool) -> [DataBrokerOperation] {
 
-        var collections: [DataBrokerOperationsCollection] = []
+        var collections: [DataBrokerOperation] = []
         var visitedDataBrokerIDs: Set<Int64> = []
 
         for queryData in brokerProfileQueriesData {
             guard let dataBrokerID = queryData.dataBroker.id else { continue }
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
-                let collection = DataBrokerOperationsCollection(dataBrokerID: dataBrokerID,
+                let collection = DataBrokerOperation(dataBrokerID: dataBrokerID,
                                                                 database: database,
                                                                 operationType: operationType,
                                                                 intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,
@@ -186,16 +186,16 @@ final class DataBrokerProtectionProcessor {
     }
 }
 
-extension DataBrokerProtectionProcessor: DataBrokerOperationsCollectionErrorDelegate {
+extension DataBrokerProtectionProcessor: DataBrokerOperationErrorDelegate {
 
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection, didErrorBeforeStartingBrokerOperations error: Error) {
+    func dataBrokerOperation(_ dataBrokerOperation: DataBrokerOperation, didErrorBeforeStartingBrokerOperations error: Error) {
 
     }
 
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
-                                        didError error: Error,
-                                        whileRunningBrokerOperationData: BrokerOperationData,
-                                        withDataBrokerName dataBrokerName: String?) {
+    func dataBrokerOperation(_ dataBrokerOperation: DataBrokerOperation,
+                             didError error: Error,
+                             whileRunningBrokerOperationData: BrokerOperationData,
+                             withDataBrokerName dataBrokerName: String?) {
         if let error = error as? DataBrokerProtectionError,
            let dataBrokerName = dataBrokerName {
             pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))

@@ -1,5 +1,5 @@
 //
-//  DataBrokerOperationsCollection.swift
+//  DataBrokerOperation.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,13 +19,13 @@
 import Foundation
 import Common
 
-protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
-                                        didError error: Error,
-                                        whileRunningBrokerOperationData: BrokerOperationData,
-                                        withDataBrokerName dataBrokerName: String?)
-    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
-                                        didErrorBeforeStartingBrokerOperations error: Error)
+protocol DataBrokerOperationErrorDelegate: AnyObject {
+    func dataBrokerOperation(_ dataBrokerOperation: DataBrokerOperation,
+                             didError error: Error,
+                             whileRunningBrokerOperationData: BrokerOperationData,
+                             withDataBrokerName dataBrokerName: String?)
+    func dataBrokerOperation(_ dataBrokerOperation: DataBrokerOperation,
+                             didErrorBeforeStartingBrokerOperations error: Error)
 }
 
 enum OperationType {
@@ -34,9 +34,10 @@ enum OperationType {
     case all
 }
 
-final class DataBrokerOperationsCollection: Operation {
+final class DataBrokerOperation: Operation {
+
     public var error: Error?
-    public weak var errorDelegate: DataBrokerOperationsCollectionErrorDelegate?
+    public weak var errorDelegate: DataBrokerOperationErrorDelegate?
 
     private let dataBrokerID: Int64
     private let database: DataBrokerProtectionRepository
@@ -145,7 +146,7 @@ final class DataBrokerOperationsCollection: Operation {
             allBrokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
         } catch {
             os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
-            errorDelegate?.dataBrokerOperationsCollection(self, didErrorBeforeStartingBrokerOperations: error)
+            errorDelegate?.dataBrokerOperation(self, didErrorBeforeStartingBrokerOperations: error)
             return
         }
 
@@ -195,10 +196,10 @@ final class DataBrokerOperationsCollection: Operation {
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 self.error = error
-                errorDelegate?.dataBrokerOperationsCollection(self,
-                                                              didError: error,
-                                                              whileRunningBrokerOperationData: operationData,
-                                                              withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
+                errorDelegate?.dataBrokerOperation(self,
+                                                   didError: error,
+                                                   whileRunningBrokerOperationData: operationData,
+                                                   withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }
 
