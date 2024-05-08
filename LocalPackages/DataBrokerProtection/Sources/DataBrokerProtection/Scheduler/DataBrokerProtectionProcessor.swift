@@ -54,7 +54,7 @@ final class DataBrokerProtectionProcessor {
                           completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
 
         operationQueue.cancelAllOperations()
-        runOperations(operationType: .manualScan,
+        runOperations(operationType: .scan,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
             os_log("Scans done", log: .dataBrokerProtection)
@@ -112,7 +112,7 @@ final class DataBrokerProtectionProcessor {
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsFor(operationType)
         // Before running new operations we check if there is any updates to the broker files.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(reporter: DataBrokerProtectionSecureVaultErrorReporter.shared) {
-            let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
+            let brokerUpdater = DefaultDataBrokerProtectionBrokerUpdater(vault: vault, pixelHandler: pixelHandler)
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
 

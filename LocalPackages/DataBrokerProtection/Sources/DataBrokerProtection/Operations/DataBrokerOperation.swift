@@ -37,13 +37,13 @@ struct DefaultDataBrokerOperationDependencies: DataBrokerOperationDependencies {
     let userNotificationService: DataBrokerProtectionUserNotificationService
 }
 
-final class DataBrokerOperation: Operation {
+enum OperationType {
+    case scan
+    case optOut
+    case all
+}
 
-    enum OperationType {
-        case manualScan
-        case optOut
-        case all
-    }
+class DataBrokerOperation: Operation {
 
     public var error: Error?
 
@@ -122,7 +122,7 @@ final class DataBrokerOperation: Operation {
         switch operationType {
         case .optOut:
             operationsData = brokerProfileQueriesData.flatMap { $0.optOutJobData }
-        case .manualScan:
+        case .scan:
             operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanJobData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
@@ -183,7 +183,7 @@ final class DataBrokerOperation: Operation {
                                                                                 runner: runner,
                                                                                 pixelHandler: pixelHandler,
                                                                                 showWebView: showWebView,
-                                                                                isManualScan: operationType == .manualScan,
+                                                                                isManualScan: operationType == .scan,
                                                                                 userNotificationService: userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }

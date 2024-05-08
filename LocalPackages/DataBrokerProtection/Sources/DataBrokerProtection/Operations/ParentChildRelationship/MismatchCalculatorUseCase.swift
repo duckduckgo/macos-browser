@@ -36,7 +36,12 @@ enum MismatchValues: Int {
     }
 }
 
-struct MismatchCalculatorUseCase {
+protocol MismatchCalculator {
+    init(database: DataBrokerProtectionRepository, pixelHandler: EventMapping<DataBrokerProtectionPixels>)
+    func calculateMismatches()
+}
+
+struct MismatchCalculatorUseCase: MismatchCalculator {
     let database: DataBrokerProtectionRepository
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 

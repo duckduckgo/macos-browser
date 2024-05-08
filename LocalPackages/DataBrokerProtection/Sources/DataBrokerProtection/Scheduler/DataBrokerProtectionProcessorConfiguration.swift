@@ -29,7 +29,7 @@ struct DataBrokerProtectionProcessorConfiguration {
         switch operation {
         case .all, .optOut:
             return concurrentOperationsDifferentBrokers
-        case .manualScan:
+        case .scan:
             return concurrentOperationsOnManualScans
         }
     }

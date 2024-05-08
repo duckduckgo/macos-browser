@@ -1025,3 +1025,99 @@ extension DataBroker {
         )
     }
 }
+
+final class MockDataBrokerProtectionOperationQueue: OperationQueue {
+
+    private(set) var didCallCancelCount = 0
+    private(set) var didCallAddCount = 0
+    private(set) var didCallAddBarrierBlockCount = 0
+
+    override func cancelAllOperations() {
+        didCallCancelCount += 1
+        super.cancelAllOperations()
+    }
+
+    override func addOperation(_ op: Operation) {
+        didCallAddCount += 1
+        super.addOperation(op)
+    }
+
+    override func addBarrierBlock(_ barrier: @escaping @Sendable () -> Void) {
+        didCallAddBarrierBlockCount += 1
+        super.addBarrierBlock(barrier)
+    }
+}
+
+final class MockDataBrokerOperation: DataBrokerOperation {
+    convenience init(id: Int64, operationType: OperationType) {
+        self.init(dataBrokerID: id,
+                  operationType: operationType,
+                  showWebView: false,
+                  operationDependencies: DefaultDataBrokerOperationDependencies.mock)
+    }
+
+    override func main() {
+        Thread.sleep(forTimeInterval: 1)
+        super.main()
+    }
+}
+
+extension DefaultDataBrokerOperationDependencies {
+    static var mock: DefaultDataBrokerOperationDependencies {
+        DefaultDataBrokerOperationDependencies(database: MockDatabase(),
+                                               brokerTimeInterval: 1,
+                                               runnerProvider: MockRunnerProvider(),
+                                               notificationCenter: .default,
+                                               pixelHandler: MockPixelHandler(),
+                                               userNotificationService: MockUserNotification())
+    }
+}
+
+final class MockDataBrokerOperationsCreator: DataBrokerOperationsCreator {
+
+    var operationCollections: [DataBrokerOperation] = []
+    var shouldError = false
+    var createdType: OperationType = .scan
+
+    init(operationCollections: [DataBrokerOperation]) {
+        self.operationCollections = operationCollections
+    }
+
+    func operations(forOperationType operationType: OperationType,
+                    withPriorityDate priorityDate: Date?,
+                    showWebView: Bool,
+                    operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation] {
+        guard !shouldError else { throw DataBrokerProtectionError.unknown("")}
+        createdType = operationType
+        return operationCollections
+    }
+}
+
+final class MockMismatchCalculator: MismatchCalculator {
+
+    private(set) var didCallCalculateMismatches = false
+
+    init(database: any DataBrokerProtectionRepository, pixelHandler: Common.EventMapping<DataBrokerProtectionPixels>) { }
+
+    func calculateMismatches() {
+        didCallCalculateMismatches = true
+    }
+}
+
+final class MockDataBrokerProtectionBrokerUpdater: DataBrokerProtectionBrokerUpdater {
+
+    private(set) var didCallUpdateBrokers = false
+    private(set) var didCallCheckForUpdates = false
+
+    static func provide() -> DefaultDataBrokerProtectionBrokerUpdater? {
+        nil
+    }
+
+    func updateBrokers() {
+        didCallUpdateBrokers = true
+    }
+
+    func checkForUpdatesInBrokerJSONFiles() {
+        didCallCheckForUpdates = true
+    }
+}

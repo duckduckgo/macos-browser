@@ -47,7 +47,7 @@ enum DataBrokerProtectionQueueMode {
 protocol DataBrokerProtectionQueueManager: DataBrokerDebugCommandExecutor {
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
-         operationsBuilder: DataBrokerOperationsBuilder,
+         operationsCreator: DataBrokerOperationsCreator,
          mismatchCalculator: MismatchCalculator,
          brokerUpdater: DataBrokerProtectionBrokerUpdater?)
 
@@ -65,17 +65,17 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
 
     private var mode = DataBrokerProtectionQueueMode.idle
     private let operationQueue: DataBrokerProtectionOperationQueue
-    private let operationsBuilder: DataBrokerOperationsBuilder
+    private let operationsCreator: DataBrokerOperationsCreator
     private let mismatchCalculator: MismatchCalculator
     private let brokerUpdater: DataBrokerProtectionBrokerUpdater?
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
-         operationsBuilder: DataBrokerOperationsBuilder,
+         operationsCreator: DataBrokerOperationsCreator,
          mismatchCalculator: MismatchCalculator,
          brokerUpdater: DataBrokerProtectionBrokerUpdater?) {
 
         self.operationQueue = operationQueue
-        self.operationsBuilder = operationsBuilder
+        self.operationsCreator = operationsCreator
         self.mismatchCalculator = mismatchCalculator
         self.brokerUpdater = brokerUpdater
     }
@@ -106,7 +106,7 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
     }
 
     func stopAllOperations() {
-        operationQueue.cancelAllOperations()
+        cancelOperationsAndCallCompletion(forMode: mode)
     }
 }
 
@@ -124,8 +124,6 @@ extension DefaultDataBrokerProtectionQueueManager {
 }
 
 private extension DefaultDataBrokerProtectionQueueManager {
-
-    typealias OperationType = DataBrokerOperation.OperationType
 
     func startOperationsIfPermitted(forNewMode newMode: DataBrokerProtectionQueueMode,
                                     type: OperationType,
@@ -172,8 +170,8 @@ private extension DefaultDataBrokerProtectionQueueManager {
         // Use builder to build operations
         let operations: [DataBrokerOperation]
         do {
-            operations = try operationsBuilder.operations(operationType: type,
-                                                          priorityDate: priorityDate,
+            operations = try operationsCreator.operations(forOperationType: type,
+                                                          withPriorityDate: priorityDate,
                                                           showWebView: showWebView,
                                                           operationDependencies: operationDependencies)
 
@@ -186,11 +184,15 @@ private extension DefaultDataBrokerProtectionQueueManager {
             return
         }
 
-        operationQueue.addBarrierBlock {
-            let operationErrors = operations.compactMap { $0.error }
-            let errorCollection = operationErrors.count != 0 ? DataBrokerProtectionSchedulerErrorCollection(operationErrors: operationErrors) : nil
+        operationQueue.addBarrierBlock { [weak self] in
+            let errorCollection = self?.errorCollection(fromOperations: operations)
             completion?(errorCollection)
         }
+    }
+
+    func errorCollection(fromOperations operations: [DataBrokerOperation]) -> DataBrokerProtectionSchedulerErrorCollection? {
+        let operationErrors = operations.compactMap { $0.error }
+        return operationErrors.count != 0 ? DataBrokerProtectionSchedulerErrorCollection(operationErrors: operationErrors) : nil
     }
 
     func firePixels(operationDependencies: DataBrokerOperationDependencies) {
