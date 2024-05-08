@@ -240,6 +240,7 @@ final class Fire {
     @MainActor
     func burnVisits(of visits: [Visit],
                     except fireproofDomains: FireproofDomains,
+                    isToday: Bool,
                     completion: (() -> Void)? = nil) {
 
         // Get domains to burn
@@ -259,7 +260,16 @@ final class Fire {
         domains = domains.convertedToETLDPlus1(tld: tld)
 
         historyCoordinating.burnVisits(visits) {
-            self.burnEntity(entity: .none(selectedDomains: domains),
+            let entity: BurningEntity
+
+            // Burn all windows in case we are burning visits for today
+            if isToday {
+                entity = .allWindows(mainWindowControllers: self.windowControllerManager.mainWindowControllers, selectedDomains: domains)
+            } else {
+                entity = .none(selectedDomains: domains)
+            }
+
+            self.burnEntity(entity: entity,
                             includingHistory: false,
                             completion: completion)
         }

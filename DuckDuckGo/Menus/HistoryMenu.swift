@@ -248,7 +248,8 @@ final class HistoryMenu: NSMenu {
         let headerItem = ClearThisHistoryMenuItem(title: UserText.clearThisHistoryMenuItem,
                                                   action: #selector(AppDelegate.clearThisHistory(_:)),
                                                   keyEquivalent: "")
-        headerItem.setDateString(dateString)
+        let historyTimeWindow = ClearThisHistoryMenuItem.HistoryTimeWindow(dateString: dateString)
+        headerItem.setRepresentingObject(historyTimeWindow: historyTimeWindow)
         return [
             headerItem,
             .separator()
