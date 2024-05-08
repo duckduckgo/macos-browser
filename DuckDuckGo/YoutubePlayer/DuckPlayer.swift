@@ -109,22 +109,10 @@ final class DuckPlayer {
 
     // MARK: - Common Message Handlers
 
-    enum MessageOrigin {
-        case duckPlayer, serpOverlay, youtubeOverlay
-
-        init?(url: URL) {
-            switch url.host {
-            case "duckduckgo.com":
-                self = .serpOverlay
-            case "www.youtube.com":
-                self = .youtubeOverlay
-            default:
-                return nil
-            }
-        }
-    }
-
-    public func handleSetUserValuesMessage(from origin: MessageOrigin) -> (_ params: Any, _ message: UserScriptMessage) -> Encodable? {
+    // swiftlint:disable:next cyclomatic_complexity
+    public func handleSetUserValuesMessage(
+        from origin: YoutubeOverlayUserScript.MessageOrigin
+    ) -> (_ params: Any, _ message: UserScriptMessage) -> Encodable? {
 
         return { [weak self] params, _ -> Encodable? in
             guard let self else {
@@ -136,28 +124,31 @@ final class DuckPlayer {
             }
 
             self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
-            self.preferences.duckPlayerMode = userValues.duckPlayerMode
 
-            switch userValues.duckPlayerMode {
-            case .enabled:
-                switch origin {
-                case .duckPlayer:
-                    PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysDuckPlayer)
-                case .serpOverlay:
-                    PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlaySERP)
-                case .youtubeOverlay:
-                    PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlayYoutube)
-                }
-            case .alwaysAsk:
-                PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
-            case .disabled:
-                switch origin {
-                case .serpOverlay:
-                    PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlaySERP)
-                case .youtubeOverlay:
-                    PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlayYoutube)
-                default:
-                    break
+            if self.preferences.duckPlayerMode != userValues.duckPlayerMode {
+                self.preferences.duckPlayerMode = userValues.duckPlayerMode
+
+                switch userValues.duckPlayerMode {
+                case .enabled:
+                    switch origin {
+                    case .duckPlayer:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysDuckPlayer)
+                    case .serpOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlaySERP)
+                    case .youtubeOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlayYoutube)
+                    }
+                case .alwaysAsk:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
+                case .disabled:
+                    switch origin {
+                    case .serpOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlaySERP)
+                    case .youtubeOverlay:
+                        PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlayYoutube)
+                    default:
+                        break
+                    }
                 }
             }
 

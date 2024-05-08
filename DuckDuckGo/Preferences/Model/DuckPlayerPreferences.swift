@@ -49,13 +49,15 @@ final class DuckPlayerPreferences: ObservableObject {
     var duckPlayerMode: DuckPlayerMode {
         didSet {
             persistor.duckPlayerModeBool = duckPlayerMode.boolValue
-            switch duckPlayerMode {
-            case .enabled:
-                PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysSettings)
-            case .alwaysAsk:
-                PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
-            case .disabled:
-                PixelKit.fire(GeneralPixel.duckPlayerSettingNeverSettings)
+            if oldValue != duckPlayerMode {
+                switch duckPlayerMode {
+                case .enabled:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysSettings)
+                case .alwaysAsk:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
+                case .disabled:
+                    PixelKit.fire(GeneralPixel.duckPlayerSettingNeverSettings)
+                }
             }
         }
     }
