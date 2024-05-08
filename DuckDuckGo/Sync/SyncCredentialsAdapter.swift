@@ -85,6 +85,11 @@ final class SyncCredentialsAdapter {
             syncErrorCancellable = provider.syncErrorPublisher
                 .sink { [weak self] error in
                     switch error {
+                    case SyncError.patchPayloadCompressionFailed(let errorCode):
+                        PixelKit.fire(
+                            DebugEvent(GeneralPixel.syncCredentialsPatchCompressionFailed),
+                            withAdditionalParameters: ["error": "\(errorCode)"]
+                        )
                     case let syncError as SyncError:
                         PixelKit.fire(DebugEvent(GeneralPixel.syncCredentialsFailed, error: syncError))
                         switch syncError {

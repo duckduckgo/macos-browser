@@ -167,6 +167,11 @@ final class SyncBookmarksAdapter {
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { [weak self] error in
                 switch error {
+                case SyncError.patchPayloadCompressionFailed(let errorCode):
+                    PixelKit.fire(
+                        DebugEvent(GeneralPixel.syncBookmarksPatchCompressionFailed),
+                        withAdditionalParameters: ["error": "\(errorCode)"]
+                    )
                 case let syncError as SyncError:
                     PixelKit.fire(DebugEvent(GeneralPixel.syncBookmarksFailed, error: syncError))
                     switch syncError {

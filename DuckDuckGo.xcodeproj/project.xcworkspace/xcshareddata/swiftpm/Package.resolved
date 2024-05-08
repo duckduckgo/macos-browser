@@ -33,7 +33,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/sync-payload-compression",
-        "revision" : "fbfcb614f152d244b475cee704e1c28fd80a3669"
+        "revision" : "67baf349eccc3aedda20d105a11fc19339a2dec3"
       }
     },
     {

@@ -275,10 +275,13 @@ enum GeneralPixel: PixelKitEventV2 {
     case syncMetadataCouldNotLoadDatabase
     case syncBookmarksProviderInitializationFailed
     case syncBookmarksFailed
+    case syncBookmarksPatchCompressionFailed
     case syncCredentialsProviderInitializationFailed
     case syncCredentialsFailed
+    case syncCredentialsPatchCompressionFailed
     case syncSettingsFailed
     case syncSettingsMetadataUpdateFailed
+    case syncSettingsPatchCompressionFailed
     case syncSignupError(error: Error)
     case syncLoginError(error: Error)
     case syncLogoutError(error: Error)
@@ -731,10 +734,13 @@ enum GeneralPixel: PixelKitEventV2 {
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
         case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
+        case .syncBookmarksPatchCompressionFailed: return "sync_bookmarks_patch_compression_failed"
         case .syncCredentialsProviderInitializationFailed: return "sync_credentials_provider_initialization_failed"
         case .syncCredentialsFailed: return "sync_credentials_failed"
+        case .syncCredentialsPatchCompressionFailed: return "sync_credentials_patch_compression_failed"
         case .syncSettingsFailed: return "sync_settings_failed"
         case .syncSettingsMetadataUpdateFailed: return "sync_settings_metadata_update_failed"
+        case .syncSettingsPatchCompressionFailed: return "sync_settings_patch_compression_failed"
         case .syncSignupError: return "sync_signup_error"
         case .syncLoginError: return "sync_login_error"
         case .syncLogoutError: return "sync_logout_error"
