@@ -27,6 +27,7 @@ protocol AutofillPreferencesPersistor {
     var autolockLocksFormFilling: Bool { get set }
     var passwordManager: PasswordManager { get set }
     var debugScriptEnabled: Bool { get set }
+    var autofillSurveyEnabled: Bool { get set }
 }
 
 enum PasswordManager: String, CaseIterable {
@@ -148,6 +149,9 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
             }
         }
     }
+
+    @UserDefaultsWrapper(key: .autofillSurveyEnabled, defaultValue: true)
+    var autofillSurveyEnabled: Bool
 
     private var statisticsStore: StatisticsStore {
         return injectedDependencyStore ?? defaultDependencyStore
