@@ -45,7 +45,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private let brokenSiteReporter: BrokenSiteReporter = {
         BrokenSiteReporter(pixelHandler: { parameters in
-            PixelKit.fire(GeneralPixel.brokenSiteReport,
+            PixelKit.fire(NonStandardEvent(NonStandardPixel.brokenSiteReport),
                           withAdditionalParameters: parameters,
                           allowedQueryReservedCharacters: BrokenSiteReport.allowedQueryReservedCharacters)
         }, keyValueStoring: UserDefaults.standard)

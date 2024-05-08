@@ -519,13 +519,16 @@ extension MainViewController {
         }
 
         let dateString = sender.dateString
+        let isToday = sender.isToday
         let visits = sender.getVisits()
         let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
         alert.beginSheetModal(for: window, completionHandler: { response in
             guard case .alertFirstButtonReturn = response else {
                 return
             }
-            FireCoordinator.fireViewModel.fire.burnVisits(of: visits, except: FireproofDomains.shared)
+            FireCoordinator.fireViewModel.fire.burnVisits(of: visits,
+                                                          except: FireproofDomains.shared,
+                                                          isToday: isToday)
         })
     }
 

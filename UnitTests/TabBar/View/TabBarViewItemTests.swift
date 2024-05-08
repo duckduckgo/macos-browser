@@ -207,7 +207,8 @@ final class TabBarViewItemTests: XCTestCase {
         tabBarViewItem.closeButton = mouseButton
 
         // Update url
-        let tab = Tab(content: .subscription(.subscriptionPurchase))
+        let url = SubscriptionURL.purchase.subscriptionURL(environment: .production)
+        let tab = Tab(content: .subscription(url))
         delegate.mockedCurrentTab = tab
         let vm = TabViewModel(tab: tab)
         tabBarViewItem.subscribe(to: vm, tabCollectionViewModel: TabCollectionViewModel())

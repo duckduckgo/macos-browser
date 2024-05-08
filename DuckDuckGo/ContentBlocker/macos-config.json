@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1714486769720,
+    "version": 1714746648846,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -295,6 +295,9 @@
                     "domain": "www.michelinman.com"
                 },
                 {
+                    "domain": "malmostadsteater.se"
+                },
+                {
                     "domain": "marvel.com"
                 },
                 {
@@ -309,19 +312,16 @@
                 ]
             },
             "state": "enabled",
-            "hash": "bca76e26434e161140776de92c03cb5f"
+            "hash": "7096d80d39c6c9a98d98ff6bde5644e0"
         },
         "autofill": {
             "exceptions": [
                 {
                     "domain": "roll20.net"
-                },
-                {
-                    "domain": "rumble.com"
                 }
             ],
             "state": "enabled",
-            "hash": "5bb5c0fc0d462da4674e4ca07dbc9363"
+            "hash": "b1ae580a636957bcbe90d16aa92c40bd"
         },
         "clickToLoad": {
             "exceptions": [
@@ -4898,7 +4898,7 @@
                 "surveyCardDay7": "disabled",
                 "surveyCardDay14": "disabled",
                 "permanentSurvey": {
-                    "state": "internal",
+                    "state": "enabled",
                     "localization": "disabled",
                     "url": "https://selfserve.decipherinc.com/survey/selfserve/32ab/240404?list=2",
                     "firstDay": 5,
@@ -4906,7 +4906,7 @@
                     "sharePercentage": 60
                 }
             },
-            "hash": "7f7445d021268ef854b20022d0fb48e6"
+            "hash": "8a5c9011216219c6576ec362acb51fd0"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -5850,6 +5850,16 @@
                             }
                         ]
                     },
+                    "curalate.com": {
+                        "rules": [
+                            {
+                                "rule": "edge.curalate.com/sites/",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            }
+                        ]
+                    },
                     "cxense.com": {
                         "rules": [
                             {
@@ -6178,6 +6188,24 @@
                     "facebook.com": {
                         "rules": [
                             {
+                                "rule": "facebook.com/plugins/customer_chat/",
+                                "domains": [
+                                    "danibowman.com"
+                                ]
+                            },
+                            {
+                                "rule": "facebook.com/v6.0/plugins/customer_chat/",
+                                "domains": [
+                                    "danibowman.com"
+                                ]
+                            },
+                            {
+                                "rule": "facebook.com/v6.0/plugins/customerchat.php",
+                                "domains": [
+                                    "danibowman.com"
+                                ]
+                            },
+                            {
                                 "rule": "facebook.com",
                                 "domains": [
                                     "nextdoor.com"
@@ -6200,6 +6228,12 @@
                                 "rule": "connect.facebook.net/en_US/all.js",
                                 "domains": [
                                     "nordicwellness.se"
+                                ]
+                            },
+                            {
+                                "rule": "connect.facebook.net/en_US/sdk/xfbml.customerchat.js",
+                                "domains": [
+                                    "danibowman.com"
                                 ]
                             },
                             {
@@ -6770,6 +6804,12 @@
                                 "domains": [
                                     "<all>"
                                 ]
+                            },
+                            {
+                                "rule": "api.hubspot.com/livechat-public/v1/message/public",
+                                "domains": [
+                                    "<all>"
+                                ]
                             }
                         ]
                     },
@@ -7170,8 +7210,7 @@
                             {
                                 "rule": "connect.nosto.com/script/shopify/nosto.js",
                                 "domains": [
-                                    "oneill.com",
-                                    "thefryecompany.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -7219,6 +7258,12 @@
                                 "rule": "cigna.sc.omtrdc.net/public/digital-experience/js/common.js",
                                 "domains": [
                                     "cigna.com"
+                                ]
+                            },
+                            {
+                                "rule": "altriagroupinc.tt.omtrdc.net/rest/v1/delivery",
+                                "domains": [
+                                    "marlboro.com"
                                 ]
                             },
                             {
@@ -8300,7 +8345,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "e21e28c6597b4ac6ab6c03bdf359912e"
+            "hash": "8abdf819c66bc3e2391e900958ed0294"
         },
         "trackingCookies1p": {
             "settings": {

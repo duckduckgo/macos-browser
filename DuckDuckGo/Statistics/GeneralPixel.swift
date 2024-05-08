@@ -26,7 +26,6 @@ import Configuration
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
-    case brokenSiteReport
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
 
@@ -54,12 +53,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case adClickAttributionDetected
     case adClickAttributionActive
     case adClickAttributionPageLoads
-
-    case emailEnabled
-    case emailDisabled
-    case emailUserPressedUseAddress
-    case emailUserPressedUseAlias
-    case emailUserCreatedAlias
 
     case jsPixel(_ pixel: AutofillUserScript.JSPixel)
 
@@ -156,6 +149,15 @@ enum GeneralPixel: PixelKitEventV2 {
     // Password Import Keychain Prompt
     case passwordImportKeychainPrompt
     case passwordImportKeychainPromptDenied
+
+    // Autocomplete
+    case autocompleteClickPhrase
+    case autocompleteClickWebsite
+    case autocompleteClickBookmark
+    case autocompleteClickFavorite
+    case autocompleteClickHistory
+    case autocompleteToggledOff
+    case autocompleteToggledOn
 
     // MARK: - Debug
 
@@ -321,9 +323,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .crash:
             return "m_mac_crash"
 
-        case .brokenSiteReport:
-            return "epbf_macos_desktop"
-
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
 
@@ -371,13 +370,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .adClickAttributionPageLoads:
             return "m_mac_ad_click_page_loads"
 
-            // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
-        case .emailEnabled: return "email_enabled_macos_desktop"
-        case .emailDisabled: return "email_disabled_macos_desktop"
-        case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
-        case .emailUserPressedUseAlias: return "email_filled_random_macos_desktop"
-        case .emailUserCreatedAlias: return "email_generated_button_macos_desktop"
-
         case .jsPixel(let pixel):
             // Email pixels deliberately avoid using the `m_mac_` prefix.
             if pixel.isEmailPixel {
@@ -386,22 +378,22 @@ enum GeneralPixel: PixelKitEventV2 {
                 return "m_mac_\(pixel.pixelName)"
             }
         case .emailEnabledInitial:
-            return "m_mac.enable-email-protection.initial"
+            return "m_mac_enable-email-protection_initial"
 
         case .watchInDuckPlayerInitial:
-            return "m_mac.watch-in-duckplayer.initial"
+            return "m_mac_watch-in-duckplayer_initial"
         case .setAsDefaultInitial:
-            return "m_mac.set-as-default.initial"
+            return "m_mac_set-as-default_initial"
         case .importDataInitial:
-            return "m_mac.import-data.initial"
+            return "m_mac_import-data_initial"
         case .newTabInitial:
-            return "m_mac.new-tab-opened.initial"
+            return "m_mac_new-tab-opened_initial"
         case .favoriteSectionHidden:
-            return "m_mac.favorite-section-hidden"
+            return "m_mac_favorite-section-hidden"
         case .recentActivitySectionHidden:
-            return "m_mac.recent-activity-section-hidden"
+            return "m_mac_recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
-            return "m_mac.continue-setup-section-hidden"
+            return "m_mac_continue-setup-section-hidden"
 
             // Fire Button
         case .fireButtonFirstBurn:
@@ -434,11 +426,11 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_mp_wlr"
 
         case .launchInitial:
-            return "m.mac.first-launch"
+            return "m_mac_first-launch"
         case .serpInitial:
-            return "m.mac.navigation.first-search"
+            return "m_mac_navigation_first-search"
         case .serpDay21to27:
-            return "m.mac.search-day-21-27.initial"
+            return "m_mac_search-day-21-27_initial"
 
         case .vpnBreakageReport:
             return "m_mac_vpn_breakage_report"
@@ -524,6 +516,15 @@ enum GeneralPixel: PixelKitEventV2 {
             // Password Import Keychain Prompt
         case .passwordImportKeychainPrompt: return "m_mac_password_import_keychain_prompt"
         case .passwordImportKeychainPromptDenied: return "m_mac_password_import_keychain_prompt_denied"
+
+            // Autocomplete
+        case .autocompleteClickPhrase: return "m_mac_autocomplete_click_phrase"
+        case .autocompleteClickWebsite: return "m_mac_autocomplete_click_website"
+        case .autocompleteClickBookmark: return "m_mac_autocomplete_click_bookmark"
+        case .autocompleteClickFavorite: return "m_mac_autocomplete_click_favorite"
+        case .autocompleteClickHistory: return "m_mac_autocomplete_click_history"
+        case .autocompleteToggledOff: return "m_mac_autocomplete_toggled_off"
+        case .autocompleteToggledOn: return "m_mac_autocomplete_toggled_on"
 
             // DEBUG
         case .assertionFailure:
