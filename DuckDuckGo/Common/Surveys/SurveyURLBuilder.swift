@@ -96,7 +96,7 @@ final class SurveyURLBuilder {
         return components.url
     }
 
-    func addPasswordsCountSurveyParameter(to originalURLString: String) -> URL? {
+    func buildSurveyURLWithPasswordsCountSurveyParameter(from originalURLString: String) -> URL? {
         let surveyURLWithParameters = buildSurveyURL(from: originalURLString)
 
         guard let surveyURLWithParametersString = surveyURLWithParameters?.absoluteString,

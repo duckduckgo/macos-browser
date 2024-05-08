@@ -216,7 +216,7 @@ final class AutofillPreferencesModel: ObservableObject {
             daysSinceLastActive: activationDateStore.daysSinceLastActive()
         )
 
-        guard let surveyUrl = surveyURLBuilder.addPasswordsCountSurveyParameter(to: "https://selfserve.decipherinc.com/survey/selfserve/32ab/240307") else {
+        guard let surveyUrl = surveyURLBuilder.buildSurveyURLWithPasswordsCountSurveyParameter(from: "https://selfserve.decipherinc.com/survey/selfserve/32ab/240307") else {
             return
         }
 
