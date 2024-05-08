@@ -155,7 +155,7 @@ final class DataBrokerProtectionProcessor {
             completion(errorCollection)
         }
     }
-    
+
     deinit {
         os_log("Deinit DataBrokerProtectionProcessor", log: .dataBrokerProtection)
     }
