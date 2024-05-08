@@ -20,14 +20,10 @@ import Foundation
 import Common
 import BrowserServicesKit
 
-protocol OperationRunnerProvider {
-    func getOperationRunner() -> WebOperationRunner
-}
-
 final class DataBrokerProtectionProcessor {
     private let database: DataBrokerProtectionRepository
     private let config: DataBrokerProtectionProcessorConfiguration
-    private let operationRunnerProvider: OperationRunnerProvider
+    private let jobRunnerProvider: JobRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
     private var pixelHandler: EventMapping<DataBrokerProtectionPixels>
@@ -38,13 +34,14 @@ final class DataBrokerProtectionProcessor {
     init(database: DataBrokerProtectionRepository,
          config: DataBrokerProtectionProcessorConfiguration = DataBrokerProtectionProcessorConfiguration(),
          operationRunnerProvider: OperationRunnerProvider,
+         jobRunnerProvider: JobRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          userNotificationService: DataBrokerProtectionUserNotificationService) {
 
         self.database = database
         self.config = config
-        self.operationRunnerProvider = operationRunnerProvider
+        self.jobRunnerProvider = jobRunnerProvider
         self.notificationCenter = notificationCenter
         self.operationQueue = OperationQueue()
         self.pixelHandler = pixelHandler
@@ -170,7 +167,7 @@ final class DataBrokerProtectionProcessor {
                                                                 intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,
                                                                 priorityDate: priorityDate,
                                                                 notificationCenter: notificationCenter,
-                                                                runner: operationRunnerProvider.getOperationRunner(),
+                                                                runner: jobRunnerProvider.getJobRunner(),
                                                                 pixelHandler: pixelHandler,
                                                                 userNotificationService: userNotificationService,
                                                                 showWebView: showWebView)

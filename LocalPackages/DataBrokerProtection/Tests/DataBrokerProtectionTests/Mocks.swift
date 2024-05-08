@@ -966,10 +966,10 @@ final class MockSchedulerConfig: SchedulerConfig {
     let intervalBetweenSameBrokerOperations: TimeInterval = 1
 }
 
-final class MockRunnerProvider: OperationRunnerProvider {
+final class MockRunnerProvider: JobRunnerProvider {
 
-    func getOperationRunner() -> any WebOperationRunner {
-        MockWebOperationRunner()
+    func getJobRunner() -> any WebJobRunner {
+        MockWebJobRunner()
     }
 }
 

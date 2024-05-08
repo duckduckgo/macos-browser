@@ -32,7 +32,7 @@ protocol OperationsManager {
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
-                      runner: WebOperationRunner,
+                      runner: WebJobRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       showWebView: Bool,
                       isManualScan: Bool,
@@ -45,7 +45,7 @@ extension OperationsManager {
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
-                      runner: WebOperationRunner,
+                      runner: WebJobRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       userNotificationService: DataBrokerProtectionUserNotificationService,
                       isManual: Bool,
@@ -70,7 +70,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                brokerProfileQueryData: BrokerProfileQueryData,
                                database: DataBrokerProtectionRepository,
                                notificationCenter: NotificationCenter = NotificationCenter.default,
-                               runner: WebOperationRunner,
+                               runner: WebJobRunner,
                                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                showWebView: Bool = false,
                                isManualScan: Bool = false,
@@ -101,7 +101,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
-    internal func runScanOperation(on runner: WebOperationRunner,
+    internal func runScanOperation(on runner: WebJobRunner,
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
                                    notificationCenter: NotificationCenter,
@@ -269,7 +269,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
     // swiftlint:disable:next function_body_length
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
-                                     on runner: WebOperationRunner,
+                                     on runner: WebJobRunner,
                                      brokerProfileQueryData: BrokerProfileQueryData,
                                      database: DataBrokerProtectionRepository,
                                      notificationCenter: NotificationCenter,

@@ -1,5 +1,5 @@
 //
-//  DataBrokerOperation.swift
+//  DataBrokerJob.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import BrowserServicesKit
 import UserScript
 import Common
 
-protocol DataBrokerOperation: CCFCommunicationDelegate {
+protocol DataBrokerJob: CCFCommunicationDelegate {
     associatedtype ReturnValue
     associatedtype InputValue
 
@@ -53,7 +53,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     func executeCurrentAction() async
 }
 
-extension DataBrokerOperation {
+extension DataBrokerJob {
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
@@ -66,7 +66,7 @@ extension DataBrokerOperation {
     }
 }
 
-extension DataBrokerOperation {
+extension DataBrokerJob {
 
     // MARK: - Shared functions
 

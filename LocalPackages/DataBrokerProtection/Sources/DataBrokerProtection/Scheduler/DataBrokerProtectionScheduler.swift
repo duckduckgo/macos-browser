@@ -144,13 +144,13 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
-        let runnerProvider = DataBrokerOperationRunnerProvider(privacyConfigManager: privacyConfigManager,
+        let runnerProvider = DataBrokerJobRunnerProvider(privacyConfigManager: privacyConfigManager,
                                                                contentScopeProperties: contentScopeProperties,
                                                                emailService: emailService,
                                                                captchaService: captchaService)
 
         return DataBrokerProtectionProcessor(database: dataManager.database,
-                                             operationRunnerProvider: runnerProvider,
+                                             jobRunnerProvider: runnerProvider,
                                              notificationCenter: notificationCenter,
                                              pixelHandler: pixelHandler,
                                              userNotificationService: userNotificationService)

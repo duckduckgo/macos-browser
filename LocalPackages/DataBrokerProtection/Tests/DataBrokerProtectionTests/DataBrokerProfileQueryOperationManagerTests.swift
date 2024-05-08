@@ -26,7 +26,7 @@ import PixelKit
 
 final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
     let sut = DataBrokerProfileQueryOperationManager()
-    let mockWebOperationRunner = MockWebOperationRunner()
+    let mockWebOperationRunner = MockWebJobRunner()
     let mockDatabase = MockDatabase()
     let mockUserNotification = MockUserNotification()
 
@@ -932,7 +932,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
     }
 }
 
-final class MockWebOperationRunner: WebOperationRunner {
+final class MockWebJobRunner: WebJobRunner {
     var shouldScanThrow = false
     var shouldOptOutThrow = false
     var scanResults = [ExtractedProfile]()

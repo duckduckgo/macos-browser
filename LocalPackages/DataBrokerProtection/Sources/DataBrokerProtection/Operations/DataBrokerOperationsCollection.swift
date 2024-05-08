@@ -47,7 +47,7 @@ final class DataBrokerOperationsCollection: Operation {
     private let priorityDate: Date? // The date to filter and sort operations priorities
     private let operationType: OperationType
     private let notificationCenter: NotificationCenter
-    private let runner: WebOperationRunner
+    private let runner: WebJobRunner
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let showWebView: Bool
     private let userNotificationService: DataBrokerProtectionUserNotificationService
@@ -62,7 +62,7 @@ final class DataBrokerOperationsCollection: Operation {
          intervalBetweenOperations: TimeInterval? = nil,
          priorityDate: Date? = nil,
          notificationCenter: NotificationCenter = NotificationCenter.default,
-         runner: WebOperationRunner,
+         runner: WebJobRunner,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          userNotificationService: DataBrokerProtectionUserNotificationService,
          showWebView: Bool) {

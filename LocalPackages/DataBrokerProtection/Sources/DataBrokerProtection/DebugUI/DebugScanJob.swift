@@ -1,5 +1,5 @@
 //
-//  DebugScanOperation.swift
+//  DebugScanJob.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -48,7 +48,7 @@ struct EmptyCookieHandler: CookieHandler {
     }
 }
 
-final class DebugScanOperation: DataBrokerOperation {
+final class DebugScanJob: DataBrokerJob {
     typealias ReturnValue = DebugScanReturnValue
     typealias InputValue = Void
 
