@@ -43,11 +43,11 @@ class MockSyncPausedStateManaging: SyncPausedStateManaging {
         return Self.syncIsPausedData
     }
 
-    var syncBookmarksPausedMetadata: SyncPausedMessageData {
+    var syncBookmarksPausedMetadata: SyncPausedMessageData? {
         return Self.syncBookmarksPausedData
     }
 
-    var syncCredentialsPausedMetadata: SyncPausedMessageData {
+    var syncCredentialsPausedMetadata: SyncPausedMessageData? {
         return Self.syncCredentialsPausedData
     }
 

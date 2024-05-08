@@ -196,9 +196,9 @@ final class SyncErrorHandlerTests: XCTestCase {
 
         handler.handleBookmarkError(error)
 
-        XCTAssertFalse(handler.isSyncBookmarksPaused)
+        XCTAssertTrue(handler.isSyncBookmarksPaused)
         XCTAssertFalse(handler.isSyncCredentialsPaused)
-        XCTAssertTrue(handler.isSyncPaused)
+        XCTAssertFalse(handler.isSyncPaused)
     }
 
     func test_WhenHandleCredentialsError400_ThenIsSyncIsPausedIsUpdatedToTrue() async {
@@ -207,8 +207,8 @@ final class SyncErrorHandlerTests: XCTestCase {
         handler.handleCredentialError(error)
 
         XCTAssertFalse(handler.isSyncBookmarksPaused)
-        XCTAssertFalse(handler.isSyncCredentialsPaused)
-        XCTAssertTrue(handler.isSyncPaused)
+        XCTAssertTrue(handler.isSyncCredentialsPaused)
+        XCTAssertFalse(handler.isSyncPaused)
     }
 
     func test_WhenHandleBookmarksError409ForTheFirstTime_ThenAlertShown() async {
@@ -402,9 +402,9 @@ final class SyncErrorHandlerTests: XCTestCase {
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
 
-    func test_WhenHandleCredentialsError400ForTheFirstTime_ThenNoAlertShown() async {
+    func test_WhenHandleCredentialsError429ForTheFirstTime_ThenNoAlertShown() async {
         let expectation = XCTestExpectation(description: "Error handled")
-        let error = SyncError.unexpectedStatusCode(400)
+        let error = SyncError.unexpectedStatusCode(429)
 
         Task {
             handler.handleCredentialError(_:)(error)
@@ -441,9 +441,9 @@ final class SyncErrorHandlerTests: XCTestCase {
         XCTAssertFalse(alertPresenter.showAlertCalled)
     }
 
-    func test_When400ErrorFired9Times_ThenNoAlertShown() async {
+    func test_When429ErrorFired9Times_ThenNoAlertShown() async {
         let expectation = XCTestExpectation(description: "Error handled")
-        let error = SyncError.unexpectedStatusCode(400)
+        let error = SyncError.unexpectedStatusCode(429)
 
         Task {
             for _ in 0...8 {
@@ -456,9 +456,9 @@ final class SyncErrorHandlerTests: XCTestCase {
         XCTAssertFalse(alertPresenter.showAlertCalled)
     }
 
-    func test_When400ErrorFired10Times_ThenAlertShown() async {
+    func test_When429ErrorFired10Times_ThenAlertShown() async {
         let expectation = XCTestExpectation(description: "Error handled")
-        let error = SyncError.unexpectedStatusCode(400)
+        let error = SyncError.unexpectedStatusCode(429)
 
         Task {
             for _ in 0...9 {
@@ -474,9 +474,9 @@ final class SyncErrorHandlerTests: XCTestCase {
         XCTAssertTrue(abs(timeDifference) <= 5)
     }
 
-    func test_When400ErrorFired10TimesTwice_ThenAlertShownOnce() async {
+    func test_When418ErrorFired10TimesTwice_ThenAlertShownOnce() async {
         let expectation = XCTestExpectation(description: "Error handled")
-        let error = SyncError.unexpectedStatusCode(400)
+        let error = SyncError.unexpectedStatusCode(418)
 
         Task {
             for _ in 0...20 {
@@ -606,9 +606,9 @@ final class SyncErrorHandlerTests: XCTestCase {
         XCTAssertEqual(alertPresenter.showAlertCount, 1)
     }
 
-    func test_When400ErrorFiredAfter12HoursFromLastSuccessfulSync_ButNoErrorRegisteredBefore_ThenNoAlertShown() async {
+    func test_When429ErrorFiredAfter12HoursFromLastSuccessfulSync_ButNoErrorRegisteredBefore_ThenNoAlertShown() async {
         let expectation = XCTestExpectation(description: "Error handled")
-        let error = SyncError.unexpectedStatusCode(400)
+        let error = SyncError.unexpectedStatusCode(418)
         let thirteenHoursAgo = Calendar.current.date(byAdding: .hour, value: -13, to: Date())!
         userDefaults.set(thirteenHoursAgo, forKey: UserDefaultsWrapper<Date>.Key.syncLastSuccesfullTime.rawValue)
 
@@ -621,10 +621,10 @@ final class SyncErrorHandlerTests: XCTestCase {
         XCTAssertFalse(alertPresenter.showAlertCalled)
     }
 
-    func test_When400ErrorFired10Times_AndAfter24H_400ErrorFired10TimesAgain_ThenAlertShownTwice() async {
+    func test_When429ErrorFired10Times_AndAfter24H_400ErrorFired10TimesAgain_ThenAlertShownTwice() async {
         let expectation = XCTestExpectation(description: "Error handled")
         let expectation2 = XCTestExpectation(description: "SecondError handled")
-        let error = SyncError.unexpectedStatusCode(400)
+        let error = SyncError.unexpectedStatusCode(429)
 
         Task {
             for _ in 0...9 {

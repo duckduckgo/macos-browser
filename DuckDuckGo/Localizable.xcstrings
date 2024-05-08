@@ -1301,7 +1301,7 @@
     },
     "alert.sync-bad-data-error-description" : {
       "comment" : "Description for alert shown when sync error occurs because of bad data",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1355,6 +1355,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Некоторые закладки или пароли не синхронизируются из-за неверного формата или превышения ограничений по длине."
+          }
+        }
+      }
+    },
+    "alert.sync-bookmarks-bad-data-error-description" : {
+      "comment" : "Description for alert shown when sync error occurs because of bad data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some bookmarks are formatted incorrectly or too long and were not synced."
           }
         }
       }
@@ -1475,6 +1487,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Синхронизация закладок приостановлена"
+          }
+        }
+      }
+    },
+    "alert.sync-credentials-bad-data-error-description" : {
+      "comment" : "Description for alert shown when sync error occurs because of bad data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some passwords are formatted incorrectly or too long and were not synced."
           }
         }
       }
@@ -45987,6 +46011,18 @@
         }
       }
     },
+    "prefrences.sync.bad.request.description" : {
+      "comment" : "Description of incorrectly formatted data error when syncing.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some bookmarks are formatted incorrectly or too long and were not synced."
+          }
+        }
+      }
+    },
     "prefrences.sync.bookmarks-limit-exceeded-action" : {
       "comment" : "Button title for sync bookmarks limits exceeded warning to go to manage bookmarks",
       "extractionState" : "extracted_with_value",
@@ -46103,6 +46139,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Достигнуто максимальное число закладок. Чтобы возобновить синхронизацию, удалите некоторые из них."
+          }
+        }
+      }
+    },
+    "prefrences.sync.bookmarks.too-many-requests" : {
+      "comment" : "Description of too many requests error when syncing.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup is temporarily unavailable."
           }
         }
       }
@@ -46227,8 +46275,20 @@
         }
       }
     },
+    "prefrences.sync.credentials.bad.request.description" : {
+      "comment" : "Description of incorrectly formatted data error when syncing.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Some passwords are formatted incorrectly or too long and were not synced."
+          }
+        }
+      }
+    },
     "prefrences.sync.invalid-login-description" : {
-      "comment" : "Description invalid credentials error when syncing.\n   Description of incorrectly formatted data error when syncing.\n   Description of too many requests error when syncing.",
+      "comment" : "Description invalid credentials error when syncing.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "de" : {

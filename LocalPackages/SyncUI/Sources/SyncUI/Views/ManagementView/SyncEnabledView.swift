@@ -106,7 +106,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     @ViewBuilder
     func syncPaused(for itemType: LimitedItemType) -> some View {
-        var title: String {
+        var title: String? {
             switch itemType {
             case .bookmarks:
                 return model.syncBookmarksPausedTitle
@@ -114,7 +114,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 return model.syncCredentialsPausedTitle
             }
         }
-        var description: String {
+        var message: String? {
             switch itemType {
             case .bookmarks:
                 return model.syncBookmarksPausedMessage
@@ -122,7 +122,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 return model.syncCredentialsPausedMessage
             }
         }
-        var actionTitle: String {
+        var buttonTitle: String? {
             switch itemType {
             case .bookmarks:
                 return model.syncBookmarksPausedButtonTitle
@@ -130,12 +130,17 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 return model.syncCredentialsPausedButtonTitle
             }
         }
-        if let action = model.syncPausedButtonAction {
-            SyncWarningMessage(title: title, message: description, buttonTitle: actionTitle) {
-                action()
+
+        if let title,
+           let message,
+           let buttonTitle {
+            if let action = model.syncPausedButtonAction {
+                SyncWarningMessage(title: title, message: message, buttonTitle: buttonTitle) {
+                    action()
+                }
+            } else {
+                SyncWarningMessage(title: title, message: message, buttonTitle: buttonTitle)
             }
-        } else {
-            SyncWarningMessage(title: title, message: description, buttonTitle: actionTitle)
         }
     }
 

@@ -37,13 +37,13 @@ public protocol ManagementViewModel: ObservableObject {
     var syncPausedMessage: String? { get }
     var syncPausedButtonTitle: String? { get }
     var syncPausedButtonAction: (() -> Void)? { get }
-    var syncBookmarksPausedTitle: String { get }
-    var syncBookmarksPausedMessage: String { get }
-    var syncBookmarksPausedButtonTitle: String { get }
+    var syncBookmarksPausedTitle: String? { get }
+    var syncBookmarksPausedMessage: String? { get }
+    var syncBookmarksPausedButtonTitle: String? { get }
     var syncBookmarksPausedButtonAction: (() -> Void)? { get }
-    var syncCredentialsPausedTitle: String { get }
-    var syncCredentialsPausedMessage: String { get }
-    var syncCredentialsPausedButtonTitle: String { get }
+    var syncCredentialsPausedTitle: String? { get }
+    var syncCredentialsPausedMessage: String? { get }
+    var syncCredentialsPausedButtonTitle: String? { get }
     var syncCredentialsPausedButtonAction: (() -> Void)? { get }
 
     var invalidBookmarksTitles: [String] { get }

@@ -34,8 +34,8 @@ protocol SyncPausedStateManaging: ObservableObject {
     var isSyncCredentialsPaused: Bool { get }
     var syncPausedChangedPublisher: AnyPublisher<Void, Never> { get }
     var syncPausedMetadata: SyncPausedMessageData? { get }
-    var syncBookmarksPausedMetadata: SyncPausedMessageData { get }
-    var syncCredentialsPausedMetadata: SyncPausedMessageData { get }
+    var syncBookmarksPausedMetadata: SyncPausedMessageData? { get }
+    var syncCredentialsPausedMetadata: SyncPausedMessageData? { get }
 
     func syncDidTurnOff()
 }
@@ -68,36 +68,36 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         return syncPreferencesErrorHandler.syncPausedMetadata?.action
     }
 
-    var syncBookmarksPausedTitle: String {
-        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.title
+    var syncBookmarksPausedTitle: String? {
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata?.title
     }
 
-    var syncBookmarksPausedMessage: String {
-        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.description
+    var syncBookmarksPausedMessage: String? {
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata?.description
     }
 
-    var syncBookmarksPausedButtonTitle: String {
-        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.buttonTitle
+    var syncBookmarksPausedButtonTitle: String? {
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata?.buttonTitle
     }
 
     var syncBookmarksPausedButtonAction: (() -> Void)? {
-        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata.action
+        return syncPreferencesErrorHandler.syncBookmarksPausedMetadata?.action
     }
 
-    var syncCredentialsPausedTitle: String {
-        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.title
+    var syncCredentialsPausedTitle: String? {
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata?.title
     }
 
-    var syncCredentialsPausedMessage: String {
-        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.description
+    var syncCredentialsPausedMessage: String? {
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata?.description
     }
 
-    var syncCredentialsPausedButtonTitle: String {
-        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.buttonTitle
+    var syncCredentialsPausedButtonTitle: String? {
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata?.buttonTitle
     }
 
     var syncCredentialsPausedButtonAction: (() -> Void)? {
-        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata.action
+        return syncPreferencesErrorHandler.syncCredentialsPausedMetadata?.action
     }
 
     struct Consts {
