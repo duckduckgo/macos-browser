@@ -19,15 +19,6 @@
 import Foundation
 import Common
 
-protocol DataBrokerOperationErrorDelegate: AnyObject {
-    func dataBrokerOperation(_ dataBrokerOperation: DataBrokerOperation,
-                             didError error: Error,
-                             whileRunningBrokerOperationData: BrokerOperationData,
-                             withDataBrokerName dataBrokerName: String?)
-    func dataBrokerOperation(_ dataBrokerOperation: DataBrokerOperation,
-                             didErrorBeforeStartingBrokerOperations error: Error)
-}
-
 enum OperationType {
     case manualScan
     case optOut
@@ -37,7 +28,6 @@ enum OperationType {
 final class DataBrokerOperation: Operation {
 
     public var error: Error?
-    public weak var errorDelegate: DataBrokerOperationErrorDelegate?
 
     private let dataBrokerID: Int64
     private let database: DataBrokerProtectionRepository
@@ -146,7 +136,6 @@ final class DataBrokerOperation: Operation {
             allBrokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
         } catch {
             os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
-            errorDelegate?.dataBrokerOperation(self, didErrorBeforeStartingBrokerOperations: error)
             return
         }
 
@@ -196,10 +185,11 @@ final class DataBrokerOperation: Operation {
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 self.error = error
-                errorDelegate?.dataBrokerOperation(self,
-                                                   didError: error,
-                                                   whileRunningBrokerOperationData: operationData,
-                                                   withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
+
+                if let error = error as? DataBrokerProtectionError,
+                   let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
+                    pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
+                }
             }
         }
 
