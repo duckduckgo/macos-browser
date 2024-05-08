@@ -23,14 +23,13 @@ import BrowserServicesKit
 import Common
 
 protocol DBPUIScanOps: AnyObject {
-    func startScan(startDate: Date) -> Bool
     func updateCacheWithCurrentScans() async
     func getBackgroundAgentMetadata() async -> DBPBackgroundAgentMetadata?
 }
 
 final class DBPUIViewModel {
     private let dataManager: DataBrokerProtectionDataManaging
-    private let scheduler: DataBrokerProtectionScheduler
+    private let agentInterface: DataBrokerProtectionAgentInterface
 
     private let privacyConfig: PrivacyConfigurationManaging?
     private let prefs: ContentScopeProperties?
@@ -40,13 +39,13 @@ final class DBPUIViewModel {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     init(dataManager: DataBrokerProtectionDataManaging,
-         scheduler: DataBrokerProtectionScheduler,
+         agentInterface: DataBrokerProtectionAgentInterface,
          webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
          privacyConfig: PrivacyConfigurationManaging? = nil,
          prefs: ContentScopeProperties? = nil,
          webView: WKWebView? = nil) {
         self.dataManager = dataManager
-        self.scheduler = scheduler
+        self.agentInterface = agentInterface
         self.webUISettings = webUISettings
         self.privacyConfig = privacyConfig
         self.prefs = prefs
@@ -74,9 +73,8 @@ final class DBPUIViewModel {
 }
 
 extension DBPUIViewModel: DBPUIScanOps {
-    func startScan(startDate: Date) -> Bool {
-        scheduler.startManualScan(startTime: startDate)
-        return true
+    func profileSaved() {
+        agentInterface.profileSaved()
     }
 
     func updateCacheWithCurrentScans() async {
@@ -89,10 +87,6 @@ extension DBPUIViewModel: DBPUIScanOps {
     }
 
     func getBackgroundAgentMetadata() async -> DBPBackgroundAgentMetadata? {
-        return await withCheckedContinuation { continuation in
-            scheduler.getDebugMetadata { metadata in
-                continuation.resume(returning: metadata)
-            }
-        }
+        return await agentInterface.getDebugMetadata()
     }
 }

@@ -51,7 +51,7 @@ final class DataBrokerProtectionProcessor {
 
     // MARK: - Public functions
     func startManualScans(showWebView: Bool = false,
-                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+                          completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
 
         operationQueue.cancelAllOperations()
         runOperations(operationType: .manualScan,
@@ -69,7 +69,7 @@ final class DataBrokerProtectionProcessor {
     }
 
     func runAllOptOutOperations(showWebView: Bool = false,
-                                completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+                                completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
         operationQueue.cancelAllOperations()
         runOperations(operationType: .optOut,
                       priorityDate: nil,
@@ -80,7 +80,7 @@ final class DataBrokerProtectionProcessor {
     }
 
     func runQueuedOperations(showWebView: Bool = false,
-                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
+                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil ) {
         runOperations(operationType: .all,
                       priorityDate: Date(),
                       showWebView: showWebView) { errors in
@@ -90,7 +90,7 @@ final class DataBrokerProtectionProcessor {
     }
 
     func runAllOperations(showWebView: Bool = false,
-                          completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil ) {
+                          completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil ) {
         runOperations(operationType: .all,
                       priorityDate: nil,
                       showWebView: showWebView) { errors in
@@ -107,7 +107,7 @@ final class DataBrokerProtectionProcessor {
     private func runOperations(operationType: OperationType,
                                priorityDate: Date?,
                                showWebView: Bool,
-                               completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
+                               completion: @escaping ((DataBrokerProtectionAgentErrorCollection?) -> Void)) {
 
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsFor(operationType)
         // Before running new operations we check if there is any updates to the broker files.
@@ -144,14 +144,14 @@ final class DataBrokerProtectionProcessor {
         } catch {
             os_log("DataBrokerProtectionProcessor error: runOperations, error: %{public}@", log: .error, error.localizedDescription)
             operationQueue.addBarrierBlock {
-                completion(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: error))
+                completion(DataBrokerProtectionAgentErrorCollection(oneTimeError: error))
             }
             return
         }
 
         operationQueue.addBarrierBlock {
             let operationErrors = operations.compactMap { $0.error }
-            let errorCollection = operationErrors.count != 0 ? DataBrokerProtectionSchedulerErrorCollection(operationErrors: operationErrors) : nil
+            let errorCollection = operationErrors.count != 0 ? DataBrokerProtectionAgentErrorCollection(operationErrors: operationErrors) : nil
             completion(errorCollection)
         }
     }

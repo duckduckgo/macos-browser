@@ -35,10 +35,10 @@ public final class DBPBackgroundAgentMetadata: NSObject, NSSecureCoding {
     let agentSchedulerState: String
     let lastSchedulerSessionStartTimestamp: Double?
 
-    init(backgroundAgentVersion: String,
-         isAgentRunning: Bool,
-         agentSchedulerState: String,
-         lastSchedulerSessionStartTimestamp: Double?) {
+    public init(backgroundAgentVersion: String,
+                isAgentRunning: Bool,
+                agentSchedulerState: String,
+                lastSchedulerSessionStartTimestamp: Double?) {
         self.backgroundAgentVersion = backgroundAgentVersion
         self.isAgentRunning = isAgentRunning
         self.agentSchedulerState = agentSchedulerState
@@ -75,40 +75,18 @@ public final class DBPBackgroundAgentMetadata: NSObject, NSSecureCoding {
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
-public protocol IPCServerInterface: AnyObject {
+public protocol IPCServerInterface: AnyObject, DataBrokerProtectionAgentDebugCommands {
     /// Registers a connection with the server.
     ///
     /// This is the point where the server will start sending status updates to the client.
     ///
     func register()
 
-    // MARK: - Scheduler
+    // MARK: - DataBrokerProtectionAgentAppEvents
 
-    /// Start the scheduler
-    ///
-    func startScheduler(showWebView: Bool)
-
-    /// Stop the scheduler
-    ///
-    func stopScheduler()
-
-    func optOutAllBrokers(showWebView: Bool,
-                          completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func startManualScan(showWebView: Bool,
-                         startTime: Date,
-                         completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func runQueuedOperations(showWebView: Bool,
-                             completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func runAllOperations(showWebView: Bool)
-
-    // MARK: - Debugging Features
-
-    /// Opens a browser window with the specified domain
-    ///
-    func openBrowser(domain: String)
-
-    /// Returns background agent metadata for debugging purposes
-    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
+    func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
+    func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
+    func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -124,31 +102,21 @@ protocol XPCServerInterface {
     ///
     func register()
 
-    // MARK: - Scheduler
+    // MARK: - DataBrokerProtectionAgentAppEvents
 
-    /// Start the scheduler
-    ///
-    func startScheduler(showWebView: Bool)
+    func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
+    func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
+    func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void)
 
-    /// Stop the scheduler
-    ///
-    func stopScheduler()
-
-    func optOutAllBrokers(showWebView: Bool,
-                          completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func startManualScan(showWebView: Bool,
-                         startTime: Date,
-                         completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func runQueuedOperations(showWebView: Bool,
-                             completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void))
-    func runAllOperations(showWebView: Bool)
-
-    // MARK: - Debugging Features
+    // MARK: - DataBrokerProtectionAgentDebugCommands
 
     /// Opens a browser window with the specified domain
     ///
     func openBrowser(domain: String)
 
+    func startManualScan(showWebView: Bool)
+    func runQueuedOperations(showWebView: Bool)
+    func runAllOptOuts(showWebView: Bool)
     func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
 }
 
@@ -157,7 +125,7 @@ public final class DataBrokerProtectionIPCServer {
 
     /// The delegate.
     ///
-    public weak var serverDelegate: IPCServerInterface?
+    public weak var serverDelegate: DataBrokerProtectionAgentInterface?
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
@@ -179,62 +147,55 @@ public final class DataBrokerProtectionIPCServer {
 // MARK: - Outgoing communication to the clients
 
 extension DataBrokerProtectionIPCServer: IPCClientInterface {
-
-    public func schedulerStatusChanges(_ status: DataBrokerProtectionSchedulerStatus) {
-        let payload: Data
-
-        do {
-            payload = try JSONEncoder().encode(status)
-        } catch {
-            return
-        }
-
-        xpc.forEachClient { client in
-            client.schedulerStatusChanged(payload)
-        }
-    }
 }
 
 // MARK: - Incoming communication from a client
 
 extension DataBrokerProtectionIPCServer: XPCServerInterface {
+
     func register() {
-        serverDelegate?.register()
+        
     }
 
-    func startScheduler(showWebView: Bool) {
-        serverDelegate?.startScheduler(showWebView: showWebView)
+    // MARK: - DataBrokerProtectionAgentAppEvents
+
+    func profileSaved(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
+        xpcMessageReceivedCompletion(nil)
+        serverDelegate?.profileSaved()
     }
 
-    func stopScheduler() {
-        serverDelegate?.stopScheduler()
+    func dataDeleted(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
+        xpcMessageReceivedCompletion(nil)
+        serverDelegate?.dataDeleted()
     }
 
-    func optOutAllBrokers(showWebView: Bool,
-                          completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
-        serverDelegate?.optOutAllBrokers(showWebView: showWebView, completion: completion)
+    func appLaunched(xpcMessageReceivedCompletion: @escaping (Error?) -> Void) {
+        xpcMessageReceivedCompletion(nil)
+        serverDelegate?.appLaunched()
     }
 
-    func startManualScan(showWebView: Bool,
-                         startTime: Date,
-                         completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
-        serverDelegate?.startManualScan(showWebView: showWebView, startTime: startTime, completion: completion)
-    }
-
-    func runQueuedOperations(showWebView: Bool,
-                             completion: @escaping ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)) {
-        serverDelegate?.runQueuedOperations(showWebView: showWebView, completion: completion)
-    }
-
-    func runAllOperations(showWebView: Bool) {
-        serverDelegate?.runAllOperations(showWebView: showWebView)
-    }
+    // MARK: - DataBrokerProtectionAgentDebugCommands
 
     func openBrowser(domain: String) {
         serverDelegate?.openBrowser(domain: domain)
     }
 
+    func startManualScan(showWebView: Bool) {
+        serverDelegate?.startManualScan(showWebView: showWebView)
+    }
+
+    func runQueuedOperations(showWebView: Bool) {
+        serverDelegate?.runQueuedOperations(showWebView: showWebView)
+    }
+
+    func runAllOptOuts(showWebView: Bool) {
+        serverDelegate?.runAllOptOuts(showWebView: showWebView)
+    }
+
     func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void) {
-        serverDelegate?.getDebugMetadata(completion: completion)
+        Task {
+            let metaData = await serverDelegate?.getDebugMetadata()
+            completion(metaData)
+        }
     }
 }
