@@ -38,17 +38,22 @@ class AccessibilityPreferencesTests: XCTestCase {
     var mockPersistor: MockAccessibilityPreferencesPersistor!
 
     override func setUp() {
+        UserDefaultsWrapper<Any>.clearAll()
         mockPersistor = MockAccessibilityPreferencesPersistor()
-        zoom1 = DefaultZoomValue.allCases.randomElement()!
-        zoom2 = DefaultZoomValue.allCases.randomElement()!
-        zoom3 = DefaultZoomValue.allCases.randomElement()!
-        zoom4 = DefaultZoomValue.allCases.randomElement()!
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != .percent100 }
+        zoom1 = filteredCases.randomElement()!
+        zoom2 = filteredCases.randomElement()!
+        zoom3 = filteredCases.randomElement()!
+        zoom4 = filteredCases.randomElement()!
     }
 
     override func tearDown() {
         mockPersistor = nil
         zoom1 = nil
         zoom2 = nil
+        zoom3 = nil
+        zoom4 = nil
+        UserDefaultsWrapper<Any>.clearAll()
     }
 
     func test_whenPreferencesInitialized_thenItLoadsPersistedDefaultPageZoom() {
