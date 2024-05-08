@@ -22,17 +22,48 @@ import History
 
 final class ClearThisHistoryMenuItem: NSMenuItem {
 
+    enum HistoryTimeWindow {
+        case today
+        case other(dateString: String)
+
+        var isToday: Bool {
+            switch self {
+            case .today:
+                return true
+            case .other:
+                return false
+            }
+        }
+
+        var dateString: String? {
+            switch self {
+            case .today:
+                return nil
+            case .other(let dateString):
+                return dateString
+            }
+        }
+
+        init(dateString: String?) {
+            if let dateString {
+                self = .other(dateString: dateString)
+            } else {
+                self = .today
+            }
+        }
+    }
+
     // Keep the dateString for alerts so we don't need to use the formatter again
-    func setRepresentingObject(dateString: String?, isToday: Bool) {
-        representedObject = (dateString, isToday)
+    func setRepresentingObject(historyTimeWindow: HistoryTimeWindow) {
+        representedObject = historyTimeWindow
     }
 
     var dateString: String? {
-        (representedObject as? (String?, Bool))?.0
+        (representedObject as? HistoryTimeWindow)?.dateString
     }
 
     var isToday: Bool {
-        (representedObject as? (String?, Bool))?.1 ?? false
+        (representedObject as? HistoryTimeWindow)?.isToday ?? false
     }
 
     // Getting visits for the whole menu section in order to perform burning

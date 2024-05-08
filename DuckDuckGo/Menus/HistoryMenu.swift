@@ -177,7 +177,7 @@ final class HistoryMenu: NSMenu {
             let menuItem = NSMenuItem(title: "\(title.0), \(title.1)")
             let isToday = NSCalendar.current.isDateInToday(grouping.date)
             let dateString = isToday ? nil : title.1
-            let subMenuItems = makeClearThisHistoryMenuItems(with: dateString, isToday: isToday) + makeMenuItems(from: grouping)
+            let subMenuItems = makeClearThisHistoryMenuItems(with: dateString) + makeMenuItems(from: grouping)
             let submenu = NSMenu(items: subMenuItems)
             menuItem.submenu = submenu
             return menuItem
@@ -244,12 +244,12 @@ final class HistoryMenu: NSMenu {
         return dateFormatter
     }()
 
-    private func makeClearThisHistoryMenuItems(with dateString: String?,
-                                               isToday: Bool) -> [NSMenuItem] {
+    private func makeClearThisHistoryMenuItems(with dateString: String?) -> [NSMenuItem] {
         let headerItem = ClearThisHistoryMenuItem(title: UserText.clearThisHistoryMenuItem,
                                                   action: #selector(AppDelegate.clearThisHistory(_:)),
                                                   keyEquivalent: "")
-        headerItem.setRepresentingObject(dateString: dateString, isToday: isToday)
+        let historyTimeWindow = ClearThisHistoryMenuItem.HistoryTimeWindow(dateString: dateString)
+        headerItem.setRepresentingObject(historyTimeWindow: historyTimeWindow)
         return [
             headerItem,
             .separator()
