@@ -19,8 +19,6 @@
 import Common
 import Foundation
 
-typealias OperationType = DataBrokerOperation.OperationType
-
 protocol DataBrokerOperationsCreator {
     func operations(forOperationType operationType: OperationType,
                     withPriorityDate priorityDate: Date?,

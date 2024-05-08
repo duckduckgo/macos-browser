@@ -33,7 +33,6 @@ final class DataBrokerProtectionProcessor {
 
     init(database: DataBrokerProtectionRepository,
          config: DataBrokerProtectionProcessorConfiguration = DataBrokerProtectionProcessorConfiguration(),
-         operationRunnerProvider: OperationRunnerProvider,
          jobRunnerProvider: JobRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
