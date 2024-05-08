@@ -20,7 +20,6 @@ import AppKit
 import Combine
 
 final class WebViewContainerView: NSView {
-    @objc
     let webView: WebView
     weak var tab: Tab?
 
@@ -51,7 +50,6 @@ final class WebViewContainerView: NSView {
     }
 
     private var blurViewIsHiddenCancellable: AnyCancellable?
-    private var fullScreenWindowWillCloseCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     override func didAddSubview(_ subview: NSView) {
@@ -140,23 +138,6 @@ final class WebViewContainerView: NSView {
                 }
             }
             .store(in: &cancellables)
-
-        fullScreenWindowWillCloseCancellable = NotificationCenter.default.publisher(for: NSWindow.willCloseNotification, object: fullScreenWindow)
-            .sink { [weak self] notification in
-                self?.fullScreenWindowWillCloseCancellable = nil
-                let fullScreenWindowController = (notification.object as? NSWindow)?.windowController
-                DispatchQueue.main.async { [weak fullScreenWindowController] in
-                    guard let fullScreenWindowController else { return }
-                    // just in case.
-                    // if WKFullScreenWindowController receives `close()` the next time it‘s open it will crash because its _webView is nil
-                    // https://errors.duckduckgo.com/organizations/ddg/issues/3411/?project=6&referrer=release-issue-stream
-                    NSException.try {
-                        fullScreenWindowController.setValue(NSView(), forKeyPath: #keyPath(webView))
-                    }
-
-                }
-            }
-
     }
 
     override func removeFromSuperview() {
