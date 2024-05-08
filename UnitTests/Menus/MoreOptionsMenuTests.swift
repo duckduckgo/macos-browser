@@ -31,9 +31,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     var passwordManagerCoordinator: PasswordManagerCoordinator!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     var accountManager: AccountManagerMock!
-    @MainActor
     var moreOptionsMenu: MoreOptionsMenu!
-
     var internalUserDecider: InternalUserDeciderMock!
 
     var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
@@ -67,7 +65,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testThatMoreOptionMenuHasTheExpectedItems() {
+    func testThatMoreOptionMenuHasTheExpectedItemsAuthenticated() {
         moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
                                          networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
@@ -89,23 +87,47 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
         XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
 
-        accountManager.isUserAuthenticated = true
         XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
         XCTAssertTrue(moreOptionsMenu.items[14].title.hasPrefix(UserText.networkProtection))
         XCTAssertTrue(moreOptionsMenu.items[15].title.hasPrefix(UserText.identityTheftRestorationOptionsMenuItem))
         XCTAssertTrue(moreOptionsMenu.items[16].isSeparatorItem)
         XCTAssertEqual(moreOptionsMenu.items[17].title, UserText.settings)
+    }
 
-        accountManager.isUserAuthenticated = false
+    @MainActor
+    func testThatMoreOptionMenuHasTheExpectedItemsNotAuthenticated() {
+
+        accountManager = AccountManagerMock(isUserAuthenticated: false)
+        moreOptionsMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                         passwordManagerCoordinator: passwordManagerCoordinator,
+                                         networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(isInstalled: false, visible: true),
+                                         sharingMenu: NSMenu(),
+                                         internalUserDecider: internalUserDecider,
+                                         accountManager: accountManager)
+
+        XCTAssertEqual(moreOptionsMenu.items[0].title, UserText.sendFeedback)
+        XCTAssertTrue(moreOptionsMenu.items[1].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[3].title, UserText.newWindowMenuItem)
+        XCTAssertEqual(moreOptionsMenu.items[4].title, UserText.newBurnerWindowMenuItem)
+        XCTAssertTrue(moreOptionsMenu.items[5].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[6].title, UserText.zoom)
+        XCTAssertTrue(moreOptionsMenu.items[7].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[8].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionsMenu.items[9].title, UserText.downloads)
+        XCTAssertEqual(moreOptionsMenu.items[10].title, UserText.passwordManagement)
+        XCTAssertTrue(moreOptionsMenu.items[11].isSeparatorItem)
+        XCTAssertEqual(moreOptionsMenu.items[12].title, UserText.emailOptionsMenuItem)
+
         XCTAssertTrue(moreOptionsMenu.items[13].isSeparatorItem)
         XCTAssertTrue(moreOptionsMenu.items[14].title.hasPrefix(UserText.networkProtection))
         XCTAssertTrue(moreOptionsMenu.items[15].isSeparatorItem)
         XCTAssertEqual(moreOptionsMenu.items[16].title, UserText.settings)
     }
-    }
 
     // MARK: Zoom
 
+    @MainActor
     func testWhenClickingDefaultZoomInZoomSubmenuThenTheActionDelegateIsAlerted() {
         guard let zoomSubmenu = moreOptionsMenu.zoomMenuItem.submenu else {
             XCTFail("No zoom submenu available")
@@ -119,9 +141,8 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     // MARK: Preferences
-
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
-        moreOptionsMenu.performActionForItem(at: moreOptionsMenu(GeneralPixel.items.count - 1)
+        moreOptionsMenu.performActionForItem(at: moreOptionsMenu.items.count - 1)
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
     }
 
@@ -129,7 +150,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     func testWhenClickingOnBookmarkAllTabsMenuItemThenTheActionDelegateIsAlerted() throws {
         // GIVEN
-        let bookmarksMenu = try XCTUnwrap(moreOptionsMenu(GeneralPixel.item(at: 8)?.submenu)
+        let bookmarksMenu = try XCTUnwrap(moreOptionsMenu.item(at: 8)?.submenu)
         let bookmarkAllTabsIndex = try XCTUnwrap(bookmarksMenu.indexOfItem(withTitle: UserText.bookmarkAllTabs))
         let bookmarkAllTabsMenuItem = try XCTUnwrap(bookmarksMenu.items[bookmarkAllTabsIndex])
         bookmarkAllTabsMenuItem.isEnabled = true
