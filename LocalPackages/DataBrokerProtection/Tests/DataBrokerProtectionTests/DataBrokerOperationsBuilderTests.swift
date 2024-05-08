@@ -51,22 +51,22 @@ final class DataBrokerOperationsBuilderTests: XCTestCase {
         let dataBrokerProfileQueries: [BrokerProfileQueryData] = [
             .init(dataBroker: .mock(withId: 1),
                   profileQuery: .mock,
-                  scanOperationData: .mock(withBrokerId: 1)),
+                  scanJobData: .mock(withBrokerId: 1)),
             .init(dataBroker: .mock(withId: 1),
                   profileQuery: .mock,
-                  scanOperationData: .mock(withBrokerId: 1)),
+                  scanJobData: .mock(withBrokerId: 1)),
             .init(dataBroker: .mock(withId: 2),
                   profileQuery: .mock,
-                  scanOperationData: .mock(withBrokerId: 2)),
+                  scanJobData: .mock(withBrokerId: 2)),
             .init(dataBroker: .mock(withId: 2),
                   profileQuery: .mock,
-                  scanOperationData: .mock(withBrokerId: 2)),
+                  scanJobData: .mock(withBrokerId: 2)),
             .init(dataBroker: .mock(withId: 2),
                   profileQuery: .mock,
-                  scanOperationData: .mock(withBrokerId: 2)),
+                  scanJobData: .mock(withBrokerId: 2)),
             .init(dataBroker: .mock(withId: 3),
                   profileQuery: .mock,
-                  scanOperationData: .mock(withBrokerId: 2)),
+                  scanJobData: .mock(withBrokerId: 2)),
         ]
         mockDatabase.brokerProfileQueryDataToReturn = dataBrokerProfileQueries
 
