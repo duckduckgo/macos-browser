@@ -35,7 +35,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
-    private let subscriptionManager: SubscriptionManager
+    private let subscriptionManager: SubscriptionManaging
     private var accountManager: AccountManaging {
         subscriptionManager.accountManager
     }
@@ -91,7 +91,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     public init(openURLHandler: @escaping (URL) -> Void,
                 userEventHandler: @escaping (UserEvent) -> Void,
                 sheetActionHandler: SubscriptionAccessActionHandlers,
-                subscriptionManager: SubscriptionManager) {
+                subscriptionManager: SubscriptionManaging) {
         self.subscriptionManager = subscriptionManager
         self.openURLHandler = openURLHandler
         self.userEventHandler = userEventHandler

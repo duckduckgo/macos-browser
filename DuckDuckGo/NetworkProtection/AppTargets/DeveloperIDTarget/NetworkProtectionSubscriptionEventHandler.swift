@@ -25,13 +25,13 @@ import NetworkProtectionUI
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let subscriptionManager: SubscriptionManager
+    private let subscriptionManager: SubscriptionManaging
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
     private let userDefaults: UserDefaults
     private var cancellables = Set<AnyCancellable>()
 
-    init(subscriptionManager: SubscriptionManager,
+    init(subscriptionManager: SubscriptionManaging,
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
          userDefaults: UserDefaults = .netP) {

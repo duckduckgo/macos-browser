@@ -84,14 +84,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     var window: NSWindow? {
         WindowControllersManager.shared.lastKeyMainWindowController?.window
     }
-    let subscriptionManager: SubscriptionManager
+    let subscriptionManager: SubscriptionManaging
     var accountManager: AccountManaging { subscriptionManager.accountManager }
     var subscriptionPlatform: SubscriptionEnvironment.Platform { subscriptionManager.currentEnvironment.platform }
 
     let stripePurchaseFlow: StripePurchaseFlow
     let subscriptionErrorReporter = SubscriptionErrorReporter()
 
-    public init(subscriptionManager: SubscriptionManager) {
+    public init(subscriptionManager: SubscriptionManaging) {
         self.subscriptionManager = subscriptionManager
         self.stripePurchaseFlow = StripePurchaseFlow(subscriptionManager: subscriptionManager)
     }

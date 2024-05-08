@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Subscription
 import SubscriptionUI
 import enum StoreKit.StoreKitError
@@ -25,11 +25,11 @@ import PixelKit
 @available(macOS 12.0, *)
 struct SubscriptionAppStoreRestorer {
 
-    private let subscriptionManager: SubscriptionManager
+    private let subscriptionManager: SubscriptionManaging
     @MainActor var window: NSWindow? { WindowControllersManager.shared.lastKeyMainWindowController?.window }
     let subscriptionErrorReporter = SubscriptionErrorReporter()
 
-    public init(subscriptionManager: SubscriptionManager) {
+    public init(subscriptionManager: SubscriptionManaging) {
         self.subscriptionManager = subscriptionManager
     }
 

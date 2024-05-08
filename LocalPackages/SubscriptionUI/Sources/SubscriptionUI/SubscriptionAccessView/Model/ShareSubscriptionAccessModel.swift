@@ -28,9 +28,9 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var emailLabel: String { UserText.email }
     public var emailDescription: String { hasEmail ? UserText.shareModalHasEmailDescription : UserText.shareModalNoEmailDescription }
     public var emailButtonTitle: String { hasEmail ? UserText.manageEmailButton : UserText.addEmailButton }
-    private let subscriptionManager: SubscriptionManager
+    private let subscriptionManager: SubscriptionManaging
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, subscriptionManager: SubscriptionManager) {
+    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?, subscriptionManager: SubscriptionManaging) {
         self.actionHandlers = actionHandlers
         self.email = email
         self.subscriptionManager = subscriptionManager

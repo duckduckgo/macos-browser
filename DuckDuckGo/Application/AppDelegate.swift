@@ -85,7 +85,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var privacyDashboardWindow: NSWindow?
 
     private let accountManager: AccountManager
-    public let subscriptionManager: SubscriptionManager
+    public let subscriptionManager: SubscriptionManaging
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
 #if DBP
