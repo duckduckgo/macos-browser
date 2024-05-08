@@ -27,7 +27,7 @@ protocol DataBrokerProtectionLoginItemInterface: DataBrokerProtectionAgentInterf
     func enableLoginItem()
 }
 
-/// Launches a login item and then communicates with it through an IPC
+/// Launches a login item and then communicates with it through IPC
 ///
 final class DefaultDataBrokerProtectionLoginItemInterface {
     private let ipcClient: DataBrokerProtectionIPCClient
@@ -54,6 +54,7 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
     }
 
     // MARK: - DataBrokerProtectionAgentInterface
+    // MARK: - DataBrokerProtectionAgentAppEvents
 
     func profileSaved() {
         enableLoginItem()
@@ -74,7 +75,7 @@ extension DefaultDataBrokerProtectionLoginItemInterface: DataBrokerProtectionLog
         }
     }
 
-    // MARK: - Debug commands
+    // MARK: - DataBrokerProtectionAgentDebugCommands
 
     func openBrowser(domain: String) {
         ipcClient.openBrowser(domain: domain)
