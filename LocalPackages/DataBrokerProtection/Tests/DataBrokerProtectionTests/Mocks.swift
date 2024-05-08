@@ -962,7 +962,6 @@ final class MockDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBa
 }
 
 final class MockRunnerProvider: JobRunnerProvider {
-
     func getJobRunner() -> any WebJobRunner {
         MockWebJobRunner()
     }

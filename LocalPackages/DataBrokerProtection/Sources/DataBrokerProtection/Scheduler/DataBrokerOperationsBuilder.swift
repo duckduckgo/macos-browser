@@ -24,7 +24,7 @@ typealias OperationType = DataBrokerOperationsCollection.OperationType
 protocol OperationDependencies {
     var database: DataBrokerProtectionRepository { get }
     var config: SchedulerConfig { get }
-    var runnerProvider: OperationRunnerProvider { get }
+    var runnerProvider: JobRunnerProvider { get }
     var notificationCenter: NotificationCenter { get }
     var pixelHandler: EventMapping<DataBrokerProtectionPixels> { get }
     var userNotificationService: DataBrokerProtectionUserNotificationService { get }
@@ -33,7 +33,7 @@ protocol OperationDependencies {
 struct DefaultOperationDependencies: OperationDependencies {
     let database: DataBrokerProtectionRepository
     let config: SchedulerConfig
-    let runnerProvider: OperationRunnerProvider
+    let runnerProvider: JobRunnerProvider
     let notificationCenter: NotificationCenter
     let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     let userNotificationService: DataBrokerProtectionUserNotificationService
@@ -67,7 +67,7 @@ final class DefaultDataBrokerOperationsBuilder: DataBrokerOperationsBuilder {
                                                                 intervalBetweenOperations: operationDependencies.config.intervalBetweenSameBrokerOperations,
                                                                 priorityDate: priorityDate,
                                                                 notificationCenter: operationDependencies.notificationCenter,
-                                                                runner: operationDependencies.runnerProvider.getOperationRunner(),
+                                                                runner: operationDependencies.runnerProvider.getJobRunner(),
                                                                 pixelHandler: operationDependencies.pixelHandler,
                                                                 userNotificationService: operationDependencies.userNotificationService,
                                                                 showWebView: showWebView)

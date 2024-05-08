@@ -1,5 +1,5 @@
 //
-//  DataBrokerOperation.swift
+//  DataBrokerOperationsCollection.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,40 +19,32 @@
 import Foundation
 import Common
 
-enum OperationType {
-    case manualScan
-    case optOut
-    case all
+protocol DataBrokerOperationsCollectionErrorDelegate: AnyObject {
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didError error: Error,
+                                        whileRunningBrokerOperationData: BrokerOperationData,
+                                        withDataBrokerName dataBrokerName: String?)
+    func dataBrokerOperationsCollection(_ dataBrokerOperationsCollection: DataBrokerOperationsCollection,
+                                        didErrorBeforeStartingBrokerOperations error: Error)
 }
 
-protocol DataBrokerOperationDependencies {
-    var database: DataBrokerProtectionRepository { get }
-    var brokerTimeInterval: TimeInterval { get }
-    var runnerProvider: JobRunnerProvider { get }
-    var notificationCenter: NotificationCenter { get }
-    var pixelHandler: EventMapping<DataBrokerProtectionPixels> { get }
-    var userNotificationService: DataBrokerProtectionUserNotificationService { get }
-}
+final class DataBrokerOperationsCollection: Operation {
 
-struct DefaultDataBrokerOperationDependencies: DataBrokerOperationDependencies {
-    let database: DataBrokerProtectionRepository
-    let brokerTimeInterval: TimeInterval
-    let runnerProvider: JobRunnerProvider
-    let notificationCenter: NotificationCenter
-    let pixelHandler: EventMapping<DataBrokerProtectionPixels>
-    let userNotificationService: DataBrokerProtectionUserNotificationService
-}
-
-final class DataBrokerOperation: Operation {
+    enum OperationType {
+        case manualScan
+        case optOut
+        case all
+    }
 
     public var error: Error?
+    public weak var errorDelegate: DataBrokerOperationsCollectionErrorDelegate?
 
     private let dataBrokerID: Int64
     private let database: DataBrokerProtectionRepository
     private let id = UUID()
     private var _isExecuting = false
     private var _isFinished = false
-    private let brokerTimeInterval: TimeInterval? // The time in seconds to wait in-between operations
+    private let intervalBetweenOperations: TimeInterval? // The time in seconds to wait in-between operations
     private let priorityDate: Date? // The date to filter and sort operations priorities
     private let operationType: OperationType
     private let notificationCenter: NotificationCenter
@@ -66,21 +58,26 @@ final class DataBrokerOperation: Operation {
     }
 
     init(dataBrokerID: Int64,
+         database: DataBrokerProtectionRepository,
          operationType: OperationType,
+         intervalBetweenOperations: TimeInterval? = nil,
          priorityDate: Date? = nil,
-         showWebView: Bool,
-         operationDependencies: DataBrokerOperationDependencies) {
+         notificationCenter: NotificationCenter = NotificationCenter.default,
+         runner: WebJobRunner,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         userNotificationService: DataBrokerProtectionUserNotificationService,
+         showWebView: Bool) {
 
         self.dataBrokerID = dataBrokerID
+        self.database = database
+        self.intervalBetweenOperations = intervalBetweenOperations
         self.priorityDate = priorityDate
         self.operationType = operationType
+        self.notificationCenter = notificationCenter
+        self.runner = runner
+        self.pixelHandler = pixelHandler
         self.showWebView = showWebView
-        self.database = operationDependencies.database
-        self.brokerTimeInterval = operationDependencies.brokerTimeInterval
-        self.runner = operationDependencies.runnerProvider.getJobRunner()
-        self.notificationCenter = operationDependencies.notificationCenter
-        self.pixelHandler = operationDependencies.pixelHandler
-        self.userNotificationService = operationDependencies.userNotificationService
+        self.userNotificationService = userNotificationService
         super.init()
     }
 
@@ -116,19 +113,19 @@ final class DataBrokerOperation: Operation {
         }
     }
 
-    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerJobData] {
-        let operationsData: [BrokerJobData]
+    private func filterAndSortOperationsData(brokerProfileQueriesData: [BrokerProfileQueryData], operationType: OperationType, priorityDate: Date?) -> [BrokerOperationData] {
+        let operationsData: [BrokerOperationData]
 
         switch operationType {
         case .optOut:
-            operationsData = brokerProfileQueriesData.flatMap { $0.optOutJobData }
+            operationsData = brokerProfileQueriesData.flatMap { $0.optOutOperationsData }
         case .manualScan:
-            operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanJobData }
+            operationsData = brokerProfileQueriesData.filter { $0.profileQuery.deprecated == false }.compactMap { $0.scanOperationData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
         }
 
-        let filteredAndSortedOperationsData: [BrokerJobData]
+        let filteredAndSortedOperationsData: [BrokerOperationData]
 
         if let priorityDate = priorityDate {
             filteredAndSortedOperationsData = operationsData
@@ -149,6 +146,7 @@ final class DataBrokerOperation: Operation {
             allBrokerProfileQueryData = try database.fetchAllBrokerProfileQueryData()
         } catch {
             os_log("DataBrokerOperationsCollection error: runOperation, error: %{public}@", log: .error, error.localizedDescription)
+            errorDelegate?.dataBrokerOperationsCollection(self, didErrorBeforeStartingBrokerOperations: error)
             return
         }
 
@@ -190,7 +188,7 @@ final class DataBrokerOperation: Operation {
                     return !self.isCancelled
                 })
 
-                if let sleepInterval = brokerTimeInterval {
+                if let sleepInterval = intervalBetweenOperations {
                     os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
                 }
@@ -198,11 +196,10 @@ final class DataBrokerOperation: Operation {
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 self.error = error
-
-                if let error = error as? DataBrokerProtectionError,
-                   let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
-                    pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
-                }
+                errorDelegate?.dataBrokerOperationsCollection(self,
+                                                              didError: error,
+                                                              whileRunningBrokerOperationData: operationData,
+                                                              withDataBrokerName: brokerProfileQueriesData.first?.dataBroker.name)
             }
         }
 
