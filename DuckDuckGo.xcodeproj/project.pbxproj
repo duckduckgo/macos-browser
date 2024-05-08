@@ -2552,6 +2552,8 @@
 		F116A7C32BD1924B00F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C22BD1924B00F3FCF7 /* PixelKitTestingUtilities */; };
 		F116A7C72BD1925500F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C62BD1925500F3FCF7 /* PixelKitTestingUtilities */; };
 		F116A7C92BD1929000F3FCF7 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = F116A7C82BD1929000F3FCF7 /* PixelKitTestingUtilities */; };
+		F118EA852BEACC7000F77634 /* NonStandardPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA842BEACC7000F77634 /* NonStandardPixel.swift */; };
+		F118EA862BEACC7000F77634 /* NonStandardPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F118EA842BEACC7000F77634 /* NonStandardPixel.swift */; };
 		F188267C2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */; };
 		F188267D2BBEB3AA00D9AC4F /* GeneralPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */; };
 		F18826802BBEB58100D9AC4F /* PrivacyProPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */; };
@@ -4034,6 +4036,7 @@
 		EEDE50102BA360C80017F3C4 /* NetworkProtection+VPNAgentConvenienceInitializers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkProtection+VPNAgentConvenienceInitializers.swift"; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
+		F118EA842BEACC7000F77634 /* NonStandardPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonStandardPixel.swift; sourceTree = "<group>"; };
 		F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPixel.swift; sourceTree = "<group>"; };
 		F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyProPixel.swift; sourceTree = "<group>"; };
 		F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PixelKit+Assertion.swift"; sourceTree = "<group>"; };
@@ -7823,6 +7826,7 @@
 				857E5AF32A79044900FC0FB4 /* Experiment */,
 				B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */,
 				F188267B2BBEB3AA00D9AC4F /* GeneralPixel.swift */,
+				F118EA842BEACC7000F77634 /* NonStandardPixel.swift */,
 				F18826832BBEE31700D9AC4F /* PixelKit+Assertion.swift */,
 				F188267F2BBEB58100D9AC4F /* PrivacyProPixel.swift */,
 			);
@@ -10022,6 +10026,7 @@
 				3706FC38293F65D500E42796 /* BundleExtension.swift in Sources */,
 				4B9DB04B2A983B24000927DB /* NotificationService.swift in Sources */,
 				3706FC3A293F65D500E42796 /* NSOpenPanelExtensions.swift in Sources */,
+				F118EA862BEACC7000F77634 /* NonStandardPixel.swift in Sources */,
 				3706FC3B293F65D500E42796 /* FirePopover.swift in Sources */,
 				4B4D60C12A0C848E00BCD287 /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				3706FC3E293F65D500E42796 /* VariantManager.swift in Sources */,
@@ -11232,6 +11237,7 @@
 				4B9DB04A2A983B24000927DB /* NotificationService.swift in Sources */,
 				3775912D29AAC72700E26367 /* SyncPreferences.swift in Sources */,
 				F1B33DF22BAD929D001128B3 /* SubscriptionAppStoreRestorer.swift in Sources */,
+				F118EA852BEACC7000F77634 /* NonStandardPixel.swift in Sources */,
 				1DB9618329F67F6200CF5568 /* FaviconNullStore.swift in Sources */,
 				BB5789722B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift in Sources */,
 				B693954F26F04BEB0015B914 /* PaddedImageButton.swift in Sources */,
@@ -12771,8 +12777,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 144.0.0;
+				branch = fcappelli/pixelkit_invalid_name_fix;
+				kind = branch;
 			};
 		};
 		9FF521422BAA8FF300B9819B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {

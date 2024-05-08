@@ -26,7 +26,6 @@ import Configuration
 enum GeneralPixel: PixelKitEventV2 {
 
     case crash
-    case brokenSiteReport
     case compileRulesWait(onboardingShown: OnboardingShown, waitTime: CompileRulesWaitTime, result: WaitResult)
     case launchInitial(cohort: String)
 
@@ -54,12 +53,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case adClickAttributionDetected
     case adClickAttributionActive
     case adClickAttributionPageLoads
-
-    case emailEnabled
-    case emailDisabled
-    case emailUserPressedUseAddress
-    case emailUserPressedUseAlias
-    case emailUserCreatedAlias
 
     case jsPixel(_ pixel: AutofillUserScript.JSPixel)
 
@@ -321,9 +314,6 @@ enum GeneralPixel: PixelKitEventV2 {
         case .crash:
             return "m_mac_crash"
 
-        case .brokenSiteReport:
-            return "epbf_macos_desktop"
-
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
 
@@ -370,13 +360,6 @@ enum GeneralPixel: PixelKitEventV2 {
 
         case .adClickAttributionPageLoads:
             return "m_mac_ad_click_page_loads"
-
-            // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
-        case .emailEnabled: return "email_enabled_macos_desktop"
-        case .emailDisabled: return "email_disabled_macos_desktop"
-        case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
-        case .emailUserPressedUseAlias: return "email_filled_random_macos_desktop"
-        case .emailUserCreatedAlias: return "email_generated_button_macos_desktop"
 
         case .jsPixel(let pixel):
             // Email pixels deliberately avoid using the `m_mac_` prefix.

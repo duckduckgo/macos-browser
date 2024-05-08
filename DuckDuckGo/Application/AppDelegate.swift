@@ -532,7 +532,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignInNotification(_ notification: Notification) {
-        PixelKit.fire(GeneralPixel.emailEnabled)
+        PixelKit.fire(NonStandardEvent(NonStandardPixel.emailEnabled))
         if AppDelegate.isNewUser {
             PixelKit.fire(GeneralPixel.emailEnabledInitial, frequency: .legacyInitial)
         }
@@ -543,7 +543,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func emailDidSignOutNotification(_ notification: Notification) {
-        PixelKit.fire(GeneralPixel.emailDisabled)
+        PixelKit.fire(NonStandardEvent(NonStandardPixel.emailDisabled))
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
             syncService?.scheduler.notifyDataChanged()
         }
