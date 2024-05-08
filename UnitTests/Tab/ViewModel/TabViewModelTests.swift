@@ -245,7 +245,8 @@ final class TabViewModelTests: XCTestCase {
     func testWhenPreferencesDefaultZoomLevelIsSetThenTabsWebViewZoomLevelIsUpdated() {
         UserDefaultsWrapper<Any>.clearAll()
         let tabVM = TabViewModel(tab: Tab())
-        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
+        let randomZoomLevel = filteredCases.randomElement()!
         AccessibilityPreferences.shared.defaultPageZoom = randomZoomLevel
 
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
@@ -254,7 +255,8 @@ final class TabViewModelTests: XCTestCase {
     @MainActor
     func testWhenPreferencesDefaultZoomLevelIsSetAndANewTabIsOpenThenItsWebViewHasTheLatestValueOfZoomLevel() {
         UserDefaultsWrapper<Any>.clearAll()
-        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
+        let randomZoomLevel = filteredCases.randomElement()!
         AccessibilityPreferences.shared.defaultPageZoom = randomZoomLevel
 
         let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences())
@@ -268,7 +270,8 @@ final class TabViewModelTests: XCTestCase {
         UserDefaultsWrapper<Any>.clearAll()
         let url = URL(string: "https://app.asana.com/0/1")!
         let hostURL = "https://app.asana.com/"
-        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
+        let randomZoomLevel = filteredCases.randomElement()!
         AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
         var tab = Tab(url: url)
         var tabVM = TabViewModel(tab: tab)
@@ -288,7 +291,8 @@ final class TabViewModelTests: XCTestCase {
         UserDefaultsWrapper<Any>.clearAll()
         let url = URL(string: "https://app.asana.com/0/1")!
         let hostURL = "https://app.asana.com/"
-        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
+        let randomZoomLevel = filteredCases.randomElement()!
         AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
 
         // WHEN
@@ -307,7 +311,8 @@ final class TabViewModelTests: XCTestCase {
         let hostURL = "https://app.asana.com/"
         let tab = Tab(url: url)
         let tabVM = TabViewModel(tab: tab)
-        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
+        let randomZoomLevel = filteredCases.randomElement()!
 
         // WHEN
         AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
@@ -326,7 +331,8 @@ final class TabViewModelTests: XCTestCase {
         UserDefaultsWrapper<Any>.clearAll()
         let tab = Tab(url: url)
         let tabVM = TabViewModel(tab: tab)
-        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 !=  AccessibilityPreferences.shared.defaultPageZoom}
+        let randomZoomLevel = filteredCases.randomElement()!
 
         // WHEN
         tabVM.zoomWasSet(to: randomZoomLevel)
@@ -341,7 +347,8 @@ final class TabViewModelTests: XCTestCase {
         let url = URL(string: "https://app.asana.com/0/1")!
         let hostURL = "https://app.asana.com/"
         UserDefaultsWrapper<Any>.clearAll()
-        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        let filteredCases = DefaultZoomValue.allCases.filter { $0 != AccessibilityPreferences.shared.defaultPageZoom }
+        let randomZoomLevel = filteredCases.randomElement()!
         AccessibilityPreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, url: hostURL)
         let tab = Tab(url: url)
         let tabView = TabViewModel(tab: tab)
@@ -375,7 +382,11 @@ final class TabViewModelTests: XCTestCase {
         tabView.tab.webView.zoomIn()
 
         // THEN
-        XCTAssertEqual(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL), nextZoomLevel)
+        if nextZoomLevel == AccessibilityPreferences.shared.defaultPageZoom {
+            XCTAssertNil(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL))
+        } else {
+            XCTAssertEqual(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL), nextZoomLevel)
+        }
     }
 
     @MainActor
@@ -400,7 +411,11 @@ final class TabViewModelTests: XCTestCase {
         tabView.tab.webView.zoomOut()
 
         // THEN
-        XCTAssertEqual(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL), previousZoomLevel)
+        if previousZoomLevel == AccessibilityPreferences.shared.defaultPageZoom {
+            XCTAssertNil(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL))
+        } else {
+            XCTAssertEqual(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL), previousZoomLevel)
+        }
     }
 
     private func randomLevelAndAdjacent() -> (randomLevel: DefaultZoomValue, nextLevel: DefaultZoomValue, previousLevel: DefaultZoomValue) {
