@@ -21,6 +21,7 @@ import Common
 import BrowserServicesKit
 import DataBrokerProtection
 import PixelKit
+import Subscription
 
 public final class DataBrokerProtectionBackgroundManager {
 
@@ -32,6 +33,8 @@ public final class DataBrokerProtectionBackgroundManager {
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
+
+    private let subscriptionHandler: DataBrokerProtectionSubscriptionHandler
 
     private lazy var ipcServiceManager = IPCServiceManager(scheduler: scheduler, pixelHandler: pixelHandler)
 
@@ -70,12 +73,14 @@ public final class DataBrokerProtectionBackgroundManager {
     }()
 
     private init() {
-        self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
-                                           authenticationRepository: authenticationRepository)
+        self.subscriptionHandler =  DataBrokerProtectionSubscriptionHandler(accountManager: AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs)))
+        self.redeemUseCase = subscriptionHandler
         _ = ipcServiceManager
     }
 
     public func runOperationsAndStartSchedulerIfPossible() {
+        testSubscription()
+
         pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossible)
 
         do {
@@ -109,5 +114,45 @@ public final class DataBrokerProtectionBackgroundManager {
             self?.pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler)
             self?.scheduler.startScheduler()
         }
+    }
+
+    private func testSubscription() {
+        print("USER AUTH \(subscriptionHandler.isUserAuthenticated ? "YES" : "NO")")
+
+        if let token = subscriptionHandler.accessToken {
+            print("TOKEN \(token)")
+        }
+        Task {
+            switch await subscriptionHandler.hasValidEntitlement() {
+            case let .success(result):
+                print("ENTITLEMENT \(result ? "YES" : "NO")")
+            case .failure(let error):
+                print("ENTITLEMENT FAILURE \(error)")
+            }
+        }
+    }
+}
+
+extension AccountManager: DataBrokerProtectionAccountManaging {
+    public func hasEntitlement(for cachePolicy: CachePolicy) async -> Result<Bool, any Error> {
+        await hasEntitlement(for: .dataBrokerProtection, cachePolicy: cachePolicy)
+    }
+}
+
+extension DataBrokerProtectionSubscriptionHandler: DataBrokerProtectionRedeemUseCase {
+    public func shouldAskForInviteCode() -> Bool {
+        false
+    }
+
+    public func redeem(inviteCode: String) async throws {
+        print("Potato")
+    }
+
+    public func getAuthHeader() -> String? {
+
+        guard let token = accessToken else {
+            return nil
+        }
+        return "bearer \(token)"
     }
 }

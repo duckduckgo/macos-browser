@@ -24,7 +24,6 @@ import DataBrokerProtection
 import BrowserServicesKit
 import PixelKit
 import Networking
-import Subscription
 
 @objc(Application)
 final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
@@ -81,7 +80,6 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
     private let settings = DataBrokerProtectionSettings()
     private var cancellables = Set<AnyCancellable>()
     private var statusBarMenu: StatusBarMenu?
-    private lazy var accountManager = AccountManager(subscriptionAppGroup: Bundle.main.appGroup(bundle: .subs))
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -91,22 +89,6 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
         manager.runOperationsAndStartSchedulerIfPossible()
 
         setupStatusBarMenu()
-        testSubscription()
-    }
-
-    private func testSubscription() {
-        SubscriptionPurchaseEnvironment.currentServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
-        
-        print("USER AUTH \(accountManager.isUserAuthenticated ? "YES" : "NO")")
-
-        Task {
-            switch await accountManager.hasEntitlement(for: .dataBrokerProtection, cachePolicy: .reloadIgnoringLocalCacheData) {
-            case let .success(result):
-                print("ENTITLEMENT \(result ? "YES" : "NO")")
-            case .failure(let error):
-                print("ENTITLEMENT FAILURE \(error)")
-            }
-        }
     }
 
     @MainActor
