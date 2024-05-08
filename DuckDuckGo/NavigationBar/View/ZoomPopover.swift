@@ -139,10 +139,6 @@ final class ZoomPopover: NSPopover {
     override func adjustFrame(_ frame: NSRect) -> NSRect {
         let boundingFrame = self.boundingFrame
         guard !boundingFrame.isInfinite else { return frame }
-        guard let popoverWindow = self.contentViewController?.view.window else {
-            assertionFailure("no popover window")
-            return frame
-        }
         var frame = frame
         frame.origin.x = boundingFrame.midX - 36
         return frame

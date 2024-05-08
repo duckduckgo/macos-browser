@@ -347,7 +347,7 @@ final class TabViewModelTests: XCTestCase {
         let tabView = TabViewModel(tab: tab)
 
         // WHEN
-        tab.webView.resetZoomLevel()
+        tabView.tab.webView.resetZoomLevel()
 
         // THEN
         XCTAssertEqual(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL), nil)
@@ -372,7 +372,7 @@ final class TabViewModelTests: XCTestCase {
         let tabView = TabViewModel(tab: tab)
 
         // WHEN
-        tab.webView.zoomIn()
+        tabView.tab.webView.zoomIn()
 
         // THEN
         XCTAssertEqual(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL), nextZoomLevel)
@@ -397,7 +397,7 @@ final class TabViewModelTests: XCTestCase {
         let tabView = TabViewModel(tab: tab)
 
         // WHEN
-        tab.webView.zoomOut()
+        tabView.tab.webView.zoomOut()
 
         // THEN
         XCTAssertEqual(AccessibilityPreferences.shared.zoomPerWebsite(url: hostURL), previousZoomLevel)
