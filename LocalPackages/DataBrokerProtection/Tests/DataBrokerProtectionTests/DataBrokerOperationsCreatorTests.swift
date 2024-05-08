@@ -25,7 +25,7 @@ final class DataBrokerOperationsCreatorTests: XCTestCase {
 
     // Dependencies
     private var mockDatabase: MockDatabase!
-    private var mockSchedulerConfig: MockSchedulerConfig!
+    private var mockSchedulerConfig = DataBrokerProtectionProcessorConfiguration()
     private var mockRunnerProvider: MockRunnerProvider!
     private var mockPixelHandler: MockPixelHandler!
     private var mockUserNotification: MockUserNotification!
@@ -33,7 +33,6 @@ final class DataBrokerOperationsCreatorTests: XCTestCase {
 
     override func setUpWithError() throws {
         mockDatabase = MockDatabase()
-        mockSchedulerConfig = MockSchedulerConfig()
         mockRunnerProvider = MockRunnerProvider()
         mockPixelHandler = MockPixelHandler()
         mockUserNotification = MockUserNotification()

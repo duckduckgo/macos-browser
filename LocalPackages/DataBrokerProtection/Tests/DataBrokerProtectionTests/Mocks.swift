@@ -961,11 +961,6 @@ final class MockDataBrokerProtectionBackendServicePixels: DataBrokerProtectionBa
     }
 }
 
-final class MockSchedulerConfig: SchedulerConfig {
-    let concurrentOperationsDifferentBrokers = 1
-    let intervalBetweenSameBrokerOperations: TimeInterval = 1
-}
-
 final class MockRunnerProvider: JobRunnerProvider {
 
     func getJobRunner() -> any WebJobRunner {
