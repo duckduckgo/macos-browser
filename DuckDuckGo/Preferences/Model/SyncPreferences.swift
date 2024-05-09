@@ -173,7 +173,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         appearancePreferences: AppearancePreferences = .shared,
         managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
-        syncPreferencesErrorHandler: any SyncPausedStateManaging
+        syncPausedStateManager: any SyncPausedStateManaging
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
@@ -181,7 +181,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.appearancePreferences = appearancePreferences
         self.syncFeatureFlags = syncService.featureFlags
         self.userAuthenticator = userAuthenticator
-        self.syncPausedStateManager = syncPreferencesErrorHandler
+        self.syncPausedStateManager = syncPausedStateManager
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified

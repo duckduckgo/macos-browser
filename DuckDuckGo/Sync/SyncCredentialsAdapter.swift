@@ -32,9 +32,9 @@ final class SyncCredentialsAdapter {
     let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
     init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory,
-         syncAdapterErrorHandler: SyncErrorHandling) {
+         syncErrorHandler: SyncErrorHandling) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
-        self.syncErrorHandler =  syncAdapterErrorHandler
+        self.syncErrorHandler =  syncErrorHandler
         databaseCleaner = CredentialsDatabaseCleaner(
             secureVaultFactory: secureVaultFactory,
             secureVaultErrorReporter: SecureVaultReporter.shared,

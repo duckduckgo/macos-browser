@@ -99,8 +99,8 @@ final class SyncDataProviders: DataProvidersSource {
         self.bookmarksDatabase = bookmarksDatabase
         self.secureVaultFactory = secureVaultFactory
         self.syncErrorHandler = syncErrorHandler
-        bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, syncAdapterErrorHandler: syncErrorHandler)
-        credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory, syncAdapterErrorHandler: syncErrorHandler)
+        bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, syncErrorHandler: syncErrorHandler)
+        credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory, syncErrorHandler: syncErrorHandler)
         settingsAdapter = SyncSettingsAdapter()
     }
 

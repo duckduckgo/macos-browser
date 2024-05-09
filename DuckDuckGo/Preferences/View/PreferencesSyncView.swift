@@ -30,7 +30,7 @@ struct SyncView: View {
                 syncService: syncService,
                 syncBookmarksAdapter: syncDataProviders.bookmarksAdapter,
                 syncCredentialsAdapter: syncDataProviders.credentialsAdapter,
-                syncPreferencesErrorHandler: syncDataProviders.syncErrorHandler
+                syncPausedStateManager: syncDataProviders.syncErrorHandler
             )
             SyncUI.ManagementView(model: syncPreferences)
                 .onAppear {
