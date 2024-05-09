@@ -58,7 +58,6 @@ extension OSLog {
     @OSLogWrapper(AppCategories.fire) static var fire
     @OSLogWrapper(AppCategories.dataImportExport) static var dataImportExport
     @OSLogWrapper(AppCategories.pixel) static var pixel
-    @OSLogWrapper(AppCategories.contentBlocking) static var contentBlocking
     @OSLogWrapper(AppCategories.httpsUpgrade) static var httpsUpgrade
     @OSLogWrapper(AppCategories.favicons) static var favicons
     @OSLogWrapper(AppCategories.autoLock) static var autoLock
