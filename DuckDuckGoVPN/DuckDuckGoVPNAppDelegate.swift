@@ -46,14 +46,16 @@ final class DuckDuckGoVPNApplication: NSApplication {
 
         // MARK: - Configure Subscription
         let settings = VPNSettings(defaults: UserDefaults.netP)
-        let subscriptionEnvironment: SubscriptionEnvironment.ServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
-        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment)
-        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment)
-        let subscriptionsAppGroup = Bundle.main.appGroup(bundle: .subs)
-        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: UserDefaults(suiteName: subscriptionsAppGroup) ?? UserDefaults.standard,
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        //        let subscriptionEnvironment: SubscriptionEnvironment.ServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
+        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults) // TODO: the subscription environment should be matching to the VPNSettings environment, what should we do?
+        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
-        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionsAppGroup)))
+        let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
         accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
                                             entitlementsCache: entitlementsCache,
                                             subscriptionService: subscriptionService,
@@ -296,10 +298,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
 
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
-
-        // let currentServiceEnvironment: SubscriptionEnvironment.ServiceEnvironment = tunnelSettings.selectedEnvironment == .production ? .production : .staging
-        // TODO: set SubscriptionEnvironment.ServiceEnvironment across extensions and VPN
-
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
 
         setupMenuVisibility()

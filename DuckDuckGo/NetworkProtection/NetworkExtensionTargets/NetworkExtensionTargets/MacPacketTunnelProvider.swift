@@ -341,6 +341,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         // MARK: - Configure Subscription
         let settings = VPNSettings(defaults: defaults)
+        let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
         let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
@@ -350,14 +352,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                                                                            isSubscriptionEnabled: isSubscriptionEnabled,
                                                                            accessTokenProvider: { nil }
         )
-        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: UserDefaults(suiteName: Self.subscriptionsAppGroup) ?? UserDefaults.standard,
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
-
-        let subscriptionEnvironment: SubscriptionEnvironment.ServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
-
-        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment)
-        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment)
+//        let subscriptionEnvironment: SubscriptionEnvironment.ServiceEnvironment = settings.selectedEnvironment == .production ? .production : .staging
+        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults) // TODO: the subscription environment should be matching to the VPNSettings environment, what should we do?
+        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
         let accountManager = AccountManager(accessTokenStorage: tokenStore,
                                             entitlementsCache: entitlementsCache,
                                             subscriptionService: subscriptionService,
