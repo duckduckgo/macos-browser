@@ -20,7 +20,7 @@ import Foundation
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
-class MockSyncPausedStateManaging: SyncPausedStateManaging {
+class MockSyncPausedStateManaging: SyncPausedStateManaging {    
     static var syncBookmarksPausedData = SyncPausedMessageData(title: "Bookmarks Paused", description: "Something with bookmark is wrong", buttonTitle: "Manage Bookmarks", action: {print("something bookmarks")})
     static var syncCredentialsPausedData = SyncPausedMessageData(title: "Credentials Paused", description: "Something with Credentials is wrong", buttonTitle: "Manage Credentials", action: {print("something Credentials")})
     static var syncIsPausedData = SyncPausedMessageData(title: "Paused", description: "Something is wrong", buttonTitle: "", action: nil)
@@ -39,15 +39,15 @@ class MockSyncPausedStateManaging: SyncPausedStateManaging {
         isSyncPausedChangedPublisher.eraseToAnyPublisher()
     }
 
-    var syncPausedMetadata: SyncPausedMessageData? {
+    var syncPausedMessageData: SyncPausedMessageData? {
         return Self.syncIsPausedData
     }
 
-    var syncBookmarksPausedMetadata: SyncPausedMessageData? {
+    var syncBookmarksPausedMessageData: SyncPausedMessageData? {
         return Self.syncBookmarksPausedData
     }
 
-    var syncCredentialsPausedMetadata: SyncPausedMessageData? {
+    var syncCredentialsPausedMessageData: SyncPausedMessageData? {
         return Self.syncCredentialsPausedData
     }
 

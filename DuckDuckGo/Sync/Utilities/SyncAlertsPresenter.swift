@@ -24,10 +24,8 @@ public protocol SyncAlertsPresenting {
 
 public struct SyncAlertsPresenter: SyncAlertsPresenting {
     public init () {}
-    @MainActor
     public func showSyncPausedAlert(title: String, informative: String) {
-        Task {
-            await MainActor.run {
+        Task { @MainActor in
                 let alert =  NSAlert.syncPaused(title: title, informative: informative)
                 let response = alert.runModal()
 
@@ -39,6 +37,6 @@ public struct SyncAlertsPresenter: SyncAlertsPresenting {
                     break
                 }
             }
-        }
+
     }
 }

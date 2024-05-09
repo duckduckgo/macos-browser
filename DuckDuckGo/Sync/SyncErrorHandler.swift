@@ -361,7 +361,7 @@ extension SyncErrorHandler: SyncErrorHandling {
 }
 
 extension SyncErrorHandler: SyncPausedStateManaging {
-    var syncPausedMetadata: SyncPausedMessageData? {
+    var syncPausedMessageData: SyncPausedMessageData? {
         guard let syncPausedMessage else { return nil }
         guard let syncPausedTitle else { return nil }
         return SyncPausedMessageData(title: syncPausedTitle,
@@ -371,7 +371,7 @@ extension SyncErrorHandler: SyncPausedStateManaging {
     }
 
     @MainActor
-    var syncBookmarksPausedMetadata: SyncPausedMessageData? {
+    var syncBookmarksPausedMessageData: SyncPausedMessageData? {
         guard let syncBookmarksPausedMessage else { return nil }
         return SyncPausedMessageData(title: UserText.syncLimitExceededTitle,
                                      description: syncBookmarksPausedMessage,
@@ -380,7 +380,7 @@ extension SyncErrorHandler: SyncPausedStateManaging {
     }
 
     @MainActor
-    var syncCredentialsPausedMetadata: SyncPausedMessageData? {
+    var syncCredentialsPausedMessageData: SyncPausedMessageData? {
         guard let syncCredentialsPausedMessage else { return nil }
         return SyncPausedMessageData(title: UserText.syncLimitExceededTitle,
                                      description: syncCredentialsPausedMessage,
