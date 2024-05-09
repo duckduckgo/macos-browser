@@ -1717,6 +1717,10 @@
 		9F06606D2BECC2F600B8EEF1 /* SubscriptionTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 9F06606C2BECC2F600B8EEF1 /* SubscriptionTestingUtilities */; };
 		9F06606F2BECC2FE00B8EEF1 /* SubscriptionTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 9F06606E2BECC2FE00B8EEF1 /* SubscriptionTestingUtilities */; };
 		9F0660712BECC30600B8EEF1 /* SubscriptionTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 9F0660702BECC30600B8EEF1 /* SubscriptionTestingUtilities */; };
+		9F0660732BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */; };
+		9F0660742BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */; };
+		9F0660782BECC81C00B8EEF1 /* PixelCapturedParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660762BECC81800B8EEF1 /* PixelCapturedParameters.swift */; };
+		9F0660792BECC81C00B8EEF1 /* PixelCapturedParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0660762BECC81800B8EEF1 /* PixelCapturedParameters.swift */; };
 		9F0A2CF82B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0A2CF72B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift */; };
 		9F0A2CF92B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0A2CF72B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift */; };
 		9F0FFFB42BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0FFFB32BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift */; };
@@ -3486,6 +3490,8 @@
 		9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionBackgroundManager.swift; sourceTree = "<group>"; };
 		9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPMocks.swift; sourceTree = "<group>"; };
 		9DB6E7222AA0DA7A00A17F3C /* LoginItems */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LoginItems; sourceTree = "<group>"; };
+		9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAttributionPixelHandlerTests.swift; sourceTree = "<group>"; };
+		9F0660762BECC81800B8EEF1 /* PixelCapturedParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelCapturedParameters.swift; sourceTree = "<group>"; };
 		9F0A2CF72B96A58600C5B8C0 /* BaseBookmarkEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseBookmarkEntityTests.swift; sourceTree = "<group>"; };
 		9F0FFFB32BCCAE37007C87DD /* BookmarkAllTabsDialogCoordinatorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAllTabsDialogCoordinatorViewModelTests.swift; sourceTree = "<group>"; };
 		9F0FFFB72BCCAE9C007C87DD /* AddEditBookmarkDialogViewModelMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogViewModelMock.swift; sourceTree = "<group>"; };
@@ -6273,6 +6279,7 @@
 				B683097A274DCFE3004B46BB /* Database */,
 				AAEC74B92642E66600C2EFBC /* Extensions */,
 				4BA1A6CE258BF58C00F6F690 /* FileSystem */,
+				9F0660752BECC7E700B8EEF1 /* Pixel */,
 				B6AE74322609AFBB005B9B1A /* Progress */,
 				B698E5032908011E00A746A8 /* AppKitPrivateMethodsAvailabilityTests.swift */,
 				B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */,
@@ -6324,6 +6331,14 @@
 			path = DuckDuckGoDBPBackgroundAgent;
 			sourceTree = "<group>";
 		};
+		9F0660752BECC7E700B8EEF1 /* Pixel */ = {
+			isa = PBXGroup;
+			children = (
+				9F0660762BECC81800B8EEF1 /* PixelCapturedParameters.swift */,
+			);
+			path = Pixel;
+			sourceTree = "<group>";
+		};
 		9F0FFFB62BCCAE80007C87DD /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
@@ -6346,6 +6361,7 @@
 			isa = PBXGroup;
 			children = (
 				9F64346F2BECBA2800D2D8A0 /* SubscriptionRedirectManagerTests.swift */,
+				9F0660722BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift */,
 			);
 			path = Subscriptions;
 			sourceTree = "<group>";
@@ -10372,6 +10388,7 @@
 				9FAD623B2BCFDB32007F3A65 /* WebsiteInfoHelpers.swift in Sources */,
 				3706FE1F293F661700E42796 /* AppStateChangePublisherTests.swift in Sources */,
 				9FA5A0B12BC9039300153786 /* BookmarkFolderStoreMock.swift in Sources */,
+				9F0660792BECC81C00B8EEF1 /* PixelCapturedParameters.swift in Sources */,
 				3706FE20293F661700E42796 /* CLLocationManagerMock.swift in Sources */,
 				B6656E0E2B29C733008798A1 /* FileImportViewLocalizationTests.swift in Sources */,
 				B6C843DB2BA1CAB6006FDEC3 /* FilePresenterTests.swift in Sources */,
@@ -10541,6 +10558,7 @@
 				5681ED442BDBA5F900F59729 /* SyncBookmarksAdapterTests.swift in Sources */,
 				B60C6F8529B1BAD3007BFAA8 /* FileManagerTempDirReplacement.swift in Sources */,
 				567DA94629E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift in Sources */,
+				9F0660742BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */,
 				9FBD847B2BB3EC3300220859 /* MockAttributionOriginProvider.swift in Sources */,
 				3706FE82293F661700E42796 /* MockStatisticsStore.swift in Sources */,
 				9FBD84712BB3DD8400220859 /* MockAttributionsPixelHandler.swift in Sources */,
@@ -11768,6 +11786,7 @@
 				1D8C2FED2B70F5D0005E4BBD /* MockViewSnapshotRenderer.swift in Sources */,
 				B6106BAF26A7C6180013B453 /* PermissionStoreMock.swift in Sources */,
 				4B98D27A28D95F1A003C2B6F /* ChromiumFaviconsReaderTests.swift in Sources */,
+				9F0660732BECC71200B8EEF1 /* SubscriptionAttributionPixelHandlerTests.swift in Sources */,
 				986189E62A7CFB3E001B4519 /* LocalBookmarkStoreSavingTests.swift in Sources */,
 				AA652CD325DDA6E9009059CC /* LocalBookmarkManagerTests.swift in Sources */,
 				CBDD5DE329A67F2700832877 /* MockConfigurationStore.swift in Sources */,
@@ -11803,6 +11822,7 @@
 				B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */,
 				56534DED29DF252C00121467 /* CapturingDefaultBrowserProvider.swift in Sources */,
 				1D8C2FF02B70F751005E4BBD /* MockTabSnapshotStore.swift in Sources */,
+				9F0660782BECC81C00B8EEF1 /* PixelCapturedParameters.swift in Sources */,
 				1D3B1AC429378953006F4388 /* BWResponseTests.swift in Sources */,
 				B693955F26F1C17F0015B914 /* DownloadListCoordinatorTests.swift in Sources */,
 				1D3B1AC22936B816006F4388 /* BWMessageIdGeneratorTests.swift in Sources */,
