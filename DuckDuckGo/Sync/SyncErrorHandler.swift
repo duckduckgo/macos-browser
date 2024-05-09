@@ -126,8 +126,9 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
     }
 
     private func shouldShowAlertForNonActionableError() -> Bool {
+        let timeStamp = Date()
         nonActionableErrorCount += 1
-        let oneDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        let oneDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: timeStamp)!
         var lastErrorNotificationWasMoreThan24hAgo: Bool
         if let lastErrorNotificationTime {
             lastErrorNotificationWasMoreThan24hAgo = lastErrorNotificationTime < oneDayAgo
@@ -138,7 +139,7 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
         if nonActionableErrorCount >= 10 {
             nonActionableErrorCount = 0
         }
-        let twelveHoursAgo = Calendar.current.date(byAdding: .hour, value: -12, to: Date())!
+        let twelveHoursAgo = Calendar.current.date(byAdding: .hour, value: -12, to: timeStamp)!
         let noSuccessfulSyncInLast12h = nonActionableErrorCount > 1 && lastSyncSuccessTime ?? Date() <= twelveHoursAgo
 
         return lastErrorNotificationWasMoreThan24hAgo &&
