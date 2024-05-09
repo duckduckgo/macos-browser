@@ -1752,6 +1752,8 @@
 		9F6434622BEC82B700D2D8A0 /* AttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434602BEC82B700D2D8A0 /* AttributionPixelHandler.swift */; };
 		9F6434682BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434672BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift */; };
 		9F6434692BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6434672BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift */; };
+		9F64346B2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64346A2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift */; };
+		9F64346C2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F64346A2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift */; };
 		9F872D982B8DA9F800138637 /* Bookmarks+Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F872D972B8DA9F800138637 /* Bookmarks+Tab.swift */; };
 		9F872D992B8DA9F800138637 /* Bookmarks+Tab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F872D972B8DA9F800138637 /* Bookmarks+Tab.swift */; };
 		9F872D9D2B9058D000138637 /* Bookmarks+TabTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F872D9C2B9058D000138637 /* Bookmarks+TabTests.swift */; };
@@ -3498,6 +3500,7 @@
 		9F56CFB02B843F6C00BB7F11 /* BookmarksDialogViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksDialogViewFactory.swift; sourceTree = "<group>"; };
 		9F6434602BEC82B700D2D8A0 /* AttributionPixelHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributionPixelHandler.swift; sourceTree = "<group>"; };
 		9F6434672BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionRedirectManager.swift; sourceTree = "<group>"; };
+		9F64346A2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAttributionPixelHandler.swift; sourceTree = "<group>"; };
 		9F872D972B8DA9F800138637 /* Bookmarks+Tab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmarks+Tab.swift"; sourceTree = "<group>"; };
 		9F872D9C2B9058D000138637 /* Bookmarks+TabTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bookmarks+TabTests.swift"; sourceTree = "<group>"; };
 		9F872D9F2B90644800138637 /* ContextualMenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextualMenuTests.swift; sourceTree = "<group>"; };
@@ -4523,6 +4526,7 @@
 			children = (
 				7BBA7CE52BAB03C1007579A3 /* DefaultSubscriptionFeatureAvailability+DefaultInitializer.swift */,
 				9F6434672BEC9A5F00D2D8A0 /* SubscriptionRedirectManager.swift */,
+				9F64346A2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift */,
 			);
 			path = Subscription;
 			sourceTree = "<group>";
@@ -9972,6 +9976,7 @@
 				B68D21D02ACBC9FD002DA3C2 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				3706FEC6293F6F0600E42796 /* BWKeyStorage.swift in Sources */,
 				4B6785482AA8DE69008A5004 /* VPNUninstaller.swift in Sources */,
+				9F64346C2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				3706FBEC293F65D500E42796 /* EditableTextView.swift in Sources */,
 				3706FBED293F65D500E42796 /* TabCollection.swift in Sources */,
 				B6C0BB6B29AF1C7000AE8E3C /* BrowserTabView.swift in Sources */,
@@ -11112,6 +11117,7 @@
 				B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */,
 				4B4D60E02A0C875F00BCD287 /* Bundle+VPN.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
+				9F64346B2BECA38B00D2D8A0 /* SubscriptionAttributionPixelHandler.swift in Sources */,
 				B6F9BDDC2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */,
 				4B67854A2AA8DE75008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				B64C852A26942AC90048FEBE /* PermissionContextMenu.swift in Sources */,
