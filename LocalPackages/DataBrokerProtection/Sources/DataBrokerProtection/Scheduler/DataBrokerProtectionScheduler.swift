@@ -27,83 +27,7 @@ public enum DataBrokerProtectionSchedulerStatus: Codable {
     case running
 }
 
-public enum DataBrokerProtectionSchedulerError: Error {
-    case loginItemDoesNotHaveNecessaryPermissions
-    case appInWrongDirectory
-    case operationsInterrupted
-}
-
-@objc
-public class DataBrokerProtectionSchedulerErrorCollection: NSObject, NSSecureCoding {
-    /*
-     This needs to be an NSObject (rather than a struct) so it can be represented in Objective C
-     and confrom to NSSecureCoding for the IPC layer.
-     */
-
-    private enum NSSecureCodingKeys {
-        static let oneTimeError = "oneTimeError"
-        static let operationErrors = "operationErrors"
-    }
-
-    public let oneTimeError: Error?
-    public let operationErrors: [Error]?
-
-    public init(oneTimeError: Error? = nil, operationErrors: [Error]? = nil) {
-        self.oneTimeError = oneTimeError
-        self.operationErrors = operationErrors
-        super.init()
-    }
-
-    // MARK: - NSSecureCoding
-
-    public static var supportsSecureCoding: Bool {
-        return true
-    }
-
-    public func encode(with coder: NSCoder) {
-        coder.encode(oneTimeError, forKey: NSSecureCodingKeys.oneTimeError)
-        coder.encode(operationErrors, forKey: NSSecureCodingKeys.operationErrors)
-    }
-
-    public required init?(coder: NSCoder) {
-        oneTimeError = coder.decodeObject(of: NSError.self, forKey: NSSecureCodingKeys.oneTimeError)
-        operationErrors = coder.decodeArrayOfObjects(ofClass: NSError.self, forKey: NSSecureCodingKeys.operationErrors)
-    }
-}
-
-public protocol DataBrokerProtectionScheduler {
-
-    var status: DataBrokerProtectionSchedulerStatus { get }
-    var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
-
-    func startScheduler(showWebView: Bool)
-    func stopScheduler()
-
-    func optOutAllBrokers(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    func startManualScan(showWebView: Bool, startTime: Date, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    func runQueuedOperations(showWebView: Bool, completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    func runAllOperations(showWebView: Bool)
-
-    /// Debug operations
-
-    func getDebugMetadata(completion: @escaping (DBPBackgroundAgentMetadata?) -> Void)
-}
-
-extension DataBrokerProtectionScheduler {
-    public func startScheduler() {
-        startScheduler(showWebView: false)
-    }
-
-    public func runAllOperations() {
-        runAllOperations(showWebView: false)
-    }
-
-    public func startManualScan(startTime: Date) {
-        startManualScan(showWebView: false, startTime: startTime, completion: nil)
-    }
-}
-
-public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionScheduler {
+public final class DefaultDataBrokerProtectionScheduler {
 
     private enum SchedulerCycle {
         // Arbitrary numbers for now
@@ -140,7 +64,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status }
 
-    private var lastSchedulerSessionStartTimestamp: Date?
+    public var lastSchedulerSessionStartTimestamp: Date?
 
     private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
@@ -253,7 +177,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func runQueuedOperations(showWebView: Bool = false,
-                                    completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+                                    completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
         guard self.currentOperation != .manualScan else {
             os_log("Manual scan in progress, returning...", log: .dataBrokerProtection)
             return
@@ -281,7 +205,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public func startManualScan(showWebView: Bool = false,
                                 startTime: Date,
-                                completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)? = nil) {
+                                completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)? = nil) {
         pixelHandler.fire(.initialScanPreStartDuration(duration: (Date().timeIntervalSince(startTime) * 1000).rounded(.towardZero)))
         let backgroundAgentManualScanStartTime = Date()
         stopScheduler()
@@ -306,7 +230,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
             if let errors = errors {
                 if let oneTimeError = errors.oneTimeError {
                     switch oneTimeError {
-                    case DataBrokerProtectionSchedulerError.operationsInterrupted:
+                    case DataBrokerProtectionAgentInterfaceError.operationsInterrupted:
                         os_log("Interrupted during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
                     default:
                         os_log("Error during DefaultDataBrokerProtectionScheduler.startManualScan in dataBrokerProcessor.runAllScanOperations(), error: %{public}@", log: .dataBrokerProtection, oneTimeError.localizedDescription)
@@ -336,7 +260,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func optOutAllBrokers(showWebView: Bool = false,
-                                 completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+                                 completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
 
         guard self.currentOperation != .manualScan else {
             os_log("Manual scan in progress, returning...", log: .dataBrokerProtection)
@@ -361,23 +285,9 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
             completion?(errors)
         })
     }
-
-    public func getDebugMetadata(completion: (DBPBackgroundAgentMetadata?) -> Void) {
-        if let backgroundAgentVersion = Bundle.main.releaseVersionNumber, let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
-            completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: backgroundAgentVersion + " (build: \(buildNumber))",
-                                                  isAgentRunning: status == .running,
-                                                  agentSchedulerState: status.toString,
-                                                  lastSchedulerSessionStartTimestamp: lastSchedulerSessionStartTimestamp?.timeIntervalSince1970))
-        } else {
-            completion(DBPBackgroundAgentMetadata(backgroundAgentVersion: "ERROR: Error fetching background agent version",
-                                                  isAgentRunning: status == .running,
-                                                  agentSchedulerState: status.toString,
-                                                  lastSchedulerSessionStartTimestamp: lastSchedulerSessionStartTimestamp?.timeIntervalSince1970))
-        }
-    }
 }
 
-extension DataBrokerProtectionSchedulerStatus {
+public extension DataBrokerProtectionSchedulerStatus {
     var toString: String {
         switch self {
         case .idle:

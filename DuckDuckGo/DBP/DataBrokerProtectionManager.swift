@@ -48,11 +48,8 @@ public final class DataBrokerProtectionManager {
                                              loginItemStatusChecker: loginItemStatusChecker)
     }()
 
-    lazy var scheduler: DataBrokerProtectionLoginItemScheduler = {
-
-        let ipcScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
-
-        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler)
+    lazy var loginItemInterface: DataBrokerProtectionLoginItemInterface = {
+        return DefaultDataBrokerProtectionLoginItemInterface(ipcClient: ipcClient)
     }()
 
     private init() {
@@ -74,14 +71,14 @@ public final class DataBrokerProtectionManager {
 
 extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
     public func dataBrokerProtectionDataManagerDidUpdateData() {
-        scheduler.startScheduler()
+        loginItemInterface.profileSaved()
 
         let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
         dbpDateStore.setActivationDateIfNecessary()
     }
 
     public func dataBrokerProtectionDataManagerDidDeleteData() {
-        scheduler.stopScheduler()
+        loginItemInterface.dataDeleted()
     }
 }
 

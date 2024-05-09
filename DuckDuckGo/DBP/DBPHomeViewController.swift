@@ -61,7 +61,7 @@ final class DBPHomeViewController: NSViewController {
                                            featureToggles: features)
 
         return DataBrokerProtectionViewController(
-            scheduler: dataBrokerProtectionManager.scheduler,
+            agentInterface: dataBrokerProtectionManager.loginItemInterface,
             dataManager: dataBrokerProtectionManager.dataManager,
             privacyConfig: privacyConfigurationManager,
             prefs: prefs,
