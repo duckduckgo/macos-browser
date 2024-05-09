@@ -78,9 +78,9 @@ public class SyncErrorHandler: EventMapping<SyncError>, ObservableObject {
     private var currentSyncCredentialsPausedError: AsyncErrorType?
     private var currentSyncBookmarksPausedError: AsyncErrorType?
 
-    let alertPresenter: AlertPresenting
+    let alertPresenter: SyncAlertsPresenting
 
-    public init(alertPresenter: AlertPresenting = StandardAlertPresenter()) {
+    public init(alertPresenter: SyncAlertsPresenting = SyncAlertsPresenter()) {
         self.alertPresenter = alertPresenter
         super.init { event, _, _, _ in
             PixelKit.fire(DebugEvent(GeneralPixel.syncSentUnauthenticatedRequest, error: event))

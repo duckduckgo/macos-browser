@@ -1749,55 +1749,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Sync hat einen Fehler festgestellt. Bitte deaktiviere die Synchronisierung und stelle die Verbindung mit deinem Wiederherstellungscode wieder her."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Sync encountered an error. Please disable sync and reconnect using your recovery code."
+            "value" : "Sync has been paused. If you want to continue syncing this device, reconnect using another device or your recovery code."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Se ha producido un error en la sincronización. Desactiva la sincronización y vuelve a conectarte con tu código de recuperación."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "La synchronisation a rencontré une erreur. Veuillez désactiver la synchronisation et vous reconnecter à l’aide de votre code de récupération."
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Sync ha riscontrato un errore. Disattiva la sincronizzazione e riconnettiti utilizzando il codice di ripristino."
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Er is een fout opgetreden bij het synchroniseren. Schakel de synchronisatie uit en maak opnieuw verbinding met je herstelcode."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Podczas synchronizacji wystąpił błąd. Wyłącz synchronizację i ponownie nawiąż połączenie za pomocą kodu odzyskiwania."
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Erro durante a sincronização. Desativa a sincronização e inicia sessão novamente com o teu código de recuperação."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Произошла ошибка синхронизации. Отключите ее и выполните повторную привязку с помощью кода восстановления."
           }
         }

@@ -1,5 +1,5 @@
 //
-//  AlertPresenter.swift
+//  SyncAlertsPresenter.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -18,11 +18,11 @@
 
 import Foundation
 
-public protocol AlertPresenting {
+public protocol SyncAlertsPresenting {
     func showSyncPausedAlert(title: String, informative: String)
 }
 
-public struct StandardAlertPresenter: AlertPresenting {
+public struct SyncAlertsPresenter: SyncAlertsPresenting {
     public init () {}
     @MainActor
     public func showSyncPausedAlert(title: String, informative: String) {

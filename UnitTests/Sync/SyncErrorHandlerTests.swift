@@ -515,7 +515,7 @@ final class SyncErrorHandlerTests: XCTestCase {
     }
 }
 
-class CapturingAlertPresenter: AlertPresenting {
+class CapturingAlertPresenter: SyncAlertsPresenting {
     var showAlertCalled = false
     var showAlertCount = 0
     func showSyncPausedAlert(title: String, informative: String) {
