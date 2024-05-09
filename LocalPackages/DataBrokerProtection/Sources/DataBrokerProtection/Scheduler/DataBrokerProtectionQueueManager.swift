@@ -45,7 +45,7 @@ enum DataBrokerProtectionQueueMode {
     }
 }
 
-protocol DataBrokerProtectionQueueManager: DataBrokerDebugCommandExecutor {
+protocol DataBrokerProtectionQueueManager {
 
     init(operationQueue: DataBrokerProtectionOperationQueue,
          operationsCreator: DataBrokerOperationsCreator,
@@ -110,19 +110,6 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
 
     func stopAllOperations() {
         cancelOperationsAndCallCompletion(forMode: mode)
-    }
-}
-
-extension DefaultDataBrokerProtectionQueueManager {
-    func execute(_ command: DataBrokerDebugCommand) {
-        guard case .startOptOutOperations(let showWebView,
-                                          let operationDependencies,
-                                          let completion) = command else { return }
-
-        addOperations(withType: .optOut,
-                      showWebView: showWebView,
-                      operationDependencies: operationDependencies,
-                      completion: completion)
     }
 }
 

@@ -222,24 +222,4 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 3)
         XCTAssert(errorCollection.operationErrors?.count == 5)
     }
-
-    // Test execute debug
-    func testWhenCallDebugOptOutCommand_thenOptOutOperationsAreCreated() throws {
-        // Given
-        sut = DefaultDataBrokerProtectionQueueManager(operationQueue: mockQueue,
-                                                      operationsCreator: mockOperationsCreator,
-                                                      mismatchCalculator: mockMismatchCalculator,
-                                                      brokerUpdater: mockUpdater)
-        let expectedConcurrentOperations = DataBrokerProtectionProcessorConfiguration().concurrentOperationsFor(.optOut)
-        XCTAssert(mockOperationsCreator.createdType == .scan)
-
-        // When
-        sut.execute(.startOptOutOperations(showWebView: false,
-                                           operationDependencies: mockDependencies,
-                                           completion: nil))
-
-        // Then
-        XCTAssert(mockOperationsCreator.createdType == .optOut)
-        XCTAssertEqual(mockQueue.maxConcurrentOperationCount, expectedConcurrentOperations)
-    }
 }
