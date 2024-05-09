@@ -45,7 +45,7 @@ final class SyncPreferencesTests: XCTestCase {
     var appearancePersistor = MockAppearancePreferencesPersistor()
     var appearancePreferences: AppearancePreferences!
     var syncPreferences: SyncPreferences!
-    var errorHandler: MockSyncPausedStateManaging!
+    var pausedStateManager: MockSyncPausedStateManaging!
     var testRecoveryCode = "some code"
     var cancellables: Set<AnyCancellable>!
 
@@ -57,7 +57,7 @@ final class SyncPreferencesTests: XCTestCase {
         setUpDatabase()
         appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
         ddgSyncing = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
-        errorHandler = MockSyncPausedStateManaging()
+        pausedStateManager = MockSyncPausedStateManaging()
 
         syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences, syncAdapterErrorHandler: SyncErrorHandler())
         syncCredentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: AutofillSecureVaultFactory, syncAdapterErrorHandler: SyncErrorHandler())
@@ -69,14 +69,14 @@ final class SyncPreferencesTests: XCTestCase {
             appearancePreferences: appearancePreferences,
             managementDialogModel: managementDialogModel,
             userAuthenticator: MockUserAuthenticator(),
-            syncPreferencesErrorHandler: errorHandler
+            syncPausedStateManager: pausedStateManager
         )
     }
 
     override func tearDown() {
         ddgSyncing = nil
         syncPreferences = nil
-        errorHandler = nil
+        pausedStateManager = nil
         tearDownDatabase()
     }
 
@@ -167,8 +167,8 @@ final class SyncPreferencesTests: XCTestCase {
             .store(in: &cancellables)
 
         Task {
-            errorHandler.isSyncPaused = true
-            errorHandler.isSyncPausedChangedPublisher.send()
+            pausedStateManager.isSyncPaused = true
+            pausedStateManager.isSyncPausedChangedPublisher.send()
             expectation1.fulfill()
         }
 
@@ -188,8 +188,8 @@ final class SyncPreferencesTests: XCTestCase {
             .store(in: &cancellables)
 
         Task {
-            errorHandler.isSyncBookmarksPaused = true
-            errorHandler.isSyncPausedChangedPublisher.send()
+            pausedStateManager.isSyncBookmarksPaused = true
+            pausedStateManager.isSyncPausedChangedPublisher.send()
             expectation1.fulfill()
         }
 
@@ -209,8 +209,8 @@ final class SyncPreferencesTests: XCTestCase {
             .store(in: &cancellables)
 
         Task {
-            errorHandler.isSyncCredentialsPaused = true
-            errorHandler.isSyncPausedChangedPublisher.send()
+            pausedStateManager.isSyncCredentialsPaused = true
+            pausedStateManager.isSyncPausedChangedPublisher.send()
             expectation1.fulfill()
         }
 
@@ -227,7 +227,7 @@ final class SyncPreferencesTests: XCTestCase {
         }
 
         await fulfillment(of: [expectation], timeout: 5.0)
-        XCTAssertTrue(errorHandler.syncDidTurnOffCalled)
+        XCTAssertTrue(pausedStateManager.syncDidTurnOffCalled)
     }
 
     @MainActor
@@ -240,7 +240,7 @@ final class SyncPreferencesTests: XCTestCase {
         }
 
         await fulfillment(of: [expectation], timeout: 5.0)
-        XCTAssertTrue(errorHandler.syncDidTurnOffCalled)
+        XCTAssertTrue(pausedStateManager.syncDidTurnOffCalled)
     }
 
     func test_ErrorHandlerReturnsExpectedSyncBookmarksPausedMetadata() {
