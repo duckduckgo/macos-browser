@@ -376,7 +376,7 @@ extension SyncErrorHandler: SyncPausedStateManaging {
         return SyncPausedMessageData(title: UserText.syncLimitExceededTitle,
                                      description: syncBookmarksPausedMessage,
                                      buttonTitle: "",
-                                     action: nil)
+                                     action: manageBookmarks)
     }
 
     @MainActor
@@ -385,7 +385,7 @@ extension SyncErrorHandler: SyncPausedStateManaging {
         return SyncPausedMessageData(title: UserText.syncLimitExceededTitle,
                                      description: syncCredentialsPausedMessage,
                                      buttonTitle: "",
-                                     action: nil)
+                                     action: manageLogins)
     }
 
     var syncPausedChangedPublisher: AnyPublisher<Void, Never> {
