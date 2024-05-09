@@ -192,6 +192,79 @@ final class FireTests: XCTestCase {
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
     }
 
+    func testWhenBurnVisitIsCalledForTodayThenAllExistingTabsAreCleared() {
+        let manager = WebCacheManagerMock()
+        let historyCoordinator = HistoryCoordinatingMock()
+        let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
+        let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+
+        let fire = Fire(cacheManager: manager,
+                        historyCoordinating: historyCoordinator,
+                        permissionManager: permissionManager,
+                        windowControllerManager: WindowControllersManager.shared,
+                        faviconManagement: faviconManager,
+                        recentlyClosedCoordinator: recentlyClosedCoordinator,
+                        tld: ContentBlocking.shared.tld)
+        let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
+        _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
+        XCTAssertNotEqual(tabCollectionViewModel.allTabsCount, 0)
+
+        let finishedBurningExpectation = expectation(description: "Finished burning")
+        fire.burnVisits(of: [],
+                        except: FireproofDomains.shared,
+                        isToday: true,
+                        completion: {
+            finishedBurningExpectation.fulfill()
+        })
+
+        waitForExpectations(timeout: 5)
+        XCTAssertEqual(tabCollectionViewModel.allTabsCount, 0)
+        XCTAssert(manager.clearCalled)
+        XCTAssert(historyCoordinator.burnVisitsCalled)
+        XCTAssertFalse(historyCoordinator.burnAllCalled)
+        XCTAssert(permissionManager.burnPermissionsOfDomainsCalled)
+        XCTAssertFalse(permissionManager.burnPermissionsCalled)
+        XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+    }
+
+    func testWhenBurnVisitIsCalledForOtherDayThenExistingTabsRemainOpen() {
+        let manager = WebCacheManagerMock()
+        let historyCoordinator = HistoryCoordinatingMock()
+        let permissionManager = PermissionManagerMock()
+        let faviconManager = FaviconManagerMock()
+        let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
+
+        let fire = Fire(cacheManager: manager,
+                        historyCoordinating: historyCoordinator,
+                        permissionManager: permissionManager,
+                        windowControllerManager: WindowControllersManager.shared,
+                        faviconManagement: faviconManager,
+                        recentlyClosedCoordinator: recentlyClosedCoordinator,
+                        tld: ContentBlocking.shared.tld)
+        let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
+        _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
+        XCTAssertNotEqual(tabCollectionViewModel.allTabsCount, 0)
+        let numberOfTabs = tabCollectionViewModel.allTabsCount
+
+        let finishedBurningExpectation = expectation(description: "Finished burning")
+        fire.burnVisits(of: [],
+                        except: FireproofDomains.shared,
+                        isToday: false,
+                        completion: {
+            finishedBurningExpectation.fulfill()
+        })
+
+        waitForExpectations(timeout: 5)
+        XCTAssertEqual(tabCollectionViewModel.allTabsCount, numberOfTabs)
+        XCTAssert(manager.clearCalled)
+        XCTAssert(historyCoordinator.burnVisitsCalled)
+        XCTAssertFalse(historyCoordinator.burnAllCalled)
+        XCTAssert(permissionManager.burnPermissionsOfDomainsCalled)
+        XCTAssertFalse(permissionManager.burnPermissionsCalled)
+        XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
+    }
+
     func preparePersistedState(withFileName fileName: String) -> FileStore {
         let fileStore = FileStoreMock()
         let state = SavedStateMock()

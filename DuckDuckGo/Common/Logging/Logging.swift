@@ -58,7 +58,6 @@ extension OSLog {
     @OSLogWrapper(.fire) static var fire
     @OSLogWrapper(.dataImportExport) static var dataImportExport
     @OSLogWrapper(.pixel) static var pixel
-    @OSLogWrapper(.contentBlocking) static var contentBlocking
     @OSLogWrapper(.httpsUpgrade) static var httpsUpgrade
     @OSLogWrapper(.favicons) static var favicons
     @OSLogWrapper(.autoLock) static var autoLock
