@@ -172,7 +172,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
                 operationQueue.addOperation(collection)
             }
         } catch {
-            os_log("DataBrokerProtectionProcessor error: runOperations, error: %{public}@", log: .error, error.localizedDescription)
+            os_log("DataBrokerProtectionProcessor error: addOperations, error: %{public}@", log: .error, error.localizedDescription)
             completion?(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: error))
             return
         }
