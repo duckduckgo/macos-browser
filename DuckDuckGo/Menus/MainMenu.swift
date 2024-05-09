@@ -619,21 +619,26 @@ import SubscriptionUI
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
-            let currentEnvironmentWrapper = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionEnvironment.ServiceEnvironment.default)
-            let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
+            let isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false) // TODO: Is this still used??
+            let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
+            let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
 
-            SubscriptionDebugMenu(currentEnvironment: { currentEnvironmentWrapper.wrappedValue.rawValue },
-                                  updateEnvironment: {
-                guard let newEnvironment = SubscriptionEnvironment.ServiceEnvironment(rawValue: $0) else { return }
-                currentEnvironmentWrapper.wrappedValue = newEnvironment
-//                SubscriptionPurchaseEnvironment.currentServiceEnvironment = newEnvironment // TODO: reimplement debug menu for change of environment 
-                VPNSettings(defaults: .netP).selectedEnvironment = newEnvironment == .staging ? .staging : .production
-            },
+            var currentEnvironment: SubscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+            let updateServiceEnvironment: (SubscriptionEnvironment.ServiceEnvironment) -> Void = { env in
+                currentEnvironment.serviceEnvironment = env
+                SubscriptionManager.save(subscriptionEnvironment: currentEnvironment, userDefaults: subscriptionUserDefaults)
+            }
+            let updatePurchasingPlatform: (SubscriptionEnvironment.Platform) -> Void = { platform in
+                currentEnvironment.platform = platform
+                SubscriptionManager.save(subscriptionEnvironment: currentEnvironment, userDefaults: subscriptionUserDefaults)
+            }
+
+            SubscriptionDebugMenu(currentEnvironment: currentEnvironment,
+                                  updateServiceEnvironment: updateServiceEnvironment,
+                                  updatePurchasingPlatform: updatePurchasingPlatform,
                                   isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
                                   updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
-                                  currentViewController: {
-                WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            },
+                                  currentViewController: { WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController },
                                   subscriptionManager: Application.appDelegate.subscriptionManager)
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())

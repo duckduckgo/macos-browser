@@ -21,8 +21,10 @@ import Subscription
 
 public final class SubscriptionDebugMenu: NSMenuItem {
 
-    var currentEnvironment: () -> String
-    var updateEnvironment: (String) -> Void
+    var currentEnvironment: SubscriptionEnvironment
+    var updateServiceEnvironment: (SubscriptionEnvironment.ServiceEnvironment) -> Void
+    var updatePurchasingPlatform: (SubscriptionEnvironment.Platform) -> Void
+
     var isInternalTestingEnabled: () -> Bool
     var updateInternalTestingFlag: (Bool) -> Void
 
@@ -48,14 +50,16 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(currentEnvironment: @escaping () -> String,
-                updateEnvironment: @escaping (String) -> Void,
+    public init(currentEnvironment: SubscriptionEnvironment,
+                updateServiceEnvironment: @escaping (SubscriptionEnvironment.ServiceEnvironment) -> Void,
+                updatePurchasingPlatform: @escaping (SubscriptionEnvironment.Platform) -> Void,
                 isInternalTestingEnabled: @escaping () -> Bool,
                 updateInternalTestingFlag: @escaping (Bool) -> Void,
                 currentViewController: @escaping () -> NSViewController?,
                 subscriptionManager: SubscriptionManaging) {
         self.currentEnvironment = currentEnvironment
-        self.updateEnvironment = updateEnvironment
+        self.updateServiceEnvironment = updateServiceEnvironment
+        self.updatePurchasingPlatform = updatePurchasingPlatform
         self.isInternalTestingEnabled = isInternalTestingEnabled
         self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
@@ -107,7 +111,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private func makePurchasePlatformSubmenu() -> NSMenu {
         let menu = NSMenu(title: "Select purchase platform:")
         let appStoreItem = NSMenuItem(title: "App Store", action: #selector(setPlatformToAppStore), target: self)
-        if subscriptionManager.currentEnvironment.platform == .appStore {
+        if currentEnvironment.platform == .appStore {
             appStoreItem.state = .on
             appStoreItem.isEnabled = false
             appStoreItem.action = nil
@@ -116,7 +120,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(appStoreItem)
 
         let stripeItem = NSMenuItem(title: "Stripe", action: #selector(setPlatformToStripe), target: self)
-        if subscriptionManager.currentEnvironment.platform == .stripe {
+        if currentEnvironment.platform == .stripe {
             stripeItem.state = .on
             stripeItem.isEnabled = false
             stripeItem.action = nil
@@ -126,7 +130,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
         menu.addItem(.separator())
 
-        let disclaimerItem = NSMenuItem(title: "⚠️ Change not persisted between app restarts", action: nil, target: nil)
+        let disclaimerItem = NSMenuItem(title: "⚠️ App restart required! The changes are persistent", action: nil, target: nil)
         menu.addItem(disclaimerItem)
 
         return menu
@@ -135,11 +139,10 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     private func makeEnvironmentSubmenu() -> NSMenu {
         let menu = NSMenu(title: "Select environment:")
 
-        let currentEnvironment = currentEnvironment()
-
         let stagingItem = NSMenuItem(title: "Staging", action: #selector(setEnvironmentToStaging), target: self)
-        stagingItem.state = currentEnvironment == "staging" ? .on : .off
-        if currentEnvironment == "staging" {
+        let isStaging = currentEnvironment.serviceEnvironment == .staging
+        stagingItem.state = isStaging ? .on : .off
+        if isStaging {
             stagingItem.isEnabled = false
             stagingItem.action = nil
             stagingItem.target = nil
@@ -147,13 +150,17 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(stagingItem)
 
         let productionItem = NSMenuItem(title: "Production", action: #selector(setEnvironmentToProduction), target: self)
-        productionItem.state = currentEnvironment == "production" ? .on : .off
-        if currentEnvironment == "production" {
+        let isProduction = currentEnvironment.serviceEnvironment == .production
+        productionItem.state = isProduction ? .on : .off
+        if isProduction {
             productionItem.isEnabled = false
             productionItem.action = nil
             productionItem.target = nil
         }
         menu.addItem(productionItem)
+
+        let disclaimerItem = NSMenuItem(title: "⚠️ App restart required! The changes are persistent", action: nil, target: nil)
+        menu.addItem(disclaimerItem)
 
         return menu
     }
@@ -242,6 +249,8 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         }
     }
 
+    // MARK: - Platform
+
     @IBAction func setPlatformToAppStore(_ sender: Any?) {
         askAndUpdatePlatform(to: .appStore)
     }
@@ -252,36 +261,43 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     private func askAndUpdatePlatform(to newPlatform: SubscriptionEnvironment.Platform) {
         let alert = makeAlert(title: "Are you sure you want to change the purchase platform to \(newPlatform.rawValue.capitalized)",
-                              message: "This setting is not persisted between app runs. After restarting the app it returns to the default determined on app's distribution method.",
+                              message: "This setting IS persisted between app runs. This action will close the app, do you want to proceed?",
                               buttonNames: ["Yes", "No"])
         let response = alert.runModal()
-
         guard case .alertFirstButtonReturn = response else { return }
-
-//        subscriptionManager.currentEnvironment.platform = newPlatform // TODO: In debug menus set subscription environments in user defaults and restart the app every time the environment is changed
-
-        refreshSubmenu()
+        updatePurchasingPlatform(newPlatform)
+        closeTheApp()
     }
 
+    // MARK: - Environment
+
     @IBAction func setEnvironmentToStaging(_ sender: Any?) {
-        askAndUpdateEnvironment(to: "staging")
+        askAndUpdateServiceEnvironment(to: SubscriptionEnvironment.ServiceEnvironment.staging)
     }
 
     @IBAction func setEnvironmentToProduction(_ sender: Any?) {
-        askAndUpdateEnvironment(to: "production")
+        askAndUpdateServiceEnvironment(to: SubscriptionEnvironment.ServiceEnvironment.production)
     }
 
-    private func askAndUpdateEnvironment(to newEnvironmentString: String) {
-        let alert = makeAlert(title: "Are you sure you want to change the environment to \(newEnvironmentString.capitalized)",
-                              message: "Please make sure you have manually removed your current active Subscription and reset all related features. \nYou may also need to change environment of related features.",
+    private func askAndUpdateServiceEnvironment(to newServiceEnvironment: SubscriptionEnvironment.ServiceEnvironment) {
+        let alert = makeAlert(title: "Are you sure you want to change the environment to \(newServiceEnvironment.description.capitalized)",
+                              message: """
+                              Please make sure you have manually removed your current active Subscription and reset all related features.
+                              You may also need to change environment of related features.
+                              This setting IS persisted between app runs. This action will close the app, do you want to proceed?
+                              """,
                               buttonNames: ["Yes", "No"])
         let response = alert.runModal()
-
         guard case .alertFirstButtonReturn = response else { return }
-
-        updateEnvironment(newEnvironmentString)
-        refreshSubmenu()
+        updateServiceEnvironment(newServiceEnvironment)
+        closeTheApp()
     }
+
+    func closeTheApp() {
+      NSApp.terminate(self)
+    }
+
+    // MARK: -
 
     @objc
     func postDidSignInNotification(_ sender: Any?) {

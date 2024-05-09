@@ -84,7 +84,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
 
-    private let accountManager: AccountManager
+    private var accountManager: AccountManaging {
+        subscriptionManager.accountManager
+    }
     public let subscriptionManager: SubscriptionManaging
 
     private var networkProtectionSubscriptionEventHandler: NetworkProtectionSubscriptionEventHandler?
@@ -179,24 +181,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         // MARK: - Configure Subscription
-
-#if APPSTORE || !STRIPE
-        let subscriptionPurchaseEnvironment: SubscriptionEnvironment.Platform = .appStore
-#else
-        let subscriptionPurchaseEnvironment: SubscriptionEnvironment.Platform = .stripe
-#endif
-
-        // Load subscription environment and re-configure SubscriptionManager if needed
-        let serviceEnvironment = UserDefaultsWrapper(key: .subscriptionEnvironment, defaultValue: SubscriptionEnvironment.ServiceEnvironment.default).wrappedValue
-
         let subscriptionAppGroup = Bundle.main.appGroup(bundle: .subs)
-        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: UserDefaults(suiteName: subscriptionAppGroup) ?? UserDefaults.standard,
+        let subscriptionUserDefaults = UserDefaults(suiteName: subscriptionAppGroup)!
+        let subscriptionEnvironment = SubscriptionManager.getSavedOrDefaultEnvironment(userDefaults: subscriptionUserDefaults)
+        let entitlementsCache = UserDefaultsCache<[Entitlement]>(userDefaults: subscriptionUserDefaults,
                                                                  key: UserDefaultsCacheKey.subscriptionEntitlements,
                                                                  settings: UserDefaultsCacheSettings(defaultExpirationInterval: .minutes(20)))
         let accessTokenStorage = SubscriptionTokenKeychainStorage(keychainType: .dataProtection(.named(subscriptionAppGroup)))
-        let subscriptionService = SubscriptionService(currentServiceEnvironment: serviceEnvironment)
-        let authService = AuthService(currentServiceEnvironment: serviceEnvironment)
-        accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
+        let subscriptionService = SubscriptionService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let authService = AuthService(currentServiceEnvironment: subscriptionEnvironment.serviceEnvironment)
+        let accountManager = AccountManager(accessTokenStorage: accessTokenStorage,
                                         entitlementsCache: entitlementsCache,
                                         subscriptionService: subscriptionService,
                                         authService: authService)
@@ -207,14 +201,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                                       accountManager: accountManager,
                                                       subscriptionService: subscriptionService,
                                                       authService: authService,
-                                                      currentServiceEnvironment: serviceEnvironment,
-                                                      current: subscriptionPurchaseEnvironment)
+                                                      subscriptionEnvironment: subscriptionEnvironment)
         } else {
             subscriptionManager = SubscriptionManager(accountManager: accountManager,
                                                       subscriptionService: subscriptionService,
                                                       authService: authService,
-                                                      currentServiceEnvironment: serviceEnvironment,
-                                                      current: subscriptionPurchaseEnvironment)
+                                                      subscriptionEnvironment: subscriptionEnvironment)
         }
     }
 
