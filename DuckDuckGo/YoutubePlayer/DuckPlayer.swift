@@ -123,13 +123,12 @@ final class DuckPlayer {
                 return nil
             }
 
-            self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
+            let modeDidChange = self.preferences.duckPlayerMode != userValues.duckPlayerMode
+            let overlayDidInteract = !self.preferences.youtubeOverlayInteracted && userValues.overlayInteracted
 
-            if self.preferences.duckPlayerMode != userValues.duckPlayerMode {
+            if modeDidChange {
                 self.preferences.duckPlayerMode = userValues.duckPlayerMode
-
-                switch userValues.duckPlayerMode {
-                case .enabled:
+                if case .enabled = userValues.duckPlayerMode {
                     switch origin {
                     case .duckPlayer:
                         PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysDuckPlayer)
@@ -138,9 +137,18 @@ final class DuckPlayer {
                     case .youtubeOverlay:
                         PixelKit.fire(GeneralPixel.duckPlayerSettingAlwaysOverlayYoutube)
                     }
-                case .alwaysAsk:
-                    PixelKit.fire(GeneralPixel.duckPlayerSettingBackToDefault)
-                case .disabled:
+                }
+            }
+
+            if overlayDidInteract {
+                self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
+
+                // If user checks "Remember my choice" and clicks "Watch here", we won't show
+                // the overlay anymore, but will keep presenting Dax logos (the mode stays at
+                // "alwaysAsk" which may be a bit counterintuitive, but it's the overlayInteracted
+                // flag that plays a role here. We want to track users opting in to not showing overlays,
+                // hence fiting the pixel here.
+                if userValues.duckPlayerMode == .alwaysAsk {
                     switch origin {
                     case .serpOverlay:
                         PixelKit.fire(GeneralPixel.duckPlayerSettingNeverOverlaySERP)
