@@ -19,6 +19,7 @@
 import Foundation
 import PixelKit
 
+// A type that send pixels that needs attributions parameters.
 protocol AttributionPixelHandler {
     func fireAttributionPixel(
         event: PixelKit.Event,

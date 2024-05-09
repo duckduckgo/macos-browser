@@ -25,7 +25,6 @@ protocol SubscriptionRedirectManager: AnyObject {
 }
 
 final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
-
     private let featureAvailabiltyProvider: () -> Bool
     private let originStore: SubscriptionOriginStorage
 
@@ -58,5 +57,4 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
         originQueryItem
             .flatMap(URL.subscriptionBaseURL.appendingQueryItem(_:)) ?? URL.subscriptionBaseURL
     }
-
 }
