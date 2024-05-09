@@ -141,6 +141,7 @@ final class WebViewContainerView: NSView {
             }
             .store(in: &cancellables)
 
+        // https://app.asana.com/0/72649045549333/1206959015087322/f
         if #unavailable(macOS 14.4) {
             fullScreenWindowWillCloseCancellable = NotificationCenter.default.publisher(for: NSWindow.willCloseNotification, object: fullScreenWindow)
                 .sink { [weak self] notification in
