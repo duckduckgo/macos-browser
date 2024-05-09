@@ -26,9 +26,14 @@ protocol SubscriptionRedirectManager: AnyObject {
 
 final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
 
+    private let featureAvailabiltyProvider: () -> Bool
     private let originStore: SubscriptionOriginStorage
 
-    init(originStore: SubscriptionOriginStorage = SubscriptionOriginStore(userDefaults: .subs)) {
+    init(
+        featureAvailabiltyProvider: @escaping @autoclosure () -> Bool = DefaultSubscriptionFeatureAvailability().isFeatureAvailable,
+        originStore: SubscriptionOriginStorage = SubscriptionOriginStore(userDefaults: .subs)
+    ) {
+        self.featureAvailabiltyProvider = featureAvailabiltyProvider
         self.originStore = originStore
     }
 
@@ -36,7 +41,7 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
         guard url.isPart(ofDomain: "duckduckgo.com") else { return nil }
 
         if url.pathComponents == URL.privacyPro.pathComponents {
-            let isFeatureAvailable = DefaultSubscriptionFeatureAvailability().isFeatureAvailable
+            let isFeatureAvailable = featureAvailabiltyProvider()
             let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
             // Look for `origin` query parameter and store in the UserDefaults.
