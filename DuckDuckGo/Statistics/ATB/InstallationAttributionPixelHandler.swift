@@ -36,3 +36,7 @@ extension GenericAttributionPixelHandler: InstallationAttributionsPixelHandler {
     }
 
 }
+
+extension GenericAttributionPixelHandler {
+    static let installation = GenericAttributionPixelHandler(originProvider: AttributionOriginFileProvider())
+}
