@@ -193,6 +193,9 @@ public struct UserDefaultsWrapper<T> {
         case syncLastErrorNotificationTime = "sync.last-error-notification-time"
         case syncLastSuccesfullTime = "sync.last-time-success"
         case syncLastNonActionableErrorCount = "sync.non-actionable-error-count"
+        case syncCurrentAllPausedError = "sync.current-all-paused-error"
+        case syncCurrentBookmarksPausedError = "sync.current-bookmarks-paused-error"
+        case syncCurrentCredentialsPausedError = "sync.current-credentials-paused-error"
 
         // Subscription
 
