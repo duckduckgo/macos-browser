@@ -41,7 +41,7 @@ final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
-    let syncAdapterErrorHandler: SyncErrorHandling
+    let syncErrorHandler: SyncErrorHandling
 
     @Published
     var isFaviconsFetchingEnabled: Bool = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false).wrappedValue {
@@ -71,7 +71,7 @@ final class SyncBookmarksAdapter {
         self.database = database
         self.bookmarkManager = bookmarkManager
         self.appearancePreferences = appearancePreferences
-        self.syncAdapterErrorHandler = syncAdapterErrorHandler
+        self.syncErrorHandler = syncAdapterErrorHandler
         databaseCleaner = BookmarkDatabaseCleaner(
             bookmarkDatabase: database,
             errorEvents: BookmarksCleanupErrorHandling(),
@@ -108,7 +108,7 @@ final class SyncBookmarksAdapter {
             metricsEvents: metricsEventsHandler,
             log: OSLog.sync,
             syncDidUpdateData: { [weak self] in
-                self?.syncAdapterErrorHandler.syncBookmarksSucceded()
+                self?.syncErrorHandler.syncBookmarksSucceded()
                 guard let manager = self?.bookmarkManager as? LocalBookmarkManager else { return }
                 manager.loadBookmarks()
             },
@@ -159,7 +159,7 @@ final class SyncBookmarksAdapter {
     private func bindSyncErrorPublisher(_ provider: BookmarksProvider) {
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { [weak self] error in
-                self?.syncAdapterErrorHandler.handleBookmarkError(error)
+                self?.syncErrorHandler.handleBookmarkError(error)
             }
     }
 

@@ -28,13 +28,13 @@ final class SyncCredentialsAdapter {
 
     private(set) var provider: CredentialsProvider?
     let databaseCleaner: CredentialsDatabaseCleaner
-    let syncAdapterErrorHandler: SyncErrorHandling
+    let syncErrorHandler: SyncErrorHandling
     let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
     init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory,
          syncAdapterErrorHandler: SyncErrorHandling) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
-        self.syncAdapterErrorHandler =  syncAdapterErrorHandler
+        self.syncErrorHandler =  syncAdapterErrorHandler
         databaseCleaner = CredentialsDatabaseCleaner(
             secureVaultFactory: secureVaultFactory,
             secureVaultErrorReporter: SecureVaultReporter.shared,
@@ -70,13 +70,13 @@ final class SyncCredentialsAdapter {
                 log: OSLog.sync,
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
-                    self?.syncAdapterErrorHandler.syncCredentialsSucceded()
+                    self?.syncErrorHandler.syncCredentialsSucceded()
                 }
             )
 
             syncErrorCancellable = provider.syncErrorPublisher
                 .sink { [weak self] error in
-                    self?.syncAdapterErrorHandler.handleCredentialError(error)
+                    self?.syncErrorHandler.handleCredentialError(error)
                 }
 
             self.provider = provider
