@@ -90,6 +90,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         self.broker = broker
     }
 
+    private let subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler
+
+    init(subscriptionSuccessPixelHandler: SubscriptionAttributionPixelHandler = GenericAttributionPixelHandler.subscription) {
+        self.subscriptionSuccessPixelHandler = subscriptionSuccessPixelHandler
+    }
+
     struct Handlers {
         static let getSubscription = "getSubscription"
         static let setSubscription = "setSubscription"
@@ -287,6 +293,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     os_log(.info, log: .subscription, "[Purchase] Purchase complete")
                     PixelKit.fire(PrivacyProPixel.privacyProPurchaseSuccess, frequency: .dailyAndCount)
                     PixelKit.fire(PrivacyProPixel.privacyProSubscriptionActivated, frequency: .unique)
+                    subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
                     await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
                 case .failure(let error):
                     switch error {
@@ -420,6 +427,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         await mainViewController?.dismiss(progressViewController)
 
         PixelKit.fire(PrivacyProPixel.privacyProPurchaseStripeSuccess, frequency: .dailyAndCount)
+        subscriptionSuccessPixelHandler.fireSuccessfulSubscriptionAttributionPixel()
         return [String: String]() // cannot be nil, the web app expect something back before redirecting the user to the final page
     }
 
