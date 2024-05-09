@@ -1049,23 +1049,50 @@ final class MockDataBrokerProtectionOperationQueue: OperationQueue {
 }
 
 final class MockDataBrokerOperation: DataBrokerOperation {
-    convenience init(id: Int64, operationType: OperationType) {
+
+    private var shouldSleep = false
+
+    convenience init(id: Int64,
+                     operationType: OperationType,
+                     errorDelegate: DataBrokerOperationErrorDelegate,
+                     shouldError: Bool = false,
+                     shouldSleep: Bool = true) {
+
         self.init(dataBrokerID: id,
                   operationType: operationType,
                   showWebView: false,
+                  errorDelegate: errorDelegate,
                   operationDependencies: DefaultDataBrokerOperationDependencies.mock)
+
+        // Immediately fire this before as operations may have not started when they are interrupted
+        if shouldError {
+            errorDelegate.dataBrokerOperationDidError(DataBrokerProtectionError.noActionFound)
+        }
+
+        self.shouldSleep = shouldSleep
     }
 
     override func main() {
-        Thread.sleep(forTimeInterval: 1)
+        if shouldSleep {
+            Thread.sleep(forTimeInterval: 1)
+        }
         super.main()
+    }
+}
+
+final class MockDataBrokerOperationErrorDelegate: DataBrokerOperationErrorDelegate {
+
+    var operationErrors: [Error] = []
+
+    func dataBrokerOperationDidError(_ error: any Error) {
+        operationErrors.append(error)
     }
 }
 
 extension DefaultDataBrokerOperationDependencies {
     static var mock: DefaultDataBrokerOperationDependencies {
         DefaultDataBrokerOperationDependencies(database: MockDatabase(),
-                                               brokerTimeInterval: 1,
+                                               config: DataBrokerProtectionProcessorConfiguration(),
                                                runnerProvider: MockRunnerProvider(),
                                                notificationCenter: .default,
                                                pixelHandler: MockPixelHandler(),
@@ -1079,13 +1106,14 @@ final class MockDataBrokerOperationsCreator: DataBrokerOperationsCreator {
     var shouldError = false
     var createdType: OperationType = .scan
 
-    init(operationCollections: [DataBrokerOperation]) {
+    init(operationCollections: [DataBrokerOperation] = []) {
         self.operationCollections = operationCollections
     }
 
     func operations(forOperationType operationType: OperationType,
                     withPriorityDate priorityDate: Date?,
                     showWebView: Bool,
+                    errorDelegate: DataBrokerOperationErrorDelegate,
                     operationDependencies: DataBrokerOperationDependencies) throws -> [DataBrokerOperation] {
         guard !shouldError else { throw DataBrokerProtectionError.unknown("")}
         createdType = operationType

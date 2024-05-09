@@ -38,7 +38,7 @@ final class DataBrokerOperationsCreatorTests: XCTestCase {
         mockUserNotification = MockUserNotification()
 
         mockDependencies = DefaultDataBrokerOperationDependencies(database: mockDatabase,
-                                                        brokerTimeInterval: mockSchedulerConfig.intervalBetweenSameBrokerOperations,
+                                                        config: mockSchedulerConfig,
                                                         runnerProvider: mockRunnerProvider,
                                                         notificationCenter: .default,
                                                         pixelHandler: mockPixelHandler,
@@ -73,6 +73,7 @@ final class DataBrokerOperationsCreatorTests: XCTestCase {
         let result = try! sut.operations(forOperationType: .scan,
                                          withPriorityDate: Date(),
                                          showWebView: false,
+                                         errorDelegate: MockDataBrokerOperationErrorDelegate(),
                                          operationDependencies: mockDependencies)
 
         // Then
