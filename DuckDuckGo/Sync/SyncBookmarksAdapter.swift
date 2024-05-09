@@ -66,12 +66,12 @@ final class SyncBookmarksAdapter {
         database: CoreDataDatabase,
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
         appearancePreferences: AppearancePreferences = .shared,
-        syncAdapterErrorHandler: SyncErrorHandling
+        syncErrorHandler: SyncErrorHandling
     ) {
         self.database = database
         self.bookmarkManager = bookmarkManager
         self.appearancePreferences = appearancePreferences
-        self.syncErrorHandler = syncAdapterErrorHandler
+        self.syncErrorHandler = syncErrorHandler
         databaseCleaner = BookmarkDatabaseCleaner(
             bookmarkDatabase: database,
             errorEvents: BookmarksCleanupErrorHandling(),

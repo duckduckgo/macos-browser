@@ -39,7 +39,7 @@ final class SyncBookmarksAdapterTests: XCTestCase {
             return
         }
         database = CoreDataDatabase(name: "", containerLocation: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString), model: model, readOnly: true, options: [:])
-        adapter = SyncBookmarksAdapter(database: database, bookmarkManager: MockBookmarkManager(), syncAdapterErrorHandler: errorHandler)
+        adapter = SyncBookmarksAdapter(database: database, bookmarkManager: MockBookmarkManager(), syncErrorHandler: errorHandler)
         cancellables = []
     }
 
