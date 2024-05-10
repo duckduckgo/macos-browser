@@ -388,7 +388,7 @@ struct BitwardenDowngradeInfoView: View, PreferencesTabOpening {
                 HStack {
                     Text("1.")
                     Button(UserText.bitwardenIncompatibleStep1, action: {
-                        openNewTab(with: URL(string: "https://github.com/bitwarden/clients/releases/download/desktop-v2024.2.1/Bitwarden-2024.2.1-universal.dmg")!)
+                        openNewTab(with: URL(string: "https://github.com/bitwarden/clients/releases/download/desktop-v2024.4.3/Bitwarden-2024.4.3-universal.dmg")!)
                     }).foregroundColor(.accentColor)
                 }
                 Text(UserText.bitwardenIncompatibleStep2)
