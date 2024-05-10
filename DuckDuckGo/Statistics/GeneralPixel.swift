@@ -132,9 +132,6 @@ enum GeneralPixel: PixelKitEventV2 {
     case dataBrokerResetLoginItemDaily
     case dataBrokerDisableAndDeleteDaily
 
-    // DataBrokerProtection Other
-    case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
-
     // Default Browser
     case defaultRequestedFromHomepage
     case defaultRequestedFromHomepageSetupView
@@ -480,8 +477,6 @@ enum GeneralPixel: PixelKitEventV2 {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
-        case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
-            return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
         case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
             return "m_mac_dbp_remote_message_displayed_\(messageID)"
         case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
