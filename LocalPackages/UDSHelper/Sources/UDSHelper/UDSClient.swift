@@ -65,7 +65,7 @@ public actor UDSClient<Incoming: Codable, Outgoing: Codable> {
     /// Establishes a new connection
     ///
     private func connect() async throws -> NWConnection {
-        let shortSocketURL: URL
+        /*let shortSocketURL: URL
 
         do {
             shortSocketURL = try urlShortener.shorten(socketFileURL, symlinkName: "appgroup")
@@ -75,12 +75,12 @@ public actor UDSClient<Incoming: Codable, Outgoing: Codable> {
                    type: .error,
                    String(describing: error))
             throw error
-        }
+        }*/
 
-        os_log("UDSClient - Connecting to shortened path: %{public}@", log: log, type: .info, shortSocketURL.path)
+        //os_log("UDSClient - Connecting to shortened path: %{public}@", log: log, type: .info, shortSocketURL.path)
 
-        let endpoint = NWEndpoint.unix(path: shortSocketURL.path)
-        let parameters = NWParameters()
+        let endpoint = NWEndpoint.unix(path: socketFileURL.path)
+        let parameters = NWParameters.tcp
         let connection = NWConnection(to: endpoint, using: parameters)
         internalConnection = connection
 

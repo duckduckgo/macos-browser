@@ -138,6 +138,7 @@ extension Bundle {
 
 enum BundleGroup {
     case netP
+    case ipc
     case dbp
     case subs
 
@@ -145,6 +146,8 @@ enum BundleGroup {
         switch self {
         case .dbp:
             return "DBP_APP_GROUP"
+        case .ipc:
+            return "IPC_APP_GROUP"
         case .netP:
             return "NETP_APP_GROUP"
         case .subs:

@@ -50,7 +50,7 @@ final class TunnelControllerIPCService {
         self.statusReporter = statusReporter
         self.defaults = defaults
 
-        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .netP))!.appendingPathComponent("vpn.sock")
+        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
 
         udsServer = UDSServer<VPNIPCServerCommand>(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
 

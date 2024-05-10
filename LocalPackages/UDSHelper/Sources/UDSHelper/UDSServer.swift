@@ -101,10 +101,10 @@ public final class UDSServer<Message: Codable> {
             let params = NWParameters()
             let shortSocketURL = try fileManager.shortenSocketURL(socketFileURL: socketFileURL, symlinkName: "appgroup")
 
-            os_log("UDSServer - Listening on shortened path: %{public}@", log: log, type: .info, shortSocketURL.path)
+            //os_log("UDSServer - Listening on shortened path: %{public}@", log: log, type: .info, shortSocketURL.path)
 
             params.defaultProtocolStack.transportProtocol = NWProtocolTCP.Options()
-            params.requiredLocalEndpoint = NWEndpoint.unix(path: shortSocketURL.path)
+            params.requiredLocalEndpoint = NWEndpoint.unix(path: socketFileURL.path)
             params.allowLocalEndpointReuse = true
 
             listener = try NWListener(using: params)

@@ -56,7 +56,11 @@ extension FileManager {
 
         // Just make extra sure there's no pre-existing file at the shortened file path
         //try? removeItem(at: shortenedFileURL)
-        try createSymbolicLink(at: shortenedFileURL, withDestinationURL: fileURL)
+        do {
+            try createSymbolicLink(at: shortenedFileURL, withDestinationURL: fileURL)
+        } catch {
+            print(error.localizedDescription)
+        }
 
         return shortenedFileURL
     }
@@ -74,7 +78,7 @@ extension FileManager {
         let directoryURL = socketFileURL.deletingLastPathComponent()
         let shortenedDirectoryURL = try shortenURL(for: directoryURL, symlinkName: symlinkName)
         let shortSocketURL = shortenedDirectoryURL.appendingPathComponent(socketFileURL.lastPathComponent)
-/*
+
         do {
             try removeItem(at: shortSocketURL)
         } catch let error as CocoaError {
@@ -85,7 +89,7 @@ extension FileManager {
             default:
                 throw error
             }
-        }*/
+        }
 
         return shortSocketURL
     }

@@ -66,7 +66,7 @@ final class NetworkProtectionIPCTunnelController {
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
 
-        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .netP))!.appendingPathComponent("vpn.sock")
+        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroup(bundle: .ipc))!.appendingPathComponent("vpn.ipc")
 
         self.udsClient = UDSClient(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
         self.pixelKit = pixelKit

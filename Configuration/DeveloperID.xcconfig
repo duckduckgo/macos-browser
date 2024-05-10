@@ -45,16 +45,6 @@ NETP_APP_GROUP[config=Review][sdk=*] = $(NETP_BASE_APP_GROUP).review
 NETP_APP_GROUP[config=Debug][sdk=*] = $(NETP_BASE_APP_GROUP).debug
 NETP_APP_GROUP[config=Release][sdk=*] = $(NETP_BASE_APP_GROUP)
 
-// It's important to try and keep this app group short since some IPC
-// mechanisms require really short paths. For instance Unix Domain Sockets
-// support paths of up to 108 bytes in length
-// (di = developer ID)
-BASE_IPC_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.di.ipc
-IPC_APP_GROUP[config=CI][sdk=macos*] = $(BASE_IPC_APP_GROUP).debug
-IPC_APP_GROUP[config=Review][sdk=macos*] = $(BASE_IPC_APP_GROUP).review
-IPC_APP_GROUP[config=Debug][sdk=macos*] = $(BASE_IPC_APP_GROUP).debug
-IPC_APP_GROUP[config=Release][sdk=macos*] = $(BASE_IPC_APP_GROUP)
-
 SUBSCRIPTION_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).$(MAIN_BUNDLE_IDENTIFIER_PREFIX).subscription
 SUBSCRIPTION_APP_GROUP[config=CI][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).debug
 SUBSCRIPTION_APP_GROUP[config=Review][sdk=*] = $(SUBSCRIPTION_BASE_APP_GROUP).review
@@ -110,3 +100,21 @@ DBP_APP_GROUP[config=CI][sdk=*] = $(DBP_BASE_APP_GROUP).debug
 DBP_APP_GROUP[config=Review][sdk=*] = $(DBP_BASE_APP_GROUP).review
 DBP_APP_GROUP[config=Debug][sdk=*] = $(DBP_BASE_APP_GROUP).debug
 DBP_APP_GROUP[config=Release][sdk=*] = $(DBP_BASE_APP_GROUP)
+
+// IPC
+
+// IMPORTANT: The reason this app group was created is because IPC through
+// Unix Domain Sockets requires the socket file path to be no longer than
+// 108 characters.  Sandboxing requirements force us to place said socket
+// within an app group container.
+//
+// Name coding:
+//  - ipc.d = ipc developer id release
+//  - ipc.d.d = ipc developer id debug
+//  - ipc.d.r = ipc developer id review
+//
+IPC_APP_GROUP_BASE = $(DEVELOPMENT_TEAM).com.ddg.ipc
+IPC_APP_GROUP[config=CI][sdk=*] = $(IPC_APP_GROUP_BASE).d
+IPC_APP_GROUP[config=Review][sdk=*] = $(IPC_APP_GROUP_BASE).r
+IPC_APP_GROUP[config=Debug][sdk=*] = $(IPC_APP_GROUP_BASE).d
+IPC_APP_GROUP[config=Release][sdk=*] = $(IPC_APP_GROUP_BASE)
