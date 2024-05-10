@@ -30,8 +30,8 @@ extension OperationQueue: DataBrokerProtectionOperationQueue {}
 
 enum DataBrokerProtectionQueueMode {
     case idle
-    case immediate(completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
-    case scheduled(completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+    case immediate(completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
+    case scheduled(completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
 
     func canBeInterruptedBy(newMode: DataBrokerProtectionQueueMode) -> Bool {
         switch (self, newMode) {
@@ -54,10 +54,10 @@ protocol DataBrokerProtectionQueueManager {
 
     func startImmediateOperationsIfPermitted(showWebView: Bool,
                                              operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
     func startScheduledOperationsIfPermitted(showWebView: Bool,
                                              operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?)
+                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?)
 
     func stopAllOperations()
 }
@@ -85,7 +85,7 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
 
     func startImmediateOperationsIfPermitted(showWebView: Bool,
                                              operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
 
         let newMode = DataBrokerProtectionQueueMode.immediate(completion: completion)
         startOperationsIfPermitted(forNewMode: newMode,
@@ -99,7 +99,7 @@ final class DefaultDataBrokerProtectionQueueManager: DataBrokerProtectionQueueMa
 
     func startScheduledOperationsIfPermitted(showWebView: Bool,
                                              operationDependencies: DataBrokerOperationDependencies,
-                                             completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+                                             completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
         let newMode = DataBrokerProtectionQueueMode.scheduled(completion: completion)
         startOperationsIfPermitted(forNewMode: newMode,
                                    type: .all,
@@ -119,7 +119,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
                                     type: OperationType,
                                     showWebView: Bool,
                                     operationDependencies: DataBrokerOperationDependencies,
-                                    completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+                                    completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
 
         guard mode.canBeInterruptedBy(newMode: newMode) else {
             completion?(nil)
@@ -149,7 +149,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
                        priorityDate: Date? = nil,
                        showWebView: Bool,
                        operationDependencies: DataBrokerOperationDependencies,
-                       completion: ((DataBrokerProtectionSchedulerErrorCollection?) -> Void)?) {
+                       completion: ((DataBrokerProtectionAgentErrorCollection?) -> Void)?) {
 
         // Update broker files if applicable
         brokerUpdater?.checkForUpdatesInBrokerJSONFiles()
@@ -173,7 +173,7 @@ private extension DefaultDataBrokerProtectionQueueManager {
             }
         } catch {
             os_log("DataBrokerProtectionProcessor error: addOperations, error: %{public}@", log: .error, error.localizedDescription)
-            completion?(DataBrokerProtectionSchedulerErrorCollection(oneTimeError: error))
+            completion?(DataBrokerProtectionAgentErrorCollection(oneTimeError: error))
             return
         }
 
@@ -183,8 +183,8 @@ private extension DefaultDataBrokerProtectionQueueManager {
         }
     }
 
-    func errorCollection() -> DataBrokerProtectionSchedulerErrorCollection? {
-        return operationErrors.count != 0 ? DataBrokerProtectionSchedulerErrorCollection(operationErrors: operationErrors) : nil
+    func errorCollection() -> DataBrokerProtectionAgentErrorCollection? {
+        return operationErrors.count != 0 ? DataBrokerProtectionAgentErrorCollection(operationErrors: operationErrors) : nil
     }
 
     func firePixels(operationDependencies: DataBrokerOperationDependencies) {

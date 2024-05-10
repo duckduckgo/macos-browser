@@ -63,7 +63,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         let mockOperationsWithError = [3, 4].map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut, shouldError: true, shouldSleep: false) }
         mockOperationsCreator.operationCollections = mockOperations + mockOperationsWithError
         let expectation = expectation(description: "Expected errors to be returned in completion")
-        var errorCollection: DataBrokerProtectionSchedulerErrorCollection!
+        var errorCollection: DataBrokerProtectionAgentErrorCollection!
         let expectedConcurrentOperations = DataBrokerProtectionProcessorConfiguration().concurrentOperationsFor(.scan)
 
         // When
@@ -89,7 +89,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         let mockOperationsWithError = [3, 4].map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut, shouldError: true, shouldSleep: false) }
         mockOperationsCreator.operationCollections = mockOperations + mockOperationsWithError
         let expectation = expectation(description: "Expected errors to be returned in completion")
-        var errorCollection: DataBrokerProtectionSchedulerErrorCollection!
+        var errorCollection: DataBrokerProtectionAgentErrorCollection!
         let expectedConcurrentOperations = DataBrokerProtectionProcessorConfiguration().concurrentOperationsFor(.all)
 
         // When
@@ -114,7 +114,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         var mockOperations = (1...5).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut) }
         let mockOperationsWithError = (6...10).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut, shouldError: true) }
         mockOperationsCreator.operationCollections = mockOperations + mockOperationsWithError
-        var errorCollection: DataBrokerProtectionSchedulerErrorCollection!
+        var errorCollection: DataBrokerProtectionAgentErrorCollection!
 
         // When
         sut.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { errors in
@@ -147,7 +147,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         var mockOperations = (1...5).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut) }
         var mockOperationsWithError = (6...10).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut, shouldError: true) }
         mockOperationsCreator.operationCollections = mockOperations + mockOperationsWithError
-        var errorCollection: DataBrokerProtectionSchedulerErrorCollection!
+        var errorCollection: DataBrokerProtectionAgentErrorCollection!
 
         // When
         sut.startImmediateOperationsIfPermitted(showWebView: false, operationDependencies: mockDependencies) { _ in }
@@ -183,7 +183,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
                                                       mismatchCalculator: mockMismatchCalculator,
                                                       brokerUpdater: mockUpdater)
         let expectation = expectation(description: "Expected completion to be called")
-        var errorCollection: DataBrokerProtectionSchedulerErrorCollection!
+        var errorCollection: DataBrokerProtectionAgentErrorCollection!
 
         // When
         sut.startImmediateOperationsIfPermitted(showWebView: false,
@@ -207,7 +207,7 @@ final class DataBrokerProtectionQueueManagerTests: XCTestCase {
         let mockOperationsWithError = (6...10).map { MockDataBrokerOperation(id: $0, operationType: .scan, errorDelegate: sut, shouldError: true) }
         mockOperationsCreator.operationCollections = mockOperations + mockOperationsWithError
         let expectation = expectation(description: "Expected completion to be called")
-        var errorCollection: DataBrokerProtectionSchedulerErrorCollection!
+        var errorCollection: DataBrokerProtectionAgentErrorCollection!
 
         // When
         sut.startImmediateOperationsIfPermitted(showWebView: false,
