@@ -333,15 +333,15 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     deinit {
-        cleanUpBeforeClosing(onDeinit: true, webView: webView)
+        cleanUpBeforeClosing(onDeinit: true, webView: webView, userContentController: userContentController)
     }
 
     func cleanUpBeforeClosing() {
-        cleanUpBeforeClosing(onDeinit: false, webView: webView)
+        cleanUpBeforeClosing(onDeinit: false, webView: webView, userContentController: userContentController)
     }
 
     @MainActor(unsafe)
-    private func cleanUpBeforeClosing(onDeinit: Bool, webView: WebView) {
+    private func cleanUpBeforeClosing(onDeinit: Bool, webView: WebView, userContentController: UserContentController?) {
         let job = { [webView, userContentController] in
             webView.stopAllMedia(shouldStopLoading: true)
 
