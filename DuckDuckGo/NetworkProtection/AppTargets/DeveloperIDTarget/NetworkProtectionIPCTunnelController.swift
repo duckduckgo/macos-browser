@@ -19,31 +19,39 @@
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
+import UDSHelper
 
 final class NetworkProtectionIPCTunnelController: TunnelController {
 
     private let loginItemsManager: LoginItemsManager
     private let ipcClient: TunnelControllerIPCClient
+    private let udsClient: UDSClient<VPNIPCClientCommand, VPNIPCServerCommand>
 
     init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
-         ipcClient: TunnelControllerIPCClient) {
+         ipcClient: TunnelControllerIPCClient,
+         fileManager: FileManager = .default) {
 
         self.loginItemsManager = loginItemsManager
         self.ipcClient = ipcClient
+
+        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.ipcAppGroupName)!.appendingPathComponent("vpn.sock")
+        self.udsClient = UDSClient(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
     }
 
     @MainActor
     func start() async {
         enableLoginItems()
 
-        ipcClient.start()
+        //ipcClient.start()
+        try? await udsClient.send(.start)
     }
 
     @MainActor
     func stop() async {
         enableLoginItems()
 
-        ipcClient.stop()
+        //ipcClient.stop()
+        try? await udsClient.send(.stop)
     }
 
     /// Queries Network Protection to know if its VPN is connected.

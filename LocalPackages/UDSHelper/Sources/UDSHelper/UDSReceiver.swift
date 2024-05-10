@@ -136,10 +136,10 @@ struct UDSReceiver<Message: Codable> {
         }
     }
 
-    /// Receive a message decoding received data of the specified length.
+    /// Decodes an incoming message.
     ///
     /// - Parameters:
-    ///     - length: the length of the data we expect to receive for decoding the next message.
+    ///     - length: the length of the data that represents the next message.
     ///     - connection: the connection through which we're receiving the message.
     ///
     /// - Returns: a message on success.

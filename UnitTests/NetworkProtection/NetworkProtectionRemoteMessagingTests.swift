@@ -338,7 +338,7 @@ private final class MockNetworkProtectionRemoteMessagingStorage: HomePageRemoteM
         _storedMessages
     }
 
-    func store<Message: Codable>(messages: [Message]) throws {
+    func store<Command: Codable>(messages: [Command]) throws {
         if let messages = messages as? [NetworkProtectionRemoteMessage] {
             self._storedMessages = messages
         } else {
@@ -346,8 +346,8 @@ private final class MockNetworkProtectionRemoteMessagingStorage: HomePageRemoteM
         }
     }
 
-    func storedMessages<Message: Codable>() -> [Message] {
-        return _storedMessages as! [Message]
+    func storedMessages<Command: Codable>() -> [Command] {
+        return _storedMessages as! [Command]
     }
 
     func dismissRemoteMessage(with id: String) {

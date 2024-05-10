@@ -112,7 +112,6 @@ extension Bundle {
         return appGroup
     }
 
-
     var ipcAppGroupName: String {
         guard let appGroup = object(forInfoDictionaryKey: Keys.ipcAppGroup) as? String else {
             fatalError("Info.plist is missing \(Keys.ipcAppGroup)")

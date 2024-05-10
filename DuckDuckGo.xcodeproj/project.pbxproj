@@ -2196,6 +2196,7 @@
 		7BA7CC5D2AD120C30042E5CE /* EventMapping+NetworkProtectionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60722A0B29FA00BCD287 /* EventMapping+NetworkProtectionError.swift */; };
 		7BA7CC5F2AD1210C0042E5CE /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA7CC5E2AD1210C0042E5CE /* Networking */; };
 		7BA7CC612AD1211C0042E5CE /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA7CC602AD1211C0042E5CE /* Networking */; };
+		7BA983D22B5B39FB00BF4F34 /* UDSHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA983D12B5B39FB00BF4F34 /* UDSHelper */; };
 		7BAF9E4B2A8A3CC9002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BAF9E4C2A8A3CCA002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
@@ -4555,6 +4556,7 @@
 				31A3A4E32B0C115F0021063C /* DataBrokerProtection in Frameworks */,
 				378F44E429B4BDE900899924 /* SwiftUIExtensions in Frameworks */,
 				1E950E432912A10D0051A99B /* UserScript in Frameworks */,
+				7BA983D22B5B39FB00BF4F34 /* UDSHelper in Frameworks */,
 				CBC83E3629B63D380008E19C /* Configuration in Frameworks */,
 				7B31FD8C2AD125620086AA24 /* NetworkProtectionIPC in Frameworks */,
 				37269EFB2B332F9E005E8E46 /* Common in Frameworks */,
@@ -8552,6 +8554,7 @@
 				37269EFA2B332F9E005E8E46 /* Common */,
 				3722177F2B3337FE00B8E9C2 /* TestUtils */,
 				373FB4B02B4D6C42004C88D6 /* PreferencesViews */,
+				7BA983D12B5B39FB00BF4F34 /* UDSHelper */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -13555,6 +13558,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Networking;
+		};
+		7BA983D12B5B39FB00BF4F34 /* UDSHelper */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UDSHelper;
 		};
 		7BBD44272AD730A400D0A064 /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -28,7 +28,8 @@ extension FileManager {
             return fileURL
         }
 
-        try removeItem(at: shortenedFileURL)
+        // Just make extra sure there's nothing there
+        try? removeItem(at: shortenedFileURL)
         try createSymbolicLink(at: shortenedFileURL, withDestinationURL: fileURL)
 
         return shortenedFileURL
