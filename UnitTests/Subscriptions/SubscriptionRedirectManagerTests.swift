@@ -17,7 +17,7 @@
 //
 
 import XCTest
-import SubscriptionTestingUtilities
+import SubscriptionTestUtils
 @testable import DuckDuckGo_Privacy_Browser
 
 final class SubscriptionRedirectManagerTests: XCTestCase {
@@ -39,7 +39,7 @@ final class SubscriptionRedirectManagerTests: XCTestCase {
     func testWhenURLIsPrivacyProAndHasOriginQueryParameterThenRedirectToSubscriptionBaseURLAndAppendQueryParameter() throws {
         // GIVEN
         let url = try XCTUnwrap(URL(string: "https://www.duckduckgo.com/pro?origin=test"))
-        let expectedURL = URL.subscriptionBaseURL.appendingQueryItem(.init(name: "origin", value: "test"))
+        let expectedURL = URL.subscriptionBaseURL.appending(percentEncodedQueryItem: .init(name: "origin", value: "test"))
 
         // WHEN
         let result = sut.redirectURL(for: url)

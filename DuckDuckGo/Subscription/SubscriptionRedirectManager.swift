@@ -44,7 +44,7 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
             let shouldHidePrivacyProDueToNoProducts = SubscriptionPurchaseEnvironment.current == .appStore && SubscriptionPurchaseEnvironment.canPurchase == false
             let isPurchasePageRedirectActive = isFeatureAvailable && !shouldHidePrivacyProDueToNoProducts
             // Look for `origin` query parameter and store in the UserDefaults.
-            let originQueryItem = url.queryItem(withName: AttributionParameter.origin)
+            let originQueryItem = url.getQueryItem(named: AttributionParameter.origin)
             originStore.origin = originQueryItem?.value
             // If origin query parameter exists forward it to the redirect URL
             return isPurchasePageRedirectActive ? purchasePageRedirectURL(for: url, originQueryItem: originQueryItem) : nil
@@ -55,6 +55,6 @@ final class PrivacyProSubscriptionRedirectManager: SubscriptionRedirectManager {
 
     private func purchasePageRedirectURL(for url: URL, originQueryItem: URLQueryItem?) -> URL {
         originQueryItem
-            .flatMap(URL.subscriptionBaseURL.appendingQueryItem(_:)) ?? URL.subscriptionBaseURL
+            .flatMap(URL.subscriptionBaseURL.appending(percentEncodedQueryItem:)) ?? URL.subscriptionBaseURL
     }
 }
