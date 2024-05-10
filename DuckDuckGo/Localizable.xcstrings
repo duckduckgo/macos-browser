@@ -6431,55 +6431,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Die folgenden Bitwarden-Versionen sind mit DuckDuckGo inkompatibel: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Bitte kehre zu einer älteren Version zurück, indem du die folgenden Schritte ausführst:"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please revert to an older version by following these steps:"
+            "value" : "The following Bitwarden versions are incompatible with DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Please update to a newer version by following these steps:"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Las siguientes versiones de Bitwarden son incompatibles con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Vuelve a una versión anterior siguiendo estos pasos:"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Les versions suivantes de Bitwarden sont incompatibles avec DuckDuckGo : v2024.3.0, v2024.3.2, v2024.4.0 et v2024.4.1. Veuillez revenir à une version antérieure en procédant comme suit :"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Le seguenti versioni di Bitwarden non sono compatibili con DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. È necessario tornare a una versione precedente seguendo questi passaggi:"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "De volgende versies van Bitwarden zijn niet compatibel met DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Volg deze stappen om terug te gaan naar een oudere versie:"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Następujące wersje Bitwarden są niezgodne z DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0, v2024.4.1. Przywróć starszą wersję, wykonując następujące czynności:"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "As seguintes versões do Bitwarden são incompatíveis com o DuckDuckGo: v2024.3.0, v2024.3.2, v2024.4.0 e v2024.4.1. Reverte para uma versão mais antiga seguindo estes passos:"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "С DuckDuckGo несовместимы следующие версии Bitwarden: 2024.3.0, 2024.3.2, 2024.4.0, 2024.4.1. Вернитесь к более старой версии, выполнив следующие действия:"
           }
         }
@@ -6491,55 +6491,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "V2014.2.1 herunterladen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Download v2014.2.1"
+            "value" : "Download v2024.4.3"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Descargar v2014.2.1"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Télécharger v2014.2.1"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Scarica la versione v2014.2.1"
           }
         },
         "nl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Download v2014.2.1"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Pobierz v2014.2.1"
           }
         },
         "pt" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Transfere a versão v2014.2.1"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Скачайте версию 2014.2.1"
           }
         }
