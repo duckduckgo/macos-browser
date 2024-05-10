@@ -52,7 +52,6 @@ final class SyncCredentialsAdapter {
         }
     }
 
-    // swiftlint:disable:next function_body_length
     func setUpProviderIfNeeded(
         secureVaultFactory: AutofillVaultFactory,
         metadataStore: SyncMetadataStore,
