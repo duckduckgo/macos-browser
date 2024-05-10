@@ -146,8 +146,8 @@ final class DuckPlayer {
                 // If user checks "Remember my choice" and clicks "Watch here", we won't show
                 // the overlay anymore, but will keep presenting Dax logos (the mode stays at
                 // "alwaysAsk" which may be a bit counterintuitive, but it's the overlayInteracted
-                // flag that plays a role here. We want to track users opting in to not showing overlays,
-                // hence fiting the pixel here.
+                // flag that plays a role here). We want to track users opting in to not showing overlays,
+                // hence firing the pixel here.
                 if userValues.duckPlayerMode == .alwaysAsk {
                     switch origin {
                     case .serpOverlay:

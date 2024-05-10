@@ -16,9 +16,8 @@
 //  limitations under the License.
 //
 
-import Combine
 import Foundation
-import PixelKit
+import Combine
 
 protocol DuckPlayerPreferencesPersistor {
     /// The persistor hadles raw Bool values but each one translates into a DuckPlayerMode:
